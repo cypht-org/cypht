@@ -13,11 +13,14 @@ ob_start();
 require_once('framework.php');
 require_once('session.php');
 require_once('output.php');
-require_once('pages.php');
+require_once('handlers.php');
+
+/* get configuration */
+$config = new Hm_Config_File('/etc/hastymail2/hastymail2.rc');
 
 /* process request input */
 $router = new Hm_Router();
-$response = $router->process_request();
+$response = $router->process_request($config);
 
 /* format response content */
 $formatter = new $response['format']();

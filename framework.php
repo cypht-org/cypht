@@ -1,5 +1,45 @@
 <?php
 
+/* base configuration */
+abstract class Hm_Config {
+
+    protected $source = false;
+    protected $config = array();
+
+    abstract protected function load($source);
+    abstract protected function dump();
+    abstract protected function set_var($name, $value);
+    abstract protected function get_var($name, $default=false);
+}
+
+/* file based configuration */
+class Hm_Config_File extends Hm_Config {
+
+    public function __construct($source) {
+        $this->load($source);
+    }
+
+    protected function load($source) {
+        $data = unserialize(file_get_contents($source));
+        if ($data) {
+            $this->config = array_merge($this->config, $data);
+        }
+    }
+
+    public function dump() {
+        return $this->config;
+    }
+
+    protected function set_var($name, $value) {
+        $this->config[$name] = $value;
+    }
+
+    protected function get_var($name, $default=false) {
+        return isset($this->config[$name]) ? $this->config[$name] : $default;
+    }
+}
+
+
 /* handle page processing delegation */
 class Hm_Router {
 
@@ -9,11 +49,11 @@ class Hm_Router {
     public $type = false;
     public $sapi = false;
 
-    public function process_request() {
+    public function process_request($config) {
         $request = new Hm_Request();
         $session = new Hm_Session_PHP($request);
         $this->get_page($request);
-        $result = $this->merge_response($this->process_page($request, $session), $request);
+        $result = $this->merge_response($this->process_page($request, $session, $config), $request);
         $session->end();
         return $result;
     }
@@ -29,12 +69,12 @@ class Hm_Router {
         }
     }
 
-    private function process_page($request, $session) {
+    private function process_page($request, $session, $config) {
         $response = array();
         $handler_name = $this->pages[$this->page];
         if (class_exists($handler_name)) {
             $handler = new $handler_name();
-            $response = $handler->process_request($request, $session);
+            $response = $handler->process_request($request, $session, $config);
         }
         else {
             die(sprintf("Page handler for page %s not found", $this->page));

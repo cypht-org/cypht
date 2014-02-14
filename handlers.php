@@ -1,14 +1,16 @@
 <?php
 
-abstract class Hm_Page_Handler {
+abstract class Hm_Request_Handler {
 
     protected $request = false;
     protected $session = false;
+    protected $config = false;
     protected $response = '';
 
-    public function process_request(Hm_Request $request, Hm_Session $session) {
+    public function process_request($request, $session, $config) {
         $this->request = $request;
         $this->session = $session;
+        $this->config = $config;
         $this->process_request_actions();
         return $this->response();
     }
@@ -19,7 +21,7 @@ abstract class Hm_Page_Handler {
     abstract protected function process_request_actions();
 }
 
-class Hm_Home extends Hm_Page_Handler {
+class Hm_Home extends Hm_Request_Handler {
 
     protected function process_request_actions() {
         $this->response = array(
@@ -29,7 +31,7 @@ class Hm_Home extends Hm_Page_Handler {
     }
 }
 
-class Hm_Notfound extends Hm_Page_Handler {
+class Hm_Notfound extends Hm_Request_Handler {
 
     protected function process_request_actions() {
         $this->response = array(
