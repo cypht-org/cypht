@@ -44,7 +44,10 @@ class Hm_Config_File extends Hm_Config {
 class Hm_Router {
 
     private $page = 'home';
-    private $pages = array('home' => 'Hm_Home', 'notfound' => 'Hm_Notfound');
+    private $pages = array(
+        'home'      => 'Hm_Home',
+        'notfound'  => 'Hm_Notfound',
+    );
 
     public $type = false;
     public $sapi = false;
@@ -53,9 +56,29 @@ class Hm_Router {
         $request = new Hm_Request();
         $session = new Hm_Session_PHP($request);
         $this->get_page($request);
-        $result = $this->merge_response($this->process_page($request, $session, $config), $request);
+        $this->forward_redirect_messages($session);
+        $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
+        $this->check_for_redirect($request, $session);
         $session->end();
         return $result;
+    }
+
+    private function forward_redirect_messages($session) {
+        $redirect_msgs = $session->get('redirect_messages', array());
+        if (!empty($redirect_msgs)) {
+            array_walk($redirect_msgs, function($v) { Hm_Msgs::add($v); });
+            $session->del('redirect_messages');
+        }
+    }
+
+    private function check_for_redirect($request, $session) {
+        if (!empty($request->post)) {
+            $msgs = Hm_Msgs::get();
+            if (!empty($msgs)) {
+                $session->set('redirect_messages', $msgs);
+            }
+            $this->redirect($request->uri);
+        }
     }
 
     private function get_page($request) {
@@ -74,7 +97,7 @@ class Hm_Router {
         $handler_name = $this->pages[$this->page];
         if (class_exists($handler_name)) {
             $handler = new $handler_name();
-            $response = $handler->process_request($request, $session, $config);
+            $response = $handler->process_request($this->page, $request, $session, $config);
         }
         else {
             die(sprintf("Page handler for page %s not found", $this->page));
@@ -82,12 +105,20 @@ class Hm_Router {
         return $response;
     }
 
-    private function merge_response($response, $request) {
+    private function merge_response($response, $request, $session) {
         return array_merge($response, array(
-            'type' => $request->type,
-            'sapi' => $request->sapi,
-            'format' => $request->format
+            'router_page_name'    => $this->page,
+            'router_request_type' => $request->type,
+            'router_sapi_name'    => $request->sapi,
+            'router_format_name'  => $request->format,
+            'router_login_state'  => $session->active
         ));
+    }
+
+    public function redirect($url) {
+        header('HTTP/1.1 303 Found');
+        header('Location: '.$url);
+        exit;
     }
 }
 
@@ -210,13 +241,21 @@ class Hm_Request {
 class Hm_Validator {
 
     private static $allowed_input = array(
-        'page'        => 'string',
-        'uri'         => 'string',
-        'server_addr' => 'string',
-        'server_port' => 'int',
-        'script'      => 'string',
-        'server'      => 'string',
-        'agent'       => 'string'
+        'page'            => 'string',
+        'username'        => 'string',
+        'password'        => 'string',
+        'uri'             => 'string',
+        'server_addr'     => 'string',
+        'script'          => 'string',
+        'server'          => 'string',
+        'PHPSESSID'       => 'string',
+        'agent'           => 'string',
+        'logout'          => 'string',
+        'new_imap_server' => 'string',
+        'submit_server'   => 'string',
+        'server_port'     => 'int',
+        'new_imap_port'   => 'int',
+        'tls'             => 'int'
     );
 
     public static function whitelist($name, $value) {
@@ -229,7 +268,6 @@ class Hm_Validator {
         return $value;
     }
 
-    /* TODO: not ascii? */
     public static function is_valid($name, $value) {
         $type = self::$allowed_input[$name];
         return self::{'validate_'.$type}($value);
@@ -244,18 +282,56 @@ class Hm_Validator {
     }
 }
 
-/* debug output */
-class Hm_Debug {
+/* interface and debug mssages */
+Trait Hm_List {
 
-    private static $debug = array();
+    private static $msgs = array();
 
     public static function add($string) {
-        self::$debug[] = $string;
+        self::$msgs[] = $string;
+    }
+
+    public static function get() {
+        return self::$msgs;
     }
 
     public static function show() {
-        print_r(self::$debug);
+        print_r(self::$msgs);
     }
 }
+class Hm_Debug { use Hm_List; }
+class Hm_Msgs { use Hm_List; }
+
+/* modules */
+trait Hm_Modules {
+
+    private static $module_list = array();
+
+    public static function add($page, $module, $logged_in, $module_args=array()) {
+        if (!isset(self::$module_list[$page])) {
+            self::$module_list[$page] = array();
+        }
+        self::$module_list[$page][$module] = array('logged_in' => $logged_in, 'args' => $module_args);
+    }
+
+    public static function del($page, $module) {
+        if (isset(self::$module_list[$page][$module])) {
+            unset(self::$module_list[$page][$module]);
+        }
+    }
+
+    public static function get_for_page($page) {
+        $res = array();
+        if (isset(self::$module_list[$page])) {
+            $res = array_merge($res, self::$module_list[$page]);
+        }
+        if (isset(self::$module_list['*'])) {
+            $res = array_merge($res, self::$module_list['*']);
+        }
+        return $res;
+    }
+}
+class Hm_Handler_Modules { use Hm_Modules; }
+class Hm_Output_Modules { use Hm_Modules; }
 
 ?>
