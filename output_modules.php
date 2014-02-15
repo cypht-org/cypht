@@ -46,13 +46,17 @@ class Hm_Output_Module_Logout extends Hm_Output_Module {
 
 class Hm_Output_Module_Msgs extends Hm_Output_Module {
     public function output($input, $format) {
-        $res = '<div class="sys_messages"><div class="subtitle">Notices: </div>';
-        if ($format == 'HTML5') {
-            foreach (Hm_Msgs::get() as $val) {
-                $res .= $val.' ';
+        $res = '';
+        $msgs = Hm_Msgs::get();
+        if (!empty($msgs)) {
+            $res .= '<div class="sys_messages"><span class="subtitle">Notices: </span>';
+            if ($format == 'HTML5') {
+                foreach ($msgs as $val) {
+                    $res .= $val.' ';
+                }
             }
+            $res .= '</div>';
         }
-        $res .= '</div>';
         return $res;
     }
 }
@@ -71,6 +75,7 @@ class Hm_Output_Module_Imap_setup_display extends Hm_Output_Module {
                     ' Username: <input type="text" name="imap_user" value="">'.
                     ' Password: <input type="password" name="imap_pass">'.
                     ' <input type="submit" value="Connect" name="connect" />'.
+                    ' <input type="submit" value="Delete" name="connect" />'.
                     '</form></div>';
             }
             $res .= '</div>';

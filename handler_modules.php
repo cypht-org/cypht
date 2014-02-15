@@ -1,7 +1,6 @@
 <?php
 
 abstract class Hm_Handler_Module {
-
     protected $session = false;
     protected $request = false;
     protected $config = false;
@@ -15,7 +14,6 @@ abstract class Hm_Handler_Module {
     }
 
     abstract public function process($data);
-
 }
 
 class Hm_Handler_Module_Title extends Hm_Handler_Module {
@@ -72,6 +70,7 @@ class Hm_Handler_Module_Imap_setup extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_Module_Imap_setup_display extends Hm_Handler_Module {
     public function process($data) {
         $data['imap_servers'] = array();
@@ -82,6 +81,7 @@ class Hm_Handler_Module_Imap_setup_display extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_Module_Imap_connect extends Hm_Handler_Module {
     public function process($data) {
         $post = $this->request->post;
