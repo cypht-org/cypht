@@ -4,6 +4,7 @@
 Hm_Handler_Modules::add('home', 'title', true);
 Hm_Handler_Modules::add('home', 'date', true);
 Hm_Handler_Modules::add('home', 'logout', true);
+Hm_Handler_Modules::add('home', 'imap_delete', true);
 Hm_Handler_Modules::add('home', 'imap_setup', true);
 Hm_Handler_Modules::add('home', 'login', false);
 Hm_Handler_Modules::add('home', 'imap_setup_display', true);

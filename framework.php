@@ -267,7 +267,9 @@ class Hm_Validator {
         'tls'             => 'int',
         'imap_server_id'  => 'int',
         'imap_user'       => 'string',
-        'imap_pass'       => 'string'
+        'imap_pass'       => 'string',
+        'imap_delete'     => 'string',
+
     );
 
     public static function whitelist($name, $value) {

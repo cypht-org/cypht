@@ -104,6 +104,18 @@ class Hm_Handler_Module_Imap_connect extends Hm_Handler_Module {
     }
 }
 
-
+class Hm_Handler_Module_Imap_delete extends Hm_Handler_Module {
+    public function process($data) {
+        $post = $this->request->post;
+        if (isset($post['imap_server_id']) && isset($post['imap_delete']) && isset($post['imap_server_id'])) {
+            $servers = $this->session->get('imap_servers', array());
+            if (isset($servers[$post['imap_server_id']])) {
+                unset($servers[$post['imap_server_id']]);
+                $this->session->set('imap_servers', $servers);
+            }
+        }
+        return $data;
+    }
+}
 
 ?>
