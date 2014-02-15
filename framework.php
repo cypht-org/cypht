@@ -283,7 +283,7 @@ class Hm_Validator {
 }
 
 /* interface and debug mssages */
-Trait Hm_List {
+trait Hm_List {
 
     private static $msgs = array();
 
@@ -307,11 +307,32 @@ trait Hm_Modules {
 
     private static $module_list = array();
 
-    public static function add($page, $module, $logged_in, $module_args=array()) {
+    public static function add($page, $module, $logged_in, $marker=false, $placement='after', $module_args=array()) {
+        $inserted = false;
         if (!isset(self::$module_list[$page])) {
             self::$module_list[$page] = array();
         }
-        self::$module_list[$page][$module] = array('logged_in' => $logged_in, 'args' => $module_args);
+        if ($marker) {
+            $mods = array_keys(self::$module_list[$page]);
+            $index = array_search($marker, $mods);
+            if ($index !== false) {
+                if ($placement == 'after') {
+                    $index++;
+                }
+                $list = self::$module_list[$page];
+                self::$module_list[$page] = array_merge(array_slice($list, 0, $index), 
+                    array($module => array('logged_in' => $logged_in, 'args' => $module_args)),
+                    array_slice($list, $index));
+                $inserted = true;
+            }
+        }
+        else {
+            $inserted = true;
+            self::$module_list[$page][$module] = array('logged_in' => $logged_in, 'args' => $module_args);
+        }
+        if (!$inserted) {
+            Hm_Msgs::add(sprintf('failed to insert module %s', $module));
+        }
     }
 
     public static function del($page, $module) {
@@ -324,9 +345,6 @@ trait Hm_Modules {
         $res = array();
         if (isset(self::$module_list[$page])) {
             $res = array_merge($res, self::$module_list[$page]);
-        }
-        if (isset(self::$module_list['*'])) {
-            $res = array_merge($res, self::$module_list['*']);
         }
         return $res;
     }

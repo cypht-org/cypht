@@ -5,15 +5,11 @@ abstract class HM_Format {
 
     protected $modules = false;
 
-    abstract protected function header($input);
     abstract protected function content($input);
-    abstract protected function footer($input);
 
     public function format_content($input) {
         $this->modules = Hm_Output_Modules::get_for_page($input['router_page_name']);
-        $formatted = $this->header($input);
-        $formatted .= $this->content($input);
-        $formatted .= $this->footer($input);
+        $formatted = $this->content($input);
         return $formatted;
     }
 
@@ -38,12 +34,6 @@ abstract class HM_Format {
 /* JSON output format */
 class Hm_Format_JSON extends HM_Format {
 
-    public function header($input) {
-        return '';
-    }
-    public function footer($input) {
-        return '';
-    }
     public function content($input) {
         return json_encode($input, JSON_FORCE_OBJECT);
     }
@@ -52,37 +42,8 @@ class Hm_Format_JSON extends HM_Format {
 /* HTML5 output format */
 class Hm_Format_HTML5 extends HM_Format {
 
-    public function header($input) {
-        return '<!DOCTYPE html><html lang=en-us><head>'.
-            '</head><body>';
-    }
-    public function footer($input) {
-        return '</body></html>';
-    }
-
-    public function js($input) {
-        return '<script type="text/javascript" src="jquery-1.11.0.min.js"></script>';
-    }
-
-    public function css($input) {
-        return '<style type="text/css">'.
-            '.add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }'.
-            '.subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%; }'.
-            '.date { float: right; }'.
-            '.imap_connect { display: inline; }'.
-            '.add_server { float: left; clear: left; margin-bottom: 10px; }'.
-            '.sys_messages { float: left; clear: left; }'.
-            '.logout_form { float: right; clear: none; padding-left: 10px; margin-top: -5px; }'.
-            '.configured_servers { float: left; clear: left; margin-bottom: 10px; }'.
-            '.logged_in { float: right; padding-right: 10px; }'.
-            '.title { font-weight: bold; float: left; padding: 0px; font-size: 125%; margin: 0px; padding-bottom: 10px; }'.
-            '</style>';
-    }
-
     public function content($input) {
         $output = $this->run_modules($input, 'HTML5');
-        $output[] = $this->js($input);
-        $output[] = $this->css($input);
         return implode('', $output);
     }
 }
@@ -90,19 +51,8 @@ class Hm_Format_HTML5 extends HM_Format {
 /* CLI compatible output format */
 class Hm_Format_Terminal extends HM_Format {
 
-    public function header($input) {
-        return "\n";
-    }
-    public function footer($input) {
-        return "\n";
-    }
     public function content($input) {
-        if (is_string($input)) {
-            return wordwrap($input, 80, "\n", true);
-        }
-        else {
-            return sprintf("Title: %s\n", $input['title']);
-        }
+        return implode('', $this->run_modules($input, 'CLI'));
     }
 }
 

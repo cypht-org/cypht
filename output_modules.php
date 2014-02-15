@@ -85,5 +85,48 @@ class Hm_Output_Module_Imap_setup extends Hm_Output_Module {
         return $res;
     }
 }
+class Hm_Output_Module_Header extends Hm_Output_Module {
+    public function output($input, $format) {
+        if ($format == 'HTML5' ) {
+        return '<!DOCTYPE html><html lang=en-us><head></head><body>';
+        }
+        return '';
+    }
+}
+class Hm_Output_Module_Footer extends Hm_Output_Module {
+    public function output($input, $format) {
+        if ($format == 'HTML5' ) {
+        return '</body></html>';
+        }
+        return '';
+    }
+}
+class Hm_Output_Module_Jquery extends Hm_Output_Module {
+    public function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<script type="text/javascript" src="jquery-1.11.0.min.js"></script>';
+        }
+        return '';
+    }
+}
+class Hm_Output_Module_Css extends Hm_Output_Module {
+    public function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<style type="text/css">'.
+                '.add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }'.
+                '.subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%; }'.
+                '.date { float: right; }'.
+                '.imap_connect { display: inline; }'.
+                '.add_server { float: left; clear: left; margin-bottom: 10px; }'.
+                '.sys_messages { float: left; clear: left; }'.
+                '.logout_form { float: right; clear: none; padding-left: 10px; margin-top: -5px; }'.
+                '.configured_servers { float: left; clear: left; margin-bottom: 10px; }'.
+                '.logged_in { float: right; padding-right: 10px; }'.
+                '.title { font-weight: bold; float: left; padding: 0px; font-size: 125%; margin: 0px; padding-bottom: 10px; }'.
+                '</style>';
+        }
+        return '';
+    }
+}
 
 ?>
