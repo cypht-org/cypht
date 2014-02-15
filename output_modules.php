@@ -46,41 +46,44 @@ class Hm_Output_Module_Logout extends Hm_Output_Module {
 
 class Hm_Output_Module_Msgs extends Hm_Output_Module {
     public function output($input, $format) {
-        $res = '<div class="sys_messages"><div class="subtitle">Messages</div>';
+        $res = '<div class="sys_messages"><div class="subtitle">Notices: </div>';
         if ($format == 'HTML5') {
             foreach (Hm_Msgs::get() as $val) {
-                $res .= '<div>'.$val.'</div>';
+                $res .= $val.' ';
             }
         }
         $res .= '</div>';
         return $res;
     }
 }
+
 class Hm_Output_Module_Imap_setup_display extends Hm_Output_Module {
     public function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
             $res = '<div class="configured_servers"><div class="subtitle">Configured Servers</div>';
             foreach ($input['imap_servers'] as $index => $vals) {
-                $res .= sprintf("Server: %s Port: %d TLS: %s", $vals['server'], $vals['port'],
+                $res .= '<div class="configured_server">';
+                $res .= sprintf("Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $vals['server'], $vals['port'],
                     $vals['tls'] ? 'true' : 'false' );
                 $res .= ' <form class="imap_connect" method="POST" action="">'.
                     '<input type="hidden" name="imap_server_id" value="'.$index.'" />'.
                     ' Username: <input type="text" name="imap_user" value="">'.
                     ' Password: <input type="password" name="imap_pass">'.
                     ' <input type="submit" value="Connect" name="connect" />'.
-                    '</form><br />';
+                    '</form></div>';
             }
             $res .= '</div>';
         }
         return $res;
     }
 }
+
 class Hm_Output_Module_Imap_debug extends Hm_Output_Module {
     public function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
-            $res = '<div class="imap_debug"><pre>';
+            $res = '<div class="imap_debug"><div class="subtitle">IMAP Debug</div><pre>';
             if (isset($input['imap_debug'])) {
                 $res .= print_r($input['imap_debug'], true);
             }
@@ -89,6 +92,7 @@ class Hm_Output_Module_Imap_debug extends Hm_Output_Module {
         return $res;
     }
 }
+
 class Hm_Output_Module_Imap_setup extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5') {
@@ -102,6 +106,7 @@ class Hm_Output_Module_Imap_setup extends Hm_Output_Module {
         return $res;
     }
 }
+
 class Hm_Output_Module_Header extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -110,6 +115,7 @@ class Hm_Output_Module_Header extends Hm_Output_Module {
         return '';
     }
 }
+
 class Hm_Output_Module_Footer extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -118,6 +124,7 @@ class Hm_Output_Module_Footer extends Hm_Output_Module {
         return '';
     }
 }
+
 class Hm_Output_Module_Jquery extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -126,20 +133,22 @@ class Hm_Output_Module_Jquery extends Hm_Output_Module {
         return '';
     }
 }
+
 class Hm_Output_Module_Css extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<style type="text/css">'.
-                '.add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }'.
+                '.configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }'.
                 '.subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%; }'.
                 '.date { float: right; }'.
                 '.imap_connect { display: inline; }'.
-                '.imap_debug { flaot: left; width: 600px; font-size: 75%; clear: left; }'.
+                '.imap_debug { flaot: left; width: 600px; clear: left; }'.
                 '.add_server { float: left; clear: left; margin-bottom: 10px; }'.
-                '.sys_messages { float: left; clear: left; }'.
+                '.configured_server { float: left; margin: 10px; }'.
+                '.sys_messages { margin-left: 20px; margin-top: 2px; float: left }'.
                 '.logout_form { float: right; clear: none; padding-left: 10px; margin-top: -5px; }'.
                 '.configured_servers { float: left; clear: left; margin-bottom: 10px; }'.
-                '.logged_in { float: right; padding-right: 10px; }'.
+                '.logged_in { padding-left: 10px; float: right; padding-right: 10px; }'.
                 '.title { font-weight: bold; float: left; padding: 0px; font-size: 125%; margin: 0px; padding-bottom: 10px; }'.
                 '</style>';
         }
