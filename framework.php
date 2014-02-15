@@ -56,27 +56,32 @@ class Hm_Router {
         $request = new Hm_Request();
         $session = new Hm_Session_PHP($request);
         $this->get_page($request);
-        $this->forward_redirect_messages($session);
+        $prior_results = $this->forward_redirect_data($session, $request);
         $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
-        $this->check_for_redirect($request, $session);
+        $result = array_merge($result, $prior_results);
+        $this->check_for_redirect($request, $session, $result);
         $session->end();
         return $result;
     }
 
-    private function forward_redirect_messages($session) {
+    private function forward_redirect_data($session, $request) {
+        $res = $session->get('redirect_result', array());
         $redirect_msgs = $session->get('redirect_messages', array());
+        $session->del('redirect_result');
         if (!empty($redirect_msgs)) {
             array_walk($redirect_msgs, function($v) { Hm_Msgs::add($v); });
             $session->del('redirect_messages');
         }
+        return $res;
     }
 
-    private function check_for_redirect($request, $session) {
+    private function check_for_redirect($request, $session, $result) {
         if (!empty($request->post)) {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
                 $session->set('redirect_messages', $msgs);
             }
+            $session->set('redirect_result', $result);
             $this->redirect($request->uri);
         }
     }
@@ -164,7 +169,8 @@ class Hm_Request {
     private function get_server_vars() {
         foreach ($this->server_vars as $type => $name) {
             if (isset($_SERVER[$name])) {
-                if ($value = $this->check($type, $_SERVER[$name])) {
+                $value = $this->check($type, $_SERVER[$name]);
+                if ($value !== false) {
                     $this->{$type} = $value;
                 }
             }
@@ -173,7 +179,8 @@ class Hm_Request {
 
     private function fetch_post_vars() {
         foreach ($_POST as $name => $value) {
-            if ($res = $this->check($name, $value)) {
+            $res = $this->check($name, $value);
+            if ($res !== false) {
                 $this->post[$name] = $value;
             }
         }
@@ -181,7 +188,8 @@ class Hm_Request {
 
     private function fetch_get_vars() {
         foreach ($_GET as $name => $value) {
-            if ($res = $this->check($name, $value)) {
+            $res = $this->check($name, $value);
+            if ($res !== false) {
                 $this->get[$name] = $value;
             }
         }
@@ -189,7 +197,8 @@ class Hm_Request {
 
     private function fetch_cookie_vars() {
         foreach ($_COOKIE as $name => $value) {
-            if ($res = $this->check($name, $value)) {
+            $res = $this->check($name, $value);
+            if ($res !== false) {
                 $this->cookie[$name] = $value;
             }
         }
@@ -255,7 +264,10 @@ class Hm_Validator {
         'submit_server'   => 'string',
         'server_port'     => 'int',
         'new_imap_port'   => 'int',
-        'tls'             => 'int'
+        'tls'             => 'int',
+        'imap_server_id'  => 'int',
+        'imap_user'       => 'string',
+        'imap_pass'       => 'string'
     );
 
     public static function whitelist($name, $value) {

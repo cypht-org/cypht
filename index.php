@@ -18,6 +18,7 @@ require_once('session.php');
 require_once('output.php');
 require_once('output_modules.php');
 require_once('handlers.php');
+require_once('hm-imap.php');
 require_once('handler_modules.php');
 require_once('module_map.php');
 

@@ -51,7 +51,8 @@ class Hm_Handler_Module_Logout extends Hm_Handler_Module {
 class Hm_Handler_Module_Imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
-            if (!isset($this->request->post['new_imap_server']) || !isset($this->request->post['new_imap_port'])) {
+            if ((!isset($this->request->post['new_imap_server']) || !$this->request->post['new_imap_server'])
+                || (!isset($this->request->post['new_imap_port']) || !$this->request->post['new_imap_port'])) {
                 Hm_Msgs::add('You must supply a server name and port');
             }
             else {
@@ -77,6 +78,27 @@ class Hm_Handler_Module_Imap_setup_display extends Hm_Handler_Module {
         $servers = $this->session->get('imap_servers', array());
         if (!empty($servers)) {
             $data['imap_servers'] = $servers;
+        }
+        return $data;
+    }
+}
+class Hm_Handler_Module_Imap_connect extends Hm_Handler_Module {
+    public function process($data) {
+        $post = $this->request->post;
+        if (isset($post['imap_server_id']) && isset($post['imap_user']) && isset($post['imap_pass'])) {
+            $servers = $this->session->get('imap_servers', array());
+            if (isset($servers[$post['imap_server_id']])) {
+                $details = $servers[$post['imap_server_id']];
+                $imap = new Hm_IMAP();
+                $imap->connect(array(
+                    'username' => $post['imap_user'],
+                    'password' => $post['imap_pass'],
+                    'server' => $details['server'],
+                    'port' => $details['port'],
+                    'tls' => $details['tls']
+                ));
+                $data['imap_debug'] = $imap->show_debug(false, true);
+            }
         }
         return $data;
     }

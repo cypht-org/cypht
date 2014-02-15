@@ -63,11 +63,28 @@ class Hm_Output_Module_Imap_setup_display extends Hm_Output_Module {
             $res = '<div class="configured_servers"><div class="subtitle">Configured Servers</div>';
             foreach ($input['imap_servers'] as $index => $vals) {
                 $res .= sprintf("Server: %s Port: %d TLS: %s", $vals['server'], $vals['port'],
-                    $vals['tls'] ? 'false' : 'true' );
+                    $vals['tls'] ? 'true' : 'false' );
                 $res .= ' <form class="imap_connect" method="POST" action="">'.
-                    '<input type="submit" value="Connect" name="connect" /></form><br />';
+                    '<input type="hidden" name="imap_server_id" value="'.$index.'" />'.
+                    ' Username: <input type="text" name="imap_user" value="">'.
+                    ' Password: <input type="password" name="imap_pass">'.
+                    ' <input type="submit" value="Connect" name="connect" />'.
+                    '</form><br />';
             }
             $res .= '</div>';
+        }
+        return $res;
+    }
+}
+class Hm_Output_Module_Imap_debug extends Hm_Output_Module {
+    public function output($input, $format) {
+        $res = '';
+        if ($format == 'HTML5') {
+            $res = '<div class="imap_debug"><pre>';
+            if (isset($input['imap_debug'])) {
+                $res .= print_r($input['imap_debug'], true);
+            }
+            $res .= '</pre></div>';
         }
         return $res;
     }
@@ -117,6 +134,7 @@ class Hm_Output_Module_Css extends Hm_Output_Module {
                 '.subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%; }'.
                 '.date { float: right; }'.
                 '.imap_connect { display: inline; }'.
+                '.imap_debug { flaot: left; width: 600px; font-size: 75%; clear: left; }'.
                 '.add_server { float: left; clear: left; margin-bottom: 10px; }'.
                 '.sys_messages { float: left; clear: left; }'.
                 '.logout_form { float: right; clear: none; padding-left: 10px; margin-top: -5px; }'.
