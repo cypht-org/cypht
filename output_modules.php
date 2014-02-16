@@ -2,12 +2,16 @@
 
 abstract class Hm_Output_Module {
     abstract public function output($input, $format);
+
+    protected function html_safe($string) {
+        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
 }
 
 class Hm_Output_Module_Title extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<h1 class="title">'.$input['title'].'</h1>';
+            return '<h1 class="title">'.$this->html_safe($input['title']).'</h1>';
         }
     }
 }
@@ -21,17 +25,15 @@ class Hm_Output_Module_Login extends Hm_Output_Module {
                     ' password: <input type="password" name="password">'.
                     ' <input type="submit" /></form>';
             }
-            else {
-                return '<div class="logged_in">[ Logged in ]</div>';
-            }
         }
+        return '';
     }
 }
 
 class Hm_Output_Module_Date extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<div class="date">'.$input['date'].'</div>';
+            return '<div class="date">'.$this->html_safe($input['date']).'</div>';
         }
     }
 }
@@ -52,7 +54,7 @@ class Hm_Output_Module_Msgs extends Hm_Output_Module {
             $res .= '<div class="sys_messages"><span class="subtitle">Notices: </span>';
             if ($format == 'HTML5') {
                 foreach ($msgs as $val) {
-                    $res .= $val.' ';
+                    $res .= $this->html_safe($val).' ';
                 }
             }
             $res .= '</div>';
@@ -68,10 +70,10 @@ class Hm_Output_Module_Imap_setup_display extends Hm_Output_Module {
             $res = '<div class="configured_servers"><div class="subtitle">Configured Servers</div>';
             foreach ($input['imap_servers'] as $index => $vals) {
                 $res .= '<div class="configured_server">';
-                $res .= sprintf("Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $vals['server'], $vals['port'],
-                    $vals['tls'] ? 'true' : 'false' );
+                $res .= sprintf("Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['server']),
+                    $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
                 $res .= ' <form class="imap_connect" method="POST" action="">'.
-                    '<input type="hidden" name="imap_server_id" value="'.$index.'" />'.
+                    '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
                     ' Username: <input type="text" name="imap_user" value="">'.
                     ' Password: <input type="password" name="imap_pass">'.
                     ' <input type="submit" value="Connect" name="connect" />'.
@@ -90,7 +92,7 @@ class Hm_Output_Module_Imap_debug extends Hm_Output_Module {
         if ($format == 'HTML5') {
             $res = '<div class="imap_debug"><div class="subtitle">IMAP Debug</div><pre>';
             if (isset($input['imap_debug'])) {
-                $res .= print_r($input['imap_debug'], true);
+                $res .= $this->html_safe(print_r($input['imap_debug'], true));
             }
             $res .= '</pre></div>';
         }
