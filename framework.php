@@ -82,7 +82,7 @@ class Hm_Router {
                 $session->set('redirect_messages', $msgs);
             }
             $session->set('redirect_result', $result);
-            $this->redirect($request->uri);
+            $this->redirect($request->server['REQUEST_URI']);
         }
     }
 
@@ -133,75 +133,69 @@ class Hm_Request {
     public $post = array();
     public $get = array();
     public $cookie = array();
-    public $uri = false;
-    public $server = false;
-    public $server_port = false;
-    public $script = false;
-    public $agent = false;
+    public $server = array(); 
+
     public $type = false;
     public $sapi = false;
     public $format = false;
 
-    private $server_vars = array(
-        'uri'         => 'REQUEST_URI',
-        'server_addr' => 'SERVER_ADDR',
-        'server_port' => 'SERVER_PORT',
-        'script'      => 'PHP_SELF',
-        'agent'       => 'HTTP_USER_AGENT',
-        'server'      => 'SERVER_NAME'
+    private $allowed_cookie = array(
+        'PHPSESSID' => FILTER_SANITIZE_STRING
     );
+
+    private $allowed_server = array(
+        'REQUEST_URI' => FILTER_SANITIZE_STRING,
+        'SERVER_ADDR' => FILTER_VALIDATE_IP,
+        'SERVER_PORT' => FILTER_VALIDATE_INT,
+        'PHP_SELF' => FILTER_SANITIZE_STRING,
+        'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING,
+        'SERVER_NAME' => FILTER_SANITIZE_STRING
+    );
+
+    private $allowed_get = array(
+        'page' => array(
+            'filter' => FILTER_CALLBACK,
+            'options' => array('callback' => array('Hm_Request::allowed_page'))
+        )
+    );
+
+    private $allowed_post = array(
+        'logout' => FILTER_VALIDATE_BOOLEAN,
+        'tls' => FILTER_VALIDATE_BOOLEAN,
+        'server_port' => FILTER_VALIDATE_INT,
+        'server' => FILTER_SANITIZE_STRING,
+        'username' => FILTER_SANITIZE_STRING,
+        'password' => FILTER_SANITIZE_STRING,
+        'new_imap_server' => FILTER_SANITIZE_STRING,
+        'new_imap_port' => FILTER_VALIDATE_INT,
+        'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_user' => FILTER_SANITIZE_STRING,
+        'imap_pass' => FILTER_SANITIZE_STRING,
+        'imap_delete' => FILTER_SANITIZE_STRING,
+        'submit_server' => FILTER_SANITIZE_STRING,
+    );
+
 
     public function __construct() {
         $this->sapi = php_sapi_name();
         $this->get_request_type();
 
         if ($this->type == 'HTTP') {
-            $this->get_server_vars();
-            $this->fetch_post_vars();
-            $this->fetch_get_vars();
-            $this->fetch_cookie_vars();
+            $this->server = filter_input_array(INPUT_SERVER, $this->allowed_server, false);
+            $this->post = filter_input_array(INPUT_POST, $this->allowed_post, false);
+            $this->get = filter_input_array(INPUT_GET, $this->allowed_get, false);
+            $this->cookie = filter_input_array(INPUT_COOKIE, $this->allowed_cookie, false);
         }
         if ($this->type == 'CLI') {
             $this->fetch_cli_vars();
         }
     }
 
-    private function get_server_vars() {
-        foreach ($this->server_vars as $type => $name) {
-            if (isset($_SERVER[$name])) {
-                $value = $this->check($type, $_SERVER[$name]);
-                if ($value !== false) {
-                    $this->{$type} = $value;
-                }
-            }
+    public static function allowed_page($val) {
+        if ($val == 'home') {
+            return $val;
         }
-    }
-
-    private function fetch_post_vars() {
-        foreach ($_POST as $name => $value) {
-            $res = $this->check($name, $value);
-            if ($res !== false) {
-                $this->post[$name] = $value;
-            }
-        }
-    }
-
-    private function fetch_get_vars() {
-        foreach ($_GET as $name => $value) {
-            $res = $this->check($name, $value);
-            if ($res !== false) {
-                $this->get[$name] = $value;
-            }
-        }
-    }
-
-    private function fetch_cookie_vars() {
-        foreach ($_COOKIE as $name => $value) {
-            $res = $this->check($name, $value);
-            if ($res !== false) {
-                $this->cookie[$name] = $value;
-            }
-        }
+        return 'notfound';
     }
 
     private function fetch_cli_vars() {
@@ -243,56 +237,6 @@ class Hm_Request {
 
     private function is_ajax() {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-    }
-}
-
-/* validate input values */
-class Hm_Validator {
-
-    private static $allowed_input = array(
-        'page'            => 'string',
-        'username'        => 'string',
-        'password'        => 'string',
-        'uri'             => 'string',
-        'server_addr'     => 'string',
-        'script'          => 'string',
-        'server'          => 'string',
-        'PHPSESSID'       => 'string',
-        'agent'           => 'string',
-        'logout'          => 'string',
-        'new_imap_server' => 'string',
-        'submit_server'   => 'string',
-        'server_port'     => 'int',
-        'new_imap_port'   => 'int',
-        'tls'             => 'int',
-        'imap_server_id'  => 'int',
-        'imap_user'       => 'string',
-        'imap_pass'       => 'string',
-        'imap_delete'     => 'string',
-
-    );
-
-    public static function whitelist($name, $value) {
-        if (!isset(self::$allowed_input[$name])) {
-            return false;
-        }
-        if (!self::is_valid($name, $value)) {
-            return false;
-        }
-        return $value;
-    }
-
-    public static function is_valid($name, $value) {
-        $type = self::$allowed_input[$name];
-        return self::{'validate_'.$type}($value);
-    }
-
-    public static function validate_string($value) {
-        return str_replace(array("\r", "\n"), array(''), $value) == $value;
-    }
-
-    public static function validate_int($value) {
-        return ctype_digit((string)$value);
     }
 }
 
