@@ -44,6 +44,7 @@ class Hm_Config_File extends Hm_Config {
 class Hm_Router {
 
     private $page = 'home';
+    private $pages = array('home', 'notfound');
 
     public $type = false;
     public $sapi = false;
@@ -84,7 +85,7 @@ class Hm_Router {
 
     private function get_page($request) {
         if (isset($request->get['page'])) {
-            if (isset($this->pages[$request->get['page']])) {
+            if (in_array($request->get['page'], $this->pages)) {
                 $this->page = $request->get['page'];
             }
             else {
