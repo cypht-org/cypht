@@ -1,6 +1,6 @@
 <?php
 
-abstract class Hm_Request_Handler {
+class Hm_Request_Handler {
 
     protected $modules = array();
 
@@ -41,19 +41,6 @@ abstract class Hm_Request_Handler {
             }
         }
     }
-
-    abstract protected function process_request_actions();
-}
-
-class Hm_Home extends Hm_Request_Handler {
-
-    protected function process_request_actions() {
-        $this->run_modules();
-    }
-}
-
-class Hm_Notfound extends Hm_Request_Handler {
-
     protected function process_request_actions() {
         $this->run_modules();
     }

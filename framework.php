@@ -44,10 +44,6 @@ class Hm_Config_File extends Hm_Config {
 class Hm_Router {
 
     private $page = 'home';
-    private $pages = array(
-        'home'      => 'Hm_Home',
-        'notfound'  => 'Hm_Notfound',
-    );
 
     public $type = false;
     public $sapi = false;
@@ -99,14 +95,8 @@ class Hm_Router {
 
     private function process_page($request, $session, $config) {
         $response = array();
-        $handler_name = $this->pages[$this->page];
-        if (class_exists($handler_name)) {
-            $handler = new $handler_name();
-            $response = $handler->process_request($this->page, $request, $session, $config);
-        }
-        else {
-            die(sprintf("Page handler for page %s not found", $this->page));
-        }
+        $handler = new Hm_Request_Handler();
+        $response = $handler->process_request($this->page, $request, $session, $config);
         return $response;
     }
 
@@ -153,10 +143,7 @@ class Hm_Request {
     );
 
     private $allowed_get = array(
-        'page' => array(
-            'filter' => FILTER_CALLBACK,
-            'options' => array('callback' => array('Hm_Request::allowed_page'))
-        )
+        'page' => FILTER_SANITIZE_STRING
     );
 
     private $allowed_post = array(
@@ -175,7 +162,6 @@ class Hm_Request {
         'submit_server' => FILTER_SANITIZE_STRING,
     );
 
-
     public function __construct() {
         $this->sapi = php_sapi_name();
         $this->get_request_type();
@@ -191,13 +177,6 @@ class Hm_Request {
         }
     }
 
-    public static function allowed_page($val) {
-        if ($val == 'home') {
-            return $val;
-        }
-        return 'notfound';
-    }
-
     private function fetch_cli_vars() {
         global $argv;
         if (empty($this->get) && empty($this->post)) {
@@ -210,10 +189,6 @@ class Hm_Request {
                 }
             }
         }
-    }
-
-    private function check($name, $value) {
-        return Hm_Validator::whitelist($name, $value);
     }
 
     private function get_request_type() {
