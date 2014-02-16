@@ -25,7 +25,8 @@ abstract class Hm_Session {
 class Hm_Session_PHP extends Hm_Session{
 
     public function check($request) {
-        if (isset($request->post['username']) && isset($request->post['password'])) {
+        if (isset($request->post['username']) && $request->post['username'] &&
+            isset($request->post['password']) && $request->post['password']) {
             if ($this->auth($request->post['username'], $request->post['password'])) {
                 Hm_Msgs::add('login accepted, starting PHP session');
                 $this->loaded = true;
