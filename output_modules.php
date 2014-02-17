@@ -35,19 +35,21 @@ abstract class Hm_Output_Module {
     }
 }
 
+if (!class_exists('Hm_Output_title')) {
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<h1 class="title">'.$this->html_safe($input['title']).'</h1>';
         }
     }
-}
+}}
 
+if (!class_exists('Hm_Output_login')) {
 class Hm_Output_login extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             if (!$input['router_login_state']) {
-                return '<form class="login_form" method="POST" action="">'.
+                return '<form class="login_form" method="POST">'.
                     ' '.$this->trans('Username').': <input type="text" name="username" value="">'.
                     ' '.$this->trans('Password').': <input type="password" name="password">'.
                     ' <input type="submit" /></form>';
@@ -55,24 +57,27 @@ class Hm_Output_login extends Hm_Output_Module {
         }
         return '';
     }
-}
+}}
 
+if (!class_exists('Hm_Output_date')) {
 class Hm_Output_date extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<div class="date">'.$this->html_safe($input['date']).'</div>';
         }
     }
-}
+}}
 
+if (!class_exists('Hm_Output_logout')) {
 class Hm_Output_logout extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' && $input['router_login_state']) {
-            return '<form class="logout_form" method="POST" action=""><input type="submit" name="logout" value="Logout" /></form>';
+            return '<form class="logout_form" method="POST"><input type="submit" name="logout" value="Logout" /></form>';
         }
     }
-}
+}}
 
+if (!class_exists('Hm_Output_msgs')) {
 class Hm_Output_msgs extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
@@ -88,8 +93,9 @@ class Hm_Output_msgs extends Hm_Output_Module {
         }
         return $res;
     }
-}
+}}
 
+if (!class_exists('Hm_Output_imap_setup_display')) {
 class Hm_Output_imap_setup_display extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
@@ -99,7 +105,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                 $res .= '<div class="configured_server">';
                 $res .= sprintf("Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['server']),
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
-                $res .= ' <form class="imap_connect" method="POST" action="">'.
+                $res .= ' <form class="imap_connect" method="POST">'.
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
                     ' '.$this->trans('Username').': <input type="text" name="imap_user" value="">'.
                     ' '.$this->trans('Password').': <input type="password" name="imap_pass">'.
@@ -111,8 +117,9 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
         }
         return $res;
     }
-}
+}}
 
+if (!class_exists('Hm_Output_imap_debug')) {
 class Hm_Output_imap_debug extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
@@ -125,22 +132,23 @@ class Hm_Output_imap_debug extends Hm_Output_Module {
         }
         return $res;
     }
-}
+}}
 
+if (!class_exists('Hm_Output_imap_setup')) {
 class Hm_Output_imap_setup extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<div><form class="add_server" method="POST" action="">'.
+            return '<form class="add_server" method="POST">'.
                 '<div class="subtitle">Add a mail server</div>'.
                 'Server name or address: <input type="text" name="new_imap_server" value=""/><br />'.
                 'Server Port: <input type="text" name="new_imap_port" value="143"><br />'.
                 'Use TLS: <input type="checkbox" name="tls" value="1" /><br />'.
-                '<input type="submit" value="Add" name="submit_server" /></form></div>';
+                '<input type="submit" value="Add" name="submit_server" /></form>';
         }
-        return $res;
     }
-}
+}}
 
+if (!class_exists('Hm_Output_header')) {
 class Hm_Output_header extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -148,12 +156,13 @@ class Hm_Output_header extends Hm_Output_Module {
             if ($this->lang) {
                 $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
             }
-            return '<!DOCTYPE html><html '.$lang.'><head><meta charset="utf-8"></head><body>';
+            return '<!DOCTYPE html><html '.$lang.'><head><title>HM3</title><meta charset="utf-8" /></head><body>';
         }
         return '';
     }
-}
+}}
 
+if (!class_exists('Hm_Output_footer')) {
 class Hm_Output_footer extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -161,8 +170,9 @@ class Hm_Output_footer extends Hm_Output_Module {
         }
         return '';
     }
-}
+}}
 
+if (!class_exists('Hm_Output_jquery')) {
 class Hm_Output_jquery extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -170,12 +180,13 @@ class Hm_Output_jquery extends Hm_Output_Module {
         }
         return '';
     }
-}
+}}
 
+if (!class_exists('Hm_Output_css')) {
 class Hm_Output_css extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<style type="text/css">'.
+            return '<style scoped type="text/css">'.
                 '.configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }'.
                 '.subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%; }'.
                 '.date { float: right; }'.
@@ -192,6 +203,6 @@ class Hm_Output_css extends Hm_Output_Module {
         }
         return '';
     }
-}
+}}
 
 ?>
