@@ -1,6 +1,7 @@
 <?php
 
 /* Homepage modules */
+Hm_Handler_Modules::add('home', 'language',  true);
 Hm_Handler_Modules::add('home', 'title', true);
 Hm_Handler_Modules::add('home', 'date', true);
 Hm_Handler_Modules::add('home', 'logout', true);
