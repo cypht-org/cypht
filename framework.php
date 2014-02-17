@@ -6,10 +6,10 @@ abstract class Hm_Config {
     protected $source = false;
     protected $config = array();
 
-    abstract protected function load($source);
-    abstract protected function dump();
-    abstract protected function set_var($name, $value);
-    abstract protected function get_var($name, $default=false);
+    abstract public function load($source);
+    abstract public function dump();
+    abstract public function set($name, $value);
+    abstract public function get($name, $default=false);
 }
 
 /* file based configuration */
@@ -19,7 +19,7 @@ class Hm_Config_File extends Hm_Config {
         $this->load($source);
     }
 
-    protected function load($source) {
+    public function load($source) {
         $data = unserialize(file_get_contents($source));
         if ($data) {
             $this->config = array_merge($this->config, $data);
@@ -30,11 +30,11 @@ class Hm_Config_File extends Hm_Config {
         return $this->config;
     }
 
-    protected function set_var($name, $value) {
+    public function set($name, $value) {
         $this->config[$name] = $value;
     }
 
-    protected function get_var($name, $default=false) {
+    public function get($name, $default=false) {
         return isset($this->config[$name]) ? $this->config[$name] : $default;
     }
 }
@@ -196,12 +196,19 @@ class Hm_Request_Handler {
         $this->session = $session;
         $this->config = $config;
         $this->modules = Hm_Handler_Modules::get_for_page($page);
-        $this->process_request_actions();
-        return $this->response();
+        $this->run_modules();
+        $this->default_language();
+        return $this->response;
+
     }
 
-    public function response() {
-        return $this->response;
+    private function default_language() {
+        if (!isset($this->response['language'])) {
+            $default_lang = $this->config->get('default_language', false);
+            if ($default_lang) {
+                $this->response['language'] = $default_lang;
+            }
+        }
     }
 
     protected function run_modules() {
@@ -221,10 +228,6 @@ class Hm_Request_Handler {
                 $this->response = $input;
             }
         }
-    }
-
-    protected function process_request_actions() {
-        $this->run_modules();
     }
 }
 
