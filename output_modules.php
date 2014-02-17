@@ -76,7 +76,7 @@ class Hm_Output_Module_Imap_setup_display extends Hm_Output_Module {
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
                     ' Username: <input type="text" name="imap_user" value="">'.
                     ' Password: <input type="password" name="imap_pass">'.
-                    ' <input type="submit" value="Connect" name="connect" />'.
+                    ' <input type="submit" value="Connect" name="imap_connect" />'.
                     ' <input type="submit" value="Delete" name="imap_delete" />'.
                     '</form></div>';
             }

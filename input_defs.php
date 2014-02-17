@@ -45,6 +45,7 @@ return array(
         'imap_pass' => FILTER_SANITIZE_STRING,
         'imap_delete' => FILTER_SANITIZE_STRING,
         'submit_server' => FILTER_SANITIZE_STRING,
+        'imap_connect' => FILTER_SANITIZE_STRING,
     )
 );
 

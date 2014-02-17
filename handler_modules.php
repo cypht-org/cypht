@@ -13,6 +13,21 @@ abstract class Hm_Handler_Module {
         $this->page = $parent->page;
     }
 
+    protected function process_form($form) {
+        $post = $this->request->post;
+        $success = false;
+        $new_form = array();
+        foreach($form as $name) {
+            if (isset($post[$name]) && (trim($post[$name]) || $post[$name] === 0)) {
+                $new_form[$name] = $post[$name];
+            }
+        }
+        if (count($form) == count($new_form)) {
+            $success = true;
+        }
+        return array($success, $new_form);
+    }
+
     abstract public function process($data);
 }
 
@@ -49,8 +64,9 @@ class Hm_Handler_Module_Logout extends Hm_Handler_Module {
 class Hm_Handler_Module_Imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
-            if ((!isset($this->request->post['new_imap_server']) || !$this->request->post['new_imap_server'])
-                || (!isset($this->request->post['new_imap_port']) || !$this->request->post['new_imap_port'])) {
+            list($success, $form) = $this->process_form(array('new_imap_server', 'new_imap_port'));
+            if (!$success) {
+                $data['old_form'] = $form;
                 Hm_Msgs::add('You must supply a server name and port');
             }
             else {
@@ -61,10 +77,9 @@ class Hm_Handler_Module_Imap_setup extends Hm_Handler_Module {
                 $servers = $this->session->get('imap_servers', array());
                 Hm_Msgs::add('Added server!');
                 $this->session->set('imap_servers', array_merge($servers, array(array(
-                    'server' => $this->request->post['new_imap_server'],
-                    'port' => $this->request->post['new_imap_port'],
+                    'server' => $form['new_imap_server'],
+                    'port' => $form['new_imap_port'],
                     'tls' => $tls))));
-
             }
         }
         return $data;
@@ -84,20 +99,23 @@ class Hm_Handler_Module_Imap_setup_display extends Hm_Handler_Module {
 
 class Hm_Handler_Module_Imap_connect extends Hm_Handler_Module {
     public function process($data) {
-        $post = $this->request->post;
-        if (isset($post['imap_server_id']) && isset($post['imap_user']) && isset($post['imap_pass'])) {
-            $servers = $this->session->get('imap_servers', array());
-            if (isset($servers[$post['imap_server_id']])) {
-                $details = $servers[$post['imap_server_id']];
+        if (isset($this->request->post['imap_connect'])) {
+            list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
+            if ($success) {
+                $servers = $this->session->get('imap_servers', array());
+                $details = $servers[$form['imap_server_id']];
                 $imap = new Hm_IMAP();
                 $imap->connect(array(
-                    'username' => $post['imap_user'],
-                    'password' => $post['imap_pass'],
+                    'username' => $form['imap_user'],
+                    'password' => $form['imap_pass'],
                     'server' => $details['server'],
                     'port' => $details['port'],
                     'tls' => $details['tls']
                 ));
                 $data['imap_debug'] = $imap->show_debug(false, true);
+            }
+            else {
+                $data['old_form'] = $form;
             }
         }
         return $data;
@@ -106,13 +124,18 @@ class Hm_Handler_Module_Imap_connect extends Hm_Handler_Module {
 
 class Hm_Handler_Module_Imap_delete extends Hm_Handler_Module {
     public function process($data) {
-        $post = $this->request->post;
-        if (isset($post['imap_server_id']) && isset($post['imap_delete']) && isset($post['imap_server_id'])) {
-            $servers = $this->session->get('imap_servers', array());
-            if (isset($servers[$post['imap_server_id']])) {
-                unset($servers[$post['imap_server_id']]);
-                Hm_Msgs::add('Server deleted');
-                $this->session->set('imap_servers', $servers);
+        if (isset($this->request->post['imap_delete'])) {
+            list($success, $form) = $this->process_form(array('imap_server_id'));
+            if ($success) {
+                $servers = $this->session->get('imap_servers', array());
+                if (isset($servers[$form['imap_server_id']])) {
+                    unset($servers[$form['imap_server_id']]);
+                    Hm_Msgs::add('Server deleted');
+                    $this->session->set('imap_servers', $servers);
+                }
+            }
+            else {
+                $data['old_form'] = $form;
             }
         }
         return $data;
