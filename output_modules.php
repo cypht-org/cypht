@@ -2,14 +2,22 @@
 
 abstract class Hm_Output_Module {
 
-    protected $language = 'en_US';
-    protected $languages = array(
-        'en_US',
-    ); 
+    private $lstr = array();
 
     abstract protected function output($input, $format);
 
     protected function trans($string) {
+        if (isset($this->lstr[$string])) {
+            if ($this->lstr[$string] === false) {
+                return $string;
+            }
+            else {
+                return $this->lstr[$string];
+            }
+        }
+        else {
+            Hm_Debug::add(sprintf('No translation found: %s', $string));
+        }
         return $string;
     }
 
@@ -17,10 +25,8 @@ abstract class Hm_Output_Module {
         return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
-    public function output_content($input, $format) {
-        if (isset($input['language']) && in_array($input['language'], $this->languages)) {
-            $this->language = $input['language'];
-        }
+    public function output_content($input, $format, $lang_str) {
+        $this->lstr = $lang_str;
         return $this->output($input, $format);
     }
 }
@@ -38,8 +44,8 @@ class Hm_Output_login extends Hm_Output_Module {
         if ($format == 'HTML5') {
             if (!$input['router_login_state']) {
                 return '<form class="login_form" method="POST" action="">'.
-                    ' username: <input type="text" name="username" value="">'.
-                    ' password: <input type="password" name="password">'.
+                    ' '.$this->trans('Username').': <input type="text" name="username" value="">'.
+                    ' '.$this->trans('Password').': <input type="password" name="password">'.
                     ' <input type="submit" /></form>';
             }
         }
@@ -68,7 +74,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
         $res = '';
         $msgs = Hm_Msgs::get();
         if (!empty($msgs)) {
-            $res .= '<div class="sys_messages"><span class="subtitle">Notices: </span>';
+            $res .= '<div class="sys_messages"><span class="subtitle">'.$this->trans('Notices').': </span>';
             if ($format == 'HTML5') {
                 foreach ($msgs as $val) {
                     $res .= $this->html_safe($val).' ';
@@ -91,8 +97,8 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
                 $res .= ' <form class="imap_connect" method="POST" action="">'.
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
-                    ' Username: <input type="text" name="imap_user" value="">'.
-                    ' Password: <input type="password" name="imap_pass">'.
+                    ' '.$this->trans('Username').': <input type="text" name="imap_user" value="">'.
+                    ' '.$this->trans('Password').': <input type="password" name="imap_pass">'.
                     ' <input type="submit" value="Connect" name="imap_connect" />'.
                     ' <input type="submit" value="Delete" name="imap_delete" />'.
                     '</form></div>';

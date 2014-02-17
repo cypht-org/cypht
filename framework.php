@@ -233,22 +233,33 @@ abstract class HM_Format {
 
     protected $modules = false;
 
-    abstract protected function content($input);
+    abstract protected function content($input, $lang_str);
 
     public function format_content($input) {
+        $lang_strings = array();
+        if (isset($input['language'])) {
+            $lang_strings = $this->get_language($input['language']);
+        }
         $this->modules = Hm_Output_Modules::get_for_page($input['router_page_name']);
-        $formatted = $this->content($input);
+        $formatted = $this->content($input, $lang_strings);
         return $formatted;
     }
 
-    protected function run_modules($input, $format) {
+    private function get_language($lang) {
+        $strings = array();
+        if (file_exists($lang.'.php')) {
+            $strings = require $lang.'.php';
+        }
+        return $strings;
+    }
+    protected function run_modules($input, $format, $lang_str) {
         $mod_output = array();
         foreach ($this->modules as $name => $args) {
             $name = "Hm_Output_$name";
             if (class_exists($name)) {
                 if (!$args['logged_in'] || ($args['logged_in'] && $input['router_login_state'])) {
                     $mod = new $name();
-                    $mod_output[] = $mod->output_content($input, $format);
+                    $mod_output[] = $mod->output_content($input, $format, $lang_str);
                 }
             }
             else {
@@ -262,7 +273,7 @@ abstract class HM_Format {
 /* JSON output format */
 class Hm_Format_JSON extends HM_Format {
 
-    public function content($input) {
+    public function content($input, $lang_str) {
         return json_encode($input, JSON_FORCE_OBJECT);
     }
 }
@@ -270,8 +281,8 @@ class Hm_Format_JSON extends HM_Format {
 /* HTML5 output format */
 class Hm_Format_HTML5 extends HM_Format {
 
-    public function content($input) {
-        $output = $this->run_modules($input, 'HTML5');
+    public function content($input, $lang_str) {
+        $output = $this->run_modules($input, 'HTML5', $lang_str);
         return implode('', $output);
     }
 }
@@ -279,8 +290,8 @@ class Hm_Format_HTML5 extends HM_Format {
 /* CLI compatible output format */
 class Hm_Format_Terminal extends HM_Format {
 
-    public function content($input) {
-        return implode('', $this->run_modules($input, 'CLI'));
+    public function content($input, $lang_str) {
+        return implode('', $this->run_modules($input, 'CLI', $lang_str));
     }
 }
 
@@ -306,7 +317,7 @@ class Hm_Output_HTTP extends Hm_Output {
 
     protected function output_content($content, $headers=array()) {
         $this->output_headers($headers);
-        ob_end_clean();
+        //ob_end_clean();
         echo $content;
     }
 }

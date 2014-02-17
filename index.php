@@ -1,7 +1,7 @@
 <?php
 
 /* don't let anything output content until we are ready */
-ob_start();
+//ob_start();
 
 /* show all warnings */
 error_reporting(E_ALL | E_STRICT);
@@ -25,18 +25,20 @@ $config = new Hm_Config_File('/etc/hastymail2/hastymail2.rc');
 
 /* process request input */
 $router = new Hm_Router();
-$response = $router->process_request($config);
+$response_data = $router->process_request($config);
 
 /* format response content */
-$formatter = new $response['router_format_name']();
-$response = $formatter->format_content($response);
+$formatter = new $response_data['router_format_name']();
+$response_str = $formatter->format_content($response_data);
 
 /* output response */
 $renderer = new Hm_Output_HTTP();
-$renderer->send_response($response);
+$renderer->send_response($response_str);
 
 /* log execution time to the error log */
 error_log(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
 error_log(sprintf("Peak Memory: %s", memory_get_peak_usage()));
+
+Hm_Debug::show();
 
 ?>
