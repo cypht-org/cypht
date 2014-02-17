@@ -287,11 +287,9 @@ class Hm_Format_Terminal extends HM_Format {
 /* base output class */
 abstract class Hm_Output {
 
-    abstract protected function output_headers($headers);
     abstract protected function output_content($content);
 
-    public function send_response($response, $headers=array()) {
-        $this->output_headers($headers);
+    public function send_response($response) {
         $this->output_content($response);
     }
 
@@ -306,18 +304,15 @@ class Hm_Output_HTTP extends Hm_Output {
         }
     }
 
-    protected function output_content($content) {
-        //ob_end_clean();
+    protected function output_content($content, $headers=array()) {
+        $this->output_headers($headers);
+        ob_end_clean();
         echo $content;
     }
 }
 
 /* STDOUT output class */
 class Hm_Output_STDOUT extends Hm_Output {
-
-    protected function output_headers($headers) {
-        return;
-    }
 
     protected function output_content($content) {
         $stdout = fopen('php://stdout', 'w');
@@ -330,10 +325,6 @@ class Hm_Output_STDOUT extends Hm_Output {
 class Hm_Output_File extends Hm_Output {
 
     public $filename = 'test.out';
-
-    protected function output_headers($headers) {
-        return;
-    }
 
     protected function output_content($content) {
         $fh = fopen($this->filename, 'a');
