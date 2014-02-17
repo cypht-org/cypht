@@ -31,33 +31,38 @@ abstract class Hm_Handler_Module {
     abstract public function process($data);
 }
 
+if (!class_exists('Hm_Handler_title')) {
 class Hm_Handler_title extends Hm_Handler_Module {
     public function process($data) {
         $data['title'] = ucfirst($this->page);
         return $data;
     }
-}
+}}
 
+if (!class_exists('Hm_Handler_language')) {
 class Hm_Handler_language extends Hm_Handler_Module {
     public function process($data) {
         $data['language'] = 'es_ES'; //$this->session->get('language', 'en_US');
         return $data;
     }
-}
+}}
 
+if (!class_exists('Hm_Handler_date')) {
 class Hm_Handler_date extends Hm_Handler_Module {
     public function process($data) {
-        $data['date'] = date('r');
+        $data['date'] = date('Y-m-d h:i:s');
         return $data;
     }
-}
+}}
 
+if (!class_exists('Hm_Handler_login')) {
 class Hm_Handler_login extends Hm_Handler_Module {
     public function process($data) {
         return $data;
     }
-}
+}}
 
+if (!class_exists('Hm_Handler_logout')) {
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
@@ -66,8 +71,9 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         }
         return $data;
     }
-}
+}}
 
+if (!class_exists('Hm_Handler_imap_setup')) {
 class Hm_Handler_imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
@@ -91,8 +97,9 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
         }
         return $data;
     }
-}
+}}
 
+if (!class_exists('Hm_Handler_imap_setup_display')) {
 class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
     public function process($data) {
         $data['imap_servers'] = array();
@@ -102,8 +109,9 @@ class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
         }
         return $data;
     }
-}
+}}
 
+if (!class_exists('Hm_Handler_imap_connect')) {
 class Hm_Handler_imap_connect extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['imap_connect'])) {
@@ -128,8 +136,9 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
         }
         return $data;
     }
-}
+}}
 
+if (!class_exists('Hm_Handler_imap_delete')) {
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['imap_delete'])) {
@@ -148,6 +157,6 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
         }
         return $data;
     }
-}
+}}
 
 ?>
