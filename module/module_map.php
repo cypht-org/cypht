@@ -10,6 +10,7 @@ Hm_Handler_Modules::add('home', 'imap_setup', true);
 Hm_Handler_Modules::add('home', 'login', false);
 Hm_Handler_Modules::add('home', 'imap_setup_display', true);
 Hm_Handler_Modules::add('home', 'imap_connect', true);
+Hm_Handler_Modules::add('home', 'http_headers', true);
 
 Hm_Output_Modules::add('home', 'header', false);
 Hm_Output_Modules::add('home', 'css', false);

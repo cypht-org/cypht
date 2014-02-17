@@ -303,8 +303,13 @@ abstract class Hm_Output {
 
     abstract protected function output_content($content);
 
-    public function send_response($response) {
-        $this->output_content($response);
+    public function send_response($response, $input=array()) {
+        if (isset($input['http_headers'])) {
+            $this->output_content($response, $input['http_headers']);
+        }
+        else {
+            $this->output_content($response);
+        }
     }
 
 }

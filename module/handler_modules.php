@@ -31,6 +31,16 @@ abstract class Hm_Handler_Module {
     abstract public function process($data);
 }
 
+if (!class_exists('HM_Handler_http_headers')) {
+class Hm_Handler_http_headers extends Hm_Handler_Module {
+    public function process($data) {
+        if (isset($data['language'])) {
+            $data['http_headers'][] = 'Content-Language: '.substr($data['language'], 0, 2);
+        }
+        return $data;
+    }
+}
+}
 if (!class_exists('Hm_Handler_title')) {
 class Hm_Handler_title extends Hm_Handler_Module {
     public function process($data) {
@@ -43,7 +53,6 @@ if (!class_exists('Hm_Handler_language')) {
 class Hm_Handler_language extends Hm_Handler_Module {
     public function process($data) {
         $data['language'] = $this->session->get('language', 'en_US');
-        $data['http_headers'][] = 'Content-Language: '.substr($data['language'], 0, 2);
         return $data;
     }
 }}

@@ -33,7 +33,7 @@ $response_str = $formatter->format_content($response_data);
 
 /* output response */
 $renderer = new Hm_Output_HTTP();
-$renderer->send_response($response_str);
+$renderer->send_response($response_str, $response_data);
 
 /* log execution time to the error log */
 error_log(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
