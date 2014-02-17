@@ -1,0 +1,12 @@
+.configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }
+.subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%; }
+.date { float: right; }
+.imap_connect { display: inline; }
+.imap_debug { flaot: left; width: 600px; clear: left; }
+.add_server { float: left; clear: left; margin-bottom: 10px; }
+.configured_server { float: left; margin: 10px; }
+.sys_messages { margin-left: 20px; margin-top: 2px; float: left }
+.logout_form { float: right; clear: none; padding-left: 10px; margin-top: -5px; }
+.configured_servers { float: left; clear: left; margin-bottom: 10px; }
+.logged_in { padding-left: 10px; float: right; padding-right: 10px; }
+.title { font-weight: bold; float: left; padding: 0px; font-size: 125%; margin: 0px; padding-bottom: 10px; }

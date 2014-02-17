@@ -13,12 +13,12 @@ date_default_timezone_set( 'UTC' );
 $start_time = microtime(true);
 
 /* get includes */
-require 'framework.php';
-require 'session.php';
-require 'hm-imap.php';
-require 'handler_modules.php';
-require 'output_modules.php';
-require 'module_map.php';
+require 'lib/framework.php';
+require 'lib/session.php';
+require 'lib/hm-imap.php';
+require 'module/handler_modules.php';
+require 'module/output_modules.php';
+require 'module/module_map.php';
 
 /* get configuration */
 $config = new Hm_Config_File('/etc/hastymail2/hastymail2.rc');
