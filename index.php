@@ -39,6 +39,6 @@ $renderer->send_response($response_str);
 error_log(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
 error_log(sprintf("Peak Memory: %s", memory_get_peak_usage()));
 
-Hm_Debug::show();
+//Hm_Debug::show();
 
 ?>
