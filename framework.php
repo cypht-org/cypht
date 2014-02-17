@@ -374,6 +374,10 @@ trait Hm_Modules {
         if (!isset(self::$module_list[$page])) {
             self::$module_list[$page] = array();
         }
+        if (isset(self::$module_list[$page][$module])) {
+            Hm_Debug::add(sprintf("Already registered module re-attempted: %s", $module));
+            return;
+        }
         if ($marker) {
             $mods = array_keys(self::$module_list[$page]);
             $index = array_search($marker, $mods);
