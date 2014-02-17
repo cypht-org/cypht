@@ -42,7 +42,8 @@ class Hm_Handler_title extends Hm_Handler_Module {
 if (!class_exists('Hm_Handler_language')) {
 class Hm_Handler_language extends Hm_Handler_Module {
     public function process($data) {
-        $data['language'] = 'es_ES'; //$this->session->get('language', 'en_US');
+        $data['language'] = $this->session->get('language', 'en_US');
+        $data['http_headers'][] = 'Content-Language: '.substr($data['language'], 0, 2);
         return $data;
     }
 }}
