@@ -15,7 +15,6 @@ $start_time = microtime(true);
 /* get includes */
 require 'framework.php';
 require 'session.php';
-require 'output.php';
 require 'hm-imap.php';
 require 'handler_modules.php';
 require 'output_modules.php';

@@ -8,7 +8,7 @@ abstract class Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Title extends Hm_Output_Module {
+class Hm_Output_title extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5') {
             return '<h1 class="title">'.$this->html_safe($input['title']).'</h1>';
@@ -16,7 +16,7 @@ class Hm_Output_Module_Title extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Login extends Hm_Output_Module {
+class Hm_Output_login extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5') {
             if (!$input['router_login_state']) {
@@ -30,7 +30,7 @@ class Hm_Output_Module_Login extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Date extends Hm_Output_Module {
+class Hm_Output_date extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5') {
             return '<div class="date">'.$this->html_safe($input['date']).'</div>';
@@ -38,7 +38,7 @@ class Hm_Output_Module_Date extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Logout extends Hm_Output_Module {
+class Hm_Output_logout extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' && $input['router_login_state']) {
             return '<form class="logout_form" method="POST" action=""><input type="submit" name="logout" value="Logout" /></form>';
@@ -46,7 +46,7 @@ class Hm_Output_Module_Logout extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Msgs extends Hm_Output_Module {
+class Hm_Output_msgs extends Hm_Output_Module {
     public function output($input, $format) {
         $res = '';
         $msgs = Hm_Msgs::get();
@@ -63,7 +63,7 @@ class Hm_Output_Module_Msgs extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Imap_setup_display extends Hm_Output_Module {
+class Hm_Output_imap_setup_display extends Hm_Output_Module {
     public function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
@@ -86,7 +86,7 @@ class Hm_Output_Module_Imap_setup_display extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Imap_debug extends Hm_Output_Module {
+class Hm_Output_imap_debug extends Hm_Output_Module {
     public function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
@@ -100,7 +100,7 @@ class Hm_Output_Module_Imap_debug extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Imap_setup extends Hm_Output_Module {
+class Hm_Output_imap_setup extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5') {
             return '<div><form class="add_server" method="POST" action="">'.
@@ -114,7 +114,7 @@ class Hm_Output_Module_Imap_setup extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Header extends Hm_Output_Module {
+class Hm_Output_header extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' ) {
         return '<!DOCTYPE html><html lang=en-us><head></head><body>';
@@ -123,7 +123,7 @@ class Hm_Output_Module_Header extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Footer extends Hm_Output_Module {
+class Hm_Output_footer extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' ) {
         return '</body></html>';
@@ -132,7 +132,7 @@ class Hm_Output_Module_Footer extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Jquery extends Hm_Output_Module {
+class Hm_Output_jquery extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<script type="text/javascript" src="jquery-1.11.0.min.js"></script>';
@@ -141,7 +141,7 @@ class Hm_Output_Module_Jquery extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_Module_Css extends Hm_Output_Module {
+class Hm_Output_css extends Hm_Output_Module {
     public function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<style type="text/css">'.

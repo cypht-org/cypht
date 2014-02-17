@@ -31,27 +31,27 @@ abstract class Hm_Handler_Module {
     abstract public function process($data);
 }
 
-class Hm_Handler_Module_Title extends Hm_Handler_Module {
+class Hm_Handler_title extends Hm_Handler_Module {
     public function process($data) {
         $data['title'] = ucfirst($this->page);
         return $data;
     }
 }
 
-class Hm_Handler_Module_Date extends Hm_Handler_Module {
+class Hm_Handler_date extends Hm_Handler_Module {
     public function process($data) {
         $data['date'] = date('r');
         return $data;
     }
 }
 
-class Hm_Handler_Module_Login extends Hm_Handler_Module {
+class Hm_Handler_login extends Hm_Handler_Module {
     public function process($data) {
         return $data;
     }
 }
 
-class Hm_Handler_Module_Logout extends Hm_Handler_Module {
+class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
             $this->session->destroy();
@@ -61,13 +61,13 @@ class Hm_Handler_Module_Logout extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_Module_Imap_setup extends Hm_Handler_Module {
+class Hm_Handler_imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
             list($success, $form) = $this->process_form(array('new_imap_server', 'new_imap_port'));
             if (!$success) {
                 $data['old_form'] = $form;
-                Hm_Msgs::add('You must supply a server name and port');
+                \hm_core\Hm_Msgs::add('You must supply a server name and port');
             }
             else {
                 $tls = false;
@@ -86,7 +86,7 @@ class Hm_Handler_Module_Imap_setup extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_Module_Imap_setup_display extends Hm_Handler_Module {
+class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
     public function process($data) {
         $data['imap_servers'] = array();
         $servers = $this->session->get('imap_servers', array());
@@ -97,7 +97,7 @@ class Hm_Handler_Module_Imap_setup_display extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_Module_Imap_connect extends Hm_Handler_Module {
+class Hm_Handler_imap_connect extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
@@ -115,6 +115,7 @@ class Hm_Handler_Module_Imap_connect extends Hm_Handler_Module {
                 $data['imap_debug'] = $imap->show_debug(false, true);
             }
             else {
+                Hm_Msgs::add('Username and password are required');
                 $data['old_form'] = $form;
             }
         }
@@ -122,7 +123,7 @@ class Hm_Handler_Module_Imap_connect extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_Module_Imap_delete extends Hm_Handler_Module {
+class Hm_Handler_imap_delete extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['imap_delete'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
