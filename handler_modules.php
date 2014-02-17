@@ -73,7 +73,7 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('new_imap_server', 'new_imap_port'));
             if (!$success) {
                 $data['old_form'] = $form;
-                \hm_core\Hm_Msgs::add('You must supply a server name and port');
+                Hm_Msgs::add('You must supply a server name and port');
             }
             else {
                 $tls = false;
