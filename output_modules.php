@@ -2,7 +2,8 @@
 
 abstract class Hm_Output_Module {
 
-    private $lstr = array();
+    protected $lstr = array();
+    protected $lang = false;
 
     abstract protected function output($input, $format);
 
@@ -27,6 +28,9 @@ abstract class Hm_Output_Module {
 
     public function output_content($input, $format, $lang_str) {
         $this->lstr = $lang_str;
+        if (isset($lang_str['interface_lang'])) {
+            $this->lang = $lang_str['interface_lang'];
+        }
         return $this->output($input, $format);
     }
 }
@@ -140,7 +144,11 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
 class Hm_Output_header extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-        return '<!DOCTYPE html><html lang=en-us><head></head><body>';
+            $lang = '';
+            if ($this->lang) {
+                $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
+            }
+            return '<!DOCTYPE html><html '.$lang.'><head><meta charset="utf-8"></head><body>';
         }
         return '';
     }

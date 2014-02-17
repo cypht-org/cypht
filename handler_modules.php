@@ -40,7 +40,7 @@ class Hm_Handler_title extends Hm_Handler_Module {
 
 class Hm_Handler_language extends Hm_Handler_Module {
     public function process($data) {
-        $data['language'] = $this->session->get('language', 'en_US');
+        $data['language'] = 'es_ES'; //$this->session->get('language', 'en_US');
         return $data;
     }
 }
