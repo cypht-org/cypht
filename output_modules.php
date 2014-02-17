@@ -1,15 +1,32 @@
 <?php
 
 abstract class Hm_Output_Module {
-    abstract public function output($input, $format);
+
+    protected $language = 'en_US';
+    protected $languages = array(
+        'en_US',
+    ); 
+
+    abstract protected function output($input, $format);
+
+    protected function trans($string) {
+        return $string;
+    }
 
     protected function html_safe($string) {
         return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
+
+    public function output_content($input, $format) {
+        if (isset($input['language']) && in_array($input['language'], $this->languages)) {
+            $this->language = $input['language'];
+        }
+        return $this->output($input, $format);
+    }
 }
 
 class Hm_Output_title extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<h1 class="title">'.$this->html_safe($input['title']).'</h1>';
         }
@@ -17,7 +34,7 @@ class Hm_Output_title extends Hm_Output_Module {
 }
 
 class Hm_Output_login extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             if (!$input['router_login_state']) {
                 return '<form class="login_form" method="POST" action="">'.
@@ -31,7 +48,7 @@ class Hm_Output_login extends Hm_Output_Module {
 }
 
 class Hm_Output_date extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<div class="date">'.$this->html_safe($input['date']).'</div>';
         }
@@ -39,7 +56,7 @@ class Hm_Output_date extends Hm_Output_Module {
 }
 
 class Hm_Output_logout extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5' && $input['router_login_state']) {
             return '<form class="logout_form" method="POST" action=""><input type="submit" name="logout" value="Logout" /></form>';
         }
@@ -47,7 +64,7 @@ class Hm_Output_logout extends Hm_Output_Module {
 }
 
 class Hm_Output_msgs extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         $res = '';
         $msgs = Hm_Msgs::get();
         if (!empty($msgs)) {
@@ -64,7 +81,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
 }
 
 class Hm_Output_imap_setup_display extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
             $res = '<div class="configured_servers"><div class="subtitle">Configured Servers</div>';
@@ -87,7 +104,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
 }
 
 class Hm_Output_imap_debug extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
             $res = '<div class="imap_debug"><div class="subtitle">IMAP Debug</div><pre>';
@@ -101,7 +118,7 @@ class Hm_Output_imap_debug extends Hm_Output_Module {
 }
 
 class Hm_Output_imap_setup extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<div><form class="add_server" method="POST" action="">'.
                 '<div class="subtitle">Add a mail server</div>'.
@@ -115,7 +132,7 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
 }
 
 class Hm_Output_header extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5' ) {
         return '<!DOCTYPE html><html lang=en-us><head></head><body>';
         }
@@ -124,7 +141,7 @@ class Hm_Output_header extends Hm_Output_Module {
 }
 
 class Hm_Output_footer extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5' ) {
         return '</body></html>';
         }
@@ -133,7 +150,7 @@ class Hm_Output_footer extends Hm_Output_Module {
 }
 
 class Hm_Output_jquery extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<script type="text/javascript" src="jquery-1.11.0.min.js"></script>';
         }
@@ -142,7 +159,7 @@ class Hm_Output_jquery extends Hm_Output_Module {
 }
 
 class Hm_Output_css extends Hm_Output_Module {
-    public function output($input, $format) {
+    protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<style type="text/css">'.
                 '.configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }'.

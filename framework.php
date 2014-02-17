@@ -248,7 +248,7 @@ abstract class HM_Format {
             if (class_exists($name)) {
                 if (!$args['logged_in'] || ($args['logged_in'] && $input['router_login_state'])) {
                     $mod = new $name();
-                    $mod_output[] = $mod->output($input, $format);
+                    $mod_output[] = $mod->output_content($input, $format);
                 }
             }
             else {
