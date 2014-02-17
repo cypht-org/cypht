@@ -111,6 +111,7 @@ class Hm_Handler_Module_Imap_delete extends Hm_Handler_Module {
             $servers = $this->session->get('imap_servers', array());
             if (isset($servers[$post['imap_server_id']])) {
                 unset($servers[$post['imap_server_id']]);
+                Hm_Msgs::add('Server deleted');
                 $this->session->set('imap_servers', $servers);
             }
         }

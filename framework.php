@@ -39,15 +39,13 @@ class Hm_Config_File extends Hm_Config {
     }
 }
 
-
 /* handle page processing delegation */
 class Hm_Router {
 
-    private $page = 'home';
-    private $pages = array('home', 'notfound');
-
     public $type = false;
     public $sapi = false;
+    private $page = 'home';
+    private $pages = array('home', 'notfound');
 
     public function process_request($config) {
         $request = new Hm_Request();
@@ -125,53 +123,20 @@ class Hm_Request {
     public $get = array();
     public $cookie = array();
     public $server = array(); 
-
     public $type = false;
     public $sapi = false;
     public $format = false;
-
-    private $allowed_cookie = array(
-        'PHPSESSID' => FILTER_SANITIZE_STRING
-    );
-
-    private $allowed_server = array(
-        'REQUEST_URI' => FILTER_SANITIZE_STRING,
-        'SERVER_ADDR' => FILTER_VALIDATE_IP,
-        'SERVER_PORT' => FILTER_VALIDATE_INT,
-        'PHP_SELF' => FILTER_SANITIZE_STRING,
-        'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING,
-        'SERVER_NAME' => FILTER_SANITIZE_STRING
-    );
-
-    private $allowed_get = array(
-        'page' => FILTER_SANITIZE_STRING
-    );
-
-    private $allowed_post = array(
-        'logout' => FILTER_VALIDATE_BOOLEAN,
-        'tls' => FILTER_VALIDATE_BOOLEAN,
-        'server_port' => FILTER_VALIDATE_INT,
-        'server' => FILTER_SANITIZE_STRING,
-        'username' => FILTER_SANITIZE_STRING,
-        'password' => FILTER_SANITIZE_STRING,
-        'new_imap_server' => FILTER_SANITIZE_STRING,
-        'new_imap_port' => FILTER_VALIDATE_INT,
-        'imap_server_id' => FILTER_VALIDATE_INT,
-        'imap_user' => FILTER_SANITIZE_STRING,
-        'imap_pass' => FILTER_SANITIZE_STRING,
-        'imap_delete' => FILTER_SANITIZE_STRING,
-        'submit_server' => FILTER_SANITIZE_STRING,
-    );
 
     public function __construct() {
         $this->sapi = php_sapi_name();
         $this->get_request_type();
 
         if ($this->type == 'HTTP') {
-            $this->server = filter_input_array(INPUT_SERVER, $this->allowed_server, false);
-            $this->post = filter_input_array(INPUT_POST, $this->allowed_post, false);
-            $this->get = filter_input_array(INPUT_GET, $this->allowed_get, false);
-            $this->cookie = filter_input_array(INPUT_COOKIE, $this->allowed_cookie, false);
+            $filters = require 'input_defs.php';
+            $this->server = filter_input_array(INPUT_SERVER, $filters['allowed_server'], false);
+            $this->post = filter_input_array(INPUT_POST, $filters['allowed_post'], false);
+            $this->get = filter_input_array(INPUT_GET, $filters['allowed_get'], false);
+            $this->cookie = filter_input_array(INPUT_COOKIE, $filters['allowed_cookie'], false);
         }
         if ($this->type == 'CLI') {
             $this->fetch_cli_vars();
@@ -213,6 +178,53 @@ class Hm_Request {
 
     private function is_ajax() {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+}
+
+class Hm_Request_Handler {
+
+    public $page = false;
+    public $request = false;
+    public $session = false;
+    public $config = false;
+    public $response = array();
+    private $modules = array();
+
+    public function process_request($page, $request, $session, $config) {
+        $this->page = $page;
+        $this->request = $request;
+        $this->session = $session;
+        $this->config = $config;
+        $this->modules = Hm_Handler_Modules::get_for_page($page);
+        $this->process_request_actions();
+        return $this->response();
+    }
+
+    public function response() {
+        return $this->response;
+    }
+
+    protected function run_modules() {
+        foreach ($this->modules as $name => $args) {
+            $input = false;
+            $name = 'Hm_Handler_Module_'.ucfirst($name);
+            if (class_exists($name)) {
+                if (!$args['logged_in'] || ($args['logged_in'] && $this->session->active)) {
+                    $mod = new $name( $this, $args['logged_in'], $args['args'] );
+                    $input = $mod->process($this->response);
+                }
+            }
+            else {
+                Hm_Msgs::add(sprintf('Handler module %s activated but not found', $name));
+            }
+            if ($input) {
+                $this->response = $input;
+            }
+        }
+    }
+
+    protected function process_request_actions() {
+        $this->run_modules();
     }
 }
 

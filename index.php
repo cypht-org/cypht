@@ -13,14 +13,13 @@ date_default_timezone_set( 'UTC' );
 $start_time = microtime(true);
 
 /* get includes */
-require_once('framework.php');
-require_once('session.php');
-require_once('output.php');
-require_once('output_modules.php');
-require_once('handlers.php');
-require_once('hm-imap.php');
-require_once('handler_modules.php');
-require_once('module_map.php');
+require 'framework.php';
+require 'session.php';
+require 'output.php';
+require 'hm-imap.php';
+require 'handler_modules.php';
+require 'output_modules.php';
+require 'module_map.php';
 
 /* get configuration */
 $config = new Hm_Config_File('/etc/hastymail2/hastymail2.rc');
@@ -40,7 +39,5 @@ $renderer->send_response($response);
 /* log execution time to the error log */
 error_log(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
 error_log(sprintf("Peak Memory: %s", memory_get_peak_usage()));
-
-//Hm_Debug::show();
 
 ?>
