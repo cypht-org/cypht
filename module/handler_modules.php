@@ -65,13 +65,6 @@ class Hm_Handler_date extends Hm_Handler_Module {
     }
 }}
 
-if (!class_exists('Hm_Handler_login')) {
-class Hm_Handler_login extends Hm_Handler_Module {
-    public function process($data) {
-        return $data;
-    }
-}}
-
 if (!class_exists('Hm_Handler_logout')) {
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
