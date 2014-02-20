@@ -46,6 +46,7 @@ return array(
         'imap_delete' => FILTER_SANITIZE_STRING,
         'submit_server' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
+        'hm_ajax_hook' => FILTER_SANITIZE_STRING,
     )
 );
 
