@@ -80,18 +80,19 @@ class Hm_Output_logout extends Hm_Output_Module {
 if (!class_exists('Hm_Output_msgs')) {
 class Hm_Output_msgs extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '';
-        $msgs = Hm_Msgs::get();
-        if (!empty($msgs)) {
-            $res .= '<div class="sys_messages"><span class="subtitle">'.$this->trans('Notices').': </span>';
-            if ($format == 'HTML5') {
+        if ($format == 'HTML5') {
+            $res = '';
+            $msgs = Hm_Msgs::get();
+            $res .= '<div class="sys_messages">';
+            if (!empty($msgs)) {
                 foreach ($msgs as $val) {
                     $res .= $this->html_safe($val).' ';
                 }
             }
             $res .= '</div>';
+            return $res;
         }
-        return $res;
+        return '';
     }
 }}
 
@@ -105,13 +106,18 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                 $res .= '<div class="configured_server">';
                 $res .= sprintf("Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['server']),
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
-                $res .= ' <form class="imap_connect" method="POST">'.
+                $res .= ' <form id="imap_connect'.$index.'" class="imap_connect" method="POST">'.
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
                     ' '.$this->trans('Username').': <input type="text" name="imap_user" value="">'.
                     ' '.$this->trans('Password').': <input type="password" name="imap_pass">'.
-                    ' <input type="submit" value="Connect" name="imap_connect" />'.
+                    ' <input type="submit" value="Connect" name="connect" />'.
                     ' <input type="submit" value="Delete" name="imap_delete" />'.
-                    '</form></div>';
+                    ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />'.
+                    ' <input type="hidden" value="1" name="imap_connect" />'.
+                    '</form><script type="text/javascript">$("#imap_connect'.$index.'").on("submit", function() {'.
+                        'event.preventDefault(); Hm_Ajax.request( $( this ).serializeArray(), function(res) {'.
+                        'Hm_Notices.show(res.router_user_msgs); $(".imap_debug").html(res.imap_debug); }
+                    );});</script></div>';
             }
             $res .= '</div>';
         }
@@ -191,5 +197,13 @@ class Hm_Output_css extends Hm_Output_Module {
         return '';
     }
 }}
+
+if (!class_exists('Hm_Output_js')) {
+    class Hm_Output_js extends Hm_Output_Module {
+        protected function output($input, $format) {
+            return '<script type="text/javascript" src="js/site.js"></script>';
+        }
+    }
+}
 
 ?>
