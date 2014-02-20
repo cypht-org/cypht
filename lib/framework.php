@@ -71,7 +71,7 @@ class Hm_Router {
     }
 
     private function check_for_redirect($request, $session, $result) {
-        if (!empty($request->post)) {
+        if (!empty($request->post) && $request->type == 'HTTP') {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
                 $session->set('redirect_messages', $msgs);
@@ -89,6 +89,9 @@ class Hm_Router {
             else {
                 $this->page = 'notfound';
             }
+        }
+        elseif (isset($request->post['hm_ajax_hook'])) {
+            $this->page = $request->post['hm_ajax_hook'];
         }
     }
 
@@ -131,7 +134,7 @@ class Hm_Request {
         $this->sapi = php_sapi_name();
         $this->get_request_type();
 
-        if ($this->type == 'HTTP') {
+        if ($this->type == 'HTTP' || $this->type == 'AJAX') {
             $filters = require 'lib/input_defs.php';
             $this->server = filter_input_array(INPUT_SERVER, $filters['allowed_server'], false);
             $this->post = filter_input_array(INPUT_POST, $filters['allowed_post'], false);
@@ -181,6 +184,7 @@ class Hm_Request {
     }
 }
 
+/* request detail */
 class Hm_Request_Handler {
 
     public $page = false;
@@ -277,6 +281,7 @@ abstract class HM_Format {
 class Hm_Format_JSON extends HM_Format {
 
     public function content($input, $lang_str) {
+        $input['router_user_msgs'] = Hm_Msgs::get();
         return json_encode($input, JSON_FORCE_OBJECT);
     }
 }
@@ -365,8 +370,13 @@ trait Hm_List {
         return self::$msgs;
     }
 
-    public static function show() {
-        print_r(self::$msgs);
+    public static function show($log=false) {
+        if ($log) {
+            error_log(print_r(self::$msgs, true));
+        }
+        else {
+            print_r(self::$msgs);
+        }
     }
 }
 class Hm_Debug { use Hm_List; }
