@@ -3,7 +3,6 @@ Hm_Ajax = {
     callback: false,
 
     request: function(args, callback) {
-        console.log(args);
         Hm_Ajax.callback = callback;
         $.post('', args )
         .done(Hm_Ajax.done)
