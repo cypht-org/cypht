@@ -107,6 +107,7 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
         $servers = Hm_IMAP_List::dump();
         Hm_Debug::add(print_r($servers, true));
         $this->session->set('imap_servers', $servers);
+        Hm_IMAP_List::clean_up();
     }
 }}
 
