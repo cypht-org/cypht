@@ -436,4 +436,72 @@ trait Hm_Modules {
 class Hm_Handler_Modules { use Hm_Modules; }
 class Hm_Output_Modules { use Hm_Modules; }
 
+class Hm_IMAP_List {
+
+    private static $imap_list = array();
+
+    public static function connect( $id, $user, $pass) {
+        if (isset(self::$imap_list[$id])) {
+            $imap = self::$imap_list[$id];
+            if ($imap['object']) {
+                return $imap['object'];
+            }
+            else {
+                self::$imap_list[$id]['object'] = new Hm_IMAP();
+                $res = self::$imap_list[$id]['object']->connect(array(
+                    'server' => $imap['server'],
+                    'port' => $imap['port'],
+                    'tls' => $imap['tls'],
+                    'username' => $user,
+                    'password' => $pass
+                ));
+                if ($res) {
+                    self::$imap_list[$id]['connected'] = true;
+                }
+                return self::$imap_list[$id]['object'];
+            }
+        }
+        return false;
+    }
+    public static function add( $atts, $id=false ) {
+        $atts['object'] = false;
+        $atts['connected'] = false;
+        if ($id) {
+            self::$imap_list[$id] = $atts;
+        }
+        else {
+            self::$imap_list[] = $atts;
+        }
+    }
+    public static function del( $id ) {
+        if (isset(self::$imap_list[$id])) {
+            unset(self::$imap_list[$id]);
+            return true;
+        }
+        return false;
+    }
+
+    public static function dump() {
+        $list = array();
+        foreach (self::$imap_list as $index => $server) {
+            $list[$index] = array(
+                'server' => $server['server'],
+                'port' => $server['port'],
+                'tls' => $server['tls']
+            );
+        }
+        return $list;
+    }
+
+    public static function clean_up( $id=false ) {
+        foreach (self::$imap_list as $index => $server) {
+            if ($id !== false && $id != $index) {
+                continue;
+            }
+            if ($server['connected'] && $server['object']);
+            self::$imap_list[$index]['object']->disconnect();
+            self::$imap_list[$index]['connected'] = false;
+        }
+    }
+}
 ?>
