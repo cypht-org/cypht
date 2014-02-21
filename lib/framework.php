@@ -372,7 +372,7 @@ trait Hm_List {
 
     public static function show($log=false) {
         if ($log) {
-            error_log(print_r(self::$msgs, true));
+            error_log(str_replace(array("\n", "\t", "  "), array(' '), print_r(self::$msgs, true)));
         }
         else {
             print_r(self::$msgs);
