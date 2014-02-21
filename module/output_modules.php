@@ -103,21 +103,25 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
         if ($format == 'HTML5') {
             $res = '<div class="configured_servers"><div class="subtitle">Configured Servers</div>';
             foreach ($input['imap_servers'] as $index => $vals) {
-                $res .= '<div class="configured_server">';
+                $res .= '<div class="configured_server" id="imap_server'.$index.'">';
                 $res .= sprintf("Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['server']),
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
-                $res .= ' <form id="imap_connect'.$index.'" class="imap_connect" method="POST">'.
+                $res .= ' <form class="imap_connect" method="POST">'.
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
                     ' '.$this->trans('Username').': <input type="text" name="imap_user" value="">'.
                     ' '.$this->trans('Password').': <input type="password" name="imap_pass">'.
-                    ' <input type="submit" value="Connect" name="connect" />'.
-                    ' <input type="submit" value="Delete" name="imap_delete" />'.
-                    ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />'.
-                    ' <input type="hidden" value="1" name="imap_connect" />'.
-                    '</form><script type="text/javascript">$("#imap_connect'.$index.'").on("submit", function() {'.
-                        'event.preventDefault(); Hm_Ajax.request( $( this ).serializeArray(), function(res) {'.
-                        'Hm_Notices.show(res.router_user_msgs); $(".imap_debug").html(res.imap_debug); }
-                    );});</script></div>';
+                    ' <input type="submit" value="Connect" id="imap_connect'.$index.'" />'.
+                    ' <input type="submit" value="Delete" id="imap_delete'.$index.'" />'.
+                    ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form><script type="text/javascript">'.
+                    '$("#imap_delete'.$index.'").on("click", function() {'.
+                        'event.preventDefault(); Hm_Ajax.request( $( this ).parent().serializeArray(), function(res) {'.
+                        'Hm_Notices.show(res.router_user_msgs); if (res.deleted_server_id > -1 ) {$("#imap_server'.$index.'").remove();}},'.
+                        '{"imap_delete": 1});});'.
+                    '$("#imap_connect'.$index.'").on("click", function() {'.
+                        'event.preventDefault(); Hm_Ajax.request( $( this ).parent().serializeArray(), function(res) {'.
+                        'Hm_Notices.show(res.router_user_msgs); $(".imap_debug").empty(); $(".imap_debug").html(res.imap_debug); },'.
+                        '{"imap_connect": 1});});'.
+                    '</script></div>';
             }
             $res .= '</div>';
         }
