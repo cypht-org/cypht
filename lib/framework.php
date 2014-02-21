@@ -498,9 +498,10 @@ class Hm_IMAP_List {
             if ($id !== false && $id != $index) {
                 continue;
             }
-            if ($server['connected'] && $server['object']);
-            self::$imap_list[$index]['object']->disconnect();
-            self::$imap_list[$index]['connected'] = false;
+            if ($server['connected'] && $server['object']) {
+                self::$imap_list[$index]['object']->disconnect();
+                self::$imap_list[$index]['connected'] = false;
+            }
         }
     }
 }
