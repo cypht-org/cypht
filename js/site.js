@@ -9,7 +9,6 @@ Hm_Ajax = {
                 args.push({'name': name, 'value': extra[name]});
             }
         }
-        console.log(args);
         $.post('', args )
         .done(Hm_Ajax.done)
         .fail(Hm_Ajax.fail)
