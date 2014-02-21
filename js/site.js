@@ -2,8 +2,14 @@ Hm_Ajax = {
 
     callback: false,
 
-    request: function(args, callback) {
+    request: function(args, callback, extra) {
         Hm_Ajax.callback = callback;
+        if (extra) {
+            for (name in extra) {
+                args.push({'name': name, 'value': extra[name]});
+            }
+        }
+        console.log(args);
         $.post('', args )
         .done(Hm_Ajax.done)
         .fail(Hm_Ajax.fail)
