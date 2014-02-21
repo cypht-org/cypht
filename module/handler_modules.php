@@ -90,15 +90,33 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
                 if (isset($this->request->post['tls'])) {
                     $tls = true;
                 }
-                $servers = $this->session->get('imap_servers', array());
-                Hm_Msgs::add('Added server!');
-                $this->session->set('imap_servers', array_merge($servers, array(array(
+                Hm_IMAP_List::add( array(
                     'server' => $form['new_imap_server'],
                     'port' => $form['new_imap_port'],
-                    'tls' => $tls))));
+                    'tls' => $tls));
+                Hm_Msgs::add('Added server!');
             }
         }
         return $data;
+    }
+}}
+
+if (!class_exists('Hm_Handler_save_imap_servers')) {
+class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
+    public function process($data) {
+        $servers = Hm_IMAP_List::dump();
+        Hm_Debug::add(print_r($servers, true));
+        $this->session->set('imap_servers', $servers);
+    }
+}}
+
+if (!class_exists('Hm_Handler_load_imap_servers')) {
+class Hm_Handler_load_imap_servers extends Hm_Handler_Module {
+    public function process($data) {
+        $servers = $this->session->get('imap_servers', array());
+        foreach ($servers as $index => $server) {
+            Hm_IMAP_List::add( $server, $index );
+        }
     }
 }}
 
@@ -106,7 +124,7 @@ if (!class_exists('Hm_Handler_imap_setup_display')) {
 class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
     public function process($data) {
         $data['imap_servers'] = array();
-        $servers = $this->session->get('imap_servers', array());
+        $servers = Hm_IMAP_List::dump();
         if (!empty($servers)) {
             $data['imap_servers'] = $servers;
         }
@@ -120,17 +138,13 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
             if ($success) {
-                $servers = $this->session->get('imap_servers', array());
-                $details = $servers[$form['imap_server_id']];
-                $imap = new Hm_IMAP();
-                $imap->connect(array(
-                    'username' => $form['imap_user'],
-                    'password' => $form['imap_pass'],
-                    'server' => $details['server'],
-                    'port' => $details['port'],
-                    'tls' => $details['tls']
-                ));
-                $data['imap_debug'] = $imap->show_debug(false, true);
+                $imap = Hm_IMAP_List::connect( $form['imap_server_id'], $form['imap_user'], $form['imap_pass'] );
+                if ($imap) {
+                    $data['imap_debug'] = $imap->show_debug(false, true);
+                    if ($imap->get_state() == 'authenticated') {
+                        Hm_Msgs::add("Successfully authenticated to the IMAP server!");
+                    }
+                }
             }
             else {
                 Hm_Msgs::add('Username and password are required');
@@ -147,11 +161,10 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
         if (isset($this->request->post['imap_delete'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             if ($success) {
-                $servers = $this->session->get('imap_servers', array());
-                if (isset($servers[$form['imap_server_id']])) {
-                    unset($servers[$form['imap_server_id']]);
+                $res = Hm_IMAP_List::del($form['imap_server_id']);
+                if ($res) {
+                    $data['deleted_server_id'] = $form['imap_server_id'];
                     Hm_Msgs::add('Server deleted');
-                    $this->session->set('imap_servers', $servers);
                 }
             }
             else {
