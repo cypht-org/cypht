@@ -2,6 +2,8 @@
 
 abstract class Hm_Output_Module {
 
+    use Hm_Sanitize;
+
     protected $lstr = array();
     protected $lang = false;
 
@@ -20,10 +22,6 @@ abstract class Hm_Output_Module {
             Hm_Debug::add(sprintf('No translation found: %s', $string));
         }
         return $string;
-    }
-
-    protected function html_safe($string) {
-        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     public function output_content($input, $format, $lang_str) {
