@@ -114,7 +114,8 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     $res .= $user_row.$pass_row;
                 }
                 $res .= ' Remember: <input type="checkbox" '. (isset($vals['user']) ? 'checked="checked" ' : '') . 'value="1" name="imap_remember" /><br />'.
-                    ' <input type="submit" value="Connect" id="imap_connect'.$index.'" />'.
+                    ' <input type="submit" value="Test Connection" id="imap_connect'.$index.'" />'.
+                    ' <input type="submit" value="Explore" id="imap_explore'.$index.'" />'.
                     ' <input type="submit" value="Delete" id="imap_delete'.$index.'" />'.
                     ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form><script type="text/javascript">'.
                     '$("#imap_delete'.$index.'").on("click", function() {'.
