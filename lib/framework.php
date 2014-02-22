@@ -440,28 +440,47 @@ class Hm_IMAP_List {
 
     private static $imap_list = array();
 
-    public static function connect( $id, $user, $pass) {
+    public static function connect( $id, $user=false, $pass=false, $save_credentials=false) {
         if (isset(self::$imap_list[$id])) {
             $imap = self::$imap_list[$id];
             if ($imap['object']) {
                 return $imap['object'];
             }
             else {
-                self::$imap_list[$id]['object'] = new Hm_IMAP();
-                $res = self::$imap_list[$id]['object']->connect(array(
-                    'server' => $imap['server'],
-                    'port' => $imap['port'],
-                    'tls' => $imap['tls'],
-                    'username' => $user,
-                    'password' => $pass
-                ));
-                if ($res) {
-                    self::$imap_list[$id]['connected'] = true;
+                if ((!$user || !$pass) && (!isset($imap['user']) || !isset($imap['pass']))) {
+                    return false;
                 }
-                return self::$imap_list[$id]['object'];
+                elseif (isset($imap['user']) && isset($imap['pass'])) {
+                    $user = $imap['user'];
+                    $pass = $imap['pass'];
+                }
+                if ($user && $pass) {
+                    self::$imap_list[$id]['object'] = new Hm_IMAP();
+                    $res = self::$imap_list[$id]['object']->connect(array(
+                        'server' => $imap['server'],
+                        'port' => $imap['port'],
+                        'tls' => $imap['tls'],
+                        'username' => $user,
+                        'password' => $pass
+                    ));
+                    if ($res) {
+                        self::$imap_list[$id]['connected'] = true;
+                        if ($save_credentials) {
+                            self::$imap_list[$id]['user'] = $user;
+                            self::$imap_list[$id]['pass'] = $pass;
+                        }
+                    }
+                    return self::$imap_list[$id]['object'];
+                }
             }
         }
         return false;
+    }
+    public static function forget_credentials( $id ) {
+        if (isset(self::$imap_list[$id])) {
+            unset(self::$imap_list[$id]['user']);
+            unset(self::$imap_list[$id]['pass']);
+        }
     }
     public static function add( $atts, $id=false ) {
         $atts['object'] = false;
@@ -489,6 +508,12 @@ class Hm_IMAP_List {
                 'port' => $server['port'],
                 'tls' => $server['tls']
             );
+            if (isset($server['user'])) {
+                $list[$index]['user'] = $server['user'];
+            }
+            if (isset($server['pass'])) {
+                $list[$index]['pass'] = $server['pass'];
+            }
         }
         return $list;
     }
