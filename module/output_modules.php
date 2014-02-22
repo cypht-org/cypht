@@ -120,6 +120,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     ' <input type="submit" value="Delete" id="imap_delete'.$index.'" />'.
                     ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form><script type="text/javascript">'.
                     '$("#imap_delete'.$index.'").on("click", function() {'.
+                        '$(".imap_debug").empty(); '.
                         'event.preventDefault(); Hm_Ajax.request( $( this ).parent().serializeArray(), function(res) {'.
                         'Hm_Notices.show(res.router_user_msgs); if (res.deleted_server_id > -1 ) {$("#imap_server'.$index.'").remove();}},'.
                         '{"imap_delete": 1});});'.
