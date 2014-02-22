@@ -357,6 +357,14 @@ class Hm_Output_File extends Hm_Output {
     }
 }
 
+/* output sanitizing */
+trait Hm_Sanitize {
+
+    protected function html_safe($string) {
+        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+}
+
 /* interface and debug mssages */
 trait Hm_List {
 
