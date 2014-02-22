@@ -4,7 +4,7 @@
 .imap_connect { display: inline; }
 .imap_debug { flaot: left; width: 80%; clear: left; white-space: pre; font-size: 90%; word-wrap: break-word; }
 .add_server { float: left; clear: left; margin-bottom: 10px; }
-.configured_server { float: left; margin: 10px; }
+.configured_server { float: left; margin: 10px; width: 250px; }
 .sys_messages { margin-left: 20px; margin-top: 2px; float: left }
 .logout_form { float: right; clear: none; padding-left: 10px; margin-top: -5px; }
 .configured_servers { float: left; clear: left; margin-bottom: 10px; }
