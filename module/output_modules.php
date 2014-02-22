@@ -103,14 +103,17 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
         if ($format == 'HTML5') {
             $res = '<div class="configured_servers"><div class="subtitle">Configured Servers</div>';
             foreach ($input['imap_servers'] as $index => $vals) {
+
+                $user_row = '<span id="user_row'.$index.'"> '.$this->trans('Username').': <input type="text" name="imap_user" value=""></span>';
+                $pass_row = '<span id="pass_row'.$index.'"> '.$this->trans('Password').': <input type="password" name="imap_pass"></span>';
+
                 $res .= '<div class="configured_server" id="imap_server'.$index.'">';
                 $res .= sprintf("Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['server']),
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
                 $res .= ' <form class="imap_connect" method="POST">'.
-                    '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />';
+                    '<input type="hidden" id="imap_server_id'.$index.'" name="imap_server_id" value="'.$this->html_safe($index).'" />';
                 if (!isset($vals['user'])) {
-                    $res .= '<span id="user_row'.$index.'"> '.$this->trans('Username').': <input type="text" name="imap_user" value=""></span>'.
-                        '<span id="pass_row'.$index.'"> '.$this->trans('Password').': <input type="password" name="imap_pass"></span>';
+                    $res .= $user_row.$pass_row;
                 }
                 $res .= ' Remember: <input type="checkbox" '. (isset($vals['user']) ? 'checked="checked" ' : '') . 'value="1" name="imap_remember" /><br />'.
                     ' <input type="submit" value="Connect" id="imap_connect'.$index.'" />'.
@@ -121,11 +124,13 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                         'Hm_Notices.show(res.router_user_msgs); if (res.deleted_server_id > -1 ) {$("#imap_server'.$index.'").remove();}},'.
                         '{"imap_delete": 1});});'.
                     '$("#imap_connect'.$index.'").on("click", function() {'.
+                        '$(this).attr("disabled", true);'.
                         'event.preventDefault(); form = $(this).parent(); Hm_Ajax.request( $(this).parent().serializeArray(), function(res) {'.
                         'Hm_Notices.show(res.router_user_msgs); '.
                         'if (res.just_saved_credentials) { $("#pass_row'.$index.'").remove(); $("#user_row'.$index.'").remove(); } '.
-                        'if (res.just_forgot_credentials) { alert("TODO: create user/pass inputs here!"); } '.
-                        'console.log(form); $(".imap_debug").empty(); $(".imap_debug").html(res.imap_debug); },'.
+                        'if (res.just_forgot_credentials) { $(\''.$pass_row.'\').insertAfter("#imap_server_id'.$index.'"); '.
+                        '$(\''.$user_row.'\').insertAfter("#imap_server_id'.$index.'"); } '.
+                        '$("#imap_connect'.$index.'").attr("disabled", false); $(".imap_debug").empty(); $(".imap_debug").html(res.imap_debug); },'.
                         '{"imap_connect": 1});});'.
                     '</script></div>';
             }
