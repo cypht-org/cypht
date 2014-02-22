@@ -2,7 +2,7 @@
 .subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%; }
 .date { float: right; }
 .imap_connect { display: inline; }
-.imap_debug { flaot: left; width: 600px; clear: left; }
+.imap_debug { flaot: left; width: 80%; clear: left; white-space: pre; font-size: 90%; word-wrap: break-word; }
 .add_server { float: left; clear: left; margin-bottom: 10px; }
 .configured_server { float: left; margin: 10px; }
 .sys_messages { margin-left: 20px; margin-top: 2px; float: left }
