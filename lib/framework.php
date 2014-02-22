@@ -90,7 +90,7 @@ class Hm_Router {
                 $this->page = 'notfound';
             }
         }
-        elseif (isset($request->post['hm_ajax_hook'])) {
+        elseif ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook'])) {
             $this->page = $request->post['hm_ajax_hook'];
         }
     }
