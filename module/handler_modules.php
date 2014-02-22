@@ -1,6 +1,9 @@
 <?php
 
 abstract class Hm_Handler_Module {
+
+    use Hm_Sanitize;
+
     protected $session = false;
     protected $request = false;
     protected $config = false;
@@ -90,11 +93,16 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
                 if (isset($this->request->post['tls'])) {
                     $tls = true;
                 }
-                Hm_IMAP_List::add( array(
-                    'server' => $form['new_imap_server'],
-                    'port' => $form['new_imap_port'],
-                    'tls' => $tls));
-                Hm_Msgs::add('Added server!');
+                if ($con = fsockopen($form['new_imap_server'], $form['new_imap_port'], $errno, $errstr, 2)) {
+                    Hm_IMAP_List::add( array(
+                        'server' => $form['new_imap_server'],
+                        'port' => $form['new_imap_port'],
+                        'tls' => $tls));
+                    Hm_Msgs::add('Added server!');
+                }
+                else {
+                    Hm_Msgs::add(sprintf('Cound not add server: %s', $this->html_safe($errstr)));
+                }
             }
         }
         return $data;
