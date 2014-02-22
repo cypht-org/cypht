@@ -105,7 +105,6 @@ if (!class_exists('Hm_Handler_save_imap_servers')) {
 class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_IMAP_List::dump();
-        Hm_Debug::add(print_r($servers, true));
         $this->session->set('imap_servers', $servers);
         Hm_IMAP_List::clean_up();
     }
@@ -136,15 +135,34 @@ class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
 if (!class_exists('Hm_Handler_imap_connect')) {
 class Hm_Handler_imap_connect extends Hm_Handler_Module {
     public function process($data) {
+        $data['just_saved_credentials'] = false;
+        $data['just_forgot_credentials'] = false;
+        $remember = false;
+        if (isset($this->request->post['imap_remember'])) {
+            $remember = true;
+        }
+        $remembered = false;
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
+            $imap = false;
             if ($success) {
-                $imap = Hm_IMAP_List::connect( $form['imap_server_id'], $form['imap_user'], $form['imap_pass'] );
-                if ($imap) {
-                    $data['imap_debug'] = $imap->show_debug(false, true);
-                    if ($imap->get_state() == 'authenticated') {
-                        Hm_Msgs::add("Successfully authenticated to the IMAP server!");
-                    }
+                $imap = Hm_IMAP_List::connect( $form['imap_server_id'], $form['imap_user'], $form['imap_pass'], $remember );
+            }
+            elseif (isset($form['imap_server_id'])) {
+                $imap = Hm_IMAP_List::connect( $form['imap_server_id'] );
+                $remembered = true;
+            }
+            if ($imap) {
+                if ($remember) {
+                    $data['just_saved_credentials'] = true;
+                }
+                if (!$remember && $remembered) {
+                    Hm_IMAP_List::forget_credentials( $form['imap_server_id'] );
+                    $data['just_forgot_credentials'] = true;
+                }
+                $data['imap_debug'] = $imap->show_debug(false, true);
+                if ($imap->get_state() == 'authenticated') {
+                    Hm_Msgs::add("Successfully authenticated to the IMAP server!");
                 }
             }
             else {
