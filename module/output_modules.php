@@ -124,13 +124,13 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                         'Hm_Notices.show(res.router_user_msgs); if (res.deleted_server_id > -1 ) {$("#imap_server'.$index.'").remove();}},'.
                         '{"imap_delete": 1});});'.
                     '$("#imap_connect'.$index.'").on("click", function() {'.
-                        '$(this).attr("disabled", true);'.
+                        '$(this).attr("disabled", true); $(".imap_debug").empty(); '.
                         'event.preventDefault(); form = $(this).parent(); Hm_Ajax.request( $(this).parent().serializeArray(), function(res) {'.
                         'Hm_Notices.show(res.router_user_msgs); '.
                         'if (res.just_saved_credentials) { $("#pass_row'.$index.'").remove(); $("#user_row'.$index.'").remove(); } '.
                         'if (res.just_forgot_credentials) { $(\''.$pass_row.'\').insertAfter("#imap_server_id'.$index.'"); '.
                         '$(\''.$user_row.'\').insertAfter("#imap_server_id'.$index.'"); } '.
-                        '$("#imap_connect'.$index.'").attr("disabled", false); $(".imap_debug").empty(); $(".imap_debug").html(res.imap_debug); },'.
+                        '$("#imap_connect'.$index.'").attr("disabled", false); $(".imap_debug").html(res.imap_debug); },'.
                         '{"imap_connect": 1});});'.
                     '</script></div>';
             }
