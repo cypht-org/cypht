@@ -34,7 +34,11 @@
  *
  */
 
-/* Homepage data handler modules */
+
+
+/* Homepage */
+
+/* data modules */
 Hm_Handler_Modules::add('home', 'load_imap_servers',  true);
 Hm_Handler_Modules::add('home', 'language',  true);
 Hm_Handler_Modules::add('home', 'title', true);
@@ -46,7 +50,7 @@ Hm_Handler_Modules::add('home', 'imap_connect', true);
 Hm_Handler_Modules::add('home', 'http_headers', true);
 Hm_Handler_Modules::add('home', 'save_imap_servers',  true);
 
-/* Homepage output modules */
+/* output modules */
 Hm_Output_Modules::add('home', 'header', false);
 Hm_Output_Modules::add('home', 'css', false);
 Hm_Output_Modules::add('home', 'jquery', true);
@@ -60,6 +64,7 @@ Hm_Output_Modules::add('home', 'imap_setup_display', true);
 Hm_Output_Modules::add('home', 'imap_debug', true);
 Hm_Output_Modules::add('home', 'js', true);
 Hm_Output_Modules::add('home', 'footer', true);
+
 
 /* ajax callbacks */
 Hm_Handler_Modules::add('ajax_imap_debug', 'load_imap_servers',  true);
