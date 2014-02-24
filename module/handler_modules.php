@@ -109,12 +109,39 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
     }
 }}
 
+if (!class_exists('Hm_Handler_save_imap_cache')) {
+class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
+    public function process($data) {
+        $cache = array();
+        $servers = Hm_IMAP_List::dump(false,true);
+        foreach ($servers as $index => $server) {
+            if (is_object($server['object'])) {
+                $cache[$index] = $server['object']->dump_cache('gzip');
+            }
+        }
+        if (count($cache) > 0) {
+            $this->session->set('imap_cache', $cache);
+            Hm_Debug::add(sprintf('Cached data for %d IMAP connections', count($cache)));
+        }
+        return $data;
+    }
+}}
+
 if (!class_exists('Hm_Handler_save_imap_servers')) {
 class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_IMAP_List::dump();
+        $cache = $this->session->get('imap_cache', array());
+        $new_cache = array();
+        foreach ($cache as $index => $cache_str) {
+            if (isset($servers[$index])) {
+                $new_cache[$index] = $cache_str;
+            }
+        }
         $this->session->set('imap_servers', $servers);
+        $this->session->set('imap_cache', $new_cache);
         Hm_IMAP_List::clean_up();
+        return $data;
     }
 }}
 
@@ -125,6 +152,7 @@ class Hm_Handler_load_imap_servers extends Hm_Handler_Module {
         foreach ($servers as $index => $server) {
             Hm_IMAP_List::add( $server, $index );
         }
+        return $data;
     }
 }}
 
@@ -153,11 +181,16 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
             $imap = false;
+            $cache = false;
+            $imap_cache = $this->session->get('imap_cache', array());
+            if (isset($imap_cache[$form['imap_server_id']])) {
+                $cache = $imap_cache[$form['imap_server_id']];
+            }
             if ($success) {
-                $imap = Hm_IMAP_List::connect( $form['imap_server_id'], $form['imap_user'], $form['imap_pass'], $remember );
+                $imap = Hm_IMAP_List::connect( $form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], $remember );
             }
             elseif (isset($form['imap_server_id'])) {
-                $imap = Hm_IMAP_List::connect( $form['imap_server_id'] );
+                $imap = Hm_IMAP_List::connect( $form['imap_server_id'], $cache );
                 $remembered = true;
             }
             if ($imap) {
@@ -168,10 +201,11 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     Hm_IMAP_List::forget_credentials( $form['imap_server_id'] );
                     $data['just_forgot_credentials'] = true;
                 }
-                $data['imap_debug'] = $imap->show_debug(false, true);
                 if ($imap->get_state() == 'authenticated') {
+                    $data['imap_folders'] = $imap->get_folder_list_by_level();
                     Hm_Msgs::add("Successfully authenticated to the IMAP server!");
                 }
+                $data['imap_debug'] = $imap->show_debug(false, true);
             }
             else {
                 Hm_Msgs::add('Username and password are required');
