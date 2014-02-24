@@ -266,7 +266,15 @@ abstract class HM_Format {
             if (class_exists($name)) {
                 if (!$args['logged_in'] || ($args['logged_in'] && $input['router_login_state'])) {
                     $mod = new $name();
-                    $mod_output[] = $mod->output_content($input, $format, $lang_str);
+                    if ($format == 'JSON') {
+                        $mod_output = $mod->output_content($input, $format, $lang_str);
+                        if ($mod_output) {
+                            $input = $mod_output;
+                        }
+                    }
+                    else {
+                        $mod_output[] = $mod->output_content($input, $format, $lang_str);
+                    }
                 }
             }
             else {
@@ -282,7 +290,8 @@ class Hm_Format_JSON extends HM_Format {
 
     public function content($input, $lang_str) {
         $input['router_user_msgs'] = Hm_Msgs::get();
-        return json_encode($input, JSON_FORCE_OBJECT);
+        $output = $this->run_modules($input, 'JSON', $lang_str);
+        return json_encode($output, JSON_FORCE_OBJECT);
     }
 }
 
