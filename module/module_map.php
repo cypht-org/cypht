@@ -46,7 +46,6 @@ Hm_Handler_Modules::add('home', 'date', true);
 Hm_Handler_Modules::add('home', 'logout', true);
 Hm_Handler_Modules::add('home', 'imap_setup', true);
 Hm_Handler_Modules::add('home', 'imap_setup_display', true);
-Hm_Handler_Modules::add('home', 'imap_connect', true);
 Hm_Handler_Modules::add('home', 'http_headers', true);
 Hm_Handler_Modules::add('home', 'save_imap_servers',  true);
 
@@ -61,6 +60,7 @@ Hm_Output_Modules::add('home', 'msgs', true);
 Hm_Output_Modules::add('home', 'date', true);
 Hm_Output_Modules::add('home', 'imap_setup', true);
 Hm_Output_Modules::add('home', 'imap_setup_display', true);
+Hm_Output_Modules::add('home', 'imap_folders', true);
 Hm_Output_Modules::add('home', 'imap_debug', true);
 Hm_Output_Modules::add('home', 'js', true);
 Hm_Output_Modules::add('home', 'footer', true);
@@ -70,6 +70,7 @@ Hm_Output_Modules::add('home', 'footer', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'load_imap_servers',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_connect', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_delete', true);
+Hm_Handler_Modules::add('ajax_imap_debug', 'save_imap_cache',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'save_imap_servers',  true);
 
 /* Not found page modules */

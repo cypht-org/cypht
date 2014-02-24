@@ -10,3 +10,4 @@
 .configured_servers { float: left; clear: left; margin-bottom: 10px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .title { font-weight: bold; float: left; padding: 0px; font-size: 125%; margin: 0px; padding-bottom: 10px; }
+.imap_folders { float: left; clear: left; }

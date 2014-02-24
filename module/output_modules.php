@@ -129,7 +129,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                         'if (res.just_saved_credentials) { $("#pass_row'.$index.'").remove(); $("#user_row'.$index.'").remove(); } '.
                         'if (res.just_forgot_credentials) { $(\''.$pass_row.'\').insertAfter("#imap_server_id'.$index.'"); '.
                         '$(\''.$user_row.'\').insertAfter("#imap_server_id'.$index.'"); } '.
-                        '$("#imap_connect'.$index.'").attr("disabled", false); $(".imap_debug").html(res.imap_debug); },'.
+                        '$("#imap_connect'.$index.'").attr("disabled", false); Hm_Folders.show(res.imap_folders); $(".imap_debug").html(res.imap_debug); },'.
                         '{"imap_connect": 1});});'.
                     '</script></div>';
             }
@@ -165,6 +165,23 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
                 'Use TLS: <input type="checkbox" name="tls" value="1" /><br />'.
                 '<input type="submit" value="Add" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
         }
+    }
+}}
+
+if (!class_exists('Hm_Output_imap_folders')) {
+class Hm_Output_imap_folders extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if ($format == 'HTML5') {
+            $res .= '<div class="imap_folders">';
+            if (isset($input['imap_folders'])) {
+                foreach (array_keys($input['imap_folders']) as $folder) {
+                    $res .= '<div class="folder">'.$this->html_safe($folder).'</div>';
+                }
+            }
+            $res .= '</div>';
+        }
+        return $res;
     }
 }}
 

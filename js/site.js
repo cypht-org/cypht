@@ -30,10 +30,23 @@ Hm_Ajax = {
     always: function(res) {
     }
 }
+
 Hm_Notices = {
 
     show: function(msgs) {
         var msg_list = $.map(msgs, function(v) { return v; });
         $('.sys_messages').html(msg_list.join('<br />'));
+    }
+}
+
+Hm_Folders = {
+
+    show: function(folders) {
+        var folder_html = '';
+        for (folder in folders) {
+            console.log(folders[folder]);
+            folder_html += '<div>'+folder+'</div>';
+        }
+        $('.imap_folders').html(folder_html);
     }
 }
