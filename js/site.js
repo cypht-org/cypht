@@ -58,3 +58,19 @@ Hm_Folders = {
         $('.imap_folder_data').html(folder_html);
     }
 }
+
+Hm_Timer = {
+
+    jobs: [],
+    interval: 5000,
+
+    fire: function() {
+        for (job in Hm_Timer.jobs) {
+            try { Hm_Timer.jobs[job](); } catch(e) {}
+        }
+        setTimeout(Hm_Timer.fire, Hm_Timer.interval);
+        console.log('weeee...');
+    }
+}
+
+Hm_Timer.fire();
