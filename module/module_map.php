@@ -3,7 +3,7 @@
 /*
  * This is the default mapping for core data and output handlers in HM3.
  * both types of handlers are executed in the order they are defined, so 
- * be careful about mixing them up!. The syntax is for adding modules is as follows:
+ * be careful about mixing them up!. The syntax for adding modules is as follows:
  *
  * There are two handler assignment methods, both take the same arguments. The
  * two methods are:
