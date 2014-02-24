@@ -2,8 +2,6 @@
 
 abstract class Hm_Handler_Module {
 
-    use Hm_Sanitize;
-
     protected $session = false;
     protected $request = false;
     protected $config = false;
@@ -101,7 +99,7 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
                     Hm_Msgs::add('Added server!');
                 }
                 else {
-                    Hm_Msgs::add(sprintf('Cound not add server: %s', $this->html_safe($errstr)));
+                    Hm_Msgs::add(sprintf('Cound not add server: %s', $errstr));
                 }
             }
         }
@@ -202,10 +200,10 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     $data['just_forgot_credentials'] = true;
                 }
                 if ($imap->get_state() == 'authenticated') {
-                    $data['imap_folders'] = array_map(function($v) { return $this->html_safe($v); }, array_keys($imap->get_folder_list_by_level()));
                     Hm_Msgs::add("Successfully authenticated to the IMAP server!");
+                    $data['imap_folders'] = $imap->get_folder_list_by_level();
                 }
-                $data['imap_debug'] = $this->html_safe(trim($imap->show_debug(false, true)));
+                $data['imap_debug'] = $imap->show_debug(false, true);
             }
             else {
                 Hm_Msgs::add('Username and password are required');
