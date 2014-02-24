@@ -123,13 +123,13 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                         'Hm_Notices.show(res.router_user_msgs); if (res.deleted_server_id > -1 ) {$("#imap_server'.$index.'").remove();}},'.
                         '{"imap_delete": 1});});'.
                     '$("#imap_connect'.$index.'").on("click", function() {'.
-                        '$(this).attr("disabled", true); $(".imap_debug").empty(); '.
+                        '$(this).attr("disabled", true); $(".imap_debug_data").empty(); '.
                         'event.preventDefault(); form = $(this).parent(); Hm_Ajax.request( $(this).parent().serializeArray(), function(res) {'.
                         'Hm_Notices.show(res.router_user_msgs); '.
                         'if (res.just_saved_credentials) { $("#pass_row'.$index.'").remove(); $("#user_row'.$index.'").remove(); } '.
                         'if (res.just_forgot_credentials) { $(\''.$pass_row.'\').insertAfter("#imap_server_id'.$index.'"); '.
                         '$(\''.$user_row.'\').insertAfter("#imap_server_id'.$index.'"); } '.
-                        '$("#imap_connect'.$index.'").attr("disabled", false); Hm_Folders.show(res.imap_folders); $(".imap_debug").html(res.imap_debug); },'.
+                        '$("#imap_connect'.$index.'").attr("disabled", false); Hm_Folders.show(res.imap_folders); $(".imap_debug_data").html(res.imap_debug); },'.
                         '{"imap_connect": 1});});'.
                     '</script></div>';
             }
@@ -144,7 +144,7 @@ class Hm_Output_imap_debug extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
-            $res = '<div class="imap_debug"><div class="subtitle">IMAP Debug</div><pre>';
+            $res = '<div class="imap_debug"><div class="subtitle">IMAP Debug</div><pre class="imap_debug_data">';
             if (isset($input['imap_debug'])) {
                 $res .= $this->html_safe(print_r($input['imap_debug'], true));
             }
@@ -173,13 +173,13 @@ class Hm_Output_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
-            $res .= '<div class="imap_folders">';
+            $res .= '<div class="imap_folders"><div class="subtitle">Top Level Folders</div><div class="imap_folder_data">';
             if (isset($input['imap_folders'])) {
                 foreach (array_keys($input['imap_folders']) as $folder) {
                     $res .= '<div class="folder">'.$this->html_safe($folder).'</div>';
                 }
             }
-            $res .= '</div>';
+            $res .= '</div></div>';
         }
         return $res;
     }

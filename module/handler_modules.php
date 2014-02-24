@@ -202,10 +202,10 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     $data['just_forgot_credentials'] = true;
                 }
                 if ($imap->get_state() == 'authenticated') {
-                    $data['imap_folders'] = $imap->get_folder_list_by_level();
+                    $data['imap_folders'] = array_map(function($v) { return $this->html_safe($v); }, array_keys($imap->get_folder_list_by_level()));
                     Hm_Msgs::add("Successfully authenticated to the IMAP server!");
                 }
-                $data['imap_debug'] = $imap->show_debug(false, true);
+                $data['imap_debug'] = $this->html_safe(trim($imap->show_debug(false, true)));
             }
             else {
                 Hm_Msgs::add('Username and password are required');

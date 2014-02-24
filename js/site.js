@@ -44,9 +44,8 @@ Hm_Folders = {
     show: function(folders) {
         var folder_html = '';
         for (folder in folders) {
-            console.log(folders[folder]);
-            folder_html += '<div>'+folder+'</div>';
+            folder_html += '<div>'+folders[folder]+'</div>';
         }
-        $('.imap_folders').html(folder_html);
+        $('.imap_folder_data').html(folder_html);
     }
 }
