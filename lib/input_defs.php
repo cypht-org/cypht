@@ -1,6 +1,6 @@
 <?php
 
-function is_valid_page($page) {
+$is_valid_page = function ($page) {
 
     $valid_pages = array(
         'home',
@@ -10,7 +10,8 @@ function is_valid_page($page) {
         return $page;
     }
     return false;
-}
+};
+
 return array(
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING
@@ -27,8 +28,9 @@ return array(
     'allowed_get' => array(
         'page' => array(
             'filter' => FILTER_CALLBACK,
-            'options' => array('callback' => 'is_valid_page')
-        )
+            'options' => $is_valid_page
+        ),
+        'imap_server_id' => FILTER_VALIDATE_INT,
     ),
 
     'allowed_post' => array(
