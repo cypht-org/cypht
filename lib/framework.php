@@ -81,14 +81,14 @@ class Hm_Router {
     }
 
     private function get_page($request) {
-        if (!isset($request->get['page'])) {
-            $this->page = 'home';
+        if ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook'])) {
+            $this->page = $request->post['hm_ajax_hook'];
         }
         elseif (isset($request->get['page'])) {
             $this->page = $request->get['page'];
         }
-        elseif ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook'])) {
-            $this->page = $request->post['hm_ajax_hook'];
+        elseif (!isset($request->get['page'])) {
+            $this->page = 'home';
         }
         else {
             $this->page = 'notfound';
@@ -448,7 +448,7 @@ class Hm_IMAP_List {
 
     private static $imap_list = array();
 
-    public static function connect( $id, $user=false, $pass=false, $save_credentials=false) {
+    public static function connect( $id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
         if (isset(self::$imap_list[$id])) {
             $imap = self::$imap_list[$id];
             if ($imap['object']) {
@@ -464,6 +464,9 @@ class Hm_IMAP_List {
                 }
                 if ($user && $pass) {
                     self::$imap_list[$id]['object'] = new Hm_IMAP();
+                    if ($cache) {
+                        self::$imap_list[$id]['object']->load_cache($cache, 'gzip');
+                    }
                     $res = self::$imap_list[$id]['object']->connect(array(
                         'server' => $imap['server'],
                         'port' => $imap['port'],
@@ -511,22 +514,27 @@ class Hm_IMAP_List {
         return false;
     }
 
-    public static function dump( $id=false ) {
+    public static function dump( $id=false, $full=false ) {
         $list = array();
         foreach (self::$imap_list as $index => $server) {
             if ($id !== false && $index != $id) {
                 continue;
             }
-            $list[$index] = array(
-                'server' => $server['server'],
-                'port' => $server['port'],
-                'tls' => $server['tls']
-            );
-            if (isset($server['user'])) {
-                $list[$index]['user'] = $server['user'];
+            if ($full) {
+                $list[$index] = $server;
             }
-            if (isset($server['pass'])) {
-                $list[$index]['pass'] = $server['pass'];
+            else {
+                $list[$index] = array(
+                    'server' => $server['server'],
+                    'port' => $server['port'],
+                    'tls' => $server['tls']
+                );
+                if (isset($server['user'])) {
+                    $list[$index]['user'] = $server['user'];
+                }
+                if (isset($server['pass'])) {
+                    $list[$index]['pass'] = $server['pass'];
+                }
             }
             if ($id !== false) {
                 return $list[$index];
