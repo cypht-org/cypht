@@ -45,7 +45,6 @@ class Hm_Router {
     public $type = false;
     public $sapi = false;
     private $page = 'home';
-    private $pages = array('home', 'notfound');
 
     public function process_request($config) {
         $request = new Hm_Request();
@@ -82,16 +81,17 @@ class Hm_Router {
     }
 
     private function get_page($request) {
-        if (isset($request->get['page'])) {
-            if (in_array($request->get['page'], $this->pages)) {
-                $this->page = $request->get['page'];
-            }
-            else {
-                $this->page = 'notfound';
-            }
+        if (!isset($request->get['page'])) {
+            $this->page = 'home';
+        }
+        elseif (isset($request->get['page'])) {
+            $this->page = $request->get['page'];
         }
         elseif ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook'])) {
             $this->page = $request->post['hm_ajax_hook'];
+        }
+        else {
+            $this->page = 'notfound';
         }
     }
 
@@ -484,12 +484,14 @@ class Hm_IMAP_List {
         }
         return false;
     }
+
     public static function forget_credentials( $id ) {
         if (isset(self::$imap_list[$id])) {
             unset(self::$imap_list[$id]['user']);
             unset(self::$imap_list[$id]['pass']);
         }
     }
+
     public static function add( $atts, $id=false ) {
         $atts['object'] = false;
         $atts['connected'] = false;
@@ -500,6 +502,7 @@ class Hm_IMAP_List {
             self::$imap_list[] = $atts;
         }
     }
+
     public static function del( $id ) {
         if (isset(self::$imap_list[$id])) {
             unset(self::$imap_list[$id]);
@@ -508,9 +511,12 @@ class Hm_IMAP_List {
         return false;
     }
 
-    public static function dump() {
+    public static function dump( $id=false ) {
         $list = array();
         foreach (self::$imap_list as $index => $server) {
+            if ($id !== false && $index != $id) {
+                continue;
+            }
             $list[$index] = array(
                 'server' => $server['server'],
                 'port' => $server['port'],
@@ -521,6 +527,9 @@ class Hm_IMAP_List {
             }
             if (isset($server['pass'])) {
                 $list[$index]['pass'] = $server['pass'];
+            }
+            if ($id !== false) {
+                return $list[$index];
             }
         }
         return $list;
