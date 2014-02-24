@@ -113,9 +113,8 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                 if (!isset($vals['user'])) {
                     $res .= $user_row.$pass_row;
                 }
-                $res .= ' Remember: <input type="checkbox" '. (isset($vals['user']) ? 'checked="checked" ' : '') . 'value="1" name="imap_remember" /><br />'.
+                $res .= ' Remember: <input type="checkbox" '. (isset($vals['user']) ? 'checked="checked" ' : '') . 'value="1" name="imap_remember" /><br /><br />'.
                     ' <input type="submit" value="Test Connection" id="imap_connect'.$index.'" />'.
-                    ' <input type="submit" value="Explore" id="imap_explore'.$index.'" />'.
                     ' <input type="submit" value="Delete" id="imap_delete'.$index.'" />'.
                     ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form><script type="text/javascript">'.
                     '$("#imap_delete'.$index.'").on("click", function() {'.
@@ -164,7 +163,7 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
                 'Server name or address: <input type="text" name="new_imap_server" value=""/><br />'.
                 'Server Port: <input type="text" name="new_imap_port" value="143"><br />'.
                 'Use TLS: <input type="checkbox" name="tls" value="1" /><br />'.
-                '<input type="submit" value="Add" name="submit_server" /></form>';
+                '<input type="submit" value="Add" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
         }
     }
 }}
