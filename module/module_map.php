@@ -66,13 +66,16 @@ Hm_Output_Modules::add('home', 'js', true);
 Hm_Output_Modules::add('home', 'footer', true);
 
 
-/* ajax callbacks */
+/* Ajax debug callback */
+
+/* data modules */
 Hm_Handler_Modules::add('ajax_imap_debug', 'load_imap_servers',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_connect', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_delete', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'save_imap_cache',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'save_imap_servers',  true);
 
+/* output modules */
 Hm_Output_Modules::add('ajax_imap_debug', 'imap_folders',  true);
 Hm_Output_Modules::add('ajax_imap_debug', 'imap_debug',  true);
 
