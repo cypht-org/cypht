@@ -69,7 +69,6 @@ Hm_Timer = {
             try { Hm_Timer.jobs[job](); } catch(e) {}
         }
         setTimeout(Hm_Timer.fire, Hm_Timer.interval);
-        console.log('weeee...');
     }
 }
 
