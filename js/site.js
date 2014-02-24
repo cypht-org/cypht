@@ -17,14 +17,23 @@ Hm_Ajax = {
     },
 
     done: function(res) {
-        res = jQuery.parseJSON(res);
-        if (Hm_Ajax.callback) {
-            Hm_Ajax.callback(res);
+        if (typeof res == 'string' && res.indexOf('<') == 0) {
+            Hm_Ajax.fail(res);
+        }
+        else if (!res) {
+            Hm_Ajax.fail(res);
+        }
+        else {
+            res = jQuery.parseJSON(res);
+            if (Hm_Ajax.callback) {
+                Hm_Ajax.callback(res);
+            }
         }
     },
 
     fail: function(res) {
         Hm_Notices.show({0: 'An error occured communicating with the server'});
+        $("input[type='submit']").attr('disabled', false);
     },
 
     always: function(res) {
