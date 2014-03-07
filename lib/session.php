@@ -6,11 +6,11 @@ abstract class Hm_Session {
     public $active = false;
     public $loaded = false;
 
-    public function __construct($request) {
-        $this->check($request);
+    public function __construct($request, $config) {
+        $this->check($request, $config);
     }
 
-    abstract protected function check($request);
+    abstract protected function check($request, $config);
     abstract protected function start($request);
     abstract protected function auth($user, $pass);
     abstract protected function get($name, $default=false);
@@ -21,21 +21,14 @@ abstract class Hm_Session {
     abstract protected function destroy();
 }
 
-/* persistant storage with vanilla PHP sessions */
-class Hm_Session_PHP extends Hm_Session{
+/* session persistant storage with vanilla PHP sessions and no local authentication */
+class Hm_Session_PHP extends Hm_Session {
 
-    public function check($request) {
-        if (isset($request->post['username']) && $request->post['username'] &&
-            isset($request->post['password']) && $request->post['password']) {
-            if ($this->auth($request->post['username'], $request->post['password'])) {
-                Hm_Msgs::add('login accepted, starting PHP session');
-                $this->loaded = true;
-                $this->start($request);
-            }
+    public function check($request, $config) {
+        if (!isset($request->cookie['PHPSESSID'])) {
+            Hm_Msgs::add('starting new PHP session');
         }
-        elseif (!empty($request->cookie) && isset($request->cookie['PHPSESSID'])) {
-            $this->start($request);
-        }
+        $this->start($request);
     }
 
     public function auth($user, $pass) {
@@ -75,6 +68,71 @@ class Hm_Session_PHP extends Hm_Session{
     public function end() {
         session_write_close();
         $this->active = false;
+    }
+}
+
+/* persistant storage with vanilla PHP sessions and DB based authentication
+ *
+ * Postgresql:
+ * create table hm_user (username varchar(255) primary key not null, hash varchar(255));
+ *
+ * Mysql:
+ * create table hm_user (username varchar(250), hash varchar(250), PRIMARY KEY (username));
+ *
+ */
+class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
+
+    private $db_user = 'test';
+    private $db_pass = '123456';
+    private $db_name = 'test';
+    private $db_host = '127.0.0.1';
+    private $db_driver = 'mysql';
+    private $dbh = false;
+
+    public function check($request, $config) {
+        if (isset($request->post['username']) && $request->post['username'] &&
+            isset($request->post['password']) && $request->post['password']) {
+            if ($this->auth($request->post['username'], $request->post['password'])) {
+                Hm_Msgs::add('login accepted, starting PHP session');
+                $this->loaded = true;
+                $this->start($request);
+            }
+        }
+        elseif (!empty($request->cookie) && isset($request->cookie['PHPSESSID'])) {
+            $this->start($request);
+        }
+    }
+
+    public function auth($user, $pass) {
+        if ($this->connect()) {
+
+            $sql = $this->dbh->prepare("select hash from hm_user where username = ?");
+            if ($sql->execute(array($user))) {
+                $row = $sql->fetch();
+                if ($row['hash'] && pbkdf2_validate_password($pass, $row['hash'])) {
+                    return true;
+                }
+            }
+        }
+        Hm_Msgs::add("Invalid username or password");
+        return false;
+    }
+
+    private function connect() {
+        $dsn = sprintf('%s:host=%s;dbname=%s', $this->db_driver, $this->db_host, $this->db_name);
+        try {
+            $this->dbh = new PDO($dsn, $this->db_user, $this->db_pass);
+        }
+        catch (Exception $oops) {
+            Hm_Debug::add($oops->getMessage());
+            Hm_Msgs::add("An error occurred communicating with the database");
+            $this->dbh = false;
+            return false;
+        }
+        return true;
+    }
+
+    private function create() {
     }
 }
 ?>
