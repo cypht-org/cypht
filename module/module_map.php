@@ -39,6 +39,7 @@
 /* Homepage */
 
 /* data modules */
+Hm_Handler_Modules::add('home', 'login', false);
 Hm_Handler_Modules::add('home', 'load_imap_servers',  true);
 Hm_Handler_Modules::add('home', 'language',  true);
 Hm_Handler_Modules::add('home', 'title', true);
