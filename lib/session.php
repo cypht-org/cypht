@@ -71,31 +71,38 @@ class Hm_Session_PHP extends Hm_Session {
     }
 }
 
-/* persistant storage with vanilla PHP sessions and DB based authentication
- *
- * Postgresql:
- * create table hm_user (username varchar(255) primary key not null, hash varchar(255));
- *
- * Mysql:
- * create table hm_user (username varchar(250), hash varchar(250), PRIMARY KEY (username));
- *
- */
+/* persistant storage with vanilla PHP sessions and DB based authentication */
 class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
 
-    private $db_user = 'test';
-    private $db_pass = '123456';
-    private $db_name = 'test';
-    private $db_host = '127.0.0.1';
-    private $db_driver = 'mysql';
     private $dbh = false;
+    private $required_config = array('db_user', 'db_pass', 'db_name', 'db_host', 'db_driver');
+    private $config = false;
+
+    private function parse_config($config) {
+        $res = array();
+        foreach ($this->required_config as $v) {
+            if (isset($config[$v])) {
+                $res[$v] = $config[$v];
+            }
+        }
+        if (count($res) == count($this->required_config)) {
+            $this->config = $res;
+        }
+    }
 
     public function check($request, $config) {
         if (isset($request->post['username']) && $request->post['username'] &&
             isset($request->post['password']) && $request->post['password']) {
-            if ($this->auth($request->post['username'], $request->post['password'])) {
-                Hm_Msgs::add('login accepted, starting PHP session');
-                $this->loaded = true;
-                $this->start($request);
+            $this->parse_config($config->dump());
+            if ($this->config) {
+                if ($this->auth($request->post['username'], $request->post['password'])) {
+                    Hm_Msgs::add('login accepted, starting PHP session');
+                    $this->loaded = true;
+                    $this->start($request);
+                }
+            }
+            else {
+                Hm_Debug::add('incomplete DB configuration');
             }
         }
         elseif (!empty($request->cookie) && isset($request->cookie['PHPSESSID'])) {
@@ -119,9 +126,9 @@ class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
     }
 
     private function connect() {
-        $dsn = sprintf('%s:host=%s;dbname=%s', $this->db_driver, $this->db_host, $this->db_name);
+        $dsn = sprintf('%s:host=%s;dbname=%s', $this->config['db_driver'], $this->config['db_host'], $this->config['db_name']);
         try {
-            $this->dbh = new PDO($dsn, $this->db_user, $this->db_pass);
+            $this->dbh = new PDO($dsn, $this->config['db_user'], $this->config['db_pass']);
         }
         catch (Exception $oops) {
             Hm_Debug::add($oops->getMessage());
