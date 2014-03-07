@@ -1,7 +1,7 @@
 <?php
 
 /* don't let anything output content until we are ready */
-//ob_start();
+ob_start();
 
 /* show all warnings */
 error_reporting(E_ALL | E_STRICT);
@@ -22,7 +22,7 @@ require 'module/output_modules.php';
 require 'module/module_map.php';
 
 /* get configuration */
-$config = new Hm_Config_File('/etc/hastymail2/hastymail2.rc');
+$config = new Hm_Config_File('hm3.rc');
 
 /* process request input */
 $router = new Hm_Router();
