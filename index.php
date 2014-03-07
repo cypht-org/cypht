@@ -16,7 +16,6 @@ $start_time = microtime(true);
 require 'lib/framework.php';
 require 'lib/session.php';
 require 'lib/hm-imap.php';
-require 'lib/pbkdf2.php';
 require 'module/handler_modules.php';
 require 'module/output_modules.php';
 require 'module/module_map.php';

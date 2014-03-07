@@ -64,6 +64,7 @@ class Hm_Router {
         switch ($config->get('session_type', false)) {
             case 'DB':
                 Hm_Debug::add('Using DB Authed session');
+                require 'lib/pbkdf2.php';
                 $session = new Hm_Session_PHP_DB_Auth();
                 break;
             default:
