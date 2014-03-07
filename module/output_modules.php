@@ -1,38 +1,5 @@
 <?php
 
-abstract class Hm_Output_Module {
-
-    use Hm_Sanitize;
-
-    protected $lstr = array();
-    protected $lang = false;
-
-    abstract protected function output($input, $format);
-
-    protected function trans($string) {
-        if (isset($this->lstr[$string])) {
-            if ($this->lstr[$string] === false) {
-                return $string;
-            }
-            else {
-                return $this->lstr[$string];
-            }
-        }
-        else {
-            Hm_Debug::add(sprintf('No translation found: %s', $string));
-        }
-        return $string;
-    }
-
-    public function output_content($input, $format, $lang_str) {
-        $this->lstr = $lang_str;
-        if (isset($lang_str['interface_lang'])) {
-            $this->lang = $lang_str['interface_lang'];
-        }
-        return $this->output($input, $format);
-    }
-}
-
 if (!class_exists('Hm_Output_title')) {
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {

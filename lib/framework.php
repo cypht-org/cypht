@@ -415,7 +415,74 @@ trait Hm_List {
 class Hm_Debug { use Hm_List; }
 class Hm_Msgs { use Hm_List; }
 
-/* modules */
+/* base handler module */
+abstract class Hm_Handler_Module {
+
+    protected $session = false;
+    protected $request = false;
+    protected $config = false;
+    protected $page = false;
+
+    public function __construct($parent, $logged_in, $args) {
+        $this->session = $parent->session;
+        $this->request = $parent->request;
+        $this->config = $parent->config;
+        $this->page = $parent->page;
+    }
+
+    protected function process_form($form) {
+        $post = $this->request->post;
+        $success = false;
+        $new_form = array();
+        foreach($form as $name) {
+            if (isset($post[$name]) && (trim($post[$name]) || $post[$name] === 0)) {
+                $new_form[$name] = $post[$name];
+            }
+        }
+        if (count($form) == count($new_form)) {
+            $success = true;
+        }
+        return array($success, $new_form);
+    }
+
+    abstract public function process($data);
+}
+
+/* base output module */
+abstract class Hm_Output_Module {
+
+    use Hm_Sanitize;
+
+    protected $lstr = array();
+    protected $lang = false;
+
+    abstract protected function output($input, $format);
+
+    protected function trans($string) {
+        if (isset($this->lstr[$string])) {
+            if ($this->lstr[$string] === false) {
+                return $string;
+            }
+            else {
+                return $this->lstr[$string];
+            }
+        }
+        else {
+            Hm_Debug::add(sprintf('No translation found: %s', $string));
+        }
+        return $string;
+    }
+
+    public function output_content($input, $format, $lang_str) {
+        $this->lstr = $lang_str;
+        if (isset($lang_str['interface_lang'])) {
+            $this->lang = $lang_str['interface_lang'];
+        }
+        return $this->output($input, $format);
+    }
+}
+
+/* module managers */
 trait Hm_Modules {
 
     private static $module_list = array();
@@ -469,6 +536,7 @@ trait Hm_Modules {
 class Hm_Handler_Modules { use Hm_Modules; }
 class Hm_Output_Modules { use Hm_Modules; }
 
+/* wrapper around multiple imap connections */
 class Hm_IMAP_List {
 
     private static $imap_list = array();

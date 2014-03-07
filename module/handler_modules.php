@@ -1,37 +1,5 @@
 <?php
 
-abstract class Hm_Handler_Module {
-
-    protected $session = false;
-    protected $request = false;
-    protected $config = false;
-    protected $page = false;
-
-    public function __construct($parent, $logged_in, $args) {
-        $this->session = $parent->session;
-        $this->request = $parent->request;
-        $this->config = $parent->config;
-        $this->page = $parent->page;
-    }
-
-    protected function process_form($form) {
-        $post = $this->request->post;
-        $success = false;
-        $new_form = array();
-        foreach($form as $name) {
-            if (isset($post[$name]) && (trim($post[$name]) || $post[$name] === 0)) {
-                $new_form[$name] = $post[$name];
-            }
-        }
-        if (count($form) == count($new_form)) {
-            $success = true;
-        }
-        return array($success, $new_form);
-    }
-
-    abstract public function process($data);
-}
-
 if (!class_exists('HM_Handler_http_headers')) {
 class Hm_Handler_http_headers extends Hm_Handler_Module {
     public function process($data) {
