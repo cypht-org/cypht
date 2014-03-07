@@ -66,6 +66,20 @@ class Hm_Handler_date extends Hm_Handler_Module {
     }
 }}
 
+if (!class_exists('Hm_Handler_login')) {
+class Hm_Handler_login extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('username', 'password'));
+        if ($success) {
+            $this->session->check($this->request, $this->config, $form['username'], $form['password']);
+        }
+        else {
+            $this->session->check($this->request, $this->config);
+        }
+        return $data;
+    }
+}}
+
 if (!class_exists('Hm_Handler_logout')) {
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
