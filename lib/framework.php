@@ -20,9 +20,11 @@ class Hm_Config_File extends Hm_Config {
     }
 
     public function load($source) {
-        $data = unserialize(file_get_contents($source));
-        if ($data) {
-            $this->config = array_merge($this->config, $data);
+        if (is_readable($source)) {
+            $data = unserialize(file_get_contents($source));
+            if ($data) {
+                $this->config = array_merge($this->config, $data);
+            }
         }
     }
 
@@ -48,7 +50,14 @@ class Hm_Router {
 
     public function process_request($config) {
         $request = new Hm_Request();
-        $session = new Hm_Session_PHP_DB_Auth($request, $config);
+        $conf_values = $config->dump();
+        if (empty($conf_values)) {
+            Hm_Debug::add('No configuration data found');
+            $session = new Hm_Session_PHP($request, $config);
+        }
+        else {
+            $session = new Hm_Session_PHP_DB_Auth($request, $config);
+        }
         $this->get_page($request);
         $prior_results = $this->forward_redirect_data($session, $request);
         $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
