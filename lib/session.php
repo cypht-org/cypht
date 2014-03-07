@@ -6,10 +6,6 @@ abstract class Hm_Session {
     public $active = false;
     public $loaded = false;
 
-    public function __construct($request, $config) {
-        $this->check($request, $config);
-    }
-
     abstract protected function check($request, $config);
     abstract protected function start($request);
     abstract protected function auth($user, $pass);
@@ -90,12 +86,11 @@ class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
         }
     }
 
-    public function check($request, $config) {
-        if (isset($request->post['username']) && $request->post['username'] &&
-            isset($request->post['password']) && $request->post['password']) {
+    public function check($request, $config, $user=false, $pass=false) {
+        if ($user && $pass) {
             $this->parse_config($config->dump());
             if ($this->config) {
-                if ($this->auth($request->post['username'], $request->post['password'])) {
+                if ($this->auth($user, $pass)) {
                     Hm_Msgs::add('login accepted, starting PHP session');
                     $this->loaded = true;
                     $this->start($request);

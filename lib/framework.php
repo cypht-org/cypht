@@ -53,14 +53,14 @@ class Hm_Router {
         $conf_values = $config->dump();
         if (empty($conf_values)) {
             Hm_Debug::add('No configuration data found');
-            $session = new Hm_Session_PHP($request, $config);
+            $session = new Hm_Session_PHP();
         }
         else {
-            $session = new Hm_Session_PHP_DB_Auth($request, $config);
+            $session = new Hm_Session_PHP_DB_Auth();
         }
         $this->get_page($request);
-        $prior_results = $this->forward_redirect_data($session, $request);
         $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
+        $prior_results = $this->forward_redirect_data($session, $request);
         $result = array_merge($result, $prior_results);
         $this->check_for_redirect($request, $session, $result);
         $session->end();
