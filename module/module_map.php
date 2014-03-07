@@ -56,7 +56,7 @@ Hm_Output_Modules::add('home', 'jquery', true);
 Hm_Output_Modules::add('home', 'logout', true);
 Hm_Output_Modules::add('home', 'login', false);
 Hm_Output_Modules::add('home', 'title', true);
-Hm_Output_Modules::add('home', 'msgs', true);
+Hm_Output_Modules::add('home', 'msgs', false);
 Hm_Output_Modules::add('home', 'date', true);
 Hm_Output_Modules::add('home', 'imap_setup', true);
 Hm_Output_Modules::add('home', 'imap_setup_display', true);
