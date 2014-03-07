@@ -40,7 +40,6 @@ $renderer->send_response($response_str, $response_data);
 error_log(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
 error_log(sprintf("Peak Memory: %d", (memory_get_peak_usage(true)/1024)));
 error_log(sprintf("PID: %d", getmypid()));
-
-//Hm_Debug::show();
+Hm_Debug::show(true);
 
 ?>
