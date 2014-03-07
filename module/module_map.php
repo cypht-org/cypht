@@ -3,7 +3,7 @@
 /*
  * This is the default mapping for core data and output handlers in HM3.
  * both types of handlers are executed in the order they are defined, so 
- * be careful about mixing them up!. The syntax for adding modules is as follows:
+ * be careful about mixing them up!.
  *
  * There are two handler assignment methods, both take the same arguments. The
  * two methods are:
@@ -15,11 +15,9 @@
  *                          of the response "page". This could be HTML, JSON, or even
  *                          terminal formatted content.
  *
- * The required add module arguments in order are page, module name, and logged
- * in flag:
+ * The required arguments in order are "page", "module name", "logged in":
  *
- *  page          string valid page name or ajax callback with at least one 
- *                handler module assignment
+ *  page          string valid page name or ajax callback
  *  module        string module name of the module associated with the request 
  *                page/ajax hook
  *  logged in     bool flag indicating if the user needs to be logged in for the 
