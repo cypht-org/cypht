@@ -50,21 +50,28 @@ class Hm_Router {
 
     public function process_request($config) {
         $request = new Hm_Request();
-        $conf_values = $config->dump();
-        if (empty($conf_values)) {
-            Hm_Debug::add('No configuration data found');
-            $session = new Hm_Session_PHP();
-        }
-        else {
-            $session = new Hm_Session_PHP_DB_Auth();
-        }
         $this->get_page($request);
+        $session = $this->setup_session($config);
         $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
         $prior_results = $this->forward_redirect_data($session, $request);
         $result = array_merge($result, $prior_results);
         $this->check_for_redirect($request, $session, $result);
         $session->end();
         return $result;
+    }
+
+    private function setup_session($config) {
+        switch ($config->get('session_type', false)) {
+            case 'DB':
+                Hm_Debug::add('Using DB Authed session');
+                $session = new Hm_Session_PHP_DB_Auth();
+                break;
+            default:
+                Hm_Debug::add('No session_type defined, using default PHP sessions');
+                $session = new Hm_Session_PHP();
+                break;
+        }
+        return $session;
     }
 
     private function forward_redirect_data($session, $request) {
