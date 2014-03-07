@@ -68,6 +68,7 @@ Hm_Output_Modules::add('home', 'footer', true);
 /* Ajax debug callback */
 
 /* data modules */
+Hm_Handler_Modules::add('ajax_imap_debug', 'login', false);
 Hm_Handler_Modules::add('ajax_imap_debug', 'load_imap_servers',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_connect', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_delete', true);
