@@ -20,7 +20,7 @@ Hm_Ajax = {
         if (typeof res == 'string' && res.indexOf('<') == 0) {
             Hm_Ajax.fail(res);
         }
-        else if (!res) {
+        else if (!res || res == '{}') {
             Hm_Ajax.fail(res);
         }
         else {
