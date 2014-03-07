@@ -48,7 +48,7 @@ class Hm_Router {
 
     public function process_request($config) {
         $request = new Hm_Request();
-        $session = new Hm_Session_PHP($request);
+        $session = new Hm_Session_PHP_DB_Auth($request, $config);
         $this->get_page($request);
         $prior_results = $this->forward_redirect_data($session, $request);
         $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
@@ -70,7 +70,7 @@ class Hm_Router {
     }
 
     private function check_for_redirect($request, $session, $result) {
-        if (!empty($request->post) && $request->type == 'HTTP') {
+        if (!empty($request->post) && $request->type == 'HTTP' && $session->active) {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
                 $session->set('redirect_messages', $msgs);
