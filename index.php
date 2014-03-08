@@ -32,10 +32,8 @@ $response_str = $formatter->format_content($response_data);
 $renderer = new Hm_Output_HTTP();
 $renderer->send_response($response_str, $response_data);
 
-/* log execution time to the error log */
-error_log(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
-error_log(sprintf("Peak Memory: %d", (memory_get_peak_usage(true)/1024)));
-error_log(sprintf("PID: %d", getmypid()));
+/* debug FTW! */
+Hm_Debug::load_page_stats($start_time);
 Hm_Debug::show(true);
 
 ?>
