@@ -51,7 +51,7 @@ class Hm_Router {
     public function process_request($config) {
         $filters = $this->load_modules($config);
         $request = new Hm_Request($filters);
-        $this->get_page($request);
+        $this->get_page($request, $filters['allowed_pages']);
         $session = $this->setup_session($config);
         $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
         $prior_results = $this->forward_redirect_data($session, $request);
@@ -78,7 +78,14 @@ class Hm_Router {
 
     private function merge_filters($existing, $new) {
         foreach (array('allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
-            $existing[$v] += $new[$v];
+            if (isset($new[$v])) {
+                if ($v == 'allowed_pages') {
+                    $existing[$v] = array_merge($existing[$v], $new[$v]);
+                }
+                else {
+                    $existing[$v] += $new[$v];
+                }
+            }
         }
         return $existing;
     }
@@ -128,11 +135,11 @@ class Hm_Router {
         }
     }
 
-    private function get_page($request) {
-        if ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook'])) {
+    private function get_page($request, $pages) {
+        if ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook']) && in_array($request->post['hm_ajax_hook'], $pages)) {
             $this->page = $request->post['hm_ajax_hook'];
         }
-        elseif (isset($request->get['page'])) {
+        elseif (isset($request->get['page']) && in_array($request->get['page'], $pages)) {
             $this->page = $request->get['page'];
         }
         elseif (!isset($request->get['page'])) {
