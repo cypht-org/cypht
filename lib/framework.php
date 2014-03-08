@@ -131,6 +131,7 @@ class Hm_Router {
                 $session->set('redirect_messages', $msgs);
             }
             $session->set('redirect_result', $result);
+            $session->end();
             $this->redirect($request->server['REQUEST_URI']);
         }
     }
