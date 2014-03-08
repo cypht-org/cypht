@@ -49,6 +49,7 @@ class Hm_Router {
     private $page = 'home';
 
     public function process_request($config) {
+        $this->load_modules($config);
         $request = new Hm_Request();
         $this->get_page($request);
         $session = $this->setup_session($config);
@@ -73,6 +74,22 @@ class Hm_Router {
                 break;
         }
         return $session;
+    }
+
+    private function load_modules($config) {
+        $mod_list = explode(',', $config->get('modules', ''));
+        foreach ($mod_list as $mod) {
+            if (preg_match("/^[a-z_]{3,}$/", $mod)) {
+                foreach (array('handler_modules', 'output_modules', 'module_map') as $name) {
+                    if (is_readable(sprintf("modules/%s/%s.php", $mod, $name))) {
+                        require sprintf("modules/%s/%s.php", $mod, $name);
+                    }
+                }
+            }
+            else {
+                Hm_Debug::add(sprintf("Invalid module name: %s", $mod));
+            }
+        }
     }
 
     private function forward_redirect_data($session, $request) {
