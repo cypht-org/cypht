@@ -16,9 +16,6 @@ $start_time = microtime(true);
 require 'lib/framework.php';
 require 'lib/session.php';
 require 'lib/hm-imap.php';
-require 'module/handler_modules.php';
-require 'module/output_modules.php';
-require 'module/module_map.php';
 
 /* get configuration */
 $config = new Hm_Config_File('hm3.rc');
