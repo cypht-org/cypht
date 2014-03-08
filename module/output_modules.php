@@ -172,6 +172,9 @@ class Hm_Output_header extends Hm_Output_Module {
             }
             return '<!DOCTYPE html><html '.$lang.'><head><title>HM3</title><meta charset="utf-8" /></head><body>';
         }
+        elseif ($format == 'CLI') {
+            return sprintf("\nHM3 CLI Interface\n\n");
+        }
         return '';
     }
 }}
