@@ -49,8 +49,8 @@ class Hm_Router {
     private $page = 'home';
 
     public function process_request($config) {
-        $this->load_modules($config);
-        $request = new Hm_Request();
+        $filters = $this->load_modules($config);
+        $request = new Hm_Request($filters);
         $this->get_page($request);
         $session = $this->setup_session($config);
         $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
@@ -76,13 +76,26 @@ class Hm_Router {
         return $session;
     }
 
+    private function merge_filters($existing, $new) {
+        foreach (array('allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
+            $existing[$v] += $new[$v];
+        }
+        return $existing;
+    }
+
     private function load_modules($config) {
         $mod_list = explode(',', $config->get('modules', ''));
+        $filters = array('allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
         foreach ($mod_list as $mod) {
             if (preg_match("/^[a-z_]{3,}$/", $mod)) {
                 foreach (array('handler_modules', 'output_modules', 'module_map') as $name) {
                     if (is_readable(sprintf("modules/%s/%s.php", $mod, $name))) {
-                        require sprintf("modules/%s/%s.php", $mod, $name);
+                        if ($name == 'module_map') {
+                            $filters = $this->merge_filters($filters, require sprintf("modules/%s/%s.php", $mod, $name));
+                        }
+                        else {
+                            require sprintf("modules/%s/%s.php", $mod, $name);
+                        }
                     }
                 }
             }
@@ -90,6 +103,7 @@ class Hm_Router {
                 Hm_Debug::add(sprintf("Invalid module name: %s", $mod));
             }
         }
+        return $filters;
     }
 
     private function forward_redirect_data($session, $request) {
@@ -164,12 +178,11 @@ class Hm_Request {
     public $sapi = false;
     public $format = false;
 
-    public function __construct() {
+    public function __construct($filters) {
         $this->sapi = php_sapi_name();
         $this->get_request_type();
 
         if ($this->type == 'HTTP' || $this->type == 'AJAX') {
-            $filters = require 'lib/input_defs.php';
             $this->server = filter_input_array(INPUT_SERVER, $filters['allowed_server'], false);
             $this->post = filter_input_array(INPUT_POST, $filters['allowed_post'], false);
             $this->get = filter_input_array(INPUT_GET, $filters['allowed_get'], false);
