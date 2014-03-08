@@ -281,7 +281,7 @@ class Hm_Request_Handler {
                 }
             }
             else {
-                Hm_Msgs::add(sprintf('Handler module %s activated but not found', $name));
+                Hm_Debug::add(sprintf('Handler module %s activated but not found', $name));
             }
             if ($input) {
                 $this->response = $input;
@@ -333,7 +333,7 @@ abstract class HM_Format {
                 }
             }
             else {
-                Hm_Msgs::add(sprintf('Output module %s activated but not found', $name));
+                Hm_Debug::add(sprintf('Output module %s activated but not found', $name));
             }
         }
         return $mod_output;
