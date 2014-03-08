@@ -157,4 +157,117 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
     }
 }}
 
+/* wrapper around multiple imap connections */
+class Hm_IMAP_List {
+
+    private static $imap_list = array();
+
+    public static function connect( $id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
+        if (isset(self::$imap_list[$id])) {
+            $imap = self::$imap_list[$id];
+            if ($imap['object']) {
+                return $imap['object'];
+            }
+            else {
+                if ((!$user || !$pass) && (!isset($imap['user']) || !isset($imap['pass']))) {
+                    return false;
+                }
+                elseif (isset($imap['user']) && isset($imap['pass'])) {
+                    $user = $imap['user'];
+                    $pass = $imap['pass'];
+                }
+                if ($user && $pass) {
+                    self::$imap_list[$id]['object'] = new Hm_IMAP();
+                    if ($cache) {
+                        self::$imap_list[$id]['object']->load_cache($cache, 'gzip');
+                    }
+                    $res = self::$imap_list[$id]['object']->connect(array(
+                        'server' => $imap['server'],
+                        'port' => $imap['port'],
+                        'tls' => $imap['tls'],
+                        'username' => $user,
+                        'password' => $pass
+                    ));
+                    if ($res) {
+                        self::$imap_list[$id]['connected'] = true;
+                        if ($save_credentials) {
+                            self::$imap_list[$id]['user'] = $user;
+                            self::$imap_list[$id]['pass'] = $pass;
+                        }
+                    }
+                    return self::$imap_list[$id]['object'];
+                }
+            }
+        }
+        return false;
+    }
+
+    public static function forget_credentials( $id ) {
+        if (isset(self::$imap_list[$id])) {
+            unset(self::$imap_list[$id]['user']);
+            unset(self::$imap_list[$id]['pass']);
+        }
+    }
+
+    public static function add( $atts, $id=false ) {
+        $atts['object'] = false;
+        $atts['connected'] = false;
+        if ($id) {
+            self::$imap_list[$id] = $atts;
+        }
+        else {
+            self::$imap_list[] = $atts;
+        }
+    }
+
+    public static function del( $id ) {
+        if (isset(self::$imap_list[$id])) {
+            unset(self::$imap_list[$id]);
+            return true;
+        }
+        return false;
+    }
+
+    public static function dump( $id=false, $full=false ) {
+        $list = array();
+        foreach (self::$imap_list as $index => $server) {
+            if ($id !== false && $index != $id) {
+                continue;
+            }
+            if ($full) {
+                $list[$index] = $server;
+            }
+            else {
+                $list[$index] = array(
+                    'server' => $server['server'],
+                    'port' => $server['port'],
+                    'tls' => $server['tls']
+                );
+                if (isset($server['user'])) {
+                    $list[$index]['user'] = $server['user'];
+                }
+                if (isset($server['pass'])) {
+                    $list[$index]['pass'] = $server['pass'];
+                }
+            }
+            if ($id !== false) {
+                return $list[$index];
+            }
+        }
+        return $list;
+    }
+
+    public static function clean_up( $id=false ) {
+        foreach (self::$imap_list as $index => $server) {
+            if ($id !== false && $id != $index) {
+                continue;
+            }
+            if ($server['connected'] && $server['object']) {
+                self::$imap_list[$index]['object']->disconnect();
+                self::$imap_list[$index]['connected'] = false;
+            }
+        }
+    }
+}
+
 ?>
