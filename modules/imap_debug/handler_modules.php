@@ -34,7 +34,7 @@ if (!class_exists('Hm_Handler_save_imap_cache')) {
 class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
     public function process($data) {
         $cache = $this->session->get('imap_cache', array());
-        $servers = Hm_IMAP_List::dump(false,true);
+        $servers = Hm_IMAP_List::dump(false, true);
         foreach ($servers as $index => $server) {
             if (is_object($server['object'])) {
                 $cache[$index] = $server['object']->dump_cache('gzip');
