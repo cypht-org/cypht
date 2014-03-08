@@ -453,11 +453,12 @@ trait Hm_List {
 class Hm_Msgs { use Hm_List; }
 class Hm_Debug { use Hm_List;
 
-    public static function load_page_stats($start_time) {
+    public static function load_page_stats() {
+        self::add(sprintf("PHP version %s", phpversion()));
+        self::add(sprintf("Zend version %s", zend_version()));
         self::add(sprintf("Peak Memory: %d", (memory_get_peak_usage(true)/1024)));
         self::add(sprintf("PID: %d", getmypid()));
         self::add(sprintf("Included files: %d", count(get_included_files())));
-        self::add(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
     }
 
 }

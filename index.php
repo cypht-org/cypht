@@ -33,7 +33,8 @@ $renderer = new Hm_Output_HTTP();
 $renderer->send_response($response_str, $response_data);
 
 /* debug FTW! */
-Hm_Debug::load_page_stats($start_time);
+Hm_Debug::add(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
+Hm_Debug::load_page_stats();
 Hm_Debug::show(true);
 
 ?>
