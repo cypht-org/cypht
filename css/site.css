@@ -2,7 +2,7 @@
 .subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%; }
 .date { float: right; }
 .imap_connect { display: inline; }
-.imap_debug { flaot: left; width: 80%; clear: left; white-space: pre; font-size: 90%; word-wrap: break-word; }
+.imap_debug { flaot: left; width: 80%; clear: left; white-space: pre; word-wrap: break-word; }
 .add_server { float: left; clear: left; margin-bottom: 10px; }
 .configured_server { float: left; margin: 10px; width: 250px; }
 .sys_messages { color: blue; margin-left: 20px; margin-top: 2px; float: left }
@@ -13,3 +13,7 @@
 .imap_folders { float: left; clear: left; margin-bottom: 10px; }
 .imap_folders div, .imap_debug_data { margin-left: 10px; }
 .subtitle { margin-left: 0px !important; }
+.tracker_output { float: right; width: 230px; margin-left: 20px; }
+.tracker_output table td { font-size: 75%; padding-right: 3px; }
+.tracker_output table .enabled{ color: green; }
+.tracker_output table .disabled{ color: red; }
