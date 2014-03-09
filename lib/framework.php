@@ -336,6 +336,9 @@ abstract class HM_Format {
     }
     protected function run_modules($input, $format, $lang_str) {
         $mod_output = array();
+        $js = array();
+        $css = array();
+
         foreach ($this->modules as $name => $args) {
             $name = "Hm_Output_$name";
             if (class_exists($name)) {
@@ -348,7 +351,14 @@ abstract class HM_Format {
                         }
                     }
                     else {
-                        $mod_output[] = $mod->output_content($input, $format, $lang_str);
+                        if ($name == 'Hm_Output_footer') {
+                            $mod_output[] = $mod->output_content($input, $format, $lang_str, $js, $css);
+                        }
+                        else {
+                            $mod_output[] = $mod->output_content($input, $format, $lang_str);
+                        }
+                        $js[] = $mod->js;
+                        $css[] = $mod->css;
                     }
                 }
             }
@@ -524,6 +534,8 @@ abstract class Hm_Output_Module {
 
     protected $lstr = array();
     protected $lang = false;
+    public $js = '';
+    public $css = '';
 
     abstract protected function output($input, $format);
 
@@ -542,12 +554,23 @@ abstract class Hm_Output_Module {
         return $string;
     }
 
-    public function output_content($input, $format, $lang_str) {
+    public function output_content($input, $format, $lang_str, $js=array(), $css=array()) {
         $this->lstr = $lang_str;
         if (isset($lang_str['interface_lang'])) {
             $this->lang = $lang_str['interface_lang'];
         }
+        if (!empty($css) || !empty($js)) {
+            return $this->output($input, $format, $js, $css);
+        }
         return $this->output($input, $format);
+    }
+
+    public function add_js($input) {
+        $this->js .= $input;
+    }
+
+    public function add_css($input) {
+        $this->css .= $input;
     }
 }
 

@@ -8,8 +8,8 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
         }
         return $data;
     }
-}
-}
+}}
+
 if (!class_exists('Hm_Handler_title')) {
 class Hm_Handler_title extends Hm_Handler_Module {
     public function process($data) {

@@ -1,6 +1,5 @@
 <?php
 
-if (!class_exists('Hm_Handler_imap_setup')) {
 class Hm_Handler_imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
@@ -28,9 +27,8 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_save_imap_cache')) {
 class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
     public function process($data) {
         $cache = $this->session->get('imap_cache', array());
@@ -46,9 +44,8 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_save_imap_servers')) {
 class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_IMAP_List::dump();
@@ -64,9 +61,8 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
         Hm_IMAP_List::clean_up();
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_load_imap_servers')) {
 class Hm_Handler_load_imap_servers extends Hm_Handler_Module {
     public function process($data) {
         $servers = $this->session->get('imap_servers', array());
@@ -75,9 +71,8 @@ class Hm_Handler_load_imap_servers extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_imap_setup_display')) {
 class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
     public function process($data) {
         $data['imap_servers'] = array();
@@ -87,9 +82,8 @@ class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_imap_connect')) {
 class Hm_Handler_imap_connect extends Hm_Handler_Module {
     public function process($data) {
         $data['just_saved_credentials'] = false;
@@ -135,9 +129,8 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_imap_delete')) {
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['imap_delete'])) {
@@ -155,7 +148,7 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
 /* wrapper around multiple imap connections */
 class Hm_IMAP_List {

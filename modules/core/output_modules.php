@@ -80,9 +80,12 @@ class Hm_Output_header extends Hm_Output_Module {
 
 if (!class_exists('Hm_Output_footer')) {
 class Hm_Output_footer extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($input, $format, $js=array(), $css=array()) {
         if ($format == 'HTML5' ) {
-        return '</body></html>';
+            $res = '<script type="text/javascript">'.implode(' ', $js).'</script>';
+            $res .= '<style type="text/css">'.implode(' ', $css).'</style>';
+            $res .= '</body></html>';
+            return $res;
         }
         return '';
     }
@@ -109,13 +112,12 @@ class Hm_Output_css extends Hm_Output_Module {
 }}
 
 if (!class_exists('Hm_Output_js')) {
-    class Hm_Output_js extends Hm_Output_Module {
-        protected function output($input, $format) {
-            if ($format == 'HTML5') {
-                return '<script type="text/javascript" src="js/site.js"></script>';
-            }
+class Hm_Output_js extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5') {
+            return '<script type="text/javascript" src="js/site.js"></script>';
         }
     }
-}
+}}
 
 ?>
