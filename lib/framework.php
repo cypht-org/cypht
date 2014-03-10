@@ -336,8 +336,6 @@ abstract class HM_Format {
     }
     protected function run_modules($input, $format, $lang_str) {
         $mod_output = array();
-        $js = array();
-        $css = array();
 
         foreach ($this->modules as $name => $args) {
             $name = "Hm_Output_$name";
@@ -351,14 +349,7 @@ abstract class HM_Format {
                         }
                     }
                     else {
-                        if ($name == 'Hm_Output_footer') {
-                            $mod_output[] = $mod->output_content($input, $format, $lang_str, $js, $css);
-                        }
-                        else {
-                            $mod_output[] = $mod->output_content($input, $format, $lang_str);
-                        }
-                        $js[] = $mod->js;
-                        $css[] = $mod->css;
+                        $mod_output[] = $mod->output_content($input, $format, $lang_str);
                     }
                 }
             }

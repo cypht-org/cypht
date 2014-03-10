@@ -69,7 +69,10 @@ class Hm_Output_header extends Hm_Output_Module {
             if ($this->lang) {
                 $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
             }
-            return '<!DOCTYPE html><html '.$lang.'><head><title>HM3</title><meta charset="utf-8" /></head><body>';
+            return '<!DOCTYPE html><html '.$lang.'><head><title>HM3</title><meta charset="utf-8" />'.
+                '<link href="site.css" media="all" rel="stylesheet" type="text/css" />'.
+                '<script type="text/javascript" src="site.js"></script>'.
+                '</head><body>';
         }
         elseif ($format == 'CLI') {
             return sprintf("\nHM3 CLI Interface\n\n");
@@ -80,33 +83,11 @@ class Hm_Output_header extends Hm_Output_Module {
 
 if (!class_exists('Hm_Output_footer')) {
 class Hm_Output_footer extends Hm_Output_Module {
-    protected function output($input, $format, $js=array(), $css=array()) {
-        if ($format == 'HTML5' ) {
-            $res = '<script type="text/javascript">'.implode(' ', $js).'</script>';
-            $res .= '<style type="text/css">'.implode(' ', $css).'</style>';
-            $res .= '</body></html>';
-            return $res;
-        }
-        return '';
-    }
-}}
-
-if (!class_exists('Hm_Output_css')) {
-class Hm_Output_css extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<link href="site.css" media="all" rel="stylesheet" type="text/css" />';
+            return '</body></html>';
         }
         return '';
-    }
-}}
-
-if (!class_exists('Hm_Output_js')) {
-class Hm_Output_js extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<script type="text/javascript" src="site.js"></script>';
-        }
     }
 }}
 
