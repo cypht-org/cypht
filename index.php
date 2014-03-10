@@ -14,6 +14,7 @@ $start_time = microtime(true);
 
 /* get includes */
 require 'lib/framework.php';
+require 'lib/pbkdf2.php';
 require 'lib/session.php';
 require 'lib/hm-imap.php';
 

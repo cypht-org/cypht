@@ -115,7 +115,6 @@ class Hm_Router {
         switch ($config->get('session_type', false)) {
             case 'DB_auth':
                 Hm_Debug::add('Using DB Authed session');
-                require 'lib/pbkdf2.php';
                 $session = new Hm_Session_PHP_DB_Auth();
                 break;
             default:
@@ -658,4 +657,30 @@ trait Hm_Modules {
 class Hm_Handler_Modules { use Hm_Modules; }
 class Hm_Output_Modules { use Hm_Modules; }
 
+class Hm_Crypt {
+
+    static private $mode = MCRYPT_MODE_CBC;
+    static private $cipher = MCRYPT_RIJNDAEL_128;
+    static private $r_source = MCRYPT_RAND;
+
+    public static function plaintext($string, $key) {
+        $key = substr(md5($key), 0, mcrypt_get_key_size(self::$cipher, self::$mode));
+        $string = base64_decode($string);
+        $iv_size = self::iv_size();
+        $iv_dec = substr($string, 0, $iv_size);
+        $string = substr($string, $iv_size);
+        return mcrypt_decrypt(self::$cipher, $key, $string, self::$mode, $iv_dec);
+    }
+
+    public static function ciphertext($string, $key) {
+        $key = substr(md5($key), 0, mcrypt_get_key_size(self::$cipher, self::$mode));
+        $iv_size = self::iv_size();
+        $iv = mcrypt_create_iv($iv_size, self::$r_source);
+        return base64_encode($iv.mcrypt_encrypt(self::$cipher, $key, $string, self::$mode, $iv));
+    }
+
+    public static function iv_size() {
+        return mcrypt_get_iv_size(self::$cipher, self::$mode);
+    }
+}
 ?>

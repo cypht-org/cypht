@@ -5,6 +5,8 @@ abstract class Hm_Session {
 
     public $active = false;
     public $loaded = false;
+    protected $enc_key = '';
+    protected $data = array();
 
     abstract protected function check($request, $config);
     abstract protected function start($request);
@@ -21,6 +23,7 @@ abstract class Hm_Session {
 class Hm_Session_PHP extends Hm_Session {
 
     public function check($request, $config) {
+        $this->enc_key = $config->get('enc_key', 'youshouldbesettingthis!');
         if (!isset($request->cookie['PHPSESSID'])) {
             Hm_Msgs::add('starting new PHP session');
         }
@@ -33,20 +36,26 @@ class Hm_Session_PHP extends Hm_Session {
 
     public function start($request) {
         session_start();
+        if (isset($_SESSION['data'])) {
+            $data = unserialize(Hm_Crypt::plaintext($_SESSION['data'], $this->enc_key));
+            if (is_array($data)) {
+                $this->data = $data;
+            }
+        }
         $this->active = true;
     }
 
     public function get($name, $default=false) {
-        return isset($_SESSION[$name]) ? $_SESSION[$name] : $default;
+        return isset($this->data[$name]) ? $this->data[$name] : $default;
     }
 
     public function set($name, $value) {
-        $_SESSION[$name] = $value;
+        $this->data[$name] = $value;
     }
 
     public function del($name) {
-        if (isset($_SESSION[$name])) {
-            unset($_SESSION[$name]);
+        if (isset($this->data[$name])) {
+            unset($this->data[$name]);
         }
     }
     public function is_active() {
@@ -62,6 +71,9 @@ class Hm_Session_PHP extends Hm_Session {
     }
 
     public function end() {
+
+        $enc_data = @Hm_Crypt::ciphertext(serialize($this->data), $this->enc_key);
+        $_SESSION = array('data' => $enc_data);
         session_write_close();
         $this->active = false;
     }
@@ -87,6 +99,7 @@ class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
     }
 
     public function check($request, $config, $user=false, $pass=false) {
+        $this->enc_key = $config->get('enc_key', 'youshouldbesettingthis!');
         if ($user && $pass) {
             $this->parse_config($config->dump());
             if ($this->config) {
