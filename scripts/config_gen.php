@@ -2,7 +2,7 @@
 
 require 'lib/framework.php';
 
-$options = getopt("", array('ini_file::'));
+$options = getopt('', array('ini_file::', 'debug'));
 $settings = '';
 
 if (isset($options['ini_file'])) {
@@ -41,6 +41,10 @@ if (!empty($settings)) {
 
     file_put_contents('hm3.rc', serialize($settings));
     printf("hm3.rc file written\n");
+    if (isset($options['debug'])) {
+        printf("Debug output:\n");
+        Hm_Debug::show();
+    }
 }
 else {
     printf("\ncould not find hm3.ini file\n");
