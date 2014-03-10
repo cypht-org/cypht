@@ -51,7 +51,10 @@ class Hm_Router {
     public function process_request($config) {
 
         /* load module sets and build a list of allowed input */
-        $filters = $this->load_modules($config);
+        $filters = $config->get('input_filters', array());
+        $handler_mods = $config->get('handler_modules', array());
+        $output_mods = $config->get('output_modules', array());
+        $this->load_modules($config, $handler_mods, $output_mods);
 
         /* process the request data using the allowed input */
         $request = new Hm_Request($filters);
@@ -110,27 +113,24 @@ class Hm_Router {
         return $existing;
     }
 
-    private function load_modules($config) {
-        $mod_list = explode(',', $config->get('modules', ''));
-        $filters = array('allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
-        foreach ($mod_list as $mod) {
-            if (preg_match("/^[a-z_]{3,}$/", $mod)) {
-                foreach (array('handler_modules', 'output_modules', 'module_map') as $name) {
-                    if (is_readable(sprintf("modules/%s/%s.php", $mod, $name))) {
-                        if ($name == 'module_map') {
-                            $filters = $this->merge_filters($filters, require sprintf("modules/%s/%s.php", $mod, $name));
-                        }
-                        else {
-                            require sprintf("modules/%s/%s.php", $mod, $name);
-                        }
-                    }
-                }
-            }
-            else {
-                Hm_Debug::add(sprintf("Invalid module name: %s", $mod));
+    private function load_modules($config, $handlers, $output) {
+
+        $mods = explode(',', $config->get('modules', '')); 
+        foreach ($mods as $name) {
+            if (is_readable(sprintf('modules/%s/modules.php', $name))) {
+                require sprintf('modules/%s/modules.php', $name);
             }
         }
-        return $filters;
+        foreach ($handlers as $page => $modlist) {
+            foreach ($modlist as $name => $vals) {
+                Hm_Handler_Modules::add($page, $name, $vals['logged_in']);
+            }
+        }
+        foreach ($output as $page => $modlist) {
+            foreach ($modlist as $name => $vals) {
+                Hm_Output_Modules::add($page, $name, $vals['logged_in']);
+            }
+        }
     }
 
     private function forward_redirect_data($session, $request) {
@@ -296,7 +296,7 @@ class Hm_Request_Handler {
             $name = "Hm_Handler_$name";
             if (class_exists($name)) {
                 if (!$args['logged_in'] || ($args['logged_in'] && $this->session->active)) {
-                    $mod = new $name( $this, $args['logged_in'], $args['args'] );
+                    $mod = new $name( $this, $args['logged_in']);
                     $input = $mod->process($this->response);
                 }
             }
@@ -493,7 +493,7 @@ abstract class Hm_Handler_Module {
     protected $config = false;
     protected $page = false;
 
-    public function __construct($parent, $logged_in, $args) {
+    public function __construct($parent, $logged_in) {
         $this->session = $parent->session;
         $this->request = $parent->request;
         $this->config = $parent->config;
@@ -570,7 +570,10 @@ trait Hm_Modules {
 
     private static $module_list = array();
 
-    public static function add($page, $module, $logged_in, $marker=false, $placement='after', $module_args=array()) {
+    public static function load($mod_list) {
+        $this->module_list = $mod_list;
+    }
+    public static function add($page, $module, $logged_in, $marker=false, $placement='after') {
         $inserted = false;
         if (!isset(self::$module_list[$page])) {
             self::$module_list[$page] = array();
@@ -588,14 +591,14 @@ trait Hm_Modules {
                 }
                 $list = self::$module_list[$page];
                 self::$module_list[$page] = array_merge(array_slice($list, 0, $index), 
-                    array($module => array('logged_in' => $logged_in, 'args' => $module_args)),
+                    array($module => array('logged_in' => $logged_in)),
                     array_slice($list, $index));
                 $inserted = true;
             }
         }
         else {
             $inserted = true;
-            self::$module_list[$page][$module] = array('logged_in' => $logged_in, 'args' => $module_args);
+            self::$module_list[$page][$module] = array('logged_in' => $logged_in);
         }
         if (!$inserted) {
             Hm_Msgs::add(sprintf('failed to insert module %s', $module));
@@ -614,6 +617,10 @@ trait Hm_Modules {
             $res = array_merge($res, self::$module_list[$page]);
         }
         return $res;
+    }
+
+    public static function dump() {
+        return self::$module_list;
     }
 }
 
