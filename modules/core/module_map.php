@@ -11,7 +11,6 @@ Hm_Handler_Modules::add('home', 'http_headers', true);
 /* homepage output */
 Hm_Output_Modules::add('home', 'header', false);
 Hm_Output_Modules::add('home', 'css', false);
-Hm_Output_Modules::add('home', 'jquery', true);
 Hm_Output_Modules::add('home', 'logout', true);
 Hm_Output_Modules::add('home', 'login', false);
 Hm_Output_Modules::add('home', 'title', true);
