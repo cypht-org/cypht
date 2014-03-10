@@ -1,0 +1,8 @@
+.configured_servers { float: left; clear: left; margin-bottom: 10px; }
+.configured_server { float: left; margin: 10px; width: 250px; }
+.configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }
+.imap_folders { float: left; clear: left; margin-bottom: 10px; }
+.imap_folders div, .imap_debug_data { margin-left: 10px; }
+.imap_connect { display: inline; }
+.imap_debug { flaot: left; width: 80%; clear: left; white-space: pre; word-wrap: break-word; }
+.add_server { float: left; clear: left; margin-bottom: 10px; }
