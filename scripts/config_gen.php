@@ -21,11 +21,11 @@ if (!empty($settings)) {
     }
     if ($css) {
         file_put_contents('site.css', compress($css));
-        printf("site.css file created, move to css/site.css\n");
+        printf("site.css file created\n");
     }
     if ($js) {
         file_put_contents('site.js', compress($js));
-        printf("site.js file created, move to js/site.js\n");
+        printf("site.js file created\n");
     }
     file_put_contents('hm3.rc', serialize($settings));
     printf("hm3.rc file written\n");

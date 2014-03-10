@@ -95,7 +95,7 @@ if (!class_exists('Hm_Output_css')) {
 class Hm_Output_css extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<link href="css/site.css" media="all" rel="stylesheet" type="text/css" />';
+            return '<link href="site.css" media="all" rel="stylesheet" type="text/css" />';
         }
         return '';
     }
@@ -105,7 +105,7 @@ if (!class_exists('Hm_Output_js')) {
 class Hm_Output_js extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<script type="text/javascript" src="js/site.js"></script>';
+            return '<script type="text/javascript" src="site.js"></script>';
         }
     }
 }}
