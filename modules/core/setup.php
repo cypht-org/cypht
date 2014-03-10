@@ -2,9 +2,11 @@
 
 /* homepage data */
 Hm_Handler_Modules::add('home', 'login', false);
+Hm_Handler_Modules::add('home', 'load_user_data', true);
 Hm_Handler_Modules::add('home', 'language',  true);
 Hm_Handler_Modules::add('home', 'title', true);
 Hm_Handler_Modules::add('home', 'date', true);
+Hm_Handler_Modules::add('home', 'save_user_data', true);
 Hm_Handler_Modules::add('home', 'logout', true);
 Hm_Handler_Modules::add('home', 'http_headers', true);
 

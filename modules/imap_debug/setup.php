@@ -1,10 +1,10 @@
 <?php
 
 /* homepage data */
-Hm_Handler_Modules::add('home', 'load_imap_servers',  true, 'login', 'after');
-Hm_Handler_Modules::add('home', 'imap_setup', true, 'logout', 'after');
+Hm_Handler_Modules::add('home', 'load_imap_servers',  true, 'language', 'after');
+Hm_Handler_Modules::add('home', 'imap_setup', true, 'load_imap_servers', 'after');
 Hm_Handler_Modules::add('home', 'imap_setup_display', true, 'imap_setup', 'after');
-Hm_Handler_Modules::add('home', 'save_imap_servers',  true, 'http_headers', 'after');
+Hm_Handler_Modules::add('home', 'save_imap_servers',  true, 'save_user_data', 'before');
 
 /* homepage output */
 Hm_Output_Modules::add('home', 'imap_setup', true, 'date', 'after');

@@ -7,26 +7,6 @@ abstract class Hm_Config {
     protected $config = array();
 
     abstract public function load($source);
-    abstract public function dump();
-    abstract public function set($name, $value);
-    abstract public function get($name, $default=false);
-}
-
-/* file based configuration */
-class Hm_Config_File extends Hm_Config {
-
-    public function __construct($source) {
-        $this->load($source);
-    }
-
-    public function load($source) {
-        if (is_readable($source)) {
-            $data = unserialize(file_get_contents($source));
-            if ($data) {
-                $this->config = array_merge($this->config, $data);
-            }
-        }
-    }
 
     public function dump() {
         return $this->config;
@@ -41,6 +21,49 @@ class Hm_Config_File extends Hm_Config {
     }
 }
 
+/* file based user configuration */
+class Hm_User_Config_File extends Hm_Config {
+
+    public function __construct() {
+    }
+
+    public function load($source) {
+        if (is_readable($source)) {
+            $data = unserialize(file_get_contents($source));
+            if ($data) {
+                $this->config = array_merge($this->config, $data);
+            }
+        }
+    }
+    public function reload($data) {
+        $this->config = $data;
+    }
+
+    public function save($destination) {
+        file_put_contents($destination, serialize($this->config));
+    }
+
+}
+
+
+/* file based site configuration */
+class Hm_Site_Config_File extends Hm_Config {
+
+    public function __construct($source) {
+        $this->load($source);
+    }
+
+    public function load($source) {
+        if (is_readable($source)) {
+            $data = unserialize(file_get_contents($source));
+            if ($data) {
+                $this->config = array_merge($this->config, $data);
+            }
+        }
+    }
+
+}
+
 /* handle page processing delegation */
 class Hm_Router {
 
@@ -50,10 +73,14 @@ class Hm_Router {
 
     public function process_request($config) {
 
-        /* load module sets and build a list of allowed input */
+        /* get list of allowed input */
         $filters = $config->get('input_filters', array());
+
+        /* get registered modules */
         $handler_mods = $config->get('handler_modules', array());
         $output_mods = $config->get('output_modules', array());
+
+        /* load module class defs */
         $this->load_modules($config, $handler_mods, $output_mods);
 
         /* process the request data using the allowed input */
@@ -266,6 +293,7 @@ class Hm_Request_Handler {
     public $request = false;
     public $session = false;
     public $config = false;
+    public $user_config = false;
     public $response = array();
     private $modules = array();
 
@@ -275,6 +303,7 @@ class Hm_Request_Handler {
         $this->session = $session;
         $this->config = $config;
         $this->modules = Hm_Handler_Modules::get_for_page($page);
+        $this->user_config = new Hm_User_Config_File();
         $this->run_modules();
         $this->default_language();
         return $this->response;
@@ -492,11 +521,13 @@ abstract class Hm_Handler_Module {
     protected $request = false;
     protected $config = false;
     protected $page = false;
+    protected $user_data = false;
 
     public function __construct($parent, $logged_in) {
         $this->session = $parent->session;
         $this->request = $parent->request;
         $this->config = $parent->config;
+        $this->user_config = $parent->user_config;
         $this->page = $parent->page;
     }
 

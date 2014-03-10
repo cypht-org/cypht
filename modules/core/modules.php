@@ -40,9 +40,39 @@ class Hm_Handler_login extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('username', 'password'));
         if ($success) {
             $this->session->check($this->request, $this->config, $form['username'], $form['password']);
+            $this->session->set('username', $form['username']);
         }
         else {
             $this->session->check($this->request, $this->config);
+        }
+        return $data;
+    }
+}}
+
+if (!class_exists('Hm_Handler_load_user_data')) {
+class Hm_Handler_load_user_data extends Hm_Handler_Module {
+    public function process($data) {
+        $user_data = $this->session->get('user_data', array());
+        if (!empty($user_data)) {
+            $this->user_config->reload($user_data);
+        }
+        else {
+            $user = $this->session->get('username', false);
+            $path = $this->config->get('user_settings_dir', false);
+            if ($user && $path && is_readable(sprintf('%s/%s.txt', $path, $user))) {
+                $this->user_config->load(sprintf('%s/%s.txt', $path, $user));
+            }
+        }
+        return $data;
+    }
+}}
+
+if (!class_exists('Hm_Handler_save_user_data')) {
+class Hm_Handler_save_user_data extends Hm_Handler_Module {
+    public function process($data) {
+        $user_data = $this->user_config->dump();
+        if (!empty($user_data)) {
+            $this->session->set('user_data', $user_data);
         }
         return $data;
     }
@@ -52,6 +82,12 @@ if (!class_exists('Hm_Handler_logout')) {
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
+            $user = $this->session->get('username', false);
+            $path = $this->config->get('user_settings_dir', false);
+            if ($user && $path && is_writable(sprintf('%s/%s.txt', $path, $user))) {
+                $this->user_config->save(sprintf('%s/%s.txt', $path, $user));
+                Hm_Msgs::add('saved user data on logout');
+            }
             $this->session->destroy();
             Hm_Msgs::add('session destroyed on logout');
         }

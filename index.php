@@ -18,7 +18,7 @@ require 'lib/session.php';
 require 'lib/hm-imap.php';
 
 /* get configuration */
-$config = new Hm_Config_File('hm3.rc');
+$config = new Hm_Site_Config_File('hm3.rc');
 
 /* process request input */
 $router = new Hm_Router();
