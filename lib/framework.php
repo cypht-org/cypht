@@ -259,7 +259,7 @@ class Hm_Request {
     }
 }
 
-/* request detail */
+/* data handler module runner */
 class Hm_Request_Handler {
 
     public $page = false;
