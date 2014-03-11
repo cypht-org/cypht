@@ -51,7 +51,6 @@ class Hm_User_Config_File extends Hm_Config {
 
 }
 
-
 /* file based site configuration */
 class Hm_Site_Config_File extends Hm_Config {
 
@@ -692,5 +691,30 @@ class Hm_Crypt {
     public static function iv_size() {
         return mcrypt_get_iv_size(self::$cipher, self::$mode);
     }
+}
+
+class Hm_DB {
+
+    static public $dbh = array();
+
+    static public function connect($driver, $host, $name, $user, $pass) {
+        $key = md5($driver.$host.$name.$user.$pass);
+        if (isset(self::$dbh[$key]) && self::$dbh[$key]) {
+            return self::$dbh[$key];
+        }
+        $dsn = sprintf('%s:host=%s;dbname=%s', $driver, $host, $name);
+        try {
+            self::$dbh[$key] = new PDO($dsn, $user, $pass);
+            Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn));
+            return self::$dbh[$key];
+        }
+        catch (Exception $oops) {
+            Hm_Debug::add($oops->getMessage());
+            Hm_Msgs::add("An error occurred communicating with the database");
+            self::$dbh[$key] = false;
+            return false;
+        }
+    }
+
 }
 ?>

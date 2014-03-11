@@ -157,17 +157,12 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
     }
 
     protected function connect() {
-        $dsn = sprintf('%s:host=%s;dbname=%s', $this->config['db_driver'], $this->config['db_host'], $this->config['db_name']);
-        try {
-            $this->dbh = new PDO($dsn, $this->config['db_user'], $this->config['db_pass']);
+        $this->dbh = Hm_DB::connect($this->config['db_driver'], $this->config['db_host'],
+            $this->config['db_name'], $this->config['db_user'], $this->config['db_pass']);
+        if ($this->dbh) {
+            return true;
         }
-        catch (Exception $oops) {
-            Hm_Debug::add($oops->getMessage());
-            Hm_Msgs::add("An error occurred communicating with the database");
-            $this->dbh = false;
-            return false;
-        }
-        return true;
+        return false;
     }
 
     private function create() {
