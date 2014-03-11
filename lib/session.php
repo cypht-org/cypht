@@ -116,7 +116,6 @@ class Hm_PHP_Session extends Hm_Session {
 class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
 
     protected $dbh = false;
-    protected $required_config = array('db_user', 'db_pass', 'db_name', 'db_host', 'db_driver');
 
     public function check($request, $user=false, $pass=false) {
         $this->set_key($request);
@@ -204,16 +203,20 @@ class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
     }
 
     public function end() {
-        $sql = $this->dbh->prepare("update hm_user_session set data=? where hm_id=?");
-        $enc_data = $this->ciphertext($this->data);
-        $sql->execute(array($enc_data, $this->session_key));
+        if ($this->dbh) {
+            $sql = $this->dbh->prepare("update hm_user_session set data=? where hm_id=?");
+            $enc_data = $this->ciphertext($this->data);
+            $sql->execute(array($enc_data, $this->session_key));
+        }
         $this->active = false;
     }
 
     public function destroy() {
         $this->end();
-        $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
-        $sql->execute(array($this->session_key));
+        if ($this->dbh) {
+            $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
+            $sql->execute(array($this->session_key));
+        }
         setcookie($this->cname, '', 0);
         setcookie('hm_id', '', 0);
     }

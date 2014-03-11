@@ -39,11 +39,14 @@ class Hm_Handler_login extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('username', 'password'));
         if ($success) {
-            $this->session->check($this->request, $this->config, $form['username'], $form['password']);
+            $this->session->check($this->request, $form['username'], $form['password']);
             $this->session->set('username', $form['username']);
         }
         else {
-            $this->session->check($this->request, $this->config);
+            $this->session->check($this->request);
+        }
+        if (!$this->session->active && !empty($this->request->post)) {
+            Hm_Msgs::add("Username and Password required");
         }
         return $data;
     }
@@ -58,10 +61,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         }
         else {
             $user = $this->session->get('username', false);
-            $path = $this->config->get('user_settings_dir', false);
-            if ($user && $path && is_readable(sprintf('%s/%s.txt', $path, $user))) {
-                $this->user_config->load(sprintf('%s/%s.txt', $path, $user), $this->config);
-            }
+            $this->user_config->load($user);
         }
         return $data;
     }
@@ -85,7 +85,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
             $user = $this->session->get('username', false);
             $path = $this->config->get('user_settings_dir', false);
             if ($user && $path && is_writable(sprintf('%s/%s.txt', $path, $user))) {
-                $this->user_config->save(sprintf('%s/%s.txt', $path, $user), $this->config);
+                $this->user_config->save($user);
                 Hm_Msgs::add('saved user data on logout');
             }
             $this->session->destroy();

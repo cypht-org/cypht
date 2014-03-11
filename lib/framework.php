@@ -24,14 +24,22 @@ abstract class Hm_Config {
 /* file based user configuration */
 class Hm_User_Config_File extends Hm_Config {
 
-    public function __construct() {
+    private $site_config = false;
+
+    public function __construct($config) {
+        $this->site_config = $config;
+    }
+    private function get_path($username) {
+        $path = $this->site_config->get('user_settings_dir', false);
+        return sprintf('%s/%s.txt', $path, $username);
     }
 
-    public function load($source, $config=array()) {
+    public function load($username) {
+        $source = $this->get_path($username);
         if (is_readable($source)) {
             $str_data = file_get_contents($source);
             if ($str_data) {
-                $enc_key = $config->get('enc_key', 'youshouldbesettingthis!');
+                $enc_key = $this->site_config->get('enc_key', 'youshouldbesettingthis!');
                 $data = @unserialize(Hm_Crypt::plaintext($str_data, $enc_key));
                 if (is_array($data)) {
                     $this->config = array_merge($this->config, $data);
@@ -39,22 +47,74 @@ class Hm_User_Config_File extends Hm_Config {
             }
         }
     }
+
     public function reload($data) {
         $this->config = $data;
     }
 
-    public function save($destination, $config) {
-        $enc_key = $config->get('enc_key', 'youshouldbesettingthis!');
-        $config = Hm_Crypt::ciphertext(serialize($this->config), $enc_key);
-        file_put_contents($destination, $config);
+    public function save($username) {
+        $destination = $this->get_path($username);
+        $enc_key = $this->site_config->get('enc_key', 'youshouldbesettingthis!');
+        $data = Hm_Crypt::ciphertext(serialize($this->config), $enc_key);
+        file_put_contents($destination, $data);
     }
 
 }
 
 /* db based user configuration */
 class Hm_User_Config_DB extends Hm_Config {
-    public function load($config) {
 
+    private $site_config = false;
+    private $dbh = false;
+
+    public function __construct($config) {
+        $this->site_config = $config;
+    }
+
+    public function load($username) {
+        $enc_key = $this->site_config->get('enc_key', 'youshouldbesettingthis!');
+        if ($this->connect()) {
+            $sql = $this->dbh->prepare("select * from hm_user_settings where username=?");
+            if ($sql->execute(array($username))) {
+                $data = $sql->fetch();
+                if (!$data || !isset($data['settings'])) {
+                    $sql = $this->dbh->prepare("insert into hm_user_settings values(?,?)");
+                    if ($sql->execute(array($username, ''))) {
+                        Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
+                        $this->config = array();
+                    }
+                }
+                else {
+                    $data = @unserialize(Hm_Crypt::plaintext($data['settings'], $enc_key));
+                    if (is_array($data)) {
+                        $this->config = array_merge($this->config, $data);
+                    }
+                }
+            }
+        }
+    }
+
+    public function reload($data) {
+        $this->config = $data;
+    }
+
+    protected function connect() {
+        $this->dbh = Hm_DB::connect($this->site_config);
+        if ($this->dbh) {
+            return true;
+        }
+        return false;
+    }
+
+    public function save($username) {
+        $enc_key = $this->site_config->get('enc_key', 'youshouldbesettingthis!');
+        $config = Hm_Crypt::ciphertext(serialize($this->config), $enc_key);
+        if ($this->connect()) {
+            $sql = $this->dbh->prepare("update hm_user_settings set settings=? where username=?");
+            if ($sql->execute(array($config, $username))) {
+                Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
+            }
+        }
     }
 }
 
@@ -187,7 +247,7 @@ class Hm_Router {
     }
 
     private function check_for_redirect($request, $session, $result) {
-        if (!empty($request->post) && $request->type == 'HTTP' && $session->active) {
+        if (!empty($request->post) && $request->type == 'HTTP') {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
                 $session->set('redirect_messages', $msgs);
@@ -318,11 +378,25 @@ class Hm_Request_Handler {
         $this->session = $session;
         $this->config = $config;
         $this->modules = Hm_Handler_Modules::get_for_page($page);
-        $this->user_config = new Hm_User_Config_File();
+        $this->load_user_config_object();
         $this->run_modules();
         $this->default_language();
         return $this->response;
+    }
 
+    private function load_user_config_object() {
+        $type = $this->config->get('user_config_type', 'file');
+        switch ($type) {
+            case 'DB':
+                $this->user_config = new Hm_User_Config_DB($this->config);
+                Hm_Debug::add("Using DB user configuration");
+                break;
+            case 'file':
+            default:
+                $this->user_config = new Hm_User_Config_File($this->config);
+                Hm_Debug::add("Using file based user configuration");
+                break;
+        }
     }
 
     private function default_language() {
