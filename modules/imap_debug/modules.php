@@ -32,9 +32,9 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
 class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
     public function process($data) {
         $cache = $this->session->get('imap_cache', array());
-        $servers = Hm_IMAP_List::dump();
+        $servers = Hm_IMAP_List::dump(false, true);
         foreach ($servers as $index => $server) {
-            if (is_object($server['object'])) {
+            if (isset($server['object']) && is_object($server['object'])) {
                 $cache[$index] = $server['object']->dump_cache('gzip');
             }
         }
@@ -89,10 +89,10 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
         $data['just_saved_credentials'] = false;
         $data['just_forgot_credentials'] = false;
         $remember = false;
+        $remembered = false;
         if (isset($this->request->post['imap_remember'])) {
             $remember = true;
         }
-        $remembered = false;
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
             $imap = false;
@@ -102,10 +102,10 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                 $cache = $imap_cache[$form['imap_server_id']];
             }
             if ($success) {
-                $imap = Hm_IMAP_List::connect( $form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], $remember );
+                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], $remember);
             }
             elseif (isset($form['imap_server_id'])) {
-                $imap = Hm_IMAP_List::connect( $form['imap_server_id'], $cache );
+                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
                 $remembered = true;
             }
             if ($imap) {
@@ -113,7 +113,7 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     $data['just_saved_credentials'] = true;
                 }
                 if (!$remember && $remembered) {
-                    Hm_IMAP_List::forget_credentials( $form['imap_server_id'] );
+                    Hm_IMAP_List::forget_credentials($form['imap_server_id']);
                     $data['just_forgot_credentials'] = true;
                 }
                 if ($imap->get_state() == 'authenticated') {
