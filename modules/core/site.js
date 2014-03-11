@@ -48,17 +48,6 @@ Hm_Notices = {
     }
 };
 
-Hm_Folders = {
-
-    show: function(folders) {
-        var folder_html = '';
-        for (folder in folders) {
-            folder_html += '<div>'+folders[folder]+'</div>';
-        }
-        $('.imap_folder_data').html(folder_html);
-    }
-};
-
 Hm_Timer = {
 
     jobs: [],

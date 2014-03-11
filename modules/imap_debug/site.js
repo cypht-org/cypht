@@ -1,3 +1,14 @@
+Hm_Folders = {
+
+    show: function(folders) {
+        var folder_html = '';
+        for (folder in folders) {
+            folder_html += '<div>'+folders[folder]+'</div>';
+        }
+        $('.imap_folder_data').html(folder_html);
+    }
+};
+
 $('.imap_delete').on('click', function() {
     $('.imap_debug_data').empty();
     event.preventDefault();
