@@ -292,7 +292,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     ' value="1" name="imap_remember" /><br /><br />'.
                     ' <input type="submit" value="Test Connection" class="test_connect" />'.
                     ' <input type="submit" value="Delete" class="imap_delete" />'.
-                    ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
+                    ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />'.
                     '</form></div>';
             }
             $res .= '</div>';
