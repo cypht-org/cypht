@@ -20,9 +20,9 @@ abstract class Hm_Session {
 }
 
 /* session persistant storage with vanilla PHP sessions and no local authentication */
-class Hm_Session_PHP extends Hm_Session {
+class Hm_PHP_Session extends Hm_Session {
 
-    public function check($request, $config) {
+    protected function set_key($request) {
         if (isset($request->cookie['hm_id'])) {
             $this->enc_key = base64_decode($request->cookie['hm_id']);
         }
@@ -30,9 +30,10 @@ class Hm_Session_PHP extends Hm_Session {
             $this->enc_key = base64_encode(openssl_random_pseudo_bytes(128));
             setcookie('hm_id', $this->enc_key, 0);
         }
-        if (!isset($request->cookie['PHPSESSID'])) {
-            Hm_Msgs::add('starting new PHP session');
-        }
+    }
+
+    public function check($request, $config) {
+        $this->set_key($request);
         $this->start($request);
     }
 
@@ -79,6 +80,7 @@ class Hm_Session_PHP extends Hm_Session {
     }
 
     public function destroy() {
+        $this->end();
         session_unset();
         @session_destroy();
         $params = session_get_cookie_params();
@@ -87,15 +89,17 @@ class Hm_Session_PHP extends Hm_Session {
     }
 
     public function end() {
-        $enc_data = @Hm_Crypt::ciphertext(serialize($this->data), $this->enc_key);
-        $_SESSION = array('data' => $enc_data);
-        session_write_close();
-        $this->active = false;
+        if ($this->active) {
+            $enc_data = @Hm_Crypt::ciphertext(serialize($this->data), $this->enc_key);
+            $_SESSION = array('data' => $enc_data);
+            session_write_close();
+            $this->active = false;
+        }
     }
 }
 
 /* persistant storage with vanilla PHP sessions and DB based authentication */
-class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
+class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
 
     private $dbh = false;
     private $required_config = array('db_user', 'db_pass', 'db_name', 'db_host', 'db_driver');
@@ -114,7 +118,7 @@ class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
     }
 
     public function check($request, $config, $user=false, $pass=false) {
-        $this->enc_key = $config->get('enc_key', 'youshouldbesettingthis!');
+        $this->set_key($request);
         if ($user && $pass) {
             $this->parse_config($config->dump());
             if ($this->config) {
@@ -135,7 +139,6 @@ class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
 
     public function auth($user, $pass) {
         if ($this->connect()) {
-
             $sql = $this->dbh->prepare("select hash from hm_user where username = ?");
             if ($sql->execute(array($user))) {
                 $row = $sql->fetch();
@@ -163,6 +166,19 @@ class Hm_Session_PHP_DB_Auth extends Hm_Session_PHP {
     }
 
     private function create() {
+    }
+}
+class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
+    public function start($request) {
+        if (isset($request->cookie['hm_session'])) {
+        }
+        else {
+        }
+        if ($this->connect()) {
+            //$sql = $this->dbh->prepare("select hash from hm_user where username = ?");
+        }
+    }
+    public function end() {
     }
 }
 ?>
