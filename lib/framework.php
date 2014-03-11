@@ -119,6 +119,10 @@ class Hm_Router {
 
     private function setup_session($config) {
         switch ($config->get('session_type', false)) {
+            case 'DB_session':
+                Hm_Debug::add('Using custom DB session');
+                $session = new Hm_DB_Session_DB_Auth();
+                break;
             case 'DB_auth':
                 Hm_Debug::add('Using DB Authed session');
                 $session = new Hm_PHP_Session_DB_Auth();

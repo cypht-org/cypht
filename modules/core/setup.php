@@ -32,7 +32,8 @@ return array(
     ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
-        'hm_id' => FILTER_SANITIZE_STRING
+        'hm_id' => FILTER_SANITIZE_STRING,
+        'hm_session' => FILTER_SANITIZE_STRING
     ),
     'allowed_server' => array(
         'REQUEST_URI' => FILTER_SANITIZE_STRING,

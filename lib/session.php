@@ -24,6 +24,12 @@ class Hm_PHP_Session extends Hm_Session {
 
     protected $cname = 'PHPSESSID';
 
+    protected function ciphertext($data) {
+        return Hm_Crypt::ciphertext(serialize($data), $this->enc_key);
+    }
+    protected function plaintext($data) {
+        return @unserialize(Hm_Crypt::plaintext($data, $this->enc_key));
+    }
     protected function set_key($request) {
         if (isset($request->cookie['hm_id'])) {
             $this->enc_key = base64_decode($request->cookie['hm_id']);
@@ -46,7 +52,7 @@ class Hm_PHP_Session extends Hm_Session {
     public function start($request) {
         session_start();
         if (isset($_SESSION['data'])) {
-            $data = unserialize(Hm_Crypt::plaintext($_SESSION['data'], $this->enc_key));
+            $data = $this->plaintext($_SESSION['data']);
             if (is_array($data)) {
                 $this->data = $data;
             }
@@ -87,12 +93,12 @@ class Hm_PHP_Session extends Hm_Session {
         @session_destroy();
         $params = session_get_cookie_params();
         setcookie($this->cname, '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-        $this->active = false;
+        setcookie('hm_id', '', 0);
     }
 
     public function end() {
         if ($this->active) {
-            $enc_data = @Hm_Crypt::ciphertext(serialize($this->data), $this->enc_key);
+            $enc_data = $this->ciphertext($this->data);
             $_SESSION = array('data' => $enc_data);
             session_write_close();
             $this->active = false;
@@ -103,9 +109,9 @@ class Hm_PHP_Session extends Hm_Session {
 /* persistant storage with vanilla PHP sessions and DB based authentication */
 class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
 
-    private $dbh = false;
-    private $required_config = array('db_user', 'db_pass', 'db_name', 'db_host', 'db_driver');
-    private $config = false;
+    protected $dbh = false;
+    protected $required_config = array('db_user', 'db_pass', 'db_name', 'db_host', 'db_driver');
+    protected $config = false;
 
     private function parse_config($config) {
         $res = array();
@@ -121,21 +127,18 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
 
     public function check($request, $config, $user=false, $pass=false) {
         $this->set_key($request);
-        if ($user && $pass) {
-            $this->parse_config($config->dump());
-            if ($this->config) {
+        $this->parse_config($config->dump());
+        if ($this->config) {
+            if ($user && $pass) {
                 if ($this->auth($user, $pass)) {
                     Hm_Msgs::add('login accepted, starting PHP session');
                     $this->loaded = true;
                     $this->start($request);
                 }
             }
-            else {
-                Hm_Debug::add('incomplete DB configuration');
+            elseif (isset($request->cookie[$this->cname])) {
+                $this->start($request);
             }
-        }
-        elseif (!empty($request->cookie) && isset($request->cookie[$this->cname])) {
-            $this->start($request);
         }
     }
 
@@ -153,7 +156,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
         return false;
     }
 
-    private function connect() {
+    protected function connect() {
         $dsn = sprintf('%s:host=%s;dbname=%s', $this->config['db_driver'], $this->config['db_host'], $this->config['db_name']);
         try {
             $this->dbh = new PDO($dsn, $this->config['db_user'], $this->config['db_pass']);
@@ -174,18 +177,61 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
 class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
 
     protected $cname = 'hm_session';
+    private $session_key = '';
+
+    private function insert_session_row() {
+        $sql = $this->dbh->prepare("insert into hm_user_session values(?, ?, current_date)");
+        $enc_data = $this->ciphertext($this->data);
+        if ($sql->execute(array($this->session_key, $enc_data))) {
+            return true;
+        }
+        return false;
+    }
 
     public function start($request) {
         if ($this->connect()) {
-            /* TODO: 
-             * get session id based on cookie value
-             * read data from db
-             * assign to $this->data (?)
-             */
-            //$sql = $this->dbh->prepare("select data from hm_user_session where username = ?");
+            if ($this->loaded) {
+                $this->session_key = base64_encode(openssl_random_pseudo_bytes(128));
+                setcookie($this->cname, $this->session_key, 0);
+                if ($this->insert_session_row()) {
+                    $this->active = true;
+                }
+            }
+            else {
+                if (!isset($request->cookie[$this->cname])) {
+                    $this->destroy();
+                }
+                else {
+                    $this->session_key = $request->cookie[$this->cname];
+                    $sql = $this->dbh->prepare('select data from hm_user_session where hm_id=?');
+                    if ($sql->execute(array($this->session_key))) {
+                        $results = $sql->fetch();
+                        if (isset($results['data'])) {
+                            $data = $this->plaintext($results['data']);
+                            if (is_array($data)) {
+                                $this->active = true;
+                                $this->data = $data;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+
     public function end() {
+        $sql = $this->dbh->prepare("update hm_user_session set data=? where hm_id=?");
+        $enc_data = $this->ciphertext($this->data);
+        $sql->execute(array($enc_data, $this->session_key));
+        $this->active = false;
+    }
+
+    public function destroy() {
+        $this->end();
+        $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
+        $sql->execute(array($this->session_key));
+        setcookie($this->cname, '', 0);
+        setcookie('hm_id', '', 0);
     }
 }
 ?>
