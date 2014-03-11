@@ -23,7 +23,13 @@ abstract class Hm_Session {
 class Hm_Session_PHP extends Hm_Session {
 
     public function check($request, $config) {
-        $this->enc_key = $config->get('enc_key', 'youshouldbesettingthis!');
+        if (isset($request->cookie['hm_id'])) {
+            $this->enc_key = base64_decode($request->cookie['hm_id']);
+        }
+        else {
+            $this->enc_key = base64_encode(openssl_random_pseudo_bytes(128));
+            setcookie('hm_id', $this->enc_key, 0);
+        }
         if (!isset($request->cookie['PHPSESSID'])) {
             Hm_Msgs::add('starting new PHP session');
         }

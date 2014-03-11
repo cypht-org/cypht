@@ -31,7 +31,8 @@ return array(
         'notfound'
     ),
     'allowed_cookie' => array(
-        'PHPSESSID' => FILTER_SANITIZE_STRING
+        'PHPSESSID' => FILTER_SANITIZE_STRING,
+        'hm_id' => FILTER_SANITIZE_STRING
     ),
     'allowed_server' => array(
         'REQUEST_URI' => FILTER_SANITIZE_STRING,
