@@ -60,7 +60,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             $user = $this->session->get('username', false);
             $path = $this->config->get('user_settings_dir', false);
             if ($user && $path && is_readable(sprintf('%s/%s.txt', $path, $user))) {
-                $this->user_config->load(sprintf('%s/%s.txt', $path, $user));
+                $this->user_config->load(sprintf('%s/%s.txt', $path, $user), $this->config);
             }
         }
         return $data;
@@ -85,7 +85,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
             $user = $this->session->get('username', false);
             $path = $this->config->get('user_settings_dir', false);
             if ($user && $path && is_writable(sprintf('%s/%s.txt', $path, $user))) {
-                $this->user_config->save(sprintf('%s/%s.txt', $path, $user));
+                $this->user_config->save(sprintf('%s/%s.txt', $path, $user), $this->config);
                 Hm_Msgs::add('saved user data on logout');
             }
             $this->session->destroy();

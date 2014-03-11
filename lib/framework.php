@@ -27,11 +27,15 @@ class Hm_User_Config_File extends Hm_Config {
     public function __construct() {
     }
 
-    public function load($source) {
+    public function load($source, $config=array()) {
         if (is_readable($source)) {
-            $data = unserialize(file_get_contents($source));
-            if ($data) {
-                $this->config = array_merge($this->config, $data);
+            $str_data = file_get_contents($source);
+            if ($str_data) {
+                $enc_key = $config->get('enc_key', 'youshouldbesettingthis!');
+                $data = @unserialize(Hm_Crypt::plaintext($str_data, $enc_key));
+                if (is_array($data)) {
+                    $this->config = array_merge($this->config, $data);
+                }
             }
         }
     }
@@ -39,8 +43,10 @@ class Hm_User_Config_File extends Hm_Config {
         $this->config = $data;
     }
 
-    public function save($destination) {
-        file_put_contents($destination, serialize($this->config));
+    public function save($destination, $config) {
+        $enc_key = $config->get('enc_key', 'youshouldbesettingthis!');
+        $config = Hm_Crypt::ciphertext(serialize($this->config), $enc_key);
+        file_put_contents($destination, $config);
     }
 
 }
