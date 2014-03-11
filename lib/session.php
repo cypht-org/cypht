@@ -22,6 +22,8 @@ abstract class Hm_Session {
 /* session persistant storage with vanilla PHP sessions and no local authentication */
 class Hm_PHP_Session extends Hm_Session {
 
+    protected $cname = 'PHPSESSID';
+
     protected function set_key($request) {
         if (isset($request->cookie['hm_id'])) {
             $this->enc_key = base64_decode($request->cookie['hm_id']);
@@ -84,7 +86,7 @@ class Hm_PHP_Session extends Hm_Session {
         session_unset();
         @session_destroy();
         $params = session_get_cookie_params();
-        setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+        setcookie($this->cname, '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
         $this->active = false;
     }
 
@@ -132,7 +134,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
                 Hm_Debug::add('incomplete DB configuration');
             }
         }
-        elseif (!empty($request->cookie) && isset($request->cookie['PHPSESSID'])) {
+        elseif (!empty($request->cookie) && isset($request->cookie[$this->cname])) {
             $this->start($request);
         }
     }
@@ -168,14 +170,19 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
     private function create() {
     }
 }
+
 class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
+
+    protected $cname = 'hm_session';
+
     public function start($request) {
-        if (isset($request->cookie['hm_session'])) {
-        }
-        else {
-        }
         if ($this->connect()) {
-            //$sql = $this->dbh->prepare("select hash from hm_user where username = ?");
+            /* TODO: 
+             * get session id based on cookie value
+             * read data from db
+             * assign to $this->data (?)
+             */
+            //$sql = $this->dbh->prepare("select data from hm_user_session where username = ?");
         }
     }
     public function end() {
