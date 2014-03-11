@@ -32,7 +32,7 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
 class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
     public function process($data) {
         $cache = $this->session->get('imap_cache', array());
-        $servers = Hm_IMAP_List::dump(false, true);
+        $servers = Hm_IMAP_List::dump();
         foreach ($servers as $index => $server) {
             if (is_object($server['object'])) {
                 $cache[$index] = $server['object']->dump_cache('gzip');
@@ -155,7 +155,7 @@ class Hm_IMAP_List {
 
     private static $imap_list = array();
 
-    public static function connect( $id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
+    public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
         if (isset(self::$imap_list[$id])) {
             $imap = self::$imap_list[$id];
             if ($imap['object']) {
@@ -195,14 +195,14 @@ class Hm_IMAP_List {
         return false;
     }
 
-    public static function forget_credentials( $id ) {
+    public static function forget_credentials($id) {
         if (isset(self::$imap_list[$id])) {
             unset(self::$imap_list[$id]['user']);
             unset(self::$imap_list[$id]['pass']);
         }
     }
 
-    public static function add( $atts, $id=false ) {
+    public static function add($atts, $id=false) {
         $atts['object'] = false;
         $atts['connected'] = false;
         if ($id) {
@@ -213,7 +213,7 @@ class Hm_IMAP_List {
         }
     }
 
-    public static function del( $id ) {
+    public static function del($id) {
         if (isset(self::$imap_list[$id])) {
             unset(self::$imap_list[$id]);
             return true;
@@ -221,7 +221,7 @@ class Hm_IMAP_List {
         return false;
     }
 
-    public static function dump( $id=false, $full=false ) {
+    public static function dump($id=false, $full=false) {
         $list = array();
         foreach (self::$imap_list as $index => $server) {
             if ($id !== false && $index != $id) {
@@ -250,7 +250,7 @@ class Hm_IMAP_List {
         return $list;
     }
 
-    public static function clean_up( $id=false ) {
+    public static function clean_up($id=false) {
         foreach (self::$imap_list as $index => $server) {
             if ($id !== false && $id != $index) {
                 continue;
