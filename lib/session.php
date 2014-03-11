@@ -45,12 +45,22 @@ class Hm_Session_PHP extends Hm_Session {
         $this->active = true;
     }
 
-    public function get($name, $default=false) {
-        return isset($this->data[$name]) ? $this->data[$name] : $default;
+    public function get($name, $default=false, $user=false) {
+        if ($user) {
+            return isset($this->data['user_data'][$name]) ? $this->data['user_data'][$name] : $default;
+        }
+        else {
+            return isset($this->data[$name]) ? $this->data[$name] : $default;
+        }
     }
 
-    public function set($name, $value) {
-        $this->data[$name] = $value;
+    public function set($name, $value, $user=false) {
+        if ($user) {
+            $this->data['user_data'][$name] = $value;
+        }
+        else {
+            $this->data[$name] = $value;
+        }
     }
 
     public function del($name) {
@@ -71,7 +81,6 @@ class Hm_Session_PHP extends Hm_Session {
     }
 
     public function end() {
-
         $enc_data = @Hm_Crypt::ciphertext(serialize($this->data), $this->enc_key);
         $_SESSION = array('data' => $enc_data);
         session_write_close();

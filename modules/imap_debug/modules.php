@@ -56,7 +56,7 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
                 $new_cache[$index] = $cache_str;
             }
         }
-        $this->session->set('imap_servers', $servers);
+        $this->user_config->set('imap_servers', $servers);
         $this->session->set('imap_cache', $new_cache);
         Hm_IMAP_List::clean_up();
         return $data;
@@ -65,7 +65,7 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
 
 class Hm_Handler_load_imap_servers extends Hm_Handler_Module {
     public function process($data) {
-        $servers = $this->session->get('imap_servers', array());
+        $servers = $this->user_config->get('imap_servers', array());
         foreach ($servers as $index => $server) {
             Hm_IMAP_List::add( $server, $index );
         }
