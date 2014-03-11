@@ -7,8 +7,10 @@ abstract class Hm_Session {
     public $loaded = false;
     protected $enc_key = '';
     protected $data = array();
+    protected $cname = false;
+    protected $site_config = false;
 
-    abstract protected function check($request, $config);
+    abstract protected function check($request);
     abstract protected function start($request);
     abstract protected function auth($user, $pass);
     abstract protected function get($name, $default=false);
@@ -23,6 +25,10 @@ abstract class Hm_Session {
 class Hm_PHP_Session extends Hm_Session {
 
     protected $cname = 'PHPSESSID';
+
+    public function __construct($config) {
+        $this->site_config = $config;
+    }
 
     protected function ciphertext($data) {
         return Hm_Crypt::ciphertext(serialize($data), $this->enc_key);
@@ -40,7 +46,7 @@ class Hm_PHP_Session extends Hm_Session {
         }
     }
 
-    public function check($request, $config) {
+    public function check($request) {
         $this->set_key($request);
         $this->start($request);
     }
@@ -111,34 +117,18 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
 
     protected $dbh = false;
     protected $required_config = array('db_user', 'db_pass', 'db_name', 'db_host', 'db_driver');
-    protected $config = false;
 
-    private function parse_config($config) {
-        $res = array();
-        foreach ($this->required_config as $v) {
-            if (isset($config[$v])) {
-                $res[$v] = $config[$v];
-            }
-        }
-        if (count($res) == count($this->required_config)) {
-            $this->config = $res;
-        }
-    }
-
-    public function check($request, $config, $user=false, $pass=false) {
+    public function check($request, $user=false, $pass=false) {
         $this->set_key($request);
-        $this->parse_config($config->dump());
-        if ($this->config) {
-            if ($user && $pass) {
-                if ($this->auth($user, $pass)) {
-                    Hm_Msgs::add('login accepted, starting PHP session');
-                    $this->loaded = true;
-                    $this->start($request);
-                }
-            }
-            elseif (isset($request->cookie[$this->cname])) {
+        if ($user && $pass) {
+            if ($this->auth($user, $pass)) {
+                Hm_Msgs::add('login accepted, starting PHP session');
+                $this->loaded = true;
                 $this->start($request);
             }
+        }
+        elseif (isset($request->cookie[$this->cname])) {
+            $this->start($request);
         }
     }
 
@@ -157,8 +147,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
     }
 
     protected function connect() {
-        $this->dbh = Hm_DB::connect($this->config['db_driver'], $this->config['db_host'],
-            $this->config['db_name'], $this->config['db_user'], $this->config['db_pass']);
+        $this->dbh = Hm_DB::connect($this->site_config);
         if ($this->dbh) {
             return true;
         }

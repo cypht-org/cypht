@@ -51,6 +51,13 @@ class Hm_User_Config_File extends Hm_Config {
 
 }
 
+/* db based user configuration */
+class Hm_User_Config_DB extends Hm_Config {
+    public function load($config) {
+
+    }
+}
+
 /* file based site configuration */
 class Hm_Site_Config_File extends Hm_Config {
 
@@ -120,15 +127,15 @@ class Hm_Router {
         switch ($config->get('session_type', false)) {
             case 'DB_session':
                 Hm_Debug::add('Using custom DB session');
-                $session = new Hm_DB_Session_DB_Auth();
+                $session = new Hm_DB_Session_DB_Auth($config);
                 break;
             case 'DB_auth':
                 Hm_Debug::add('Using DB Authed session');
-                $session = new Hm_PHP_Session_DB_Auth();
+                $session = new Hm_PHP_Session_DB_Auth($config);
                 break;
             default:
-                Hm_Debug::add('No session_type defined, using default PHP sessions');
-                $session = new Hm_PHP_Session();
+                Hm_Debug::add('Using default PHP sessions with no auth');
+                $session = new Hm_PHP_Session($config);
                 break;
         }
         return $session;
@@ -696,15 +703,43 @@ class Hm_Crypt {
 class Hm_DB {
 
     static public $dbh = array();
+    static private $required_config = array('db_user', 'db_pass', 'db_name', 'db_host', 'db_driver');
+    static private $config;
 
-    static public function connect($driver, $host, $name, $user, $pass) {
-        $key = md5($driver.$host.$name.$user.$pass);
+    static private function parse_config($site_config) {
+        self::$config = array(
+            'db_driver' => $site_config->get('db_driver', false),
+            'db_host' => $site_config->get('db_host', false),
+            'db_name' => $site_config->get('db_name', false),
+            'db_user' => $site_config->get('db_user', false),
+            'db_pass' => $site_config->get('db_pass', false),
+        );
+        foreach (self::$required_config as $v) {
+            if (!self::$config[$v]) {
+                Hm_Debug('Missing configuration setting for %s', $v);
+            }
+        }
+    }
+    static private function db_key() {
+        return md5(self::$config['db_driver'].
+            self::$config['db_host'].
+            self::$config['db_name'].
+            self::$config['db_user'].
+            self::$config['db_pass']
+        );
+    }
+
+    static public function connect($site_config) {
+
+        self::parse_config($site_config);
+        $key = self::db_key();
+
         if (isset(self::$dbh[$key]) && self::$dbh[$key]) {
             return self::$dbh[$key];
         }
-        $dsn = sprintf('%s:host=%s;dbname=%s', $driver, $host, $name);
+        $dsn = sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
         try {
-            self::$dbh[$key] = new PDO($dsn, $user, $pass);
+            self::$dbh[$key] = new PDO($dsn, self::$config['db_user'], self::$config['db_pass']);
             Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn));
             return self::$dbh[$key];
         }
