@@ -533,7 +533,7 @@ class Hm_Output_HTTP extends Hm_Output {
 
     protected function output_content($content, $headers=array()) {
         $this->output_headers($headers);
-        //ob_end_clean();
+        ob_end_clean();
         echo $content;
     }
 }
@@ -749,11 +749,14 @@ class Hm_Output_Modules { use Hm_Modules; }
 
 class Hm_Crypt {
 
-    static private $mode = MCRYPT_MODE_CBC;
-    static private $cipher = MCRYPT_RIJNDAEL_128;
-    static private $r_source = MCRYPT_RAND;
+    static private $mode = BLOCK_MODE;
+    static private $cipher = CIPHER;
+    static private $r_source = RAND_SOURCE;
 
     public static function plaintext($string, $key) {
+        if (!MCRYPT_DATA) {
+            return $string;
+        }
         $key = substr(md5($key), 0, mcrypt_get_key_size(self::$cipher, self::$mode));
         $string = base64_decode($string);
         $iv_size = self::iv_size();
@@ -763,6 +766,9 @@ class Hm_Crypt {
     }
 
     public static function ciphertext($string, $key) {
+        if (!MCRYPT_DATA) {
+            return $string;
+        }
         $key = substr(md5($key), 0, mcrypt_get_key_size(self::$cipher, self::$mode));
         $iv_size = self::iv_size();
         $iv = mcrypt_create_iv($iv_size, self::$r_source);

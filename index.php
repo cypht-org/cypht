@@ -1,5 +1,11 @@
 <?php
 
+/* constants */
+define('MCRYPT_DATA', true);
+define('BLOCK_MODE', MCRYPT_MODE_CBC);
+define('CIPHER', MCRYPT_RIJNDAEL_128);
+define('RAND_SOURCE', MCRYPT_RAND);
+
 /* don't let anything output content until we are ready */
 ob_start();
 
