@@ -11,7 +11,11 @@ Hm_Handler_Modules::add('home', 'logout', true);
 Hm_Handler_Modules::add('home', 'http_headers', true);
 
 /* homepage output */
-Hm_Output_Modules::add('home', 'header', false);
+Hm_Output_Modules::add('home', 'header_start', false);
+Hm_Output_Modules::add('home', 'header_css', false);
+Hm_Output_Modules::add('home', 'header_js', false);
+Hm_Output_Modules::add('home', 'header_content', false);
+Hm_Output_Modules::add('home', 'header_end', false);
 Hm_Output_Modules::add('home', 'logout', true);
 Hm_Output_Modules::add('home', 'login', false);
 Hm_Output_Modules::add('home', 'title', true);

@@ -156,15 +156,42 @@ class Hm_Output_msgs extends Hm_Output_Module {
     }
 }}
 
-if (!class_exists('Hm_Output_header')) {
-class Hm_Output_header extends Hm_Output_Module {
+if (!class_exists('Hm_Output_header_start')) {
+class Hm_Output_header_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             $lang = '';
             if ($this->lang) {
                 $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
             }
-            $res= '<!DOCTYPE html><html '.$lang.'><head><title>HM3</title><meta charset="utf-8" />';
+            return '<!DOCTYPE html><html '.$lang.'><head>';
+        }
+        elseif ($format == 'CLI') {
+            return sprintf("\nHM3 CLI Interface\n\n");
+        }
+    }
+}}
+if (!class_exists('Hm_Output_header_end')) {
+class Hm_Output_header_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '</head><body>';
+        }
+    }
+}}
+if (!class_exists('Hm_Output_header_content')) {
+class Hm_Output_header_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<title>HM3</title><meta charset="utf-8" />';
+        }
+    }
+}}
+if (!class_exists('Hm_Output_header_css')) {
+class Hm_Output_header_css extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            $res = '';
             if (DEBUG_MODE) {
                 foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                     if (is_readable(sprintf("%ssite.css", $name))) {
@@ -175,13 +202,8 @@ class Hm_Output_header extends Hm_Output_Module {
             else {
                 $res .= '<link href="site.css" media="all" rel="stylesheet" type="text/css" />';
             }
-            $res .= '</head><body>';
             return $res;
         }
-        elseif ($format == 'CLI') {
-            return sprintf("\nHM3 CLI Interface\n\n");
-        }
-        return '';
     }
 }}
 
