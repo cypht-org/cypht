@@ -1,7 +1,7 @@
 <?php
 
 /* constants */
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', false);
 define('MCRYPT_DATA', true);
 define('BLOCK_MODE', MCRYPT_MODE_CBC);
 define('CIPHER', MCRYPT_RIJNDAEL_128);

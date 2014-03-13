@@ -3,6 +3,7 @@
 class Hm_Handler_tracker extends Hm_Handler_Module {
     public function process($data) {
         if (!DEBUG_MODE) {
+            $data['module_debug'] = array();
             return $data;
         }
         $debug = array();
