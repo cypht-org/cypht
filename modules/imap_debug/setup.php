@@ -21,7 +21,6 @@ Hm_Handler_Modules::add('servers', 'http_headers', true);
 Hm_Output_Modules::add('servers', 'header_start', false);
 Hm_Output_Modules::add('servers', 'jquery', false);
 Hm_Output_Modules::add('servers', 'header_css', false);
-Hm_Output_Modules::add('servers', 'header_js', false);
 Hm_Output_Modules::add('servers', 'header_content', false);
 Hm_Output_Modules::add('servers', 'header_end', false);
 Hm_Output_Modules::add('servers', 'logout', true);
