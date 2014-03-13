@@ -40,11 +40,4 @@ $response_str = $formatter->format_content($response_data);
 $renderer = new Hm_Output_HTTP();
 $renderer->send_response($response_str, $response_data);
 
-if (DEBUG_MODE) {
-    Hm_Debug::add(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
-    Hm_Debug::load_page_stats();
-    if ($response_data['router_format_name'] == 'Hm_Format_HTML5') {
-        Hm_Debug::show(false, true);
-    }
-}
 ?>
