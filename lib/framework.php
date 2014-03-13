@@ -240,12 +240,13 @@ class Hm_Router {
     }
 
     private function forward_redirect_data($session, $request) {
-        $res = $session->get('redirect_result', array());
-        $redirect_msgs = $session->get('redirect_messages', array());
-        $session->del('redirect_result');
-        if (!empty($redirect_msgs)) {
-            array_walk($redirect_msgs, function($v) { Hm_Msgs::add($v); });
-            $session->del('redirect_messages');
+        $res = array();
+        if (isset($request->cookie['hm_msgs']) && trim($request->cookie['hm_msgs'])) {
+            $msgs = @unserialize(base64_decode($request->cookie['hm_msgs']));
+            if (is_array($msgs)) {
+                array_walk($msgs, function($v) { Hm_Msgs::add($v); });
+            }
+            setcookie('hm_msgs', '', 0);
         }
         return $res;
     }
@@ -254,9 +255,8 @@ class Hm_Router {
         if (!empty($request->post) && $request->type == 'HTTP') {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
-                $session->set('redirect_messages', $msgs);
+                setcookie('hm_msgs', base64_encode(serialize($msgs)), 0);
             }
-            $session->set('redirect_result', $result);
             $session->end();
             $this->redirect($request->server['REQUEST_URI']);
         }
@@ -290,7 +290,8 @@ class Hm_Router {
             'router_request_type' => $request->type,
             'router_sapi_name'    => $request->sapi,
             'router_format_name'  => $request->format,
-            'router_login_state'  => $session->active
+            'router_login_state'  => $session->active,
+            'router_url_path'     => $request->path
         ));
     }
 
@@ -325,6 +326,7 @@ class Hm_Request {
     public $type = false;
     public $sapi = false;
     public $format = false;
+    public $path = '';
 
     public function __construct($filters) {
         $this->sapi = php_sapi_name();
@@ -335,6 +337,7 @@ class Hm_Request {
             $this->post = filter_input_array(INPUT_POST, $filters['allowed_post'], false);
             $this->get = filter_input_array(INPUT_GET, $filters['allowed_get'], false);
             $this->cookie = filter_input_array(INPUT_COOKIE, $filters['allowed_cookie'], false);
+            $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
         }
         if ($this->type == 'CLI') {
             $this->fetch_cli_vars();
@@ -376,6 +379,20 @@ class Hm_Request {
 
     private function is_ajax() {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+
+    private function get_clean_url_path($uri) {
+        if (strpos($uri, '?') !== false) {
+            $parts = explode('?', $uri, 2);
+            $path = $parts[0];
+        }
+        else {
+            $path = $uri;
+        }
+        if (substr($path, -1) != '/') {
+            $path .= '/';
+        }
+        return $path;
     }
 }
 
