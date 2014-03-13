@@ -2,6 +2,9 @@
 
 class Hm_Handler_tracker extends Hm_Handler_Module {
     public function process($data) {
+        if (!DEBUG_MODE) {
+            return $data;
+        }
         $debug = array();
         foreach (Hm_Handler_Modules::get_for_page($this->page) as $mod => $args) {
             $debug[] = $this->get_module('handler', $mod, $args);
@@ -35,10 +38,6 @@ class Hm_Output_tracker extends Hm_Output_Module {
                 }
             }
             $res .= '</table></div>';
-            $res .= '<script type="text/javascript">$(document).ajaxSuccess(function(event, xhr, settings) {'.
-                'var debug_data = jQuery.parseJSON(xhr.responseText); $(".module_list").html(debug_data.module_debug);'.
-                '});</script>';
-
             return $res;
         }
         elseif ($format == 'JSON' && isset($input['module_debug'])) {
