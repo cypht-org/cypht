@@ -164,9 +164,19 @@ class Hm_Output_header extends Hm_Output_Module {
             if ($this->lang) {
                 $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
             }
-            return '<!DOCTYPE html><html '.$lang.'><head><title>HM3</title><meta charset="utf-8" />'.
-                '<link href="site.css" media="all" rel="stylesheet" type="text/css" />'.
-                '</head><body>';
+            $res= '<!DOCTYPE html><html '.$lang.'><head><title>HM3</title><meta charset="utf-8" />';
+            if (DEBUG_MODE) {
+                foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+                    if (is_readable(sprintf("%ssite.css", $name))) {
+                        $res .= '<link href="'.sprintf("%ssite.css", $name).'" media="all" rel="stylesheet" type="text/css" />';
+                    }
+                }
+            }
+            else {
+                $res .= '<link href="site.css" media="all" rel="stylesheet" type="text/css" />';
+            }
+            $res .= '</head><body>';
+            return $res;
         }
         elseif ($format == 'CLI') {
             return sprintf("\nHM3 CLI Interface\n\n");

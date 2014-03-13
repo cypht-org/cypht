@@ -2,3 +2,4 @@
 .tracker_output table td { font-size: 75%; padding-right: 3px; }
 .tracker_output table .enabled{ color: green; }
 .tracker_output table .disabled{ color: red; }
+.tracker_debug { float: left; clear: left; }

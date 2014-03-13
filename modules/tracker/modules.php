@@ -32,7 +32,7 @@ class Hm_Output_show_debug extends Hm_Output_Module {
             Hm_Debug::add(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
             Hm_Debug::load_page_stats();
             if ($format == 'HTML5') {
-                return '<div><div class="subtitle">HM3 Debug</div><pre class="hm3_debug">'.Hm_Debug::show('return').'</pre></div>';
+                return '<div class="tracker_debug"><div class="subtitle">HM3 Debug</div><pre class="hm3_debug">'.Hm_Debug::show('return').'</pre></div>';
             }
             elseif ($format == 'JSON') {
                 $input['hm3_debug'] = Hm_Debug::show('return');
