@@ -25,6 +25,22 @@ class Hm_Handler_tracker extends Hm_Handler_Module {
         return array('type' => $type, 'mod' => $mod, 'active' => $active ? 'enabled' : 'disabled');
     }
 }
+class Hm_Output_show_debug extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (DEBUG_MODE) {
+            global $start_time;
+            Hm_Debug::add(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
+            Hm_Debug::load_page_stats();
+            if ($format == 'HTML5') {
+                return '<div><div class="subtitle">HM3 Debug</div><pre class="hm3_debug">'.Hm_Debug::show('return').'</pre></div>';
+            }
+            elseif ($format == 'JSON') {
+                $input['hm3_debug'] = Hm_Debug::show('return');
+                return $input;
+            }
+        }
+    }
+}
 
 class Hm_Output_tracker extends Hm_Output_Module {
     protected function output($input, $format) {
