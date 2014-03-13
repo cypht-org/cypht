@@ -29,6 +29,7 @@ $('.imap_delete').on('click', function() {
 $('.test_connect').on('click', function() {
     $(this).attr('disabled', true);
     $('.imap_debug_data').empty();
+    $('.imap_folder_data').empty();
     event.preventDefault();
     var form = $(this).parent();
     var id = form.find('#imap_server_id');

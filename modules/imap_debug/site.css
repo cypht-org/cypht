@@ -6,3 +6,4 @@
 .imap_connect { display: inline; }
 .imap_debug { float: left; clear: left; width: 600px; white-space: pre; word-wrap: break-word; }
 .add_server { float: left; clear: left; margin-bottom: 10px; }
+.home_link, .server_link { float: right; clear: none; }

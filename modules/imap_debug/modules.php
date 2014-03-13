@@ -267,7 +267,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
-            $res = '<div class="configured_servers"><div class="subtitle">Configured Servers</div>';
+            $res = '<div class="configured_servers"><div class="subtitle">Configured IMAP Servers</div>';
             foreach ($input['imap_servers'] as $index => $vals) {
 
                 if (isset($vals['user'])) {
@@ -324,7 +324,7 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<form class="add_server" method="POST">'.
-                '<div class="subtitle">Add a mail server</div>'.
+                '<div class="subtitle">Add an IMAP server</div>'.
                 'Server name or address: <input type="text" name="new_imap_server" value=""/><br />'.
                 'Server Port: <input type="text" name="new_imap_port" value="143"><br />'.
                 'Use TLS: <input type="checkbox" name="tls" value="1" /><br />'.
@@ -351,6 +351,17 @@ class Hm_Output_imap_folders extends Hm_Output_Module {
             }
             return $input;
         }
+    }
+}
+class Hm_Output_servers_link extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        return '<a class="server_link" href="?page=servers">Setup Servers</a>';
+    }
+}
+
+class Hm_Output_homepage_link extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'">Home</a>';
     }
 }
 
