@@ -25,6 +25,9 @@ class Hm_Handler_tracker extends Hm_Handler_Module {
 class Hm_Output_tracker extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
+            if (!DEBUG_MODE) {
+                return '';
+            }
             $res = '<div class="tracker_output"><div class="subtitle">Registered Modules</div><table class="module_list">';
             if (isset($input['module_debug'])) {
                 foreach ($input['module_debug'] as $vals) {
@@ -39,6 +42,9 @@ class Hm_Output_tracker extends Hm_Output_Module {
             return $res;
         }
         elseif ($format == 'JSON' && isset($input['module_debug'])) {
+            if (!DEBUG_MODE) {
+                return $input;
+            }
             $res = '';
             foreach ($input['module_debug'] as $vals) {
                 $res .= $this->format_row($vals);

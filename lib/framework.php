@@ -149,8 +149,19 @@ class Hm_Router {
         $filters = $config->get('input_filters', array());
 
         /* get registered modules */
-        $handler_mods = $config->get('handler_modules', array());
-        $output_mods = $config->get('output_modules', array());
+        if (DEBUG_MODE) {
+            foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+                if (is_readable(sprintf("%ssetup.php", $name))) {
+                    $filters = Hm_Router::merge_filters($filters, require sprintf("%ssetup.php", $name));
+                }
+            }
+            $handler_modules = Hm_Handler_Modules::dump();
+            $output_modules = Hm_Output_Modules::dump();
+        }
+        else {
+            $handler_mods = $config->get('handler_modules', array());
+            $output_mods = $config->get('output_modules', array());
+        }
 
         /* load module class defs */
         $this->load_modules($config, $handler_mods, $output_mods);
@@ -199,20 +210,6 @@ class Hm_Router {
                 break;
         }
         return $session;
-    }
-
-    private function merge_filters($existing, $new) {
-        foreach (array('allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
-            if (isset($new[$v])) {
-                if ($v == 'allowed_pages') {
-                    $existing[$v] = array_merge($existing[$v], $new[$v]);
-                }
-                else {
-                    $existing[$v] += $new[$v];
-                }
-            }
-        }
-        return $existing;
     }
 
     private function load_modules($config, $handlers, $output) {
@@ -294,6 +291,20 @@ class Hm_Router {
         header('HTTP/1.1 303 Found');
         header('Location: '.$url);
         exit;
+    }
+
+    static public function merge_filters($existing, $new) {
+        foreach (array('allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
+            if (isset($new[$v])) {
+                if ($v == 'allowed_pages') {
+                    $existing[$v] = array_merge($existing[$v], $new[$v]);
+                }
+                else {
+                    $existing[$v] += $new[$v];
+                }
+            }
+        }
+        return $existing;
     }
 }
 
@@ -581,9 +592,12 @@ trait Hm_List {
         return self::$msgs;
     }
 
-    public static function show($log=false) {
+    public static function show($log=false, $html=false) {
         if ($log) {
             error_log(str_replace(array("\n", "\t", "  "), array(' '), print_r(self::$msgs, true)));
+        }
+        elseif ($html) {
+            echo '<div class="hm3_debug"><div class="subtitle">HM3 Debug</div><pre>'.print_r(self::$msgs, true).'</pre></div>';
         }
         else {
             print_r(self::$msgs);

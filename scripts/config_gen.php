@@ -23,7 +23,7 @@ if (!empty($settings)) {
                $css .= file_get_contents(sprintf("modules/%s/site.css", $mod));
             }
             if (is_readable(sprintf("modules/%s/setup.php", $mod))) {
-                $filters = merge_filters($filters, require sprintf("modules/%s/setup.php", $mod));
+                $filters = Hm_Router::merge_filters($filters, require sprintf("modules/%s/setup.php", $mod));
             }
         }
     }
@@ -53,17 +53,5 @@ else {
 function compress($string) {
     return preg_replace("/(\r\n|\n|\s{2,})/", ' ', $string);
 }
-function merge_filters($existing, $new) {
-    foreach (array('allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
-        if (isset($new[$v])) {
-            if ($v == 'allowed_pages') {
-                $existing[$v] = array_merge($existing[$v], $new[$v]);
-            }
-            else {
-                $existing[$v] += $new[$v];
-            }
-        }
-    }
-    return $existing;
-}
+
 ?>
