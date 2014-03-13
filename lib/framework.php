@@ -592,12 +592,12 @@ trait Hm_List {
         return self::$msgs;
     }
 
-    public static function show($log=false, $html=false) {
-        if ($log) {
+    public static function show($type='print') {
+        if ($type == 'log') {
             error_log(str_replace(array("\n", "\t", "  "), array(' '), print_r(self::$msgs, true)));
         }
-        elseif ($html) {
-            echo '<div class="hm3_debug"><div class="subtitle">HM3 Debug</div><pre>'.print_r(self::$msgs, true).'</pre></div>';
+        elseif ($type == 'return') {
+            return print_r(self::$msgs, true);
         }
         else {
             print_r(self::$msgs);
