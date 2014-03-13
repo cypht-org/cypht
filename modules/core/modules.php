@@ -181,11 +181,8 @@ class Hm_Output_footer extends Hm_Output_Module {
         if ($format == 'HTML5' ) {
             if (DEBUG_MODE) {
                 $res = '';
-                $mods = Hm_Output_Modules::get_for_page($input['router_page_name']);
                 foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
-                    error_log(sprintf("%ssite.js", $name));
                     if (is_readable(sprintf("%ssite.js", $name))) {
-                        echo 'here';
                         $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $name).'"></script>';
                     }
                 }
