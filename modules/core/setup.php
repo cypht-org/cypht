@@ -14,7 +14,6 @@ Hm_Handler_Modules::add('home', 'http_headers', true);
 Hm_Output_Modules::add('home', 'header_start', false);
 Hm_Output_Modules::add('home', 'jquery', false);
 Hm_Output_Modules::add('home', 'header_css', false);
-Hm_Output_Modules::add('home', 'header_js', false);
 Hm_Output_Modules::add('home', 'header_content', false);
 Hm_Output_Modules::add('home', 'header_end', false);
 Hm_Output_Modules::add('home', 'logout', true);

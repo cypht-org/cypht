@@ -45,9 +45,6 @@ class Hm_Handler_login extends Hm_Handler_Module {
         else {
             $this->session->check($this->request);
         }
-        if (!$this->session->active && !empty($this->request->post)) {
-            Hm_Msgs::add("Username and Password required");
-        }
         return $data;
     }
 }}
