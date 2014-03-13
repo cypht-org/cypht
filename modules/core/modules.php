@@ -146,7 +146,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
             $res .= '<div class="sys_messages">';
             if (!empty($msgs)) {
                 foreach ($msgs as $val) {
-                    $res .= $this->html_safe($val).' ';
+                    $res .= $this->html_safe($val).'<br />';
                 }
             }
             $res .= '</div>';
@@ -207,8 +207,8 @@ class Hm_Output_header_css extends Hm_Output_Module {
     }
 }}
 
-if (!class_exists('Hm_Output_footer')) {
-class Hm_Output_footer extends Hm_Output_Module {
+if (!class_exists('Hm_Output_page_js')) {
+class Hm_Output_page_js extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             if (DEBUG_MODE) {
@@ -221,8 +221,24 @@ class Hm_Output_footer extends Hm_Output_Module {
                 return $res;
             }
             else {
-                return '<script type="text/javascript" src="site.js"></script></body></html>';
+                return '<script type="text/javascript" src="site.js"></script>';
             }
+        }
+    }
+}}
+if (!class_exists('Hm_Output_page_js')) {
+class Hm_Output_page_js extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '</body></html>';
+        }
+    }
+}}
+if (!class_exists('Hm_Output_jquery')) {
+class Hm_Output_jquery extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<script type="text/javascript" src="modules/core/jquery-1.11.0.min.js"></script>';
         }
         return '';
     }

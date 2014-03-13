@@ -12,6 +12,7 @@ Hm_Handler_Modules::add('home', 'http_headers', true);
 
 /* homepage output */
 Hm_Output_Modules::add('home', 'header_start', false);
+Hm_Output_Modules::add('home', 'jquery', false);
 Hm_Output_Modules::add('home', 'header_css', false);
 Hm_Output_Modules::add('home', 'header_js', false);
 Hm_Output_Modules::add('home', 'header_content', false);
@@ -19,8 +20,9 @@ Hm_Output_Modules::add('home', 'header_end', false);
 Hm_Output_Modules::add('home', 'logout', true);
 Hm_Output_Modules::add('home', 'login', false);
 Hm_Output_Modules::add('home', 'title', true);
-Hm_Output_Modules::add('home', 'msgs', false);
 Hm_Output_Modules::add('home', 'date', true);
+Hm_Output_Modules::add('home', 'msgs', false);
+Hm_Output_Modules::add('home', 'page_js', true);
 Hm_Output_Modules::add('home', 'footer', true);
 
 /* not-found page data and output */
@@ -37,7 +39,8 @@ return array(
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
         'hm_id' => FILTER_SANITIZE_STRING,
-        'hm_session' => FILTER_SANITIZE_STRING
+        'hm_session' => FILTER_SANITIZE_STRING,
+        'hm_msgs'    => FILTER_SANITIZE_STRING
     ),
     'allowed_server' => array(
         'REQUEST_URI' => FILTER_SANITIZE_STRING,
@@ -50,6 +53,7 @@ return array(
 
     'allowed_get' => array(
         'page' => FILTER_SANITIZE_STRING,
+        'msgs' => FILTER_SANITIZE_STRING
     ),
 
     'allowed_post' => array(

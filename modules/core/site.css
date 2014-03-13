@@ -1,5 +1,5 @@
 .subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%;  margin-left: 0px !important; }
-.date { float: right; }
+.date { float: right; padding-right: 10px; }
 .sys_messages { color: blue; margin-left: 20px; margin-top: 2px; float: left }
 .logout_form { float: right; clear: none; padding-left: 10px; margin-top: -5px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
