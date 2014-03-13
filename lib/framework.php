@@ -145,32 +145,35 @@ class Hm_Router {
 
     public function process_request($config) {
 
+
         /* get list of allowed input */
-        $filters = $config->get('input_filters', array());
 
         /* get registered modules */
         if (DEBUG_MODE) {
+            $filters = array();
+            $filters = array('allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
             foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 if (is_readable(sprintf("%ssetup.php", $name))) {
                     $filters = Hm_Router::merge_filters($filters, require sprintf("%ssetup.php", $name));
                 }
             }
-            $handler_modules = Hm_Handler_Modules::dump();
-            $output_modules = Hm_Output_Modules::dump();
+            $handler_mods = array();
+            $output_mods = array();
         }
         else {
+            $filters = $config->get('input_filters', array());
             $handler_mods = $config->get('handler_modules', array());
             $output_mods = $config->get('output_modules', array());
         }
 
-        /* load module class defs */
-        $this->load_modules($config, $handler_mods, $output_mods);
-
-        /* process the request data using the allowed input */
+        /* process inbound data */
         $request = new Hm_Request($filters);
 
-        /* determine what "page" we are on. This could be an ajax callback name */
+        /* determine page or ajax request name */
         $this->get_page($request, $filters['allowed_pages']);
+
+        /* load processing modules for this page */
+        $this->load_modules($config, $handler_mods, $output_mods);
 
         /* initiate a session class, but don't start anything yet */
         $session = $this->setup_session($config);
@@ -212,7 +215,7 @@ class Hm_Router {
         return $session;
     }
 
-    private function load_modules($config, $handlers, $output) {
+    private function load_modules($config, $handlers=array(), $output=array()) {
 
         $mods = explode(',', $config->get('modules', '')); 
         foreach ($mods as $name) {
@@ -222,12 +225,16 @@ class Hm_Router {
         }
         foreach ($handlers as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
-                Hm_Handler_Modules::add($page, $name, $vals['logged_in']);
+                if ($this->page == $page) {
+                    Hm_Handler_Modules::add($page, $name, $vals['logged_in']);
+                }
             }
         }
         foreach ($output as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
-                Hm_Output_Modules::add($page, $name, $vals['logged_in']);
+                if ($this->page == $page) {
+                    Hm_Output_Modules::add($page, $name, $vals['logged_in']);
+                }
             }
         }
     }
