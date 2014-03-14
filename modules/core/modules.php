@@ -96,7 +96,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
             $user = $this->session->get('username', false);
             $path = $this->config->get('user_settings_dir', false);
-            if ($user && $path && is_writable(sprintf('%s/%s.txt', $path, $user))) {
+            if ($user && $path) {
                 $this->user_config->save($user);
                 Hm_Msgs::add('saved user data on logout');
             }
@@ -148,7 +148,7 @@ if (!class_exists('Hm_Output_logout')) {
 class Hm_Output_logout extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' && $input['router_login_state']) {
-            return '<form class="logout_form" method="POST"><input type="submit" name="logout" value="Logout" /></form>';
+            return '<form class="logout_form" method="POST"><input type="submit" class="logout" name="logout" value="Logout" /></form>';
         }
     }
 }}
@@ -281,7 +281,7 @@ if (!class_exists('Hm_Output_loading_icon')) {
 class Hm_Output_loading_icon extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<div class="loading_icon"><img src="images/ajax-loader.gif" width="16" height="16" /></div>';
+            return '<div class="loading_icon"><img alt="Loading..." src="images/ajax-loader.gif" width="16" height="16" /></div>';
         }
     }
 }}
