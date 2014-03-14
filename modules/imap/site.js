@@ -1,5 +1,4 @@
 Hm_Folders = {
-
     show: function(folders) {
         var folder_html = '';
         for (folder in folders) {
@@ -52,3 +51,26 @@ $('.test_connect').on('click', function() {
         {'imap_connect': 1}
     );
 });
+
+var update_summary_display = function(res) {
+    var context;
+    for (id in res.imap_summary) {
+        context = $('.imap_summary_'+id);
+        $('.total', context).html(res.imap_summary[id].messages);
+        $('.unseen', context).html(res.imap_summary[id].unseen);
+    }
+};
+
+var imap_summary_update = function() {
+    var ids = $('#imap_summary_ids').val();
+    $('.total').html('...');
+    $('.unseen').html('...');
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_summary'},
+        {'name': 'summary_ids', 'value': ids}],
+        update_summary_display);
+};
+
+if (hm_page_name == 'home') {
+    Hm_Timer.add_job(imap_summary_update, 60);
+}

@@ -1,5 +1,26 @@
 <?php
 
+class Hm_Handler_imap_summary extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('summary_ids'));
+        if ($success) {
+            $ids = explode(',', $form['summary_ids']);
+            foreach($ids as $id) {
+                $id = intval($id);
+                $cache = Hm_IMAP_List::get_cache($this->session, $id);
+                $imap = Hm_IMAP_List::connect($id, $cache);
+                if ($imap) {
+                    $data['imap_summary'][$id] = $imap->get_mailbox_status('INBOX');
+                }
+                else {
+                    $data['imap_summary'][$id] = array('messages' => '?', 'unseen' => '?');
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
@@ -96,11 +117,7 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
             $imap = false;
-            $cache = false;
-            $imap_cache = $this->session->get('imap_cache', array());
-            if (isset($imap_cache[$form['imap_server_id']])) {
-                $cache = $imap_cache[$form['imap_server_id']];
-            }
+            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             if ($success) {
                 $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], $remember);
             }
@@ -261,6 +278,13 @@ class Hm_IMAP_List {
             }
         }
     }
+    public static function get_cache($session, $id) {
+        $imap_cache = $session->get('imap_cache', array());
+        if (isset($imap_cache[$id])) {
+            return $imap_cache[$id];
+        }
+        return false;
+    }
 }
 
 class Hm_Output_imap_setup_display extends Hm_Output_Module {
@@ -355,13 +379,47 @@ class Hm_Output_imap_folders extends Hm_Output_Module {
 }
 class Hm_Output_servers_link extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
-        return '<a class="server_link" href="?page=servers">Setup Servers</a>';
+        if ($format == 'HTML5') {
+            return '<a class="server_link" href="'.$this->html_safe($input['router_url_path']).'?page=servers"><input type="button" value="IMAP Setup" /></a>';
+        }
     }
 }
 
 class Hm_Output_homepage_link extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
-        return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'">Home</a>';
+        if ($format == 'HTML5') {
+            return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'"><input type="button" value="Home" /></a>';
+        }
+    }
+}
+
+class Hm_Output_imap_summary extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            $res = '<div class="imap_summary"><div class="subtitle">IMAP Summary</div>';
+            if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
+                $res .= '<input type="hidden" id="imap_summary_ids" value="'.
+                    $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+                $res .= '<div class="imap_summary_data">';
+                foreach ($input['imap_servers'] as $index => $vals) {
+                    $res .= '<div class="server_label">'.$vals['server'].'/'.$vals['port'].
+                        ($vals['tls'] ? '/TLS' : '').
+                        '</div><div class="imap_summary_row imap_summary_'.$index.'">'.
+                        'INBOX: '.
+                        '<br />Unseen: <span class="unseen">...</span>'.
+                        '<br />Total: <span class="total">...</span>'.
+                        '</div>';
+                }
+                $res .= '</div>';
+            }
+            else {
+                $res .= '<div>'.$this->trans('No IMAP servers found!').' '.
+                    '<a href="'.$this->html_safe($input['router_url_path']).
+                    '?page=servers">'.$this->trans('Add some').'</a></div>';
+            }
+            $res .= '</div>';
+            return $res;
+        }
     }
 }
 

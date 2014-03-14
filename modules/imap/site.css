@@ -7,3 +7,8 @@
 .imap_debug { float: left; clear: left; width: 600px; white-space: pre; word-wrap: break-word; }
 .add_server { float: left; clear: left; margin-bottom: 10px; }
 .home_link, .server_link { float: right; clear: none; }
+.server_label { padding-top: 10px; }
+.imap_summary_data { width: 300px; padding: 10px; border: solid 1px #ccc; }
+.imap_summary_row { padding: 10px; }
+.total { color: green; }
+.unseen { color: green; }
