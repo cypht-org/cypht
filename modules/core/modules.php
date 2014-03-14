@@ -266,7 +266,7 @@ if (!class_exists('Hm_Output_loading_icon')) {
 class Hm_Output_loading_icon extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<div class="loading_icon"><img src="ajax-loader.gif" width="16" height="16" /></div>';
+            return '<div class="loading_icon"><img src="images/ajax-loader.gif" width="16" height="16" /></div>';
         }
     }
 }}
