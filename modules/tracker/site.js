@@ -6,4 +6,7 @@ $(document).ajaxSuccess(function(event, xhr, settings) {
     if (response.hm3_debug) {
         $(".hm3_debug").html(response.hm3_debug);
     }
+    if (response.imap_summary_debug) {
+        $(".hm3_imap_debug").html(response.imap_summary_debug);
+    }
 });

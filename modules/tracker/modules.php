@@ -1,5 +1,21 @@
 <?php
 
+class Hm_Handler_imap_tracker extends Hm_Handler_Module {
+    public function process($data) {
+        if (DEBUG_MODE) {
+            $debug = array();
+            $servers = Hm_IMAP_List::dump(false, true);
+            foreach ($servers as $server) {
+                if (is_object($server['object'])) {
+                    $debug[] = $server['object']->show_debug(false, true);
+                }
+            }
+            $data['imap_summary_debug'] = $debug;
+            return $data;
+        }
+    }
+}
+
 class Hm_Handler_tracker extends Hm_Handler_Module {
     public function process($data) {
         if (!DEBUG_MODE) {
@@ -31,11 +47,20 @@ class Hm_Output_show_debug extends Hm_Output_Module {
             global $start_time;
             Hm_Debug::add(sprintf("Execution Time: %f", (microtime(true) - $start_time)));
             Hm_Debug::load_page_stats();
+            if (isset($input['imap_summary_debug'])) {
+                $imap_debug = $input['imap_summary_debug'];
+            }
+            else {
+                $imap_debug = array();
+            }
             if ($format == 'HTML5') {
-                return '<div class="tracker_debug"><div class="subtitle">HM3 Debug</div><pre class="hm3_debug">'.Hm_Debug::show('return').'</pre></div>';
+                return '<div class="tracker_debug"><div class="subtitle">HM3 Debug</div><pre class="hm3_debug">'.Hm_Debug::show('return').'</pre></div>'.
+                    '<div class="imap_summary_debug"><div class="subtitle">IMAP Debug</div><pre class="hm3_imap_debug">'.print_r($imap_debug, true).'</pre></div>';
             }
             elseif ($format == 'JSON') {
+                $input['imap_summary_debug'] = print_r($input['imap_summary_debug'], true);
                 $input['hm3_debug'] = Hm_Debug::show('return');
+
                 return $input;
             }
         }
