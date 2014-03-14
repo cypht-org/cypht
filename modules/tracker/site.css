@@ -1,6 +1,6 @@
 .tracker_output { border: solid 1px #ccc; padding: 10px; float: left; clear: left; width: 300px; overflow: scroll; height: 300px; margin-top: 50px;}
-.tracker_output table td { font-size: 75%; padding-right: 3px; }
+.tracker_output table td { padding-right: 3px; }
 .tracker_output table .enabled{ color: green; }
 .tracker_output table .disabled{ color: red; }
-.imap_summary_debug, .tracker_debug { height: 300px; border: solid 1px #ccc; padding: 10px; overflow: scroll; float: left; width: 300px; font-size: 75%; margin-top: 50px;}
+.imap_summary_debug, .tracker_debug { height: 300px; border: solid 1px #ccc; padding: 10px; overflow: scroll; float: left; width: 300px; margin-top: 50px;}
 .imap_summary_debug { width: 600px; }

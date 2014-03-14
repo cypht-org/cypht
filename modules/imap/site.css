@@ -1,15 +1,14 @@
 .configured_servers { float: left; clear: left; margin-bottom: 10px; }
 .configured_server { float: left; margin: 10px; width: 250px; }
-.configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }
+.configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .imap_folders { border: solid 1px #ccc; padding: 10px; clear: left; float: left; margin-bottom: 10px; height: 300px; width: 300px; overflow: scroll; margin-top: 50px;}
 .imap_folders div, .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #ccc; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
-.add_server { float: left; clear: left; margin-bottom: 10px; }
-.logout, .home_link, .server_link { font-size: 10pt; margin: 2px; display: block; padding: 3px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
-.server_label { padding-top: 10px; }
-.imap_summary_data { width: 300px; padding: 10px; border: solid 1px #ccc; }
-.imap_summary_row { padding: 10px; }
+.add_server { float: left; clear: left; margin-bottom: 10px; margin-left: 10px; }
+.logout, .home_link, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; display: block; padding: 3px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #000; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.imap_summary_data { width: 300px; padding: 10px; border: solid 1px #ccc; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.imap_summary_row { padding: 10px; padding-top: 0px; }
 .total { color: green; }
 .unseen { color: green; }
-.imap_summary_row td { text-align: right; padding-left: 10px;}
+.imap_summary_row td { text-align: left; padding-left: 10px;}

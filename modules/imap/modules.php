@@ -331,8 +331,8 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
 class Hm_Output_imap_setup extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<form class="add_server" method="POST">'.
-                '<div class="subtitle">Add an IMAP server</div>'.
+            return '<div class="subtitle">Add an IMAP server</div>'.
+                '<form class="add_server" method="POST">'.
                 'Server name or address: <input type="text" name="new_imap_server" value=""/><br />'.
                 'Server Port: <input type="text" name="new_imap_port" value="143"><br />'.
                 'Use TLS: <input type="checkbox" name="tls" value="1" /><br />'.
