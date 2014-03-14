@@ -18,11 +18,13 @@ Hm_Ajax = {
     },
 
     done: function(res) {
-        if (typeof res == 'string' && res.indexOf('<') == 0) {
+        if (typeof res == 'string' && (res == 'null' || res.indexOf('<') == 0)) {
             Hm_Ajax.fail(res);
+            return;
         }
         else if (!res) {
             Hm_Ajax.fail(res);
+            return;
         }
         else {
             res = jQuery.parseJSON(res);
