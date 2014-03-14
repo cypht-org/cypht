@@ -11,8 +11,8 @@ class Hm_Handler_imap_tracker extends Hm_Handler_Module {
                 }
             }
             $data['imap_summary_debug'] = $debug;
-            return $data;
         }
+        return $data;
     }
 }
 
@@ -63,6 +63,9 @@ class Hm_Output_show_debug extends Hm_Output_Module {
 
                 return $input;
             }
+        }
+        elseif ($format == 'JSON') {
+            return $input;
         }
     }
 }

@@ -1,5 +1,8 @@
 $(document).ajaxSuccess(function(event, xhr, settings) {
     var response = jQuery.parseJSON(xhr.responseText);
+    if (typeof res == 'string' && (res == 'null' || res.indexOf('<') == 0)) {
+        return;
+    }
     if (response.module_debug) {
         $(".module_list").html(response.module_debug);
     }
