@@ -13,10 +13,10 @@ Hm_Handler_Modules::add('home', 'http_headers', true);
 
 /* homepage output */
 Hm_Output_Modules::add('home', 'header_start', false);
-Hm_Output_Modules::add('home', 'jquery', false);
-Hm_Output_Modules::add('home', 'header_css', false);
-Hm_Output_Modules::add('home', 'header_content', false);
 Hm_Output_Modules::add('home', 'js_data', true);
+Hm_Output_Modules::add('home', 'header_css', false);
+Hm_Output_Modules::add('home', 'jquery', false);
+Hm_Output_Modules::add('home', 'header_content', false);
 Hm_Output_Modules::add('home', 'header_end', false);
 Hm_Output_Modules::add('home', 'logout', true);
 Hm_Output_Modules::add('home', 'login', false);

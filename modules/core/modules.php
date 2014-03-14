@@ -113,7 +113,7 @@ if (!class_exists('Hm_Output_title')) {
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<h1 class="title">HM3 - '.$this->html_safe($input['title']).'</h1>';
+            return '<h1 class="title">HM3</h1>';
         }
     }
 }}
