@@ -24,10 +24,10 @@ Hm_Handler_Modules::add('servers', 'http_headers', true);
 
 /* servers page output */
 Hm_Output_Modules::add('servers', 'header_start', false);
-Hm_Output_Modules::add('servers', 'jquery', false);
-Hm_Output_Modules::add('servers', 'header_css', false);
-Hm_Output_Modules::add('servers', 'header_content', false);
 Hm_Output_Modules::add('servers', 'js_data', true);
+Hm_Output_Modules::add('servers', 'header_css', false);
+Hm_Output_Modules::add('servers', 'jquery', false);
+Hm_Output_Modules::add('servers', 'header_content', false);
 Hm_Output_Modules::add('servers', 'header_end', false);
 Hm_Output_Modules::add('servers', 'logout', true);
 Hm_Output_Modules::add('servers', 'unread_link', true);
@@ -56,10 +56,10 @@ Hm_Handler_Modules::add('unread', 'logout', true);
 Hm_Handler_Modules::add('unread', 'http_headers', true);
 
 Hm_Output_Modules::add('unread', 'header_start', false);
-Hm_Output_Modules::add('unread', 'jquery', false);
-Hm_Output_Modules::add('unread', 'header_css', false);
-Hm_Output_Modules::add('unread', 'header_content', false);
 Hm_Output_Modules::add('unread', 'js_data', true);
+Hm_Output_Modules::add('unread', 'header_css', false);
+Hm_Output_Modules::add('unread', 'jquery', false);
+Hm_Output_Modules::add('unread', 'header_content', false);
 Hm_Output_Modules::add('unread', 'header_end', false);
 Hm_Output_Modules::add('unread', 'logout', true);
 Hm_Output_Modules::add('unread', 'unread_link', true);

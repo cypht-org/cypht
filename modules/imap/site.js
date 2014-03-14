@@ -61,23 +61,7 @@ var update_summary_display = function(res) {
 };
 
 var update_unread_message_display = function(res) {
-    var result = '<table>';
-    var msg;
-    var subject;
-    var from;
-    for (i in res.imap_unread_data) {
-        msg = res.imap_unread_data[i];
-        subject = msg.subject.replace(/(\[.+\])/, "<span class=\"hl\">$1</span>");
-        from = msg.from.replace(/(\&lt;.+\&gt;)/, "<span class=\"dl\">$1</span>");
-        result += '<tr>';
-        result += '<td><div class="source">'+msg.server_name+'</div></td>';
-        result += '<td><div class="from">'+from+'</div></td>';
-        result += '<td><div class="subject">'+subject+'</div></td>';
-        result += '<td><div class="msg_date">'+msg.date+'</div></td></tr>';
-        console.log(msg);
-    }
-    result += '</table>';
-    $('.unread_messages').html(result);
+    $('.unread_messages').html(res.imap_unread_data);
 };
 
 var imap_unread_update = function() {

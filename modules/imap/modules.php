@@ -32,15 +32,16 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if ($imap) {
+                    $imap->read_only = true;
                     $server_details = Hm_IMAP_List::dump($id);
                     if ($imap->select_mailbox('INBOX')) {
                         $unseen = $imap->search('UNSEEN');
                         if ($unseen) {
                             $msgs = $imap->get_message_list($unseen);
-                            $imap->bust_cache('ALL');
                             foreach ($msgs as $msg) {
                                 $msg['server_id'] = $id;
                                 $msg['server_name'] = $server_details['server'];
+                                $msg['body'] = $imap->get_first_message_part($msg['uid'], 'text', 'plain');
                                 $msg_list[] = $msg;
                             }
                         }
@@ -443,14 +444,26 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
     }
 }
 
+if (!class_exists('Hm_Output_filter_unread_data')) {
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
         $clean = array();
+        $res = '<table>';
         foreach($input['imap_unread_data'] as $msg) {
-            $clean[] = array_map(function($v) { return $this->html_safe($v); }, $msg);
+            $clean = array_map(function($v) { return $this->html_safe($v); }, $msg);
+            $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $clean['subject']);
+            $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $clean['from']);
+            $res .= '<tr><td><div class="source">'.$clean['server_name'].'</div></td>'.
+                '<td><div class="subject">'.$subject.'</div></td>'.
+                '<td><div class="from">'.$from.'</div></td>'.
+                '<td><div class="msg_date">'.$clean['date'].'</div></td></tr>';
         }
-        $input['imap_unread_data'] = $clean;
+        if (!count($input['imap_unread_data'])) {
+            $res .= '<tr><td class="empty_table">No unread message found in your accounts</td></tr>';
+        }
+        $res .= '</table>';
+        $input['imap_unread_data'] = $res;
         return $input;
     }
-}
+}}
 ?>

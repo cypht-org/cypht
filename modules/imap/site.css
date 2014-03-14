@@ -1,4 +1,4 @@
-.configured_servers { float: left; clear: left; margin-bottom: 10px; }
+.configured_servers { float: left; clear: left; margin-bottom: 10px; width: 98%; }
 .configured_server { float: left; margin: 10px; width: 250px; }
 .unread_messages, .configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .imap_folders { border: solid 1px #ccc; padding: 10px; clear: left; float: left; margin-bottom: 10px; height: 300px; width: 300px; overflow: scroll; margin-top: 50px;}
@@ -15,7 +15,9 @@
 .unread_messages { width: 98%; min-height: 200px; overflow: hidden; }
 .unread_messages table td { padding-bottom: 5px; padding-right: 10px; color: #333; }
 .subject, .msg_date, .from { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.subject { font-weight: bold; }
+.source { font-style: italic; color: #666; }
 .msg_date { color: #666; }
-.hl { color: green; }
+.hl { padding: 5px; color: green; }
 .dl { color: #888; }
 
