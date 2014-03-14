@@ -153,7 +153,23 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
         return false;
     }
 
-    private function create() {
+    public function create($request, $user, $pass) {
+        $this->connect();
+        $sql = $this->dbh->prepare("select username from hm_user where username = ?");
+        if ($sql->execute(array($user))) {
+            $res = $sql->fetch();
+            if (!empty($res)) {
+                Hm_Msgs::add("That username is already in use");
+            }
+            else {
+                $sql = $this->dbh->prepare("insert into hm_user values(?,?)");
+                $hash = pbkdf2_create_hash($pass);
+                if ($sql->execute(array($user, $hash))) {
+                    $this->check($request, $user, $pass);
+                    Hm_Msgs::add("Account created");
+                }
+            }
+        }
     }
 }
 
