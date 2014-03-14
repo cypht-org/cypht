@@ -1,13 +1,3 @@
-Hm_Folders = {
-    show: function(folders) {
-        var folder_html = '';
-        for (folder in folders) {
-            folder_html += '<div>'+folders[folder]+'</div>';
-        }
-        $('.imap_folder_data').html(folder_html);
-    }
-};
-
 $('.imap_delete').on('click', function() {
     $('.imap_debug_data').empty();
     event.preventDefault();
@@ -45,7 +35,6 @@ $('.test_connect').on('click', function() {
                 form.find('span').show();
             }
             $('.test_connect').attr('disabled', false);
-            Hm_Folders.show(res.imap_folders);
             $('.imap_debug_data').html(res.imap_debug);
         },
         {'imap_connect': 1}

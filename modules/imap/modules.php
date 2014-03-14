@@ -298,7 +298,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
             foreach ($input['imap_servers'] as $index => $vals) {
 
                 if (isset($vals['user'])) {
-                    $disabled = 'disabled="true"';
+                    $disabled = 'disabled="disabled"';
                     $display = 'none';
                 }
                 else {
@@ -310,7 +310,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
                 $res .= 
                     ' <form class="imap_connect" method="POST">'.
-                    '<input type="hidden" id="imap_server_id" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
+                    '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
                     '<span style="display: '.$display.'"> '.$this->trans('Username').': '.
                     '<input '.$disabled.' class="credentials" type="text" name="imap_user" value=""></span>'.
                     '<span style="display: '.$display.'"> '.$this->trans('Password').': '.
@@ -328,27 +328,6 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_imap_debug extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if (DEBUG_MODE) {
-            if ($format == 'HTML5') {
-                $res = '<div class="imap_debug"><div class="subtitle">IMAP Debug</div><pre class="imap_debug_data">';
-                if (isset($input['imap_debug'])) {
-                    $res .= $this->html_safe($input['imap_debug']);
-                }
-                $res .= '</pre></div>';
-                return $res;
-            }
-            elseif ($format == 'JSON') {
-                if (isset($input['imap_debug'])) {
-                    $input['imap_debug'] = $this->html_safe($input['imap_debug']);
-                }
-                return $input;
-            }
-        }
-    }
-}
-
 class Hm_Output_imap_setup extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
@@ -362,32 +341,10 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_imap_folders extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
-        if (DEBUG_MODE) {
-            if ($format == 'HTML5') {
-                $res = '<div class="imap_folders"><div class="subtitle">Top Level Folders</div><div class="imap_folder_data">';
-                if (isset($input['imap_folders'])) {
-                    foreach (array_keys($input['imap_folders']) as $folder) {
-                        $res .= '<div class="folder">'.$this->html_safe($folder).'</div>';
-                    }
-                }
-                $res .= '</div></div>';
-                return $res;
-            }
-            elseif ($format == 'JSON') {
-                if (isset($input['imap_folders'])) {
-                    $input['imap_folders'] = array_map(function($v) { return $this->html_safe($v); }, array_keys($input['imap_folders']));
-                }
-                return $input;
-            }
-        }
-    }
-}
 class Hm_Output_servers_link extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
         if ($format == 'HTML5') {
-            return '<a class="server_link" href="'.$this->html_safe($input['router_url_path']).'?page=servers"><input type="button" value="IMAP Setup" /></a>';
+            return '<a class="server_link" href="'.$this->html_safe($input['router_url_path']).'?page=servers">Servers</a>';
         }
     }
 }
@@ -395,7 +352,7 @@ class Hm_Output_servers_link extends Hm_Output_Module {
 class Hm_Output_homepage_link extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
         if ($format == 'HTML5') {
-            return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'"><input type="button" value="Home" /></a>';
+            return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'">Home</a>';
         }
     }
 }

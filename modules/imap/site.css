@@ -6,7 +6,7 @@
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #ccc; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
 .add_server { float: left; clear: left; margin-bottom: 10px; }
-.home_link, .server_link { float: right; clear: none; }
+.logout, .home_link, .server_link { font-size: 10pt; margin: 2px; display: block; padding: 3px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .server_label { padding-top: 10px; }
 .imap_summary_data { width: 300px; padding: 10px; border: solid 1px #ccc; }
 .imap_summary_row { padding: 10px; }

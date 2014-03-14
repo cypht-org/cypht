@@ -38,8 +38,6 @@ Hm_Output_Modules::add('servers', 'loading_icon', false);
 Hm_Output_Modules::add('servers', 'date', true);
 Hm_Output_Modules::add('servers', 'imap_setup', true);
 Hm_Output_Modules::add('servers', 'imap_setup_display', true);
-Hm_Output_Modules::add('servers', 'imap_folders', true);
-Hm_Output_Modules::add('servers', 'imap_debug', true);
 Hm_Output_Modules::add('servers', 'page_js', true);
 Hm_Output_Modules::add('servers', 'footer', true);
 
