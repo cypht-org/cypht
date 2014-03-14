@@ -54,10 +54,20 @@ $('.test_connect').on('click', function() {
 
 var update_summary_display = function(res) {
     var context;
+    var unseen;
+    var messages;
     for (id in res.imap_summary) {
         context = $('.imap_summary_'+id);
-        $('.total', context).html(res.imap_summary[id].messages);
-        $('.unseen', context).html(res.imap_summary[id].unseen);
+        messages = res.imap_summary[id].messages;
+        unseen = res.imap_summary[id].unseen;
+        if (!unseen) {
+            unseen = 0;
+        }
+        if (!messages) {
+            messages = 0;
+        }
+        $('.total', context).html(messages);
+        $('.unseen', context).html(unseen);
     }
 };
 
