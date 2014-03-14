@@ -39,13 +39,26 @@ class Hm_Handler_date extends Hm_Handler_Module {
 if (!class_exists('Hm_Handler_login')) {
 class Hm_Handler_login extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('username', 'password'));
-        if ($success) {
-            $this->session->check($this->request, $form['username'], $form['password']);
-            $this->session->set('username', $form['username']);
+        if (!isset($this->request->post['create_hm_user'])) {
+            list($success, $form) = $this->process_form(array('username', 'password'));
+            if ($success) {
+                $this->session->check($this->request, $form['username'], $form['password']);
+                $this->session->set('username', $form['username']);
+            }
+            else {
+                $this->session->check($this->request);
+            }
         }
-        else {
-            $this->session->check($this->request);
+        return $data;
+    }
+}}
+
+if (!class_exists('Hm_Handler_create_user')) {
+class Hm_Handler_create_user extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('username', 'password', 'create_hm_user'));
+        if ($success) {
+            $this->session->create($this->request, $form['username'], $form['password']);
         }
         return $data;
     }
@@ -113,7 +126,9 @@ class Hm_Output_login extends Hm_Output_Module {
                 return '<form class="login_form" method="POST">'.
                     ' '.$this->trans('Username').': <input type="text" name="username" value="">'.
                     ' '.$this->trans('Password').': <input type="password" name="password">'.
-                    ' <input type="submit" /></form>';
+                    ' <input type="submit" value="Login" />'.
+                    ' <input type="submit" name="create_hm_user" value="Create" />'.
+                    '</form>';
             }
         }
         return '';

@@ -1,6 +1,7 @@
 <?php
 
 /* homepage data */
+Hm_Handler_Modules::add('home', 'create_user', false);
 Hm_Handler_Modules::add('home', 'login', false);
 Hm_Handler_Modules::add('home', 'load_user_data', true);
 Hm_Handler_Modules::add('home', 'language',  true);
@@ -60,6 +61,7 @@ return array(
     'allowed_post' => array(
         'logout' => FILTER_VALIDATE_BOOLEAN,
         'username' => FILTER_SANITIZE_STRING,
+        'create_hm_user' => FILTER_SANITIZE_STRING,
         'password' => FILTER_SANITIZE_STRING,
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
     )
