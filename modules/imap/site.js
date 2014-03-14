@@ -60,6 +60,34 @@ var update_summary_display = function(res) {
     }
 };
 
+var update_unread_message_display = function(res) {
+    var result = '<table>';
+    var msg;
+    var subject;
+    var from;
+    for (i in res.imap_unread_data) {
+        msg = res.imap_unread_data[i];
+        subject = msg.subject.replace(/(\[.+\])/, "<span class=\"hl\">$1</span>");
+        from = msg.from.replace(/(\&lt;.+\&gt;)/, "<span class=\"dl\">$1</span>");
+        result += '<tr>';
+        result += '<td><div class="source">'+msg.server_name+'</div></td>';
+        result += '<td><div class="from">'+from+'</div></td>';
+        result += '<td><div class="subject">'+subject+'</div></td>';
+        result += '<td><div class="msg_date">'+msg.date+'</div></td></tr>';
+        console.log(msg);
+    }
+    result += '</table>';
+    $('.unread_messages').html(result);
+};
+
+var imap_unread_update = function() {
+    var ids = $('#imap_unread_ids').val();
+    Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
+            {'name': 'imap_unread_ids', 'value': ids}],
+            update_unread_message_display)
+};
+
 var imap_summary_update = function() {
     var ids = $('#imap_summary_ids').val();
     $('.total').html('...');
@@ -72,4 +100,7 @@ var imap_summary_update = function() {
 
 if (hm_page_name == 'home') {
     Hm_Timer.add_job(imap_summary_update, 60);
+}
+else if (hm_page_name == 'unread') {
+    Hm_Timer.add_job(imap_unread_update, 60);
 }

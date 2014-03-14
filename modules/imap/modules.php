@@ -21,6 +21,42 @@ class Hm_Handler_imap_summary extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_imap_unread extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_unread_ids'));
+        if ($success) {
+            $ids = explode(',', $form['imap_unread_ids']);
+            $msg_list = array();
+            foreach($ids as $id) {
+                $id = intval($id);
+                $cache = Hm_IMAP_List::get_cache($this->session, $id);
+                $imap = Hm_IMAP_List::connect($id, $cache);
+                if ($imap) {
+                    $server_details = Hm_IMAP_List::dump($id);
+                    if ($imap->select_mailbox('INBOX')) {
+                        $unseen = $imap->search('UNSEEN');
+                        if ($unseen) {
+                            $msgs = $imap->get_message_list($unseen);
+                            $imap->bust_cache('ALL');
+                            foreach ($msgs as $msg) {
+                                $msg['server_id'] = $id;
+                                $msg['server_name'] = $server_details['server'];
+                                $msg_list[] = $msg;
+                            }
+                        }
+                    }
+                }
+            }
+            usort($msg_list, function($a, $b) {
+                if ($a['date'] == $b['date']) return 0;
+                return (strtotime($a['date']) > strtotime($b['date']))? -1 : 1;
+            });
+            $data['imap_unread_data'] = $msg_list;
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
@@ -349,6 +385,14 @@ class Hm_Output_servers_link extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_unread_link extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            return '<a class="unread_link" href="'.$this->html_safe($input['router_url_path']).'?page=unread">Unread</a>';
+        }
+    }
+}
+
 class Hm_Output_homepage_link extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
         if ($format == 'HTML5') {
@@ -386,5 +430,27 @@ class Hm_Output_imap_summary extends Hm_Output_Module {
         }
     }
 }
+class Hm_Output_unread_message_list extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            $res = '';
+            if (isset($input['imap_servers'])) {
+                $res .= '<input type="hidden" id="imap_unread_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+            }
+            $res .= '<div class="subtitle">Unread Messages</div><div class="unread_messages"></div>';
+            return $res;
+        }
+    }
+}
 
+class Hm_Output_filter_unread_data extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        $clean = array();
+        foreach($input['imap_unread_data'] as $msg) {
+            $clean[] = array_map(function($v) { return $this->html_safe($v); }, $msg);
+        }
+        $input['imap_unread_data'] = $clean;
+        return $input;
+    }
+}
 ?>
