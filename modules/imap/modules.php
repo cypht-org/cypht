@@ -134,8 +134,11 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     $data['just_forgot_credentials'] = true;
                 }
                 if ($imap->get_state() == 'authenticated') {
-                    Hm_Msgs::add("Successfully authenticated to the IMAP server!");
+                    Hm_Msgs::add("Successfully authenticated to the IMAP server");
                     $data['imap_folders'] = $imap->get_folder_list_by_level();
+                }
+                else {
+                    Hm_Msgs::add("Failed to authenticate to the IMAP server");
                 }
                 $data['imap_debug'] = $imap->show_debug(false, true);
             }
@@ -409,10 +412,10 @@ class Hm_Output_imap_summary extends Hm_Output_Module {
                     $res .= '<div class="server_label">'.$vals['server'].'/'.$vals['port'].
                         ($vals['tls'] ? '/TLS' : '').
                         '</div><div class="imap_summary_row imap_summary_'.$index.'">'.
-                        'INBOX: '.
-                        '<br />Unseen: <span class="unseen">...</span>'.
-                        '<br />Total: <span class="total">...</span>'.
-                        '</div>';
+                        '<table><tr><td>INBOX</td></tr>'.
+                        '<tr><td>Unseen</td><td><span class="unseen">...</span></td></tr>'.
+                        '<tr><td>Total</td><td><span class="total">...</span></td></tr>'.
+                        '</table></div>';
                 }
                 $res .= '</div>';
             }

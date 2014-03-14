@@ -4,6 +4,7 @@
 Hm_Handler_Modules::add('home', 'load_imap_servers',  true, 'load_user_data', 'after');
 Hm_Handler_Modules::add('home', 'imap_setup_display',  true, 'load_imap_servers', 'after');
 Hm_Output_Modules::add('home', 'servers_link', true, 'logout', 'after');
+Hm_Output_Modules::add('home', 'homepage_link', true, 'servers_link', 'after');
 Hm_Output_Modules::add('home', 'imap_summary', true, 'date', 'after');
 
 /* servers page data */
@@ -28,6 +29,7 @@ Hm_Output_Modules::add('servers', 'header_content', false);
 Hm_Output_Modules::add('servers', 'js_data', true);
 Hm_Output_Modules::add('servers', 'header_end', false);
 Hm_Output_Modules::add('servers', 'logout', true);
+Hm_Output_Modules::add('servers', 'servers_link', true);
 Hm_Output_Modules::add('servers', 'homepage_link', true);
 Hm_Output_Modules::add('servers', 'login', false);
 Hm_Output_Modules::add('servers', 'title', true);

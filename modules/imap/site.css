@@ -12,3 +12,4 @@
 .imap_summary_row { padding: 10px; }
 .total { color: green; }
 .unseen { color: green; }
+.imap_summary_row td { text-align: right; padding-left: 10px;}
