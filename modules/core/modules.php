@@ -1,5 +1,7 @@
 <?php
 
+/* INPUT */
+
 if (!class_exists('HM_Handler_http_headers')) {
 class Hm_Handler_http_headers extends Hm_Handler_Module {
     public function process($data) {
@@ -92,6 +94,8 @@ class Hm_Handler_logout extends Hm_Handler_Module {
     }
 }}
 
+/* OUTPUT */
+
 if (!class_exists('Hm_Output_title')) {
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {
@@ -168,6 +172,7 @@ class Hm_Output_header_start extends Hm_Output_Module {
         }
     }
 }}
+
 if (!class_exists('Hm_Output_header_end')) {
 class Hm_Output_header_end extends Hm_Output_Module {
     protected function output($input, $format) {
@@ -176,6 +181,7 @@ class Hm_Output_header_end extends Hm_Output_Module {
         }
     }
 }}
+
 if (!class_exists('Hm_Output_header_content')) {
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($input, $format) {
@@ -184,6 +190,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
         }
     }
 }}
+
 if (!class_exists('Hm_Output_header_css')) {
 class Hm_Output_header_css extends Hm_Output_Module {
     protected function output($input, $format) {
@@ -223,6 +230,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
         }
     }
 }}
+
 if (!class_exists('Hm_Output_page_js')) {
 class Hm_Output_page_js extends Hm_Output_Module {
     protected function output($input, $format) {
@@ -231,6 +239,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
         }
     }
 }}
+
 if (!class_exists('Hm_Output_jquery')) {
 class Hm_Output_jquery extends Hm_Output_Module {
     protected function output($input, $format) {
@@ -238,6 +247,27 @@ class Hm_Output_jquery extends Hm_Output_Module {
             return '<script type="text/javascript" src="modules/core/jquery-1.11.0.min.js"></script>';
         }
         return '';
+    }
+}}
+
+if (!class_exists('Hm_Output_js_data')) {
+class Hm_Output_js_data extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<script type="text/javascript">'.
+                'var hm_url_path = "'.$input['router_url_path'].'";'.
+                'var hm_page_name = "'.$input['router_page_name'].'";'.
+                '</script>';
+        }
+    }
+}}
+
+if (!class_exists('Hm_Output_loading_icon')) {
+class Hm_Output_loading_icon extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<div class="loading_icon"><img src="ajax-loader.gif" width="16" height="16" /></div>';
+        }
     }
 }}
 
