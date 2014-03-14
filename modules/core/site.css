@@ -1,6 +1,6 @@
 .subtitle { padding-bottom: 5px; font-weight: bold; font-size: 110%;  margin-left: 0px !important; }
 .date { float: right; padding-right: 30px; }
-.sys_messages { color: blue; margin-left: 20px; margin-top: 2px; float: left }
+.sys_messages { color: blue; position: absolute; left: 300px; top: 10px; }
 .logout_form { float: right; clear: none; padding-left: 10px; padding-right: 30px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .title { font-weight: bold; padding: 0px; font-size: 125%; margin: 0px; padding-bottom: 10px; }
