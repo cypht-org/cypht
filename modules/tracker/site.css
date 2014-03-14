@@ -1,5 +1,5 @@
-.tracker_output { margin-top: 20px; border: solid 1px #ccc; padding: 10px; float: left; width: 300px; overflow: scroll; height: 300px; clear: left; }
+.tracker_output { border: solid 1px #ccc; padding: 10px; float: left; width: 300px; overflow: scroll; height: 300px; margin-top: 50px;}
 .tracker_output table td { font-size: 75%; padding-right: 3px; }
 .tracker_output table .enabled{ color: green; }
 .tracker_output table .disabled{ color: red; }
-.tracker_debug { height: 300px; border: solid 1px #ccc; padding: 10px; overflow: scroll; float: left; width: 300px; clear: left; font-size: 75%; }
+.tracker_debug { height: 300px; border: solid 1px #ccc; padding: 10px; overflow: scroll; float: left; width: 300px; font-size: 75%; margin-top: 50px;}

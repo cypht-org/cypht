@@ -1,10 +1,10 @@
 .configured_servers { float: left; clear: left; margin-bottom: 10px; }
 .configured_server { float: left; margin: 10px; width: 250px; }
 .configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; }
-.imap_folders { float: left; clear: left; margin-bottom: 10px; }
+.imap_folders { border: solid 1px #ccc; padding: 10px; clear: left; float: left; margin-bottom: 10px; height: 300px; width: 300px; overflow: scroll; margin-top: 50px;}
 .imap_folders div, .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
-.imap_debug { float: left; clear: left; width: 600px; white-space: pre; word-wrap: break-word; }
+.imap_debug { border: solid 1px #ccc; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
 .add_server { float: left; clear: left; margin-bottom: 10px; }
 .home_link, .server_link { float: right; clear: none; }
 .server_label { padding-top: 10px; }
