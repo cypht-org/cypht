@@ -87,4 +87,8 @@ if (hm_page_name == 'home') {
 }
 else if (hm_page_name == 'unread') {
     Hm_Timer.add_job(imap_unread_update, 60);
+    $( document ).ready(function() {
+        $( '.unread_messages' ).show(1000);
+    })
 }
+

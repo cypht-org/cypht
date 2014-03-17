@@ -40,8 +40,8 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                             $msgs = $imap->get_message_list($unseen);
                             foreach ($msgs as $msg) {
                                 $msg['server_id'] = $id;
-                                $msg['server_name'] = $server_details['server'];
-                                $msg['body'] = $imap->get_first_message_part($msg['uid'], 'text', 'plain');
+                                $msg['server_name'] = $server_details['name'];
+                                $msg['body'] = false; //$imap->get_first_message_part($msg['uid'], 'text', 'plain');
                                 $msg_list[] = $msg;
                             }
                         }
@@ -61,10 +61,10 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
 class Hm_Handler_imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
-            list($success, $form) = $this->process_form(array('new_imap_server', 'new_imap_port'));
+            list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_server', 'new_imap_port'));
             if (!$success) {
                 $data['old_form'] = $form;
-                Hm_Msgs::add('You must supply a server name and port');
+                Hm_Msgs::add('You must supply a name, a server and a port');
             }
             else {
                 $tls = false;
@@ -73,6 +73,7 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
                 }
                 if ($con = fsockopen($form['new_imap_server'], $form['new_imap_port'], $errno, $errstr, 2)) {
                     Hm_IMAP_List::add( array(
+                        'name' => $form['new_imap_name'],
                         'server' => $form['new_imap_server'],
                         'port' => $form['new_imap_port'],
                         'tls' => $tls));
@@ -289,6 +290,7 @@ class Hm_IMAP_List {
             }
             else {
                 $list[$index] = array(
+                    'name' => $server['name'],
                     'server' => $server['server'],
                     'port' => $server['port'],
                     'tls' => $server['tls']
@@ -343,7 +345,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     $display = 'inline';
                 }
                 $res .= '<div class="configured_server">';
-                $res .= sprintf("Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['server']),
+                $res .= sprintf("%s<br />Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
                 $res .= 
                     ' <form class="imap_connect" method="POST">'.
@@ -370,9 +372,10 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return '<div class="subtitle">Add an IMAP server</div>'.
                 '<form class="add_server" method="POST">'.
-                'Server name or address: <input type="text" name="new_imap_server" value=""/><br />'.
-                'Server Port: <input type="text" name="new_imap_port" value="143"><br />'.
-                'Use TLS: <input type="checkbox" name="tls" value="1" /><br />'.
+                'Account name: <input type="text" name="new_imap_name" value="" placeholder="My Account" /><br />'.
+                'Server name or address: <input type="text" name="new_imap_server" placeholder="127.0.0.1" value=""/><br />'.
+                'Server port: <input type="text" name="new_imap_port" value="" placeholder="993"><br />'.
+                'Use TLS: <input type="checkbox" name="tls" value="1" checked="checked" /><br />'.
                 '<input type="submit" value="Add" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
         }
     }
@@ -438,7 +441,8 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
             if (isset($input['imap_servers'])) {
                 $res .= '<input type="hidden" id="imap_unread_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
             }
-            $res .= '<div class="subtitle">Unread Messages</div><div class="unread_messages"></div>';
+            $res .= '<div class="subtitle">Unread Messages</div><div class="unread_messages">'.
+                '<table><tr><td class="empty_table">Loading unread messages ...</td></tr></table></div>';
             return $res;
         }
     }

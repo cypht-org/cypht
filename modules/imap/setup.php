@@ -134,7 +134,8 @@ return array(
         'imap_connect' => FILTER_SANITIZE_STRING,
         'imap_remember' => FILTER_VALIDATE_INT,
         'summary_ids' => FILTER_SANITIZE_STRING,
-        'imap_unread_ids' => FILTER_SANITIZE_STRING
+        'imap_unread_ids' => FILTER_SANITIZE_STRING,
+        'new_imap_name' => FILTER_SANITIZE_STRING
     )
 );
 
