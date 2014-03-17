@@ -663,7 +663,7 @@ abstract class Hm_Handler_Module {
         $success = false;
         $new_form = array();
         foreach($form as $name) {
-            if (isset($post[$name]) && (trim($post[$name]) || (intval($post[$name]) === 0 && $post[$name] == 0))) {
+            if (isset($post[$name]) && (trim($post[$name]) || $post[$name] === '0' )) {
                 $new_form[$name] = $post[$name];
             }
         }
