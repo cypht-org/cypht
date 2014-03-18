@@ -41,7 +41,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                             foreach ($msgs as $msg) {
                                 $msg['server_id'] = $id;
                                 $msg['server_name'] = $server_details['name'];
-                                $msg['body'] = false; //$imap->get_first_message_part($msg['uid'], 'text', 'plain');
+                                $msg['body'] = $imap->get_first_message_part($msg['uid'], 'text', 'plain');
                                 $msg_list[] = $msg;
                             }
                         }

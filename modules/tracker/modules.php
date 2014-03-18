@@ -77,6 +77,7 @@ class Hm_Output_tracker extends Hm_Output_Module {
                 return '';
             }
             $res = '<div class="tracker_output"><div class="subtitle">Registered Modules</div><table class="module_list">';
+            $res .= '<tr><td colspan="2"><b>page: '.$this->html_safe($input['router_page_name']).'</b></td></tr>';
             if (isset($input['module_debug'])) {
                 foreach ($input['module_debug'] as $vals) {
                     $res .= $this->format_row($vals);
@@ -89,7 +90,7 @@ class Hm_Output_tracker extends Hm_Output_Module {
             if (!DEBUG_MODE) {
                 return $input;
             }
-            $res = '';
+            $res = '<tr><td colspan="2"><b>page: '.$this->html_safe($input['router_page_name']).'</b></td></tr>';
             foreach ($input['module_debug'] as $vals) {
                 $res .= $this->format_row($vals);
             }
