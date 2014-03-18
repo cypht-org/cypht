@@ -61,6 +61,19 @@ var update_summary_display = function(res) {
 };
 
 var update_unread_message_display = function(res) {
+    var count = 0;
+    var empty = $('.empty_table', $(res.imap_unread_data));
+    if (empty.length == 0) {
+        count = $('tr', $(res.imap_unread_data)).length;
+    }
+    var title = document.title;
+    if (title.search(/\(\d+\)/) != -1) {
+        title = title.replace(/\(\d+\)/, ' ('+count+')');
+    }
+    else {
+        title = title + ' ('+count+')';
+    }
+    document.title = title;
     $('.unread_messages').html(res.imap_unread_data);
 };
 

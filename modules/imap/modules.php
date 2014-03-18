@@ -237,7 +237,9 @@ class Hm_IMAP_List {
                         'port' => $imap['port'],
                         'tls' => $imap['tls'],
                         'username' => $user,
-                        'password' => $pass
+                        'password' => $pass,
+                        'no_caps' => true,
+                        'blacklisted_extensions' => array('enable')
                     ));
                     if ($res) {
                         self::$imap_list[$id]['connected'] = true;
@@ -414,9 +416,8 @@ class Hm_Output_imap_summary extends Hm_Output_Module {
                     $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
                 $res .= '<div class="imap_summary_data">';
                 foreach ($input['imap_servers'] as $index => $vals) {
-                    $res .= '<div class="server_label">'.$vals['server'].'/'.$vals['port'].
-                        ($vals['tls'] ? '/TLS' : '').
-                        '</div><div class="imap_summary_row imap_summary_'.$index.'">'.
+                    $res .= '<div class="server_label">'.$vals['name'].'</div>'.
+                        '<div class="imap_summary_row imap_summary_'.$index.'">'.
                         '<table><tr><td>INBOX</td></tr>'.
                         '<tr><td>Unseen</td><td><span class="unseen">...</span></td></tr>'.
                         '<tr><td>Total</td><td><span class="total">...</span></td></tr>'.
