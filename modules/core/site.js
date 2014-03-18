@@ -83,3 +83,9 @@ Hm_Timer = {
 };
 
 Hm_Timer.fire();
+
+setTimeout(
+    function() { $('.sys_messages').empty(); },
+    20000
+);
+
