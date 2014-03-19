@@ -152,9 +152,10 @@ class Hm_Router {
         if (DEBUG_MODE) {
             $filters = array();
             $filters = array('allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
-            foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
-                if (is_readable(sprintf("%ssetup.php", $name))) {
-                    $filters = Hm_Router::merge_filters($filters, require sprintf("%ssetup.php", $name));
+            $modules = explode(',', $config->get('modules', array()));
+            foreach ($modules as $name) {
+                if (is_readable(sprintf("modules/%s/setup.php", $name))) {
+                    $filters = Hm_Router::merge_filters($filters, require sprintf("modules/%s/setup.php", $name));
                 }
             }
             $handler_mods = array();
