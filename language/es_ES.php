@@ -7,6 +7,12 @@ return array(
     'IMAP Server' => 'Servidor IMAP',
     'Notices' => false,
     'TLS' => false,
+    'IMAP Summary' => 'Resumen IMAP',
+    'Home' => 'página principal',
+    'Unread' => 'no leído',
+    'Servers' => 'servidores',
+    'Settings' => 'configuración',
+    'Logout' => 'salida',
 ); 
 
 ?>

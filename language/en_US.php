@@ -7,6 +7,12 @@ return array(
     'Notices' => false,
     'IMAP Server' => false,
     'TLS' => false,
+    'IMAP Summary' => false,
+    'Home' => false,
+    'Unread' => false,
+    'Servers' => false,
+    'Settings' => false,
+    'Logout' => false,
 ); 
 
 ?>
