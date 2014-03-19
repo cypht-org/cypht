@@ -1,11 +1,11 @@
 body { font-family: Arial; padding-left: 20px; padding-top: 10px; }
 table { width: 100%; }
 .subtitle { color: #444; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 110%;  margin-left: 0px !important; }
-.date { float: right; color: #444; padding-right: 30px; }
+.date { float: right; clear: none; color: #444; padding-right: 30px; padding-top: 4px;}
 .sys_messages { color: blue; position: absolute; left: 300px; top: 20px; }
 .logout_form { float: right; clear: none; padding-right: 30px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .title { font-weight: normal; padding: 0px; font-size: 135%; color: #888; margin: 0px; padding-bottom: 20px; letter-spacing: -2px; }
 .loading_icon { position: absolute; top: 22px; left: 8px; visibility: hidden; width: 16px; height: 16px; }
 .loading_icon img { visibility: inherit; }
-.empty_table { text-align: center; color: #666 !important; padding-top: 75px; }
+.empty_table { text-align: center; color: #666 !important; padding-top: 75px !important; }

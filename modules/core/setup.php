@@ -19,11 +19,11 @@ Hm_Output_Modules::add('home', 'jquery', false);
 Hm_Output_Modules::add('home', 'header_content', false);
 Hm_Output_Modules::add('home', 'header_end', false);
 Hm_Output_Modules::add('home', 'logout', true);
+Hm_Output_Modules::add('home', 'date', true);
 Hm_Output_Modules::add('home', 'login', false);
 Hm_Output_Modules::add('home', 'msgs', false);
 Hm_Output_Modules::add('home', 'title', true);
 Hm_Output_Modules::add('home', 'loading_icon', true);
-Hm_Output_Modules::add('home', 'date', true);
 Hm_Output_Modules::add('home', 'page_js', true);
 Hm_Output_Modules::add('home', 'footer', true);
 

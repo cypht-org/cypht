@@ -2,18 +2,21 @@ Hm_Ajax = {
 
     callback: false,
 
-    request: function(args, callback, extra) {
+    request: function(args, callback, extra, no_icon) {
         Hm_Ajax.callback = callback;
         if (extra) {
             for (name in extra) {
                 args.push({'name': name, 'value': extra[name]});
             }
         }
-        $('.loading_icon').css('visibility', 'visible');
+        if (!no_icon) {
+            $('.loading_icon').css('visibility', 'visible');
+        }
         $.post('', args )
         .done(Hm_Ajax.done)
         .fail(Hm_Ajax.fail)
         .always(Hm_Ajax.always);
+
         return false;
     },
 
