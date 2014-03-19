@@ -28,4 +28,8 @@ Hm_Handler_Modules::add('ajax_imap_unread', 'imap_tracker', true, 'imap_unread',
 Hm_Output_Modules::add('ajax_imap_unread', 'tracker', false);
 Hm_Output_Modules::add('ajax_imap_unread', 'show_debug', false);
 
+Hm_Handler_Modules::add('settings', 'tracker', false, 'http_headers', 'after');
+Hm_Output_Modules::add('settings', 'tracker', false, 'footer', 'before');
+Hm_Output_Modules::add('settings', 'show_debug', false, 'footer', 'before');
+
 ?>
