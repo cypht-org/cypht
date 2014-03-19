@@ -43,6 +43,7 @@ class Hm_User_Config_File extends Hm_Config {
                 $data = @unserialize(Hm_Crypt::plaintext($str_data, $enc_key));
                 if (is_array($data)) {
                     $this->config = array_merge($this->config, $data);
+                    $this->set_tz();
                 }
             }
         }
@@ -50,6 +51,11 @@ class Hm_User_Config_File extends Hm_Config {
 
     public function reload($data) {
         $this->config = $data;
+        $this->set_tz();
+    }
+
+    private function set_tz() {
+        date_default_timezone_set($this->get('timezone_setting', 'UTC'));
     }
 
     public function save($username) {
