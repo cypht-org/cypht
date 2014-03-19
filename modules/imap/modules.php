@@ -25,8 +25,10 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_unread_ids'));
         if ($success) {
+            $data['imap_unread_unchanged'] = false;
             $ids = explode(',', $form['imap_unread_ids']);
             $msg_list = array();
+            $cached = 0;
             foreach($ids as $id) {
                 $id = intval($id);
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
@@ -36,23 +38,32 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                     $server_details = Hm_IMAP_List::dump($id);
                     if ($imap->select_mailbox('INBOX')) {
                         $unseen = $imap->search('UNSEEN');
-                        if ($unseen) {
-                            $msgs = $imap->get_message_list($unseen);
-                            foreach ($msgs as $msg) {
-                                $msg['server_id'] = $id;
-                                $msg['server_name'] = $server_details['name'];
-                                $msg['body'] = $imap->get_first_message_part($msg['uid'], 'text', 'plain');
-                                $msg_list[] = $msg;
+                        if ($imap->cached_response) {
+                            $cached++;
+                        }
+                        else {
+                            if ($unseen) {
+                                $msgs = $imap->get_message_list($unseen);
+                                foreach ($msgs as $msg) {
+                                    $msg['server_id'] = $id;
+                                    $msg['server_name'] = $server_details['name'];
+                                    $msg_list[] = $msg;
+                                }
                             }
                         }
                     }
                 }
             }
-            usort($msg_list, function($a, $b) {
-                if ($a['date'] == $b['date']) return 0;
-                return (strtotime($a['date']) > strtotime($b['date']))? -1 : 1;
-            });
-            $data['imap_unread_data'] = $msg_list;
+            if ($cached == count($ids)) {
+                $data['imap_unread_unchanged'] = true;
+            }
+            else {
+                usort($msg_list, function($a, $b) {
+                    if ($a['date'] == $b['date']) return 0;
+                    return (strtotime($a['date']) > strtotime($b['date']))? -1 : 1;
+                });
+                $data['imap_unread_data'] = $msg_list;
+            }
         }
         return $data;
     }
@@ -139,6 +150,13 @@ class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
         if (!empty($servers)) {
             $data['imap_servers'] = $servers;
         }
+        return $data;
+    }
+}
+
+class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
+    public function process($data) {
+        $this->session->set('imap_cache', array());
         return $data;
     }
 }
@@ -251,6 +269,12 @@ class Hm_IMAP_List {
                     return self::$imap_list[$id]['object'];
                 }
             }
+        }
+        return false;
+    }
+    public static function reuse($id) {
+        if (isset(self::$imap_list[$id]) && is_object(self::$imap_list[$id]['object'])) {
+            return self::$imap_list[$id]['object'];
         }
         return false;
     }
@@ -435,6 +459,14 @@ class Hm_Output_imap_summary extends Hm_Output_Module {
         }
     }
 }
+class Hm_Output_jquery_table extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5' ) {
+            return '<script type="text/javascript" src="modules/imap/jquery.tablesorter.min.js"></script>';
+        }
+        return '';
+    }
+}
 class Hm_Output_unread_message_list extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
         if ($format == 'HTML5') {
@@ -442,33 +474,38 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
             if (isset($input['imap_servers'])) {
                 $res .= '<input type="hidden" id="imap_unread_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
             }
-            $res .= '<div class="subtitle">Unread Messages</div><div class="unread_messages">'.
-                '<table><tr><td class="empty_table">Loading unread messages ...</td></tr></table></div>';
+            $res .= '<div class="unread_messages">'.
+                '<table><tr><td class="empty_table"><img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...</td></tr></table></div>';
             return $res;
         }
     }
 }
 
-if (!class_exists('Hm_Output_filter_unread_data')) {
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
         $clean = array();
-        $res = '<table>';
-        foreach($input['imap_unread_data'] as $msg) {
-            $clean = array_map(function($v) { return $this->html_safe($v); }, $msg);
-            $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $clean['subject']);
-            $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $clean['from']);
-            $res .= '<tr><td><div class="source">'.$clean['server_name'].'</div></td>'.
-                '<td><div class="subject">'.$subject.'</div></td>'.
-                '<td><div class="from">'.$from.'</div></td>'.
-                '<td><div class="msg_date">'.$clean['date'].'</div></td></tr>';
+        if (isset($input['imap_unread_data'])) {
+            $res = '<table><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';
+            foreach($input['imap_unread_data'] as $msg) {
+                $clean = array_map(function($v) { return $this->html_safe($v); }, $msg);
+                $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $clean['subject']);
+                $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $clean['from']);
+                $from = str_replace("&quot;", '', $from);
+                $res .= '<tr><td><div class="source">'.$clean['server_name'].'</div></td>'.
+                    '<td><div class="subject">'.$subject.'</div></td>'.
+                    '<td><div class="from">'.$from.'</div></td>'.
+                    '<td><div class="msg_date">'.$clean['date'].'</div></td></tr>';
+            }
+            if (!count($input['imap_unread_data'])) {
+                $res .= '<tr><td colspan="4" class="empty_table">No unread message found in your accounts</td></tr>';
+            }
+            $res .= '</tbody></table>';
+            $input['formatted_unread_data'] = $res;
         }
-        if (!count($input['imap_unread_data'])) {
-            $res .= '<tr><td class="empty_table">No unread message found in your accounts</td></tr>';
+        else {
+            $input['formatted_unread_data'] = '';
         }
-        $res .= '</table>';
-        $input['imap_unread_data'] = $res;
         return $input;
     }
-}}
+}
 ?>

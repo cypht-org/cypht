@@ -13,11 +13,13 @@
 .unseen { color: green; }
 .imap_summary_row td { text-align: left; padding-left: 10px;}
 .unread_messages { display: none; width: 98%; min-height: 200px; overflow: hidden; }
-.unread_messages table td { padding-bottom: 5px; padding-right: 10px; color: #333; }
+.unread_messages table td { padding-top: 5px; padding-right: 10px; color: #333; }
 .subject, .msg_date, .from { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.subject { font-weight: bold; }
+.subject { cursor: pointer; font-weight: bold; }
 .source { font-style: italic; color: #666; font-size: 75%;}
 .msg_date { color: #666; }
 .hl { padding: 5px; color: #666; }
 .dl { color: #888; }
-
+.empty_table img { vertical-align: -2px; }
+.unread_messages table th { cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
+.unread_messages table th:hover { color: #000;

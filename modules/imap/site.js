@@ -61,10 +61,14 @@ var update_summary_display = function(res) {
 };
 
 var update_unread_message_display = function(res) {
+    if (res.imap_unread_unchanged) {
+        console.log("Nothing to update");
+        return;
+    }
     var count = 0;
-    var empty = $('.empty_table', $(res.imap_unread_data));
+    var empty = $('.empty_table', $(res.formatted_unread_data));
     if (empty.length == 0) {
-        count = $('tr', $(res.imap_unread_data)).length;
+        count = $('tr', $(res.formatted_unread_data)).length - 1;
     }
     var title = document.title;
     if (title.search(/\(\d+\)/) != -1) {
@@ -74,15 +78,20 @@ var update_unread_message_display = function(res) {
         title = title + ' ('+count+')';
     }
     document.title = title;
-    $('.unread_messages').html(res.imap_unread_data);
+    $('h1').text('HM3 - '+count);
+    $('.unread_messages').html(res.formatted_unread_data);
+    $('table', $('.unread_messages')).tablesorter();
 };
 
-var imap_unread_update = function() {
+var imap_unread_update = function(loading) {
     var ids = $('#imap_unread_ids').val();
     Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-            {'name': 'imap_unread_ids', 'value': ids}],
-            update_unread_message_display)
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
+        {'name': 'imap_unread_ids', 'value': ids}],
+        update_unread_message_display,
+        [],
+        loading
+    );
 };
 
 var imap_summary_update = function() {
@@ -92,16 +101,17 @@ var imap_summary_update = function() {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_summary'},
         {'name': 'summary_ids', 'value': ids}],
-        update_summary_display);
+        update_summary_display
+    );
 };
 
 if (hm_page_name == 'home') {
     Hm_Timer.add_job(imap_summary_update, 60);
 }
 else if (hm_page_name == 'unread') {
-    Hm_Timer.add_job(imap_unread_update, 60);
+    imap_unread_update(true);
+    Hm_Timer.add_job(imap_unread_update, 60, true);
     $( document ).ready(function() {
-        $( '.unread_messages' ).show(1000);
-    })
+        $('.unread_messages').show(1000);
+    });
 }
-
