@@ -41,14 +41,12 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                         if ($imap->cached_response) {
                             $cached++;
                         }
-                        else {
-                            if ($unseen) {
-                                $msgs = $imap->get_message_list($unseen);
-                                foreach ($msgs as $msg) {
-                                    $msg['server_id'] = $id;
-                                    $msg['server_name'] = $server_details['name'];
-                                    $msg_list[] = $msg;
-                                }
+                        if ($unseen) {
+                            $msgs = $imap->get_message_list($unseen);
+                            foreach ($msgs as $msg) {
+                                $msg['server_id'] = $id;
+                                $msg['server_name'] = $server_details['name'];
+                                $msg_list[] = $msg;
                             }
                         }
                     }
@@ -226,6 +224,155 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
     }
 }
 
+class Hm_Output_imap_setup_display extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if ($format == 'HTML5') {
+            $res = '<div class="configured_servers"><div class="subtitle">Configured IMAP Servers</div>';
+            foreach ($input['imap_servers'] as $index => $vals) {
+
+                if (isset($vals['user'])) {
+                    $disabled = 'disabled="disabled"';
+                    $display = 'none';
+                }
+                else {
+                    $disabled = '';
+                    $display = 'inline';
+                }
+                $res .= '<div class="configured_server">';
+                $res .= sprintf("%s<br />Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
+                    $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
+                $res .= 
+                    ' <form class="imap_connect" method="POST">'.
+                    '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
+                    '<span style="display: '.$display.'"> '.$this->trans('Username').': '.
+                    '<input '.$disabled.' class="credentials" type="text" name="imap_user" value=""></span>'.
+                    '<span style="display: '.$display.'"> '.$this->trans('Password').': '.
+                    '<input '.$disabled.' class="credentials" type="password" name="imap_pass"></span>'.
+                    ' Remember: <input type="checkbox" '. (isset($vals['user']) ? 'checked="checked" ' : '').
+                    ' value="1" name="imap_remember" /><br /><br />'.
+                    ' <input type="submit" value="Test Connection" class="test_connect" />'.
+                    ' <input type="submit" value="Delete" class="imap_delete" />'.
+                    ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />'.
+                    '</form></div>';
+            }
+            $res .= '</div>';
+        }
+        return $res;
+    }
+}
+
+class Hm_Output_imap_setup extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5') {
+            return '<div class="subtitle">Add an IMAP server</div>'.
+                '<form class="add_server" method="POST">'.
+                'Account name: <input type="text" name="new_imap_name" value="" placeholder="My Account" /><br />'.
+                'Server name or address: <input type="text" name="new_imap_server" placeholder="127.0.0.1" value=""/><br />'.
+                'Server port: <input type="text" name="new_imap_port" value="" placeholder="993"><br />'.
+                'Use TLS: <input type="checkbox" name="tls" value="1" checked="checked" /><br />'.
+                '<input type="submit" value="Add" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
+        }
+    }
+}
+
+class Hm_Output_servers_link extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            return '<a class="server_link" href="'.$this->html_safe($input['router_url_path']).'?page=servers">'.$this->trans('Servers').'</a>';
+        }
+    }
+}
+
+class Hm_Output_unread_link extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            return '<a class="unread_link" href="'.$this->html_safe($input['router_url_path']).'?page=unread">'.$this->trans('Unread').'</a>';
+        }
+    }
+}
+
+class Hm_Output_imap_summary extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            $res = '<div class="imap_summary"><div class="subtitle">'.$this->trans('IMAP Summary').'</div>';
+            if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
+                $res .= '<input type="hidden" id="imap_summary_ids" value="'.
+                    $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+                $res .= '<div class="imap_summary_data">';
+                foreach ($input['imap_servers'] as $index => $vals) {
+                    $res .= '<div class="server_label">'.$vals['name'].'</div>'.
+                        '<div class="imap_summary_row imap_summary_'.$index.'">'.
+                        '<table><tr><td>INBOX</td></tr>'.
+                        '<tr><td>Unseen</td><td><span class="unseen">...</span></td></tr>'.
+                        '<tr><td>Total</td><td><span class="total">...</span></td></tr>'.
+                        '</table></div>';
+                }
+                $res .= '</div>';
+            }
+            else {
+                $res .= '<div>'.$this->trans('No IMAP servers found!').' '.
+                    '<a href="'.$this->html_safe($input['router_url_path']).
+                    '?page=servers">'.$this->trans('Add some').'</a></div>';
+            }
+            $res .= '</div>';
+            return $res;
+        }
+    }
+}
+
+class Hm_Output_jquery_table extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5' ) {
+            return '<script type="text/javascript" src="modules/imap/jquery.tablesorter.min.js"></script>';
+        }
+        return '';
+    }
+}
+
+class Hm_Output_unread_message_list extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            $res = '';
+            if (isset($input['imap_servers'])) {
+                $res .= '<input type="hidden" id="imap_unread_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+            }
+            $res .= '<div class="unread_messages">'.
+                '<table><tr><td class="empty_table"><img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...</td></tr></table></div>';
+            return $res;
+        }
+    }
+}
+
+class Hm_Output_filter_unread_data extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        $clean = array();
+        if (isset($input['imap_unread_data'])) {
+            $res = '<table><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';
+            foreach($input['imap_unread_data'] as $msg) {
+                $clean = array_map(function($v) { return $this->html_safe($v); }, $msg);
+                $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $clean['subject']);
+                $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $clean['from']);
+                $from = str_replace("&quot;", '', $from);
+                $date = date('Y-m-d g:i:s', strtotime($clean['date']));
+                $res .= '<tr><td><div class="source">'.$clean['server_name'].'</div></td>'.
+                    '<td><div class="subject">'.$subject.'</div></td>'.
+                    '<td><div class="from">'.$from.'</div></td>'.
+                    '<td><div class="msg_date">'.$date.'</div></td></tr>';
+            }
+            if (!count($input['imap_unread_data'])) {
+                $res .= '<tr><td colspan="4" class="empty_table">No unread message found in your accounts</td></tr>';
+            }
+            $res .= '</tbody></table>';
+            $input['formatted_unread_data'] = $res;
+        }
+        else {
+            $input['formatted_unread_data'] = '';
+        }
+        return $input;
+    }
+}
+
 /* wrapper around multiple imap connections */
 class Hm_IMAP_List {
 
@@ -355,157 +502,4 @@ class Hm_IMAP_List {
     }
 }
 
-class Hm_Output_imap_setup_display extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '';
-        if ($format == 'HTML5') {
-            $res = '<div class="configured_servers"><div class="subtitle">Configured IMAP Servers</div>';
-            foreach ($input['imap_servers'] as $index => $vals) {
-
-                if (isset($vals['user'])) {
-                    $disabled = 'disabled="disabled"';
-                    $display = 'none';
-                }
-                else {
-                    $disabled = '';
-                    $display = 'inline';
-                }
-                $res .= '<div class="configured_server">';
-                $res .= sprintf("%s<br />Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
-                    $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
-                $res .= 
-                    ' <form class="imap_connect" method="POST">'.
-                    '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
-                    '<span style="display: '.$display.'"> '.$this->trans('Username').': '.
-                    '<input '.$disabled.' class="credentials" type="text" name="imap_user" value=""></span>'.
-                    '<span style="display: '.$display.'"> '.$this->trans('Password').': '.
-                    '<input '.$disabled.' class="credentials" type="password" name="imap_pass"></span>'.
-                    ' Remember: <input type="checkbox" '. (isset($vals['user']) ? 'checked="checked" ' : '').
-                    ' value="1" name="imap_remember" /><br /><br />'.
-                    ' <input type="submit" value="Test Connection" class="test_connect" />'.
-                    ' <input type="submit" value="Delete" class="imap_delete" />'.
-                    ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />'.
-                    '</form></div>';
-            }
-            $res .= '</div>';
-        }
-        return $res;
-    }
-}
-
-class Hm_Output_imap_setup extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<div class="subtitle">Add an IMAP server</div>'.
-                '<form class="add_server" method="POST">'.
-                'Account name: <input type="text" name="new_imap_name" value="" placeholder="My Account" /><br />'.
-                'Server name or address: <input type="text" name="new_imap_server" placeholder="127.0.0.1" value=""/><br />'.
-                'Server port: <input type="text" name="new_imap_port" value="" placeholder="993"><br />'.
-                'Use TLS: <input type="checkbox" name="tls" value="1" checked="checked" /><br />'.
-                '<input type="submit" value="Add" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
-        }
-    }
-}
-
-class Hm_Output_servers_link extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
-        if ($format == 'HTML5') {
-            return '<a class="server_link" href="'.$this->html_safe($input['router_url_path']).'?page=servers">Servers</a>';
-        }
-    }
-}
-
-class Hm_Output_unread_link extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
-        if ($format == 'HTML5') {
-            return '<a class="unread_link" href="'.$this->html_safe($input['router_url_path']).'?page=unread">Unread</a>';
-        }
-    }
-}
-
-class Hm_Output_homepage_link extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
-        if ($format == 'HTML5') {
-            return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'">Home</a>';
-        }
-    }
-}
-
-class Hm_Output_imap_summary extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
-        if ($format == 'HTML5') {
-            $res = '<div class="imap_summary"><div class="subtitle">IMAP Summary</div>';
-            if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
-                $res .= '<input type="hidden" id="imap_summary_ids" value="'.
-                    $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
-                $res .= '<div class="imap_summary_data">';
-                foreach ($input['imap_servers'] as $index => $vals) {
-                    $res .= '<div class="server_label">'.$vals['name'].'</div>'.
-                        '<div class="imap_summary_row imap_summary_'.$index.'">'.
-                        '<table><tr><td>INBOX</td></tr>'.
-                        '<tr><td>Unseen</td><td><span class="unseen">...</span></td></tr>'.
-                        '<tr><td>Total</td><td><span class="total">...</span></td></tr>'.
-                        '</table></div>';
-                }
-                $res .= '</div>';
-            }
-            else {
-                $res .= '<div>'.$this->trans('No IMAP servers found!').' '.
-                    '<a href="'.$this->html_safe($input['router_url_path']).
-                    '?page=servers">'.$this->trans('Add some').'</a></div>';
-            }
-            $res .= '</div>';
-            return $res;
-        }
-    }
-}
-class Hm_Output_jquery_table extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
-        if ($format == 'HTML5' ) {
-            return '<script type="text/javascript" src="modules/imap/jquery.tablesorter.min.js"></script>';
-        }
-        return '';
-    }
-}
-class Hm_Output_unread_message_list extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
-        if ($format == 'HTML5') {
-            $res = '';
-            if (isset($input['imap_servers'])) {
-                $res .= '<input type="hidden" id="imap_unread_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
-            }
-            $res .= '<div class="unread_messages">'.
-                '<table><tr><td class="empty_table"><img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...</td></tr></table></div>';
-            return $res;
-        }
-    }
-}
-
-class Hm_Output_filter_unread_data extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
-        $clean = array();
-        if (isset($input['imap_unread_data'])) {
-            $res = '<table><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';
-            foreach($input['imap_unread_data'] as $msg) {
-                $clean = array_map(function($v) { return $this->html_safe($v); }, $msg);
-                $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $clean['subject']);
-                $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $clean['from']);
-                $from = str_replace("&quot;", '', $from);
-                $res .= '<tr><td><div class="source">'.$clean['server_name'].'</div></td>'.
-                    '<td><div class="subject">'.$subject.'</div></td>'.
-                    '<td><div class="from">'.$from.'</div></td>'.
-                    '<td><div class="msg_date">'.$clean['date'].'</div></td></tr>';
-            }
-            if (!count($input['imap_unread_data'])) {
-                $res .= '<tr><td colspan="4" class="empty_table">No unread message found in your accounts</td></tr>';
-            }
-            $res .= '</tbody></table>';
-            $input['formatted_unread_data'] = $res;
-        }
-        else {
-            $input['formatted_unread_data'] = '';
-        }
-        return $input;
-    }
-}
 ?>

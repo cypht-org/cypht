@@ -3,9 +3,6 @@
 /* add stuff to the home page */
 Hm_Handler_Modules::add('home', 'load_imap_servers',  true, 'load_user_data', 'after');
 Hm_Handler_Modules::add('home', 'imap_setup_display',  true, 'load_imap_servers', 'after');
-Hm_Output_Modules::add('home', 'unread_link', true, 'logout', 'after');
-Hm_Output_Modules::add('home', 'servers_link', true, 'unread_link', 'after');
-Hm_Output_Modules::add('home', 'homepage_link', true, 'servers_link', 'after');
 Hm_Output_Modules::add('home', 'imap_summary', true, 'title', 'after');
 
 /* servers page data */
@@ -30,8 +27,9 @@ Hm_Output_Modules::add('servers', 'jquery', false);
 Hm_Output_Modules::add('servers', 'header_content', false);
 Hm_Output_Modules::add('servers', 'header_end', false);
 Hm_Output_Modules::add('servers', 'logout', true);
-Hm_Output_Modules::add('servers', 'unread_link', true);
+Hm_Output_Modules::add('servers', 'settings_link', true);
 Hm_Output_Modules::add('servers', 'servers_link', true);
+Hm_Output_Modules::add('servers', 'unread_link', true);
 Hm_Output_Modules::add('servers', 'homepage_link', true);
 Hm_Output_Modules::add('servers', 'date', true);
 Hm_Output_Modules::add('servers', 'login', false);
@@ -65,8 +63,9 @@ Hm_Output_Modules::add('unread', 'jquery_table', false);
 Hm_Output_Modules::add('unread', 'header_content', false);
 Hm_Output_Modules::add('unread', 'header_end', false);
 Hm_Output_Modules::add('unread', 'logout', true);
-Hm_Output_Modules::add('unread', 'unread_link', true);
+Hm_Output_Modules::add('unread', 'settings_link', true);
 Hm_Output_Modules::add('unread', 'servers_link', true);
+Hm_Output_Modules::add('unread', 'unread_link', true);
 Hm_Output_Modules::add('unread', 'homepage_link', true);
 Hm_Output_Modules::add('unread', 'login', false);
 Hm_Output_Modules::add('unread', 'date', true);

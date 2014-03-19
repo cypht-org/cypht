@@ -1,12 +1,11 @@
 .configured_servers { float: left; clear: left; margin-bottom: 10px; width: 98%; }
 .configured_server { float: left; margin: 10px; width: 250px; }
 .unread_messages, .configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
-.imap_folders { border: solid 1px #ccc; padding: 10px; clear: left; float: left; margin-bottom: 10px; height: 300px; width: 300px; overflow: scroll; margin-top: 50px;}
-.imap_folders div, .imap_debug_data { margin-left: 10px; }
+.imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #ccc; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
 .add_server { float: left; clear: left; margin-bottom: 10px; margin-left: 10px; }
-.unread_link, .logout, .home_link, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; display: block; padding: 3px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #000; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.save_settings, .unread_link, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; display: block; padding: 3px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #000; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .imap_summary_data { width: 300px; padding: 10px; border: solid 1px #ccc; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .imap_summary_row { padding: 10px; padding-top: 0px; }
 .total { color: green; }
@@ -18,7 +17,7 @@
 .subject { cursor: pointer; font-weight: bold; }
 .source { font-style: italic; color: #666; font-size: 75%;}
 .msg_date { color: #666; }
-.hl { padding: 5px; color: #666; }
+.hl { padding-right: 5px; color: #666; }
 .dl { color: #888; }
 .empty_table img { vertical-align: -2px; }
 .unread_messages table th { cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
