@@ -2,10 +2,14 @@ body { font-family: Arial; padding-left: 20px; padding-top: 10px; }
 table { width: 100%; }
 .subtitle { color: #444; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 110%;  margin-left: 0px !important; }
 .date { float: right; clear: none; color: #444; padding-right: 30px; padding-top: 4px;}
-.sys_messages { color: blue; position: absolute; left: 300px; top: 20px; }
+.sys_messages { color: green; position: absolute; left: 270px; top: 20px; }
 .logout_form { float: right; clear: none; padding-right: 30px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .title { font-weight: normal; padding: 0px; font-size: 135%; color: #888; margin: 0px; padding-bottom: 20px; letter-spacing: -2px; }
 .loading_icon { position: absolute; top: 22px; left: 8px; visibility: hidden; width: 16px; height: 16px; }
 .loading_icon img { visibility: inherit; }
 .empty_table { text-align: center; color: #666 !important; padding-top: 75px !important; }
+.settings_link, .logout, .home_link { line-height: 10pt; font-size: 10pt; margin: 2px; display: block; padding: 3px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #000; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.user_settings { width: 98%; padding: 10px; padding-bottom: 40px; border: solid 1px #ccc; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.user_settings table { width: 50%; white-space: nowrap; }
+.save_settings { float: none !important; }

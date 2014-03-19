@@ -12,6 +12,53 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
     }
 }}
 
+if (!class_exists('Hm_Handler_process_language_setting')) {
+class Hm_Handler_process_language_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
+        if ($success) {
+            $data['new_user_settings']['language_setting'] = $form['language_setting'];
+        }
+        else {
+            $data['user_settings']['language'] = $this->user_config->get('language_setting', false);
+        }
+        return $data;
+    }
+}}
+
+if (!class_exists('Hm_Handler_process_timezone_setting')) {
+class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'timezone_setting'));
+        if ($success) {
+            $data['new_user_settings']['timezone_setting'] = $form['timezone_setting'];
+        }
+        else {
+            $data['user_settings']['timezone'] = $this->user_config->get('timezone_setting', false);
+        }
+        return $data;
+    }
+}}
+
+if (!class_exists('Hm_Handler_save_user_settings')) {
+class Hm_Handler_save_user_settings extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings'));
+        if ($success && isset($data['new_user_settings'])) {
+            foreach ($data['new_user_settings'] as $name => $value) {
+                $this->user_config->set($name, $value);
+            }
+            $user = $this->session->get('username', false);
+            $path = $this->config->get('user_settings_dir', false);
+            if ($user && $path) {
+                $this->user_config->save($user);
+                Hm_Msgs::add('Settings saved');
+            }
+        }
+        return $data;
+    }
+}}
+
 if (!class_exists('Hm_Handler_title')) {
 class Hm_Handler_title extends Hm_Handler_Module {
     public function process($data) {
@@ -23,7 +70,8 @@ class Hm_Handler_title extends Hm_Handler_Module {
 if (!class_exists('Hm_Handler_language')) {
 class Hm_Handler_language extends Hm_Handler_Module {
     public function process($data) {
-        $data['language'] = $this->session->get('language', 'en_US');
+        $data['language'] = $this->user_config->get('language_setting', 'en_US');
+        //$data['language'] = $this->session->get('language', 'en_US');
         return $data;
     }
 }}
@@ -206,6 +254,24 @@ class Hm_Output_header_content extends Hm_Output_Module {
     }
 }}
 
+if (!class_exists('Hm_Output_settings_link')) {
+class Hm_Output_settings_link extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            return '<a class="settings_link" href="'.$this->html_safe($input['router_url_path']).'?page=settings">'.$this->trans('Settings').'</a>';
+        }
+    }
+}}
+
+if (!class_exists('Hm_Output_homepage_link')) {
+class Hm_Output_homepage_link extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'">'.$this->trans('Home').'</a>';
+        }
+    }
+}}
+
 if (!class_exists('Hm_Output_header_css')) {
 class Hm_Output_header_css extends Hm_Output_Module {
     protected function output($input, $format) {
@@ -282,6 +348,79 @@ class Hm_Output_loading_icon extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<div class="loading_icon"><img alt="Loading..." src="images/ajax-loader.gif" width="16" height="16" /></div>';
+        }
+    }
+}}
+
+if (!class_exists('Hm_Output_start_settings_form')) {
+class Hm_Output_start_settings_form extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<div class="user_settings"><div class="subtitle">Settings</div><form method="POST" action=""><table>';
+        }
+    }
+}}
+
+if (!class_exists('Hm_Output_language_setting')) {
+class Hm_Output_language_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            $langs = array(
+                'en_US' => 'English',
+                'es_ES' => 'Spanish'
+            );
+            if (isset($input['user_settings']['language'])) {
+                $mylang = $input['user_settings']['language'];
+            }
+            else {
+                $mylang = false;
+            }
+            $res = '<tr><td>Interface Language</td><td><select name="language_setting">';
+            foreach ($langs as $id => $lang) {
+                $res .= '<option ';
+                if ($id == $mylang) {
+                    $res .= 'selected="selected" ';
+                }
+                $res .= 'value="'.$id.'">'.$lang.'</option>';
+            }
+            $res .= '</select></td></tr>';
+            return $res;
+        }
+    }
+}}
+
+if (!class_exists('Hm_Output_timezone_setting')) {
+class Hm_Output_timezone_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            $zones = timezone_identifiers_list();
+            if (isset($input['user_settings']['timezone'])) {
+                $myzone = $input['user_settings']['timezone'];
+            }
+            else {
+                $myzone = false;
+            }
+            $res = '<tr><td>Timezone</td><td><select name="timezone_setting">';
+            foreach ($zones as $zone) {
+                $res .= '<option ';
+                if ($zone == $myzone) {
+                    $res .= 'selected="selected" ';
+                }
+                $res .= 'value="'.$zone.'">'.$zone.'</option>';
+            }
+            $res .= '</select></td></tr>';
+            return $res;
+        }
+    }
+}}
+
+if (!class_exists('Hm_Output_end_settings_form')) {
+class Hm_Output_end_settings_form extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<tr><td colspan="2" class="submit_cell">'.
+                '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
+                '</tr></table></form></div>';
         }
     }
 }}
