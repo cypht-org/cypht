@@ -19,6 +19,10 @@ abstract class Hm_Config {
     public function get($name, $default=false) {
         return isset($this->config[$name]) ? $this->config[$name] : $default;
     }
+    protected function set_tz() {
+        date_default_timezone_set($this->get('timezone_setting', 'UTC'));
+    }
+
 }
 
 /* file based user configuration */
@@ -52,10 +56,6 @@ class Hm_User_Config_File extends Hm_Config {
     public function reload($data) {
         $this->config = $data;
         $this->set_tz();
-    }
-
-    private function set_tz() {
-        date_default_timezone_set($this->get('timezone_setting', 'UTC'));
     }
 
     public function save($username) {
@@ -94,6 +94,7 @@ class Hm_User_Config_DB extends Hm_Config {
                     $data = @unserialize(Hm_Crypt::plaintext($data['settings'], $enc_key));
                     if (is_array($data)) {
                         $this->config = array_merge($this->config, $data);
+                        $this->set_tz();
                     }
                 }
             }
@@ -102,6 +103,7 @@ class Hm_User_Config_DB extends Hm_Config {
 
     public function reload($data) {
         $this->config = $data;
+        $this->set_tz();
     }
 
     protected function connect() {
