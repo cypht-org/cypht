@@ -80,7 +80,9 @@ var update_unread_message_display = function(res) {
     document.title = title;
     $('h1').text('HM3 - '+count);
     $('.unread_messages').html(res.formatted_unread_data);
-    $('table', $('.unread_messages')).tablesorter();
+    if (count > 1) {
+        $('table', $('.unread_messages')).tablesorter();
+    }
 };
 
 var imap_unread_update = function(loading) {

@@ -361,7 +361,7 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
                     '<td><div class="msg_date">'.$date.'</div></td></tr>';
             }
             if (!count($input['imap_unread_data'])) {
-                $res .= '<tr><td colspan="4" class="empty_table">No unread message found in your accounts</td></tr>';
+                $res .= '<tr><td colspan="4" class="empty_table">No unread message found</td></tr>';
             }
             $res .= '</tbody></table>';
             $input['formatted_unread_data'] = $res;
