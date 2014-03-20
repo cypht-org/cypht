@@ -24,6 +24,10 @@ $('.save_connection').on('click', function() {
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
+            if (res.just_saved_credentials) {
+                form.find('.credentials').attr('disabled', true);
+                form.find('span').hide();
+            }
         },
         {'imap_save': 1}
     );
@@ -38,6 +42,9 @@ $('.forget_connection').on('click', function() {
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
+            if (res.deleted_server_id > -1 ) {
+                form.parent().remove();
+            }
         },
         {'imap_forget': 1}
     );
@@ -54,16 +61,7 @@ $('.test_connect').on('click', function() {
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
-            if (res.just_saved_credentials) {
-                form.find('.credentials').attr('disabled', true);
-                form.find('span').hide();
-            }
-            if (res.just_forgot_credentials) {
-                form.find('.credentials').attr('disabled', false);
-                form.find('span').show();
-            }
             $('.test_connect').attr('disabled', false);
-            $('.imap_debug_data').html(res.imap_debug);
         },
         {'imap_connect': 1}
     );

@@ -161,35 +161,19 @@ class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
 
 class Hm_Handler_imap_connect extends Hm_Handler_Module {
     public function process($data) {
-        $data['just_saved_credentials'] = false;
-        $data['just_forgot_credentials'] = false;
-        $remember = false;
-        $remembered = false;
-        if (isset($this->request->post['imap_remember'])) {
-            $remember = true;
-        }
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
             $imap = false;
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             if ($success) {
-                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], $remember);
+                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass']);
             }
             elseif (isset($form['imap_server_id'])) {
                 $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-                $remembered = true;
             }
             if ($imap) {
-                if ($remember) {
-                    $data['just_saved_credentials'] = true;
-                }
-                if (!$remember && $remembered) {
-                    Hm_IMAP_List::forget_credentials($form['imap_server_id']);
-                    $data['just_forgot_credentials'] = true;
-                }
                 if ($imap->get_state() == 'authenticated') {
                     Hm_Msgs::add("Successfully authenticated to the IMAP server");
-                    $data['imap_folders'] = $imap->get_folder_list_by_level();
                 }
                 else {
                     Hm_Msgs::add("Failed to authenticate to the IMAP server");
@@ -207,12 +191,43 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
 
 class Hm_Handler_imap_forget extends Hm_Handler_Module {
     public function process($data) {
+        if (isset($this->request->post['imap_forget'])) {
+            list($success, $form) = $this->process_form(array('imap_server_id'));
+            if ($success) {
+                $res = Hm_IMAP_List::del($form['imap_server_id']);
+                if ($res) {
+                    $data['deleted_server_id'] = $form['imap_server_id'];
+                    Hm_Msgs::add('Server forgotten');
+                }
+            }
+            else {
+                $data['old_form'] = $form;
+            }
+        }
         return $data;
     }
 }
 
 class Hm_Handler_imap_save extends Hm_Handler_Module {
     public function process($data) {
+        $data['just_saved_credentials'] = false;
+        if (isset($this->request->post['imap_save'])) {
+            list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
+            if (!$success) {
+                Hm_Msgs::add('Username and Password are required to save a connection');
+            }
+            else {
+                $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], true);
+                if ($imap->get_state() == 'authenticated') {
+                    $data['just_saved_credentials'] = true;
+                    Hm_Msgs::add("Server saved");
+                }
+                else {
+                    Hm_Msgs::add("Unable to save this server, are the username and password correct?");
+                }
+            }
+        }
         return $data;
     }
 }
