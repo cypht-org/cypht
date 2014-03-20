@@ -250,7 +250,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     '<span style="display: '.$display.'"> '.
                     '<input '.$disabled.' class="credentials" placeholder="Password" type="password" name="imap_pass"></span>'.
                     '<input type="submit" value="Test Connection" class="test_connect" />';
-                if (!$vals['user']) {
+                if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="Save" class="save_connection" />';
                     $res .= '<input type="submit" value="Forget" class="forget_connection" />';
                 }
