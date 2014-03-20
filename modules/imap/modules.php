@@ -252,7 +252,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     $display = 'inline';
                 }
                 $res .= '<div class="configured_server">';
-                $res .= sprintf("Name: %s<br />Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
+                $res .= sprintf("<div>Name: %s</div><div>Server: %s</div><div>Port: %d</div><div>TLS: %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
                 $res .= 
                     ' <form class="imap_connect" method="POST">'.
