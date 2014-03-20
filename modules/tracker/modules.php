@@ -54,7 +54,7 @@ class Hm_Output_show_debug extends Hm_Output_Module {
                 $imap_debug = array();
             }
             if ($format == 'HTML5') {
-                return '<div class="tracker_debug"><div class="subtitle">HM3 Debug</div><pre class="hm3_debug">'.Hm_Debug::show('return').'</pre></div>'.
+                return '<div style="width: 100%; clear: both; "></div><div class="tracker_debug"><div class="subtitle">HM3 Debug</div><pre class="hm3_debug">'.Hm_Debug::show('return').'</pre></div>'.
                     '<div class="imap_summary_debug"><div class="subtitle">IMAP Debug</div><pre class="hm3_imap_debug">'.print_r($imap_debug, true).'</pre></div>';
             }
             elseif ($format == 'JSON') {
