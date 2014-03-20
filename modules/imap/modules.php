@@ -240,21 +240,24 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     $display = 'inline';
                 }
                 $res .= '<div class="configured_server">';
-                $res .= sprintf("%s<br />Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
+                $res .= sprintf("Name: %s<br />Server: %s<br />Port: %d<br />TLS: %s<br /><br />", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
                 $res .= 
                     ' <form class="imap_connect" method="POST">'.
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
-                    '<span style="display: '.$display.'"> '.$this->trans('Username').': '.
-                    '<input '.$disabled.' class="credentials" type="text" name="imap_user" value=""></span>'.
-                    '<span style="display: '.$display.'"> '.$this->trans('Password').': '.
-                    '<input '.$disabled.' class="credentials" type="password" name="imap_pass"></span>'.
-                    ' Remember: <input type="checkbox" '. (isset($vals['user']) ? 'checked="checked" ' : '').
-                    ' value="1" name="imap_remember" /><br /><br />'.
-                    ' <input type="submit" value="Test Connection" class="test_connect" />'.
-                    ' <input type="submit" value="Delete" class="imap_delete" />'.
-                    ' <input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />'.
-                    '</form></div>';
+                    '<span style="display: '.$display.'"> '.
+                    '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value=""></span>'.
+                    '<span style="display: '.$display.'"> '.
+                    '<input '.$disabled.' class="credentials" placeholder="Password" type="password" name="imap_pass"></span>'.
+                    '<input type="submit" value="Test Connection" class="test_connect" />';
+                if (!$vals['user']) {
+                    $res .= '<input type="submit" value="Save" class="save_connection" />';
+                    $res .= '<input type="submit" value="Forget" class="forget_connection" />';
+                }
+                else {
+                    $res .= '<input type="submit" value="Delete" class="imap_delete" />';
+                }
+                $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form></div>';
             }
             $res .= '</div>';
         }
@@ -267,9 +270,9 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return '<div class="subtitle">Add an IMAP server</div>'.
                 '<form class="add_server" method="POST">'.
-                'Account name: <input type="text" name="new_imap_name" value="" placeholder="My Account" /><br />'.
-                'Server name or address: <input type="text" name="new_imap_server" placeholder="127.0.0.1" value=""/><br />'.
-                'Server port: <input type="text" name="new_imap_port" value="" placeholder="993"><br />'.
+                '<input type="text" name="new_imap_name" value="" placeholder="Account name" /><br />'.
+                '<input type="text" name="new_imap_server" placeholder="Server name or address" value=""/><br />'.
+                '<input type="text" name="new_imap_port" value="" placeholder="Port"><br />'.
                 'Use TLS: <input type="checkbox" name="tls" value="1" checked="checked" /><br />'.
                 '<input type="submit" value="Add" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
         }

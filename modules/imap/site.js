@@ -15,6 +15,34 @@ $('.imap_delete').on('click', function() {
     );
 });
 
+$('.save_connection').on('click', function() {
+    $('.imap_debug_data').empty();
+    event.preventDefault();
+    var form = $(this).parent();
+    var id = form.find('#imap_server_id');
+    Hm_Ajax.request(
+        form.serializeArray(),
+        function(res) {
+            Hm_Notices.show(res.router_user_msgs);
+        },
+        {'imap_save': 1}
+    );
+});
+
+$('.forget_connection').on('click', function() {
+    $('.imap_debug_data').empty();
+    event.preventDefault();
+    var form = $(this).parent();
+    var id = form.find('#imap_server_id');
+    Hm_Ajax.request(
+        form.serializeArray(),
+        function(res) {
+            Hm_Notices.show(res.router_user_msgs);
+        },
+        {'imap_forget': 1}
+    );
+});
+
 $('.test_connect').on('click', function() {
     $(this).attr('disabled', true);
     $('.imap_debug_data').empty();
