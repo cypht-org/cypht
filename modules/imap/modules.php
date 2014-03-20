@@ -191,14 +191,14 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
 
 class Hm_Handler_imap_forget extends Hm_Handler_Module {
     public function process($data) {
+        $data['just_forgot_credentials'] = false;
+        error_log(print_r($this->request->post, true));
         if (isset($this->request->post['imap_forget'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             if ($success) {
-                $res = Hm_IMAP_List::del($form['imap_server_id']);
-                if ($res) {
-                    $data['deleted_server_id'] = $form['imap_server_id'];
-                    Hm_Msgs::add('Server forgotten');
-                }
+                Hm_IMAP_List::forget_credentials($form['imap_server_id']);
+                $data['just_forgot_credentials'] = true;
+                Hm_Msgs::add('Server credentials forgotten');
             }
             else {
                 $data['old_form'] = $form;
@@ -278,11 +278,12 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     '<input '.$disabled.' class="credentials" placeholder="Password" type="password" name="imap_pass"></span>'.
                     '<input type="submit" value="Test Connection" class="test_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
+                    $res .= '<input type="submit" value="Delete" class="imap_delete" />';
                     $res .= '<input type="submit" value="Save" class="save_connection" />';
                 }
                 else {
-                    //$res .= '<input type="submit" value="Forget" class="forget_connection" />';
                     $res .= '<input type="submit" value="Delete" class="imap_delete" />';
+                    $res .= '<input type="submit" value="Forget" class="forget_connection" />';
                 }
                 $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form></div>';
             }

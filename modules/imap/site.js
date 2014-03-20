@@ -14,9 +14,8 @@ var imap_delete_action = function() {
         {'imap_delete': 1}
     );
 };
-$('.imap_delete').on('click', imap_delete_action);
 
-$('.save_connection').on('click', function() {
+var imap_save_action = function() {
     $('.imap_debug_data').empty();
     event.preventDefault();
     var form = $(this).parent();
@@ -29,15 +28,15 @@ $('.save_connection').on('click', function() {
                 form.find('.credentials').attr('disabled', true);
                 form.find('.save_connection').hide();
                 form.find('span').hide();
-                form.append('<input type="submit" value="Delete" class="imap_delete" />');
-                $('.imap_delete').on('click', imap_delete_action);
+                form.append('<input type="submit" value="Forget" class="forget_connection" />');
+                $('.forget_connection').on('click', imap_forget_action);
             }
         },
         {'imap_save': 1}
     );
-});
+};
 
-$('.forget_connection').on('click', function() {
+var imap_forget_action = function() {
     $('.imap_debug_data').empty();
     event.preventDefault();
     var form = $(this).parent();
@@ -46,15 +45,19 @@ $('.forget_connection').on('click', function() {
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
-            if (res.deleted_server_id > -1 ) {
-                form.parent().remove();
+            if (res.just_forgot_credentials) {
+                form.find('.credentials').attr('disabled', false);
+                form.find('span').show();
+                form.append('<input type="submit" value="Save" class="save_connection" />');
+                $('.save_connection').on('click', imap_save_action);
+                $('.forget_connection', form).remove();
             }
         },
         {'imap_forget': 1}
     );
-});
+};
 
-$('.test_connect').on('click', function() {
+var imap_test_action = function() {
     $(this).attr('disabled', true);
     $('.imap_debug_data').empty();
     $('.imap_folder_data').empty();
@@ -66,10 +69,11 @@ $('.test_connect').on('click', function() {
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
             $('.test_connect').attr('disabled', false);
+            /* TODO: add "forget" button */
         },
         {'imap_connect': 1}
     );
-});
+};
 
 var update_summary_display = function(res) {
     var context;
@@ -139,6 +143,12 @@ var imap_summary_update = function() {
 
 if (hm_page_name == 'home') {
     Hm_Timer.add_job(imap_summary_update, 60);
+}
+else if (hm_page_name == 'servers') {
+    $('.imap_delete').on('click', imap_delete_action);
+    $('.save_connection').on('click', imap_save_action);
+    $('.forget_connection').on('click', imap_forget_action);
+    $('.test_connect').on('click', imap_test_action);
 }
 else if (hm_page_name == 'unread') {
     imap_unread_update(true);
