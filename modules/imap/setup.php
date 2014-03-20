@@ -82,6 +82,8 @@ Hm_Handler_Modules::add('ajax_imap_debug', 'load_user_data',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'load_imap_servers',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_connect', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_delete', true);
+Hm_Handler_Modules::add('ajax_imap_debug', 'imap_forget', true);
+Hm_Handler_Modules::add('ajax_imap_debug', 'imap_save', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'save_imap_cache',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'save_imap_servers',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'save_user_data',  true);

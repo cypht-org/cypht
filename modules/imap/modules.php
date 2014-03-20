@@ -205,6 +205,18 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_imap_forget extends Hm_Handler_Module {
+    public function process($data) {
+        return $data;
+    }
+}
+
+class Hm_Handler_imap_save extends Hm_Handler_Module {
+    public function process($data) {
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['imap_delete'])) {
