@@ -255,7 +255,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
-            $res = '<div class="configured_servers"><div class="subtitle">Configured IMAP Servers</div>';
+            $res = '';
             foreach ($input['imap_servers'] as $index => $vals) {
 
                 if (isset($vals['user'])) {
@@ -279,14 +279,13 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     '<input type="submit" value="Test Connection" class="test_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="Save" class="save_connection" />';
-                    $res .= '<input type="submit" value="Forget" class="forget_connection" />';
                 }
                 else {
+                    //$res .= '<input type="submit" value="Forget" class="forget_connection" />';
                     $res .= '<input type="submit" value="Delete" class="imap_delete" />';
                 }
                 $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form></div>';
             }
-            $res .= '</div>';
         }
         return $res;
     }
@@ -295,13 +294,12 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
 class Hm_Output_imap_setup extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<div class="subtitle">Add an IMAP server</div>'.
-                '<form class="add_server" method="POST">'.
+            return '<form class="add_server" method="POST">'.
                 '<input type="text" name="new_imap_name" value="" placeholder="Account name" /><br />'.
                 '<input type="text" name="new_imap_server" placeholder="Server name or address" value=""/><br />'.
                 '<input type="text" name="new_imap_port" value="" placeholder="Port"><br />'.
                 'Use TLS: <input type="checkbox" name="tls" value="1" checked="checked" /><br />'.
-                '<input type="submit" value="Add" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
+                '<input type="submit" value="Add IMAP Server" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
         }
     }
 }

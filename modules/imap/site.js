@@ -1,4 +1,4 @@
-$('.imap_delete').on('click', function() {
+var imap_delete_action = function() {
     $('.imap_debug_data').empty();
     event.preventDefault();
     var form = $(this).parent();
@@ -13,7 +13,8 @@ $('.imap_delete').on('click', function() {
         },
         {'imap_delete': 1}
     );
-});
+};
+$('.imap_delete').on('click', imap_delete_action);
 
 $('.save_connection').on('click', function() {
     $('.imap_debug_data').empty();
@@ -26,7 +27,10 @@ $('.save_connection').on('click', function() {
             Hm_Notices.show(res.router_user_msgs);
             if (res.just_saved_credentials) {
                 form.find('.credentials').attr('disabled', true);
+                form.find('.save_connection').hide();
                 form.find('span').hide();
+                form.append('<input type="submit" value="Delete" class="imap_delete" />');
+                $('.imap_delete').on('click', imap_delete_action);
             }
         },
         {'imap_save': 1}
