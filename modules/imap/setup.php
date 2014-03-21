@@ -123,25 +123,26 @@ return array(
     ),
 
     'allowed_post' => array(
-        'tls' => FILTER_VALIDATE_BOOLEAN,
         'server_port' => FILTER_VALIDATE_INT,
         'server' => FILTER_SANITIZE_STRING,
         'username' => FILTER_SANITIZE_STRING,
         'password' => FILTER_SANITIZE_STRING,
-        'new_imap_server' => FILTER_SANITIZE_STRING,
-        'new_imap_port' => FILTER_VALIDATE_INT,
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_user' => FILTER_SANITIZE_STRING,
         'imap_pass' => FILTER_SANITIZE_STRING,
         'imap_delete' => FILTER_SANITIZE_STRING,
-        'submit_server' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
         'imap_remember' => FILTER_VALIDATE_INT,
         'summary_ids' => FILTER_SANITIZE_STRING,
         'imap_unread_ids' => FILTER_SANITIZE_STRING,
-        'new_imap_name' => FILTER_SANITIZE_STRING,
         'imap_forget' => FILTER_SANITIZE_STRING,
-        'imap_save' => FILTER_SANITIZE_STRING
+        'imap_save' => FILTER_SANITIZE_STRING,
+        'submit_server' => FILTER_SANITIZE_STRING,
+        'new_server_address' => FILTER_SANITIZE_STRING,
+        'new_server_port' => FILTER_VALIDATE_INT,
+        'new_server_name' => FILTER_SANITIZE_STRING,
+        'new_server_type' => FILTER_SANITIZE_STRING,
+        'tls' => FILTER_VALIDATE_BOOLEAN,
     )
 );
 

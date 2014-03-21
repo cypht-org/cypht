@@ -70,7 +70,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
 class Hm_Handler_imap_setup extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_server'])) {
-            list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_server', 'new_imap_port'));
+            list($success, $form) = $this->process_form(array('new_server_name', 'new_server_address', 'new_server_port'));
             if (!$success) {
                 $data['old_form'] = $form;
                 Hm_Msgs::add('You must supply a name, a server and a port');
@@ -80,11 +80,11 @@ class Hm_Handler_imap_setup extends Hm_Handler_Module {
                 if (isset($this->request->post['tls'])) {
                     $tls = true;
                 }
-                if ($con = fsockopen($form['new_imap_server'], $form['new_imap_port'], $errno, $errstr, 2)) {
+                if ($con = fsockopen($form['new_server_address'], $form['new_server_port'], $errno, $errstr, 2)) {
                     Hm_IMAP_List::add( array(
-                        'name' => $form['new_imap_name'],
-                        'server' => $form['new_imap_server'],
-                        'port' => $form['new_imap_port'],
+                        'name' => $form['new_server_name'],
+                        'server' => $form['new_server_address'],
+                        'port' => $form['new_server_port'],
                         'tls' => $tls));
                     Hm_Msgs::add('Added server!');
                 }
@@ -267,7 +267,8 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
                     $display = 'inline';
                 }
                 $res .= '<div class="configured_server">';
-                $res .= sprintf("<div>Name: %s</div><div>Server: %s</div><div>Port: %d</div><div>TLS: %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
+                $res .= sprintf("<div>Type: IMAP</div><div>Name: %s</div><div>Server: %s</div>".
+                    "<div>Port: %d</div><div>TLS: %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
                     $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
                 $res .= 
                     ' <form class="imap_connect" method="POST">'.
@@ -296,11 +297,16 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<form class="add_server" method="POST">'.
-                '<input type="text" name="new_imap_name" value="" placeholder="Account name" /><br />'.
-                '<input type="text" name="new_imap_server" placeholder="Server name or address" value=""/><br />'.
-                '<input type="text" name="new_imap_port" value="" placeholder="Port"><br />'.
-                'Use TLS: <input type="checkbox" name="tls" value="1" checked="checked" /><br />'.
-                '<input type="submit" value="Add IMAP Server" name="submit_server" /></form>';
+                '<table><tr><td colspan="2"><select name="new_server_type">'.
+                '<option value="imap">IMAP</option>'.
+                '<option value="pop3" disabled="disabled">POP3</option>'.
+                '<option value="smtp" disabled="disabled">SMTP</option></select></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_server_name" value="" placeholder="Account name" /></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_server_address" placeholder="Server name or address" value=""/></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_server_port" value="" placeholder="Port"></td></tr>'.
+                '<tr><td>Use TLS</td><td><input type="checkbox" name="tls" value="1" checked="checked" /></td></tr>'.
+                '<tr><td colspan="2"><input type="submit" value="Add Server" name="submit_server" /></td></tr>'.
+                '</table></form>';
         }
     }
 }
