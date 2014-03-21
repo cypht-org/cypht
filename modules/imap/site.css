@@ -21,7 +21,7 @@
 
 .empty_table img { vertical-align: -2px; }
 .imap_summary_data table td { padding: 5px; }
-.imap_summary_data { width: 58%; padding: 10px; border: solid 1px #ccc; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.imap_summary_data { width: 98%; padding: 10px; border: solid 1px #ccc; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .imap_summary_row { padding: 10px; padding-top: 0px; }
 .imap_summary_row td { text-align: left; padding-left: 10px;}
 .total { color: green; }
