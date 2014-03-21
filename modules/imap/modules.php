@@ -341,24 +341,15 @@ class Hm_Output_imap_summary extends Hm_Output_Module {
                     '<th>TLS</th><th>Folders</th><th>INBOX count</th><th>INBOX unread</th></tr></thead><tbody>';
                 foreach ($input['imap_servers'] as $index => $vals) {
                     $res .= '<tr class="imap_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
-                        '<td>'.$vals['server'].'</td>'.
-                        '<td>'.$vals['port'].'</td>'.
-                        '<td>'.$vals['tls'].'</td>'.
-                        '<td class="folders"></td>'.
-                        '<td class="total"></td>'.
-                        '<td class="unseen"></td>'.
+                        '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
+                        '<td>'.$vals['tls'].'</td><td class="folders"></td>'.
+                        '<td class="total"></td><td class="unseen"></td>'.
                         '</tr>';
                 }
-                    /*$res .= '<div class="server_label">'.$vals['name'].'</div>'.
-                        '<div class="imap_summary_row imap_summary_'.$index.'">'.
-                        '<table><tr><td>INBOX</td></tr>'.
-                        '<tr><td>Unseen</td><td><span class="unseen">...</span></td></tr>'.
-                        '<tr><td>Total</td><td><span class="total">...</span></td></tr>'.
-                        '</table></div>';
-                }
-                
-                $res .= '</div>';*/
                 $res .= '</table>';
+            }
+            else {
+                $res .= '<table class="empty_table"><tr><td>No IMAP servers found<br /><a href="'.$input['router_url_path'].'?page=servers">Add some</a></td></tr></table>';
             }
             return $res;
         }
