@@ -193,7 +193,6 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
 class Hm_Handler_imap_forget extends Hm_Handler_Module {
     public function process($data) {
         $data['just_forgot_credentials'] = false;
-        error_log(print_r($this->request->post, true));
         if (isset($this->request->post['imap_forget'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             if ($success) {
