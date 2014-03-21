@@ -37,6 +37,11 @@ class Hm_Handler_tracker extends Hm_Handler_Module {
         $active = false;
         if (!$args['logged_in'] || ($args['logged_in'] && $this->session->active)) {
             $active = true;
+            $name = 'Hm_'.ucfirst($type).'_'.$mod;
+            error_log($name);
+            if (!class_exists($name)) {
+                $active = false;
+            }
         }
         return array('type' => $type, 'mod' => $mod, 'active' => $active ? 'enabled' : 'disabled');
     }
