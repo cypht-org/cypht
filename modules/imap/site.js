@@ -58,7 +58,6 @@ var imap_forget_action = function() {
 };
 
 var imap_test_action = function() {
-    $(this).attr('disabled', true);
     $('.imap_debug_data').empty();
     $('.imap_folder_data').empty();
     event.preventDefault();

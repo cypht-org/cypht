@@ -3,6 +3,7 @@ Hm_Ajax = {
     callback: false,
 
     request: function(args, callback, extra, no_icon) {
+        $("input[type='submit']").attr('disabled', true);
         Hm_Ajax.callback = callback;
         if (extra) {
             for (name in extra) {

@@ -300,7 +300,7 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
                 '<input type="text" name="new_imap_server" placeholder="Server name or address" value=""/><br />'.
                 '<input type="text" name="new_imap_port" value="" placeholder="Port"><br />'.
                 'Use TLS: <input type="checkbox" name="tls" value="1" checked="checked" /><br />'.
-                '<input type="submit" value="Add IMAP Server" onclick="$( this ).css(\'visibility\', \'hidden\'); return true;" name="submit_server" /></form>';
+                '<input type="submit" value="Add IMAP Server" name="submit_server" /></form>';
         }
     }
 }
