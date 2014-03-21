@@ -171,12 +171,15 @@ class Hm_Output_login extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             if (!$input['router_login_state']) {
-                return '<form class="login_form" method="POST">'.
+                $res = '<form class="login_form" method="POST">'.
                     ' '.$this->trans('Username').': <input type="text" name="username" value="">'.
                     ' '.$this->trans('Password').': <input type="password" name="password">'.
-                    ' <input type="submit" value="Login" />'.
-                    ' <input type="submit" name="create_hm_user" value="Create" />'.
-                    '</form>';
+                    ' <input type="submit" value="Login" />';
+                if ($input['router_page_name'] == 'home') {
+                    $res .= ' <input type="submit" name="create_hm_user" value="Create" />';
+                }
+                $res .= '</form>';
+                return $res;
             }
         }
         return '';
