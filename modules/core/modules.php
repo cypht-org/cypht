@@ -312,8 +312,8 @@ class Hm_Output_page_js extends Hm_Output_Module {
     }
 }}
 
-if (!class_exists('Hm_Output_page_js')) {
-class Hm_Output_page_js extends Hm_Output_Module {
+if (!class_exists('Hm_Output_footer')) {
+class Hm_Output_footer extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '</body></html>';
