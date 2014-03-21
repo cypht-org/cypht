@@ -11,9 +11,10 @@ class Hm_Handler_imap_summary extends Hm_Handler_Module {
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if ($imap) {
                     $data['imap_summary'][$id] = $imap->get_mailbox_status('INBOX');
+                    $data['imap_summary'][$id]['folders'] = count($imap->get_mailbox_list());
                 }
                 else {
-                    $data['imap_summary'][$id] = array('messages' => '?', 'unseen' => '?');
+                    $data['imap_summary'][$id] = array('folders' => '?', 'messages' => '?', 'unseen' => '?');
                 }
             }
         }
@@ -330,27 +331,35 @@ class Hm_Output_unread_link extends Hm_Output_Module {
 class Hm_Output_imap_summary extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
         if ($format == 'HTML5') {
-            $res = '<div class="imap_summary"><div class="subtitle">'.$this->trans('IMAP Summary').'</div>';
+            $res = '';
             if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
                 $res .= '<input type="hidden" id="imap_summary_ids" value="'.
                     $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+
                 $res .= '<div class="imap_summary_data">';
+                $res .= '<table><thead><tr><th>IMAP Server</th><th>Address</th><th>Port</th>'.
+                    '<th>TLS</th><th>Folders</th><th>INBOX count</th><th>INBOX unread</th></tr></thead><tbody>';
                 foreach ($input['imap_servers'] as $index => $vals) {
-                    $res .= '<div class="server_label">'.$vals['name'].'</div>'.
+                    $res .= '<tr class="imap_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
+                        '<td>'.$vals['server'].'</td>'.
+                        '<td>'.$vals['port'].'</td>'.
+                        '<td>'.$vals['tls'].'</td>'.
+                        '<td class="folders"></td>'.
+                        '<td class="total"></td>'.
+                        '<td class="unseen"></td>'.
+                        '</tr>';
+                }
+                    /*$res .= '<div class="server_label">'.$vals['name'].'</div>'.
                         '<div class="imap_summary_row imap_summary_'.$index.'">'.
                         '<table><tr><td>INBOX</td></tr>'.
                         '<tr><td>Unseen</td><td><span class="unseen">...</span></td></tr>'.
                         '<tr><td>Total</td><td><span class="total">...</span></td></tr>'.
                         '</table></div>';
                 }
-                $res .= '</div>';
+                
+                $res .= '</div>';*/
+                $res .= '</table>';
             }
-            else {
-                $res .= '<div>'.$this->trans('No IMAP servers found!').' '.
-                    '<a href="'.$this->html_safe($input['router_url_path']).
-                    '?page=servers">'.$this->trans('Add some').'</a></div>';
-            }
-            $res .= '</div>';
             return $res;
         }
     }

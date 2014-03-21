@@ -82,14 +82,20 @@ var update_summary_display = function(res) {
         context = $('.imap_summary_'+id);
         messages = res.imap_summary[id].messages;
         unseen = res.imap_summary[id].unseen;
+        folders = res.imap_summary[id].folders;
         if (!unseen) {
             unseen = 0;
         }
         if (!messages) {
             messages = 0;
         }
+        if (!folders) {
+            folders = 0;
+        }
         $('.total', context).html(messages);
         $('.unseen', context).html(unseen);
+        $('.folders', context).html(folders);
+        $('table', $('.imap_summary_data')).tablesorter();
     }
 };
 
@@ -133,6 +139,7 @@ var imap_summary_update = function() {
     var ids = $('#imap_summary_ids').val();
     $('.total').html('...');
     $('.unseen').html('...');
+    $('.folders').html('...');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_summary'},
         {'name': 'summary_ids', 'value': ids}],

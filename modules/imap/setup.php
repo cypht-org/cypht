@@ -3,6 +3,7 @@
 /* add stuff to the home page */
 Hm_Handler_Modules::add('home', 'load_imap_servers',  true, 'load_user_data', 'after');
 Hm_Handler_Modules::add('home', 'imap_setup_display',  true, 'load_imap_servers', 'after');
+Hm_Output_Modules::add('home', 'jquery_table', true, 'jquery', 'after');
 Hm_Output_Modules::add('home', 'imap_summary', true, 'title', 'after');
 
 /* servers page data */
