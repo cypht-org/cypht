@@ -7,40 +7,14 @@ Hm_Output_Modules::add('home', 'jquery_table', true, 'jquery', 'after');
 Hm_Output_Modules::add('home', 'imap_summary', true, 'title', 'after');
 
 /* servers page data */
-Hm_Handler_Modules::add('servers', 'login', false);
-Hm_Handler_Modules::add('servers', 'load_user_data', true);
-Hm_Handler_Modules::add('servers', 'language',  true);
-Hm_Handler_Modules::add('servers', 'title', true);
-Hm_Handler_Modules::add('servers', 'date', true);
-Hm_Handler_Modules::add('servers', 'load_imap_servers',  true);
-Hm_Handler_Modules::add('servers', 'imap_setup', true);
-Hm_Handler_Modules::add('servers', 'imap_setup_display', true);
-Hm_Handler_Modules::add('servers', 'save_imap_servers',  true);
-Hm_Handler_Modules::add('servers', 'save_user_data', true);
-Hm_Handler_Modules::add('servers', 'logout', true);
-Hm_Handler_Modules::add('servers', 'http_headers', true);
+Hm_Handler_Modules::add('servers', 'load_imap_servers',  true, 'date', 'after');
+Hm_Handler_Modules::add('servers', 'imap_setup', true, 'load_imap_servers', 'after');
+Hm_Handler_Modules::add('servers', 'imap_setup_display', true, 'imap_setup', 'after');
+Hm_Handler_Modules::add('servers', 'save_imap_servers',  true, 'imap_setup_display', 'after');
 
 /* servers page output */
-Hm_Output_Modules::add('servers', 'header_start', false);
-Hm_Output_Modules::add('servers', 'js_data', true);
-Hm_Output_Modules::add('servers', 'header_css', false);
-Hm_Output_Modules::add('servers', 'jquery', false);
-Hm_Output_Modules::add('servers', 'header_content', false);
-Hm_Output_Modules::add('servers', 'header_end', false);
-Hm_Output_Modules::add('servers', 'logout', true);
-Hm_Output_Modules::add('servers', 'settings_link', true);
-Hm_Output_Modules::add('servers', 'servers_link', true);
-Hm_Output_Modules::add('servers', 'unread_link', true);
-Hm_Output_Modules::add('servers', 'homepage_link', true);
-Hm_Output_Modules::add('servers', 'date', true);
-Hm_Output_Modules::add('servers', 'login', false);
-Hm_Output_Modules::add('servers', 'title', true);
-Hm_Output_Modules::add('servers', 'msgs', false);
-Hm_Output_Modules::add('servers', 'loading_icon', false);
-Hm_Output_Modules::add('servers', 'imap_setup', true);
-Hm_Output_Modules::add('servers', 'imap_setup_display', true);
-Hm_Output_Modules::add('servers', 'page_js', true);
-Hm_Output_Modules::add('servers', 'footer', true);
+Hm_Output_Modules::add('servers', 'imap_setup', true, 'loading_icon', 'after');
+Hm_Output_Modules::add('servers', 'imap_setup_display', true, 'imap_setup', 'after');
 
 /* unread page data */
 Hm_Handler_Modules::add('unread', 'login', false);

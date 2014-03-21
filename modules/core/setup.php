@@ -31,6 +31,37 @@ Hm_Output_Modules::add('home', 'loading_icon', true);
 Hm_Output_Modules::add('home', 'page_js', true);
 Hm_Output_Modules::add('home', 'footer', true);
 
+/* servers page data */
+Hm_Handler_Modules::add('servers', 'login', false);
+Hm_Handler_Modules::add('servers', 'load_user_data', true);
+Hm_Handler_Modules::add('servers', 'language',  true);
+Hm_Handler_Modules::add('servers', 'title', true);
+Hm_Handler_Modules::add('servers', 'date', true);
+Hm_Handler_Modules::add('servers', 'save_user_data', true);
+Hm_Handler_Modules::add('servers', 'logout', true);
+Hm_Handler_Modules::add('servers', 'http_headers', true);
+
+/* servers page output */
+Hm_Output_Modules::add('servers', 'header_start', false);
+Hm_Output_Modules::add('servers', 'js_data', true);
+Hm_Output_Modules::add('servers', 'header_css', false);
+Hm_Output_Modules::add('servers', 'jquery', false);
+Hm_Output_Modules::add('servers', 'header_content', false);
+Hm_Output_Modules::add('servers', 'header_end', false);
+Hm_Output_Modules::add('servers', 'logout', true);
+Hm_Output_Modules::add('servers', 'settings_link', true);
+Hm_Output_Modules::add('servers', 'servers_link', true);
+Hm_Output_Modules::add('servers', 'unread_link', true);
+Hm_Output_Modules::add('servers', 'homepage_link', true);
+Hm_Output_Modules::add('servers', 'date', true);
+Hm_Output_Modules::add('servers', 'login', false);
+Hm_Output_Modules::add('servers', 'title', true);
+Hm_Output_Modules::add('servers', 'msgs', false);
+Hm_Output_Modules::add('servers', 'loading_icon', false);
+Hm_Output_Modules::add('servers', 'page_js', true);
+Hm_Output_Modules::add('servers', 'footer', true);
+
+
 /* settings data */
 Hm_Handler_Modules::add('settings', 'create_user', false);
 Hm_Handler_Modules::add('settings', 'login', false);
@@ -63,7 +94,6 @@ Hm_Output_Modules::add('settings', 'msgs', false);
 Hm_Output_Modules::add('settings', 'title', true);
 Hm_Output_Modules::add('settings', 'loading_icon', true);
 Hm_Output_Modules::add('settings', 'start_settings_form', true);
-
 Hm_Output_Modules::add('settings', 'language_setting', true);
 Hm_Output_Modules::add('settings', 'timezone_setting', true);
 Hm_Output_Modules::add('settings', 'end_settings_form', true);
