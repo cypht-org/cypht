@@ -139,10 +139,9 @@ return array(
         'imap_forget' => FILTER_SANITIZE_STRING,
         'imap_save' => FILTER_SANITIZE_STRING,
         'submit_server' => FILTER_SANITIZE_STRING,
-        'new_server_address' => FILTER_SANITIZE_STRING,
-        'new_server_port' => FILTER_VALIDATE_INT,
-        'new_server_name' => FILTER_SANITIZE_STRING,
-        'new_server_type' => FILTER_SANITIZE_STRING,
+        'new_imap_address' => FILTER_SANITIZE_STRING,
+        'new_imap_port' => FILTER_VALIDATE_INT,
+        'new_imap_name' => FILTER_SANITIZE_STRING,
         'tls' => FILTER_VALIDATE_BOOLEAN,
     )
 );
