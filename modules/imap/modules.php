@@ -342,7 +342,7 @@ class Hm_Output_imap_summary extends Hm_Output_Module {
                         '<td class="total"></td><td class="unseen"></td>'.
                         '</tr>';
                 }
-                $res .= '</table>';
+                $res .= '</table></div>';
             }
             else {
                 $res .= '<table class="empty_table"><tr><td>No IMAP servers found<br /><a href="'.$input['router_url_path'].'?page=servers">Add some</a></td></tr></table>';
