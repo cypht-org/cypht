@@ -981,7 +981,9 @@ trait Hm_Server_List {
                 continue;
             }
             if ($server['connected'] && $server['object']) {
-                self::$server_list[$index]['object']->disconnect();
+                if (method_exists(self::$server_list[$index]['object'], 'disconnect')) {
+                    self::$server_list[$index]['object']->disconnect();
+                }
                 self::$server_list[$index]['connected'] = false;
             }
         }
@@ -1022,16 +1024,16 @@ class Hm_POP3_List {
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         self::$server_list[$id]['object'] = new Hm_POP3();
-        if ($cache) {
-            self::$server_list[$id]['object']->load_cache($cache, 'gzip');
+        self::$server_list[$id]['object']->server = $server['server'];
+        self::$server_list[$id]['object']->port = $server['port'];
+        self::$server_list[$id]['object']->ssl = $server['tls'];
+
+        if (self::$server_list[$id]['object']->connect()) {
+            if (self::$server_list[$id]['object']->auth($user, $pass)) {
+                return self::$server_list[$id]['object']->auth($user, $pass);
+            }
         }
-        return self::$server_list[$id]['object']->connect(array(
-            'server'    => $server['server'],
-            'port'      => $server['port'],
-            'tls'       => $server['tls'],
-            'username'  => $user,
-            'password'  => $pass,
-        ));
+        return false;
     }
 }
 
