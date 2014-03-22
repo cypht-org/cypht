@@ -2,6 +2,10 @@
 
 class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
     public function process($data) {
+        $servers = $this->user_config->get('pop3_servers', array());
+        foreach ($servers as $index => $server) {
+            Hm_POP3_List::add( $server, $index );
+        }
         return $data;
     }
 }
@@ -20,11 +24,11 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
                     $tls = true;
                 }
                 if ($con = fsockopen($form['new_pop3_address'], $form['new_pop3_port'], $errno, $errstr, 2)) {
-                    /*Hm_POP3_List::add( array(
+                    Hm_POP3_List::add( array(
                         'name' => $form['new_pop3_name'],
                         'server' => $form['new_pop3_address'],
                         'port' => $form['new_pop3_port'],
-                        'tls' => $tls));*/
+                        'tls' => $tls));
                     Hm_Msgs::add('Added server!');
                 }
                 else {
@@ -38,12 +42,20 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
 
 class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
     public function process($data) {
+        $data['pop3_servers'] = array();
+        $servers = Hm_POP3_List::dump();
+        if (!empty($servers)) {
+            $data['pop3_servers'] = $servers;
+        }
         return $data;
     }
 }
 
 class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
     public function process($data) {
+        $servers = Hm_POP3_List::dump();
+        $this->user_config->set('pop3_servers', $servers);
+        Hm_POP3_List::clean_up();
         return $data;
     }
 }
@@ -65,6 +77,8 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
 class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
+            if (isset($input['pop3_servers'])) {
+            }
         }
     }
 }
