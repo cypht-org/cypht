@@ -22,7 +22,7 @@ Hm_Ajax = {
     },
 
     done: function(res) {
-        if (typeof res == 'string' && (res == 'null' || res.indexOf('<') == 0)) {
+        if (typeof res == 'string' && (res == 'null' || res.indexOf('<') == 0 || res == '{}')) {
             Hm_Ajax.fail(res);
             return;
         }
