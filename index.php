@@ -21,9 +21,10 @@ $start_time = microtime(true);
 
 /* get includes */
 require 'lib/framework.php';
-require 'lib/pbkdf2.php';
 require 'lib/session.php';
+require 'lib/pbkdf2.php';
 require 'lib/hm-imap.php';
+require 'lib/hm-pop3.php';
 
 /* get configuration */
 $config = new Hm_Site_Config_File('hm3.rc');
@@ -40,4 +41,16 @@ $response_str = $formatter->format_content($response_data);
 $renderer = new Hm_Output_HTTP();
 $renderer->send_response($response_str, $response_data);
 
+/* TODO:
+ * pop and smtp
+ * - add/del/test on servers page
+ * - add pop to unread(!)
+ * - extend list class
+ * - add both to tracker
+ * - ....
+ * 
+ * display cache in output mods
+ * test removing a module ...
+ * plugin/ability to make auth single server imap based
+ */
 ?>
