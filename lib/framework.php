@@ -877,6 +877,162 @@ class Hm_DB {
             return false;
         }
     }
-
 }
+
+trait Hm_Server_List {
+
+    private static $server_list = array();
+    public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
+        if (isset(self::$server_list[$id])) {
+            $server = self::$server_list[$id];
+            if ($server['object']) {
+                return $server['object'];
+            }
+            else {
+                if ((!$user || !$pass) && (!isset($server['user']) || !isset($server['pass']))) {
+                    return false;
+                }
+                elseif (isset($server['user']) && isset($server['pass'])) {
+                    $user = $server['user'];
+                    $pass = $server['pass'];
+                }
+                if ($user && $pass) {
+                    $res = self::service_connect($id, $server, $user, $pass, $cache);
+                    if ($res) {
+                        self::$server_list[$id]['connected'] = true;
+                        if ($save_credentials) {
+                            self::$server_list[$id]['user'] = $user;
+                            self::$server_list[$id]['pass'] = $pass;
+                        }
+                    }
+                    return self::$server_list[$id]['object'];
+                }
+            }
+        }
+        return false;
+    }
+
+    public static function reuse($id) {
+        if (isset(self::$server_list[$id]) && is_object(self::$server_list[$id]['object'])) {
+            return self::$server_list[$id]['object'];
+        }
+        return false;
+    }
+
+    public static function forget_credentials($id) {
+        if (isset(self::$server_list[$id])) {
+            unset(self::$server_list[$id]['user']);
+            unset(self::$server_list[$id]['pass']);
+        }
+    }
+
+    public static function add($atts, $id=false) {
+        $atts['object'] = false;
+        $atts['connected'] = false;
+        if ($id) {
+            self::$server_list[$id] = $atts;
+        }
+        else {
+            self::$server_list[] = $atts;
+        }
+    }
+
+    public static function del($id) {
+        if (isset(self::$server_list[$id])) {
+            unset(self::$server_list[$id]);
+            return true;
+        }
+        return false;
+    }
+
+    public static function dump($id=false, $full=false) {
+        $list = array();
+        foreach (self::$server_list as $index => $server) {
+            if ($id !== false && $index != $id) {
+                continue;
+            }
+            if ($full) {
+                $list[$index] = $server;
+            }
+            else {
+                $list[$index] = array(
+                    'name' => $server['name'],
+                    'server' => $server['server'],
+                    'port' => $server['port'],
+                    'tls' => $server['tls']
+                );
+                if (isset($server['user'])) {
+                    $list[$index]['user'] = $server['user'];
+                }
+                if (isset($server['pass'])) {
+                    $list[$index]['pass'] = $server['pass'];
+                }
+            }
+            if ($id !== false) {
+                return $list[$index];
+            }
+        }
+        return $list;
+    }
+
+    public static function clean_up($id=false) {
+        foreach (self::$server_list as $index => $server) {
+            if ($id !== false && $id != $index) {
+                continue;
+            }
+            if ($server['connected'] && $server['object']) {
+                self::$server_list[$index]['object']->disconnect();
+                self::$server_list[$index]['connected'] = false;
+            }
+        }
+    }
+    public static function get_cache($session, $id) {
+        $server_cache = $session->get('server_cache', array());
+        if (isset($server_cache[$id])) {
+            return $server_cache[$id];
+        }
+        return false;
+    }
+}
+
+class Hm_IMAP_List {
+    
+    use Hm_Server_List;
+
+    public static function service_connect($id, $server, $user, $pass, $cache=false) {
+        self::$server_list[$id]['object'] = new Hm_IMAP();
+        if ($cache) {
+            self::$server_list[$id]['object']->load_cache($cache, 'gzip');
+        }
+        return self::$server_list[$id]['object']->connect(array(
+            'server'    => $server['server'],
+            'port'      => $server['port'],
+            'tls'       => $server['tls'],
+            'username'  => $user,
+            'password'  => $pass,
+            'no_caps'   => true,
+            'blacklisted_extensions' => array('enable')
+        ));
+    }
+}
+
+class Hm_POP3_List {
+    
+    use Hm_Server_List;
+
+    public static function service_connect($id, $server, $user, $pass, $cache=false) {
+        self::$server_list[$id]['object'] = new Hm_POP3();
+        if ($cache) {
+            self::$server_list[$id]['object']->load_cache($cache, 'gzip');
+        }
+        return self::$server_list[$id]['object']->connect(array(
+            'server'    => $server['server'],
+            'port'      => $server['port'],
+            'tls'       => $server['tls'],
+            'username'  => $user,
+            'password'  => $pass,
+        ));
+    }
+}
+
 ?>
