@@ -1,5 +1,28 @@
 <?php
 
+class Hm_Handler_pop3_connect extends Hm_Handler_Module {
+    public function process($data) {
+        $pop3 = false;
+        error_log(print_r($data, true));
+        if (isset($this->request->post['pop3_connect'])) {
+            list($success, $form) = $this->process_form(array('pop3_user', 'pop3_pass', 'pop3_server_id'));
+            if ($success) {
+                $pop3 = Hm_POP3_List::connect($form['pope_server_id'], false, $form['pop3_user'], $form['pop3_pass']);
+            }
+            elseif (isset($form['pop3_server_id'])) {
+                $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache);
+            }
+            if ($pop3) {
+                Hm_Msgs::add("Successfully authenticated to the POP3 server");
+                $data['pop3_debug'] = $pop3->puke();
+            }
+            else {
+                Hm_Msgs::add("Failed to authenticate to the POP3 server");
+            }
+        }
+        return $data;
+    }
+}
 class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
     public function process($data) {
         $servers = $this->user_config->get('pop3_servers', array());
@@ -77,8 +100,42 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
 class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
+            $res = '';
             if (isset($input['pop3_servers'])) {
+                foreach ($input['pop3_servers'] as $index => $vals) {
+
+                    if (isset($vals['user'])) {
+                        $disabled = 'disabled="disabled"';
+                        $display = 'none';
+                    }
+                    else {
+                        $disabled = '';
+                        $display = 'inline';
+                    }
+                    $res .= '<div class="configured_server">';
+                    $res .= sprintf("<div>Type: POP3</div><div>Name: %s</div><div>Server: %s</div>".
+                        "<div>Port: %d</div><div>TLS: %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
+                        $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
+                    $res .= 
+                        ' <form class="pop3_connect" method="POST">'.
+                        '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" />'.
+                        '<span style="display: '.$display.'"> '.
+                        '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value=""></span>'.
+                        '<span style="display: '.$display.'"> '.
+                        '<input '.$disabled.' class="credentials" placeholder="Password" type="password" name="pop3_pass"></span>'.
+                        '<input type="submit" value="Test Connection" class="test_pop3_connect" />';
+                    if (!isset($vals['user']) || !$vals['user']) {
+                        $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
+                        $res .= '<input type="submit" value="Save" class="save_connection" />';
+                    }
+                    else {
+                        $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
+                        $res .= '<input type="submit" value="Forget" class="forget_connection" />';
+                    }
+                    $res .= '<input type="hidden" value="ajax_pop3_debug" name="hm_ajax_hook" /></form></div>';
+                }
             }
+        return $res;
         }
     }
 }
