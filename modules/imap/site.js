@@ -67,8 +67,6 @@ var imap_test_action = function() {
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
-            $('.test_connect').attr('disabled', false);
-            /* TODO: add "forget" button */
         },
         {'imap_connect': 1}
     );
@@ -154,7 +152,7 @@ else if (hm_page_name == 'servers') {
     $('.imap_delete').on('click', imap_delete_action);
     $('.save_connection').on('click', imap_save_action);
     $('.forget_connection').on('click', imap_forget_action);
-    $('.test_connect').on('click', imap_test_action);
+    $('.test_imap_connect').on('click', imap_test_action);
 }
 else if (hm_page_name == 'unread') {
     imap_unread_update(true);
