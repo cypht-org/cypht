@@ -3,7 +3,6 @@
 class Hm_Handler_pop3_connect extends Hm_Handler_Module {
     public function process($data) {
         $pop3 = false;
-        error_log(print_r($data, true));
         if (isset($this->request->post['pop3_connect'])) {
             list($success, $form) = $this->process_form(array('pop3_user', 'pop3_pass', 'pop3_server_id'));
             if ($success) {
