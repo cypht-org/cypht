@@ -1,6 +1,6 @@
 <?php
 
-class Hm_Handler_imap_summary extends Hm_Handler_Module {
+class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('summary_ids'));
         if ($success) {
@@ -68,9 +68,9 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_imap_setup extends Hm_Handler_Module {
+class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
     public function process($data) {
-        if (isset($this->request->post['submit_server'])) {
+        if (isset($this->request->post['submit_imap_server'])) {
             list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_address', 'new_imap_port'));
             if (!$success) {
                 $data['old_form'] = $form;
@@ -132,7 +132,7 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_load_imap_servers extends Hm_Handler_Module {
+class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     public function process($data) {
         $servers = $this->user_config->get('imap_servers', array());
         foreach ($servers as $index => $server) {
@@ -142,7 +142,7 @@ class Hm_Handler_load_imap_servers extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_imap_setup_display extends Hm_Handler_Module {
+class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
     public function process($data) {
         $data['imap_servers'] = array();
         $servers = Hm_IMAP_List::dump();
@@ -251,7 +251,7 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
     }
 }
 
-class Hm_Output_imap_setup_display extends Hm_Output_Module {
+class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if ($format == 'HTML5') {
@@ -293,7 +293,7 @@ class Hm_Output_imap_setup_display extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_imap_setup extends Hm_Output_Module {
+class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<form class="add_server" method="POST">'.
@@ -302,7 +302,7 @@ class Hm_Output_imap_setup extends Hm_Output_Module {
                 '<tr><td colspan="2"><input type="text" name="new_imap_address" placeholder="IMAP server address" value=""/></td></tr>'.
                 '<tr><td colspan="2"><input type="text" name="new_imap_port" value="" placeholder="Port"></td></tr>'.
                 '<tr><td>Use TLS</td><td><input type="checkbox" name="tls" value="1" checked="checked" /></td></tr>'.
-                '<tr><td colspan="2"><input type="submit" value="Add IMAP Server" name="submit_server" /></td></tr>'.
+                '<tr><td colspan="2"><input type="submit" value="Add IMAP Server" name="submit_imap_server" /></td></tr>'.
                 '</table></form>';
         }
     }
@@ -324,7 +324,7 @@ class Hm_Output_unread_link extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_imap_summary extends Hm_Output_Module {
+class Hm_Output_display_imap_summary extends Hm_Output_Module {
     protected function output($input, $format, $lang_str=false) {
         if ($format == 'HTML5') {
             $res = '';
@@ -401,135 +401,6 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
             $input['formatted_unread_data'] = '';
         }
         return $input;
-    }
-}
-
-/* wrapper around multiple imap connections */
-class Hm_IMAP_List {
-
-    private static $imap_list = array();
-
-    public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
-        if (isset(self::$imap_list[$id])) {
-            $imap = self::$imap_list[$id];
-            if ($imap['object']) {
-                return $imap['object'];
-            }
-            else {
-                if ((!$user || !$pass) && (!isset($imap['user']) || !isset($imap['pass']))) {
-                    return false;
-                }
-                elseif (isset($imap['user']) && isset($imap['pass'])) {
-                    $user = $imap['user'];
-                    $pass = $imap['pass'];
-                }
-                if ($user && $pass) {
-                    self::$imap_list[$id]['object'] = new Hm_IMAP();
-                    if ($cache) {
-                        self::$imap_list[$id]['object']->load_cache($cache, 'gzip');
-                    }
-                    $res = self::$imap_list[$id]['object']->connect(array(
-                        'server' => $imap['server'],
-                        'port' => $imap['port'],
-                        'tls' => $imap['tls'],
-                        'username' => $user,
-                        'password' => $pass,
-                        'no_caps' => true,
-                        'blacklisted_extensions' => array('enable')
-                    ));
-                    if ($res) {
-                        self::$imap_list[$id]['connected'] = true;
-                        if ($save_credentials) {
-                            self::$imap_list[$id]['user'] = $user;
-                            self::$imap_list[$id]['pass'] = $pass;
-                        }
-                    }
-                    return self::$imap_list[$id]['object'];
-                }
-            }
-        }
-        return false;
-    }
-    public static function reuse($id) {
-        if (isset(self::$imap_list[$id]) && is_object(self::$imap_list[$id]['object'])) {
-            return self::$imap_list[$id]['object'];
-        }
-        return false;
-    }
-
-    public static function forget_credentials($id) {
-        if (isset(self::$imap_list[$id])) {
-            unset(self::$imap_list[$id]['user']);
-            unset(self::$imap_list[$id]['pass']);
-        }
-    }
-
-    public static function add($atts, $id=false) {
-        $atts['object'] = false;
-        $atts['connected'] = false;
-        if ($id) {
-            self::$imap_list[$id] = $atts;
-        }
-        else {
-            self::$imap_list[] = $atts;
-        }
-    }
-
-    public static function del($id) {
-        if (isset(self::$imap_list[$id])) {
-            unset(self::$imap_list[$id]);
-            return true;
-        }
-        return false;
-    }
-
-    public static function dump($id=false, $full=false) {
-        $list = array();
-        foreach (self::$imap_list as $index => $server) {
-            if ($id !== false && $index != $id) {
-                continue;
-            }
-            if ($full) {
-                $list[$index] = $server;
-            }
-            else {
-                $list[$index] = array(
-                    'name' => $server['name'],
-                    'server' => $server['server'],
-                    'port' => $server['port'],
-                    'tls' => $server['tls']
-                );
-                if (isset($server['user'])) {
-                    $list[$index]['user'] = $server['user'];
-                }
-                if (isset($server['pass'])) {
-                    $list[$index]['pass'] = $server['pass'];
-                }
-            }
-            if ($id !== false) {
-                return $list[$index];
-            }
-        }
-        return $list;
-    }
-
-    public static function clean_up($id=false) {
-        foreach (self::$imap_list as $index => $server) {
-            if ($id !== false && $id != $index) {
-                continue;
-            }
-            if ($server['connected'] && $server['object']) {
-                self::$imap_list[$index]['object']->disconnect();
-                self::$imap_list[$index]['connected'] = false;
-            }
-        }
-    }
-    public static function get_cache($session, $id) {
-        $imap_cache = $session->get('imap_cache', array());
-        if (isset($imap_cache[$id])) {
-            return $imap_cache[$id];
-        }
-        return false;
     }
 }
 

@@ -18,8 +18,8 @@ Hm_Handler_Modules::add('ajax_imap_debug', 'imap_tracker', true, 'imap_connect',
 Hm_Output_Modules::add('ajax_imap_debug', 'tracker', false);
 Hm_Output_Modules::add('ajax_imap_debug', 'show_debug', false);
 
-Hm_Handler_Modules::add('ajax_imap_summary', 'imap_tracker', true, 'imap_summary', 'after');
-Hm_Handler_Modules::add('ajax_imap_summary', 'tracker', false, 'imap_summary', 'after');
+Hm_Handler_Modules::add('ajax_imap_summary', 'imap_tracker', true, 'prep_imap_summary_display', 'after');
+Hm_Handler_Modules::add('ajax_imap_summary', 'tracker', false, 'prep_imap_summary_display', 'after');
 Hm_Output_Modules::add('ajax_imap_summary', 'show_debug', false);
 Hm_Output_Modules::add('ajax_imap_summary', 'tracker', false);
 

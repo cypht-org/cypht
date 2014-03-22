@@ -1,20 +1,21 @@
 <?php
 
 /* add stuff to the home page */
-Hm_Handler_Modules::add('home', 'load_imap_servers',  true, 'load_user_data', 'after');
-Hm_Handler_Modules::add('home', 'imap_setup_display',  true, 'load_imap_servers', 'after');
-Hm_Output_Modules::add('home', 'jquery_table', true, 'jquery', 'after');
-Hm_Output_Modules::add('home', 'imap_summary', true, 'title', 'after');
+Hm_Handler_Modules::add('home', 'load_imap_servers_from_config',  true, 'load_user_data', 'after');
+Hm_Handler_Modules::add('home', 'add_imap_servers_to_page_data',  true, 'load_imap_servers_from_config', 'after');
+
+Hm_Output_Modules::add('home', 'jquery_table', true, 'jquery', 'after'); 
+Hm_Output_Modules::add('home', 'display_imap_summary', true, 'title', 'after');
 
 /* servers page data */
-Hm_Handler_Modules::add('servers', 'load_imap_servers',  true, 'date', 'after');
-Hm_Handler_Modules::add('servers', 'imap_setup', true, 'load_imap_servers', 'after');
-Hm_Handler_Modules::add('servers', 'imap_setup_display', true, 'imap_setup', 'after');
-Hm_Handler_Modules::add('servers', 'save_imap_servers',  true, 'imap_setup_display', 'after');
+Hm_Handler_Modules::add('servers', 'load_imap_servers_from_config',  true, 'date', 'after');
+Hm_Handler_Modules::add('servers', 'process_add_imap_server', true, 'load_imap_servers_from_config', 'after');
+Hm_Handler_Modules::add('servers', 'add_imap_servers_to_page_data', true, 'process_add_imap_server', 'after');
+Hm_Handler_Modules::add('servers', 'save_imap_servers',  true, 'add_imap_servers_to_page_data', 'after');
 
 /* servers page output */
-Hm_Output_Modules::add('servers', 'imap_setup', true, 'loading_icon', 'after');
-Hm_Output_Modules::add('servers', 'imap_setup_display', true, 'imap_setup', 'after');
+Hm_Output_Modules::add('servers', 'add_imap_server_dialog', true, 'loading_icon', 'after');
+Hm_Output_Modules::add('servers', 'display_configured_imap_servers', true, 'add_imap_server_dialog', 'after');
 
 /* unread page data */
 Hm_Handler_Modules::add('unread', 'login', false);
@@ -22,9 +23,8 @@ Hm_Handler_Modules::add('unread', 'load_user_data', true);
 Hm_Handler_Modules::add('unread', 'language',  true);
 Hm_Handler_Modules::add('unread', 'title', true);
 Hm_Handler_Modules::add('unread', 'date', true);
-Hm_Handler_Modules::add('unread', 'load_imap_servers',  true);
-Hm_Handler_Modules::add('unread', 'imap_setup', true);
-Hm_Handler_Modules::add('unread', 'imap_setup_display', true);
+Hm_Handler_Modules::add('unread', 'load_imap_servers_from_config',  true);
+Hm_Handler_Modules::add('unread', 'add_imap_servers_to_page_data', true);
 Hm_Handler_Modules::add('unread', 'imap_bust_cache', true);
 Hm_Handler_Modules::add('unread', 'save_user_data', true);
 Hm_Handler_Modules::add('unread', 'logout', true);
@@ -54,7 +54,7 @@ Hm_Output_Modules::add('unread', 'footer', true);
 /* ajax server setup callback data */
 Hm_Handler_Modules::add('ajax_imap_debug', 'login', false);
 Hm_Handler_Modules::add('ajax_imap_debug', 'load_user_data',  true);
-Hm_Handler_Modules::add('ajax_imap_debug', 'load_imap_servers',  true);
+Hm_Handler_Modules::add('ajax_imap_debug', 'load_imap_servers_from_config',  true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_connect', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_delete', true);
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_forget', true);
@@ -67,8 +67,9 @@ Hm_Handler_Modules::add('ajax_imap_debug', 'date', true);
 /* ajax server summary callback data */
 Hm_Handler_Modules::add('ajax_imap_summary', 'login', false);
 Hm_Handler_Modules::add('ajax_imap_summary', 'load_user_data',  true);
-Hm_Handler_Modules::add('ajax_imap_summary', 'load_imap_servers',  true);
-Hm_Handler_Modules::add('ajax_imap_summary', 'imap_summary',  true);
+Hm_Handler_Modules::add('ajax_imap_summary', 'load_imap_servers_from_config',  true);
+Hm_Handler_Modules::add('ajax_imap_summary', 'add_imap_servers_to_page_data',  true);
+Hm_Handler_Modules::add('ajax_imap_summary', 'prep_imap_summary_display',  true);
 Hm_Handler_Modules::add('ajax_imap_summary', 'save_imap_cache',  true);
 Hm_Handler_Modules::add('ajax_imap_summary', 'save_imap_servers',  true);
 Hm_Handler_Modules::add('ajax_imap_summary', 'date', true);
@@ -76,7 +77,7 @@ Hm_Handler_Modules::add('ajax_imap_summary', 'date', true);
 /* ajax unread callback data */
 Hm_Handler_Modules::add('ajax_imap_unread', 'login', false);
 Hm_Handler_Modules::add('ajax_imap_unread', 'load_user_data',  true);
-Hm_Handler_Modules::add('ajax_imap_unread', 'load_imap_servers',  true);
+Hm_Handler_Modules::add('ajax_imap_unread', 'load_imap_servers_from_config',  true);
 Hm_Handler_Modules::add('ajax_imap_unread', 'imap_unread',  true);
 Hm_Handler_Modules::add('ajax_imap_unread', 'save_imap_cache',  true);
 Hm_Handler_Modules::add('ajax_imap_unread', 'save_imap_servers',  true);
@@ -112,7 +113,7 @@ return array(
         'imap_unread_ids' => FILTER_SANITIZE_STRING,
         'imap_forget' => FILTER_SANITIZE_STRING,
         'imap_save' => FILTER_SANITIZE_STRING,
-        'submit_server' => FILTER_SANITIZE_STRING,
+        'submit_imap_server' => FILTER_SANITIZE_STRING,
         'new_imap_address' => FILTER_SANITIZE_STRING,
         'new_imap_port' => FILTER_VALIDATE_INT,
         'new_imap_name' => FILTER_SANITIZE_STRING,
