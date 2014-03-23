@@ -179,7 +179,6 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                 else {
                     Hm_Msgs::add("Failed to authenticate to the IMAP server");
                 }
-                $data['imap_debug'] = $imap->show_debug(false, true);
             }
             else {
                 Hm_Msgs::add('Username and password are required');
