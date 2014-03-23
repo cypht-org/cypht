@@ -1,5 +1,5 @@
 var pop3_test_action = function() {
-    //$('.pop3_debug_data').empty();
+    $('.pop3_debug_data').empty();
     event.preventDefault();
     var form = $(this).parent();
     var id = form.find('#pop3_server_id');
