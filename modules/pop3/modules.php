@@ -124,11 +124,11 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                         '<input type="submit" value="Test Connection" class="test_pop3_connect" />';
                     if (!isset($vals['user']) || !$vals['user']) {
                         $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
-                        $res .= '<input type="submit" value="Save" class="save_connection" />';
+                        $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
                     }
                     else {
                         $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
-                        $res .= '<input type="submit" value="Forget" class="forget_connection" />';
+                        $res .= '<input type="submit" value="Forget" class="forget_pop3_connection" />';
                     }
                     $res .= '<input type="hidden" value="ajax_pop3_debug" name="hm_ajax_hook" /></form></div>';
                 }
