@@ -519,6 +519,9 @@ abstract class HM_Format {
                 Hm_Debug::add(sprintf('Output module %s activated but not found', $name));
             }
         }
+        if (empty($mod_output)) {
+            return $input;
+        }
         return $mod_output;
     }
 }
