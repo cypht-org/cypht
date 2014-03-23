@@ -964,12 +964,12 @@ trait Hm_Server_List {
                     'port' => $server['port'],
                     'tls' => $server['tls']
                 );
-            }
-            if (isset($list[$index]['user'])) {
-                unset($list[$index]['user']);
-            }
-            if (isset($list[$index]['pass'])) {
-                unset($list[$index]['pass']);
+                if (isset($server['user'])) {
+                    $list[$index]['user'] = $server['user'];
+                }
+                if (isset($server['pass'])) {
+                    $list[$index]['pass'] = $server['pass'];
+                }
             }
             if ($id !== false) {
                 return $list[$index];
