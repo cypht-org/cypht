@@ -15,11 +15,9 @@ Hm_Handler_Modules::add('ajax_pop3_debug', 'load_user_data',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'load_pop3_servers_from_config',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'add_pop3_servers_to_page_data',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_connect', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_connect', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_delete', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_forget', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_save', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'save_pop3_cache',  true);
+//Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_delete', true);
+//Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_forget', true);
+//Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_save', true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'save_pop3_servers',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'save_user_data',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'date', true);
@@ -33,7 +31,10 @@ return array(
         'new_pop3_address' => FILTER_SANITIZE_STRING,
         'new_pop3_port' => FILTER_SANITIZE_STRING,
         'pop3_connect' => FILTER_VALIDATE_INT,
-        'submit_pop3_server' => FILTER_SANITIZE_STRING
+        'submit_pop3_server' => FILTER_SANITIZE_STRING,
+        'pop3_server_id' => FILTER_VALIDATE_INT,
+        'pop3_user' => FILTER_SANITIZE_STRING,
+        'pop3_pass' => FILTER_SANITIZE_STRING,
     )
 );
 

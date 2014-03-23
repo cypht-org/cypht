@@ -6,14 +6,13 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
         if (isset($this->request->post['pop3_connect'])) {
             list($success, $form) = $this->process_form(array('pop3_user', 'pop3_pass', 'pop3_server_id'));
             if ($success) {
-                $pop3 = Hm_POP3_List::connect($form['pope_server_id'], false, $form['pop3_user'], $form['pop3_pass']);
+                $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false, $form['pop3_user'], $form['pop3_pass']);
             }
             elseif (isset($form['pop3_server_id'])) {
-                $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache);
+                $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
             }
-            if ($pop3) {
+            if ($pop3 && $pop3->state == 'authed') {
                 Hm_Msgs::add("Successfully authenticated to the POP3 server");
-                $data['pop3_debug'] = $pop3->puke();
             }
             else {
                 Hm_Msgs::add("Failed to authenticate to the POP3 server");
