@@ -5,13 +5,13 @@ class Hm_POP3 {
     var $starttls;
     var $port;
     var $ssl;
-    var $auth;
     var $debug;
     var $command_count;
     var $commands;
     var $responses;
     var $connected;
     var $banner;
+    var $state;
     var $handle;
    
     /* set defaults */ 
@@ -61,7 +61,6 @@ class Hm_POP3 {
                 break;
             }
             if ($n == 0) {
-                $this->responses[$result[$n]] = microtime();
             }
         } while ($result[$n] != ".\r\n");
         return $result;
@@ -74,7 +73,7 @@ class Hm_POP3 {
         else {
             $res = fgets($this->handle, $line_length);
         }
-        $this->responses[$res] = microtime();
+        $this->responses[trim($res)] = microtime(true);
         return $res;
     }
     /* send a command string to the server */
@@ -82,7 +81,12 @@ class Hm_POP3 {
         if (is_resource($this->handle)) {
             fputs($this->handle, $command."\r\n");
         }
-        $this->commands[trim($command)] = microtime();
+        if (preg_match("/^PASS/", $command)) {
+            $this->commands['PASS'] = microtime(true);
+        }
+        else {
+            $this->commands[trim($command)] = microtime(true);
+        }
     }
     /* establish a connection to the server. */
     function connect() {
@@ -99,7 +103,7 @@ class Hm_POP3 {
             if (!empty($res)) {
                 $this->banner = $res[0];
             }
-            $this->commands['Connected'] = microtime();
+            $this->commands['Connected'] = microtime(true);
         }
         else {
             $this->debug[] = 'Could not connect to the POP3 server';
@@ -109,11 +113,7 @@ class Hm_POP3 {
     }
     /* output debug */
     function puke() {
-        $res = '<div style="margin: 20px;">';
-        $res .= '<b>POP3 commands</b><br />'.timer_display($this->commands);
-        $res .= '<b>POP3 responses</b><br />'.timer_display($this->responses);
-        $res .= '<div>';
-        return $res;
+        return print_r(array_merge($this->debug, $this->commands), true);
     }
     /* check the POP3 response code for errors */
     function is_error($response) {
@@ -247,13 +247,11 @@ class Hm_POP3 {
         return $this->is_error($this->get_response()) == false;
     }
     function auth($user, $pass) {
-        global $phpversion;
+        $res = false;
         if ($this->starttls) {
-            if ($phpversion >= 5) {
-                $this->send_command('STLS');
-                if ($this->is_error($this->get_response()) == false && is_resource($this->handle)) {
-                    stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-                }
+            $this->send_command('STLS');
+            if ($this->is_error($this->get_response()) == false && is_resource($this->handle)) {
+                stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
             }
         }
         if (preg_match('/<[0-9.]+@[^>]+>/', $this->banner, $matches)) {
@@ -263,6 +261,9 @@ class Hm_POP3 {
             if ($this->user($user)) {
                 $res = $this->pass($pass);
             }
+        }
+        if ($res) {
+            $this->state = 'authed';
         }
         return $res;
     }
