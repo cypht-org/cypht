@@ -26,10 +26,10 @@ var imap_save_action = function() {
             Hm_Notices.show(res.router_user_msgs);
             if (res.just_saved_credentials) {
                 form.find('.credentials').attr('disabled', true);
-                form.find('.save_connection').hide();
+                form.find('.save_imap_connection').hide();
                 form.find('span').hide();
-                form.append('<input type="submit" value="Forget" class="forget_connection" />');
-                $('.forget_connection').on('click', imap_forget_action);
+                form.append('<input type="submit" value="Forget" class="forget_imap_connection" />');
+                $('.forget_imap_connection').on('click', imap_forget_action);
             }
         },
         {'imap_save': 1}
@@ -48,9 +48,9 @@ var imap_forget_action = function() {
             if (res.just_forgot_credentials) {
                 form.find('.credentials').attr('disabled', false);
                 form.find('span').show();
-                form.append('<input type="submit" value="Save" class="save_connection" />');
-                $('.save_connection').on('click', imap_save_action);
-                $('.forget_connection', form).remove();
+                form.append('<input type="submit" value="Save" class="save_imap_connection" />');
+                $('.save_imap_connection').on('click', imap_save_action);
+                $('.forget_imap_connection', form).remove();
             }
         },
         {'imap_forget': 1}
@@ -150,8 +150,8 @@ if (hm_page_name == 'home') {
 }
 else if (hm_page_name == 'servers') {
     $('.imap_delete').on('click', imap_delete_action);
-    $('.save_connection').on('click', imap_save_action);
-    $('.forget_connection').on('click', imap_forget_action);
+    $('.save_imap_connection').on('click', imap_save_action);
+    $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
 }
 else if (hm_page_name == 'unread') {

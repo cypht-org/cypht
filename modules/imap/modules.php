@@ -279,11 +279,11 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                     '<input type="submit" value="Test Connection" class="test_imap_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="Delete" class="imap_delete" />';
-                    $res .= '<input type="submit" value="Save" class="save_connection" />';
+                    $res .= '<input type="submit" value="Save" class="save_imap_connection" />';
                 }
                 else {
                     $res .= '<input type="submit" value="Delete" class="imap_delete" />';
-                    $res .= '<input type="submit" value="Forget" class="forget_connection" />';
+                    $res .= '<input type="submit" value="Forget" class="forget_imap_connection" />';
                 }
                 $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form></div>';
             }
