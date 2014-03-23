@@ -964,12 +964,12 @@ trait Hm_Server_List {
                     'port' => $server['port'],
                     'tls' => $server['tls']
                 );
-                if (isset($server['user'])) {
-                    $list[$index]['user'] = $server['user'];
-                }
-                if (isset($server['pass'])) {
-                    $list[$index]['pass'] = $server['pass'];
-                }
+            }
+            if (isset($list[$index]['user'])) {
+                unset($list[$index]['user']);
+            }
+            if (isset($list[$index]['pass'])) {
+                unset($list[$index]['pass']);
             }
             if ($id !== false) {
                 return $list[$index];
@@ -1032,9 +1032,8 @@ class Hm_POP3_List {
         self::$server_list[$id]['object']->ssl = $server['tls'];
 
         if (self::$server_list[$id]['object']->connect()) {
-            if (self::$server_list[$id]['object']->auth($user, $pass)) {
-                return self::$server_list[$id]['object']->auth($user, $pass);
-            }
+            self::$server_list[$id]['object']->auth($user, $pass);
+            return self::$server_list[$id]['object'];
         }
         return false;
     }
