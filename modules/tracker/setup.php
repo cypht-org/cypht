@@ -13,6 +13,11 @@ Hm_Handler_Modules::add('unread', 'tracker', false, 'http_headers', 'after');
 Hm_Output_Modules::add('unread', 'show_debug', false, 'footer', 'before');
 Hm_Output_Modules::add('unread', 'tracker', false, 'footer', 'before');
 
+Hm_Handler_Modules::add('ajax_pop3_debug', 'tracker', false, 'save_pop3_servers', 'after');
+Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_tracker', true, 'pop3_connect', 'after');
+Hm_Output_Modules::add('ajax_pop3_debug', 'tracker', false);
+Hm_Output_Modules::add('ajax_pop3_debug', 'show_debug', false);
+
 Hm_Handler_Modules::add('ajax_imap_debug', 'tracker', false, 'save_imap_servers', 'after');
 Hm_Handler_Modules::add('ajax_imap_debug', 'imap_tracker', true, 'imap_connect', 'after');
 Hm_Output_Modules::add('ajax_imap_debug', 'tracker', false);

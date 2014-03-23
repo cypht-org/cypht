@@ -12,4 +12,7 @@ $(document).ajaxSuccess(function(event, xhr, settings) {
     if (response.imap_summary_debug) {
         $(".hm3_imap_debug").html(response.imap_summary_debug);
     }
+    if (response.pop3_summary_debug) {
+        $(".hm3_pop3_debug").html(response.pop3_summary_debug);
+    }
 });
