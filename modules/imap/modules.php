@@ -9,7 +9,7 @@ class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
                 $id = intval($id);
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $imap = Hm_IMAP_List::connect($id, $cache);
-                if ($imap) {
+                if ($imap->get_state() == 'authenticated') {
                     $data['imap_summary'][$id] = $imap->get_mailbox_status('INBOX');
                     $data['imap_summary'][$id]['folders'] = count($imap->get_mailbox_list());
                 }

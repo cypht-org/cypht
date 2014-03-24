@@ -74,7 +74,7 @@ var imap_test_action = function() {
     );
 };
 
-var update_summary_display = function(res) {
+var update_imap_summary_display = function(res) {
     var context;
     var unseen;
     var messages;
@@ -145,7 +145,7 @@ var imap_summary_update = function() {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_summary'},
         {'name': 'summary_ids', 'value': ids}],
-        update_summary_display
+        update_imap_summary_display
     );
 };
 
