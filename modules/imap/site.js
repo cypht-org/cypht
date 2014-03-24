@@ -27,7 +27,8 @@ var imap_save_action = function() {
             if (res.just_saved_credentials) {
                 form.find('.credentials').attr('disabled', true);
                 form.find('.save_imap_connection').hide();
-                form.find('span').hide();
+                form.find('.imap_password').val('');
+                form.find('.imap_password').attr('placeholder', '[saved]');
                 form.append('<input type="submit" value="Forget" class="forget_imap_connection" />');
                 $('.forget_imap_connection').on('click', imap_forget_action);
             }
@@ -47,7 +48,8 @@ var imap_forget_action = function() {
             Hm_Notices.show(res.router_user_msgs);
             if (res.just_forgot_credentials) {
                 form.find('.credentials').attr('disabled', false);
-                form.find('span').show();
+                form.find('.imap_password').val('');
+                form.find('.imap_password').attr('placeholder', 'Password');
                 form.append('<input type="submit" value="Save" class="save_imap_connection" />');
                 $('.save_imap_connection').on('click', imap_save_action);
                 $('.forget_imap_connection', form).remove();

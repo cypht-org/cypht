@@ -259,23 +259,24 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 
                 if (isset($vals['user'])) {
                     $disabled = 'disabled="disabled"';
-                    $display = 'none';
+                    $user_pc = $vals['user'];
+                    $pass_pc = '[saved]';
                 }
                 else {
+                    $user_pc = '';
+                    $pass_pc = 'Password';
                     $disabled = '';
-                    $display = 'inline';
                 }
                 $res .= '<div class="configured_server">';
-                $res .= sprintf("<div>Type: IMAP</div><div>Name: %s</div><div>Server: %s</div>".
-                    "<div>Port: %d</div><div>TLS: %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
-                    $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
+                    $res .= sprintf("<div>IMAP - %s</div><div>%s/%d %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
+                        $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
                 $res .= 
-                    ' <form class="imap_connect" method="POST">'.
+                    '<form class="imap_connect" method="POST">'.
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
+                    '<span> '.
+                    '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
                     '<span style="display: '.$display.'"> '.
-                    '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value=""></span>'.
-                    '<span style="display: '.$display.'"> '.
-                    '<input '.$disabled.' class="credentials" placeholder="Password" type="password" name="imap_pass"></span>'.
+                    '<input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>'.
                     '<input type="submit" value="Test Connection" class="test_imap_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="Delete" class="imap_delete" />';
@@ -297,11 +298,11 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return '<form class="add_server" method="POST">'.
                 '<table>'.
-                '<tr><td colspan="2"><input type="text" name="new_imap_name" value="" placeholder="Account name" /></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_imap_address" placeholder="IMAP server address" value=""/></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_imap_port" value="" placeholder="Port"></td></tr>'.
-                '<tr><td>Use TLS</td><td><input type="checkbox" name="tls" value="1" checked="checked" /></td></tr>'.
-                '<tr><td colspan="2"><input type="submit" value="Add IMAP Server" name="submit_imap_server" /></td></tr>'.
+                '<tr><td><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+                '<tr><td><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
+                '<tr><td><input type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+                '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td></tr>'.
+                '<tr><td><input type="submit" value="Add IMAP Server" name="submit_imap_server" /></td></tr>'.
                 '</table></form>';
         }
     }
