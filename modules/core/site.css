@@ -9,7 +9,7 @@ table { width: 100%; }
 .loading_icon { position: absolute; top: 22px; left: 8px; visibility: hidden; width: 16px; height: 16px; }
 .loading_icon img { visibility: inherit; }
 .empty_table { text-align: center; color: #666 !important; padding-top: 75px !important; }
-.settings_link, .logout, .home_link { line-height: 10pt; font-size: 10pt; margin: 2px; display: block; padding: 3px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #000; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.settings_link, .logout, .home_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #000; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .user_settings { width: 98%; padding: 10px; padding-bottom: 40px; border: solid 1px #ccc; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .user_settings table { width: 50%; white-space: nowrap; }
 .user_settings table td { padding: 5px; }
