@@ -48,10 +48,9 @@ $renderer->send_response($response_str, $response_data);
  * - add to tracker
  * 
  * pop3
- * - add to homepage summary
  * - add to unread(!)
  *
- * display cache in output mods
+ * display_cache in output mods
  * test removing a module ...
  * plugin/ability to make auth single server imap based
  */
