@@ -1,5 +1,6 @@
-.tracker_output { margin-right: 10px; border: solid 1px #ccc; padding: 10px; float: left; width: 330px; overflow: scroll; height: 500px; margin-top: 50px;-webkit -border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.tracker_output { margin-right: 10px; border: solid 1px #aaa; padding: 10px; float: left; width: 330px; overflow: scroll; height: 500px; margin-top: 50px;-webkit -border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .tracker_output table td { padding-right: 3px; }
 .tracker_output table .enabled{ color: green; }
 .tracker_output table .disabled{ color: red; }
-.pop3_summary_debug, .imap_summary_debug, .tracker_debug { margin-right: 10px; height: 500px; border: solid 1px #ccc; padding: 10px; overflow: scroll; float: left; width: 330px; margin-top: 50px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.pop3_summary_debug, .imap_summary_debug, .tracker_debug { margin-right: 10px; height: 500px; border: solid 1px #aaa; padding: 10px; overflow: scroll; float: left; width: 330px; margin-top: 50px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.tracker_output, .pop3_summary_debug, .imap_summary_debug, .tracker_debug { font-size: 75%; }
