@@ -28,6 +28,11 @@ Hm_Handler_Modules::add('ajax_imap_summary', 'tracker', false, 'prep_imap_summar
 Hm_Output_Modules::add('ajax_imap_summary', 'show_debug', false);
 Hm_Output_Modules::add('ajax_imap_summary', 'tracker', false);
 
+Hm_Handler_Modules::add('ajax_pop3_summary', 'pop3_tracker', true, 'prep_pop3_summary_display', 'after');
+Hm_Handler_Modules::add('ajax_pop3_summary', 'tracker', false, 'prep_pop3_summary_display', 'after');
+Hm_Output_Modules::add('ajax_pop3_summary', 'show_debug', false);
+Hm_Output_Modules::add('ajax_pop3_summary', 'tracker', false);
+
 Hm_Handler_Modules::add('ajax_imap_unread', 'tracker', false, 'imap_unread', 'after');
 Hm_Handler_Modules::add('ajax_imap_unread', 'imap_tracker', true, 'imap_unread', 'after');
 Hm_Output_Modules::add('ajax_imap_unread', 'tracker', false);
