@@ -12,6 +12,16 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
     }
 }}
 
+if (!class_exists('Hm_Handler_load_page_cache_from_session')) {
+class Hm_Handler_load_page_cache_from_session extends Hm_Handler_Module {
+    public function process($data) {
+        $pages = $this->session->get('page_cache', array());
+        foreach ($pages as $key => $page) {
+            Hm_Page_Cache::add($key, $page);
+        }
+    }
+}}
+
 if (!class_exists('Hm_Handler_process_language_setting')) {
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     public function process($data) {
