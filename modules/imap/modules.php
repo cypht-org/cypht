@@ -268,16 +268,16 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                     $disabled = '';
                 }
                 $res .= '<div class="configured_server">';
-                    $res .= sprintf("<div>IMAP - %s</div><div>%s/%d %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
-                        $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
+                $res .= sprintf('<div class="server_title">IMAP - %s</div><div class="server_subtitle">%s/%d %s</div>',
+                    $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
+                    $vals['tls'] ? 'TLS' : '' );
                 $res .= 
                     '<form class="imap_connect" method="POST">'.
-                    '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" />'.
-                    '<span> '.
+                    '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
                     '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
                     '<span style="display: '.$display.'"> '.
                     '<input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>'.
-                    '<input type="submit" value="Test Connection" class="test_imap_connect" />';
+                    '<input type="submit" value="Test" class="test_imap_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="Delete" class="imap_delete" />';
                     $res .= '<input type="submit" value="Save" class="save_imap_connection" />';

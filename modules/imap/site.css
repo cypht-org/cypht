@@ -1,13 +1,12 @@
-.unread_messages, .configured_server, .add_server, .login_form { border: solid 1px #ccc; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.unread_messages, .configured_server, .add_server, .login_form { border: solid 1px #aaa; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .imap_summary_data table th, .unread_messages table th { cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
 .configured_server { float: left; margin-left: 20px; margin-bottom: 20px; width: 230px; height: 205px; }
 .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
-.imap_debug { border: solid 1px #ccc; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
+.imap_debug { border: solid 1px #aaa; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
 .add_server { float: left; clear: left; margin-bottom: 10px; margin-left: 10px; width: 230px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; }
-.configured_server div { margin-bottom: 10px; }
-.save_settings, .unread_link, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #ccc; background-color: #efefef; float: right; clear: none; color: #000; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.save_settings, .unread_link, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #efefef; float: right; clear: none; color: #000; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 
 .unread_messages { display: none; width: 98%; min-height: 200px; overflow: hidden; }
 .unread_messages table td { padding-top: 5px; padding-right: 10px; color: #333; }
@@ -21,11 +20,15 @@
 
 .empty_table img { vertical-align: -2px; }
 .imap_summary_data table td { padding: 5px; }
-.imap_summary_data { width: 98%; padding: 10px; border: solid 1px #ccc; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.imap_summary_data { width: 98%; padding: 10px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .imap_summary_row { padding: 10px; padding-top: 0px; }
 .imap_summary_row td { text-align: left; padding-left: 10px;}
 .total { color: green; }
 .unseen { color: green; }
 .credentials { width: 205px; margin-bottom: 15px !important; }
+input:disabled { background-color: #f5f5f5; }
+input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .add_server .txt_fld { width: 205px; }
 .add_server .port_fld { width: 50px; }
+.server_title { font-weight: bold; margin-bottom: 0px; color: #666; }
+.server_subtitle { margin-bottom: 20px; color: #666; }
