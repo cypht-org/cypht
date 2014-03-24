@@ -5,7 +5,7 @@ Hm_Handler_Modules::add('home', 'load_imap_servers_from_config',  true, 'load_us
 Hm_Handler_Modules::add('home', 'add_imap_servers_to_page_data',  true, 'load_imap_servers_from_config', 'after');
 
 Hm_Output_Modules::add('home', 'jquery_table', true, 'jquery', 'after'); 
-Hm_Output_Modules::add('home', 'display_imap_summary', true, 'title', 'after');
+Hm_Output_Modules::add('home', 'display_imap_summary', true, 'page_js', 'before');
 
 /* servers page data */
 Hm_Handler_Modules::add('servers', 'load_imap_servers_from_config',  true, 'date', 'after');
@@ -37,6 +37,7 @@ Hm_Output_Modules::add('unread', 'jquery', false);
 Hm_Output_Modules::add('unread', 'jquery_table', false);
 Hm_Output_Modules::add('unread', 'header_content', false);
 Hm_Output_Modules::add('unread', 'header_end', false);
+Hm_Output_Modules::add('unread', 'toolbar_start', false);
 Hm_Output_Modules::add('unread', 'logout', true);
 Hm_Output_Modules::add('unread', 'settings_link', true);
 Hm_Output_Modules::add('unread', 'servers_link', true);
@@ -47,6 +48,7 @@ Hm_Output_Modules::add('unread', 'date', true);
 Hm_Output_Modules::add('unread', 'title', true);
 Hm_Output_Modules::add('unread', 'msgs', false);
 Hm_Output_Modules::add('unread', 'loading_icon', false);
+Hm_Output_Modules::add('unread', 'toolbar_end', false);
 Hm_Output_Modules::add('unread', 'unread_message_list', true);
 Hm_Output_Modules::add('unread', 'page_js', true);
 Hm_Output_Modules::add('unread', 'footer', true);

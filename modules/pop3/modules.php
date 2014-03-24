@@ -195,7 +195,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
 }
 
 class Hm_Output_display_pop3_summary extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             $res = '';
             if (isset($input['pop3_servers']) && !empty($input['pop3_servers'])) {
@@ -213,7 +213,8 @@ class Hm_Output_display_pop3_summary extends Hm_Output_Module {
                 $res .= '</table></div>';
             }
             else {
-                $res .= '<table class="empty_table"><tr><td>No POP3 servers found<br /><a href="'.$input['router_url_path'].'?page=servers">Add some</a></td></tr></table>';
+                $res .= '<div class="pop3_summary_data"><table class="empty_table"><tr><td>No POP3 servers found. '.
+                    '<a href="'.$input['router_url_path'].'?page=servers">Add some</a></td></tr></table></div>';
             }
             return $res;
         }

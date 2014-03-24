@@ -109,6 +109,9 @@ var update_unread_message_display = function(res) {
     if (empty.length == 0) {
         count = $('tr', $(res.formatted_unread_data)).length - 1;
     }
+    if (count < 0) {
+        count = 0;
+    }
     var title = document.title;
     if (title.search(/\(\d+\)/) != -1) {
         title = title.replace(/\(\d+\)/, ' ('+count+')');
@@ -117,7 +120,6 @@ var update_unread_message_display = function(res) {
         title = title + ' ('+count+')';
     }
     document.title = title;
-    $('h1').text('HM3 - '+count);
     $('.unread_messages').html(res.formatted_unread_data);
     if (count > 1) {
         $('table', $('.unread_messages')).tablesorter();

@@ -308,7 +308,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
 }
 
 class Hm_Output_servers_link extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<a class="server_link" href="'.$this->html_safe($input['router_url_path']).'?page=servers">'.$this->trans('Servers').'</a>';
         }
@@ -316,7 +316,7 @@ class Hm_Output_servers_link extends Hm_Output_Module {
 }
 
 class Hm_Output_unread_link extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<a class="unread_link" href="'.$this->html_safe($input['router_url_path']).'?page=unread">'.$this->trans('Unread').'</a>';
         }
@@ -324,7 +324,7 @@ class Hm_Output_unread_link extends Hm_Output_Module {
 }
 
 class Hm_Output_display_imap_summary extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             $res = '';
             if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
@@ -344,7 +344,8 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
                 $res .= '</table></div>';
             }
             else {
-                $res .= '<table class="empty_table"><tr><td>No IMAP servers found<br /><a href="'.$input['router_url_path'].'?page=servers">Add some</a></td></tr></table>';
+                $res .= '<div class="imap_summary_data"><table class="empty_table"><tr><td>No IMAP servers found. '.
+                    '<a href="'.$input['router_url_path'].'?page=servers">Add some</a></td></tr></table></div>';
             }
             return $res;
         }
@@ -352,7 +353,7 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
 }
 
 class Hm_Output_jquery_table extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<script type="text/javascript" src="modules/imap/jquery.tablesorter.min.js"></script>';
         }
@@ -361,7 +362,7 @@ class Hm_Output_jquery_table extends Hm_Output_Module {
 }
 
 class Hm_Output_unread_message_list extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             $res = '';
             if (isset($input['imap_servers'])) {
@@ -375,7 +376,7 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
 }
 
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         $clean = array();
         if (isset($input['imap_unread_data'])) {
             $res = '<table><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';

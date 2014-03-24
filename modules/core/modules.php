@@ -259,7 +259,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
 
 if (!class_exists('Hm_Output_settings_link')) {
 class Hm_Output_settings_link extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<a class="settings_link" href="'.$this->html_safe($input['router_url_path']).'?page=settings">'.$this->trans('Settings').'</a>';
         }
@@ -268,7 +268,7 @@ class Hm_Output_settings_link extends Hm_Output_Module {
 
 if (!class_exists('Hm_Output_homepage_link')) {
 class Hm_Output_homepage_link extends Hm_Output_Module {
-    protected function output($input, $format, $lang_str=false) {
+    protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'">'.$this->trans('Home').'</a>';
         }
@@ -424,6 +424,24 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
             return '<tr><td colspan="2" class="submit_cell">'.
                 '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
                 '</tr></table></form></div>';
+        }
+    }
+}}
+
+if (!class_exists('Hm_Output_toolbar_start')) {
+class Hm_Output_toolbar_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<div class="toolbar">';
+        }
+    }
+}}
+
+if (!class_exists('Hm_Output_toolbar_end')) {
+class Hm_Output_toolbar_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '</div>';
         }
     }
 }}
