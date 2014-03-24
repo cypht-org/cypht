@@ -170,16 +170,16 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                         $disabled = '';
                     }
                     $res .= '<div class="configured_server">';
-                    $res .= sprintf("<div>POP3 - %s</div><div>%s/%d %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
-                        $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
+                    $res .= sprintf('<div class="server_title">POP3 - %s</div><div class="server_subtitle">%s/%d %s</div>',
+                        $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
                     $res .= 
-                        '<br /><form class="pop3_connect" method="POST">'.
+                        '<form class="pop3_connect" method="POST">'.
                         '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" />'.
                         '<span> '.
                         '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
                         '<span style="display: '.$display.'"> '.
                         '<input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>'.
-                        '<input type="submit" value="Test Connection" class="test_pop3_connect" />';
+                        '<input type="submit" value="Test" class="test_pop3_connect" />';
                     if (!isset($vals['user']) || !$vals['user']) {
                         $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
                         $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
@@ -192,6 +192,32 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 }
             }
         return $res;
+        }
+    }
+}
+
+class Hm_Output_display_pop3_summary extends Hm_Output_Module {
+    protected function output($input, $format, $lang_str=false) {
+        if ($format == 'HTML5') {
+            $res = '';
+            if (isset($input['pop3_servers']) && !empty($input['pop3_servers'])) {
+                $res .= '<input type="hidden" id="pop3_summary_ids" value="'.
+                    $this->html_safe(implode(',', array_keys($input['pop3_servers']))).'" />';
+
+                $res .= '<div class="pop3_summary_data">';
+                $res .= '<table><thead><tr><th>POP3 Server</th><th>Address</th><th>Port</th>'.
+                    '<th>TLS</th></tr></thead><tbody>';
+                foreach ($input['pop3_servers'] as $index => $vals) {
+                    $res .= '<tr class="pop3_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
+                        '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
+                        '<td>'.$vals['tls'].'</td></tr>';
+                }
+                $res .= '</table></div>';
+            }
+            else {
+                $res .= '<table class="empty_table"><tr><td>No POP3 servers found<br /><a href="'.$input['router_url_path'].'?page=servers">Add some</a></td></tr></table>';
+            }
+            return $res;
         }
     }
 }

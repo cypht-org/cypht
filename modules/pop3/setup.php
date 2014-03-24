@@ -1,4 +1,8 @@
 <?php
+/* add stuff to the home page */
+Hm_Handler_Modules::add('home', 'load_pop3_servers_from_config',  true, 'load_user_data', 'after');
+Hm_Handler_Modules::add('home', 'add_pop3_servers_to_page_data',  true, 'load_pop3_servers_from_config', 'after');
+Hm_Output_Modules::add('home', 'display_pop3_summary', true, 'display_imap_summary', 'after');
 
 /* servers page */
 Hm_Handler_Modules::add('servers', 'load_pop3_servers_from_config',  true, 'date', 'after');
