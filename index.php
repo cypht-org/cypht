@@ -42,13 +42,15 @@ $renderer = new Hm_Output_HTTP();
 $renderer->send_response($response_str, $response_data);
 
 /* TODO:
- * pop and smtp
+ * smtp
  * - add/del/test on servers page
- * - add pop to unread(!)
  * - extend list class
- * - add both to tracker
- * - ....
+ * - add to tracker
  * 
+ * pop3
+ * - add to homepage summary
+ * - add to unread(!)
+ *
  * display cache in output mods
  * test removing a module ...
  * plugin/ability to make auth single server imap based
