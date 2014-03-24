@@ -152,11 +152,6 @@ class Hm_Router {
     private $page = 'home';
 
     public function process_request($config) {
-
-
-        /* get list of allowed input */
-
-        /* get registered modules */
         if (DEBUG_MODE) {
             $filters = array();
             $filters = array('allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
@@ -177,6 +172,8 @@ class Hm_Router {
 
         /* process inbound data */
         $request = new Hm_Request($filters);
+
+        $this->check_for_tls($config, $request);
 
         /* determine page or ajax request name */
         $this->get_page($request, $filters['allowed_pages']);
@@ -204,6 +201,13 @@ class Hm_Router {
 
         /* return processed data */
         return $result;
+    }
+
+    private function check_for_tls($config, $request) {
+        if (!$request->tls && $config->get('force_tls', false)) {
+            error_log(str_replace('http://', 'https://', $request->server['REQUEST_URI']));
+            $this->redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
+        }
     }
 
     private function setup_session($config) {
@@ -335,6 +339,7 @@ class Hm_Request {
     public $type = false;
     public $sapi = false;
     public $format = false;
+    public $tls = false;
     public $path = '';
 
     public function __construct($filters) {
@@ -347,6 +352,7 @@ class Hm_Request {
             $this->get = filter_input_array(INPUT_GET, $filters['allowed_get'], false);
             $this->cookie = filter_input_array(INPUT_COOKIE, $filters['allowed_cookie'], false);
             $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
+            $this->is_tls();
         }
         if ($this->type == 'CLI') {
             $this->fetch_cli_vars();
@@ -364,6 +370,14 @@ class Hm_Request {
                     }
                 }
             }
+        }
+    }
+    private function is_tls() {
+        if (isset($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on') {
+            $this->tls = true;
+        }
+        elseif (isset($this->server['REQUEST_SCHEME']) && strtolower($this->server['REQUEST_SCHEME']) == 'https') {
+            $this->tls = true;
         }
     }
 
@@ -1024,6 +1038,14 @@ class Hm_POP3_List {
         }
         return false;
     }
+}
+
+class Hm_Page_Cache {
+    public static function add() {}
+    public static function del() {}
+    public static function get() {}
+    public static function save() {}
+    public static function load() {}
 }
 
 ?>
