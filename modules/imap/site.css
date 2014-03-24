@@ -1,6 +1,6 @@
 .unread_messages, .configured_server, .add_server, .login_form { border: solid 1px #aaa; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .imap_summary_data table th, .unread_messages table th { cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
-.configured_server { float: left; margin-left: 20px; margin-bottom: 20px; width: 230px; height: 205px; }
+.configured_server { float: left; margin-left: 20px; margin-bottom: 20px; width: 230px; height: 216px; }
 .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #aaa; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }

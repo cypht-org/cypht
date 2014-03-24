@@ -275,8 +275,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                     '<form class="imap_connect" method="POST">'.
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
                     '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
-                    '<span style="display: '.$display.'"> '.
-                    '<input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>'.
+                    '<span> <input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>'.
                     '<input type="submit" value="Test" class="test_imap_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="Delete" class="imap_delete" />';

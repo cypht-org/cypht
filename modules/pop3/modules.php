@@ -174,11 +174,9 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                         $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
                     $res .= 
                         '<form class="pop3_connect" method="POST">'.
-                        '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" />'.
-                        '<span> '.
+                        '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
                         '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
-                        '<span style="display: '.$display.'"> '.
-                        '<input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>'.
+                        '<span> <input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>'.
                         '<input type="submit" value="Test" class="test_pop3_connect" />';
                     if (!isset($vals['user']) || !$vals['user']) {
                         $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
