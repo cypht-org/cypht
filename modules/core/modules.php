@@ -212,9 +212,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
             $msgs = Hm_Msgs::get();
             $res .= '<div class="sys_messages">';
             if (!empty($msgs)) {
-                foreach ($msgs as $val) {
-                    $res .= $this->html_safe($val).'<br />';
-                }
+                $res .= implode(',', array_map(function($v) { return $this->html_safe($v); }, $msgs));
             }
             $res .= '</div>';
             return $res;

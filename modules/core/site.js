@@ -1,34 +1,55 @@
+/* Ajax multiplexer */
 Hm_Ajax = {
-
-    callback: false,
+    requests: [],
 
     request: function(args, callback, extra, no_icon) {
-        $("input[type='submit']").attr('disabled', true);
-        Hm_Notices.show([]);
-        Hm_Ajax.callback = callback;
+        var ajax = new Hm_Ajax_Request();
+        ajax.index = Hm_Ajax.requests.length;
+        if (Hm_Ajax.requests.length == 0) {
+            $("input[type='submit']").attr('disabled', true);
+            Hm_Notices.show([]);
+            if (!no_icon) {
+                $('.loading_icon').css('visibility', 'visible');
+            }
+        }
+        Hm_Ajax.requests.push(ajax);
+        return ajax.make_request(args, callback, extra);
+    }
+};
+
+/* Ajax request wrapper */
+Hm_Ajax_Request = function() { return { 
+
+    callback: false,
+    index: 0,
+
+    make_request: function(args, callback, extra) {
+        this.callback = callback;
         if (extra) {
             for (name in extra) {
                 args.push({'name': name, 'value': extra[name]});
             }
         }
-        if (!no_icon) {
-            $('.loading_icon').css('visibility', 'visible');
-        }
-        $.post('', args )
-        .done(Hm_Ajax.done)
-        .fail(Hm_Ajax.fail)
-        .always(Hm_Ajax.always);
+        $.ajax({
+            type: "POST",
+            url: '',
+            data: args,
+            context: this, 
+            success: this.done,
+        })
+        .fail(this.fail)
+        .always(this.always)
 
         return false;
     },
 
     done: function(res) {
         if (typeof res == 'string' && (res == 'null' || res.indexOf('<') == 0 || res == '{}')) {
-            Hm_Ajax.fail(res);
+            this.fail(res);
             return;
         }
         else if (!res) {
-            Hm_Ajax.fail(res);
+            this.fail(res);
             return;
         }
         else {
@@ -36,8 +57,8 @@ Hm_Ajax = {
             if (res.date) {
                 $('.date').html(res.date);
             }
-            if (Hm_Ajax.callback) {
-                Hm_Ajax.callback(res);
+            if (this.callback) {
+                this.callback(res);
             }
         }
     },
@@ -47,19 +68,39 @@ Hm_Ajax = {
     },
 
     always: function(res) {
-        $('.loading_icon').css('visibility', 'hidden');
-        $("input[type='submit']").attr('disabled', false);
+        Hm_Ajax.requests.splice(this.index, 1);
+        if (Hm_Ajax.requests.length == 0) {
+            $("input[type='submit']").attr('disabled', false);
+            $('.loading_icon').css('visibility', 'hidden');
+        }
     }
-};
+}};
 
+/* user notification manager */
 Hm_Notices = {
+
+    hide_id: false,
 
     show: function(msgs) {
         var msg_list = $.map(msgs, function(v) { return v; });
-        $('.sys_messages').html(msg_list.join('<br />'));
+        $('.sys_messages').html(msg_list.join(', '));
+        Hm_Notices.hide();
+    },
+
+    hide: function() {
+        if (Hm_Notices.hide_id) {
+            clearTimeout(Hm_Notices.hide_id);
+        }
+        Hm_Notices.hide_id = setTimeout(function() {
+            $('.sys_messages').fadeOut(1000, function() {
+                $('.sys_messages').html('');
+                $('.sys_messages').show('');
+            });
+        }, 10000);
     }
 };
 
+/* job scheduler */
 Hm_Timer = {
 
     jobs: [],
@@ -87,4 +128,8 @@ Hm_Timer = {
     }
 };
 
+/* start the scheduler */
 Hm_Timer.fire();
+
+/* setup hiding of any user notifications */
+Hm_Notices.hide();
