@@ -72,8 +72,35 @@ var pop3_delete_action = function() {
         {'pop3_delete': 1}
     );
 };
+var pop3_summary_update = function() {
+    var ids = $('#pop3_summary_ids').val();
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_summary'},
+        {'name': 'summary_ids', 'value': ids}],
+        update_pop3_summary_display
+    );
+};
+var update_pop3_summary_display = function(res) {
+    var context;
+    var unseen;
+    var messages;
+    for (id in res.pop3_summary) {
+        context = $('.pop3_summary_'+id);
+        messages = res.pop3_summary[id].messages;
+        if (!messages) {
+            messages = 0;
+        }
+        $('.total', context).html(messages);
+        $('table', $('.pop3_summary_data')).tablesorter();
+    }
+};
 
-$('.test_pop3_connect').on('click', pop3_test_action);
-$('.save_pop3_connection').on('click', pop3_save_action);
-$('.forget_pop3_connection').on('click', pop3_forget_action);
-$('.delete_pop3_connection').on('click', pop3_delete_action);
+if (hm_page_name == 'home') {
+    Hm_Timer.add_job(pop3_summary_update, 60);
+}
+else if (hm_page_name == 'servers') {
+    $('.test_pop3_connect').on('click', pop3_test_action);
+    $('.save_pop3_connection').on('click', pop3_save_action);
+    $('.forget_pop3_connection').on('click', pop3_forget_action);
+    $('.delete_pop3_connection').on('click', pop3_delete_action);
+}

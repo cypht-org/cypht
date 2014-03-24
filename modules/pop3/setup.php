@@ -26,9 +26,19 @@ Hm_Handler_Modules::add('ajax_pop3_debug', 'save_pop3_servers',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'save_user_data',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'date', true);
 
+/* ajax server summary callback data */
+Hm_Handler_Modules::add('ajax_pop3_summary', 'login', false);
+Hm_Handler_Modules::add('ajax_pop3_summary', 'load_user_data',  true);
+Hm_Handler_Modules::add('ajax_pop3_summary', 'load_pop3_servers_from_config',  true);
+Hm_Handler_Modules::add('ajax_pop3_summary', 'add_pop3_servers_to_page_data',  true);
+Hm_Handler_Modules::add('ajax_pop3_summary', 'prep_pop3_summary_display',  true);
+Hm_Handler_Modules::add('ajax_pop3_summary', 'save_pop3_servers',  true);
+Hm_Handler_Modules::add('ajax_pop3_summary', 'date', true);
+
 return array(
     'allowed_pages' => array(
-        'ajax_pop3_debug'
+        'ajax_pop3_debug',
+        'ajax_pop3_summary',
     ),
     'allowed_post' => array(
         'new_pop3_name' => FILTER_SANITIZE_STRING,

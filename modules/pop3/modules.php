@@ -1,5 +1,26 @@
 <?php
 
+class Hm_Handler_prep_pop3_summary_display extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('summary_ids'));
+        if ($success) {
+            $ids = explode(',', $form['summary_ids']);
+            foreach($ids as $id) {
+                $id = intval($id);
+                $pop3 = Hm_POP3_List::connect($id, false);
+                if ($pop3->state == 'authed') {
+                    $exists = $pop3->mlist();
+                    $data['pop3_summary'][$id] = array('messages', count($exists));
+                }
+                else {
+                    $data['pop3_summary'][$id] = array('messages' => '?');
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_pop3_save extends Hm_Handler_Module {
     public function process($data) {
         $data['just_saved_credentials'] = false;
@@ -9,7 +30,7 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
                 Hm_Msgs::add('Username and Password are required to save a connection');
             }
             else {
-                $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache, $form['pop3_user'], $form['pop3_pass'], true);
+                $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false, $form['pop3_user'], $form['pop3_pass'], true);
                 if ($pop3->state == 'authed') {
                     $data['just_saved_credentials'] = true;
                     Hm_Msgs::add("Server saved");
@@ -22,6 +43,7 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_pop3_forget extends Hm_Handler_Module {
     public function process($data) {
         $data['just_forgot_credentials'] = false;
@@ -39,6 +61,7 @@ class Hm_Handler_pop3_forget extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_pop3_delete extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['pop3_delete'])) {
@@ -57,6 +80,7 @@ class Hm_Handler_pop3_delete extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_pop3_connect extends Hm_Handler_Module {
     public function process($data) {
         $pop3 = false;
@@ -78,6 +102,7 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
     public function process($data) {
         $servers = $this->user_config->get('pop3_servers', array());
@@ -152,6 +177,7 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
         }
     }
 }
+
 class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
@@ -204,11 +230,11 @@ class Hm_Output_display_pop3_summary extends Hm_Output_Module {
 
                 $res .= '<div class="pop3_summary_data">';
                 $res .= '<table><thead><tr><th>POP3 Server</th><th>Address</th><th>Port</th>'.
-                    '<th>TLS</th></tr></thead><tbody>';
+                    '<th>TLS</th><th>Messages</th></tr></thead><tbody>';
                 foreach ($input['pop3_servers'] as $index => $vals) {
                     $res .= '<tr class="pop3_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
                         '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
-                        '<td>'.$vals['tls'].'</td></tr>';
+                        '<td>'.$vals['tls'].'</td><td class="total">...</td></tr>';
                 }
                 $res .= '</table></div>';
             }
