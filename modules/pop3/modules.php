@@ -1,5 +1,62 @@
 <?php
 
+class Hm_Handler_pop3_save extends Hm_Handler_Module {
+    public function process($data) {
+        $data['just_saved_credentials'] = false;
+        if (isset($this->request->post['pop3_save'])) {
+            list($success, $form) = $this->process_form(array('pop3_user', 'pop3_pass', 'pop3_server_id'));
+            if (!$success) {
+                Hm_Msgs::add('Username and Password are required to save a connection');
+            }
+            else {
+                $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache, $form['pop3_user'], $form['pop3_pass'], true);
+                if ($pop3->state == 'authed') {
+                    $data['just_saved_credentials'] = true;
+                    Hm_Msgs::add("Server saved");
+                }
+                else {
+                    Hm_Msgs::add("Unable to save this server, are the username and password correct?");
+                }
+            }
+        }
+        return $data;
+    }
+}
+class Hm_Handler_pop3_forget extends Hm_Handler_Module {
+    public function process($data) {
+        $data['just_forgot_credentials'] = false;
+        if (isset($this->request->post['pop3_forget'])) {
+            list($success, $form) = $this->process_form(array('pop3_server_id'));
+            if ($success) {
+                Hm_POP3_List::forget_credentials($form['pop3_server_id']);
+                $data['just_forgot_credentials'] = true;
+                Hm_Msgs::add('Server credentials forgotten');
+            }
+            else {
+                $data['old_form'] = $form;
+            }
+        }
+        return $data;
+    }
+}
+class Hm_Handler_pop3_delete extends Hm_Handler_Module {
+    public function process($data) {
+        if (isset($this->request->post['pop3_delete'])) {
+            list($success, $form) = $this->process_form(array('pop3_server_id'));
+            if ($success) {
+                $res = Hm_POP3_List::del($form['pop3_server_id']);
+                if ($res) {
+                    $data['deleted_server_id'] = $form['pop3_server_id'];
+                    Hm_Msgs::add('Server deleted');
+                }
+            }
+            else {
+                $data['old_form'] = $form;
+            }
+        }
+        return $data;
+    }
+}
 class Hm_Handler_pop3_connect extends Hm_Handler_Module {
     public function process($data) {
         $pop3 = false;
@@ -86,11 +143,11 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return '<form class="add_server" method="POST">'.
                 '<table>'.
-                '<tr><td colspan="2"><input type="text" name="new_pop3_name" value="" placeholder="Account name" /></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_pop3_address" placeholder="pop3 server address" value=""/></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_pop3_port" value="" placeholder="Port"></td></tr>'.
-                '<tr><td>Use TLS</td><td><input type="checkbox" name="tls" value="1" checked="checked" /></td></tr>'.
-                '<tr><td colspan="2"><input type="submit" value="Add POP3 Server" name="submit_pop3_server" /></td></tr>'.
+                '<tr><td><input type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+                '<tr><td><input type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
+                '<tr><td><input type="text" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+                '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td></tr>'.
+                '<tr><td><input type="submit" value="Add POP3 Server" name="submit_pop3_server" /></td></tr>'.
                 '</table></form>';
         }
     }
@@ -104,30 +161,31 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
 
                     if (isset($vals['user'])) {
                         $disabled = 'disabled="disabled"';
-                        $display = 'none';
+                        $user_pc = $vals['user'];
+                        $pass_pc = '[saved]';
                     }
                     else {
+                        $user_pc = '';
+                        $pass_pc = 'Password';
                         $disabled = '';
-                        $display = 'inline';
                     }
                     $res .= '<div class="configured_server">';
-                    $res .= sprintf("<div>Type: POP3</div><div>Name: %s</div><div>Server: %s</div>".
-                        "<div>Port: %d</div><div>TLS: %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
-                        $this->html_safe($vals['port']), $vals['tls'] ? 'true' : 'false' );
+                    $res .= sprintf("<div>POP3 - %s</div><div>%s/%d %s</div>", $this->html_safe($vals['name']), $this->html_safe($vals['server']),
+                        $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
                     $res .= 
-                        ' <form class="pop3_connect" method="POST">'.
+                        '<br /><form class="pop3_connect" method="POST">'.
                         '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" />'.
+                        '<span> '.
+                        '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
                         '<span style="display: '.$display.'"> '.
-                        '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value=""></span>'.
-                        '<span style="display: '.$display.'"> '.
-                        '<input '.$disabled.' class="credentials" placeholder="Password" type="password" name="pop3_pass"></span>'.
+                        '<input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>'.
                         '<input type="submit" value="Test Connection" class="test_pop3_connect" />';
                     if (!isset($vals['user']) || !$vals['user']) {
                         $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
                         $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
                     }
                     else {
-                        $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
+                        $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
                         $res .= '<input type="submit" value="Forget" class="forget_pop3_connection" />';
                     }
                     $res .= '<input type="hidden" value="ajax_pop3_debug" name="hm_ajax_hook" /></form></div>';

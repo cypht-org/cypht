@@ -24,12 +24,13 @@ var pop3_save_action = function() {
             if (res.just_saved_credentials) {
                 form.find('.credentials').attr('disabled', true);
                 form.find('.save_pop3_connection').hide();
-                form.find('span').hide();
+                form.find('.pop3_password').val('');
+                form.find('.pop3_password').attr('placeholder', '[saved]');
                 form.append('<input type="submit" value="Forget" class="forget_pop3_connection" />');
                 $('.forget_pop3_connection').on('click', pop3_forget_action);
             }
         },
-        {'po3_save': 1}
+        {'pop3_save': 1}
     );
 };
 
@@ -44,7 +45,8 @@ var pop3_forget_action = function() {
             Hm_Notices.show(res.router_user_msgs);
             if (res.just_forgot_credentials) {
                 form.find('.credentials').attr('disabled', false);
-                form.find('span').show();
+                form.find('.pop3_password').val('');
+                form.find('.pop3_password').attr('placeholder', 'Password');
                 form.append('<input type="submit" value="Save" class="save_pop3_connection" />');
                 $('.save_pop3_connection').on('click', pop3_save_action);
                 $('.forget_pop3_connection', form).remove();
@@ -73,3 +75,5 @@ var pop3_delete_action = function() {
 
 $('.test_pop3_connect').on('click', pop3_test_action);
 $('.save_pop3_connection').on('click', pop3_save_action);
+$('.forget_pop3_connection').on('click', pop3_forget_action);
+$('.delete_pop3_connection').on('click', pop3_delete_action);
