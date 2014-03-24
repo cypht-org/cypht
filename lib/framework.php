@@ -695,8 +695,6 @@ abstract class Hm_Output_Module {
 
     protected $lstr = array();
     protected $lang = false;
-    public $js = '';
-    public $css = '';
 
     abstract protected function output($input, $format);
 
@@ -715,23 +713,12 @@ abstract class Hm_Output_Module {
         return $string;
     }
 
-    public function output_content($input, $format, $lang_str, $js=array(), $css=array()) {
+    public function output_content($input, $format, $lang_str) {
         $this->lstr = $lang_str;
         if (isset($lang_str['interface_lang'])) {
             $this->lang = $lang_str['interface_lang'];
         }
-        if (!empty($css) || !empty($js)) {
-            return $this->output($input, $format, $js, $css);
-        }
         return $this->output($input, $format);
-    }
-
-    public function add_js($input) {
-        $this->js .= $input;
-    }
-
-    public function add_css($input) {
-        $this->css .= $input;
     }
 }
 
