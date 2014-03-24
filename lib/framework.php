@@ -1041,11 +1041,31 @@ class Hm_POP3_List {
 }
 
 class Hm_Page_Cache {
-    public static function add() {}
-    public static function del() {}
-    public static function get() {}
-    public static function save() {}
-    public static function load() {}
+
+    private static $pages = array();
+
+    public static function add($key, $page) {
+        self::$pages[$key] = $page;
+    }
+    public static function del() {
+        if (isset(self::$pages[$key])) {
+            unset(self::$pages[$key]);
+            return true;
+        }
+        return false;
+    }
+    public static function get($key) {
+        if (isset(self::$pages[$key])) {
+            return self::$pages[$key];
+        }
+        return false;
+    }
+    public static function dump() {
+        return self::$pages;
+    }
+    public static function load($pages) {
+        self::$pages = $pages;
+    }
 }
 
 ?>
