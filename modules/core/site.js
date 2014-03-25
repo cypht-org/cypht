@@ -38,7 +38,7 @@ Hm_Ajax_Request = function() { return {
             success: this.done,
         })
         .fail(this.fail)
-        .always(this.always)
+        .always(this.always);
 
         return false;
     },
@@ -74,7 +74,7 @@ Hm_Ajax_Request = function() { return {
             $('.loading_icon').css('visibility', 'hidden');
         }
     }
-}};
+}; };
 
 /* user notification manager */
 Hm_Notices = {
