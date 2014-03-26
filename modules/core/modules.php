@@ -2,7 +2,6 @@
 
 /* INPUT */
 
-if (!class_exists('HM_Handler_http_headers')) {
 class Hm_Handler_http_headers extends Hm_Handler_Module {
     public function process($data) {
         if (isset($data['language'])) {
@@ -13,9 +12,8 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_load_page_cache_from_session')) {
 class Hm_Handler_load_page_cache_from_session extends Hm_Handler_Module {
     public function process($data) {
         $pages = $this->session->get('page_cache', array());
@@ -23,9 +21,8 @@ class Hm_Handler_load_page_cache_from_session extends Hm_Handler_Module {
             Hm_Page_Cache::add($key, $page);
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_process_language_setting')) {
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
@@ -37,9 +34,8 @@ class Hm_Handler_process_language_setting extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_process_timezone_setting')) {
 class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'timezone_setting'));
@@ -51,9 +47,8 @@ class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_save_user_settings')) {
 class Hm_Handler_save_user_settings extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings'));
@@ -70,34 +65,30 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_title')) {
 class Hm_Handler_title extends Hm_Handler_Module {
     public function process($data) {
         $data['title'] = ucfirst($this->page);
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_language')) {
 class Hm_Handler_language extends Hm_Handler_Module {
     public function process($data) {
         $data['language'] = $this->user_config->get('language_setting', 'en_US');
         //$data['language'] = $this->session->get('language', 'en_US');
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_date')) {
 class Hm_Handler_date extends Hm_Handler_Module {
     public function process($data) {
         $data['date'] = date('Y-m-d h:i:s');
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_login')) {
 class Hm_Handler_login extends Hm_Handler_Module {
     public function process($data) {
         if (!isset($this->request->post['create_hm_user'])) {
@@ -112,9 +103,8 @@ class Hm_Handler_login extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_create_user')) {
 class Hm_Handler_create_user extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('username', 'password', 'create_hm_user'));
@@ -123,9 +113,8 @@ class Hm_Handler_create_user extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_load_user_data')) {
 class Hm_Handler_load_user_data extends Hm_Handler_Module {
     public function process($data) {
         $user_data = $this->session->get('user_data', array());
@@ -138,9 +127,8 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_save_user_data')) {
 class Hm_Handler_save_user_data extends Hm_Handler_Module {
     public function process($data) {
         $user_data = $this->user_config->dump();
@@ -149,9 +137,8 @@ class Hm_Handler_save_user_data extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
-if (!class_exists('Hm_Handler_logout')) {
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
@@ -166,20 +153,18 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         }
         return $data;
     }
-}}
+}
 
 /* OUTPUT */
 
-if (!class_exists('Hm_Output_title')) {
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<h1 class="title">HM3</h1>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_login')) {
 class Hm_Output_login extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
@@ -197,27 +182,24 @@ class Hm_Output_login extends Hm_Output_Module {
         }
         return '';
     }
-}}
+}
 
-if (!class_exists('Hm_Output_date')) {
 class Hm_Output_date extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<div class="date">'.$this->html_safe($input['date']).'</div>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_logout')) {
 class Hm_Output_logout extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' && $input['router_login_state']) {
             return '<form class="logout_form" method="POST"><input type="submit" class="logout" name="logout" value="Logout" /></form>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_msgs')) {
 class Hm_Output_msgs extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
@@ -232,9 +214,8 @@ class Hm_Output_msgs extends Hm_Output_Module {
         }
         return '';
     }
-}}
+}
 
-if (!class_exists('Hm_Output_header_start')) {
 class Hm_Output_header_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -248,45 +229,48 @@ class Hm_Output_header_start extends Hm_Output_Module {
             return sprintf("\nHM3 CLI Interface\n\n");
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_header_end')) {
 class Hm_Output_header_end extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '</head><body>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_header_content')) {
+class Hm_Output_content_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<body>';
+        }
+    }
+}
+
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<title>HM3</title><meta charset="utf-8" />';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_settings_link')) {
 class Hm_Output_settings_link extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<a class="settings_link" href="'.$this->html_safe($input['router_url_path']).'?page=settings">'.$this->trans('Settings').'</a>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_homepage_link')) {
 class Hm_Output_homepage_link extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'">'.$this->trans('Home').'</a>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_header_css')) {
 class Hm_Output_header_css extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -304,9 +288,8 @@ class Hm_Output_header_css extends Hm_Output_Module {
             return $res;
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_page_js')) {
 class Hm_Output_page_js extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -324,18 +307,16 @@ class Hm_Output_page_js extends Hm_Output_Module {
             }
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_footer')) {
-class Hm_Output_footer extends Hm_Output_Module {
+class Hm_Output_content_end extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '</body></html>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_jquery')) {
 class Hm_Output_jquery extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -343,9 +324,8 @@ class Hm_Output_jquery extends Hm_Output_Module {
         }
         return '';
     }
-}}
+}
 
-if (!class_exists('Hm_Output_js_data')) {
 class Hm_Output_js_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -355,27 +335,24 @@ class Hm_Output_js_data extends Hm_Output_Module {
                 '</script>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_loading_icon')) {
 class Hm_Output_loading_icon extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<div class="loading_icon"><img alt="Loading..." src="images/ajax-loader.gif" width="16" height="16" /></div>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_start_settings_form')) {
 class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<div class="user_settings"><div class="subtitle">Settings</div><form method="POST" action=""><table>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_language_setting')) {
 class Hm_Output_language_setting extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -401,9 +378,8 @@ class Hm_Output_language_setting extends Hm_Output_Module {
             return $res;
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_timezone_setting')) {
 class Hm_Output_timezone_setting extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -426,9 +402,8 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             return $res;
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_end_settings_form')) {
 class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -437,24 +412,22 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
                 '</tr></table></form></div>';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_toolbar_start')) {
 class Hm_Output_toolbar_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<div class="toolbar">';
         }
     }
-}}
+}
 
-if (!class_exists('Hm_Output_toolbar_end')) {
 class Hm_Output_toolbar_end extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '</div>';
         }
     }
-}}
+}
 
 ?>
