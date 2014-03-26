@@ -13,7 +13,6 @@ $(document).ajaxSuccess(function(event, xhr, settings) {
         $(".hm3_pop3_debug").html('');
         tracker_update_count = 0;
     }
-    console.log(tracker_update_count);
     if (response.module_debug) {
         $(".module_list").prepend(response.module_debug);
     }
