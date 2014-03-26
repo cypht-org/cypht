@@ -37,6 +37,7 @@ Hm_Output_Modules::add('unread', 'jquery', false);
 Hm_Output_Modules::add('unread', 'jquery_table', false);
 Hm_Output_Modules::add('unread', 'header_content', false);
 Hm_Output_Modules::add('unread', 'header_end', false);
+Hm_Output_Modules::add('unread', 'content_start', false);
 Hm_Output_Modules::add('unread', 'toolbar_start', false);
 Hm_Output_Modules::add('unread', 'logout', true);
 Hm_Output_Modules::add('unread', 'settings_link', true);
@@ -51,7 +52,7 @@ Hm_Output_Modules::add('unread', 'loading_icon', false);
 Hm_Output_Modules::add('unread', 'toolbar_end', false);
 Hm_Output_Modules::add('unread', 'unread_message_list', true);
 Hm_Output_Modules::add('unread', 'page_js', true);
-Hm_Output_Modules::add('unread', 'footer', true);
+Hm_Output_Modules::add('unread', 'content_end', false);
 
 /* ajax server setup callback data */
 Hm_Handler_Modules::add('ajax_imap_debug', 'login', false);
