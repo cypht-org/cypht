@@ -22,7 +22,6 @@ abstract class Hm_Config {
     protected function set_tz() {
         date_default_timezone_set($this->get('timezone_setting', 'UTC'));
     }
-
 }
 
 /* file based user configuration */
@@ -64,7 +63,6 @@ class Hm_User_Config_File extends Hm_Config {
         $data = Hm_Crypt::ciphertext(serialize($this->config), $enc_key);
         file_put_contents($destination, $data);
     }
-
 }
 
 /* db based user configuration */
@@ -141,7 +139,6 @@ class Hm_Site_Config_File extends Hm_Config {
             }
         }
     }
-
 }
 
 /* handle page processing delegation */
@@ -205,7 +202,6 @@ class Hm_Router {
 
     private function check_for_tls($config, $request) {
         if (!$request->tls && $config->get('force_tls', false)) {
-            error_log(str_replace('http://', 'https://', $request->server['REQUEST_URI']));
             $this->redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
         }
     }
@@ -243,6 +239,8 @@ class Hm_Router {
                 }
             }
         }
+        Hm_Handler_Modules::try_queued_modules();
+
         foreach ($output as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
                 if ($this->page == $page) {
@@ -250,6 +248,7 @@ class Hm_Router {
                 }
             }
         }
+        Hm_Output_Modules::try_queued_modules();
     }
 
     private function forward_redirect_data($session, $request) {
@@ -580,7 +579,6 @@ abstract class Hm_Output {
             $this->output_content($response);
         }
     }
-
 }
 
 /* HTTP output class */
@@ -664,7 +662,6 @@ class Hm_Debug { use Hm_List;
         self::add(sprintf("PID: %d", getmypid()));
         self::add(sprintf("Included files: %d", count(get_included_files())));
     }
-
 }
 
 /* base handler module */
@@ -740,11 +737,12 @@ abstract class Hm_Output_Module {
 trait Hm_Modules {
 
     private static $module_list = array();
+    private static $module_queue = array();
 
     public static function load($mod_list) {
         $this->module_list = $mod_list;
     }
-    public static function add($page, $module, $logged_in, $marker=false, $placement='after') {
+    public static function add($page, $module, $logged_in, $marker=false, $placement='after', $queue=true) {
         $inserted = false;
         if (!isset(self::$module_list[$page])) {
             self::$module_list[$page] = array();
@@ -772,7 +770,18 @@ trait Hm_Modules {
             self::$module_list[$page][$module] = array('logged_in' => $logged_in);
         }
         if (!$inserted) {
-            Hm_Msgs::add(sprintf('failed to insert module %s', $module));
+            if ($queue) {
+                Hm_Debug::add(sprintf('queueing module %s', $module));
+                self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement);
+            }
+            else {
+                Hm_Debug::add(sprintf('failed to insert module %s', $module));
+            }
+        }
+    }
+    public static function try_queued_modules() {
+        foreach (self::$module_queue as $vals) {
+            self::add($vals[0], $vals[1], $vals[2], $vals[3], $vals[4], false);
         }
     }
 
