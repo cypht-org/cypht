@@ -1,8 +1,19 @@
+var tracker_update_count = 0;
+
 $(document).ajaxSuccess(function(event, xhr, settings) {
     var response = jQuery.parseJSON(xhr.responseText);
     if (typeof res == 'string' && (res == 'null' || res.indexOf('<') == 0)) {
         return;
     }
+    tracker_update_count++;
+    if (tracker_update_count == 10) {
+        $(".module_list").html('');
+        $(".hm3_debug").html('');
+        $(".hm3_imap_debug").html('');
+        $(".hm3_pop3_debug").html('');
+        tracker_update_count = 0;
+    }
+    console.log(tracker_update_count);
     if (response.module_debug) {
         $(".module_list").prepend(response.module_debug);
     }

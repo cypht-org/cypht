@@ -2,16 +2,16 @@
 
 Hm_Handler_Modules::add('home', 'tracker', false, 'http_headers', 'after');
 Hm_Handler_Modules::add('home', 'imap_tracker', true, 'tracker', 'after');
-Hm_Output_Modules::add('home', 'show_debug', false, 'footer', 'before');
-Hm_Output_Modules::add('home', 'tracker', false, 'footer', 'before');
+Hm_Output_Modules::add('home', 'show_debug', false, 'content_end', 'before');
+Hm_Output_Modules::add('home', 'tracker', false, 'content_end', 'before');
 
 Hm_Handler_Modules::add('servers', 'tracker', false, 'http_headers', 'after');
-Hm_Output_Modules::add('servers', 'show_debug', false, 'footer', 'before');
-Hm_Output_Modules::add('servers', 'tracker', false, 'footer', 'before');
+Hm_Output_Modules::add('servers', 'show_debug', false, 'content_end', 'before');
+Hm_Output_Modules::add('servers', 'tracker', false, 'content_end', 'before');
 
 Hm_Handler_Modules::add('unread', 'tracker', false, 'http_headers', 'after');
-Hm_Output_Modules::add('unread', 'show_debug', false, 'footer', 'before');
-Hm_Output_Modules::add('unread', 'tracker', false, 'footer', 'before');
+Hm_Output_Modules::add('unread', 'show_debug', false, 'content_end', 'before');
+Hm_Output_Modules::add('unread', 'tracker', false, 'content_end', 'before');
 
 Hm_Handler_Modules::add('ajax_pop3_debug', 'tracker', false, 'save_pop3_servers', 'after');
 Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_tracker', true, 'pop3_connect', 'after');
@@ -39,7 +39,7 @@ Hm_Output_Modules::add('ajax_imap_unread', 'tracker', false);
 Hm_Output_Modules::add('ajax_imap_unread', 'show_debug', false);
 
 Hm_Handler_Modules::add('settings', 'tracker', false, 'http_headers', 'after');
-Hm_Output_Modules::add('settings', 'show_debug', false, 'footer', 'before');
-Hm_Output_Modules::add('settings', 'tracker', false, 'footer', 'before');
+Hm_Output_Modules::add('settings', 'show_debug', false, 'content_end', 'before');
+Hm_Output_Modules::add('settings', 'tracker', false, 'content_end', 'before');
 
 ?>
