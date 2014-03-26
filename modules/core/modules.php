@@ -8,6 +8,9 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
         if (isset($data['language'])) {
             $data['http_headers'][] = 'Content-Language: '.substr($data['language'], 0, 2);
         }
+        if ($this->request->tls) {
+            $data['http_headers'][] = 'Strict-Transport-Security: max-age=31536000';
+        }
         return $data;
     }
 }}
