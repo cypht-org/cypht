@@ -170,16 +170,17 @@ class Hm_Router {
         /* process inbound data */
         $request = new Hm_Request($filters);
 
+        /* check for HTTP TLS */
         $this->check_for_tls($config, $request);
+
+        /* initiate a session class */
+        $session = $this->setup_session($config);
 
         /* determine page or ajax request name */
         $this->get_page($request, $filters['allowed_pages']);
 
         /* load processing modules for this page */
         $this->load_modules($config, $handler_mods, $output_mods);
-
-        /* initiate a session class, but don't start anything yet */
-        $session = $this->setup_session($config);
 
         /* run all the handler modules for a page and merge in some standard results */
         $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
@@ -193,7 +194,7 @@ class Hm_Router {
         /* see if we should redirect this request */
         $this->check_for_redirect($request, $session, $result);
 
-        /* close down the session class */
+        /* close down the session */
         $session->end();
 
         /* return processed data */
@@ -1072,8 +1073,11 @@ class Hm_Page_Cache {
     public static function dump() {
         return self::$pages;
     }
-    public static function load($pages) {
-        self::$pages = $pages;
+    public static function load($session) {
+        self::$pages = $session->get('page_cache', array());
+    }
+    public static function save($session) {
+        $session->set('page_cache', self::$pages);
     }
 }
 
