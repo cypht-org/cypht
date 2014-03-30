@@ -27,7 +27,7 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
         if (isset($this->request->post['pop3_save'])) {
             list($success, $form) = $this->process_form(array('pop3_user', 'pop3_pass', 'pop3_server_id'));
             if (!$success) {
-                Hm_Msgs::add('Username and Password are required to save a connection');
+                Hm_Msgs::add('ERRUsername and Password are required to save a connection');
             }
             else {
                 $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false, $form['pop3_user'], $form['pop3_pass'], true);
@@ -36,7 +36,7 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
                     Hm_Msgs::add("Server saved");
                 }
                 else {
-                    Hm_Msgs::add("Unable to save this server, are the username and password correct?");
+                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
                 }
             }
         }
@@ -96,7 +96,19 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
                 Hm_Msgs::add("Successfully authenticated to the POP3 server");
             }
             else {
-                Hm_Msgs::add("Failed to authenticate to the POP3 server");
+                Hm_Msgs::add("ERRFailed to authenticate to the POP3 server");
+            }
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_load_pop3_server_cache extends Hm_Handler_Module {
+    public function process($data) {
+        $servers = Hm_POP3_List::dump();
+        $cache = $this->session->get('pop3_cache', array()); 
+        foreach ($servers as $index => $server) {
+            if (isset($cache[$index])) {
             }
         }
         return $data;
@@ -119,7 +131,7 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('new_pop3_name', 'new_pop3_address', 'new_pop3_port'));
             if (!$success) {
                 $data['old_form'] = $form;
-                Hm_Msgs::add('You must supply a name, a server and a port');
+                Hm_Msgs::add('ERRYou must supply a name, a server and a port');
             }
             else {
                 $tls = false;
@@ -135,7 +147,7 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
                     Hm_Msgs::add('Added server!');
                 }
                 else {
-                    Hm_Msgs::add(sprintf('Cound not add server: %s', $errstr));
+                    Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));
                 }
             }
         }

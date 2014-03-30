@@ -17,6 +17,7 @@ Hm_Output_Modules::add('servers', 'display_configured_pop3_servers', true, 'add_
 Hm_Handler_Modules::add('ajax_pop3_debug', 'login', false);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'load_user_data',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'load_pop3_servers_from_config',  true);
+Hm_Handler_Modules::add('ajax_pop3_debug', 'load_pop3_server_cache',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'add_pop3_servers_to_page_data',  true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_connect', true);
 Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_delete', true);
