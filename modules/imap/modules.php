@@ -7,13 +7,17 @@ class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
             $ids = explode(',', $form['summary_ids']);
             foreach($ids as $id) {
                 $id = intval($id);
+                $details = Hm_IMAP_List::dump($id);
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $imap = Hm_IMAP_List::connect($id, $cache);
-                if ($imap->get_state() == 'authenticated') {
+                if (is_object($imap) && $imap->get_state() == 'authenticated') {
                     $data['imap_summary'][$id] = $imap->get_mailbox_status('INBOX');
                     $data['imap_summary'][$id]['folders'] = count($imap->get_mailbox_list());
                 }
                 else {
+                    if (!$imap) {
+                        Hm_Msgs::add(sprintf('ERRCould not access IMAP server "%s" (%s:%d)', $details['name'], $details['server'], $details['port']));
+                    }
                     $data['imap_summary'][$id] = array('folders' => '?', 'messages' => '?', 'unseen' => '?');
                 }
             }
@@ -74,7 +78,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_address', 'new_imap_port'));
             if (!$success) {
                 $data['old_form'] = $form;
-                Hm_Msgs::add('You must supply a name, a server and a port');
+                Hm_Msgs::add('ERRYou must supply a name, a server and a port');
             }
             else {
                 $tls = false;
@@ -90,7 +94,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                     Hm_Msgs::add('Added server!');
                 }
                 else {
-                    Hm_Msgs::add(sprintf('Cound not add server: %s', $errstr));
+                    Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));
                 }
             }
         }
@@ -177,11 +181,11 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     Hm_Msgs::add("Successfully authenticated to the IMAP server");
                 }
                 else {
-                    Hm_Msgs::add("Failed to authenticate to the IMAP server");
+                    Hm_Msgs::add("ERRFailed to authenticate to the IMAP server");
                 }
             }
             else {
-                Hm_Msgs::add('Username and password are required');
+                Hm_Msgs::add('ERRUsername and password are required');
                 $data['old_form'] = $form;
             }
         }
@@ -213,7 +217,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
         if (isset($this->request->post['imap_save'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
             if (!$success) {
-                Hm_Msgs::add('Username and Password are required to save a connection');
+                Hm_Msgs::add('ERRUsername and Password are required to save a connection');
             }
             else {
                 $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
@@ -223,7 +227,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                     Hm_Msgs::add("Server saved");
                 }
                 else {
-                    Hm_Msgs::add("Unable to save this server, are the username and password correct?");
+                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
                 }
             }
         }
@@ -330,7 +334,6 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
             if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
                 $res .= '<input type="hidden" id="imap_summary_ids" value="'.
                     $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
-
                 $res .= '<div class="imap_summary_data">';
                 $res .= '<table><thead><tr><th>IMAP Server</th><th>Address</th><th>Port</th>'.
                     '<th>TLS</th><th>Folders</th><th>INBOX count</th><th>INBOX unread</th></tr></thead><tbody>';
