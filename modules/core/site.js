@@ -57,6 +57,9 @@ Hm_Ajax_Request = function() { return {
             if (res.date) {
                 $('.date').html(res.date);
             }
+            if (res.router_user_msgs) {
+                Hm_Notices.show(res.router_user_msgs);
+            }
             if (this.callback) {
                 this.callback(res);
             }
@@ -82,7 +85,12 @@ Hm_Notices = {
     hide_id: false,
 
     show: function(msgs) {
-        var msg_list = $.map(msgs, function(v) { return v; });
+        var msg_list = $.map(msgs, function(v) {
+            if (v.match(/^ERR/)) {
+                return '<span class="err">'+v.substring(3)+'</span>';
+            }
+            return v;
+        });
         $('.sys_messages').html(msg_list.join(', '));
         Hm_Notices.hide();
     },
@@ -96,7 +104,7 @@ Hm_Notices = {
                 $('.sys_messages').html('');
                 $('.sys_messages').show('');
             });
-        }, 10000);
+        }, 20000);
     }
 };
 

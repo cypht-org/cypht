@@ -17,3 +17,4 @@ table { width: 100%; }
 option, select { padding: 3px; }
 .toolbar { background: #f5f5f5; border-bottom: solid 1px #aaa; margin-bottom: 20px; padding-top: 10px; padding-left: 10px; margin-left: -20px; }
 .login_form { margin-top: 60px; margin-left: 60px; }
+.err { color: red; }

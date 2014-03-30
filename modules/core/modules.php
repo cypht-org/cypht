@@ -14,15 +14,6 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_load_page_cache_from_session extends Hm_Handler_Module {
-    public function process($data) {
-        $pages = $this->session->get('page_cache', array());
-        foreach ($pages as $key => $page) {
-            Hm_Page_Cache::add($key, $page);
-        }
-    }
-}
-
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
@@ -146,10 +137,10 @@ class Hm_Handler_logout extends Hm_Handler_Module {
             $path = $this->config->get('user_settings_dir', false);
             if ($user && $path) {
                 $this->user_config->save($user);
-                Hm_Msgs::add('saved user data on logout');
+                Hm_Msgs::add('Saved user data on logout');
             }
             $this->session->destroy();
-            Hm_Msgs::add('session destroyed on logout');
+            Hm_Msgs::add('Session destroyed on logout');
         }
         return $data;
     }
