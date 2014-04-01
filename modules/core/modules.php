@@ -198,7 +198,14 @@ class Hm_Output_msgs extends Hm_Output_Module {
             $msgs = Hm_Msgs::get();
             $res .= '<div class="sys_messages">';
             if (!empty($msgs)) {
-                $res .= implode(',', array_map(function($v) { return $this->html_safe($v); }, $msgs));
+                $res .= implode(',', array_map(function($v) {
+                    if (preg_match("/ERR/", $v)) {
+                        return sprintf('<span class="err">%s</span>', substr($this->html_safe($v), 3));
+                    }
+                    else {
+                        return $this->html_safe($v);
+                    }
+                }, $msgs));
             }
             $res .= '</div>';
             return $res;
