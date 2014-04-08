@@ -281,6 +281,8 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res = '';
             foreach ($input['imap_servers'] as $index => $vals) {
 
+                $no_edit = false;
+
                 if (isset($vals['user'])) {
                     $disabled = 'disabled="disabled"';
                     $user_pc = $vals['user'];
@@ -293,6 +295,9 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 }
                 if ($vals['name'] == 'Default-Auth-Server') {
                     $vals['name'] = 'Default';
+                    if (stristr($input['session_type'], 'imap')) {
+                        $no_edit = true;
+                    }
                 }
                 $res .= '<div class="configured_server">';
                 $res .= sprintf('<div class="server_title">IMAP %s</div><div class="server_subtitle">%s/%d %s</div>',
@@ -303,7 +308,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
                     '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
                     '<span> <input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
-                if ($vals['name']) {
+                if (!$no_edit) {
                     $res .= '<input type="submit" value="Test" class="test_imap_connect" />';
                     if (!isset($vals['user']) || !$vals['user']) {
                         $res .= '<input type="submit" value="Delete" class="imap_delete" />';
