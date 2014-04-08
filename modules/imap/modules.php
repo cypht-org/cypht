@@ -313,22 +313,6 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_servers_link extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<a class="server_link" href="'.$this->html_safe($input['router_url_path']).'?page=servers">'.$this->trans('Servers').'</a>';
-        }
-    }
-}
-
-class Hm_Output_unread_link extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<a class="unread_link" href="'.$this->html_safe($input['router_url_path']).'?page=unread">'.$this->trans('Unread').'</a>';
-        }
-    }
-}
-
 class Hm_Output_display_imap_summary extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
