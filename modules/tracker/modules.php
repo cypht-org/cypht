@@ -58,7 +58,7 @@ class Hm_Handler_tracker extends Hm_Handler_Module {
                 $active = false;
             }
         }
-        return array('type' => $type, 'mod' => $mod, 'active' => $active ? 'enabled' : 'disabled');
+        return array('type' => $type, 'mod' => $mod, 'source' => $args['source'], 'active' => $active ? 'enabled' : 'disabled');
     }
 }
 class Hm_Output_show_debug extends Hm_Output_Module {
@@ -132,7 +132,7 @@ class Hm_Output_tracker extends Hm_Output_Module {
     }
 
     private function format_row($vals) {
-        return sprintf("<tr><td>%s</td><td>%s</td><td class='%s'>%s</td></tr>", $vals['type'], $vals['mod'], $vals['active'], $vals['active']);
+        return sprintf("<tr><td>%s</td><td>%s</td><td>%s</td><td class='%s'>%s</td></tr>", $vals['type'], $vals['mod'], $vals['source'], $vals['active'], $vals['active']);
     }
 }
 
