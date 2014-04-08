@@ -1,40 +1,42 @@
 <?php
+handler_source('pop3');
+output_source('pop3');
+
 /* add stuff to the home page */
-Hm_Handler_Modules::add('home', 'load_pop3_servers_from_config',  true, 'load_user_data', 'after');
-Hm_Handler_Modules::add('home', 'add_pop3_servers_to_page_data',  true, 'load_pop3_servers_from_config', 'after');
-Hm_Output_Modules::add('home', 'display_pop3_summary', true, 'display_imap_summary', 'after');
+add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
+add_handler('home', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_output('home', 'display_pop3_summary', true, 'pop3', 'display_imap_summary', 'after');
 
 /* servers page */
-Hm_Handler_Modules::add('servers', 'load_pop3_servers_from_config',  true, 'date', 'after');
-Hm_Handler_Modules::add('servers', 'process_add_pop3_server', true, 'load_pop3_servers_from_config', 'after');
-Hm_Handler_Modules::add('servers', 'add_pop3_servers_to_page_data', true, 'process_add_pop3_server', 'after');
-Hm_Handler_Modules::add('servers', 'save_pop3_servers',  true, 'add_pop3_servers_to_page_data', 'after');
-
-Hm_Output_Modules::add('servers', 'add_pop3_server_dialog', true, 'display_configured_imap_servers', 'after');
-Hm_Output_Modules::add('servers', 'display_configured_pop3_servers', true, 'add_pop3_server_dialog', 'after');
+add_handler('servers', 'load_pop3_servers_from_config', true, 'pop3', 'date', 'after');
+add_handler('servers', 'process_add_pop3_server', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_handler('servers', 'add_pop3_servers_to_page_data', true, 'pop3', 'process_add_pop3_server', 'after');
+add_handler('servers', 'save_pop3_servers', true, 'pop3', 'add_pop3_servers_to_page_data', 'after');
+add_output('servers', 'add_pop3_server_dialog', true, 'pop3', 'display_configured_imap_servers', 'after');
+add_output('servers', 'display_configured_pop3_servers', true, 'pop3', 'add_pop3_server_dialog', 'after');
 
 /* ajax server setup callback data */
-Hm_Handler_Modules::add('ajax_pop3_debug', 'login', false);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'load_user_data',  true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'load_pop3_servers_from_config',  true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'load_pop3_server_cache',  true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'add_pop3_servers_to_page_data',  true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_connect', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_delete', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_forget', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'pop3_save', true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'save_pop3_servers',  true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'save_user_data',  true);
-Hm_Handler_Modules::add('ajax_pop3_debug', 'date', true);
+add_handler('ajax_pop3_debug', 'login', false, 'core');
+add_handler('ajax_pop3_debug', 'load_user_data',  true, 'core');
+add_handler('ajax_pop3_debug', 'load_pop3_servers_from_config',  true);
+add_handler('ajax_pop3_debug', 'load_pop3_server_cache',  true);
+add_handler('ajax_pop3_debug', 'add_pop3_servers_to_page_data',  true);
+add_handler('ajax_pop3_debug', 'pop3_connect', true);
+add_handler('ajax_pop3_debug', 'pop3_delete', true);
+add_handler('ajax_pop3_debug', 'pop3_forget', true);
+add_handler('ajax_pop3_debug', 'pop3_save', true);
+add_handler('ajax_pop3_debug', 'save_pop3_servers', true);
+add_handler('ajax_pop3_debug', 'save_user_data',  true, 'core');
+add_handler('ajax_pop3_debug', 'date', true, 'core');
 
 /* ajax server summary callback data */
-Hm_Handler_Modules::add('ajax_pop3_summary', 'login', false);
-Hm_Handler_Modules::add('ajax_pop3_summary', 'load_user_data',  true);
-Hm_Handler_Modules::add('ajax_pop3_summary', 'load_pop3_servers_from_config',  true);
-Hm_Handler_Modules::add('ajax_pop3_summary', 'add_pop3_servers_to_page_data',  true);
-Hm_Handler_Modules::add('ajax_pop3_summary', 'prep_pop3_summary_display',  true);
-Hm_Handler_Modules::add('ajax_pop3_summary', 'save_pop3_servers',  true);
-Hm_Handler_Modules::add('ajax_pop3_summary', 'date', true);
+add_handler('ajax_pop3_summary', 'login', false, 'core');
+add_handler('ajax_pop3_summary', 'load_user_data', true, 'core');
+add_handler('ajax_pop3_summary', 'load_pop3_servers_from_config',  true);
+add_handler('ajax_pop3_summary', 'add_pop3_servers_to_page_data',  true);
+add_handler('ajax_pop3_summary', 'prep_pop3_summary_display',  true);
+add_handler('ajax_pop3_summary', 'save_pop3_servers',  true);
+add_handler('ajax_pop3_summary', 'date', true, 'core');
 
 return array(
     'allowed_pages' => array(
