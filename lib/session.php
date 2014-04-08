@@ -12,6 +12,7 @@ abstract class Hm_Session {
 
     abstract protected function check($request);
     abstract protected function start($request);
+    abstract protected function just_started();
     abstract protected function auth($user, $pass);
     abstract protected function get($name, $default=false);
     abstract protected function set($name, $value);
@@ -29,7 +30,8 @@ class Hm_PHP_Session extends Hm_Session {
     public function __construct($config) {
         $this->site_config = $config;
     }
-
+    protected function just_started() {
+    }
     protected function ciphertext($data) {
         return Hm_Crypt::ciphertext(serialize($data), $this->enc_key);
     }
@@ -124,6 +126,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
                 Hm_Msgs::add('login accepted, starting PHP session');
                 $this->loaded = true;
                 $this->start($request);
+                $this->just_started();
             }
         }
         elseif (isset($request->cookie[$this->cname])) {
@@ -173,6 +176,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
     }
 }
 
+/* persistant storage with DB sessions and DB authentication */
 class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
 
     protected $cname = 'hm_session';
@@ -238,6 +242,7 @@ class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
     }
 }
 
+/* POP3 authentication */
 trait Hm_POP3_Auth {
     public function auth($user, $pass) {
         if (!class_exists('Hm_POP3')) {
@@ -269,7 +274,10 @@ trait Hm_POP3_Auth {
 
 }
 
+/* IMAP authentication */
 trait Hm_IMAP_Auth {
+
+    private $imap_settings = array();
 
     public function auth($user, $pass) {
         if (!class_exists('Hm_IMAP')) {
@@ -278,7 +286,7 @@ trait Hm_IMAP_Auth {
         $imap = new Hm_IMAP();
         list($server, $port, $tls) = $this->get_imap_config();
         if ($user && $pass && $server && $port) {
-            $imap->connect(array(
+            $this->imap_settings = array(
                 'server' => $server,
                 'port' => $port,
                 'tls' => $tls,
@@ -286,7 +294,8 @@ trait Hm_IMAP_Auth {
                 'password' => $pass,
                 'no_caps' => true,
                 'blacklisted_extensions' => array('enable')
-            ));
+            );
+            $imap->connect($this->imap_settings);
         }
         if ($imap->get_state() == 'authenticated') {
             return true;
@@ -301,6 +310,9 @@ trait Hm_IMAP_Auth {
         $port = $this->site_config->get('imap_auth_port', false);
         $tls = $this->site_config->get('imap_auth_tls', false);
         return array($server, $port, $tls);
+    }
+    protected function just_started() {
+        $this->set('imap_auth_server_settings', $this->imap_settings);
     }
 }
 
