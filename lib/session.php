@@ -244,6 +244,9 @@ class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
 
 /* POP3 authentication */
 trait Hm_POP3_Auth {
+
+    private $pop3_settings = array();
+
     public function auth($user, $pass) {
         if (!class_exists('Hm_POP3')) {
             require 'lib/hm-pop3.php';
@@ -252,6 +255,14 @@ trait Hm_POP3_Auth {
         $authed = false;
         list($server, $port, $tls) = $this->get_pop3_config();
         if ($user && $pass && $server && $port) {
+            $this->pop3_settings = array(
+                'server' => $server,
+                'port' => $port,
+                'tls' => $tls,
+                'username' => $user,
+                'password' => $pass,
+                'no_caps' => true
+            );
             $pop3->server = $server;
             $pop3->port = $port;
             $pop3->tls = $tls;
@@ -270,6 +281,9 @@ trait Hm_POP3_Auth {
         $port = $this->site_config->get('pop3_auth_port', false);
         $tls = $this->site_config->get('pop3_auth_tls', false);
         return array($server, $port, $tls);
+    }
+    protected function just_started() {
+        $this->set('pop3_auth_server_settings', $this->pop3_settings);
     }
 
 }
