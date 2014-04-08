@@ -208,14 +208,33 @@ class Hm_Router {
     }
 
     private function setup_session($config) {
-        switch ($config->get('session_type', false)) {
-            case 'DB_session':
-                Hm_Debug::add('Using custom DB session');
+        $session_type = $config->get('session_type', false);
+        $auth_type = $config->get('auth_type', false);
+
+        switch ($session_type.$auth_type) {
+            case 'DBDB':
+                Hm_Debug::add('Using DB auth and DB sessions');
                 $session = new Hm_DB_Session_DB_Auth($config);
                 break;
-            case 'DB_auth':
-                Hm_Debug::add('Using DB Authed session');
+            case 'PHPDB':
+                Hm_Debug::add('Using DB auth and PHP sessions');
                 $session = new Hm_PHP_Session_DB_Auth($config);
+                break;
+            case 'PHPIMAP':
+                Hm_Debug::add('Using IMAP auth and PHP sessions');
+                $session = new Hm_PHP_Session_IMAP_Auth($config);
+                break;
+            case 'PHPPOP3':
+                Hm_Debug::add('Using POP3 auth and PHP sessions');
+                $session = new Hm_PHP_Session_POP3_Auth($config);
+                break;
+            case 'DBIMAP':
+                Hm_Debug::add('Using IMAP auth and DB sessions');
+                $session = new Hm_DB_Session_IMAP_Auth($config);
+                break;
+            case 'DBPOP3':
+                Hm_Debug::add('Using POP3 auth and DB sessions');
+                $session = new Hm_DB_Session_POP3_Auth($config);
                 break;
             default:
                 Hm_Debug::add('Using default PHP sessions with no auth');
