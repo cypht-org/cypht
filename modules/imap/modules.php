@@ -88,7 +88,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                     $tls = true;
                 }
                 if ($con = fsockopen($form['new_imap_address'], $form['new_imap_port'], $errno, $errstr, 2)) {
-                    Hm_IMAP_List::add( array(
+                    Hm_IMAP_List::add(array(
                         'name' => $form['new_imap_name'],
                         'server' => $form['new_imap_address'],
                         'port' => $form['new_imap_port'],
@@ -141,8 +141,26 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
 class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     public function process($data) {
         $servers = $this->user_config->get('imap_servers', array());
+        $added = false;
         foreach ($servers as $index => $server) {
-            Hm_IMAP_List::add( $server, $index );
+            Hm_IMAP_List::add($server, $index);
+            if ($server['name'] == 'Default-Auth-Server') {
+                $added = true;
+            }
+        }
+        if (!$added) {
+            $auth_server = $this->session->get('imap_auth_server_settings', array());
+            if (!empty($auth_server)) {
+                Hm_IMAP_List::add(array( 
+                    'name' => 'Default-Auth-Server',
+                    'server' => $auth_server['server'],
+                    'port' => $auth_server['port'],
+                    'tls' => $auth_server['tls'],
+                    'user' => $auth_server['username'],
+                    'pass' => $auth_server['password']),
+                count($servers));
+                $this->session->del('imap_auth_server_settings');
+            }
         }
         return $data;
     }
@@ -273,25 +291,31 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                     $pass_pc = 'Password';
                     $disabled = '';
                 }
+                if ($vals['name'] == 'Default-Auth-Server') {
+                    $vals['name'] = 'Default';
+                }
                 $res .= '<div class="configured_server">';
-                $res .= sprintf('<div class="server_title">IMAP - %s</div><div class="server_subtitle">%s/%d %s</div>',
+                $res .= sprintf('<div class="server_title">IMAP %s</div><div class="server_subtitle">%s/%d %s</div>',
                     $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                     $vals['tls'] ? 'TLS' : '' );
                 $res .= 
                     '<form class="imap_connect" method="POST">'.
                     '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
                     '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
-                    '<span> <input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>'.
-                    '<input type="submit" value="Test" class="test_imap_connect" />';
-                if (!isset($vals['user']) || !$vals['user']) {
-                    $res .= '<input type="submit" value="Delete" class="imap_delete" />';
-                    $res .= '<input type="submit" value="Save" class="save_imap_connection" />';
+                    '<span> <input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
+                if ($vals['name']) {
+                    $res .= '<input type="submit" value="Test" class="test_imap_connect" />';
+                    if (!isset($vals['user']) || !$vals['user']) {
+                        $res .= '<input type="submit" value="Delete" class="imap_delete" />';
+                        $res .= '<input type="submit" value="Save" class="save_imap_connection" />';
+                    }
+                    else {
+                        $res .= '<input type="submit" value="Delete" class="imap_delete" />';
+                        $res .= '<input type="submit" value="Forget" class="forget_imap_connection" />';
+                    }
+                    $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
                 }
-                else {
-                    $res .= '<input type="submit" value="Delete" class="imap_delete" />';
-                    $res .= '<input type="submit" value="Forget" class="forget_imap_connection" />';
-                }
-                $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" /></form></div>';
+                $res .= '</form></div>';
             }
         }
         return $res;
@@ -324,6 +348,9 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
                 $res .= '<table><thead><tr><th>IMAP Server</th><th>Address</th><th>Port</th>'.
                     '<th>TLS</th><th>Folders</th><th>INBOX count</th><th>INBOX unread</th></tr></thead><tbody>';
                 foreach ($input['imap_servers'] as $index => $vals) {
+                    if ($vals['name'] == 'Default-Auth-Server') {
+                        $vals['name'] = 'Default';
+                    }
                     $res .= '<tr class="imap_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
                         '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
                         '<td>'.$vals['tls'].'</td><td class="folders"></td>'.
@@ -371,6 +398,9 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
             $res = '<table><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';
             foreach($input['imap_unread_data'] as $msg) {
                 $clean = array_map(function($v) { return $this->html_safe($v); }, $msg);
+                if ($clean['server_name'] == 'Default-Auth-Server') {
+                    $clean['server_name'] = 'Default';
+                }
                 $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $clean['subject']);
                 $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $clean['from']);
                 $from = str_replace("&quot;", '', $from);
