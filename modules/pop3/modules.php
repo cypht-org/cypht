@@ -1,5 +1,7 @@
 <?php
 
+require 'hm-pop3.php';
+
 class Hm_Handler_prep_pop3_summary_display extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('summary_ids'));

@@ -74,11 +74,13 @@ var pop3_delete_action = function() {
 };
 var pop3_summary_update = function() {
     var ids = $('#pop3_summary_ids').val();
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_summary'},
-        {'name': 'summary_ids', 'value': ids}],
-        update_pop3_summary_display
-    );
+    if ( ids && ids.length ) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_summary'},
+            {'name': 'summary_ids', 'value': ids}],
+            update_pop3_summary_display
+        );
+    }
 };
 var update_pop3_summary_display = function(res) {
     var context;
