@@ -224,19 +224,16 @@ class Hm_Router {
         }
         return $session;
     }
+    private function get_active_mods($mod_list) {
+        return array_unique(array_values(array_map(function($v) { return $v['source']; }, $mod_list)));
+    }
 
     private function load_modules($config, $handlers=array(), $output=array()) {
 
-        $mods = explode(',', $config->get('modules', '')); 
-        foreach ($mods as $name) {
-            if (is_readable(sprintf('modules/%s/modules.php', $name))) {
-                require sprintf('modules/%s/modules.php', $name);
-            }
-        }
         foreach ($handlers as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
                 if ($this->page == $page) {
-                    Hm_Handler_Modules::add($page, $name, $vals['logged_in']);
+                    Hm_Handler_Modules::add($page, $name, $vals['logged_in'], false, 'after', true, $vals['source']);
                 }
             }
         }
@@ -245,11 +242,20 @@ class Hm_Router {
         foreach ($output as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
                 if ($this->page == $page) {
-                    Hm_Output_Modules::add($page, $name, $vals['logged_in']);
+                    Hm_Output_Modules::add($page, $name, $vals['logged_in'], false, 'after', true, $vals['source']);
                 }
             }
         }
         Hm_Output_Modules::try_queued_modules();
+        $active_mods = array_unique(array_merge($this->get_active_mods(Hm_Output_Modules::get_for_page($this->page)),
+            $this->get_active_mods(Hm_Handler_Modules::get_for_page($this->page))));
+
+        $mods = explode(',', $config->get('modules', '')); 
+        foreach ($mods as $name) {
+            if (in_array($name, $active_mods) && is_readable(sprintf('modules/%s/modules.php', $name))) {
+                require sprintf('modules/%s/modules.php', $name);
+            }
+        }
     }
 
     private function forward_redirect_data($session, $request) {
@@ -738,12 +744,16 @@ abstract class Hm_Output_Module {
 trait Hm_Modules {
 
     private static $module_list = array();
+    private static $source = false;
     private static $module_queue = array();
 
     public static function load($mod_list) {
-        $this->module_list = $mod_list;
+        self::$module_list = $mod_list;
     }
-    public static function add($page, $module, $logged_in, $marker=false, $placement='after', $queue=true) {
+    public static function set_source($source) {
+        self::$source = $source;
+    }
+    public static function add($page, $module, $logged_in, $marker=false, $placement='after', $queue=true, $source=false) {
         $inserted = false;
         if (!isset(self::$module_list[$page])) {
             self::$module_list[$page] = array();
@@ -751,6 +761,9 @@ trait Hm_Modules {
         if (isset(self::$module_list[$page][$module])) {
             Hm_Debug::add(sprintf("Already registered module re-attempted: %s", $module));
             return;
+        }
+        if (!$source) {
+            $source = self::$source;
         }
         if ($marker) {
             $mods = array_keys(self::$module_list[$page]);
@@ -761,14 +774,14 @@ trait Hm_Modules {
                 }
                 $list = self::$module_list[$page];
                 self::$module_list[$page] = array_merge(array_slice($list, 0, $index), 
-                    array($module => array('logged_in' => $logged_in)),
+                    array($module => array('source' => $source, 'logged_in' => $logged_in)),
                     array_slice($list, $index));
                 $inserted = true;
             }
         }
         else {
             $inserted = true;
-            self::$module_list[$page][$module] = array('logged_in' => $logged_in);
+            self::$module_list[$page][$module] = array('source' => $source, 'logged_in' => $logged_in);
         }
         if (!$inserted) {
             if ($queue) {
@@ -1079,6 +1092,19 @@ class Hm_Page_Cache {
     public static function save($session) {
         $session->set('page_cache', self::$pages);
     }
+}
+
+function handler_source($source) {
+    Hm_Handler_Modules::set_source($source);
+}
+function output_source($source) {
+    Hm_Output_Modules::set_source($source);
+}
+function add_handler($page, $mod, $logged_in, $source=false, $marker=false, $placement='after', $queue=true) {
+    Hm_Handler_Modules::add($page, $mod, $logged_in, $marker, $placement, $queue, $source);
+}
+function add_output($page, $mod, $logged_in, $source=false, $marker=false, $placement='after', $queue=true) {
+    Hm_Output_Modules::add($page, $mod, $logged_in, $marker, $placement, $queue, $source);
 }
 
 ?>
