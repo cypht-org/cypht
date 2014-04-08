@@ -128,25 +128,29 @@ var update_unread_message_display = function(res) {
 
 var imap_unread_update = function(loading) {
     var ids = $('#imap_unread_ids').val();
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-        {'name': 'imap_unread_ids', 'value': ids}],
-        update_unread_message_display,
-        [],
-        loading
-    );
+    if ( ids && ids.length ) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
+            {'name': 'imap_unread_ids', 'value': ids}],
+            update_unread_message_display,
+            [],
+            loading
+        );
+    }
 };
 
 var imap_summary_update = function() {
     var ids = $('#imap_summary_ids').val();
-    $('.total').html('...');
-    $('.unseen').html('...');
-    $('.folders').html('...');
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_summary'},
-        {'name': 'summary_ids', 'value': ids}],
-        update_imap_summary_display
-    );
+    if ( ids && ids.length ) {
+        $('.total').html('...');
+        $('.unseen').html('...');
+        $('.folders').html('...');
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_summary'},
+            {'name': 'summary_ids', 'value': ids}],
+            update_imap_summary_display
+        );
+    }
 };
 
 if (hm_page_name == 'home') {
