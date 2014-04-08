@@ -1,6 +1,6 @@
 <?php
 
-require 'hm-imap.php';
+require 'lib/hm-imap.php';
 
 class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
     public function process($data) {
