@@ -91,6 +91,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
             else {
                 $this->session->check($this->request);
             }
+            $data['session_type'] = get_class($this->session);
         }
         return $data;
     }
@@ -164,7 +165,8 @@ class Hm_Output_login extends Hm_Output_Module {
                     ' '.$this->trans('Username').': <input type="text" name="username" value="">'.
                     ' '.$this->trans('Password').': <input type="password" name="password">'.
                     ' <input type="submit" value="Login" />';
-                if ($input['router_page_name'] == 'home') {
+                if (($input['session_type'] == 'Hm_DB_Session_DB_Auth' || $input['session_type'] == 'Hm_PHP_Session_DB_Auth') &&
+                    $input['router_page_name'] == 'home') {
                     $res .= ' <input type="submit" name="create_hm_user" value="Create" />';
                 }
                 $res .= '</form>';
