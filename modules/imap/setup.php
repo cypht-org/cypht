@@ -8,7 +8,9 @@ add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_da
 add_handler('home', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 
 add_output('home', 'jquery_table', true, 'imap', 'jquery', 'after'); 
-add_output('home', 'display_imap_summary', 'imap', true, 'page_js', 'before');
+add_output('home', 'display_imap_summary', true, 'imap', 'page_js', 'before');
+add_output('home', 'folder_list_start', true, 'imap', 'toolbar_end', 'after');
+add_output('home', 'folder_list_end', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
 add_handler('servers', 'load_imap_servers_from_config',  true, 'imap', 'date', 'after');

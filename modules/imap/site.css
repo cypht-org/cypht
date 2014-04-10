@@ -1,10 +1,10 @@
 .unread_messages, .configured_server, .add_server, .login_form { border: solid 1px #aaa; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .imap_summary_data table th, .unread_messages table th { cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
-.configured_server { margin-top: 20px; float: left; margin-left: 20px; width: 230px; height: 216px; }
+.configured_server { background-color: #f5f5f5; margin-top: 20px; float: left; margin-left: 20px; width: 230px; height: 216px; }
 .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #aaa; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
-.add_server { float: left; clear: left; margin-top: 20px; margin-left: 20px; width: 230px; background-color: #f5f5f5; }
+.add_server { float: left; clear: left; margin-top: 20px; margin-left: 20px; width: 230px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; }
 .save_settings, .unread_link, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 
@@ -30,5 +30,7 @@ input:disabled { background-color: #f5f5f5; }
 input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .add_server .txt_fld { width: 205px; }
 .add_server .port_fld { width: 50px; }
-.server_title { font-weight: bold; margin-bottom: 0px; color: #666; }
+.server_title { font-size: 110%; margin-bottom: 0px; color: #666; }
 .server_subtitle { margin-bottom: 20px; color: #666; }
+.folder_list { background-color: #f5f5f5; width: 200px; height: 600px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.folder_cell { width: 220px; }

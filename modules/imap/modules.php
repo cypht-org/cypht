@@ -300,7 +300,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                     }
                 }
                 $res .= '<div class="configured_server">';
-                $res .= sprintf('<div class="server_title">IMAP %s</div><div class="server_subtitle">%s/%d %s</div>',
+                $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
                     $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                     $vals['tls'] ? 'TLS' : '' );
                 $res .= 
@@ -331,12 +331,13 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<form class="add_server" method="POST"><input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.
+                '<div class="subtitle">Add an IMAP Server</div>'.
                 '<table>'.
-                '<tr><td><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-                '<tr><td><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
-                '<tr><td><input type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
-                '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td></tr>'.
-                '<tr><td><input type="submit" value="Add IMAP Server" name="submit_imap_server" /></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+                '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
+                '<td align="right"><input type="submit" value="Add" name="submit_imap_server" /></td></tr>'.
                 '</table></form>';
         }
     }
@@ -425,6 +426,18 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
             $input['formatted_unread_data'] = '';
         }
         return $input;
+    }
+}
+
+class Hm_Output_folder_list_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<table><tr><td class="folder_cell"><div class="folder_list"></div></td><td>';
+    }
+}
+
+class Hm_Output_folder_list_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</td></tr></table>';
     }
 }
 
