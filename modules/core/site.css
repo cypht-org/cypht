@@ -1,5 +1,6 @@
 body { font-family: Arial; padding: 0px; margin: 0px; margin-left: 20px; }
 table { width: 100%; }
+td { vertical-align: top; }
 .subtitle { color: #444; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 110%;  margin-left: 0px !important; }
 .date { float: right; clear: none; color: #888; padding-right: 30px; padding-top: 6px;}
 .sys_messages { color: green; position: absolute; left: 85px; top: 13px; }
