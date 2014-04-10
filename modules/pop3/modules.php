@@ -199,12 +199,14 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
             return '<form class="add_server" method="POST">'.
+                '<div class="subtitle">Add a POP3 Server</div>'.
+                '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce( 'add_pop3_server' ).'" />'.
                 '<table>'.
-                '<tr><td><input type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-                '<tr><td><input type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
-                '<tr><td><input type="text" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
-                '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td></tr>'.
-                '<tr><td><input type="submit" value="Add POP3 Server" name="submit_pop3_server" /></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
+                '<tr><td colspan="2"><input type="text" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+                '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
+                '<td align="right"><input type="submit" value="Add" name="submit_pop3_server" /></td></tr>'.
                 '</table></form>';
         }
     }
@@ -236,7 +238,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                         }
                     }
                     $res .= '<div class="configured_server">';
-                    $res .= sprintf('<div class="server_title">POP3 - %s</div><div class="server_subtitle">%s/%d %s</div>',
+                    $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
                         $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
                     $res .= 
                         '<form class="pop3_connect" method="POST">'.
