@@ -312,7 +312,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
 class Hm_Output_content_end extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '</body></html>';
+            return '<div class="elapsed"></div></body></html>';
         }
     }
 }

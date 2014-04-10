@@ -146,6 +146,7 @@ return array(
     ),
 
     'allowed_post' => array(
+        'hm_nonce' => FILTER_SANITIZE_STRING,
         'logout' => FILTER_VALIDATE_BOOLEAN,
         'username' => FILTER_SANITIZE_STRING,
         'create_hm_user' => FILTER_SANITIZE_STRING,

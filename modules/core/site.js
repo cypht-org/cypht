@@ -7,7 +7,7 @@ Hm_Ajax = {
         ajax.index = Hm_Ajax.requests.length;
         if (Hm_Ajax.requests.length == 0) {
             $("input[type='submit']").attr('disabled', true);
-            Hm_Notices.show([]);
+            //Hm_Notices.show([]);
             if (!no_icon) {
                 $('.loading_icon').css('visibility', 'visible');
             }
@@ -22,6 +22,7 @@ Hm_Ajax_Request = function() { return {
 
     callback: false,
     index: 0,
+    start_time: 0,
 
     make_request: function(args, callback, extra) {
         this.callback = callback;
@@ -30,15 +31,18 @@ Hm_Ajax_Request = function() { return {
                 args.push({'name': name, 'value': extra[name]});
             }
         }
+
+        var dt = new Date();
+        this.start_time = dt.getTime();
         $.ajax({
             type: "POST",
             url: '',
             data: args,
             context: this, 
             success: this.done,
-        })
-        .fail(this.fail)
-        .always(this.always);
+            complete: this.always,
+            error: this.fail
+        });
 
         return false;
     },
@@ -57,7 +61,7 @@ Hm_Ajax_Request = function() { return {
             if (res.date) {
                 $('.date').html(res.date);
             }
-            if (res.router_user_msgs) {
+            if (res.router_user_msgs && !jQuery.isEmptyObject(res.router_user_msgs)) {
                 Hm_Notices.show(res.router_user_msgs);
             }
             if (this.callback) {
@@ -71,6 +75,9 @@ Hm_Ajax_Request = function() { return {
     },
 
     always: function(res) {
+        var dt = new Date();
+        var elapsed = dt.getTime() - this.start_time;
+        $('.elapsed').html('AJAX request finished in ' + elapsed + ' millis');
         Hm_Ajax.requests.splice(this.index, 1);
         if (Hm_Ajax.requests.length == 0) {
             $("input[type='submit']").attr('disabled', false);
