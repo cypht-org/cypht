@@ -183,7 +183,7 @@ class Hm_Router {
         $this->load_modules($config, $handler_mods, $output_mods);
 
         /* run all the handler modules for a page and merge in some standard results */
-        $result = $this->merge_response($this->process_page($request, $session, $config), $request, $session);
+        $result = $this->merge_response($this->process_page($request, $session, $config), $config, $request, $session);
 
         /* check for a POST redirect */
         $prior_results = $this->forward_redirect_data($session, $request);
@@ -321,10 +321,21 @@ class Hm_Router {
         $response = $handler->process_request($this->page, $request, $session, $config);
         return $response;
     }
+    private function build_nonce_base($session, $config, $request) {
+        $result = $session->get('username', false);
+        if (isset($request->cookie['hm_id'])) {
+            $result .= $request->cookie['hm_id']; 
+        }
+        elseif ($config->get('enc_key', false)) {
+            $result .= $config->get('enc_key', false);
+        }
+        return $result;
+    }
 
-    private function merge_response($response, $request, $session) {
+    private function merge_response($response, $config, $request, $session) {
         return array_merge($response, array(
             'router_page_name'    => $this->page,
+            'router_nonce_base'   => $this->build_nonce_base($session, $config, $request),
             'router_request_type' => $request->type,
             'router_sapi_name'    => $request->sapi,
             'router_format_name'  => $request->format,
@@ -397,6 +408,7 @@ class Hm_Request {
             }
         }
     }
+
     private function is_tls() {
         if (isset($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on') {
             $this->tls = true;
@@ -542,7 +554,7 @@ abstract class HM_Format {
             $name = "Hm_Output_$name";
             if (class_exists($name)) {
                 if (!$args['logged_in'] || ($args['logged_in'] && $input['router_login_state'])) {
-                    $mod = new $name();
+                    $mod = new $name($input);
                     if ($format == 'JSON') {
                         $mod_output = $mod->output_content($input, $format, $lang_str);
                         if ($mod_output) {
@@ -707,7 +719,7 @@ abstract class Hm_Handler_Module {
         $this->page = $parent->page;
     }
 
-    protected function process_form($form) {
+    protected function process_form($form, $nonce=false) {
         $post = $this->request->post;
         $success = false;
         $new_form = array();
@@ -718,6 +730,24 @@ abstract class Hm_Handler_Module {
         }
         if (count($form) == count($new_form)) {
             $success = true;
+        }
+        if ($nonce && $success) {
+            $success = false;
+            if (isset($post['hm_nonce'])) {
+                $key = $this->session->get('username', false);
+                if (isset($this->request->cookie['hm_id'])) {
+                    $key .= $this->request->cookie['hm_id'];
+                }
+                elseif ($this->config->get('enc_key', false)) {
+                    $key .= $this->config->get('enc_key', false);
+                }
+                if (hash_hmac('sha256', $nonce, $key) == $post['hm_nonce']) {
+                    $success = true;
+                }
+            }
+            else {
+                $success = false;
+            }
         }
         return array($success, $new_form);
     }
@@ -732,9 +762,17 @@ abstract class Hm_Output_Module {
 
     protected $lstr = array();
     protected $lang = false;
+    protected $nonce_base = false;
+
+    function __construct($input) {
+        $this->nonce_base = $input['router_nonce_base'];
+    }
 
     abstract protected function output($input, $format);
 
+    protected function build_nonce($name) {
+        return hash_hmac('sha256', $name, $this->nonce_base);
+    }
     protected function trans($string) {
         if (isset($this->lstr[$string])) {
             if ($this->lstr[$string] === false) {
