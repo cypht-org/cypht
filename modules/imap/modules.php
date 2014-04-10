@@ -77,7 +77,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
 class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_imap_server'])) {
-            list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_address', 'new_imap_port'));
+            list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_address', 'new_imap_port'), 'add_imap_server');
             if (!$success) {
                 $data['old_form'] = $form;
                 Hm_Msgs::add('ERRYou must supply a name, a server and a port');
@@ -330,7 +330,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<form class="add_server" method="POST">'.
+            return '<form class="add_server" method="POST"><input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.
                 '<table>'.
                 '<tr><td><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
                 '<tr><td><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
