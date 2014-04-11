@@ -390,8 +390,14 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
             if (isset($input['imap_servers'])) {
                 $res .= '<input type="hidden" id="imap_unread_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
             }
-            $res .= '<div class="unread_messages">'.
-                '<table><tr><td class="empty_table"><img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...</td></tr></table></div>';
+            $cache = Hm_Page_Cache::get('formatted_unread_data');
+            $res .= '<div class="unread_messages">';
+            if ($cache) {
+                $res .= $cache.'</div>';
+            }
+            else {
+                $res .= '<table><tr><td class="empty_table"><img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...</td></tr></table></div>';
+            }
             return $res;
         }
     }
@@ -400,6 +406,7 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $clean = array();
+        $res = '';
         if (isset($input['imap_unread_data'])) {
             $res = '<table><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';
             foreach($input['imap_unread_data'] as $msg) {
@@ -425,6 +432,7 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
         else {
             $input['formatted_unread_data'] = '';
         }
+        Hm_Page_Cache::add('formatted_unread_data', $res);
         return $input;
     }
 }

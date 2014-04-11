@@ -163,7 +163,13 @@ else if (hm_page_name == 'servers') {
     $('.test_imap_connect').on('click', imap_test_action);
 }
 else if (hm_page_name == 'unread') {
-    imap_unread_update(true);
+    var content = $('.empty_table', $('.unread_messages'));
+    if (content.length > 0) {
+        imap_unread_update(true);
+    }
+    else {
+        imap_unread_update();
+    }
     Hm_Timer.add_job(imap_unread_update, 60, true);
     $( document ).ready(function() {
         $('.unread_messages').show(1000);
