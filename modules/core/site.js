@@ -7,7 +7,6 @@ Hm_Ajax = {
         ajax.index = Hm_Ajax.requests.length;
         if (Hm_Ajax.requests.length == 0) {
             $("input[type='submit']").attr('disabled', true);
-            //Hm_Notices.show([]);
             if (!no_icon) {
                 $('.loading_icon').css('visibility', 'visible');
             }
