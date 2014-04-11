@@ -194,11 +194,8 @@ class Hm_Router {
         /* see if we should redirect this request */
         $this->check_for_redirect($request, $session, $result);
 
-        /* close down the session */
-        $session->end();
-
         /* return processed data */
-        return $result;
+        return array($result, $session);
     }
 
     private function check_for_tls($config, $request) {

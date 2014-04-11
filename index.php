@@ -29,7 +29,7 @@ $config = new Hm_Site_Config_File('hm3.rc');
 
 /* process request input */
 $router = new Hm_Router();
-$response_data = $router->process_request($config);
+list($response_data, $session) = $router->process_request($config);
 
 /* format response content */
 $formatter = new $response_data['router_format_name']();
@@ -39,4 +39,15 @@ $response_str = $formatter->format_content($response_data);
 $renderer = new Hm_Output_HTTP();
 $renderer->send_response($response_str, $response_data);
 
+/* save any cached stuff */
+Hm_Page_Cache::save($session);
+
+/* close down the session */
+$session->end();
+
+/* log some debug info if not in debug mode */
+if (!DEBUG_MODE) {
+    Hm_Debug::load_page_stats();
+    Hm_Debug::show('log');
+}
 ?>
