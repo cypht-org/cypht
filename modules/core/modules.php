@@ -92,6 +92,9 @@ class Hm_Handler_login extends Hm_Handler_Module {
                 $this->session->check($this->request);
             }
             $data['session_type'] = get_class($this->session);
+            if ($this->session->is_active()) {
+                Hm_Page_Cache::load($this->session);
+            }
         }
         return $data;
     }
