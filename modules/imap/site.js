@@ -82,19 +82,14 @@ var update_imap_summary_display = function(res) {
         context = $('.imap_summary_'+id);
         messages = res.imap_summary[id].messages;
         unseen = res.imap_summary[id].unseen;
-        folders = res.imap_summary[id].folders;
         if (!unseen) {
             unseen = 0;
         }
         if (!messages) {
             messages = 0;
         }
-        if (!folders) {
-            folders = 0;
-        }
         $('.total', context).html(messages);
         $('.unseen', context).html(unseen);
-        $('.folders', context).html(folders);
         $('table', $('.imap_summary_data')).tablesorter();
     }
 };
@@ -171,7 +166,4 @@ else if (hm_page_name == 'unread') {
         imap_unread_update();
     }
     Hm_Timer.add_job(imap_unread_update, 60, true);
-    $( document ).ready(function() {
-        $('.unread_messages').show(1000);
-    });
 }

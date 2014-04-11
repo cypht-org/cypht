@@ -14,13 +14,13 @@ class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if (is_object($imap) && $imap->get_state() == 'authenticated') {
                     $data['imap_summary'][$id] = $imap->get_mailbox_status('INBOX');
-                    $data['imap_summary'][$id]['folders'] = count($imap->get_mailbox_list());
+                    //$data['imap_summary'][$id]['folders'] = count($imap->get_mailbox_list());
                 }
                 else {
                     if (!$imap) {
                         Hm_Msgs::add(sprintf('ERRCould not access IMAP server "%s" (%s:%d)', $details['name'], $details['server'], $details['port']));
                     }
-                    $data['imap_summary'][$id] = array('folders' => '?', 'messages' => '?', 'unseen' => '?');
+                    $data['imap_summary'][$id] = array('messages' => '?', 'unseen' => '?');
                 }
             }
         }
@@ -352,14 +352,14 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
                     $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
                 $res .= '<div class="imap_summary_data">';
                 $res .= '<table><thead><tr><th>IMAP Server</th><th>Address</th><th>Port</th>'.
-                    '<th>TLS</th><th>Folders</th><th>INBOX count</th><th>INBOX unread</th></tr></thead><tbody>';
+                    '<th>TLS</th><th>INBOX count</th><th>INBOX unread</th></tr></thead><tbody>';
                 foreach ($input['imap_servers'] as $index => $vals) {
                     if ($vals['name'] == 'Default-Auth-Server') {
                         $vals['name'] = 'Default';
                     }
                     $res .= '<tr class="imap_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
                         '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
-                        '<td>'.$vals['tls'].'</td><td class="folders"></td>'.
+                        '<td>'.$vals['tls'].'</td>'.
                         '<td class="total"></td><td class="unseen"></td>'.
                         '</tr>';
                 }

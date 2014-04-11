@@ -8,7 +8,7 @@
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; }
 .save_settings, .unread_link, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 
-.unread_messages { display: none; width: 98%; min-height: 200px; overflow: hidden; }
+.unread_messages { width: 98%; min-height: 200px; overflow: hidden; }
 .unread_messages table td { padding-top: 5px; padding-right: 10px; color: #333; }
 .unread_messages table th:hover { color: #000; }
 .subject, .msg_date, .from { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
