@@ -76,7 +76,11 @@ Hm_Ajax_Request = function() { return {
     always: function(res) {
         var dt = new Date();
         var elapsed = dt.getTime() - this.start_time;
-        $('.elapsed').html('AJAX request finished in ' + elapsed + ' millis');
+        var msg = 'AJAX request finished in ' + elapsed + ' millis';
+        if (elapsed > 2000) {
+            msg += '. Ouch!';
+        }
+        $('.elapsed').html(msg);
         Hm_Ajax.requests.splice(this.index, 1);
         if (Hm_Ajax.requests.length == 0) {
             $("input[type='submit']").attr('disabled', false);
