@@ -4,7 +4,10 @@ Hm_Ajax = {
 
     request: function(args, callback, extra, no_icon) {
         var ajax = new Hm_Ajax_Request();
-        ajax.index = Hm_Ajax.requests.length;
+        ajax.index = Hm_Ajax.requests.length - 1;
+        if (ajax.index < 0) {
+            ajax.index = 0;
+        }
         if (Hm_Ajax.requests.length == 0) {
             $("input[type='submit']").attr('disabled', true);
             if (!no_icon) {
@@ -125,7 +128,9 @@ Hm_Timer = {
     interval: 1000,
 
     add_job: function(job, interval, defer) {
-        Hm_Timer.jobs.push([job, interval, interval]);
+        if (interval) {
+            Hm_Timer.jobs.push([job, interval, interval]);
+        }
         if (!defer) {
             try { job(); } catch(e) { console.log(e); }
         }
