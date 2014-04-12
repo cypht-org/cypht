@@ -40,6 +40,11 @@ add_handler('ajax_imap_unread', 'imap_tracker', true, 'tracker', 'imap_unread', 
 add_output('ajax_imap_unread', 'tracker', false, 'tracker');
 add_output('ajax_imap_unread', 'show_debug', false, 'tracker');
 
+add_handler('ajax_imap_folders', 'tracker', false, 'tracker',  'load_imap_folders', 'after');
+add_handler('ajax_imap_folders', 'imap_tracker', true, 'tracker', 'load_imap_folders', 'after');
+add_output('ajax_imap_folders', 'tracker', false, 'tracker');
+add_output('ajax_imap_folders', 'show_debug', false, 'tracker');
+
 add_handler('settings', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('settings', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('settings', 'tracker', false, 'tracker', 'content_end', 'before');
