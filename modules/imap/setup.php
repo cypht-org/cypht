@@ -74,16 +74,6 @@ add_handler('ajax_imap_debug', 'save_imap_servers',  true);
 add_handler('ajax_imap_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_imap_debug', 'date', true, 'core');
 
-/* ajax server summary callback data */
-add_handler('ajax_imap_summary', 'login', false, 'core');
-add_handler('ajax_imap_summary', 'load_user_data', true, 'core');
-add_handler('ajax_imap_summary', 'load_imap_servers_from_config',  true);
-add_handler('ajax_imap_summary', 'add_imap_servers_to_page_data',  true);
-add_handler('ajax_imap_summary', 'prep_imap_summary_display',  true);
-add_handler('ajax_imap_summary', 'save_imap_cache',  true);
-add_handler('ajax_imap_summary', 'save_imap_servers',  true);
-add_handler('ajax_imap_summary', 'date', true, 'core');
-
 /* ajax unread callback data */
 add_handler('ajax_imap_unread', 'login', false, 'core');
 add_handler('ajax_imap_unread', 'load_user_data', true, 'core');
@@ -94,12 +84,24 @@ add_handler('ajax_imap_unread', 'save_imap_servers',  true);
 add_handler('ajax_imap_unread', 'date', true, 'core');
 add_output('ajax_imap_unread', 'filter_unread_data', true);
 
+/* ajax folder callback data */
+add_handler('ajax_imap_folders', 'login', false, 'core');
+add_handler('ajax_imap_folders', 'load_user_data', true, 'core');
+add_handler('ajax_imap_folders', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_folders', 'add_imap_servers_to_page_data',  true);
+add_handler('ajax_imap_folders', 'load_imap_folders',  true);
+add_handler('ajax_imap_folders', 'save_imap_cache',  true);
+add_handler('ajax_imap_folders', 'save_imap_servers',  true);
+add_handler('ajax_imap_folders', 'date', true, 'core');
+add_output('ajax_imap_folders', 'filter_imap_folders', true);
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
         'ajax_imap_debug',
         'ajax_imap_summary',
         'ajax_imap_unread',
+        'ajax_imap_folders',
         'servers',
         'unread'
     ),
@@ -121,6 +123,7 @@ return array(
         'imap_remember' => FILTER_VALIDATE_INT,
         'summary_ids' => FILTER_SANITIZE_STRING,
         'imap_unread_ids' => FILTER_SANITIZE_STRING,
+        'imap_folder_ids' => FILTER_SANITIZE_STRING,
         'imap_forget' => FILTER_SANITIZE_STRING,
         'imap_save' => FILTER_SANITIZE_STRING,
         'submit_imap_server' => FILTER_SANITIZE_STRING,

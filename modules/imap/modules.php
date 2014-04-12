@@ -14,7 +14,6 @@ class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if (is_object($imap) && $imap->get_state() == 'authenticated') {
                     $data['imap_summary'][$id] = $imap->get_mailbox_status('INBOX');
-                    //$data['imap_summary'][$id]['folders'] = count($imap->get_mailbox_list());
                 }
                 else {
                     if (!$imap) {
@@ -28,6 +27,26 @@ class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
+    public function process($data) {
+        $folders = array();
+        list($success, $form) = $this->process_form(array('imap_folder_ids'));
+        if ($success) {
+            $ids = explode(',', $form['imap_folder_ids']);
+            foreach ($ids as $id) {
+                $details = Hm_IMAP_List::dump($id);
+                $cache = Hm_IMAP_List::get_cache($this->session, $id);
+                $imap = Hm_IMAP_List::connect($id, $cache);
+                if ($imap->get_state() == 'authenticated') {
+                    $imap->read_only = true;
+                    $folders[$details['name']] = $imap->get_folder_list_by_level();
+                }
+            }
+        }
+        $data['imap_folders'] = $folders;
+        return $data;
+    }
+}
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_unread_ids'));
@@ -352,7 +371,7 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
                     $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
                 $res .= '<div class="imap_summary_data">';
                 $res .= '<table><thead><tr><th>IMAP Server</th><th>Address</th><th>Port</th>'.
-                    '<th>TLS</th><th>INBOX count</th><th>INBOX unread</th></tr></thead><tbody>';
+                    '<th>TLS</th></tr></thead><tbody>';
                 foreach ($input['imap_servers'] as $index => $vals) {
                     if ($vals['name'] == 'Default-Auth-Server') {
                         $vals['name'] = 'Default';
@@ -360,7 +379,6 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
                     $res .= '<tr class="imap_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
                         '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
                         '<td>'.$vals['tls'].'</td>'.
-                        '<td class="total"></td><td class="unseen"></td>'.
                         '</tr>';
                 }
                 $res .= '</table></div>';
@@ -396,13 +414,32 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
                 $res .= $cache.'</div>';
             }
             else {
-                $res .= '<table><tr><td class="empty_table"><img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...</td></tr></table></div>';
+                $res .= '<table><tr><td class="empty_table loading_messages"><img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...</td></tr></table></div>';
             }
             return $res;
         }
     }
 }
 
+class Hm_Output_filter_imap_folders extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $results = '<ul class="folders">';
+        if (isset($input['imap_folders'])) {
+            foreach ($input['imap_folders'] as $name => $folders) {
+                $results .= '<li>'.$this->html_safe($name).'</li>';
+                $results .= '<li><ul class="inner_list">';
+                foreach ($folders as $folder) {
+                    $results .= '<li>'.$this->html_safe($folder['basename']).'</li>';
+                }
+                $results .= '</ul></li>';
+            }
+        }
+        $results .= '</ul>';
+        $input['imap_folders'] = $results;
+        Hm_Page_Cache::add('imap_folders', $results);
+        return $input;
+    }
+}
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $clean = array();
@@ -439,7 +476,15 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
 
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<table><tr><td class="folder_cell"><div class="folder_list"></div></td><td>';
+        $cache = Hm_Page_Cache::get('imap_folders');
+        if ($cache) {
+            return '<table><tr><td class="folder_cell"><div class="folder_list">'.$cache.'</div></td><td>';
+        }
+        else {
+            return '<table><tr><td class="folder_cell"><div class="folder_list"><div class="loading_folders">'.
+                '<img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading IMAP<br />Folders'.
+                '</div></div></td><td>';
+        }
     }
 }
 

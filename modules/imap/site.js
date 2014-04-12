@@ -74,26 +74,6 @@ var imap_test_action = function() {
     );
 };
 
-var update_imap_summary_display = function(res) {
-    var context;
-    var unseen;
-    var messages;
-    for (id in res.imap_summary) {
-        context = $('.imap_summary_'+id);
-        messages = res.imap_summary[id].messages;
-        unseen = res.imap_summary[id].unseen;
-        if (!unseen) {
-            unseen = 0;
-        }
-        if (!messages) {
-            messages = 0;
-        }
-        $('.total', context).html(messages);
-        $('.unseen', context).html(unseen);
-        $('table', $('.imap_summary_data')).tablesorter();
-    }
-};
-
 var update_unread_message_display = function(res) {
     if (res.imap_unread_unchanged) {
         console.log("Nothing to update");
@@ -134,22 +114,31 @@ var imap_unread_update = function(loading) {
     }
 };
 
-var imap_summary_update = function() {
+var imap_folder_update = function() {
     var ids = $('#imap_summary_ids').val();
     if ( ids && ids.length ) {
-        $('.total').html('...');
-        $('.unseen').html('...');
-        $('.folders').html('...');
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_summary'},
-            {'name': 'summary_ids', 'value': ids}],
-            update_imap_summary_display
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders'},
+            {'name': 'imap_folder_ids', 'value': ids}],
+            update_folder_display,
+            [],
+            true
         );
     }
 };
 
+var update_folder_display = function(res) {
+    if (res.imap_folders) {
+        $('.folder_list').html(res.imap_folders);
+    }
+};
+
 if (hm_page_name == 'home') {
-    Hm_Timer.add_job(imap_summary_update, 60);
+    var folders = $('.loading_folders');
+    console.log(folders.length);
+    if (folders.length > 0) {
+        imap_folder_update();
+    }
 }
 else if (hm_page_name == 'servers') {
     $('.imap_delete').on('click', imap_delete_action);
@@ -158,7 +147,7 @@ else if (hm_page_name == 'servers') {
     $('.test_imap_connect').on('click', imap_test_action);
 }
 else if (hm_page_name == 'unread') {
-    var content = $('.empty_table', $('.unread_messages'));
+    var content = $('.loading_messages');
     if (content.length > 0) {
         imap_unread_update(true);
     }
