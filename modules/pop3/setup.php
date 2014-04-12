@@ -29,15 +29,6 @@ add_handler('ajax_pop3_debug', 'save_pop3_servers', true);
 add_handler('ajax_pop3_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_pop3_debug', 'date', true, 'core');
 
-/* ajax server summary callback data */
-add_handler('ajax_pop3_summary', 'login', false, 'core');
-add_handler('ajax_pop3_summary', 'load_user_data', true, 'core');
-add_handler('ajax_pop3_summary', 'load_pop3_servers_from_config',  true);
-add_handler('ajax_pop3_summary', 'add_pop3_servers_to_page_data',  true);
-add_handler('ajax_pop3_summary', 'prep_pop3_summary_display',  true);
-add_handler('ajax_pop3_summary', 'save_pop3_servers',  true);
-add_handler('ajax_pop3_summary', 'date', true, 'core');
-
 return array(
     'allowed_pages' => array(
         'ajax_pop3_debug',

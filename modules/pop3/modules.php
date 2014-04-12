@@ -275,14 +275,14 @@ class Hm_Output_display_pop3_summary extends Hm_Output_Module {
 
                 $res .= '<div class="pop3_summary_data">';
                 $res .= '<table><thead><tr><th>POP3 Server</th><th>Address</th><th>Port</th>'.
-                    '<th>TLS</th><th>Messages</th></tr></thead><tbody>';
+                    '<th>TLS</th></tr></thead><tbody>';
                 foreach ($input['pop3_servers'] as $index => $vals) {
                     if ($vals['name'] == 'Default-Auth-Server') {
                         $vals['name'] = 'Default';
                     }
                     $res .= '<tr class="pop3_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
                         '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
-                        '<td>'.$vals['tls'].'</td><td class="total">...</td></tr>';
+                        '<td>'.$vals['tls'].'</td></tr>';
                 }
                 $res .= '</table></div>';
             }
