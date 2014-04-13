@@ -414,7 +414,14 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
                 $res .= $cache.'</div>';
             }
             else {
-                $res .= '<table><tr><td class="empty_table loading_messages"><img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...</td></tr></table></div>';
+                $res .= '<table><tr><td class="empty_table loading_messages">';
+                if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
+                    $res .= '<img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...';
+                }
+                else {
+                    $res .= 'No servers found. <a href="'.$input['router_url_path'].'?page=servers">Add some</a>';
+                }
+                $res .= '</td></tr></table></div>';
             }
             return $res;
         }
@@ -423,7 +430,7 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
 
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
-        $results = '<ul class="folders">';
+        $results = '';
         if (isset($input['imap_folders'])) {
             foreach ($input['imap_folders'] as $name => $folders) {
                 $results .= '<li>'.$this->html_safe($name).'</li>';
@@ -434,7 +441,6 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
                 $results .= '</ul></li>';
             }
         }
-        $results .= '</ul>';
         $input['imap_folders'] = $results;
         Hm_Page_Cache::add('imap_folders', $results);
         return $input;
@@ -481,16 +487,22 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             return '<table><tr><td class="folder_cell"><div class="folder_list">'.$cache.'</div></td><td>';
         }
         else {
-            return '<table><tr><td class="folder_cell"><div class="folder_list"><div class="loading_folders">'.
-                '<img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading IMAP<br />Folders'.
-                '</div></div></td><td>';
+            $res = '<table><tr><td class="folder_cell"><div class="folder_list"><div class="loading_folders">';
+            if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
+                $res .= '<img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading IMAP<br />Folders';
+            }
+            else {
+                $res .= 'No IMAP folders found';
+            }
+            $res .= '</div></div></td><td><ul class="folders">';
+            return $res;
         }
     }
 }
 
 class Hm_Output_folder_list_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '</td></tr></table>';
+        return '</ul></td></tr></table>';
     }
 }
 
