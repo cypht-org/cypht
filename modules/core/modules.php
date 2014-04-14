@@ -449,4 +449,28 @@ class Hm_Output_unread_link extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_folder_list_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<table><tr><td class="folder_cell"><div class="folder_list">';
+        if (isset($input['folder_sources'])) {
+            foreach ($input['folder_sources'] as $src) {
+                $res .= '<div class="'.$src.'">';
+                $cache = Hm_Page_Cache::get($src);
+                if ($cache) {
+                    $res .= $cache;
+                }
+                $res .= '</div>';
+            }
+        }
+        $res .= '</div></td><td>';
+        return $res;
+    }
+}
+
+class Hm_Output_folder_list_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</td></tr></table>';
+    }
+}
+
 ?>

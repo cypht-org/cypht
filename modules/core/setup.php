@@ -115,6 +115,9 @@ add_output('settings', 'content_end', true);
 add_handler('notfound', 'title', true);
 add_output('notfound', 'title', true);
 
+add_handler('ajax_hm_folders', 'login', false, 'core');
+add_handler('ajax_hm_folders', 'load_user_data', true, 'core');
+add_handler('ajax_hm_folders', 'date', true, 'core');
 
 /* allowed input */
 return array(
@@ -122,6 +125,7 @@ return array(
         'home',
         'notfound',
         'settings',
+        'ajax_hm_folders',
     ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
