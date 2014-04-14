@@ -369,37 +369,18 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
         if ($format == 'HTML5') {
             $res = '';
             if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
-                $res .= '<input type="hidden" id="imap_summary_ids" value="'.
-                    $this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
-                $res .= '<div class="imap_summary_data">';
-                $res .= '<table><thead><tr><th>IMAP Server</th><th>Address</th><th>Port</th>'.
-                    '<th>TLS</th></tr></thead><tbody>';
                 foreach ($input['imap_servers'] as $index => $vals) {
                     if ($vals['name'] == 'Default-Auth-Server') {
                         $vals['name'] = 'Default';
                     }
-                    $res .= '<tr class="imap_summary_'.$index.'"><td>'.$vals['name'].'</td>'.
+                    $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td>'.
                         '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
                         '<td>'.$vals['tls'].'</td>'.
                         '</tr>';
                 }
-                $res .= '</table></div>';
-            }
-            else {
-                $res .= '<div class="imap_summary_data"><table class="empty_table"><tr><td>No IMAP servers found. '.
-                    '<a href="'.$input['router_url_path'].'?page=servers">Add some</a></td></tr></table></div>';
             }
             return $res;
         }
-    }
-}
-
-class Hm_Output_jquery_table extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<script type="text/javascript" src="modules/imap/jquery.tablesorter.min.js"></script>';
-        }
-        return '';
     }
 }
 
@@ -426,6 +407,14 @@ class Hm_Output_unread_message_list extends Hm_Output_Module {
                 $res .= '</td></tr></table></div>';
             }
             return $res;
+        }
+    }
+}
+
+class Hm_Output_imap_server_ids extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['imap_servers'])) {
+            return '<input type="hidden" id="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
         }
     }
 }

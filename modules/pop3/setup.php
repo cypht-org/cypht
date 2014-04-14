@@ -5,7 +5,7 @@ output_source('pop3');
 /* add stuff to the home page */
 add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
 add_handler('home', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('home', 'display_pop3_summary', true, 'pop3', 'display_imap_summary', 'after');
+add_output('home', 'display_pop3_summary', true, 'pop3', 'server_summary_start', 'after');
 
 /* servers page */
 add_handler('servers', 'load_pop3_servers_from_config', true, 'pop3', 'date', 'after');

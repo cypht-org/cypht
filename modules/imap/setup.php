@@ -6,11 +6,8 @@ output_source('imap');
 /* add stuff to the home page */
 add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('home', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
-
-add_output('home', 'jquery_table', true, 'imap', 'jquery', 'after'); 
-add_output('home', 'display_imap_summary', true, 'imap', 'page_js', 'before');
-add_output('home', 'folder_list_start', true, 'imap', 'toolbar_end', 'after');
-add_output('home', 'folder_list_end', true, 'imap', 'page_js', 'before');
+add_output('home', 'display_imap_summary', true, 'imap', 'server_summary_start', 'after');
+add_output('home', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
 add_handler('servers', 'load_imap_servers_from_config',  true, 'imap', 'date', 'after');
@@ -55,9 +52,9 @@ add_output('unread', 'title', true, 'core');
 add_output('unread', 'msgs', false, 'core');
 add_output('unread', 'loading_icon', false, 'core');
 add_output('unread', 'toolbar_end', true, 'core');
-add_output('unread', 'folder_list_start', true, 'imap');
+add_output('unread', 'folder_list_start', true, 'core');
 add_output('unread', 'unread_message_list', true);
-add_output('unread', 'folder_list_end', true, 'imap');
+add_output('unread', 'folder_list_end', true, 'core');
 add_output('unread', 'page_js', true, 'core');
 add_output('unread', 'content_end', false, 'core');
 

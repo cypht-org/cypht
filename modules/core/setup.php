@@ -18,6 +18,7 @@ add_output('home', 'header_start', false);
 add_output('home', 'js_data', true);
 add_output('home', 'header_css', false);
 add_output('home', 'jquery', false);
+add_output('home', 'jquery_table', true);
 add_output('home', 'header_content', false);
 add_output('home', 'header_end', false);
 add_output('home', 'content_start', false);
@@ -33,6 +34,10 @@ add_output('home', 'msgs', false);
 add_output('home', 'title', true);
 add_output('home', 'loading_icon', true);
 add_output('home', 'toolbar_end', true);
+add_output('home', 'folder_list_start', true);
+add_output('home', 'server_summary_start', true);
+add_output('home', 'server_summary_end', true);
+add_output('home', 'folder_list_end', true);
 add_output('home', 'page_js', true);
 add_output('home', 'content_end', true);
 

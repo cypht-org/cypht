@@ -115,14 +115,14 @@ var imap_unread_update = function(loading) {
 };
 
 var imap_folder_update = function() {
-    var ids = $('#imap_summary_ids').val();
+    var ids = $('#imap_server_ids').val();
     if ( ids && ids.length ) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
             {'name': 'imap_folder_ids', 'value': ids}],
             update_imap_folder_display,
             [],
-            true
+            false
         );
     }
 };

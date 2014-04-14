@@ -320,6 +320,15 @@ class Hm_Output_content_end extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_jquery_table extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5' ) {
+            return '<script type="text/javascript" src="modules/imap/jquery.tablesorter.min.js"></script>';
+        }
+        return '';
+    }
+}
+
 class Hm_Output_jquery extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -470,6 +479,21 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
 class Hm_Output_folder_list_end extends Hm_Output_Module {
     protected function output($input, $format) {
         return '</td></tr></table>';
+    }
+}
+
+class Hm_Output_server_summary_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<div class="server_summary">';
+        $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Address</th><th>Port</th>'.
+                '<th>TLS</th></tr></thead><tbody>';
+        return $res;
+    }
+}
+
+class Hm_Output_server_summary_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</tbody></table></div>';
     }
 }
 

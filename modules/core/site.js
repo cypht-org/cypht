@@ -154,5 +154,9 @@ Hm_Timer = {
 /* start the scheduler */
 Hm_Timer.fire();
 
+if (hm_page_name == 'home') {
+    $('table', $('.server_summary')).tablesorter();
+}
+
 /* setup hiding of any user notifications */
 Hm_Notices.hide();

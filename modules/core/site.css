@@ -20,3 +20,4 @@ option, select { padding: 3px; }
 .login_form { margin-top: 60px; margin-left: 60px; }
 .err { color: red; }
 .elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
+.server_summary { margin-right: 20px; padding: 10px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
