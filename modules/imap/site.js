@@ -118,25 +118,24 @@ var imap_folder_update = function() {
     var ids = $('#imap_summary_ids').val();
     if ( ids && ids.length ) {
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders'},
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
             {'name': 'imap_folder_ids', 'value': ids}],
-            update_folder_display,
+            update_imap_folder_display,
             [],
             true
         );
     }
 };
 
-var update_folder_display = function(res) {
+var update_imap_folder_display = function(res) {
     if (res.imap_folders) {
-        $('.folder_list').html(res.imap_folders);
+        $('.imap_folders').html(res.imap_folders);
     }
 };
 
 if (hm_page_name == 'home') {
-    var folders = $('.loading_folders');
-    console.log(folders.length);
-    if (folders.length > 0) {
+    var imap_folders = $('.imap_folders').html();
+    if (!imap_folders) {
         imap_folder_update();
     }
 }

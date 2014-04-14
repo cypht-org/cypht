@@ -85,15 +85,12 @@ add_handler('ajax_imap_unread', 'date', true, 'core');
 add_output('ajax_imap_unread', 'filter_unread_data', true);
 
 /* ajax folder callback data */
-add_handler('ajax_imap_folders', 'login', false, 'core');
-add_handler('ajax_imap_folders', 'load_user_data', true, 'core');
-add_handler('ajax_imap_folders', 'load_imap_servers_from_config',  true);
-add_handler('ajax_imap_folders', 'add_imap_servers_to_page_data',  true);
-add_handler('ajax_imap_folders', 'load_imap_folders',  true);
-add_handler('ajax_imap_folders', 'save_imap_cache',  true);
-add_handler('ajax_imap_folders', 'save_imap_servers',  true);
-add_handler('ajax_imap_folders', 'date', true, 'core');
-add_output('ajax_imap_folders', 'filter_imap_folders', true);
+add_handler('ajax_hm_folders', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_hm_folders', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_hm_folders', 'load_imap_folders',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
+add_handler('ajax_hm_folders', 'save_imap_cache',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_hm_folders', 'save_imap_servers',  true, 'imap', 'save_imap_cache', 'after');
+add_output('ajax_hm_folders', 'filter_imap_folders', true);
 
 /* allowed input */
 return array(
@@ -101,7 +98,6 @@ return array(
         'ajax_imap_debug',
         'ajax_imap_summary',
         'ajax_imap_unread',
-        'ajax_imap_folders',
         'servers',
         'unread'
     ),
