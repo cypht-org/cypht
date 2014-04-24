@@ -1069,13 +1069,6 @@ trait Hm_Server_List {
             }
         }
     }
-    public static function get_cache($session, $id) {
-        $server_cache = $session->get('server_cache', array());
-        if (isset($server_cache[$id])) {
-            return $server_cache[$id];
-        }
-        return false;
-    }
 }
 
 class Hm_IMAP_List {
@@ -1097,6 +1090,13 @@ class Hm_IMAP_List {
             'blacklisted_extensions' => array('enable')
         ));
     }
+    public static function get_cache($session, $id) {
+        $server_cache = $session->get('imap_cache', array());
+        if (isset($server_cache[$id])) {
+            return $server_cache[$id];
+        }
+        return false;
+    }
 }
 
 class Hm_POP3_List {
@@ -1113,6 +1113,9 @@ class Hm_POP3_List {
             self::$server_list[$id]['object']->auth($user, $pass);
             return self::$server_list[$id]['object'];
         }
+        return false;
+    }
+    public static function get_cache($session, $id) {
         return false;
     }
 }
