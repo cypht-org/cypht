@@ -55,6 +55,7 @@ add_output('unread', 'toolbar_end', true, 'core');
 add_output('unread', 'folder_list_start', true, 'core');
 add_output('unread', 'unread_message_list', true);
 add_output('unread', 'folder_list_end', true, 'core');
+add_output('unread', 'imap_server_ids', true);
 add_output('unread', 'page_js', true, 'core');
 add_output('unread', 'content_end', false, 'core');
 
@@ -85,7 +86,7 @@ add_output('ajax_imap_unread', 'filter_unread_data', true);
 add_handler('ajax_hm_folders', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_hm_folders', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_hm_folders', 'load_imap_folders',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
-add_handler('ajax_hm_folders', 'save_imap_cache',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_hm_folders', 'save_imap_cache',  true, 'imap', 'load_imap_folders', 'after');
 add_handler('ajax_hm_folders', 'save_imap_servers',  true, 'imap', 'save_imap_cache', 'after');
 add_output('ajax_hm_folders', 'filter_imap_folders', true);
 
@@ -109,13 +110,13 @@ return array(
         'username' => FILTER_SANITIZE_STRING,
         'password' => FILTER_SANITIZE_STRING,
         'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_server_ids' => FILTER_SANITIZE_STRING,
         'imap_user' => FILTER_SANITIZE_STRING,
         'imap_pass' => FILTER_SANITIZE_STRING,
         'imap_delete' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
         'imap_remember' => FILTER_VALIDATE_INT,
         'summary_ids' => FILTER_SANITIZE_STRING,
-        'imap_unread_ids' => FILTER_SANITIZE_STRING,
         'imap_folder_ids' => FILTER_SANITIZE_STRING,
         'imap_forget' => FILTER_SANITIZE_STRING,
         'imap_save' => FILTER_SANITIZE_STRING,
