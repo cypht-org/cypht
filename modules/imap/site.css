@@ -35,5 +35,4 @@ input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 .folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; }
 .folders li, .inner_list li { padding: 3px; padding-left: 10px; margin: 0px; }
 .loading_folders { text-align: center; margin: 10px; margin-top: 20px; color: #666; }
-.msg_text { display: none; white-space: pre; position: absolute; background-color: #f5f5f5; padding: 40px; padding-top: 20px; padding-left: 115px; left: 246px; right: 22px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; border-top: none; border-top-left-radius: 0px; border-top-right-radius: 0px; }
-
+.msg_text { display: none; white-space: pre; position: absolute; background-color: #f5f5f5; padding: 40px; padding-top: 20px; padding-left: 130px; left: 246px; right: 22px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; border-top: none; border-top-left-radius: 0px; border-top-right-radius: 0px; font-size: 95%; word-wrap: break-word; }
