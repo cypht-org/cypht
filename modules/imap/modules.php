@@ -275,6 +275,31 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_imap_message_text extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid'));
+        if ($success) {
+            $data['msg_text_uid'] = $form['imap_msg_uid'];
+            $page_cache = Hm_Page_Cache::get('imap_msg_text_'.$form['imap_server_id'].'_'.$form['imap_msg_uid']);
+            if ($page_cache) {
+                $data['msg_text'] = $page_cache;
+            }
+            else {
+                $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+                if ($imap) {
+                    $imap->read_only = true;
+                    if ($imap->select_mailbox('INBOX')) {
+                        $data['msg_text'] = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'plain');
+                        Hm_Page_Cache::add('imap_msg_text_'.$form['imap_server_id'].'_'.$form['imap_msg_uid'], $data['msg_text']);
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['imap_delete'])) {
@@ -291,6 +316,15 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
             }
         }
         return $data;
+    }
+}
+
+class Hm_Output_filter_message_text extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['msg_text'])) {
+            $input['msg_text'] = $this->html_safe($input['msg_text']);
+        }
+        return $input;
     }
 }
 
@@ -444,7 +478,7 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
         $clean = array();
         $res = '';
         if (isset($input['imap_unread_data'])) {
-            $res = '<table><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';
+            $res = '<table cellpadding="0" cellspacing="0"><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';
             foreach($input['imap_unread_data'] as $msg) {
                 $clean = array_map(function($v) { return $this->html_safe($v); }, $msg);
                 if ($clean['server_name'] == 'Default-Auth-Server') {
@@ -455,7 +489,8 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
                 $from = str_replace("&quot;", '', $from);
                 $date = date('Y-m-d g:i:s', strtotime($clean['date']));
                 $res .= '<tr><td><div class="source">'.$clean['server_name'].'</div></td>'.
-                    '<td><div class="subject">'.$subject.'</div></td>'.
+                    '<td><div onclick="msg_preview('.$clean['uid'].', '.$clean['server_id'].')" class="subject">'.$subject.'</div>'.
+                    '<div class="msg_text" id="msg_text_'.$clean['uid'].'"></div></td>'.
                     '<td><div class="from">'.$from.'</div></td>'.
                     '<td><div class="msg_date">'.$date.'</div></td></tr>';
             }

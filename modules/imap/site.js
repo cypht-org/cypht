@@ -133,6 +133,27 @@ var update_imap_folder_display = function(res) {
     }
 };
 
+var display_msg_text = function(res) {
+    if (res.msg_text) {
+        var msg_text = $('#msg_text_' + res.msg_text_uid);
+        msg_text.html(res.msg_text);
+        msg_text.slideDown();
+        msg_text.parent().parent().css('background-color', '#f5f5f5');
+        $('body').on('click', function() { $('.msg_text').slideUp(); $('.msg_text').parent().parent().css('background-color', '#fff'); } );
+    }
+};
+
+var msg_preview = function(uid, server_id) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_msg_text'},
+        {'name': 'imap_msg_uid', 'value': uid},
+        {'name': 'imap_server_id', 'value': server_id}],
+        display_msg_text,
+        [],
+        false
+    );
+};
+
 if (hm_page_name == 'home') {
     var imap_folders = $('.imap_folders').html();
     if (!imap_folders) {

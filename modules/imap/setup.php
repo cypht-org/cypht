@@ -82,6 +82,16 @@ add_handler('ajax_imap_unread', 'save_imap_servers',  true);
 add_handler('ajax_imap_unread', 'date', true, 'core');
 add_output('ajax_imap_unread', 'filter_unread_data', true);
 
+/* msg preview */
+add_handler('ajax_imap_msg_text', 'login', false, 'core');
+add_handler('ajax_imap_msg_text', 'load_user_data', true, 'core');
+add_handler('ajax_imap_msg_text', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_msg_text', 'imap_message_text',  true);
+add_handler('ajax_imap_msg_text', 'save_imap_cache',  true);
+add_handler('ajax_imap_msg_text', 'save_imap_servers',  true);
+add_handler('ajax_imap_msg_text', 'date', true, 'core');
+add_output('ajax_imap_msg_text', 'filter_message_text', true);
+
 /* ajax folder callback data */
 add_handler('ajax_hm_folders', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_hm_folders', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
@@ -96,6 +106,7 @@ return array(
         'ajax_imap_debug',
         'ajax_imap_summary',
         'ajax_imap_unread',
+        'ajax_imap_msg_text',
         'servers',
         'unread'
     ),
@@ -120,6 +131,7 @@ return array(
         'imap_folder_ids' => FILTER_SANITIZE_STRING,
         'imap_forget' => FILTER_SANITIZE_STRING,
         'imap_save' => FILTER_SANITIZE_STRING,
+        'imap_msg_uid' => FILTER_VALIDATE_INT,
         'submit_imap_server' => FILTER_SANITIZE_STRING,
         'new_imap_address' => FILTER_SANITIZE_STRING,
         'new_imap_port' => FILTER_VALIDATE_INT,
