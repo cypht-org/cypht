@@ -138,8 +138,13 @@ var display_msg_text = function(res) {
         var msg_text = $('#msg_text_' + res.msg_text_uid);
         msg_text.html(res.msg_text);
         msg_text.slideDown();
-        msg_text.parent().parent().css('background-color', '#f5f5f5');
-        $('body').on('click', function() { $('.msg_text').slideUp(); $('.msg_text').parent().parent().css('background-color', '#fff'); } );
+        msg_text.parent().parent().css({'background-color': '#f5f5f5'});
+        msg_text.parent().parent().children().css({'border-top': 'solid 1px #ccc'});
+        $('body').on('click', function() {
+            $('.msg_text').slideUp();
+            $('.msg_text').parent().parent().css('background-color', '#fff');
+            $('.msg_text').parent().parent().children().css('border-top', 'none');
+        } );
     }
 };
 
