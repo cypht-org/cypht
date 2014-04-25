@@ -35,6 +35,11 @@ add_handler('ajax_hm_folders', 'imap_tracker', true, 'tracker', 'load_imap_folde
 add_output('ajax_hm_folders', 'tracker', false, 'tracker');
 add_output('ajax_hm_folders', 'show_debug', false, 'tracker');
 
+add_handler('ajax_imap_msg_text', 'tracker', false, 'tracker',  'imap_message_text', 'after');
+add_handler('ajax_imap_msg_text', 'imap_tracker', true, 'tracker', 'imap_message_text', 'after');
+add_output('ajax_imap_msg_text', 'tracker', false, 'tracker');
+add_output('ajax_imap_msg_text', 'show_debug', false, 'tracker');
+
 add_handler('settings', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('settings', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('settings', 'tracker', false, 'tracker', 'content_end', 'before');
