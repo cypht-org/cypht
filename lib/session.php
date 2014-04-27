@@ -40,7 +40,7 @@ class Hm_PHP_Session extends Hm_Session {
     }
     protected function set_key($request) {
         if (isset($request->cookie['hm_id'])) {
-            $this->enc_key = base64_decode($request->cookie['hm_id']);
+            $this->enc_key = $request->cookie['hm_id'];
         }
         else {
             $this->enc_key = base64_encode(openssl_random_pseudo_bytes(128));
@@ -120,9 +120,9 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
     protected $dbh = false;
 
     public function check($request, $user=false, $pass=false) {
-        $this->set_key($request);
         if ($user && $pass) {
             if ($this->auth($user, $pass)) {
+                $this->set_key($request);
                 Hm_Msgs::add('login accepted, starting PHP session');
                 $this->loaded = true;
                 $this->start($request);
@@ -130,6 +130,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
             }
         }
         elseif (isset($request->cookie[$this->cname])) {
+            $this->set_key($request);
             $this->start($request);
         }
     }
@@ -232,13 +233,13 @@ class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
     }
 
     public function destroy() {
-        $this->end();
         if ($this->dbh) {
             $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
             $sql->execute(array($this->session_key));
         }
         setcookie($this->cname, '', 0);
         setcookie('hm_id', '', 0);
+        $this->active = false;
     }
 }
 
