@@ -37,7 +37,7 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
                 $details = Hm_IMAP_List::dump($id);
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $imap = Hm_IMAP_List::connect($id, $cache);
-                if ($imap->get_state() == 'authenticated') {
+                if (is_object($imap) && $imap->get_state() == 'authenticated') {
                     $folders[$details['name']] = $imap->get_folder_list_by_level();
                 }
             }
@@ -51,25 +51,19 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $data['imap_unread_unchanged'] = false;
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
-            $cached = 0;
             foreach($ids as $id) {
                 $id = intval($id);
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $imap = Hm_IMAP_List::connect($id, $cache);
-                if ($imap) {
+                if (is_object($imap) && $imap->get_state() == 'authenticated') {
                     $imap->read_only = true;
                     $server_details = Hm_IMAP_List::dump($id);
                     if ($imap->select_mailbox('INBOX')) {
                         $unseen = $imap->search('UNSEEN');
-                        if ($imap->cached_response) {
-                            $cached++;
-                        }
                         if ($unseen) {
-                            $msgs = $imap->get_message_list($unseen);
-                            foreach ($msgs as $msg) {
+                            foreach ($imap->get_message_list($unseen) as $msg) {
                                 $msg['server_id'] = $id;
                                 $msg['server_name'] = $server_details['name'];
                                 $msg_list[] = $msg;
@@ -78,16 +72,11 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                     }
                 }
             }
-            if ($cached == count($ids)) {
-                $data['imap_unread_unchanged'] = true;
-            }
-            else {
-                usort($msg_list, function($a, $b) {
-                    if ($a['date'] == $b['date']) return 0;
-                    return (strtotime($a['date']) > strtotime($b['date']))? -1 : 1;
-                });
-                $data['imap_unread_data'] = $msg_list;
-            }
+            usort($msg_list, function($a, $b) {
+                if ($a['date'] == $b['date']) return 0;
+                return (strtotime($a['date']) > strtotime($b['date']))? -1 : 1;
+            });
+            $data['imap_unread_data'] = $msg_list;
         }
         return $data;
     }
@@ -125,11 +114,11 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
 
 class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
     public function process($data) {
-        $cache = array();
         $servers = Hm_IMAP_List::dump(false, true);
+        $cache = $this->session->get('imap_cache', array());
         foreach ($servers as $index => $server) {
             if (isset($server['object']) && is_object($server['object'])) {
-                $cache[$index] = $server['object']->dump_cache('gzip');
+                $cache[$index] = $server['object']->dump_cache('string');
             }
         }
         if (count($cache) > 0) {
@@ -143,15 +132,7 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
 class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_IMAP_List::dump();
-        $cache = $this->session->get('imap_cache', array());
-        $new_cache = array();
-        foreach ($cache as $index => $cache_str) {
-            if (isset($servers[$index])) {
-                $new_cache[$index] = $cache_str;
-            }
-        }
         $this->user_config->set('imap_servers', $servers);
-        $this->session->set('imap_cache', $new_cache);
         Hm_IMAP_List::clean_up();
         return $data;
     }
@@ -499,13 +480,12 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
             }
             $res .= '</tbody></table>';
             $input['formatted_unread_data'] = $res;
+            unset($input['imap_unread_data']);
         }
         else {
             $input['formatted_unread_data'] = '';
         }
-        if ($input['formatted_unread_data']) {
-            Hm_Page_Cache::add('formatted_unread_data', $res);
-        }
+        Hm_Page_Cache::add('formatted_unread_data', $res);
         return $input;
     }
 }
