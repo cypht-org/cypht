@@ -96,12 +96,12 @@ class Hm_PHP_Session extends Hm_Session {
     }
 
     public function destroy() {
-        $this->end();
         session_unset();
         @session_destroy();
         $params = session_get_cookie_params();
         setcookie($this->cname, '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
         setcookie('hm_id', '', 0);
+        $this->active = false;
     }
 
     public function end() {

@@ -43,7 +43,9 @@ $renderer->send_response($response_str, $response_data);
 Hm_Page_Cache::save($session);
 
 /* close down the session */
-$session->end();
+if ($session->is_active()) {
+    $session->end();
+}
 
 /* log some debug info if not in debug mode */
 if (!DEBUG_MODE) {
