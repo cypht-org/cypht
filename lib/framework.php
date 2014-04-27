@@ -1078,7 +1078,7 @@ class Hm_IMAP_List {
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         self::$server_list[$id]['object'] = new Hm_IMAP();
         if ($cache) {
-            self::$server_list[$id]['object']->load_cache($cache, 'gzip');
+            self::$server_list[$id]['object']->load_cache($cache, 'string');
         }
         return self::$server_list[$id]['object']->connect(array(
             'server'    => $server['server'],
