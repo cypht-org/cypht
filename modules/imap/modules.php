@@ -7,6 +7,13 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
         $data['imap_expanded_folder_data'] = array();
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
+            $path = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
+            $page_cache = Hm_Page_Cache::get('imap_folders_'.$path);
+            if ($page_cache) {
+                $data['imap_expanded_folder_path'] = $path;
+                $data['imap_expanded_folder_formatted'] = $page_cache;
+                return $data;
+            }
             $details = Hm_IMAP_List::dump($form['imap_server_id']);
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
@@ -17,7 +24,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 }
                 $data['imap_expanded_folder_data'] = $msgs;
                 $data['imap_expanded_folder_id'] = $form['imap_server_id'];
-                $data['imap_expanded_folder_path'] = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
+                $data['imap_expanded_folder_path'] = $path;
             }
         }
         return $data;
@@ -486,11 +493,13 @@ class Hm_Output_imap_server_ids extends Hm_Output_Module {
 class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['imap_expanded_folder_data'])) {
+        if (isset($input['imap_expanded_folder_data']) && !empty($input['imap_expanded_folder_data'])) {
             ksort($input['imap_expanded_folder_data']);
             $res .= format_imap_folder_section($input['imap_expanded_folder_data'], $input['imap_expanded_folder_id'], $this);
+            $input['imap_expanded_folder_formatted'] = $res;
+            unset($input['imap_expanded_folder_data']);
+            Hm_Page_Cache::add('imap_folders_'.$input['imap_expanded_folder_path'], $res);
         }
-        $input['imap_expanded_folder_data'] = $res;
         return $input;
     }
 }

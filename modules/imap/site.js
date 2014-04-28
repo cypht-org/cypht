@@ -224,7 +224,7 @@ var expand_imap_folders = function(path) {
 };
 
 var expand_imap_mailbox = function(res) {
-    $('.'+res.imap_expanded_folder_path.replace(/(:|\.|\[|\])/g, "\\$1")).append(res.imap_expanded_folder_data);
+    $('.'+res.imap_expanded_folder_path.replace(/(:|\.|\[|\])/g, "\\$1")).append(res.imap_expanded_folder_formatted);
 };
 
 if (hm_page_name == 'home') {
