@@ -119,7 +119,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         else {
             $user = $this->session->get('username', false);
             $this->user_config->load($user);
-            $pages = array(); //$this->user_config->get('page_cache', array());
+            $pages = $this->user_config->get('page_cache', array());
             if (!empty($pages)) {
                 $this->session->set('page_cache', $pages);
             }
@@ -145,7 +145,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
             $path = $this->config->get('user_settings_dir', false);
             $pages = $this->session->get('page_cache', array());
             if (!empty($pages)) {
-                //$this->user_config->set('page_cache', $pages);
+                $this->user_config->set('page_cache', $pages);
             }
             if ($user && $path) {
                 $this->user_config->save($user);
@@ -479,7 +479,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
                 $res .= '</div>';
             }
         }
-        $res .= '</div></td><td>';
+        $res .= '</div></td><td class="content_cell">';
         return $res;
     }
 }

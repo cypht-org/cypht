@@ -21,3 +21,10 @@ option, select { padding: 3px; }
 .err { color: red; }
 .elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
 .server_summary { margin-right: 20px; padding: 10px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.inner_list a { padding-right: 5px; }
+.folders a { color: #666; text-decoration: none; }
+.folder_list { background-color: #fff; width: 200px; height: 600px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.folder_cell { width: 220px; }
+.folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; }
+.folders li, .inner_list li { padding: 3px; padding-left: 10px; margin: 0px; }
+.loading_folders { text-align: center; margin: 10px; margin-top: 20px; color: #666; }
