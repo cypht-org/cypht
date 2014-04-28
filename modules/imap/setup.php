@@ -108,6 +108,7 @@ add_handler('ajax_imap_folder_expand', 'imap_folder_expand',  true);
 add_handler('ajax_imap_folder_expand', 'save_imap_cache',  true);
 add_handler('ajax_imap_folder_expand', 'save_imap_servers',  true);
 add_handler('ajax_imap_folder_expand', 'date', true, 'core');
+add_output('ajax_imap_folder_expand', 'filter_expanded_folder_data', true);
 
 /* select folder */
 add_handler('ajax_imap_folder_display', 'login', false, 'core');

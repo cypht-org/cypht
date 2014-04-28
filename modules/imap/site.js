@@ -188,7 +188,6 @@ var select_imap_folder = function(path) {
             [],
             false
         );
-        console.log(detail);
     }
     return false;
 };
@@ -208,12 +207,12 @@ var expand_imap_folders = function(path) {
             [],
             false
         );
-        console.log(detail);
     }
     return false;
 };
 
 var expand_imap_mailbox = function(res) {
+    $('.'+res.imap_expanded_folder_path.replace(/(:|\.|\[|\])/g, "\\$1")).append(res.imap_expanded_folder_data);
 };
 
 if (hm_page_name == 'home') {
