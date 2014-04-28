@@ -40,6 +40,16 @@ add_handler('ajax_imap_msg_text', 'imap_tracker', true, 'tracker', 'imap_message
 add_output('ajax_imap_msg_text', 'tracker', false, 'tracker');
 add_output('ajax_imap_msg_text', 'show_debug', false, 'tracker');
 
+add_handler('ajax_imap_folder_expand', 'tracker', false, 'tracker',  'imap_folder_expand', 'after');
+add_handler('ajax_imap_folder_expand', 'imap_tracker', true, 'tracker', 'imap_folder_expand', 'after');
+add_output('ajax_imap_folder_expand', 'tracker', false, 'tracker');
+add_output('ajax_imap_folder_expand', 'show_debug', false, 'tracker');
+
+add_handler('ajax_imap_folder_display', 'tracker', false, 'tracker',  'imap_folder_page', 'after');
+add_handler('ajax_imap_folder_display', 'imap_tracker', true, 'tracker', 'imap_folder_page', 'after');
+add_output('ajax_imap_folder_display', 'tracker', false, 'tracker');
+add_output('ajax_imap_folder_display', 'show_debug', false, 'tracker');
+
 add_handler('settings', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('settings', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('settings', 'tracker', false, 'tracker', 'content_end', 'before');
