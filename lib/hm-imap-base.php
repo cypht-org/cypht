@@ -1224,7 +1224,6 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
             elseif ($mailbox) {
                 $namespace .= $mailbox.$delim.'%';
             }
-            error_log(sprintf("NAMESPACE: %s", $namespace));
             if ($this->is_supported('LIST-STATUS')) {
                 $status = ' RETURN (';
                 if ($this->is_supported('LIST-EXTENDED')) {
