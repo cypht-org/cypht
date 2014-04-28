@@ -149,10 +149,11 @@ var display_msg_text = function(res) {
     }
 };
 
-var msg_preview = function(uid, server_id) {
+var msg_preview = function(uid, server_id, folder) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_msg_text'},
         {'name': 'imap_msg_uid', 'value': uid},
+        {'name': 'folder', 'value': folder},
         {'name': 'imap_server_id', 'value': server_id}],
         display_msg_text,
         [],
@@ -198,15 +199,26 @@ var display_imap_mailbox = function(res) {
 
 var expand_imap_folders = function(path) {
     var detail = parse_folder_path(path);
-    if (detail) {
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
-            {'name': 'imap_server_id', 'value': detail.server_id},
-            {'name': 'folder', 'value': detail.folder}],
-            expand_imap_mailbox,
-            [],
-            false
-        );
+    var list = $('.imap_'+detail.server_id+'_'+detail.folder.replace(/(:|\.|\[|\])/g, "\\$1"));
+    var link = $('a:first-child', list);
+    var sublist = $('ul', list);
+    console.log(sublist);
+    if (link.html() == '+') {
+        if (detail) {
+            link.html('-');
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
+                {'name': 'imap_server_id', 'value': detail.server_id},
+                {'name': 'folder', 'value': detail.folder}],
+                expand_imap_mailbox,
+                [],
+                false
+            );
+        }
+    }
+    else {
+        sublist.remove();
+        link.html('+');
     }
     return false;
 };

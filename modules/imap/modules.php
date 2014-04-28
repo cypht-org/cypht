@@ -44,6 +44,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                 foreach ($imap->get_mailbox_page($form['folder'], $sort, $rev, $filter, $offset, $limit) as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
+                    $msg['folder'] = $form['folder'];
                     $msgs[] = $msg;
                 }
             }
@@ -116,6 +117,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                         if ($unseen) {
                             foreach ($imap->get_message_list($unseen) as $msg) {
                                 $msg['server_id'] = $id;
+                                $msg['folder'] = 'INBOX';
                                 $msg['server_name'] = $server_details['name'];
                                 $msg_list[] = $msg;
                             }
@@ -309,7 +311,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
 
 class Hm_Handler_imap_message_text extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid'));
+        list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
         if ($success) {
             $data['msg_text_uid'] = $form['imap_msg_uid'];
             $page_cache = Hm_Page_Cache::get('imap_msg_text_'.$form['imap_server_id'].'_'.$form['imap_msg_uid']);
@@ -321,7 +323,7 @@ class Hm_Handler_imap_message_text extends Hm_Handler_Module {
                 $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
                 if ($imap) {
                     $imap->read_only = true;
-                    if ($imap->select_mailbox('INBOX')) {
+                    if ($imap->select_mailbox($form['folder'])) {
                         $data['msg_text'] = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'plain');
                         Hm_Page_Cache::add('imap_msg_text_'.$form['imap_server_id'].'_'.$form['imap_msg_uid'], $data['msg_text']);
                     }
@@ -535,7 +537,8 @@ function format_imap_message_list($msg_list, $output_module) {
         $from = str_replace("&quot;", '', $from);
         $date = date('Y-m-d g:i:s', strtotime($output_module->html_safe($msg['date'])));
         $res .= '<tr><td><div class="source">'.$output_module->html_safe($msg['server_name']).'</div></td>'.
-            '<td><div onclick="return msg_preview('.$output_module->html_safe($msg['uid']).', '.$output_module->html_safe($msg['server_id']).')" class="subject">'.$subject.'</div>'.
+            '<td><div onclick="return msg_preview('.$output_module->html_safe($msg['uid']).', '.
+            $output_module->html_safe($msg['server_id']).', \''.$output_module->html_safe($msg['folder']).'\')" class="subject">'.$subject.'</div>'.
             '<div class="msg_text" id="msg_text_'.$output_module->html_safe($msg['uid']).'"></div></td>'.
             '<td><div class="from">'.$from.'</div></td>'.
             '<td><div class="msg_date">'.$date.'</div></td></tr>';
