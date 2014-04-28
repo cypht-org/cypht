@@ -100,6 +100,25 @@ add_handler('ajax_hm_folders', 'save_imap_cache',  true, 'imap', 'load_imap_fold
 add_handler('ajax_hm_folders', 'save_imap_servers',  true, 'imap', 'save_imap_cache', 'after');
 add_output('ajax_hm_folders', 'filter_imap_folders', true);
 
+/* expand folder */
+add_handler('ajax_imap_folder_expand', 'login', false, 'core');
+add_handler('ajax_imap_folder_expand', 'load_user_data', true, 'core');
+add_handler('ajax_imap_folder_expand', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_folder_expand', 'imap_folder_expand',  true);
+add_handler('ajax_imap_folder_expand', 'save_imap_cache',  true);
+add_handler('ajax_imap_folder_expand', 'save_imap_servers',  true);
+add_handler('ajax_imap_folder_expand', 'date', true, 'core');
+
+/* select folder */
+add_handler('ajax_imap_folder_display', 'login', false, 'core');
+add_handler('ajax_imap_folder_display', 'load_user_data', true, 'core');
+add_handler('ajax_imap_folder_display', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_folder_display', 'imap_folder_page',  true);
+add_handler('ajax_imap_folder_display', 'save_imap_cache',  true);
+add_handler('ajax_imap_folder_display', 'save_imap_servers',  true);
+add_handler('ajax_imap_folder_display', 'date', true, 'core');
+add_output('ajax_imap_folder_display', 'filter_folder_page', true);
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -107,6 +126,8 @@ return array(
         'ajax_imap_summary',
         'ajax_imap_unread',
         'ajax_imap_msg_text',
+        'ajax_imap_folder_expand',
+        'ajax_imap_folder_display',
         'servers',
         'unread'
     ),
@@ -137,6 +158,7 @@ return array(
         'new_imap_port' => FILTER_VALIDATE_INT,
         'new_imap_name' => FILTER_SANITIZE_STRING,
         'tls' => FILTER_VALIDATE_BOOLEAN,
+        'folder' => FILTER_SANITIZE_STRING,
     )
 );
 

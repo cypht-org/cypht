@@ -2,6 +2,47 @@
 
 require 'lib/hm-imap.php';
 
+class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
+        if ($success) {
+            $details = Hm_IMAP_List::dump($form['imap_server_id']);
+            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
+    public function process($data) {
+
+        $sort = 'ARRIVAL';
+        $rev = false;
+        $filter = false;
+        $offset = 0;
+        $limit = 20;
+        $msgs = array();
+        $data['imap_mailbox_page'] = array();
+
+        list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
+        if ($success) {
+            $details = Hm_IMAP_List::dump($form['imap_server_id']);
+            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            if (is_object($imap) && $imap->get_state() == 'authenticated') {
+                foreach ($imap->get_mailbox_page($form['folder'], $sort, $rev, $filter, $offset, $limit) as $msg) {
+                    $msg['server_id'] = $form['imap_server_id'];
+                    $msg['server_name'] = $details['name'];
+                    $msgs[] = $msg;
+                }
+            }
+        }
+        $data['imap_mailbox_page'] = $msgs;
+        return $data;
+    }
+}
+
 class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('summary_ids'));
@@ -38,7 +79,7 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                    $folders[$details['name']] = $imap->get_folder_list_by_level();
+                    $folders[$id] = $imap->get_folder_list_by_level();
                 }
             }
         }
@@ -434,20 +475,21 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $results = '<ul class="folders">';
         if (isset($input['imap_folders'])) {
-            foreach ($input['imap_folders'] as $name => $folders) {
-                $results .= '<li>'.$this->html_safe($name).'</li>';
+            foreach ($input['imap_folders'] as $id => $folders) {
+                $details = Hm_IMAP_List::dump($id);
+                $results .= '<li>'.$this->html_safe($details['name']).'</li>';
                 $results .= '<li><ul class="inner_list">';
-                foreach ($folders as $folder) {
+                foreach ($folders as $folder_name => $folder) {
                     $results .= '<li>';
                     if ($folder['children']) {
-                        $results .= '+ ';
+                        $results .= '<a href="#" onclick="return expand_imap_folders(\'imap:'.intval($id).':'.$this->html_safe($folder_name).'\')">+</a>';
                     }
-                    $results .= $this->html_safe($folder['basename']).'</li>';
+                    $results .= '<a href="#" onclick="return select_imap_folder(\'imap:'.intval($id).':'.$this->html_safe($folder_name).'\')">'.$this->html_safe($folder['basename']).'</a></li>';
                 }
                 $results .= '</ul></li>';
             }
         }
-        $results .= '<li><a href="#" onclick="imap_folder_update(true); return false;">Update</a></li></ul>';
+        $results .= '<li class="imap_update"><a href="#" onclick="return imap_folder_update(true); return false;">Update</a></li></ul>';
         $input['imap_folders'] = $results;
         Hm_Page_Cache::add('imap_folders', $results);
         return $input;
@@ -470,7 +512,7 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
                 $from = str_replace("&quot;", '', $from);
                 $date = date('Y-m-d g:i:s', strtotime($clean['date']));
                 $res .= '<tr><td><div class="source">'.$clean['server_name'].'</div></td>'.
-                    '<td><div onclick="msg_preview('.$clean['uid'].', '.$clean['server_id'].')" class="subject">'.$subject.'</div>'.
+                    '<td><div onclick="return msg_preview('.$clean['uid'].', '.$clean['server_id'].')" class="subject">'.$subject.'</div>'.
                     '<div class="msg_text" id="msg_text_'.$clean['uid'].'"></div></td>'.
                     '<td><div class="from">'.$from.'</div></td>'.
                     '<td><div class="msg_date">'.$date.'</div></td></tr>';
@@ -486,6 +528,40 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
             $input['formatted_unread_data'] = '';
         }
         Hm_Page_Cache::add('formatted_unread_data', $res);
+        return $input;
+    }
+}
+
+class Hm_Output_filter_folder_page extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['imap_mailbox_page'])) {
+            $res = '<div class="unread_messages"><table cellpadding="0" cellspacing="0"><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr><tbody>';
+            foreach($input['imap_mailbox_page'] as $msg) {
+                $clean = array_map(function($v) { return $this->html_safe($v); }, $msg);
+                if ($clean['server_name'] == 'Default-Auth-Server') {
+                    $clean['server_name'] = 'Default';
+                }
+                $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $clean['subject']);
+                $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $clean['from']);
+                $from = str_replace("&quot;", '', $from);
+                $date = date('Y-m-d g:i:s', strtotime($clean['date']));
+                $res .= '<tr><td><div class="source">'.$clean['server_name'].'</div></td>'.
+                    '<td><div onclick="return msg_preview('.$clean['uid'].', '.$clean['server_id'].')" class="subject">'.$subject.'</div>'.
+                    '<div class="msg_text" id="msg_text_'.$clean['uid'].'"></div></td>'.
+                    '<td><div class="from">'.$from.'</div></td>'.
+                    '<td><div class="msg_date">'.$date.'</div></td></tr>';
+            }
+            if (!count($input['imap_mailbox_page'])) {
+                $res .= '<tr><td colspan="4" class="empty_table">No messages found</td></tr>';
+            }
+            $res .= '</tbody></table></div>';
+            $input['formatted_mailbox_page'] = $res;
+            unset($input['imap_mailbox_page']);
+        }
+        else {
+            $input['formatted_mailbox_page'] = '';
+        }
+        //Hm_Page_Cache::add('formatted_mailbox_page', $res);
         return $input;
     }
 }

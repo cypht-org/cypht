@@ -125,6 +125,7 @@ var imap_folder_update = function() {
             false
         );
     }
+    return false;
 };
 
 var update_imap_folder_display = function(res) {
@@ -157,6 +158,62 @@ var msg_preview = function(uid, server_id) {
         [],
         false
     );
+    return false;
+};
+
+var parse_folder_path = function(path) {
+    var type = false;
+    var server_id = false;
+    var folder = false;
+    parts = path.split(':');
+    if (parts.length == 3) {
+        type = parts[0];
+        server_id = parts[1];
+        folder = parts[2];
+    }
+    if (type && server_id && folder) {
+        return {'type': type, 'server_id' : server_id, 'folder' : folder}
+    }
+    return false;
+};
+
+var select_imap_folder = function(path) {
+    var detail = parse_folder_path(path);
+    if (detail) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_display'},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder}],
+            display_imap_mailbox,
+            [],
+            false
+        );
+        console.log(detail);
+    }
+    return false;
+};
+
+var display_imap_mailbox = function(res) {
+    $('.content_cell').html(res.formatted_mailbox_page);
+};
+
+var expand_imap_folders = function(path) {
+    var detail = parse_folder_path(path);
+    if (detail) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder}],
+            expand_imap_mailbox,
+            [],
+            false
+        );
+        console.log(detail);
+    }
+    return false;
+};
+
+var expand_imap_mailbox = function(res) {
 };
 
 if (hm_page_name == 'home') {
@@ -181,3 +238,4 @@ else if (hm_page_name == 'unread') {
     }
     Hm_Timer.add_job(imap_unread_update, 60, true);
 }
+
