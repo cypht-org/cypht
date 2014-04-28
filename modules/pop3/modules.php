@@ -105,7 +105,7 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_load_pop3_server_cache extends Hm_Handler_Module {
+class Hm_Handler_load_pop3_cache extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_POP3_List::dump();
         $cache = $this->session->get('pop3_cache', array()); 
@@ -113,6 +113,12 @@ class Hm_Handler_load_pop3_server_cache extends Hm_Handler_Module {
             if (isset($cache[$index])) {
             }
         }
+        return $data;
+    }
+}
+
+class Hm_Handler_save_pop3_cache extends Hm_Handler_Module {
+    public function process($data) {
         return $data;
     }
 }

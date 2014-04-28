@@ -19,7 +19,8 @@ add_output('servers', 'display_configured_pop3_servers', true, 'pop3', 'add_pop3
 add_handler('ajax_pop3_debug', 'login', false, 'core');
 add_handler('ajax_pop3_debug', 'load_user_data',  true, 'core');
 add_handler('ajax_pop3_debug', 'load_pop3_servers_from_config',  true);
-add_handler('ajax_pop3_debug', 'load_pop3_server_cache',  true);
+add_handler('ajax_pop3_debug', 'load_pop3_cache',  true);
+add_handler('ajax_pop3_debug', 'save_pop3_cache',  true);
 add_handler('ajax_pop3_debug', 'add_pop3_servers_to_page_data',  true);
 add_handler('ajax_pop3_debug', 'pop3_connect', true);
 add_handler('ajax_pop3_debug', 'pop3_delete', true);
