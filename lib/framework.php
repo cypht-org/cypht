@@ -1134,6 +1134,7 @@ class Hm_Page_Cache {
     }
     public static function get($key) {
         if (isset(self::$pages[$key])) {
+            Hm_Debug::add(sprintf("PAGE CACHE: %s", $key));
             return self::$pages[$key];
         }
         return false;
