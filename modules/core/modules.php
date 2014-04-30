@@ -119,10 +119,10 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         else {
             $user = $this->session->get('username', false);
             $this->user_config->load($user);
-            $pages = $this->user_config->get('page_cache', array());
+            /*$pages = $this->user_config->get('page_cache', array());
             if (!empty($pages)) {
                 $this->session->set('page_cache', $pages);
-            }
+            }*/
         }
         return $data;
     }
@@ -143,10 +143,10 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
             $user = $this->session->get('username', false);
             $path = $this->config->get('user_settings_dir', false);
-            $pages = $this->session->get('page_cache', array());
+            /*$pages = $this->session->get('page_cache', array());
             if (!empty($pages)) {
                 $this->user_config->set('page_cache', $pages);
-            }
+            }*/
             if ($user && $path) {
                 $this->user_config->save($user);
                 Hm_Msgs::add('Saved user data on logout');
@@ -458,17 +458,10 @@ class Hm_Output_servers_link extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_unread_link extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<a class="unread_link" href="'.$this->html_safe($input['router_url_path']).'?page=unread">'.$this->trans('Unread').'</a>';
-        }
-    }
-}
-
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<table><tr><td class="folder_cell"><div class="folder_list">';
+        $res .= '<a class="unread_link" href="#" onclick="return imap_unread_update()">'.$this->trans('Unread').'</a>';
         if (isset($input['folder_sources'])) {
             foreach ($input['folder_sources'] as $src) {
                 $res .= '<div class="'.$src.'">';

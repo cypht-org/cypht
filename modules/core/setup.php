@@ -26,7 +26,6 @@ add_output('home', 'toolbar_start', true);
 add_output('home', 'logout', true);
 add_output('home', 'settings_link', true);
 add_output('home', 'servers_link', true);
-add_output('home', 'unread_link', true);
 add_output('home', 'homepage_link', true);
 add_output('home', 'date', true);
 add_output('home', 'login', false);
@@ -63,7 +62,6 @@ add_output('servers', 'toolbar_start', true);
 add_output('servers', 'logout', true);
 add_output('servers', 'settings_link', true);
 add_output('servers', 'servers_link', true);
-add_output('servers', 'unread_link', true);
 add_output('servers', 'homepage_link', true);
 add_output('servers', 'date', true);
 add_output('servers', 'login', false);
@@ -101,7 +99,6 @@ add_output('settings', 'toolbar_start', true);
 add_output('settings', 'logout', true);
 add_output('settings', 'settings_link', true);
 add_output('settings', 'servers_link', true);
-add_output('settings', 'unread_link', true);
 add_output('settings', 'homepage_link', true);
 add_output('settings', 'date', true);
 add_output('settings', 'login', false);
@@ -130,6 +127,7 @@ return array(
         'home',
         'notfound',
         'settings',
+        'servers',
         'ajax_hm_folders',
     ),
     'allowed_cookie' => array(

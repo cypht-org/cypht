@@ -8,7 +8,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
             $path = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
-            $page_cache = Hm_Page_Cache::get('imap_folders_'.$path);
+            $page_cache =  Hm_Page_Cache::get('imap_folders_'.$path);
             if ($page_cache) {
                 $data['imap_expanded_folder_path'] = $path;
                 $data['imap_expanded_folder_formatted'] = $page_cache;
@@ -40,14 +40,30 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         $offset = 0;
         $limit = 20;
         $msgs = array();
-        $data['imap_mailbox_page'] = array();
+        $force = false;
 
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
+            $path = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
+            if (isset($this->request->post['force_update']) && $this->request->post['force_update']) {
+                $force = true;
+            }
+            if (!$force) {
+                $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$path);
+                if ($page_cache) {
+                    $data['formatted_mailbox_page'] = $page_cache;
+                    $data['imap_mailbox_page_path'] = $path;
+                    $data['imap_mailbox_page_id'] = $form['imap_server_id'];
+                    return $data;
+                }
+            }
             $details = Hm_IMAP_List::dump($form['imap_server_id']);
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
+                $data['imap_mailbox_page_path'] = $path;
+                $data['imap_mailbox_page_title'] = $form['folder'];
+                $data['imap_mailbox_page_id'] = $form['imap_server_id'];
                 foreach ($imap->get_mailbox_page($form['folder'], $sort, $rev, $filter, $offset, $limit) as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
@@ -55,8 +71,8 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $msgs[] = $msg;
                 }
             }
+            $data['imap_mailbox_page'] = $msgs;
         }
-        $data['imap_mailbox_page'] = $msgs;
         return $data;
     }
 }
@@ -110,8 +126,19 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
+            $force = false;
+            if (isset($this->request->post['force_update']) && $this->request->post['force_update']) {
+                $force = true;
+            }
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
+            if (!$force) {
+                $page_cache = Hm_Page_Cache::get('formatted_unread_data');
+                if ($page_cache) {
+                    $data['formatted_unread_data'] = $page_cache;
+                    return $data;
+                }
+            }
             foreach($ids as $id) {
                 $id = intval($id);
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
@@ -458,30 +485,6 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_unread_message_list extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            $res = '';
-            $cache = Hm_Page_Cache::get('formatted_unread_data');
-            $res .= '<div class="unread_messages">';
-            if ($cache) {
-                $res .= $cache.'</div>';
-            }
-            else {
-                $res .= '<table><tr><td class="empty_table loading_messages">';
-                if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
-                    $res .= '<img src="images/ajax-loader.gif" width="16" height="16" alt="" />&nbsp; Loading unread messages ...';
-                }
-                else {
-                    $res .= 'No servers found. <a href="'.$input['router_url_path'].'?page=servers">Add some</a>';
-                }
-                $res .= '</td></tr></table></div>';
-            }
-            return $res;
-        }
-    }
-}
-
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_servers'])) {
@@ -561,31 +564,36 @@ function format_imap_message_list($msg_list, $output_module) {
 
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '';
+        $res = '<div class="message_list"><div class="content_title">Unread Messages</div>'.
+            '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">Update</a>';
         if (isset($input['imap_unread_data'])) {
             $res .= format_imap_message_list($input['imap_unread_data'], $this);
-            $input['formatted_unread_data'] = $res;
+            $input['formatted_unread_data'] = $res.'</div>';
             unset($input['imap_unread_data']);
+            Hm_Page_Cache::add('formatted_unread_data', $res);
         }
-        else {
+        elseif (!isset($input['formatted_unread_data'])) {
             $input['formatted_unread_data'] = '';
         }
-        Hm_Page_Cache::add('formatted_unread_data', $res);
         return $input;
     }
 }
 class Hm_Output_filter_folder_page extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['imap_mailbox_page'])) {
-            $res = '<div class="mailbox_page">'.format_imap_message_list($input['imap_mailbox_page'], $this).'</div>';
+        if (isset($input['imap_mailbox_page']) && !empty($input['imap_mailbox_page'])) {
+            $res .= '<div class="message_list"><div class="content_title">'.
+                $this->html_safe( $input['imap_mailbox_page_title']).'</div>'.
+                '<a class="update_unread" href="#" onclick="return select_imap_folder(\'imap:'.intval($input['imap_mailbox_page_path']).
+                ':'.$this->html_safe($input['imap_mailbox_page_title']).'\', true)">Update</a>';
+            $res .= format_imap_message_list($input['imap_mailbox_page'], $this).'</div>';
             $input['formatted_mailbox_page'] = $res;
+            Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'], $res);
             unset($input['imap_mailbox_page']);
         }
-        else {
+        elseif (!isset($input['formatted_mailbox_page'])) {
             $input['formatted_mailbox_page'] = '';
         }
-        //Hm_Page_Cache::add('formatted_mailbox_page', $res);
         return $input;
     }
 }

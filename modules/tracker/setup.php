@@ -11,10 +11,6 @@ add_handler('servers', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('servers', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('servers', 'tracker', false, 'tracker', 'content_end', 'before');
 
-add_handler('unread', 'tracker', false, 'tracker', 'http_headers', 'after');
-add_output('unread', 'show_debug', false, 'tracker', 'content_end', 'before');
-add_output('unread', 'tracker', false, 'tracker', 'content_end', 'before');
-
 add_handler('ajax_pop3_debug', 'tracker', false, 'tracker', 'save_pop3_servers', 'after');
 add_handler('ajax_pop3_debug', 'pop3_tracker', true, 'tracker', 'pop3_connect', 'after');
 add_output('ajax_pop3_debug', 'tracker', false, 'tracker');

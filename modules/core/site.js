@@ -108,16 +108,24 @@ Hm_Notices = {
         Hm_Notices.hide();
     },
 
-    hide: function() {
+    hide: function(now) {
         if (Hm_Notices.hide_id) {
             clearTimeout(Hm_Notices.hide_id);
         }
-        Hm_Notices.hide_id = setTimeout(function() {
+        if (now) {
             $('.sys_messages').fadeOut(1000, function() {
                 $('.sys_messages').html('');
                 $('.sys_messages').show('');
             });
-        }, 20000);
+        }
+        else {
+            Hm_Notices.hide_id = setTimeout(function() {
+                $('.sys_messages').fadeOut(1000, function() {
+                    $('.sys_messages').html('');
+                    $('.sys_messages').show('');
+                });
+            }, 20000);
+        }
     }
 };
 

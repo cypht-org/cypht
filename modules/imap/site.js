@@ -79,6 +79,7 @@ var update_unread_message_display = function(res) {
         console.log("Nothing to update");
         return;
     }
+    Hm_Notices.hide(true);
     var count = 0;
     var empty = $('.empty_table', $(res.formatted_unread_data));
     if (empty.length == 0) {
@@ -95,23 +96,28 @@ var update_unread_message_display = function(res) {
         title = title + ' ('+count+')';
     }
     document.title = title;
-    $('.unread_messages').html(res.formatted_unread_data);
+    $('.content_cell').html(res.formatted_unread_data);
     if (count > 1) {
-        $('table', $('.unread_messages')).tablesorter();
+        $('table', $('.content_cell')).tablesorter();
     }
 };
 
-var imap_unread_update = function(loading) {
+var imap_unread_update = function(loading, force) {
     var ids = $('#imap_server_ids').val();
     if ( ids && ids.length ) {
+        if (force) {
+            Hm_Notices.show({0: 'Loading unread messages...'});
+        }
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
+            {'name': 'force_update', 'value': force},
             {'name': 'imap_server_ids', 'value': ids}],
             update_unread_message_display,
             [],
             loading
         );
     }
+    return false;
 };
 
 var imap_folder_update = function() {
@@ -178,12 +184,16 @@ var parse_folder_path = function(path) {
     return false;
 };
 
-var select_imap_folder = function(path) {
+var select_imap_folder = function(path, force) {
     var detail = parse_folder_path(path);
     if (detail) {
+        if (force) {
+            Hm_Notices.show({0: 'Loading folder...'});
+        }
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_display'},
             {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'force_update', 'value': force},
             {'name': 'folder', 'value': detail.folder}],
             display_imap_mailbox,
             [],
@@ -194,6 +204,7 @@ var select_imap_folder = function(path) {
 };
 
 var display_imap_mailbox = function(res) {
+    Hm_Notices.hide(true);
     $('.content_cell').html(res.formatted_mailbox_page);
 };
 
@@ -239,14 +250,3 @@ else if (hm_page_name == 'servers') {
     $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
 }
-else if (hm_page_name == 'unread') {
-    var content = $('.loading_messages');
-    if (content.length > 0) {
-        imap_unread_update(true);
-    }
-    else {
-        imap_unread_update();
-    }
-    Hm_Timer.add_job(imap_unread_update, 60, true);
-}
-

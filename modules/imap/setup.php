@@ -19,46 +19,6 @@ add_handler('servers', 'save_imap_servers',  true, 'imap', 'add_imap_servers_to_
 add_output('servers', 'add_imap_server_dialog', true, 'imap', 'loading_icon', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap_server_dialog', 'after');
 
-/* unread page data */
-add_handler('unread', 'login', false, 'core');
-add_handler('unread', 'load_user_data', true, 'core');
-add_handler('unread', 'language',  true, 'core');
-add_handler('unread', 'title', true, 'core');
-add_handler('unread', 'date', true, 'core');
-add_handler('unread', 'load_imap_servers_from_config', true);
-add_handler('unread', 'add_imap_servers_to_page_data', true);
-add_handler('unread', 'imap_bust_cache', true);
-add_handler('unread', 'save_user_data', true, 'core');
-add_handler('unread', 'logout', true, 'core');
-add_handler('unread', 'http_headers', true, 'core');
-
-add_output('unread', 'header_start', false, 'core');
-add_output('unread', 'js_data', true, 'core');
-add_output('unread', 'header_css', false, 'core');
-add_output('unread', 'jquery', false, 'core');
-add_output('unread', 'jquery_table', false, 'core');
-add_output('unread', 'header_content', false, 'core');
-add_output('unread', 'header_end', false, 'core');
-add_output('unread', 'content_start', false, 'core');
-add_output('unread', 'toolbar_start', true, 'core');
-add_output('unread', 'logout', true, 'core');
-add_output('unread', 'settings_link', true, 'core');
-add_output('unread', 'servers_link', true, 'core');
-add_output('unread', 'unread_link', true, 'core');
-add_output('unread', 'homepage_link', true, 'core');
-add_output('unread', 'login', false, 'core');
-add_output('unread', 'date', true, 'core');
-add_output('unread', 'title', true, 'core');
-add_output('unread', 'msgs', false, 'core');
-add_output('unread', 'loading_icon', false, 'core');
-add_output('unread', 'toolbar_end', true, 'core');
-add_output('unread', 'folder_list_start', true, 'core');
-add_output('unread', 'unread_message_list', true);
-add_output('unread', 'folder_list_end', true, 'core');
-add_output('unread', 'imap_server_ids', true);
-add_output('unread', 'page_js', true, 'core');
-add_output('unread', 'content_end', false, 'core');
-
 /* ajax server setup callback data */
 add_handler('ajax_imap_debug', 'login', false, 'core');
 add_handler('ajax_imap_debug', 'load_user_data',  true, 'core');
@@ -129,8 +89,6 @@ return array(
         'ajax_imap_msg_text',
         'ajax_imap_folder_expand',
         'ajax_imap_folder_display',
-        'servers',
-        'unread'
     ),
 
     'allowed_get' => array(
@@ -160,6 +118,7 @@ return array(
         'new_imap_name' => FILTER_SANITIZE_STRING,
         'tls' => FILTER_VALIDATE_BOOLEAN,
         'folder' => FILTER_SANITIZE_STRING,
+        'force_update' => FILTER_VALIDATE_BOOLEAN,
     )
 );
 
