@@ -7,6 +7,11 @@ add_handler('home', 'imap_tracker', true, 'tracker', 'tracker', 'after');
 add_output('home', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('home', 'tracker', false, 'tracker', 'content_end', 'before');
 
+add_handler('message_list', 'tracker', false, 'tracker', 'http_headers', 'after');
+add_handler('message_list', 'imap_tracker', true, 'tracker', 'tracker', 'after');
+add_output('message_list', 'show_debug', false, 'tracker', 'content_end', 'before');
+add_output('message_list', 'tracker', false, 'tracker', 'content_end', 'before');
+
 add_handler('servers', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('servers', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('servers', 'tracker', false, 'tracker', 'content_end', 'before');

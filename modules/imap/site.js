@@ -75,47 +75,44 @@ var imap_test_action = function() {
 };
 
 var update_unread_message_display = function(res) {
-    if (res.imap_unread_unchanged) {
-        console.log("Nothing to update");
-        return;
+    var ids = res.unread_server_ids.split(',');
+    var msg_ids = [];
+    for (index in res.formatted_unread_data) {
+        row = res.formatted_unread_data[index][0];
+        id = res.formatted_unread_data[index][1];
+        if (!$('.'+id).length) {
+            $('.message_table tbody').prepend(row);
+            $('.'+id).fadeIn(600);
+        }
+        msg_ids.push(id);
     }
-    Hm_Notices.hide(true);
-    var count = 0;
-    var empty = $('.empty_table', $(res.formatted_unread_data));
-    if (empty.length == 0) {
-        count = $('tr', $(res.formatted_unread_data)).length - 1;
-    }
-    if (count < 0) {
-        count = 0;
-    }
-    var title = document.title;
-    if (title.search(/\(\d+\)/) != -1) {
-        title = title.replace(/\(\d+\)/, ' ('+count+')');
-    }
-    else {
-        title = title + ' ('+count+')';
-    }
-    document.title = title;
-    $('.content_cell').html(res.formatted_unread_data);
-    if (count > 1) {
-        $('table', $('.content_cell')).tablesorter();
+    for (i=0;i<ids.length;i++) {
+        $('.message_table tbody tr[class^=imap_'+ids[i]+'_]').filter(function() {
+            var id = this.className;
+            if (jQuery.inArray(id, msg_ids) == -1) {
+                $(this).fadeOut(600, function() { $('.'+id).remove(); });
+            }
+        });
     }
 };
 
 var imap_unread_update = function(loading, force) {
-    var ids = $('#imap_server_ids').val();
+    var ids = $('#imap_server_ids').val().split(',');
     if ( ids && ids.length ) {
         if (force) {
-            Hm_Notices.show({0: 'Loading unread messages...'});
+            Hm_Notices.show({0: 'Updating unread messages ...'});
         }
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-            {'name': 'force_update', 'value': force},
-            {'name': 'imap_server_ids', 'value': ids}],
-            update_unread_message_display,
-            [],
-            loading
-        );
+        for (i=0;i<ids.length;i++) {
+            id=ids[i];
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
+                {'name': 'force_update', 'value': force},
+                {'name': 'imap_server_ids', 'value': id}],
+                update_unread_message_display,
+                [],
+                loading
+            );
+        }
     }
     return false;
 };
@@ -123,6 +120,7 @@ var imap_unread_update = function(loading, force) {
 var imap_folder_update = function() {
     var ids = $('#imap_server_ids').val();
     if ( ids && ids.length ) {
+        Hm_Notices.show({0: 'Updating IMAP folders ...'});
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
             {'name': 'imap_folder_ids', 'value': ids}],
@@ -142,20 +140,17 @@ var update_imap_folder_display = function(res) {
 
 var display_msg_text = function(res) {
     if (res.msg_text) {
-        var msg_text = $('#msg_text_' + res.msg_text_uid);
+        var msg_text = $('.msg_text');
         msg_text.html(res.msg_text);
         msg_text.slideDown();
-        msg_text.parent().parent().css({'background-color': '#f5f5f5'});
-        msg_text.parent().parent().children().css({'border-top': 'solid 1px #ccc'});
         $('body').on('click', function() {
             $('.msg_text').slideUp();
-            $('.msg_text').parent().parent().css('background-color', '#fff');
-            $('.msg_text').parent().parent().children().css('border-top', 'none');
         } );
     }
 };
 
 var msg_preview = function(uid, server_id, folder) {
+    Hm_Notices.show({0: 'Fetching message text ...'});
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_msg_text'},
         {'name': 'imap_msg_uid', 'value': uid},
@@ -188,7 +183,7 @@ var select_imap_folder = function(path, force) {
     var detail = parse_folder_path(path);
     if (detail) {
         if (force) {
-            Hm_Notices.show({0: 'Loading folder...'});
+            Hm_Notices.show({0: 'Updating folder...'});
         }
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_display'},
@@ -204,8 +199,23 @@ var select_imap_folder = function(path, force) {
 };
 
 var display_imap_mailbox = function(res) {
-    Hm_Notices.hide(true);
-    $('.content_cell').html(res.formatted_mailbox_page);
+    var imap_id = res.imap_server_id;
+    var msg_ids = [];
+    for (index in res.formatted_mailbox_page) {
+        row = res.formatted_mailbox_page[index][0];
+        id = res.formatted_mailbox_page[index][1];
+        if (!$('.'+id).length) {
+            $('.message_table tbody').prepend(row);
+            $('.'+id).fadeIn(600);
+        }
+        msg_ids.push(id);
+    }
+    $('.message_table tbody tr[class^=imap_'+imap_id+'_]').filter(function() {
+        var id = this.className;
+        if (jQuery.inArray(id, msg_ids) == -1) {
+            $(this).fadeOut(600, function() { $('.'+id).remove(); });
+        }
+    });
 };
 
 var expand_imap_folders = function(path) {
@@ -213,10 +223,10 @@ var expand_imap_folders = function(path) {
     var list = $('.imap_'+detail.server_id+'_'+detail.folder.replace(/(:|\.|\[|\])/g, "\\$1"));
     var link = $('a:first-child', list);
     var sublist = $('ul', list);
-    console.log(sublist);
     if (link.html() == '+') {
         if (detail) {
             link.html('-');
+            Hm_Notices.show({0: 'Loading subfolder ...'});
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
                 {'name': 'imap_server_id', 'value': detail.server_id},
@@ -243,6 +253,8 @@ if (hm_page_name == 'home') {
     if (!imap_folders) {
         imap_folder_update();
     }
+}
+else if (hm_page_name == 'unread') {
 }
 else if (hm_page_name == 'servers') {
     $('.imap_delete').on('click', imap_delete_action);

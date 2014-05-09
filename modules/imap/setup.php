@@ -14,10 +14,15 @@ add_handler('servers', 'load_imap_servers_from_config',  true, 'imap', 'date', '
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('servers', 'add_imap_servers_to_page_data', 'imap', true, 'process_add_imap_server', 'after');
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
-
-/* servers page output */
 add_output('servers', 'add_imap_server_dialog', true, 'imap', 'loading_icon', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap_server_dialog', 'after');
+
+
+add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('message_list', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('message_list', 'imap_message_list_type',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
+add_output('message_list', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
+//add_output('message_list', 'imap_unread_table', true, 'imap', 'folder_list_end', 'before');
 
 /* ajax server setup callback data */
 add_handler('ajax_imap_debug', 'login', false, 'core');
