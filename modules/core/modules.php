@@ -461,7 +461,7 @@ class Hm_Output_servers_link extends Hm_Output_Module {
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<table><tr><td class="folder_cell"><div class="folder_list">';
-        $res .= '<a class="unread_link" href="#" onclick="return imap_unread_update()">'.$this->trans('Unread').'</a>';
+        $res .= '<a class="unread_link" href="?page=message_list&amp;list_path=unread">'.$this->trans('Unread').'</a>';
         if (isset($input['folder_sources'])) {
             foreach ($input['folder_sources'] as $src) {
                 $res .= '<div class="'.$src.'">';

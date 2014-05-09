@@ -113,6 +113,41 @@ add_output('settings', 'end_settings_form', true);
 add_output('settings', 'page_js', true);
 add_output('settings', 'content_end', true);
 
+/* message list page */
+add_handler('message_list', 'create_user', false);
+add_handler('message_list', 'login', false);
+add_handler('message_list', 'load_user_data', true);
+add_handler('message_list', 'language',  true);
+add_handler('message_list', 'title', true);
+add_handler('message_list', 'date', true);
+add_handler('message_list', 'save_user_data', true);
+add_handler('message_list', 'logout', true);
+add_handler('message_list', 'http_headers', true);
+add_output('message_list', 'header_start', false);
+add_output('message_list', 'js_data', true);
+add_output('message_list', 'header_css', false);
+add_output('message_list', 'jquery', false);
+add_output('message_list', 'jquery_table', true);
+add_output('message_list', 'header_content', false);
+add_output('message_list', 'header_end', false);
+add_output('message_list', 'content_start', false);
+add_output('message_list', 'toolbar_start', true);
+add_output('message_list', 'logout', true);
+add_output('message_list', 'settings_link', true);
+add_output('message_list', 'servers_link', true);
+add_output('message_list', 'homepage_link', true);
+add_output('message_list', 'date', true);
+add_output('message_list', 'login', false);
+add_output('message_list', 'msgs', false);
+add_output('message_list', 'title', true);
+add_output('message_list', 'loading_icon', true);
+add_output('message_list', 'toolbar_end', true);
+add_output('message_list', 'folder_list_start', true);
+add_output('message_list', 'folder_list_end', true);
+add_output('message_list', 'imap_server_ids', true);
+add_output('message_list', 'page_js', true);
+add_output('message_list', 'content_end', true);
+
 /* not-found page data and output */
 add_handler('notfound', 'title', true);
 add_output('notfound', 'title', true);
@@ -125,6 +160,7 @@ add_handler('ajax_hm_folders', 'date', true, 'core');
 return array(
     'allowed_pages' => array(
         'home',
+        'message_list',
         'notfound',
         'settings',
         'servers',
@@ -149,7 +185,8 @@ return array(
 
     'allowed_get' => array(
         'page' => FILTER_SANITIZE_STRING,
-        'msgs' => FILTER_SANITIZE_STRING
+        'msgs' => FILTER_SANITIZE_STRING,
+        'list_path' => FILTER_SANITIZE_STRING,
     ),
 
     'allowed_post' => array(

@@ -1,20 +1,17 @@
 /* Ajax multiplexer */
 Hm_Ajax = {
-    requests: [],
+    request_count: 0,
+    batch_callback: false,
 
-    request: function(args, callback, extra, no_icon) {
+    request: function(args, callback, extra, no_icon, batch_callback) {
         var ajax = new Hm_Ajax_Request();
-        ajax.index = Hm_Ajax.requests.length - 1;
-        if (ajax.index < 0) {
-            ajax.index = 0;
-        }
-        if (Hm_Ajax.requests.length == 0) {
-            $("input[type='submit']").attr('disabled', true);
+        if (Hm_Ajax.request_count == 0) {
             if (!no_icon) {
                 $('.loading_icon').css('visibility', 'visible');
             }
         }
-        Hm_Ajax.requests.push(ajax);
+        Hm_Ajax.request_count++;
+        Hm_Ajax.batch_callback = batch_callback;
         return ajax.make_request(args, callback, extra);
     }
 };
@@ -84,10 +81,15 @@ Hm_Ajax_Request = function() { return {
             msg += '. Ouch!';
         }
         $('.elapsed').html(msg);
-        Hm_Ajax.requests.splice(this.index, 1);
-        if (Hm_Ajax.requests.length == 0) {
-            $("input[type='submit']").attr('disabled', false);
+        Hm_Ajax.request_count--;
+        if (Hm_Ajax.request_count == 0) {
+            if (Hm_Ajax.batch_callback) {
+                batch_callback(res);
+                Hm_Ajax.batch_callback = false;
+            }
             $('.loading_icon').css('visibility', 'hidden');
+            Hm_Notices.hide(true);
+            $('.message_table').tablesorter({sortList: [[3,1],[2,0]]});
         }
     }
 }; };
