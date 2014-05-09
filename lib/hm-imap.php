@@ -986,7 +986,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      *
      * @return array associate array of message headers
      */
-    public function get_message_headers($uid, $message_part, $raw=false) {
+    public function get_message_headers($uid, $message_part=false, $raw=false) {
         if (!$this->is_clean($uid, 'uid')) {
             return array();
         }
