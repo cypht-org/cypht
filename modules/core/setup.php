@@ -187,6 +187,7 @@ return array(
         'page' => FILTER_SANITIZE_STRING,
         'msgs' => FILTER_SANITIZE_STRING,
         'list_path' => FILTER_SANITIZE_STRING,
+        'list_page' => FILTER_VALIDATE_INT,
     ),
 
     'allowed_post' => array(

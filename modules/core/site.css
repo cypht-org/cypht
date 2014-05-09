@@ -11,7 +11,7 @@ td { vertical-align: top; }
 .loading_icon img { visibility: inherit; }
 .empty_table { text-align: center; color: #666 !important; padding-top: 50px !important; padding-bottom: 50px !important; }
 .settings_link, .logout, .home_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
-.user_settings { width: 98%; padding: 10px; padding-bottom: 40px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.user_settings { margin-left: 20px; margin-right: 20px; padding: 10px; padding-bottom: 40px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .user_settings table { width: 50%; white-space: nowrap; }
 .user_settings table td { padding: 5px; }
 .save_settings { float: none !important; }
