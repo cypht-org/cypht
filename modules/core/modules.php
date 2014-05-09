@@ -119,10 +119,10 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         else {
             $user = $this->session->get('username', false);
             $this->user_config->load($user);
-            /*$pages = $this->user_config->get('page_cache', array());
+            $pages = $this->user_config->get('saved_pages', array());
             if (!empty($pages)) {
-                $this->session->set('page_cache', $pages);
-            }*/
+                $this->session->set('saved_pages', $pages);
+            }
         }
         return $data;
     }
@@ -143,10 +143,10 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
             $user = $this->session->get('username', false);
             $path = $this->config->get('user_settings_dir', false);
-            /*$pages = $this->session->get('page_cache', array());
+            $pages = $this->session->get('saved_pages', array());
             if (!empty($pages)) {
-                $this->user_config->set('page_cache', $pages);
-            }*/
+                $this->user_config->set('saved_pages', $pages);
+            }
             if ($user && $path) {
                 $this->user_config->save($user);
                 Hm_Msgs::add('Saved user data on logout');
@@ -352,6 +352,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             return '<script type="text/javascript">'.
                 'var hm_url_path = "'.$input['router_url_path'].'";'.
                 'var hm_page_name = "'.$input['router_page_name'].'";'.
+                'var hm_list_path = "'.(isset($input['list_path']) ? $input['list_path'] : '').'";'.
                 '</script>';
         }
     }

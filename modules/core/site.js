@@ -84,12 +84,12 @@ Hm_Ajax_Request = function() { return {
         Hm_Ajax.request_count--;
         if (Hm_Ajax.request_count == 0) {
             if (Hm_Ajax.batch_callback) {
-                batch_callback(res);
+                Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
             }
             $('.loading_icon').css('visibility', 'hidden');
+            /* TODO: broken */
             Hm_Notices.hide(true);
-            $('.message_table').tablesorter({sortList: [[3,1],[2,0]]});
         }
     }
 }; };
