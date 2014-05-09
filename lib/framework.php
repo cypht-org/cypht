@@ -1122,8 +1122,8 @@ class Hm_Page_Cache {
 
     private static $pages = array();
 
-    public static function add($key, $page) {
-        self::$pages[$key] = $page;
+    public static function add($key, $page, $save=false) {
+        self::$pages[$key] = array($page, $save);
     }
     public static function del() {
         if (isset(self::$pages[$key])) {
@@ -1135,7 +1135,7 @@ class Hm_Page_Cache {
     public static function get($key) {
         if (isset(self::$pages[$key])) {
             Hm_Debug::add(sprintf("PAGE CACHE: %s", $key));
-            return self::$pages[$key];
+            return self::$pages[$key][0];
         }
         return false;
     }
@@ -1144,9 +1144,19 @@ class Hm_Page_Cache {
     }
     public static function load($session) {
         self::$pages = $session->get('page_cache', array());
+        self::$pages = array_merge(self::$pages, $session->get('saved_pages', array()));
     }
     public static function save($session) {
-        $session->set('page_cache', self::$pages);
+        $pages = self::$pages;
+        $saved_pages = array();
+        foreach (self::$pages as $key => $page) {
+            if ($page[1]) {
+                $saved_pages[$key] = $pages[$key];
+                unset($pages[$key]);
+            }
+        }
+        $session->set('page_cache', $pages);
+        $session->set('saved_pages', $saved_pages);
     }
 }
 
