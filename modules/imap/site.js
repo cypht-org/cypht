@@ -96,21 +96,19 @@ var update_unread_message_display = function(res) {
     }
 };
 
-var imap_unread_update = function(loading, force) {
+var imap_unread_update = function(loading) {
     var ids = $('#imap_server_ids').val().split(',');
     if ( ids && ids.length ) {
-        if (force) {
-            Hm_Notices.show({0: 'Updating unread messages ...'});
-        }
+        Hm_Notices.show({0: 'Updating unread messages ...'});
         for (i=0;i<ids.length;i++) {
             id=ids[i];
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-                {'name': 'force_update', 'value': force},
                 {'name': 'imap_server_ids', 'value': id}],
                 update_unread_message_display,
                 [],
-                loading
+                loading,
+                set_unread_state
             );
         }
     }
@@ -216,6 +214,7 @@ var display_imap_mailbox = function(res) {
             $(this).fadeOut(600, function() { $('.'+id).remove(); });
         }
     });
+    $('.message_table').tablesorter({debug: true, sortList: [[3,1],[2,0]]});
 };
 
 var expand_imap_folders = function(path) {
@@ -248,13 +247,32 @@ var expand_imap_mailbox = function(res) {
     $('.'+res.imap_expanded_folder_path.replace(/(:|\.|\[|\])/g, "\\$1")).append(res.imap_expanded_folder_formatted);
 };
 
+var set_unread_state = function() {
+    $('.message_table').tablesorter({debug: true, sortList: [[3,1],[2,0]]});
+    var data = $('.message_table tbody').html();
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_unread_state'},
+        {'name': 'formatted_unread_data', 'value': data}],
+        false,
+        [],
+        false
+    );
+};
+
 if (hm_page_name == 'home') {
-    var imap_folders = $('.imap_folders').html();
-    if (!imap_folders) {
+    if (!$('.imap_folders').html()) {
         imap_folder_update();
     }
 }
-else if (hm_page_name == 'unread') {
+else if (hm_page_name == 'message_list') {
+    if (hm_list_path == 'unread') {
+        Hm_Timer.add_job(imap_unread_update, 60);
+        $('.message_table tr').fadeIn(100);
+    }
+    else if (hm_list_path != '') {
+        select_imap_folder(hm_list_path, true);
+        $('.message_table tr').fadeIn(100);
+    }
 }
 else if (hm_page_name == 'servers') {
     $('.imap_delete').on('click', imap_delete_action);
