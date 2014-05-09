@@ -1,6 +1,6 @@
 .configured_server, .add_server, .login_form { border: solid 1px #aaa; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .message_list { min-height: 250px; border: solid 1px #aaa; padding: 15px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
-.content_cell table th { padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
+.server_summary table th, .message_table th { padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
 .configured_server { margin-top: 20px; float: left; margin-left: 20px; width: 230px; height: 216px; }
 .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
@@ -8,8 +8,8 @@
 .add_server { background-color: #f5f5f5; float: left; clear: left; margin-top: 20px; margin-left: 20px; width: 230px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; }
 .save_settings, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
-.content_cell table td { padding: 5px; padding-left: 10px; padding-top: 7px; padding-bottom: 3px; color: #333; }
-.content_cell table th:hover { color: #000; }
+.message_table td { padding: 5px; padding-left: 10px; padding-top: 7px; padding-bottom: 3px; color: #333; }
+.message_tble th:hover { color: #000; }
 .subject, .msg_date, .from { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .subject { cursor: pointer; font-weight: bold; }
 .source { font-style: italic; color: #666; font-size: 75%;}
@@ -28,7 +28,17 @@ input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 .add_server .port_fld { width: 50px; }
 .server_title { font-size: 110%; margin-bottom: 0px; color: #666; }
 .server_subtitle { margin-bottom: 20px; color: #666; }
-.msg_text { display: none; white-space: pre; position: absolute; background-color: #fff; padding: 40px; padding-top: 20px; padding-left: 20px; left: 249px; right: 22px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; border-top: none; border-top-left-radius: 0px; border-top-right-radius: 0px; font-size: 95%; word-wrap: break-word; }
-.imap_update { padding-top: 20px !important; }
-.update_unread { color: green; font-size: 75%; text-decoration: none; padding-left: 10px; }
+.msg_text { z-index: 101; display: none; position: absolute; background-color: #fff; padding: 30px; padding-top: 10px; right: 50px; top: 90px; left: 270px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; margin-bottom: 20px; }
+.msg_headers { margin-bottom: 20px; margin-top: 10px; background-color: #f5f5f5; padding: 20px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; font-size: 95%; word-wrap: break-word; }
+.msg_headers td, .msg_headers th { line-height: 120%; vertical-align: top; text-align: left; font-weight: normal; padding: 3px; border: none; }
+.msg_headers th { white-space: nowrap; width: 1%; }
+.msg_headers td { padding-left: 20px; width: 90%; }
+.imap_update a, .update_unread { color: green; font-size: 75%; text-decoration: none; padding-left: 10px; }
 .unread_link { text-decoration: none; padding-left: 18px; display: block; color: #000; padding-top: 15px; }
+.close_link { float: right; padding-right: 20px; text-decoration: none; color: green; font-size: 90%; margin-bottom: 10px;}
+.header_toggle { color: green; text-decoration: none; font-size: 90%; }
+.msg_text_inner { padding-left: 10px; white-space: pre; font-size: 95%; word-wrap: break-word; }
+.header_subject td { font-size: 120%; }
+.header_links { padding-top: 10px !important; }
+.header_links a { float: none !important; padding-left: 3px !important; padding-right: 3px !important; }
+.overlay {position: fixed; height: 100%; width: 100%; z-index: 100; background-color: #ccc; opacity: .7; }

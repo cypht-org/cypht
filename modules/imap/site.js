@@ -136,14 +136,23 @@ var update_imap_folder_display = function(res) {
     }
 };
 
+var close_msg_preview = function() {
+    $('.overlay').remove();
+    $('.msg_text').slideUp();
+};
+
+var toggle_long_headers = function() {
+    $('.long_header').toggle(600);
+    $('.header_toggle').toggle(600);
+};
+
 var display_msg_text = function(res) {
+    overlay = $('<div></div>').prependTo('body').attr('class', 'overlay');
+    $('.overlay').on('click', close_msg_preview);
     if (res.msg_text) {
         var msg_text = $('.msg_text');
         msg_text.html(res.msg_text);
         msg_text.slideDown();
-        $('body').on('click', function() {
-            $('.msg_text').slideUp();
-        } );
     }
 };
 

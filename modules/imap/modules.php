@@ -376,7 +376,8 @@ class Hm_Handler_imap_message_text extends Hm_Handler_Module {
                     $imap->read_only = true;
                     if ($imap->select_mailbox($form['folder'])) {
                         $data['msg_text'] = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'plain');
-                        Hm_Page_Cache::add('imap_msg_text_'.$form['imap_server_id'].'_'.$form['imap_msg_uid'], $data['msg_text']);
+                        $data['msg_headers'] = $imap->get_message_headers($form['imap_msg_uid']);
+                        $data['msg_cache_path'] = 'imap_msg_text_'.$form['imap_server_id'].'_'.$form['imap_msg_uid'];
                     }
                 }
             }
@@ -406,8 +407,34 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
 
 class Hm_Output_filter_message_text extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['msg_text'])) {
-            $input['msg_text'] = $this->html_safe($input['msg_text']);
+        if (isset($input['msg_text']) && isset($input['msg_headers'])) {
+            $txt = '';
+            $small_headers = array('subject', 'date', 'from');
+            $headers = $input['msg_headers'];
+            $txt .= '<table class="msg_headers" cellspacing="0" cellpadding="0">';
+            foreach ($small_headers as $fld) {
+                foreach ($headers as $name => $value) {
+                    if ($fld == strtolower($name)) {
+                        $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                        break;
+                    }
+                }
+            }
+            foreach ($headers as $name => $value) {
+                if (!in_array(strtolower($name), $small_headers)) {
+                    $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                }
+            }
+            $txt .= '<tr><th colspan="2" class="header_links">'.
+                '<a href="#" class="header_toggle" onclick="return toggle_long_headers();">All</a>'.
+                '<a class="header_toggle" style="display: none;" href="#" onclick="return toggle_long_headers();">Small</a>'.
+                ' | <a class="close_link" href="#" onclick="return close_msg_preview();">Close</a>'.
+                '</th></tr></table>'.
+                '<div class="msg_text_inner">'.$this->html_safe($input['msg_text']).'</div>'.
+                '<a href="#" class="close_link" onclick="return close_msg_preview();">Close</a>';
+
+            $input['msg_text'] = $txt;
+            Hm_Page_Cache::add($input['msg_cache_path'], $txt);
         }
         return $input;
     }
