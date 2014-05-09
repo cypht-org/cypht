@@ -174,7 +174,7 @@ var parse_folder_path = function(path) {
     var type = false;
     var server_id = false;
     var folder = false;
-    parts = path.split(':');
+    parts = path.split('_', 3);
     if (parts.length == 3) {
         type = parts[0];
         server_id = parts[1];
@@ -212,7 +212,7 @@ var display_imap_mailbox = function(res) {
         row = res.formatted_mailbox_page[index][0];
         id = res.formatted_mailbox_page[index][1];
         if (!$('.'+id).length) {
-            $('.message_table tbody').prepend(row);
+            $('.message_table tbody').append(row);
             $('.'+id).fadeIn(600);
         }
         msg_ids.push(id);
@@ -223,7 +223,11 @@ var display_imap_mailbox = function(res) {
             $(this).fadeOut(600, function() { $('.'+id).remove(); });
         }
     });
-    $('.message_table').tablesorter({debug: true, sortList: [[3,1],[2,0]]});
+    if (res.imap_page_links) {
+        $('.imap_page_links').html(res.imap_page_links);
+    }
+
+    /*$('.message_table').tablesorter({debug: true, sortList: [[3,1],[2,0]]});*/
 };
 
 var expand_imap_folders = function(path) {
@@ -257,7 +261,7 @@ var expand_imap_mailbox = function(res) {
 };
 
 var set_unread_state = function() {
-    $('.message_table').tablesorter({debug: true, sortList: [[3,1],[2,0]]});
+    $('.message_table').tablesorter({debug: true, headers: { 3: { sorter: 'dt' } }, sortList: [[3,1],[2,0]]});
     var data = $('.message_table tbody').html();
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_unread_state'},
@@ -279,7 +283,9 @@ else if (hm_page_name == 'message_list') {
         $('.message_table tr').fadeIn(100);
     }
     else if (hm_list_path != '') {
-        select_imap_folder(hm_list_path, true);
+        if ($('.message_table tbody tr').length == 0) {
+            select_imap_folder(hm_list_path, true);
+        }
         $('.message_table tr').fadeIn(100);
     }
 }
@@ -289,3 +295,9 @@ else if (hm_page_name == 'servers') {
     $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
 }
+$.tablesorter.addParser({ 
+    id: 'dt', 
+    is: function(s) { return false; }, 
+    format: function(s) { return Date.parse(s); }, 
+    type: 'numeric' 
+}); 

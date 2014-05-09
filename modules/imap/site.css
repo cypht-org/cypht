@@ -30,7 +30,7 @@ input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 .server_subtitle { margin-bottom: 20px; color: #666; }
 .msg_text { z-index: 101; display: none; position: absolute; background-color: #fff; padding: 30px; padding-top: 10px; right: 50px; top: 90px; left: 270px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; margin-bottom: 20px; }
 .msg_headers { margin-bottom: 20px; margin-top: 10px; background-color: #f5f5f5; padding: 20px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; font-size: 95%; word-wrap: break-word; }
-.msg_headers td, .msg_headers th { line-height: 120%; vertical-align: top; text-align: left; font-weight: normal; padding: 3px; border: none; }
+.msg_headers td, .msg_headers th { vertical-align: top; text-align: left; font-weight: normal; padding: 3px; border: none; }
 .msg_headers th { white-space: nowrap; width: 1%; }
 .msg_headers td { padding-left: 20px; width: 90%; }
 .imap_update a, .update_unread { color: green; font-size: 75%; text-decoration: none; padding-left: 10px; }
@@ -42,3 +42,5 @@ input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 .header_links { padding-top: 10px !important; }
 .header_links a { float: none !important; padding-left: 3px !important; padding-right: 3px !important; }
 .overlay {position: fixed; height: 100%; width: 100%; z-index: 100; background-color: #ccc; opacity: .7; }
+.imap_page_links a { text-decoration: none; color: green; }
+.imap_page_links { text-align: center; padding-top: 20px; }

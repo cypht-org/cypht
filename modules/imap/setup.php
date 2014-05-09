@@ -22,7 +22,6 @@ add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load
 add_handler('message_list', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('message_list', 'imap_message_list_type',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
 add_output('message_list', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
-//add_output('message_list', 'imap_unread_table', true, 'imap', 'folder_list_end', 'before');
 
 /* ajax server setup callback data */
 add_handler('ajax_imap_debug', 'login', false, 'core');
