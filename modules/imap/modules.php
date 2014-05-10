@@ -31,6 +31,15 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_save_folder_state extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_folder_state'));
+        if ($success) {
+            Hm_Page_Cache::add('imap_folders', $form['imap_folder_state']);
+        }
+    }
+}
+
 class Hm_Handler_save_unread_state extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('formatted_unread_data'));

@@ -245,15 +245,28 @@ var expand_imap_folders = function(path) {
                 {'name': 'folder', 'value': detail.folder}],
                 expand_imap_mailbox,
                 [],
-                false
+                false,
+                save_folder_list
             );
         }
     }
     else {
         sublist.remove();
         link.html('+');
+        save_folder_list();
     }
     return false;
+};
+
+var save_folder_list = function() {
+    var folders = $('.imap_folders').html();
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_folder_state'},
+        {'name': 'imap_folder_state', 'value': folders}],
+        false,
+        [],
+        false
+    );
 };
 
 var expand_imap_mailbox = function(res) {
