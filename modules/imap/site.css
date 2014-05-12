@@ -44,3 +44,5 @@ input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 .overlay {position: fixed; height: 100%; width: 100%; z-index: 100; background-color: #ccc; opacity: .7; }
 .imap_page_links a { text-decoration: none; color: green; }
 .imap_page_links { text-align: center; padding-top: 20px; }
+.current_page { font-weight: bold; }
+.disabled_link { color: #666 !important; }

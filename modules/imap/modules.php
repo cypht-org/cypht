@@ -570,23 +570,6 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
     }
 }
 
-function format_imap_folder_section($folders, $id, $output_mod) {
-    $results = '<ul class="inner_list">';
-    foreach ($folders as $folder_name => $folder) {
-        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
-        if ($folder['children']) {
-            $results .= '<a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
-        }
-        // HERE
-        $results .= '<a href="?page=message_list&amp;list_path='.
-            urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
-            '">'.$output_mod->html_safe($folder['basename']).'</a></li>';
-    }
-    $results .= '</ul></li>';
-    return $results;
-}
-
-
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $results = '<ul class="folders">';
@@ -602,26 +585,6 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         Hm_Page_Cache::add('imap_folders', $results, true);
         return $input;
     }
-}
-
-function format_imap_message_list($msg_list, $output_module) {
-    $res = array();
-    foreach($msg_list as $msg) {
-        if ($msg['server_name'] == 'Default-Auth-Server') {
-            $msg['server_name'] = 'Default';
-        }
-        $id = sprintf("imap_%s_%s", $output_module->html_safe($msg['server_id']), $output_module->html_safe($msg['uid']));
-        $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
-        $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
-        $from = str_replace("&quot;", '', $from);
-        $date = date('Y-m-d G:i:s', strtotime($output_module->html_safe($msg['internal_date'])));
-        $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
-            '<td onclick="return msg_preview('.$output_module->html_safe($msg['uid']).', '.
-            $output_module->html_safe($msg['server_id']).', \''.$output_module->html_safe($msg['folder']).'\')" class="subject">'.$subject.
-            '</td><td class="from">'.$from.'</div></td>'.
-            '<td class="msg_date">'.$date.'</td></tr>', $id);
-    }
-    return $res;
 }
 
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
@@ -653,6 +616,62 @@ class Hm_Output_imap_message_list extends Hm_Output_Module {
         }
     }
 }
+
+class Hm_Output_filter_folder_page extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = array();
+        if (isset($input['imap_mailbox_page']) && !empty($input['imap_mailbox_page'])) {
+            $res = format_imap_message_list($input['imap_mailbox_page'], $this);
+            $input['formatted_mailbox_page'] = $res;
+            Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $res);
+            $input['imap_page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
+            Hm_Page_Cache::add('imap_page_links_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $input['imap_page_links']);
+            unset($input['imap_mailbox_page']);
+            unset($input['imap_folder_detail']);
+        }
+        elseif (!isset($input['formatted_mailbox_page'])) {
+            $input['formatted_mailbox_page'] = array();
+        }
+        return $input;
+    }
+}
+
+function format_imap_folder_section($folders, $id, $output_mod) {
+    $results = '<ul class="inner_list">';
+    foreach ($folders as $folder_name => $folder) {
+        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
+        if ($folder['children']) {
+            $results .= '<a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
+        }
+        // HERE
+        $results .= '<a href="?page=message_list&amp;list_path='.
+            urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
+            '">'.$output_mod->html_safe($folder['basename']).'</a></li>';
+    }
+    $results .= '</ul></li>';
+    return $results;
+}
+
+function format_imap_message_list($msg_list, $output_module) {
+    $res = array();
+    foreach($msg_list as $msg) {
+        if ($msg['server_name'] == 'Default-Auth-Server') {
+            $msg['server_name'] = 'Default';
+        }
+        $id = sprintf("imap_%s_%s", $output_module->html_safe($msg['server_id']), $output_module->html_safe($msg['uid']));
+        $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
+        $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
+        $from = str_replace("&quot;", '', $from);
+        $date = date('Y-m-d G:i:s', strtotime($output_module->html_safe($msg['internal_date'])));
+        $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
+            '<td onclick="return msg_preview('.$output_module->html_safe($msg['uid']).', '.
+            $output_module->html_safe($msg['server_id']).', \''.$output_module->html_safe($msg['folder']).'\')" class="subject">'.$subject.
+            '</td><td class="from">'.$from.'</div></td>'.
+            '<td class="msg_date">'.$date.'</td></tr>', $id);
+    }
+    return $res;
+}
+
 function imap_message_list_folder($input, $output_module) {
     $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path'].'_'.$input['list_page']);
     $rows = '';
@@ -678,37 +697,29 @@ function imap_message_list_unread() {
         '<table class="message_table" cellpadding="0" cellspacing="0"><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
         '<tbody>'.$cache.'</tbody></table></div>';
 }
+
 function build_page_links($detail, $path) {
     $links = '';
+    $display_links = 10;
     $page_size = $detail['limit'];
     $max_pages = ceil($detail['detail']['exists']/$page_size);
-    $current_page = $detail['offset']/$page_size;
-    if ($current_page < 1) {
-        $current_page = 1;
+    $current_page = $detail['offset']/$page_size + 1;
+    $prev = '<a class="disabled_link">&larr;</a>';
+    $next = '<a class="disabled_link">&rarr;</a>';
+
+    if ($current_page > 1) {
+        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).'">&larr;</a>';
+    }
+    if ($max_pages > 1 && $current_page < $max_pages) {
+        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).'">&rarr;</a>';
     }
     for ($i=1;$i<=$max_pages;$i++) {
-        $links .= ' <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.'">'.$i.'</a>';
-    }
-    return $links;
-}
-
-class Hm_Output_filter_folder_page extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = array();
-        if (isset($input['imap_mailbox_page']) && !empty($input['imap_mailbox_page'])) {
-            $res = format_imap_message_list($input['imap_mailbox_page'], $this);
-            $input['formatted_mailbox_page'] = $res;
-            Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $res);
-            $input['imap_page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
-            Hm_Page_Cache::add('imap_page_links_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $input['imap_page_links']);
-            unset($input['imap_mailbox_page']);
-            unset($input['imap_folder_detail']);
+        $links .= ' <a ';
+        if ($i == $current_page) {
+            $links .= 'class="current_page" ';
         }
-        elseif (!isset($input['formatted_mailbox_page'])) {
-            $input['formatted_mailbox_page'] = array();
-        }
-        return $input;
+        $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.'">'.$i.'</a>';
     }
+    return $prev.' '.$links.' '.$next;
 }
-
 ?>
