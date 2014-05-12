@@ -700,13 +700,29 @@ function imap_message_list_unread() {
 
 function build_page_links($detail, $path) {
     $links = '';
+    $first = '';
+    $last = '';
     $display_links = 10;
     $page_size = $detail['limit'];
     $max_pages = ceil($detail['detail']['exists']/$page_size);
     $current_page = $detail['offset']/$page_size + 1;
+    $floor = $current_page - intval($display_links/2);
+    if ($floor < 0) {
+        $floor = 1;
+    }
+    $ceil = $floor + $display_links;
+    if ($ceil > $max_pages) {
+        $floor -= ($ceil - $max_pages);
+    }
     $prev = '<a class="disabled_link">&larr;</a>';
     $next = '<a class="disabled_link">&rarr;</a>';
 
+    if ($floor > 1 ) {
+        $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1">1</a> ... ';
+    }
+    if ($ceil < $max_pages) {
+        $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.'">'.$max_pages.'</a>';
+    }
     if ($current_page > 1) {
         $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).'">&larr;</a>';
     }
@@ -714,12 +730,15 @@ function build_page_links($detail, $path) {
         $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).'">&rarr;</a>';
     }
     for ($i=1;$i<=$max_pages;$i++) {
+        if ($i < $floor || $i > $ceil) {
+            continue;
+        }
         $links .= ' <a ';
         if ($i == $current_page) {
             $links .= 'class="current_page" ';
         }
         $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.'">'.$i.'</a>';
     }
-    return $prev.' '.$links.' '.$next;
+    return $prev.' '.$first.$links.$last.' '.$next;
 }
 ?>
