@@ -131,6 +131,7 @@ var imap_folder_update = function() {
 };
 
 var update_imap_folder_display = function(res) {
+    Hm_Notices.hide(true);
     if (res.imap_folders) {
         $('.imap_folders').html(res.imap_folders);
     }
@@ -206,6 +207,7 @@ var select_imap_folder = function(path, force) {
 };
 
 var display_imap_mailbox = function(res) {
+    Hm_Notices.hide(true);
     var imap_id = res.imap_server_id;
     var msg_ids = [];
     for (index in res.formatted_mailbox_page) {
