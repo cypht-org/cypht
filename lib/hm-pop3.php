@@ -179,6 +179,27 @@ class Hm_POP3 {
         $this->send_command('TOP '.$id);
         return $this->get_response(true);
     }
+    function msg_headers($id) {
+        $lines = $this->top($id);
+        $msg_headers = array();
+        $current_header = false;
+        foreach ($lines as $line) {
+            if ($line{0} == "\t" && $current_header) {
+                $msg_headers[$current_header] .= ' '.trim($line);
+            }
+            else {
+                $parts = explode(":", $line, 2);
+                if (count($parts) == 2) {
+                    $msg_headers[strtolower($parts[0])] = trim($parts[1]);
+                    $current_header = strtolower($parts[0]);
+                }
+                else {
+                    $current_header = false;
+                }
+            }
+        }
+        return $msg_headers;
+    }
     function retr_full($id) {
         $this->send_command('RETR '.$id);
         $res = $this->get_response(true);
