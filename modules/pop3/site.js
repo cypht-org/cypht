@@ -119,7 +119,7 @@ if (hm_page_name == 'servers') {
     $('.delete_pop3_connection').on('click', pop3_delete_action);
 }
 else if (hm_page_name == 'message_list') {
-    if (hm_list_path != '') {
+    if (hm_list_path.substring(0, 4) == 'pop3') {
         if ($('.message_table tbody tr').length == 0) {
             select_pop3_folder(hm_list_path, true);
         }

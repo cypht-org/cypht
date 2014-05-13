@@ -280,7 +280,7 @@ if (hm_page_name == 'message_list') {
         Hm_Timer.add_job(imap_unread_update, 60);
         $('.message_table tr').fadeIn(100);
     }
-    else if (hm_list_path != '') {
+    else if (hm_list_path.substring(0, 4) == 'imap') {
         if ($('.message_table tbody tr').length == 0) {
             select_imap_folder(hm_list_path, true);
         }
