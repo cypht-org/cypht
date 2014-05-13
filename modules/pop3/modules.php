@@ -18,27 +18,12 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
         if ($success) {
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
+            $path = sprintf("pop3_%d", $form['pop3_server_id']);
             if ($pop3->state = 'authed') {
+                $data['pop3_mailbox_page_path'] = $path;
                 foreach (array_reverse(array_unique($pop3->mlist())) as $id => $size) {
                     $path = sprintf("pop3_%d", $form['pop3_server_id']);
-                    $header_lines = $pop3->top($id);
-                    $msg_headers = array();
-                    $current_header = false;
-                    foreach ($header_lines as $line) {
-                        if ($line{0} == "\t" && $current_header) {
-                            $msg_headers[$current_header] .= ' '.trim($line);
-                        }
-                        else {
-                            $parts = explode(":", $line, 2);
-                            if (count($parts) == 2 && in_array(strtolower($parts[0]), $headers)) {
-                                $msg_headers[strtolower($parts[0])] = trim($parts[1]);
-                                $current_header = strtolower($parts[0]);
-                            }
-                            else {
-                                $current_header = false;
-                            }
-                        }
-                    }
+                    $msg_headers = $pop3->msg_headers($id);
                     if (!empty($msg_headers)) {
                         $msg_headers['server_name'] = $details['name'];
                         $msg_headers['server_id'] = $form['pop3_server_id'];
@@ -367,6 +352,7 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
         if (isset($input['pop3_mailbox_page'])) {
             $res = format_pop3_message_list($input['pop3_mailbox_page'], $this);
             $input['formatted_mailbox_page'] = $res;
+            Hm_Page_Cache::add('formatted_mailbox_page_'.$input['pop3_mailbox_page_path'], $res);
             unset($input['pop3_mailbox_page']);
         }
         return $input;
@@ -375,15 +361,11 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
 
 
 function pop3_message_list($input, $output_module) {
-    $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path'].'_'.$input['list_page']);
+    $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path']);
     $rows = '';
     $links = '';
     if ($page_cache) {
         $rows = implode(array_map(function($v) { return $v[0]; }, $page_cache));
-    }
-    $links_cache = Hm_Page_Cache::get('pop3_page_links_'.$input['list_path'].'_'.$input['list_page']);
-    if ($links_cache) {
-        $links = $links_cache;
     }
     return '<div class="message_list"><div class="msg_text"></div><div class="content_title">POP3</div>'.
         '<a class="update_unread" href="#"  onclick="return select_pop3_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">Update</a>'.
