@@ -2,21 +2,51 @@
 
 require 'lib/hm-pop3.php';
 
-class Hm_Handler_prep_pop3_summary_display extends Hm_Handler_Module {
+class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('summary_ids'));
+
+        $sort = 'ARRIVAL';
+        $rev = true;
+        $filter = 'ALL';
+        $offset = 0;
+        $limit = 20;
+        $headers = array('subject', 'from', 'date');
+        $msgs = array();
+        $list_page = 1;
+
+        list($success, $form) = $this->process_form(array('pop3_server_id'));
         if ($success) {
-            $ids = explode(',', $form['summary_ids']);
-            foreach($ids as $id) {
-                $id = intval($id);
-                $pop3 = Hm_POP3_List::connect($id, false);
-                if ($pop3->state == 'authed') {
-                    $exists = $pop3->mlist();
-                    $data['pop3_summary'][$id] = array('messages', count($exists));
+            $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
+            $details = Hm_POP3_List::dump($form['pop3_server_id']);
+            if ($pop3->state = 'authed') {
+                foreach (array_reverse(array_unique($pop3->mlist())) as $id => $size) {
+                    $path = sprintf("pop3_%d", $form['pop3_server_id']);
+                    $header_lines = $pop3->top($id);
+                    $msg_headers = array();
+                    $current_header = false;
+                    foreach ($header_lines as $line) {
+                        if ($line{0} == "\t" && $current_header) {
+                            $msg_headers[$current_header] .= ' '.trim($line);
+                        }
+                        else {
+                            $parts = explode(":", $line, 2);
+                            if (count($parts) == 2 && in_array(strtolower($parts[0]), $headers)) {
+                                $msg_headers[strtolower($parts[0])] = trim($parts[1]);
+                                $current_header = strtolower($parts[0]);
+                            }
+                            else {
+                                $current_header = false;
+                            }
+                        }
+                    }
+                    if (!empty($msg_headers)) {
+                        $msg_headers['server_name'] = $details['name'];
+                        $msg_headers['server_id'] = $form['pop3_server_id'];
+                        $msgs[$id] = $msg_headers;
+                    }
                 }
-                else {
-                    $data['pop3_summary'][$id] = array('messages' => '?');
-                }
+                $data['pop3_mailbox_page'] = $msgs;
+                $data['pop3_server_id'] = $form['pop3_server_id'];
             }
         }
         return $data;
@@ -187,7 +217,25 @@ class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
         $servers = Hm_POP3_List::dump();
         if (!empty($servers)) {
             $data['pop3_servers'] = $servers;
+            $data['folder_sources'][] = 'pop3_folders';
         }
+        return $data;
+    }
+}
+
+class Hm_Handler_load_pop3_folders extends Hm_Handler_Module {
+    public function process($data) {
+        $servers = Hm_POP3_List::dump();
+        $folders = array();
+        if (!empty($servers)) {
+            foreach ($servers as $id => $server) {
+                if ($server['name'] == 'Default-Auth-Server') {
+                    $server['name'] = 'Default';
+                }
+                $folders[$id] = $server['name'];
+            }
+        }
+        $data['pop3_folders'] = $folders;
         return $data;
     }
 }
@@ -288,6 +336,81 @@ class Hm_Output_display_pop3_summary extends Hm_Output_Module {
             return $res;
         }
     }
+}
+
+class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<ul class="folders">';
+        if (isset($input['pop3_folders'])) {
+            foreach ($input['pop3_folders'] as $id => $folder) {
+                $res .= '<li><a href="?page=message_list&list_path=pop3_'.$this->html_safe($id).'">'.$this->html_safe($folder).'</a></li>';
+            }
+        }
+        $res .= '</ul>';
+        Hm_Page_Cache::add('pop3_folders', $res, true);
+        return '';
+    }
+}
+class Hm_Output_pop3_message_list extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['list_path']) && preg_match("/^pop3_/", $input['list_path'])) {
+            return pop3_message_list($input, $this);
+        }
+        else {
+            // TODO: default
+        }
+    }
+}
+class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $input['formatted_mailbox_page'] = array();
+        if (isset($input['pop3_mailbox_page'])) {
+            $res = format_pop3_message_list($input['pop3_mailbox_page'], $this);
+            $input['formatted_mailbox_page'] = $res;
+            unset($input['pop3_mailbox_page']);
+        }
+        return $input;
+    }
+}
+
+
+function pop3_message_list($input, $output_module) {
+    $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path'].'_'.$input['list_page']);
+    $rows = '';
+    $links = '';
+    if ($page_cache) {
+        $rows = implode(array_map(function($v) { return $v[0]; }, $page_cache));
+    }
+    $links_cache = Hm_Page_Cache::get('pop3_page_links_'.$input['list_path'].'_'.$input['list_page']);
+    if ($links_cache) {
+        $links = $links_cache;
+    }
+    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">POP3</div>'.
+        '<a class="update_unread" href="#"  onclick="return select_pop3_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">Update</a>'.
+        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
+        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
+        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
+        '<tbody>'.$rows.'</tbody></table><div class="pop3_page_links">'.$links.'</div></div>';
+}
+
+function format_pop3_message_list($msg_list, $output_module) {
+    $res = array();
+    foreach($msg_list as $msg_id => $msg) {
+        if ($msg['server_name'] == 'Default-Auth-Server') {
+            $msg['server_name'] = 'Default';
+        }
+        $id = sprintf("pop3_%s_%s", $output_module->html_safe($msg['server_id']), $output_module->html_safe($msg_id));
+        $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
+        $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
+        $from = str_replace("&quot;", '', $from);
+        $date = date('Y-m-d G:i:s', strtotime($output_module->html_safe($msg['date'])));
+        $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
+            '<td onclick="return msg_preview('.$output_module->html_safe($msg_id).', '.
+            $output_module->html_safe($msg['server_id']).')" class="subject">'.$subject.
+            '</td><td class="from">'.$from.'</div></td>'.
+            '<td class="msg_date">'.$date.'</td></tr>', $id);
+    }
+    return $res;
 }
 
 ?>
