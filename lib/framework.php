@@ -1142,6 +1142,11 @@ class Hm_Page_Cache {
     public static function dump() {
         return self::$pages;
     }
+    public static function flush($session) {
+        self::$pages = array();
+        $session->set('page_cache', array());
+        $session->set('saved_pages', array());
+    }
     public static function load($session) {
         self::$pages = $session->get('page_cache', array());
         self::$pages = array_merge(self::$pages, $session->get('saved_pages', array()));
