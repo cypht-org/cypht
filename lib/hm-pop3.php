@@ -175,6 +175,10 @@ class Hm_POP3 {
         }
         return $mlist;
     }
+    function top($id) {
+        $this->send_command('TOP '.$id);
+        return $this->get_response(true);
+    }
     function retr_full($id) {
         $this->send_command('RETR '.$id);
         $res = $this->get_response(true);
