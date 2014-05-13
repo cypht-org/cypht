@@ -367,7 +367,7 @@ function pop3_message_list($input, $output_module) {
     if ($page_cache) {
         $rows = implode(array_map(function($v) { return $v[0]; }, $page_cache));
     }
-    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">POP3</div>'.
+    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.$output_module->html_safe($input['mailbox_list_title']).'</div>'.
         '<a class="update_unread" href="#"  onclick="return select_pop3_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">Update</a>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
         '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.

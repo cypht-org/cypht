@@ -96,34 +96,6 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
-    public function process($data) {
-        $data['list_path'] = false;
-        if (isset($this->request->get['list_path'])) {
-            $path = $this->request->get['list_path'];
-            if ($path == 'unread') {
-                $data['list_path'] = 'unread';
-            }
-            elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
-                $data['list_path'] = $path;
-            }
-            elseif (preg_match("/^pop3_\d+/", $path)) {
-                $data['list_path'] = $path;
-            }
-        }
-        if (isset($this->request->get['list_page'])) {
-            $data['list_page'] = (int) $this->request->get['list_page'];
-            if ($data['list_page'] < 1) {
-                $data['list_page'] = 1;
-            }
-        }
-        else {
-            $data['list_page'] = 1;
-        }
-        return $data;
-    }
-}
-
 class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('summary_ids'));
@@ -685,7 +657,7 @@ function imap_message_list_folder($input, $output_module) {
         $links = $links_cache;
     }
     return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.
-        $output_module->html_safe(explode('_', $input['list_path'], 3)[2]).'</div>'.
+        $output_module->html_safe($input['mailbox_list_title']).'</div>'.
         '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">Update</a>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
         '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.

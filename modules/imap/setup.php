@@ -20,7 +20,6 @@ add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap
 
 add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('message_list', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('message_list', 'imap_message_list_type',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
 add_output('message_list', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
 
 /* ajax server setup callback data */
