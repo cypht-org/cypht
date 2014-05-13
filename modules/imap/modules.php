@@ -78,8 +78,6 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 $data['imap_mailbox_page_path'] = $path;
-                $data['imap_mailbox_page_title'] = $form['folder'];
-                $data['imap_mailbox_page_id'] = $form['imap_server_id'];
                 foreach ($imap->get_mailbox_page($form['folder'], $sort, $rev, $filter, $offset, $limit) as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
