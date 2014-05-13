@@ -119,6 +119,7 @@ add_handler('message_list', 'login', false);
 add_handler('message_list', 'load_user_data', true);
 add_handler('message_list', 'language',  true);
 add_handler('message_list', 'title', true);
+add_handler('message_list', 'message_list_type', true);
 add_handler('message_list', 'date', true);
 add_handler('message_list', 'save_user_data', true);
 add_handler('message_list', 'logout', true);

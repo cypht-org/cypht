@@ -159,6 +159,44 @@ class Hm_Handler_logout extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_message_list_type extends Hm_Handler_Module {
+    public function process($data) {
+        $data['list_path'] = false;
+        if (isset($this->request->get['list_path'])) {
+            $path = $this->request->get['list_path'];
+            if ($path == 'unread') {
+                $data['list_path'] = 'unread';
+            }
+            elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
+                $data['list_path'] = $path;
+                $parts = explode('_', $path, 3);
+                $details = Hm_IMAP_List::dump(intval($parts[1]));
+                $data['mailbox_list_title'] = sprintf("%s:%s", $details['name'], $parts[2]);
+            }
+            elseif (preg_match("/^pop3_\d+/", $path)) {
+                $data['list_path'] = $path;
+                $parts = explode('_', $path, 3);
+                $details = Hm_POP3_List::dump(intval($parts[1]));
+                if ($details['name'] == 'Default-Auth-Server') {
+                    $details['name'] = 'Default';
+                }
+                $data['mailbox_list_title'] = sprintf("%s:INBOX", $details['name']);
+            }
+        }
+        if (isset($this->request->get['list_page'])) {
+            $data['list_page'] = (int) $this->request->get['list_page'];
+            if ($data['list_page'] < 1) {
+                $data['list_page'] = 1;
+            }
+        }
+        else {
+            $data['list_page'] = 1;
+        }
+        return $data;
+    }
+}
+
+
 /* OUTPUT */
 
 class Hm_Output_title extends Hm_Output_Module {
