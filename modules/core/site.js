@@ -162,6 +162,35 @@ Hm_Timer = {
     }
 };
 
+var parse_folder_path = function(path, path_type) {
+    var type = false;
+    var server_id = false;
+    var folder = false;
+
+    if (path_type == 'imap') {
+        parts = path.split('_', 3);
+        if (parts.length == 3) {
+            type = parts[0];
+            server_id = parts[1];
+            folder = parts[2];
+        }
+        if (type && server_id && folder) {
+            return {'type': type, 'server_id' : server_id, 'folder' : folder}
+        }
+    }
+    else if (path_type == 'pop3') {
+        parts = path.split('_', 2);
+        if (parts.length == 2) {
+            type = parts[0];
+            server_id = parts[1];
+        }
+        if (type && server_id) {
+            return {'type': type, 'server_id' : server_id}
+        }
+    }
+    return false;
+};
+
 /* start the scheduler */
 Hm_Timer.fire();
 

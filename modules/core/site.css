@@ -24,10 +24,10 @@ option, select { padding: 3px; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; }
 .folders a { color: #666; text-decoration: none; }
-.folder_list { background-color: #fff; min-width: 200px; min-height: 600px; margin-right: 20px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
-.folder_cell { padding-left: 20px; width: 220px; }
+.folder_list { background-color: #fff; min-height: 600px; margin-right: 20px; padding-right: 30px; min-width: 100px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.folder_cell { padding-left: 20px; width: 1%; }
 .folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; }
-.folders li, .inner_list li { padding: 3px; padding-left: 10px; margin: 0px; }
+.folders li, .inner_list li { padding: 3px; padding-left: 10px; margin: 0px; word-wrap: no-break; }
 .loading_folders { text-align: center; margin: 10px; margin-top: 20px; color: #666; }
 .content_cell { padding-right: 20px; }
 .content_title { float: left; padding-bottom: 10px; font-size: 125%; padding-left: 10px; }

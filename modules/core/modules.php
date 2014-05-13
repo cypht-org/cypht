@@ -53,6 +53,7 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                 $this->user_config->save($user);
                 Hm_Msgs::add('Settings saved');
             }
+            Hm_Page_Cache::flush($this->session);
         }
         return $data;
     }
