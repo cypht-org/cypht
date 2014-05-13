@@ -109,6 +109,9 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
                 $data['list_path'] = $path;
             }
+            elseif (preg_match("/^pop3_\d+/", $path)) {
+                $data['list_path'] = $path;
+            }
         }
         if (isset($this->request->get['list_page'])) {
             $data['list_page'] = (int) $this->request->get['list_page'];
@@ -607,7 +610,7 @@ class Hm_Output_imap_message_list extends Hm_Output_Module {
             if ($input['list_path'] == 'unread') {
                 return imap_message_list_unread();     
             }
-            else {
+            elseif (preg_match("/^imap_/", $input['list_path'])) {
                 return imap_message_list_folder($input, $this);
             }
         }
@@ -686,7 +689,9 @@ function imap_message_list_folder($input, $output_module) {
     return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.
         $output_module->html_safe(explode('_', $input['list_path'], 3)[2]).'</div>'.
         '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">Update</a>'.
-        '<table class="message_table" cellpadding="0" cellspacing="0"><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
+        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
+        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
+        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
         '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
 }
 
@@ -694,7 +699,9 @@ function imap_message_list_unread() {
     $cache = (string) Hm_Page_Cache::get('formatted_unread_data');
     return '<div class="message_list"><div class="msg_text"></div><div class="content_title">Unread</div>'.
         '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">Update</a>'.
-        '<table class="message_table" cellpadding="0" cellspacing="0"><thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
+        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
+        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
+        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
         '<tbody>'.$cache.'</tbody></table></div>';
 }
 

@@ -171,24 +171,8 @@ var msg_preview = function(uid, server_id, folder) {
     return false;
 };
 
-var parse_folder_path = function(path) {
-    var type = false;
-    var server_id = false;
-    var folder = false;
-    parts = path.split('_', 3);
-    if (parts.length == 3) {
-        type = parts[0];
-        server_id = parts[1];
-        folder = parts[2];
-    }
-    if (type && server_id && folder) {
-        return {'type': type, 'server_id' : server_id, 'folder' : folder}
-    }
-    return false;
-};
-
 var select_imap_folder = function(path, force) {
-    var detail = parse_folder_path(path);
+    var detail = parse_folder_path(path, 'imap');
     if (detail) {
         if (force) {
             Hm_Notices.show({0: 'Updating folder...'});
@@ -233,7 +217,7 @@ var display_imap_mailbox = function(res) {
 };
 
 var expand_imap_folders = function(path) {
-    var detail = parse_folder_path(path);
+    var detail = parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+detail.folder.replace(/(:|\.|\[|\])/g, "\\$1"));
     var link = $('a:first-child', list);
     var sublist = $('ul', list);
@@ -287,12 +271,11 @@ var set_unread_state = function() {
     );
 };
 
-if (hm_page_name == 'home') {
-    if (!$('.imap_folders').html()) {
-        imap_folder_update();
-    }
+if (!$('.imap_folders').html()) {
+    imap_folder_update();
 }
-else if (hm_page_name == 'message_list') {
+
+if (hm_page_name == 'message_list') {
     if (hm_list_path == 'unread') {
         Hm_Timer.add_job(imap_unread_update, 60);
         $('.message_table tr').fadeIn(100);
@@ -310,9 +293,11 @@ else if (hm_page_name == 'servers') {
     $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
 }
-$.tablesorter.addParser({ 
-    id: 'dt', 
-    is: function(s) { return false; }, 
-    format: function(s) { return Date.parse(s); }, 
-    type: 'numeric' 
-}); 
+if ($.tablesorter) {
+    $.tablesorter.addParser({ 
+        id: 'dt', 
+        is: function(s) { return false; }, 
+        format: function(s) { return Date.parse(s); }, 
+        type: 'numeric' 
+    }); 
+}

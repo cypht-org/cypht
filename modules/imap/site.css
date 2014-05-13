@@ -9,12 +9,16 @@
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; }
 .save_settings, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .message_table td { padding: 5px; padding-left: 10px; padding-top: 7px; padding-bottom: 3px; color: #333; }
-.message_tble th:hover { color: #000; }
-.subject, .msg_date, .from { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.message_table { table-layout: fixed; width: 100%; }
+.message_table th:hover { color: #000; }
+.subject, .msg_date, .from, .source { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .subject { cursor: pointer; font-weight: bold; }
-.source { font-style: italic; color: #666; font-size: 75%;}
-.msg_date { color: #666; max-width: 200px; }
-.from { max-width: 200px; }
+.source { font-style: italic; color: #666; font-size: 75%; }
+.msg_date { color: #666; }
+.source_col { width: 10%; }
+.subject_col { width: 50%; }
+.from_col { width: 20%; }
+.date_col { width: 20%; }
 .hl { padding-right: 5px; color: #666; }
 .dl { color: #888; }
 .empty_table img { vertical-align: -2px; }
