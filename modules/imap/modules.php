@@ -616,10 +616,15 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         if ($folder['children']) {
             $results .= '<a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
         }
-        // HERE
-        $results .= '<a href="?page=message_list&amp;list_path='.
+        if (!$folder['noselect']) {
+            $results .= '<a href="?page=message_list&amp;list_path='.
             urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
-            '">'.$output_mod->html_safe($folder['basename']).'</a></li>';
+            '">'.$output_mod->html_safe($folder['basename']).'</a>';
+        }
+        else {
+            $results .= $output_mod->html_safe($folder['basename']);
+        }
+        $results .= '</li>';
     }
     $results .= '</ul></li>';
     return $results;

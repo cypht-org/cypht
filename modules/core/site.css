@@ -23,11 +23,11 @@ option, select { padding: 3px; }
 .server_summary { margin-right: 20px; padding: 10px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; }
-.folders a { color: #666; text-decoration: none; }
+.folders a { color: #333; text-decoration: none; }
 .folder_list { background-color: #fff; min-height: 600px; margin-right: 20px; padding-right: 30px; min-width: 100px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .folder_cell { padding-left: 20px; width: 1%; }
 .folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; }
-.folders li, .inner_list li { padding: 3px; padding-left: 10px; margin: 0px; white-space: nowrap; }
+.folders li, .inner_list li { color: #666; padding: 3px; padding-left: 10px; margin: 0px; white-space: nowrap; }
 .loading_folders { text-align: center; margin: 10px; margin-top: 20px; color: #666; }
 .content_cell { padding-right: 20px; }
 .content_title { float: left; padding-bottom: 10px; font-size: 125%; padding-left: 10px; }
