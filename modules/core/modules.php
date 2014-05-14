@@ -171,7 +171,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
-                $data['mailbox_list_title'] = sprintf("%s:%s", $details['name'], $parts[2]);
+                $data['mailbox_list_title'] = array($details['name'], $parts[2]);
             }
             elseif (preg_match("/^pop3_\d+/", $path)) {
                 $data['list_path'] = $path;
@@ -180,7 +180,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 if ($details['name'] == 'Default-Auth-Server') {
                     $details['name'] = 'Default';
                 }
-                $data['mailbox_list_title'] = sprintf("%s:INBOX", $details['name']);
+                $data['mailbox_list_title'] = array($details['name'], 'INBOX');
             }
         }
         if (isset($this->request->get['list_page'])) {
@@ -300,7 +300,8 @@ class Hm_Output_content_start extends Hm_Output_Module {
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<title>HM3</title><meta charset="utf-8" />';
+            return '<title>HM3</title><meta charset="utf-8" />'.
+                '<base href="'.$this->html_safe($input['router_url_path']).'" />';
         }
     }
 }
@@ -408,7 +409,8 @@ class Hm_Output_loading_icon extends Hm_Output_Module {
 class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<div class="user_settings"><div class="subtitle">Settings</div><form method="POST" action=""><table>';
+            return '<div class="user_settings"><div class="content_title">Settings</div><br />'.
+                '<form method="POST" action=""><table class="settings_table">';
         }
     }
 }
@@ -501,9 +503,16 @@ class Hm_Output_servers_link extends Hm_Output_Module {
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<table><tr><td class="folder_cell"><div class="folder_list">';
-        $res .= '<a class="unread_link" href="?page=message_list&amp;list_path=unread">'.$this->trans('Unread').'</a>';
+        $res .= '<div class="src_name">Everything</div><ul class="folders">'.
+            '<li><img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.
+            '<a class="unread_link" href="?page=home">'.$this->trans('Home').'</a></li>'.
+            '<li><img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.
+            '<a class="unread_link" href="?page=message_list&amp;list_path=unread">'.$this->trans('Unread').'</a></li>'.
+            '</ul>';
         if (isset($input['folder_sources'])) {
             foreach ($input['folder_sources'] as $src) {
+                $name = ucwords(str_replace(array('imap', 'pop3', '_'), array('IMAP', 'POP3', ' '), $src));
+                $res .= '<div class="src_name">'.$this->html_safe($name).'</div>';
                 $res .= '<div class="'.$src.'">';
                 $cache = Hm_Page_Cache::get($src);
                 if ($cache) {
@@ -525,7 +534,7 @@ class Hm_Output_folder_list_end extends Hm_Output_Module {
 
 class Hm_Output_server_summary_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="server_summary">';
+        $res = '<div class="server_summary"><div class="content_title">Summary</div>';
         $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Address</th><th>Port</th>'.
                 '<th>TLS</th></tr></thead><tbody>';
         return $res;
