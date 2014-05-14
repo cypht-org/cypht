@@ -140,6 +140,7 @@ var update_imap_folder_display = function(res) {
 var close_msg_preview = function() {
     $('.overlay').remove();
     $('.msg_text').slideUp();
+    return false;
 };
 
 var toggle_long_headers = function() {

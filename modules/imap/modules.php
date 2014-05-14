@@ -549,11 +549,11 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         if (isset($input['imap_folders'])) {
             foreach ($input['imap_folders'] as $id => $folders) {
                 $details = Hm_IMAP_List::dump($id);
-                $results .= '<li>'.$this->html_safe($details['name']).'</li>';
+                $results .= '<li><img class="account_icon" src="images/open_iconic/spreadsheet-2x.png" /> '.$this->html_safe($details['name']).'</li>';
                 $results .= '<li>'.format_imap_folder_section($folders, $id, $this).'</li>';
             }
         }
-        $results .= '<li class="imap_update"><a href="#" onclick="return imap_folder_update(true); return false;">Update</a></li></ul>';
+        $results .= '<li class="imap_update"><a href="#" onclick="return imap_folder_update(true); return false;">[update]</a></li></ul>';
         $input['imap_folders'] = $results;
         Hm_Page_Cache::add('imap_folders', $results, true);
         return $input;
@@ -616,6 +616,9 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         if ($folder['children']) {
             $results .= '<a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
         }
+        else {
+            $results .= ' <img class="folder_icon" src="images/open_iconic/folder.png" alt="" />';
+        }
         if (!$folder['noselect']) {
             $results .= '<a href="?page=message_list&amp;list_path='.
             urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
@@ -661,9 +664,9 @@ function imap_message_list_folder($input, $output_module) {
     if ($links_cache) {
         $links = $links_cache;
     }
-    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.
-        $output_module->html_safe($input['mailbox_list_title']).'</div>'.
-        '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">Update</a>'.
+    $title = implode('<img class="path_delim" src="images/open_iconic/caret-right-2x.png" alt="&gt;" />', $input['mailbox_list_title']);
+    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.$title.'</div>'.
+        '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
         '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
         '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
@@ -673,7 +676,7 @@ function imap_message_list_folder($input, $output_module) {
 function imap_message_list_unread() {
     $cache = (string) Hm_Page_Cache::get('formatted_unread_data');
     return '<div class="message_list"><div class="msg_text"></div><div class="content_title">Unread</div>'.
-        '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">Update</a>'.
+        '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
         '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
         '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
