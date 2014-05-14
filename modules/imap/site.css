@@ -46,7 +46,8 @@ input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 .header_links { padding-top: 10px !important; }
 .header_links a { float: none !important; padding-left: 3px !important; padding-right: 3px !important; }
 .overlay {position: fixed; height: 100%; width: 100%; z-index: 100; background-color: #ccc; opacity: .7; }
-.imap_page_links a { text-decoration: none; color: green; }
+.imap_page_links a { text-decoration: none; color: #111; }
+.imap_page_links a img { vertical-align: -2px; }
 .imap_page_links { text-align: center; padding-top: 20px; }
 .current_page { font-weight: bold; }
-.disabled_link { color: #666 !important; }
+.disabled_link { opacity: .5; color: #666 !important; }
