@@ -1,14 +1,13 @@
 .configured_server, .add_server, .login_form { border: solid 1px #aaa; padding: 10px; width: 200px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
-.message_list { min-height: 250px; border: solid 1px #aaa; padding: 15px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.message_list { height: 100%; border: solid 1px #aaa; padding: 15px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .server_summary table th, .message_table th { padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
-.configured_server { margin-top: 20px; float: left; margin-left: 20px; width: 230px; height: 216px; }
+.configured_server { margin-top: 0px; float: left; margin-left: 25px; margin-bottom: 20px; width: 230px; height: 220px; }
 .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #aaa; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
-.add_server { background-color: #f5f5f5; float: left; clear: left; margin-top: 20px; margin-left: 10px; width: 230px; }
+.add_server { background-color: #f5f5f5; float: left; clear: left; margin-top: 0px; margin-left: 0px; width: 230px; height: 220px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; }
 .save_settings, .server_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
-.server_link { background: #fff url('/hm3/images/open_iconic/monitor-2x.png') no-repeat 4px 3px; padding-left: 25px; opacity: .6; color: #000; }
 .message_table td { padding: 5px; padding-left: 10px; padding-top: 7px; padding-bottom: 3px; color: #333; }
 .message_table { table-layout: fixed; width: 100%; }
 .message_table th:hover { color: #000; }
@@ -16,9 +15,9 @@
 .subject { cursor: pointer; font-size: 110%; }
 .source { font-style: italic; color: #666; font-size: 75%; }
 .msg_date { color: #666; }
-.source_col { width: 5%; }
+.source_col { width: 10%; }
 .subject_col { width: 50%; }
-.from_col { width: 30%; }
+.from_col { width: 25%; }
 .date_col { width: 15%; }
 .hl { padding-right: 5px; color: #666; }
 .dl { color: #888; }
@@ -33,7 +32,7 @@ input { -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 .add_server .port_fld { width: 50px; }
 .server_title { font-size: 110%; margin-bottom: 0px; color: #666; }
 .server_subtitle { margin-bottom: 20px; color: #666; }
-.msg_text { z-index: 101; display: none; position: absolute; background-color: #fff; padding: 30px; padding-top: 10px; right: 50px; top: 90px; left: 270px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; margin-bottom: 20px; }
+.msg_text { z-index: 101; display: none; position: absolute; background-color: #fff; padding: 30px; padding-top: 10px; right: 50px; top: 70px; left: 20px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; margin-bottom: 20px; }
 .msg_headers { margin-bottom: 20px; margin-top: 10px; background-color: #f5f5f5; padding: 20px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; font-size: 95%; word-wrap: break-word; }
 .msg_headers td, .msg_headers th { vertical-align: top; text-align: left; font-weight: normal; padding: 3px; border: none; }
 .msg_headers th { white-space: nowrap; width: 1%; }

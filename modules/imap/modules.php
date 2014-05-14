@@ -664,7 +664,7 @@ function imap_message_list_folder($input, $output_module) {
     if ($links_cache) {
         $links = $links_cache;
     }
-    $title = implode('<img class="path_delim" src="images/open_iconic/caret-right-2x.png" alt="&gt;" />', $input['mailbox_list_title']);
+    $title = implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']);
     return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.$title.'</div>'.
         '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.

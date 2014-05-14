@@ -149,6 +149,7 @@ var toggle_long_headers = function() {
 };
 
 var display_msg_text = function(res) {
+    Hm_Notices.hide(true);
     overlay = $('<div></div>').prependTo('body').attr('class', 'overlay');
     $('.overlay').on('click', close_msg_preview);
     if (res.msg_text) {
