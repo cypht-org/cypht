@@ -171,7 +171,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
-                $data['mailbox_list_title'] = array($details['name'], $parts[2]);
+                $data['mailbox_list_title'] = array('IMAP', $details['name'], $parts[2]);
             }
             elseif (preg_match("/^pop3_\d+/", $path)) {
                 $data['list_path'] = $path;
@@ -180,7 +180,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 if ($details['name'] == 'Default-Auth-Server') {
                     $details['name'] = 'Default';
                 }
-                $data['mailbox_list_title'] = array($details['name'], 'INBOX');
+                $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
             }
         }
         if (isset($this->request->get['list_page'])) {
@@ -302,22 +302,6 @@ class Hm_Output_header_content extends Hm_Output_Module {
         if ($format == 'HTML5' ) {
             return '<title>HM3</title><meta charset="utf-8" />'.
                 '<base href="'.$this->html_safe($input['router_url_path']).'" />';
-        }
-    }
-}
-
-class Hm_Output_settings_link extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<a class="settings_link" href="'.$this->html_safe($input['router_url_path']).'?page=settings">'.$this->trans('Settings').'</a>';
-        }
-    }
-}
-
-class Hm_Output_homepage_link extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<a class="home_link" href="'.$this->html_safe($input['router_url_path']).'">'.$this->trans('Home').'</a>';
         }
     }
 }
@@ -492,22 +476,18 @@ class Hm_Output_toolbar_end extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_servers_link extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<a class="server_link" href="'.$this->html_safe($input['router_url_path']).'?page=servers">'.$this->trans('Servers').'</a>';
-        }
-    }
-}
-
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<table><tr><td class="folder_cell"><div class="folder_list">';
-        $res .= '<div class="src_name">Everything</div><ul class="folders">'.
-            '<li><img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.
+        $res = '<table class="framework_table"><tr><td class="folder_cell"><div class="folder_list">';
+        $res .= '<div class="src_name">Main</div><ul class="folders">'.
+            '<li><img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=home">'.$this->trans('Home').'</a></li>'.
             '<li><img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=message_list&amp;list_path=unread">'.$this->trans('Unread').'</a></li>'.
+            '<li><img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.
+            '<a class="unread_link" href="?page=servers">'.$this->trans('Servers').'</a></li>'.
+            '<li><img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.
+            '<a class="unread_link" href="?page=settings">'.$this->trans('Settings').'</a></li>'.
             '</ul>';
         if (isset($input['folder_sources'])) {
             foreach ($input['folder_sources'] as $src) {

@@ -1,22 +1,21 @@
 a:hover { color: #000; }
 br { clear: both; }
-body { color: #222; font-family: Arial; padding: 0px; margin: 0px; }
+body { height: 100%; color: #222; font-family: Arial; padding: 0px; margin: 0px; }
+.framework_table{ height: 100%; }
 table { width: 100%; }
 td { vertical-align: top; }
 .subtitle { color: #444; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 110%;  margin-left: 0px !important; }
 .date { float: right; clear: none; color: #888; padding-right: 30px; padding-top: 6px;}
-.sys_messages { color: green; position: absolute; left: 85px; top: 13px; }
+.sys_messages { color: green; position: absolute; left: 120px; top: 13px; }
 .logout_form { float: right; clear: none; padding-right: 30px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
-.title { font-weight: normal; padding: 0px; font-size: 135%; color: #aaa; margin: 0px; margin-left: 5px; padding-bottom: 10px; letter-spacing: -2px; }
-.loading_icon { position: absolute; top: 15px; left: 63px; visibility: hidden; width: 16px; height: 16px; }
+.title { background: #f5f5f5 url('/hm3/images/open_iconic/envelope-closed-3x.png') no-repeat 0px 0px; font-weight: normal; padding: 0px; padding-left: 30px; font-size: 135%; color: #000; opacity: .4; margin: 0px; margin-left: 15px; padding-bottom: 10px; letter-spacing: -2px; width: 50px; }
+.loading_icon { position: absolute; top: 15px; left: 100px; visibility: hidden; width: 16px; height: 16px; }
 .loading_icon img { visibility: inherit; }
 .empty_table { text-align: center; color: #666 !important; padding-top: 50px !important; padding-bottom: 50px !important; }
-.settings_link, .logout, .home_link { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
-.settings_link { background: #fff url('/hm3/images/open_iconic/cog-2x.png') no-repeat 4px 3px; opacity: .7; color: #000; padding-left: 25px; }
-.logout { cursor: pointer; background: #fff url('/hm3/images/open_iconic/power-standby-2x.png') no-repeat 4px 3px; padding-left: 25px; opacity: .7; color: #000; }
-.user_settings { margin-left: 20px; margin-right: 20px; padding: 10px; padding-bottom: 40px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
-.home_link { background-color: #d9f0e4; padding: 10px; float: left; clear: both; margin-left: 25px; margin-top: 25px; font-size: 115%; }
+.logout { line-height: 10pt; font-size: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.logout { cursor: pointer; background: #fff url('/hm3/images/open_iconic/power-standby-2x.png') no-repeat 6px 3px; padding-left: 25px; color: #000; opacity: .7; }
+.user_settings { margin-left: margin-right: 20px; padding: 10px; padding-bottom: 40px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .user_settings table { width: 50%; white-space: nowrap; margin-left: 10px; }
 .user_settings table td { padding: 5px; }
 .save_settings { float: none !important; }
@@ -39,4 +38,4 @@ option, select { padding: 3px; }
 .folder_icon { opacity: .6; vertical-align: 2px; padding-right: 6px; }
 .account_icon { opacity: .6; vertical-align: -2px; padding-right: 6px; }
 .src_name { padding-left: 10px; margin-top: 15px; background-color: #fcfcfc; color: #aaa; border-bottom: solid 1px #ddd; border-top: solid 1px #ddd; padding-top: 3px; padding-bottom: 3px; margin-right: -30px; }
-.path_delim { opacity: .4; padding-left: 5px; vertical-align: 0px; padding-right: 3px; }
+.path_delim { opacity: .4; padding-left: 5px; vertical-align: 3px; padding-right: 3px; }
