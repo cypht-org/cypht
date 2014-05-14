@@ -24,6 +24,10 @@ add_handler('servers', 'save_pop3_servers', true, 'pop3', 'add_pop3_servers_to_p
 add_output('servers', 'add_pop3_server_dialog', true, 'pop3', 'display_configured_imap_servers', 'after');
 add_output('servers', 'display_configured_pop3_servers', true, 'pop3', 'add_pop3_server_dialog', 'after');
 
+/* settings page */
+add_handler('settings', 'load_pop3_servers_from_config', true, 'pop3', 'date', 'after');
+add_handler('settings', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+
 /* select pop3 "folder" */
 add_handler('ajax_pop3_folder_display', 'login', false, 'core');
 add_handler('ajax_pop3_folder_display', 'load_user_data', true, 'core');
