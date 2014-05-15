@@ -120,6 +120,7 @@ if (hm_page_name == 'servers') {
 }
 else if (hm_page_name == 'message_list') {
     if (hm_list_path.substring(0, 4) == 'pop3') {
+        $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
         if ($('.message_table tbody tr').length == 0) {
             select_pop3_folder(hm_list_path, true);
         }

@@ -25,19 +25,22 @@ option, select { padding: 3px; }
 .err { color: red; }
 .elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
 .server_summary { border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
-.server_summary table { margin: 10px; }
+.server_summary table { padding: 10px; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 0px; }
 .folders a { color: #333; text-decoration: none; }
-.folder_list { background-color: #fff; margin-right: 20px; padding-right: 30px; padding-bottom: 20px; min-width: 100px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.folder_list { background-color: #fff; margin-right: 20px; padding-right: 20px; padding-bottom: 20px; min-width: 100px; border: solid 1px #aaa; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .folder_cell { padding-left: 20px; width: 1%; }
-.folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 15px; }
-.folders li, .inner_list li { padding: 4px; padding-left: 10px; margin: 0px; white-space: nowrap; }
+.folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; padding-right: 0px; }
+.folders li, .inner_list li { padding: 4px; padding-left: 10px; margin: 2px; white-space: nowrap; }
 .loading_folders { text-align: center; margin: 10px; margin-top: 20px; color: #666; }
 .content_cell { padding-right: 20px; }
 .content_title { margin-top: 15px; border-bottom: solid 1px #ddd; color: #999; background-color: #fff; padding-bottom: 5px; padding-top: 3px; padding-left: 10px; }
-.folder_icon { opacity: .6; vertical-align: 2px; padding-left: 5px; padding-right: 6px; }
+.folder_icon { opacity: .6; vertical-align: 2px; padding-left: 1px; padding-right: 11px; }
 .account_icon { opacity: .6; vertical-align: -2px; padding-right: 6px; }
-.src_name { cursor: pointer; padding-left: 10px; margin-top: 15px; background-color: #fff; color: #999; border-bottom: solid 1px #ddd; border-bottom: solid 1px #ddd; padding-top: 3px; padding-bottom: 5px; margin-right: -30px; }
+.small_account_icon { opacity: .6; vertical-align: 3px; padding-left: 1px; padding-right: 6px; }
+.src_name { cursor: pointer; padding-left: 10px; margin-top: 15px; margin-right: -20px; background-color: #fff; color: #999; border-bottom: solid 1px #ddd; border-bottom: solid 1px #ddd; padding-top: 3px; padding-bottom: 5px; }
 .path_delim { opacity: .4; padding-left: 5px; vertical-align: 1px; padding-right: 3px; }
-.not_found { font-size: 150%; padding: 50px; height: 100%; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.not_found { font-size: 150%; color: #999; padding: 50px; height: 100%; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.no_servers { text-align: center; padding: 50px; margin: auto; }
+.selected_menu { font-weight: bold; };

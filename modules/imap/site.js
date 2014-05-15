@@ -98,7 +98,7 @@ var update_unread_message_display = function(res) {
 
 var imap_unread_update = function(loading) {
     var ids = $('#imap_server_ids').val().split(',');
-    if ( ids && ids.length ) {
+    if ( ids && ids != '') {
         Hm_Notices.show({0: 'Updating unread messages ...'});
         for (i=0;i<ids.length;i++) {
             id=ids[i];
@@ -199,7 +199,7 @@ var display_imap_mailbox = function(res) {
 
 var expand_imap_folders = function(path) {
     var detail = parse_folder_path(path, 'imap');
-    var list = $('.imap_'+detail.server_id+'_'+detail.folder.replace(/(:|\.|\[|\])/g, "\\$1"));
+    var list = $('.imap_'+detail.server_id+'_'+clean_selector(detail.folder));
     var link = $('a:first-child', list);
     var sublist = $('ul', list);
     if (link.html() == '+') {
@@ -227,6 +227,7 @@ var expand_imap_folders = function(path) {
 
 var save_folder_list = function() {
     var folders = $('.imap_folders').html();
+    $('*', folders).removeClass('selected_menu');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_folder_state'},
         {'name': 'imap_folder_state', 'value': folders}],
@@ -237,7 +238,7 @@ var save_folder_list = function() {
 };
 
 var expand_imap_mailbox = function(res) {
-    $('.'+res.imap_expanded_folder_path.replace(/(:|\.|\[|\])/g, "\\$1")).append(res.imap_expanded_folder_formatted);
+    $('.'+clean_selector(res.imap_expanded_folder_path)).append(res.imap_expanded_folder_formatted);
 };
 
 var set_unread_state = function() {
@@ -254,10 +255,13 @@ var set_unread_state = function() {
 
 if (hm_page_name == 'message_list') {
     if (hm_list_path == 'unread') {
+        $('.menu_unread').addClass('selected_menu');
         Hm_Timer.add_job(imap_unread_update, 60);
         $('.message_table tr').fadeIn(100);
     }
     else if (hm_list_path.substring(0, 4) == 'imap') {
+        $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
+        $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
         if ($('.message_table tbody tr').length == 0) {
             select_imap_folder(hm_list_path, true);
         }

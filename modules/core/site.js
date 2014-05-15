@@ -211,12 +211,18 @@ var toggle_section = function(class_name) {
     return false;
 };
 
+var clean_selector = function(str) {
+    return str.replace(/(:|\.|\[|\])/g, "\\$1");
+};
+
 /* start the scheduler */
 Hm_Timer.fire();
+$('.folder_list').find('*').removeClass('selected_menu');
 
 if (hm_page_name == 'home') {
     $('table', $('.server_summary')).tablesorter();
 }
+$('.menu_'+hm_page_name).addClass('selected_menu');
 
 /* setup hiding of any user notifications */
 Hm_Notices.hide();

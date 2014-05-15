@@ -183,16 +183,20 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
-                $data['mailbox_list_title'] = array('IMAP', $details['name'], $parts[2]);
+                if (!empty($details)) {
+                    $data['mailbox_list_title'] = array('IMAP', $details['name'], $parts[2]);
+                }
             }
             elseif (preg_match("/^pop3_\d+/", $path)) {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 3);
                 $details = Hm_POP3_List::dump(intval($parts[1]));
-                if ($details['name'] == 'Default-Auth-Server') {
-                    $details['name'] = 'Default';
+                if (!empty($details)) {
+                    if ($details['name'] == 'Default-Auth-Server') {
+                        $details['name'] = 'Default';
+                    }
+                    $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
                 }
-                $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
             }
         }
         if (isset($this->request->get['list_page'])) {
@@ -496,15 +500,15 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             $res .= 'style="display: '.$this->html_safe($input['section_state']['.main']).'" ';
         }
         $res .= 'class="main folders">'.
-            '<li><img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.
+            '<li class="menu_home"><img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=home">'.$this->trans('Home').'</a></li>'.
-            '<li><img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.
+            '<li class="menu_unread"><img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=message_list&amp;list_path=unread">'.$this->trans('Unread').'</a></li>'.
-            '<li><img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.
+            '<li class="menu_servers"><img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=servers">'.$this->trans('Servers').'</a></li>'.
-            '<li><img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.
+            '<li class="menu_settings"><img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=settings">'.$this->trans('Settings').'</a></li>'.
-            '<li><img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.
+            '<li class="menu_profiles"><img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=profiles">'.$this->trans('Profiles').'</a></li>'.
             '</ul>';
 
@@ -553,7 +557,13 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
 
 class Hm_Output_server_summary_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '</tbody></table></div>';
+        $res = '';
+        if ((!isset($input['imap_servers']) || empty($input['imap_servers'])) &&
+            (!isset($input['pop3_servers']) || empty($input['pop3_servers']))) {
+            $res .= '<tr><td colspan="5"><div class="no_servers">No IMAP or POP3 Servers configured! You should <a href="?page=servers">add some</a>.</div></td></tr>';
+        }
+        $res .= '</tbody></table></div>';
+        return $res;
     }
 }
 
