@@ -165,16 +165,20 @@ Hm_Timer = {
 var parse_folder_path = function(path, path_type) {
     var type = false;
     var server_id = false;
-    var folder = false;
+    var folder = '';
 
     if (path_type == 'imap') {
         parts = path.split('_', 3);
-        if (parts.length == 3) {
+        if (parts.length == 2) {
+            type = parts[0];
+            server_id = parts[1];
+        }
+        else if (parts.length == 3) {
             type = parts[0];
             server_id = parts[1];
             folder = parts[2];
         }
-        if (type && server_id && folder) {
+        if (type && server_id) {
             return {'type': type, 'server_id' : server_id, 'folder' : folder}
         }
     }
@@ -192,16 +196,18 @@ var parse_folder_path = function(path, path_type) {
 };
 
 var toggle_section = function(class_name) {
-    var section_state = $(class_name).css('display').toLowerCase();
-    $(class_name).toggle(300);
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_save_section_state'},
-        {'name': 'section_state', 'value': section_state},
-        {'name': 'section_class', 'value': class_name}],
-        false,
-        [],
-        false
-    );
+    if ($(class_name).length) {
+        var section_state = $(class_name).css('display').toLowerCase();
+        $(class_name).toggle(300);
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_save_section_state'},
+            {'name': 'section_state', 'value': section_state},
+            {'name': 'section_class', 'value': class_name}],
+            false,
+            [],
+            false
+        );
+    }
     return false;
 };
 

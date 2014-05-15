@@ -31,11 +31,6 @@ add_handler('ajax_imap_unread', 'imap_tracker', true, 'tracker', 'imap_unread', 
 add_output('ajax_imap_unread', 'tracker', false, 'tracker');
 add_output('ajax_imap_unread', 'show_debug', false, 'tracker');
 
-add_handler('ajax_hm_folders', 'tracker', false, 'tracker',  'load_imap_folders', 'after');
-add_handler('ajax_hm_folders', 'imap_tracker', true, 'tracker', 'load_imap_folders', 'after');
-add_output('ajax_hm_folders', 'tracker', false, 'tracker');
-add_output('ajax_hm_folders', 'show_debug', false, 'tracker');
-
 add_handler('ajax_imap_msg_text', 'tracker', false, 'tracker',  'imap_message_text', 'after');
 add_handler('ajax_imap_msg_text', 'imap_tracker', true, 'tracker', 'imap_message_text', 'after');
 add_output('ajax_imap_msg_text', 'tracker', false, 'tracker');
@@ -50,6 +45,21 @@ add_handler('ajax_imap_folder_display', 'tracker', false, 'tracker',  'imap_fold
 add_handler('ajax_imap_folder_display', 'imap_tracker', true, 'tracker', 'imap_folder_page', 'after');
 add_output('ajax_imap_folder_display', 'tracker', false, 'tracker');
 add_output('ajax_imap_folder_display', 'show_debug', false, 'tracker');
+
+add_handler('ajax_imap_save_unread_state', 'tracker', false, 'tracker',  'save_unread_state', 'after');
+add_handler('ajax_imap_save_unread_state', 'imap_tracker', true, 'tracker', 'save_unread_state', 'after');
+add_output('ajax_imap_save_unread_state', 'tracker', false, 'tracker');
+add_output('ajax_imap_save_unread_state', 'show_debug', false, 'tracker');
+
+add_handler('ajax_save_section_state', 'tracker', false, 'tracker',  'save_section_state', 'after');
+add_handler('ajax_save_section_state', 'imap_tracker', true, 'tracker', 'save_section_state', 'after');
+add_output('ajax_save_section_state', 'tracker', false, 'tracker');
+add_output('ajax_save_section_state', 'show_debug', false, 'tracker');
+
+add_handler('ajax_imap_save_folder_state', 'tracker', false, 'tracker',  'save_folder_state', 'after');
+add_handler('ajax_imap_save_folder_state', 'imap_tracker', true, 'tracker', 'save_folder_state', 'after');
+add_output('ajax_imap_save_folder_state', 'tracker', false, 'tracker');
+add_output('ajax_imap_save_folder_state', 'show_debug', false, 'tracker');
 
 add_handler('settings', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('settings', 'show_debug', false, 'tracker', 'content_end', 'before');

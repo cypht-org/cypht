@@ -504,6 +504,8 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             '<a class="unread_link" href="?page=servers">'.$this->trans('Servers').'</a></li>'.
             '<li><img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=settings">'.$this->trans('Settings').'</a></li>'.
+            '<li><img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.
+            '<a class="unread_link" href="?page=profiles">'.$this->trans('Profiles').'</a></li>'.
             '</ul>';
 
         if (isset($input['folder_sources'])) {
@@ -538,6 +540,13 @@ class Hm_Output_server_summary_start extends Hm_Output_Module {
         $res = '<div class="server_summary"><div class="content_title">Summary</div>';
         $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Address</th><th>Port</th>'.
                 '<th>TLS</th></tr></thead><tbody>';
+        return $res;
+    }
+}
+
+class Hm_Output_notfound_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<div class="not_found">Page Not Found!</div>';
         return $res;
     }
 }

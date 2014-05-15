@@ -5,9 +5,13 @@ require 'lib/hm-imap.php';
 class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
     public function process($data) {
         $data['imap_expanded_folder_data'] = array();
-        list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
+        list($success, $form) = $this->process_form(array('imap_server_id'));
         if ($success) {
-            $path = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
+            $folder = '';
+            if (isset($this->request->post['folder'])) {
+                $folder = $this->request->post['folder'];
+            }
+            $path = sprintf("imap_%d_%s", $form['imap_server_id'], $folder);
             $page_cache =  Hm_Page_Cache::get('imap_folders_'.$path);
             if ($page_cache) {
                 $data['imap_expanded_folder_path'] = $path;
@@ -18,9 +22,9 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                $msgs = $imap->get_folder_list_by_level($form['folder']);
-                if (isset($msgs[$form['folder']])) {
-                    unset($msgs[$form['folder']]);
+                $msgs = $imap->get_folder_list_by_level($folder);
+                if (isset($msgs[$folder])) {
+                    unset($msgs[$folder]);
                 }
                 $data['imap_expanded_folder_data'] = $msgs;
                 $data['imap_expanded_folder_id'] = $form['imap_server_id'];
@@ -123,17 +127,14 @@ class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
 
 class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
     public function process($data) {
+        $servers = Hm_IMAP_List::dump();
         $folders = array();
-        list($success, $form) = $this->process_form(array('imap_folder_ids'));
-        if ($success) {
-            $ids = explode(',', $form['imap_folder_ids']);
-            foreach ($ids as $id) {
-                $details = Hm_IMAP_List::dump($id);
-                $cache = Hm_IMAP_List::get_cache($this->session, $id);
-                $imap = Hm_IMAP_List::connect($id, $cache);
-                if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                    $folders[$id] = $imap->get_folder_list_by_level();
+        if (!empty($servers)) {
+            foreach ($servers as $id => $server) {
+                if ($server['name'] == 'Default-Auth-Server') {
+                    $server['name'] = 'Default';
                 }
+                $folders[$id] = $server['name'];
             }
         }
         $data['imap_folders'] = $folders;
@@ -545,18 +546,20 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
-        $results = '<ul class="folders">';
-        if (isset($input['imap_folders'])) {
-            foreach ($input['imap_folders'] as $id => $folders) {
-                $details = Hm_IMAP_List::dump($id);
-                $results .= '<li><img class="account_icon" src="images/open_iconic/document-2x.png" /> '.$this->html_safe($details['name']).'</li>';
-                $results .= '<li>'.format_imap_folder_section($folders, $id, $this).'</li>';
+        $cache = Hm_Page_Cache::get('imap_folders');
+        if (!$cache) {
+            $res = '<ul class="folders">';
+            if (isset($input['imap_folders'])) {
+                foreach ($input['imap_folders'] as $id => $folder) {
+                    $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')">+</a> '.
+                        '<img class="account_icon" src="images/open_iconic/spreadsheet-2x.png" /> '.
+                        $this->html_safe($folder).'</li>';
+                }
             }
+            $res .= '</ul>';
+            Hm_Page_Cache::add('imap_folders', $res, true);
         }
-        $results .= '<li class="imap_update"><a href="#" onclick="return imap_folder_update(true); return false;">[update]</a></li></ul>';
-        $input['imap_folders'] = $results;
-        Hm_Page_Cache::add('imap_folders', $results, true);
-        return $input;
+        return '';
     }
 }
 
@@ -614,7 +617,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
     foreach ($folders as $folder_name => $folder) {
         $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
         if ($folder['children']) {
-            $results .= '<a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
+            $results .= '<a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
         }
         else {
             $results .= ' <img class="folder_icon" src="images/open_iconic/folder.png" alt="" />';
@@ -629,7 +632,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         }
         $results .= '</li>';
     }
-    $results .= '</ul></li>';
+    $results .= '</ul>';
     return $results;
 }
 

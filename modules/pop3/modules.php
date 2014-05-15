@@ -328,9 +328,9 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
         $res = '<ul class="folders">';
         if (isset($input['pop3_folders'])) {
             foreach ($input['pop3_folders'] as $id => $folder) {
-                $res .= '<li><img class="account_icon" src="images/open_iconic/document-2x.png" /> '.
-                    $this->html_safe($folder).'<ul class="inner_list"><li><img class="folder_icon" src="images/open_iconic/folder.png" /> '.
-                    '<a href="?page=message_list&list_path=pop3_'.$this->html_safe($id).'">INBOX</a></li></ul></li>';
+                $res .= '<li><img class="account_icon" src="images/open_iconic/spreadsheet-2x.png" /> '.
+                    '<a href="?page=message_list&list_path=pop3_'.$this->html_safe($id).'">'.
+                    $this->html_safe($folder).'</a></li>';
             }
         }
         $res .= '</ul>';

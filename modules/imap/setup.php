@@ -5,27 +5,43 @@ output_source('imap');
 
 /* add stuff to the home page */
 add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('home', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('home', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('home', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 add_output('home', 'display_imap_summary', true, 'imap', 'server_summary_start', 'after');
 add_output('home', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
-add_handler('servers', 'load_imap_servers_from_config',  true, 'imap', 'date', 'after');
+add_handler('servers', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('servers', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('servers', 'add_imap_servers_to_page_data', 'imap', true, 'process_add_imap_server', 'after');
+add_handler('servers', 'add_imap_servers_to_page_data', true, 'imap', 'process_add_imap_server', 'after');
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
+add_output('servers', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 add_output('servers', 'add_imap_server_dialog', true, 'imap', 'folder_list_start', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap_server_dialog', 'after');
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* settings page date */
-add_handler('settings', 'load_imap_servers_from_config',  true, 'imap', 'date', 'after');
-add_handler('settings', 'add_imap_servers_to_page_data', 'imap', true, 'load_imap_servers_from_config', 'after');
+add_handler('settings', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('settings', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('settings', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('settings', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
+/* message list pages */
 add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('message_list', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('message_list', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('message_list', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
+add_output('message_list', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
+
+/* page not found */
+add_handler('notfound', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('notfound', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('notfound', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('notfound', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
+add_output('notfound', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 
 /* ajax server setup callback data */
 add_handler('ajax_imap_debug', 'login', false, 'core');
@@ -72,14 +88,6 @@ add_handler('ajax_imap_msg_text', 'save_imap_cache',  true);
 add_handler('ajax_imap_msg_text', 'save_imap_servers',  true);
 add_handler('ajax_imap_msg_text', 'date', true, 'core');
 add_output('ajax_imap_msg_text', 'filter_message_text', true);
-
-/* ajax folder callback data */
-add_handler('ajax_hm_folders', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_hm_folders', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('ajax_hm_folders', 'load_imap_folders',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
-add_handler('ajax_hm_folders', 'save_imap_cache',  true, 'imap', 'load_imap_folders', 'after');
-add_handler('ajax_hm_folders', 'save_imap_servers',  true, 'imap', 'save_imap_cache', 'after');
-add_output('ajax_hm_folders', 'filter_imap_folders', true);
 
 /* expand folder */
 add_handler('ajax_imap_folder_expand', 'login', false, 'core');

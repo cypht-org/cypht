@@ -115,28 +115,6 @@ var imap_unread_update = function(loading) {
     return false;
 };
 
-var imap_folder_update = function() {
-    var ids = $('#imap_server_ids').val();
-    if ( ids && ids.length ) {
-        Hm_Notices.show({0: 'Updating IMAP folders ...'});
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
-            {'name': 'imap_folder_ids', 'value': ids}],
-            update_imap_folder_display,
-            [],
-            false
-        );
-    }
-    return false;
-};
-
-var update_imap_folder_display = function(res) {
-    Hm_Notices.hide(true);
-    if (res.imap_folders) {
-        $('.imap_folders').html(res.imap_folders);
-    }
-};
-
 var close_msg_preview = function() {
     $('.overlay').remove();
     $('.msg_text').slideUp();
@@ -273,10 +251,6 @@ var set_unread_state = function() {
         false
     );
 };
-
-if (!$('.imap_folders').html()) {
-    imap_folder_update();
-}
 
 if (hm_page_name == 'message_list') {
     if (hm_list_path == 'unread') {

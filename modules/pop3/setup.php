@@ -3,14 +3,14 @@ handler_source('pop3');
 output_source('pop3');
 
 /* add stuff to the home page */
-add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
+add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'date', 'after');
 add_handler('home', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('home', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('home', 'display_pop3_summary', true, 'pop3', 'server_summary_start', 'after');
 add_output('home', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 
 /* message list page */
-add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
+add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'date', 'after');
 add_handler('message_list', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('message_list', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('message_list', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
@@ -29,6 +29,11 @@ add_handler('settings', 'load_pop3_servers_from_config', true, 'pop3', 'date', '
 add_handler('settings', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('settings', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('settings', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
+
+add_handler('notfound', 'load_pop3_servers_from_config', true, 'pop3', 'date', 'after');
+add_handler('notfound', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_handler('notfound', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_output('notfound', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 
 /* select pop3 "folder" */
 add_handler('ajax_pop3_folder_display', 'login', false, 'core');

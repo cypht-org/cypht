@@ -148,8 +148,36 @@ add_handler('ajax_save_section_state', 'save_section_state', true);
 add_handler('ajax_save_section_state', 'date', true);
 
 /* not-found page data and output */
+add_handler('notfound', 'login', false);
+add_handler('notfound', 'load_user_data', true);
+add_handler('notfound', 'language',  true);
 add_handler('notfound', 'title', true);
+add_handler('notfound', 'date', true);
+add_handler('notfound', 'save_user_data', true);
+add_handler('notfound', 'logout', true);
+add_handler('notfound', 'http_headers', true);
+add_output('notfound', 'header_start', false);
+add_output('notfound', 'js_data', true);
+add_output('notfound', 'header_css', false);
+add_output('notfound', 'jquery', false);
+add_output('notfound', 'jquery_table', true);
+add_output('notfound', 'header_content', false);
+add_output('notfound', 'header_end', false);
+add_output('notfound', 'content_start', false);
+add_output('notfound', 'toolbar_start', true);
+add_output('notfound', 'logout', true);
+add_output('notfound', 'date', true);
+add_output('notfound', 'login', false);
+add_output('notfound', 'msgs', false);
 add_output('notfound', 'title', true);
+add_output('notfound', 'loading_icon', true);
+add_output('notfound', 'toolbar_end', true);
+add_output('notfound', 'folder_list_start', true);
+add_output('notfound', 'notfound_content', true);
+add_output('notfound', 'folder_list_end', true);
+add_output('notfound', 'page_js', true);
+add_output('notfound', 'content_end', true);
+
 
 add_handler('ajax_hm_folders', 'login', false, 'core');
 add_handler('ajax_hm_folders', 'load_user_data', true, 'core');
