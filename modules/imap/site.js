@@ -146,6 +146,7 @@ var close_msg_preview = function() {
 var toggle_long_headers = function() {
     $('.long_header').toggle(600);
     $('.header_toggle').toggle(600);
+    return false;
 };
 
 var display_msg_text = function(res) {

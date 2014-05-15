@@ -549,7 +549,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         if (isset($input['imap_folders'])) {
             foreach ($input['imap_folders'] as $id => $folders) {
                 $details = Hm_IMAP_List::dump($id);
-                $results .= '<li><img class="account_icon" src="images/open_iconic/spreadsheet-2x.png" /> '.$this->html_safe($details['name']).'</li>';
+                $results .= '<li><img class="account_icon" src="images/open_iconic/document-2x.png" /> '.$this->html_safe($details['name']).'</li>';
                 $results .= '<li>'.format_imap_folder_section($folders, $id, $this).'</li>';
             }
         }
@@ -665,8 +665,8 @@ function imap_message_list_folder($input, $output_module) {
         $links = $links_cache;
     }
     $title = implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']);
-    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.$title.'</div>'.
-        '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a>'.
+    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.$title.
+        '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a></div>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
         '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
         '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
@@ -675,8 +675,8 @@ function imap_message_list_folder($input, $output_module) {
 
 function imap_message_list_unread() {
     $cache = (string) Hm_Page_Cache::get('formatted_unread_data');
-    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">Unread</div>'.
-        '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a>'.
+    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">Unread'.
+        '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a></div>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
         '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
         '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.

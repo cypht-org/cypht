@@ -16,10 +16,12 @@ add_handler('servers', 'add_imap_servers_to_page_data', 'imap', true, 'process_a
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
 add_output('servers', 'add_imap_server_dialog', true, 'imap', 'folder_list_start', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap_server_dialog', 'after');
+add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* settings page date */
 add_handler('settings', 'load_imap_servers_from_config',  true, 'imap', 'date', 'after');
 add_handler('settings', 'add_imap_servers_to_page_data', 'imap', true, 'load_imap_servers_from_config', 'after');
+add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('message_list', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
