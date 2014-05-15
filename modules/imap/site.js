@@ -62,6 +62,7 @@ var imap_forget_action = function() {
 var imap_test_action = function() {
     $('.imap_debug_data').empty();
     $('.imap_folder_data').empty();
+    Hm_Notices.show({0: 'Testing connection...'});
     event.preventDefault();
     var form = $(this).parent();
     var id = form.find('#imap_server_id');
@@ -94,6 +95,7 @@ var update_unread_message_display = function(res) {
             }
         });
     }
+    document.title = 'HM3 '+$('.message_table tbody tr').length+' Unread';
 };
 
 var imap_unread_update = function(loading) {
@@ -193,19 +195,14 @@ var display_imap_mailbox = function(res) {
     if (res.imap_page_links) {
         $('.imap_page_links').html(res.imap_page_links);
     }
-
-    /*$('.message_table').tablesorter({debug: true, sortList: [[3,1],[2,0]]});*/
 };
 
 var expand_imap_folders = function(path) {
     var detail = parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+clean_selector(detail.folder));
-    var link = $('a:first-child', list);
-    var sublist = $('ul', list);
-    if (link.html() == '+') {
+    if ($('li', list).length == 0) {
         if (detail) {
-            link.html('-');
-            Hm_Notices.show({0: 'Loading subfolder ...'});
+            Hm_Notices.show({0: 'Loading folder ...'});
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
                 {'name': 'imap_server_id', 'value': detail.server_id},
@@ -218,8 +215,7 @@ var expand_imap_folders = function(path) {
         }
     }
     else {
-        sublist.remove();
-        link.html('+');
+        $('ul', list).remove();
         save_folder_list();
     }
     return false;
@@ -233,7 +229,7 @@ var save_folder_list = function() {
         {'name': 'imap_folder_state', 'value': folders}],
         false,
         [],
-        false
+        true
     );
 };
 
@@ -242,14 +238,15 @@ var expand_imap_mailbox = function(res) {
 };
 
 var set_unread_state = function() {
-    $('.message_table').tablesorter({debug: true, headers: { 3: { sorter: 'dt' } }, sortList: [[3,1],[2,0]]});
+    Hm_Notices.hide(true);
+    $('.message_table').tablesorter({headers: { 3: { sorter: 'dt' } }, sortList: [[3,1],[2,0]]});
     var data = $('.message_table tbody').html();
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_unread_state'},
         {'name': 'formatted_unread_data', 'value': data}],
         false,
         [],
-        false
+        true
     );
 };
 

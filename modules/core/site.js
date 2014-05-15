@@ -123,11 +123,11 @@ Hm_Notices = {
         }
         else {
             Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').fadeOut(1000, function() {
+                $('.sys_messages').fadeOut(5000, function() {
                     $('.sys_messages').html('');
                     $('.sys_messages').show('');
                 });
-            }, 20000);
+            }, 3000);
         }
     }
 };
@@ -205,7 +205,7 @@ var toggle_section = function(class_name) {
             {'name': 'section_class', 'value': class_name}],
             false,
             [],
-            false
+            true
         );
     }
     return false;

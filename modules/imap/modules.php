@@ -551,8 +551,8 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
             $res = '<ul class="folders">';
             if (isset($input['imap_folders'])) {
                 foreach ($input['imap_folders'] as $id => $folder) {
-                    $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')">+</a> '.
-                        $this->html_safe($folder).'</li>';
+                    $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" src="images/open_iconic/folder-2x.png" /> '.
+                        $this->html_safe($folder).'</a></li>';
                 }
             }
             $res .= '</ul>';
