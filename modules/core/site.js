@@ -191,6 +191,20 @@ var parse_folder_path = function(path, path_type) {
     return false;
 };
 
+var toggle_section = function(class_name) {
+    var section_state = $(class_name).css('display').toLowerCase();
+    $(class_name).toggle(300);
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_save_section_state'},
+        {'name': 'section_state', 'value': section_state},
+        {'name': 'section_class', 'value': class_name}],
+        false,
+        [],
+        false
+    );
+    return false;
+};
+
 /* start the scheduler */
 Hm_Timer.fire();
 

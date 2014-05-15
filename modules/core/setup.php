@@ -141,6 +141,12 @@ add_output('message_list', 'imap_server_ids', true);
 add_output('message_list', 'page_js', true);
 add_output('message_list', 'content_end', true);
 
+/* save folder tree collapsed state */
+add_handler('ajax_save_section_state', 'login', false);
+add_handler('ajax_save_section_state', 'load_user_data', true);
+add_handler('ajax_save_section_state', 'save_section_state', true);
+add_handler('ajax_save_section_state', 'date', true);
+
 /* not-found page data and output */
 add_handler('notfound', 'title', true);
 add_output('notfound', 'title', true);
@@ -158,6 +164,7 @@ return array(
         'settings',
         'servers',
         'ajax_hm_folders',
+        'ajax_save_section_state',
     ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
@@ -192,7 +199,9 @@ return array(
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'save_settings' => FILTER_SANITIZE_STRING,
         'language_setting' => FILTER_SANITIZE_STRING,
-        'timezone_setting' => FILTER_SANITIZE_STRING
+        'timezone_setting' => FILTER_SANITIZE_STRING,
+        'section_state' => FILTER_SANITIZE_STRING,
+        'section_class' => FILTER_SANITIZE_STRING
     )
 );
 

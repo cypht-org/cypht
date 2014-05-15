@@ -26,6 +26,17 @@ class Hm_Handler_process_language_setting extends Hm_Handler_Module {
         return $data;
     }
 }
+class Hm_Handler_save_section_state extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('section_state', 'section_class'));
+        if ($success && in_array($form['section_state'], array('block', 'none'))) {
+            $state = $this->session->get('section_state', array());
+            $state[$form['section_class']] = $form['section_state'] == 'block' ? 'none' : 'block';
+            $this->session->set('section_state', $state);
+        }
+        return $data;
+    }
+}
 
 class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
     public function process($data) {
@@ -125,6 +136,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
                 $this->session->set('saved_pages', $pages);
             }
         }
+        $data['section_state'] = $this->session->get('section_state', array());
         return $data;
     }
 }
@@ -479,7 +491,11 @@ class Hm_Output_toolbar_end extends Hm_Output_Module {
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<table class="framework_table"><tr><td class="folder_cell"><div class="folder_list">';
-        $res .= '<div class="src_name">Main</div><ul class="folders">'.
+        $res .= '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><ul ';
+        if (isset($input['section_state']['.main'])) {
+            $res .= 'style="display: '.$this->html_safe($input['section_state']['.main']).'" ';
+        }
+        $res .= 'class="main folders">'.
             '<li><img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=home">'.$this->trans('Home').'</a></li>'.
             '<li><img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.
@@ -489,11 +505,16 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             '<li><img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.
             '<a class="unread_link" href="?page=settings">'.$this->trans('Settings').'</a></li>'.
             '</ul>';
+
         if (isset($input['folder_sources'])) {
             foreach ($input['folder_sources'] as $src) {
                 $name = ucwords(str_replace(array('imap', 'pop3', '_'), array('IMAP', 'POP3', ' '), $src));
-                $res .= '<div class="src_name">'.$this->html_safe($name).'</div>';
-                $res .= '<div class="'.$src.'">';
+                $res .= '<div onclick="return toggle_section(\'.'.$this->html_safe($src).'\');" class="src_name">'.$this->html_safe($name).'</div>';
+                $res .= '<div ';
+                if (isset($input['section_state']['.'.$src])) {
+                    $res .= 'style="display: '.$this->html_safe($input['section_state']['.'.$src]).'" ';
+                }
+                $res .= 'class="'.$this->html_safe($src).'">';
                 $cache = Hm_Page_Cache::get($src);
                 if ($cache) {
                     $res .= $cache;
