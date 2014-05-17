@@ -141,6 +141,42 @@ add_output('message_list', 'imap_server_ids', true);
 add_output('message_list', 'page_js', true);
 add_output('message_list', 'content_end', true);
 
+/* message view page */
+add_handler('message', 'create_user', false);
+add_handler('message', 'login', false);
+add_handler('message', 'load_user_data', true);
+add_handler('message', 'language',  true);
+add_handler('message', 'title', true);
+add_handler('message', 'message_list_type', true);
+add_handler('message', 'message', true);
+add_handler('message', 'date', true);
+add_handler('message', 'save_user_data', true);
+add_handler('message', 'logout', true);
+add_handler('message', 'http_headers', true);
+add_output('message', 'header_start', false);
+add_output('message', 'js_data', true);
+add_output('message', 'header_css', false);
+add_output('message', 'jquery', false);
+add_output('message', 'jquery_table', true);
+add_output('message', 'header_content', false);
+add_output('message', 'header_end', false);
+add_output('message', 'content_start', false);
+add_output('message', 'toolbar_start', true);
+add_output('message', 'logout', true);
+add_output('message', 'date', true);
+add_output('message', 'login', false);
+add_output('message', 'msgs', false);
+add_output('message', 'title', true);
+add_output('message', 'loading_icon', true);
+add_output('message', 'toolbar_end', true);
+add_output('message', 'folder_list_start', true);
+add_output('message', 'imap_server_ids', true);
+add_output('message', 'message_start', true);
+add_output('message', 'folder_list_end', true);
+add_output('message', 'message_end', true);
+add_output('message', 'page_js', true);
+add_output('message', 'content_end', true);
+
 /* save folder tree collapsed state */
 add_handler('ajax_save_section_state', 'login', false);
 add_handler('ajax_save_section_state', 'load_user_data', true);
@@ -188,11 +224,12 @@ return array(
     'allowed_pages' => array(
         'home',
         'message_list',
-        'notfound',
+        'message',
         'settings',
         'servers',
         'ajax_hm_folders',
         'ajax_save_section_state',
+        'notfound',
     ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
@@ -216,6 +253,7 @@ return array(
         'msgs' => FILTER_SANITIZE_STRING,
         'list_path' => FILTER_SANITIZE_STRING,
         'list_page' => FILTER_VALIDATE_INT,
+        'uid' => FILTER_VALIDATE_INT,
     ),
 
     'allowed_post' => array(

@@ -100,7 +100,7 @@ var select_pop3_folder = function(path, force) {
     var detail = parse_folder_path(path, 'pop3');
     if (detail) {
         if (force) {
-            Hm_Notices.show({0: 'Updating folder...'});
+            Hm_Notices.show({0: 'Loading messages ...'});
         }
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},

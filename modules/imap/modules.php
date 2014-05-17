@@ -48,8 +48,7 @@ class Hm_Handler_save_unread_state extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('formatted_unread_data'));
         if ($success) {
-            Hm_Page_Cache::add('formatted_unread_data',
-                preg_replace("/<tr style=\"opacity: \d(\.\d+|);\"/", "<tr ", $form['formatted_unread_data']));
+            Hm_Page_Cache::add('formatted_unread_data', $form['formatted_unread_data']);
         }
     }
 }
@@ -353,7 +352,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_imap_message_text extends Hm_Handler_Module {
+class Hm_Handler_imap_message_content extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
         if ($success) {
@@ -368,7 +367,8 @@ class Hm_Handler_imap_message_text extends Hm_Handler_Module {
                 if ($imap) {
                     $imap->read_only = true;
                     if ($imap->select_mailbox($form['folder'])) {
-                        $data['msg_text'] = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'plain');
+                        $data['msg_struct'] = $imap->get_message_structure($form['imap_msg_uid']);
+                        $data['msg_text'] = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'plain', $data['msg_struct']);
                         $data['msg_headers'] = $imap->get_message_headers($form['imap_msg_uid']);
                         $data['msg_cache_path'] = 'imap_msg_text_'.$form['imap_server_id'].'_'.$form['imap_msg_uid'];
                     }
@@ -398,9 +398,21 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
     }
 }
 
-class Hm_Output_filter_message_text extends Hm_Output_Module {
+class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['msg_text']) && isset($input['msg_headers'])) {
+        $txt = '<div class="msg_text_inner">';
+        if (isset($input['msg_text'])) {
+            $txt .= nl2br($this->html_safe($input['msg_text']));
+        }
+        $txt .= '</div>';
+        $input['msg_text'] = $txt;
+        return $input;
+    }
+}
+
+class Hm_Output_filter_message_headers extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['msg_headers'])) {
             $txt = '';
             $small_headers = array('subject', 'date', 'from');
             $headers = $input['msg_headers'];
@@ -408,7 +420,12 @@ class Hm_Output_filter_message_text extends Hm_Output_Module {
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
                     if ($fld == strtolower($name)) {
-                        $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                        if ($fld == 'subject') {
+                            $txt .= '<tr class="header_'.$fld.'"><td colspan="2"><div class="content_title">'.$this->html_safe($value).'</div></td></tr>';
+                        }
+                        else {
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                        }
                         break;
                     }
                 }
@@ -421,13 +438,10 @@ class Hm_Output_filter_message_text extends Hm_Output_Module {
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="header_toggle" onclick="return toggle_long_headers();">All</a>'.
                 '<a class="header_toggle" style="display: none;" href="#" onclick="return toggle_long_headers();">Small</a>'.
-                '<a class="close_link" href="#" onclick="return close_msg_preview();">Close</a>'.
-                '</th></tr></table>'.
-                '<div class="msg_text_inner">'.$this->html_safe($input['msg_text']).'</div>'.
-                '<a href="#" class="close_link" onclick="return close_msg_preview();">Close</a>';
+                '</th></tr></table>';
 
-            $input['msg_text'] = $txt;
-            Hm_Page_Cache::add($input['msg_cache_path'], $txt);
+            $input['msg_headers'] = $txt;
+            //Hm_Page_Cache::add($input['msg_cache_path'], $txt);
         }
         return $input;
     }
@@ -525,207 +539,207 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_servers'])) {
-            return '<input type="hidden" id="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+                return '<input type="hidden" id="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+            }
         }
     }
-}
 
-class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '';
-        if (isset($input['imap_expanded_folder_data']) && !empty($input['imap_expanded_folder_data'])) {
-            ksort($input['imap_expanded_folder_data']);
-            $res .= format_imap_folder_section($input['imap_expanded_folder_data'], $input['imap_expanded_folder_id'], $this);
-            $input['imap_expanded_folder_formatted'] = $res;
-            unset($input['imap_expanded_folder_data']);
-            Hm_Page_Cache::add('imap_folders_'.$input['imap_expanded_folder_path'], $res);
+    class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
+        protected function output($input, $format) {
+            $res = '';
+            if (isset($input['imap_expanded_folder_data']) && !empty($input['imap_expanded_folder_data'])) {
+                ksort($input['imap_expanded_folder_data']);
+                $res .= format_imap_folder_section($input['imap_expanded_folder_data'], $input['imap_expanded_folder_id'], $this);
+                $input['imap_expanded_folder_formatted'] = $res;
+                unset($input['imap_expanded_folder_data']);
+                Hm_Page_Cache::add('imap_folders_'.$input['imap_expanded_folder_path'], $res);
+            }
+            return $input;
         }
-        return $input;
     }
-}
 
-class Hm_Output_filter_imap_folders extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $cache = Hm_Page_Cache::get('imap_folders');
-        if (!$cache) {
-            $res = '<ul class="folders">';
-            if (isset($input['imap_folders'])) {
-                foreach ($input['imap_folders'] as $id => $folder) {
-                    $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" src="images/open_iconic/folder-2x.png" /> '.
-                        $this->html_safe($folder).'</a></li>';
+    class Hm_Output_filter_imap_folders extends Hm_Output_Module {
+        protected function output($input, $format) {
+            $cache = Hm_Page_Cache::get('imap_folders');
+            if (!$cache) {
+                $res = '<ul class="folders">';
+                if (isset($input['imap_folders'])) {
+                    foreach ($input['imap_folders'] as $id => $folder) {
+                        $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" src="images/open_iconic/folder-2x.png" /> '.
+                            $this->html_safe($folder).'</a></li>';
+                    }
+                }
+                $res .= '</ul>';
+                Hm_Page_Cache::add('imap_folders', $res, true);
+            }
+            return '';
+        }
+    }
+
+    class Hm_Output_filter_unread_data extends Hm_Output_Module {
+        protected function output($input, $format) {
+            if (isset($input['imap_unread_data'])) {
+                $res = format_imap_message_list($input['imap_unread_data'], $this);
+                $input['formatted_unread_data'] = $res;
+                unset($input['imap_unread_data']);
+            }
+            elseif (!isset($input['formatted_unread_data'])) {
+                $input['formatted_unread_data'] = array();
+            }
+            return $input;
+        }
+    }
+
+    class Hm_Output_imap_message_list extends Hm_Output_Module {
+        protected function output($input, $format) {
+            if (isset($input['list_path'])) {
+                if ($input['list_path'] == 'unread') {
+                    return imap_message_list_unread();     
+                }
+                elseif (preg_match("/^imap_/", $input['list_path'])) {
+                    return imap_message_list_folder($input, $this);
                 }
             }
-            $res .= '</ul>';
-            Hm_Page_Cache::add('imap_folders', $res, true);
-        }
-        return '';
-    }
-}
-
-class Hm_Output_filter_unread_data extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if (isset($input['imap_unread_data'])) {
-            $res = format_imap_message_list($input['imap_unread_data'], $this);
-            $input['formatted_unread_data'] = $res;
-            unset($input['imap_unread_data']);
-        }
-        elseif (!isset($input['formatted_unread_data'])) {
-            $input['formatted_unread_data'] = array();
-        }
-        return $input;
-    }
-}
-
-class Hm_Output_imap_message_list extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if (isset($input['list_path'])) {
-            if ($input['list_path'] == 'unread') {
-                return imap_message_list_unread();     
-            }
-            elseif (preg_match("/^imap_/", $input['list_path'])) {
-                return imap_message_list_folder($input, $this);
+            else {
+                // TODO: default/not found message list type
             }
         }
-        else {
-            // TODO: default
+    }
+
+    class Hm_Output_filter_folder_page extends Hm_Output_Module {
+        protected function output($input, $format) {
+            $res = array();
+            if (isset($input['imap_mailbox_page']) && !empty($input['imap_mailbox_page'])) {
+                $res = format_imap_message_list($input['imap_mailbox_page'], $this);
+                $input['formatted_mailbox_page'] = $res;
+                Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $res);
+                $input['imap_page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
+                Hm_Page_Cache::add('imap_page_links_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $input['imap_page_links']);
+                unset($input['imap_mailbox_page']);
+                unset($input['imap_folder_detail']);
+            }
+            elseif (!isset($input['formatted_mailbox_page'])) {
+                $input['formatted_mailbox_page'] = array();
+            }
+            return $input;
         }
     }
-}
 
-class Hm_Output_filter_folder_page extends Hm_Output_Module {
-    protected function output($input, $format) {
+    function format_imap_folder_section($folders, $id, $output_mod) {
+        $results = '<ul class="inner_list">';
+        foreach ($folders as $folder_name => $folder) {
+            $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
+            if ($folder['children']) {
+                $results .= '<a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
+            }
+            else {
+                $results .= ' <img class="folder_icon" src="images/open_iconic/folder.png" alt="" />';
+            }
+            if (!$folder['noselect']) {
+                $results .= '<a href="?page=message_list&amp;list_path='.
+                urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
+                '">'.$output_mod->html_safe($folder['basename']).'</a>';
+            }
+            else {
+                $results .= $output_mod->html_safe($folder['basename']);
+            }
+            $results .= '</li>';
+        }
+        $results .= '</ul>';
+        return $results;
+    }
+
+    function format_imap_message_list($msg_list, $output_module) {
         $res = array();
-        if (isset($input['imap_mailbox_page']) && !empty($input['imap_mailbox_page'])) {
-            $res = format_imap_message_list($input['imap_mailbox_page'], $this);
-            $input['formatted_mailbox_page'] = $res;
-            Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $res);
-            $input['imap_page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
-            Hm_Page_Cache::add('imap_page_links_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $input['imap_page_links']);
-            unset($input['imap_mailbox_page']);
-            unset($input['imap_folder_detail']);
+        foreach($msg_list as $msg) {
+            if ($msg['server_name'] == 'Default-Auth-Server') {
+                $msg['server_name'] = 'Default';
+            }
+            $id = sprintf("imap_%s_%s", $output_module->html_safe($msg['server_id']), $output_module->html_safe($msg['uid']));
+            $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
+            $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
+            $from = str_replace("&quot;", '', $from);
+            $date = date('Y-m-d G:i:s', strtotime($output_module->html_safe($msg['internal_date'])));
+            $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
+                '<td class="subject"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
+                '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).'">'.$subject.'</a>'.
+                '</td><td class="from">'.$from.'</div></td>'.
+                '<td class="msg_date">'.$date.'</td></tr>', $id);
         }
-        elseif (!isset($input['formatted_mailbox_page'])) {
-            $input['formatted_mailbox_page'] = array();
-        }
-        return $input;
+        return $res;
     }
-}
 
-function format_imap_folder_section($folders, $id, $output_mod) {
-    $results = '<ul class="inner_list">';
-    foreach ($folders as $folder_name => $folder) {
-        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
-        if ($folder['children']) {
-            $results .= '<a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
+    function imap_message_list_folder($input, $output_module) {
+        $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path'].'_'.$input['list_page']);
+        $rows = '';
+        $links = '';
+        if ($page_cache) {
+            $rows = implode(array_map(function($v) { return $v[0]; }, $page_cache));
         }
-        else {
-            $results .= ' <img class="folder_icon" src="images/open_iconic/folder.png" alt="" />';
+        $links_cache = Hm_Page_Cache::get('imap_page_links_'.$input['list_path'].'_'.$input['list_page']);
+        if ($links_cache) {
+            $links = $links_cache;
         }
-        if (!$folder['noselect']) {
-            $results .= '<a href="?page=message_list&amp;list_path='.
-            urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
-            '">'.$output_mod->html_safe($folder['basename']).'</a>';
-        }
-        else {
-            $results .= $output_mod->html_safe($folder['basename']);
-        }
-        $results .= '</li>';
+        $title = implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']);
+        return '<div class="message_list"><div class="content_title">'.$title.
+            '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a></div>'.
+            '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
+            '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
+            '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
+            '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
     }
-    $results .= '</ul>';
-    return $results;
-}
 
-function format_imap_message_list($msg_list, $output_module) {
-    $res = array();
-    foreach($msg_list as $msg) {
-        if ($msg['server_name'] == 'Default-Auth-Server') {
-            $msg['server_name'] = 'Default';
+    function imap_message_list_unread() {
+        $cache = (string) Hm_Page_Cache::get('formatted_unread_data');
+        return '<div class="message_list"><div class="content_title">Unread'.
+            '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a></div>'.
+            '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
+            '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
+            '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
+            '<tbody>'.$cache.'</tbody></table></div>';
+    }
+
+    function build_page_links($detail, $path) {
+        $links = '';
+        $first = '';
+        $last = '';
+        $display_links = 10;
+        $page_size = $detail['limit'];
+        $max_pages = ceil($detail['detail']['exists']/$page_size);
+        $current_page = $detail['offset']/$page_size + 1;
+        $floor = $current_page - intval($display_links/2);
+        if ($floor < 0) {
+            $floor = 1;
         }
-        $id = sprintf("imap_%s_%s", $output_module->html_safe($msg['server_id']), $output_module->html_safe($msg['uid']));
-        $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
-        $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
-        $from = str_replace("&quot;", '', $from);
-        $date = date('Y-m-d G:i:s', strtotime($output_module->html_safe($msg['internal_date'])));
-        $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
-            '<td onclick="return msg_preview('.$output_module->html_safe($msg['uid']).', '.
-            $output_module->html_safe($msg['server_id']).', \''.$output_module->html_safe($msg['folder']).'\')" class="subject">'.$subject.
-            '</td><td class="from">'.$from.'</div></td>'.
-            '<td class="msg_date">'.$date.'</td></tr>', $id);
-    }
-    return $res;
-}
-
-function imap_message_list_folder($input, $output_module) {
-    $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path'].'_'.$input['list_page']);
-    $rows = '';
-    $links = '';
-    if ($page_cache) {
-        $rows = implode(array_map(function($v) { return $v[0]; }, $page_cache));
-    }
-    $links_cache = Hm_Page_Cache::get('imap_page_links_'.$input['list_path'].'_'.$input['list_page']);
-    if ($links_cache) {
-        $links = $links_cache;
-    }
-    $title = implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']);
-    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">'.$title.
-        '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a></div>'.
-        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
-        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
-        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
-        '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
-}
-
-function imap_message_list_unread() {
-    $cache = (string) Hm_Page_Cache::get('formatted_unread_data');
-    return '<div class="message_list"><div class="msg_text"></div><div class="content_title">Unread'.
-        '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a></div>'.
-        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
-        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
-        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
-        '<tbody>'.$cache.'</tbody></table></div>';
-}
-
-function build_page_links($detail, $path) {
-    $links = '';
-    $first = '';
-    $last = '';
-    $display_links = 10;
-    $page_size = $detail['limit'];
-    $max_pages = ceil($detail['detail']['exists']/$page_size);
-    $current_page = $detail['offset']/$page_size + 1;
-    $floor = $current_page - intval($display_links/2);
-    if ($floor < 0) {
-        $floor = 1;
-    }
-    $ceil = $floor + $display_links;
-    if ($ceil > $max_pages) {
-        $floor -= ($ceil - $max_pages);
-    }
-    $prev = '<a class="disabled_link"><img src="images/open_iconic/caret-left-2x.png" alt="&larr;" /></a>';
-    $next = '<a class="disabled_link"><img src="images/open_iconic/caret-right-2x.png" alt="&rarr;" /></a>';
-
-    if ($floor > 1 ) {
-        $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1">1</a> ... ';
-    }
-    if ($ceil < $max_pages) {
-        $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.'">'.$max_pages.'</a>';
-    }
-    if ($current_page > 1) {
-        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).'"><img src="images/open_iconic/caret-left-2x.png" alt="&larr;" /></a>';
-    }
-    if ($max_pages > 1 && $current_page < $max_pages) {
-        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).'"><img src="images/open_iconic/caret-right-2x.png" alt="&rarr;" /></a>';
-    }
-    for ($i=1;$i<=$max_pages;$i++) {
-        if ($i < $floor || $i > $ceil) {
-            continue;
+        $ceil = $floor + $display_links;
+        if ($ceil > $max_pages) {
+            $floor -= ($ceil - $max_pages);
         }
-        $links .= ' <a ';
-        if ($i == $current_page) {
-            $links .= 'class="current_page" ';
+        $prev = '<a class="disabled_link"><img src="images/open_iconic/caret-left-2x.png" alt="&larr;" /></a>';
+        $next = '<a class="disabled_link"><img src="images/open_iconic/caret-right-2x.png" alt="&rarr;" /></a>';
+
+        if ($floor > 1 ) {
+            $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1">1</a> ... ';
         }
-        $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.'">'.$i.'</a>';
+        if ($ceil < $max_pages) {
+            $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.'">'.$max_pages.'</a>';
+        }
+        if ($current_page > 1) {
+            $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).'"><img src="images/open_iconic/caret-left-2x.png" alt="&larr;" /></a>';
+        }
+        if ($max_pages > 1 && $current_page < $max_pages) {
+            $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).'"><img src="images/open_iconic/caret-right-2x.png" alt="&rarr;" /></a>';
+        }
+        for ($i=1;$i<=$max_pages;$i++) {
+            if ($i < $floor || $i > $ceil) {
+                continue;
+            }
+            $links .= ' <a ';
+            if ($i == $current_page) {
+                $links .= 'class="current_page" ';
+            }
+            $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.'">'.$i.'</a>';
+        }
+        return $prev.' '.$first.$links.$last.' '.$next;
     }
-    return $prev.' '.$first.$links.$last.' '.$next;
-}
 ?>

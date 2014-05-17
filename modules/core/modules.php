@@ -208,6 +208,9 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         else {
             $data['list_page'] = 1;
         }
+        if (isset($this->request->get['uid']) && preg_match("/\d+/", $this->request->get['uid'])) {
+            $data['uid'] = $this->request->get['uid'];
+        }
         return $data;
     }
 }
@@ -519,10 +522,10 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
         $res .= 'class="main"><ul class="folders">'.
             '<li class="menu_home"><a class="unread_link" href="?page=home">'.
             '<img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.$this->trans('Home').'</a></li>'.
-            '<li class="menu_unread"><img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.
-            '<a class="unread_link" href="?page=message_list&amp;list_path=unread">'.$this->trans('Unread').'</a></li>'.
-            '<li class="menu_flagged"><img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.
-            '<a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.$this->trans('Flagged').'</a></li>'.
+            '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
+            '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$this->trans('Unread').'</a></li>'.
+            '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
+            '<img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.$this->trans('Flagged').'</a></li>'.
             '</ul></div>';
         if (isset($input['folder_sources'])) {
             foreach ($input['folder_sources'] as $src) {
@@ -546,12 +549,12 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             $res .= 'style="display: '.$this->html_safe($input['section_state']['.settings']).'" ';
         }
         $res .= 'class="settings folders">'.
-            '<li class="menu_servers"><img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.
-            '<a class="unread_link" href="?page=servers">'.$this->trans('Servers').'</a></li>'.
-            '<li class="menu_settings"><img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.
-            '<a class="unread_link" href="?page=settings">'.$this->trans('Site').'</a></li>'.
-            '<li class="menu_profiles"><img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.
-            '<a class="unread_link" href="?page=profiles">'.$this->trans('Profiles').'</a></li>'.
+            '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
+            '<img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.$this->trans('Servers').'</a></li>'.
+            '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
+            '<img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.$this->trans('Site').'</a></li>'.
+            '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
+            '<img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.$this->trans('Profiles').'</a></li>'.
             '</ul>';
 
         $res .= '</div></td><td class="content_cell">';
@@ -571,6 +574,23 @@ class Hm_Output_server_summary_start extends Hm_Output_Module {
         $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Address</th><th>Port</th>'.
                 '<th>TLS</th></tr></thead><tbody>';
         return $res;
+    }
+}
+
+class Hm_Output_message_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if (isset($input['uid'])) {
+            $res .= '<input type="hidden" class="msg_uid" value="'.$this->html_safe($input['uid']).'" />';
+        }
+        $res .= '<div class="msg_text">';
+        return $res;
+    }
+}
+
+class Hm_Output_message_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</div>';
     }
 }
 
