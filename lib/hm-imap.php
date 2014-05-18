@@ -1974,14 +1974,16 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      *
      * @return string formatted message content, bool false if no matching part is found
      */
-    public function get_first_message_part($uid, $type, $subtype=false) {
+    public function get_first_message_part($uid, $type, $subtype=false, $struct=false) {
         if (!$subtype) {
             $flds = array('type' => $type);
         }
         else {
             $flds = array('type' => $type, 'subtype' => $subtype);
         }
-        $struct = $this->get_message_structure($uid);
+        if (!$struct) {
+            $struct = $this->get_message_structure($uid);
+        }
         $matches = $this->search_bodystructure($struct, $flds, false);
         if (!empty($matches)) {
 
