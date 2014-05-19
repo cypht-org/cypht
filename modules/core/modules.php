@@ -179,6 +179,9 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             if ($path == 'unread') {
                 $data['list_path'] = 'unread';
             }
+            elseif ($path == 'flagged') {
+                $data['list_path'] = 'flagged';
+            }
             elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 3);
@@ -598,6 +601,12 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<div class="not_found">Page Not Found!</div>';
         return $res;
+    }
+}
+
+class Hm_Output_profile_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<div class="profile_content"><div class="content_title">Profiles</div></div>';
     }
 }
 

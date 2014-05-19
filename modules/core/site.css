@@ -17,7 +17,7 @@ td { vertical-align: top; }
 .empty_table { text-align: center; color: #666 !important; padding-top: 50px !important; padding-bottom: 50px !important; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .logout { cursor: pointer; background: #fff url('/hm3/images/open_iconic/power-standby-2x.png') no-repeat 6px 4px; padding-left: 25px; color: #000; opacity: .6; }
-.user_settings { background: #fff; height: 100%; margin-left: margin-right: 20px; padding-bottom: 40px; }
+.profile_content, .user_settings { background: #fff; height: 100%; margin-left: margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { width: 50%; white-space: nowrap; margin-left: 10px; }
 .user_settings table td { padding: 5px; }
 .save_settings { float: none !important; }

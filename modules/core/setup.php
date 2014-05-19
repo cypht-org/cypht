@@ -108,6 +108,38 @@ add_output('settings', 'folder_list_end', true);
 add_output('settings', 'page_js', true);
 add_output('settings', 'content_end', true);
 
+/* profile page */
+add_handler('profiles', 'create_user', false);
+add_handler('profiles', 'login', false);
+add_handler('profiles', 'load_user_data', true);
+add_handler('profiles', 'language',  true);
+add_handler('profiles', 'title', true);
+add_handler('profiles', 'date', true);
+add_handler('profiles', 'save_user_settings', true);
+add_handler('profiles', 'save_user_data', true);
+add_handler('profiles', 'logout', true);
+add_handler('profiles', 'http_headers', true);
+add_output('profiles', 'header_start', false);
+add_output('profiles', 'js_data', true);
+add_output('profiles', 'header_css', false);
+add_output('profiles', 'jquery', false);
+add_output('profiles', 'header_content', false);
+add_output('profiles', 'header_end', false);
+add_output('profiles', 'content_start', false);
+add_output('profiles', 'toolbar_start', true);
+add_output('profiles', 'logout', true);
+add_output('profiles', 'date', true);
+add_output('profiles', 'login', false);
+add_output('profiles', 'msgs', false);
+add_output('profiles', 'title', true);
+add_output('profiles', 'loading_icon', true);
+add_output('profiles', 'toolbar_end', true);
+add_output('profiles', 'folder_list_start', true);
+add_output('profiles', 'profile_content', true);
+add_output('profiles', 'folder_list_end', true);
+add_output('profiles', 'page_js', true);
+add_output('profiles', 'content_end', true);
+
 /* message list page */
 add_handler('message_list', 'create_user', false);
 add_handler('message_list', 'login', false);
@@ -148,7 +180,6 @@ add_handler('message', 'load_user_data', true);
 add_handler('message', 'language',  true);
 add_handler('message', 'title', true);
 add_handler('message', 'message_list_type', true);
-add_handler('message', 'message', true);
 add_handler('message', 'date', true);
 add_handler('message', 'save_user_data', true);
 add_handler('message', 'logout', true);
@@ -230,6 +261,7 @@ return array(
         'ajax_hm_folders',
         'ajax_save_section_state',
         'notfound',
+        'profiles',
     ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
