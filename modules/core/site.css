@@ -8,11 +8,11 @@ table { width: 100%; }
 td { vertical-align: top; }
 .subtitle { color: green; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
 .date { float: right; clear: none; color: #888; padding-right: 30px; padding-top: 6px;}
-.sys_messages { color: green; position: absolute; left: 250px; top: 13px; }
+.sys_messages { color: green; position: absolute; left: 17%; top: 13px; }
 .logout_form { float: right; clear: none; padding-right: 20px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .title { font-weight: normal; padding: 0px; font-size: 2em; color: #000; opacity: .4; margin: 0px; margin-left: 15px; letter-spacing: -3px; font-family: monospace; width: 50px; }
-.loading_icon { position: absolute; top: 15px; left: 215px; visibility: hidden; width: 32px; height: 32px; }
+.loading_icon { position: absolute; top: 15px; left: 15%; visibility: hidden; width: 32px; height: 32px; }
 .loading_icon img { visibility: inherit; }
 .empty_table { text-align: center; color: #666 !important; padding-top: 50px !important; padding-bottom: 50px !important; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }

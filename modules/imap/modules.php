@@ -467,6 +467,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 ' | <a href="#">reply</a>'.
                 ' | <a href="#">forward</a>'.
                 ' | <a href="#">attach</a>'.
+                ' | <a href="#">raw</a>'.
                 '</th></tr></table>';
 
             $input['msg_headers'] = $txt;
