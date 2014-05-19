@@ -2000,7 +2000,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             /*error_log(sprintf("uid %s part %s matches %s struct %s",
                 $uid, $msg_part_num, print_r($matches, true), print_r($struct, true)));*/
 
-            return ($this->get_message_content($uid, $msg_part_num, false, $struct));
+            return array($msg_part_num, $this->get_message_content($uid, $msg_part_num, false, $struct));
         } 
         return false;
     }
