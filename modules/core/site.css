@@ -11,7 +11,7 @@ td { vertical-align: top; }
 .sys_messages { float: left; color: green; margin-left: 20px; margin-top: 5px; }
 .logout_form { float: right; clear: none; padding-right: 20px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
-.title { float: left; font-weight: normal; padding: 0px; font-size: 2em; color: #000; opacity: .4; margin: 0px; margin-left: 15px; letter-spacing: -3px; font-family: monospace; width: 50px; }
+.title { float: left; font-weight: normal; padding: 0px; font-size: 2em; color: #000; opacity: .4; margin: 0px; margin-left: 15px; letter-spacing: -1px; font-family: monospace; width: 50px; }
 .loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 6px; margin-left: 10px; vertical-align: -5px; }
 .loading_icon img { visibility: inherit; }
 .empty_table { text-align: center; color: #666 !important; padding-top: 50px !important; padding-bottom: 50px !important; }
