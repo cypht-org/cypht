@@ -372,7 +372,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 if ($imap->select_mailbox($form['folder'])) {
                     $data['msg_struct'] = $imap->get_message_structure($form['imap_msg_uid']);
                     if ($part) {
-                        $data['msg_text'] = $imap->get_message_content($form['imap_msg_uid'], $part);
+                        $data['msg_text'] = $imap->get_message_content($form['imap_msg_uid'], $part, false, $data['msg_struct']);
                     }
                     else {
                         list($part, $data['msg_text']) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'plain', $data['msg_struct']);
@@ -625,6 +625,9 @@ class Hm_Output_imap_message_list extends Hm_Output_Module {
             if ($input['list_path'] == 'unread') {
                 return imap_message_list_unread();     
             }
+            elseif ($input['list_path'] == 'flagged') {
+                return imap_flagged_list();
+            }
             elseif (preg_match("/^imap_/", $input['list_path'])) {
                 return imap_message_list_folder($input, $this);
             }
@@ -730,6 +733,15 @@ function imap_message_list_folder($input, $output_module) {
         '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
         '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
         '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
+}
+
+function imap_flagged_list() {
+    return '<div class="message_list"><div class="content_title">Flagged'.
+        '<a class="update_unread" href="#"">[update]</a></div>'.
+        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
+        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
+        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
+        '<tbody></tbody></table></div>';
 }
 
 function imap_message_list_unread() {

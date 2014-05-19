@@ -255,6 +255,9 @@ if (hm_page_name == 'message_list') {
         Hm_Timer.add_job(imap_unread_update, 60);
         $('.message_table tr').fadeIn(100);
     }
+    else if (hm_list_path == 'flagged') {
+        $('.menu_flagged').addClass('selected_menu');
+    }
     else if (hm_list_path.substring(0, 4) == 'imap') {
         $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
         $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');

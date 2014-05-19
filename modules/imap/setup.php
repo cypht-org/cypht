@@ -29,6 +29,13 @@ add_handler('settings', 'add_imap_servers_to_page_data', true, 'imap', 'load_ima
 add_output('settings', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
+/* profile page date */
+add_handler('profiles', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('profiles', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('profiles', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('profiles', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
+add_output('profiles', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+
 /* message list pages */
 add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('message_list', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
