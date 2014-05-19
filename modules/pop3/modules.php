@@ -296,7 +296,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                     }
                     $res .= '</form></div>';
                 }
-                $res .= '</div>';
+                $res .= '<br class="clear_float" /></div>';
             }
         return $res;
         }
