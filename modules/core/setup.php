@@ -30,10 +30,14 @@ add_output('home', 'msgs', false);
 add_output('home', 'title', true);
 add_output('home', 'loading_icon', true);
 add_output('home', 'toolbar_end', true);
+add_output('home', 'two_col_layout_start', true);
 add_output('home', 'folder_list_start', true);
+add_output('home', 'folder_list_end', true);
+add_output('home', 'content_section_start', true);
 add_output('home', 'server_summary_start', true);
 add_output('home', 'server_summary_end', true);
-add_output('home', 'folder_list_end', true);
+add_output('home', 'content_section_end', true);
+add_output('home', 'two_col_layout_end', true);
 add_output('home', 'page_js', true);
 add_output('home', 'content_end', true);
 
@@ -63,8 +67,12 @@ add_output('servers', 'title', true);
 add_output('servers', 'msgs', false);
 add_output('servers', 'loading_icon', false);
 add_output('servers', 'toolbar_end', true);
+add_output('servers', 'two_col_layout_start', true);
 add_output('servers', 'folder_list_start', true);
 add_output('servers', 'folder_list_end', true);
+add_output('servers', 'content_section_start', true);
+add_output('servers', 'content_section_end', true);
+add_output('servers', 'two_col_layout_end', true);
 add_output('servers', 'page_js', true);
 add_output('servers', 'content_end', true);
 
@@ -99,14 +107,55 @@ add_output('settings', 'msgs', false);
 add_output('settings', 'title', true);
 add_output('settings', 'loading_icon', true);
 add_output('settings', 'toolbar_end', true);
+add_output('settings', 'two_col_layout_start', true);
 add_output('settings', 'folder_list_start', true);
+add_output('settings', 'folder_list_end', true);
+add_output('settings', 'content_section_start', true);
 add_output('settings', 'start_settings_form', true);
 add_output('settings', 'language_setting', true);
 add_output('settings', 'timezone_setting', true);
 add_output('settings', 'end_settings_form', true);
-add_output('settings', 'folder_list_end', true);
+add_output('settings', 'content_section_end', true);
+add_output('settings', 'two_col_layout_end', true);
 add_output('settings', 'page_js', true);
 add_output('settings', 'content_end', true);
+
+/* search page */
+add_handler('search', 'create_user', false);
+add_handler('search', 'login', false);
+add_handler('search', 'load_user_data', true);
+add_handler('search', 'language',  true);
+add_handler('search', 'title', true);
+add_handler('search', 'date', true);
+add_handler('search', 'save_user_settings', true);
+add_handler('search', 'save_user_data', true);
+add_handler('search', 'logout', true);
+add_handler('search', 'http_headers', true);
+add_output('search', 'header_start', false);
+add_output('search', 'js_data', true);
+add_output('search', 'header_css', false);
+add_output('search', 'jquery', false);
+add_output('search', 'header_content', false);
+add_output('search', 'header_end', false);
+add_output('search', 'content_start', false);
+add_output('search', 'toolbar_start', true);
+add_output('search', 'logout', true);
+add_output('search', 'date', true);
+add_output('search', 'login', false);
+add_output('search', 'msgs', false);
+add_output('search', 'title', true);
+add_output('search', 'loading_icon', true);
+add_output('search', 'toolbar_end', true);
+add_output('search', 'two_col_layout_start', true);
+add_output('search', 'folder_list_start', true);
+add_output('search', 'folder_list_end', true);
+add_output('search', 'content_section_start', true);
+add_output('search', 'search_content', true);
+add_output('search', 'content_section_end', true);
+add_output('search', 'two_col_layout_end', true);
+add_output('search', 'page_js', true);
+add_output('search', 'content_end', true);
+
 
 /* profile page */
 add_handler('profiles', 'create_user', false);
@@ -134,9 +183,13 @@ add_output('profiles', 'msgs', false);
 add_output('profiles', 'title', true);
 add_output('profiles', 'loading_icon', true);
 add_output('profiles', 'toolbar_end', true);
+add_output('profiles', 'two_col_layout_start', true);
 add_output('profiles', 'folder_list_start', true);
-add_output('profiles', 'profile_content', true);
 add_output('profiles', 'folder_list_end', true);
+add_output('profiles', 'content_section_start', true);
+add_output('profiles', 'profile_content', true);
+add_output('profiles', 'content_section_end', true);
+add_output('profiles', 'two_col_layout_end', true);
 add_output('profiles', 'page_js', true);
 add_output('profiles', 'content_end', true);
 
@@ -167,9 +220,13 @@ add_output('message_list', 'msgs', false);
 add_output('message_list', 'title', true);
 add_output('message_list', 'loading_icon', true);
 add_output('message_list', 'toolbar_end', true);
+add_output('message_list', 'two_col_layout_start', true);
 add_output('message_list', 'folder_list_start', true);
 add_output('message_list', 'folder_list_end', true);
+add_output('message_list', 'content_section_start', true);
 add_output('message_list', 'imap_server_ids', true);
+add_output('message_list', 'content_section_end', true);
+add_output('message_list', 'two_col_layout_end', true);
 add_output('message_list', 'page_js', true);
 add_output('message_list', 'content_end', true);
 
@@ -200,11 +257,15 @@ add_output('message', 'msgs', false);
 add_output('message', 'title', true);
 add_output('message', 'loading_icon', true);
 add_output('message', 'toolbar_end', true);
+add_output('message', 'two_col_layout_start', true);
 add_output('message', 'folder_list_start', true);
+add_output('message', 'folder_list_end', true);
+add_output('message', 'content_section_start', true);
 add_output('message', 'imap_server_ids', true);
 add_output('message', 'message_start', true);
-add_output('message', 'folder_list_end', true);
 add_output('message', 'message_end', true);
+add_output('message', 'content_section_end', true);
+add_output('message', 'two_col_layout_end', true);
 add_output('message', 'page_js', true);
 add_output('message', 'content_end', true);
 
@@ -239,9 +300,13 @@ add_output('notfound', 'msgs', false);
 add_output('notfound', 'title', true);
 add_output('notfound', 'loading_icon', true);
 add_output('notfound', 'toolbar_end', true);
+add_output('notfound', 'two_col_layout_start', true);
 add_output('notfound', 'folder_list_start', true);
-add_output('notfound', 'notfound_content', true);
 add_output('notfound', 'folder_list_end', true);
+add_output('notfound', 'content_section_start', true);
+add_output('notfound', 'notfound_content', true);
+add_output('notfound', 'content_section_end', true);
+add_output('notfound', 'two_col_layout_end', true);
 add_output('notfound', 'page_js', true);
 add_output('notfound', 'content_end', true);
 
@@ -262,6 +327,7 @@ return array(
         'ajax_save_section_state',
         'notfound',
         'profiles',
+        'search',
     ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,

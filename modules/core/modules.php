@@ -515,9 +515,20 @@ class Hm_Output_toolbar_end extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_two_col_layout_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<div class="framework">';
+    }
+}
+class Hm_Output_two_col_layout_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</div><br class="end_float" />';
+    }
+}
+
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<table class="framework_table"><tr><td class="folder_cell"><div class="folder_list">';
+        $res = '<div class="folder_cell"><div class="folder_list">';
         $res .= '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
         if (isset($input['section_state']['.main'])) {
             $res .= 'style="display: '.$this->html_safe($input['section_state']['.main']).'" ';
@@ -529,6 +540,8 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$this->trans('Unread').'</a></li>'.
             '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
             '<img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.$this->trans('Flagged').'</a></li>'.
+            '<li class="menu_search"><a class="unread_link" href="?page=search">'.
+            '<img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.$this->trans('Search').'</a></li>'.
             '</ul></div>';
         if (isset($input['folder_sources'])) {
             foreach ($input['folder_sources'] as $src) {
@@ -558,16 +571,26 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             '<img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.$this->trans('Site').'</a></li>'.
             '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
             '<img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.$this->trans('Profiles').'</a></li>'.
-            '</ul>';
+            '</ul></div></div>';
 
-        $res .= '</div></td><td class="content_cell">';
         return $res;
     }
 }
 
 class Hm_Output_folder_list_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '</td></tr></table>';
+        return '</div>';
+    }
+}
+class Hm_Output_content_section_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<div class="content_cell">';
+    }
+}
+
+class Hm_Output_content_section_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</div>';
     }
 }
 
@@ -607,6 +630,12 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
 class Hm_Output_profile_content extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="profile_content"><div class="content_title">Profiles</div></div>';
+    }
+}
+
+class Hm_Output_search_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<div class="search_content"><div class="content_title">Search</div></div>';
     }
 }
 

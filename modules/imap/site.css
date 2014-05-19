@@ -51,7 +51,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .expand_link { display: block; width: 16px; height: 16px; float: left; margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
 .header_subject td { padding: 0px; }
 .header_date th, .header_date td { padding-top: 16px; }
-.msg_parts { border-top: solid 1px #ddd; padding-top: 20px; padding-left: 40px; width: 100%; padding-bottom: 20px; }
+.msg_parts { border-top: solid 1px #ddd; padding-top: 20px; padding-left: 40px; width: 100%; padding-bottom: 40px; }
 .msg_parts td { padding: 3px; }
 .row_indent_0 { display: inline; padding: 0px; }
 .row_indent_1 { display: inline; padding-left: 20px; }

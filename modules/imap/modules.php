@@ -825,8 +825,8 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
         $res .= ' class="selected_part"';
     }
     $res .= '><td><div class="'.$class.'"><a href="#" onclick="return get_message_content(\''.$output_mod->html_safe($id).'\');">'.$output_mod->html_safe($vals['type']).
-        '</a></td><td>'.$output_mod->html_safe($vals['subtype']).
-        '</td><td>'.$output_mod->html_safe($vals['encoding']).
+        ' / '.$output_mod->html_safe($vals['subtype']).
+        '</a></td><td>'.$output_mod->html_safe($vals['encoding']).
         '</td><td>'.(isset($vals['charset']) && trim($vals['charset']) ? $output_mod->html_safe($vals['charset']) : '-').
         '</td><td>'.$output_mod->html_safe($desc).'</td></tr>';
     return $res;
