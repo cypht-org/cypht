@@ -33,8 +33,8 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .server_title { font-size: 100%; margin-bottom: 0px; color: #666; }
 .server_subtitle { margin-bottom: 20px; color: #666; }
 .msg_text { background-color: #fff; height: 100%; }
-.msg_text_inner { width: 80%; padding: 20px; padding-left: 40px; font-size: 95%; }
-.msg_headers { color: #777; padding: 0px; padding-bottom: 10px; border-bottom: solid 1px #ddd; }
+.msg_text_inner { font-family: monospace; width: 90%; padding: 30px; padding-left: 40px; font-size: 95%; }
+.msg_headers { border-bottom: solid 1px #ddd; color: #777; padding: 0px; padding-bottom: 10px; }
 .msg_headers th { padding: 3px; padding-top: 5px; padding-left: 30px; font-weight: normal; text-align: left; white-space: nowrap; width: 1%; padding-right: 13px; }
 .msg_headers td { padding: 3px; padding-top: 5px; }
 .imap_update a, .update_unread { color: green; font-size: 75%; vertical-align: 1px; text-decoration: none; padding-left: 20px; letter-spacing: 0px; }
@@ -50,7 +50,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .account_row { cursor: pointer; }
 .expand_link { display: block; width: 16px; height: 16px; float: left; margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
 .header_subject td { padding: 0px; }
-.header_date th, .header_date td { padding-top: 20px; }
+.header_date th, .header_date td { padding-top: 16px; }
 .msg_parts { border-top: solid 1px #ddd; padding-top: 20px; padding-left: 40px; width: 100%; padding-bottom: 20px; }
 .msg_parts td { padding: 3px; }
 .row_indent_0 { display: inline; padding: 0px; }

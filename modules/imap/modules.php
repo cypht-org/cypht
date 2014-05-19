@@ -410,7 +410,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output($input, $format) {
         $txt = '<div class="msg_text_inner">';
         if (isset($input['msg_text'])) {
-            $txt .= nl2br($this->html_safe($input['msg_text']));
+            $txt .= format_msg_text($input['msg_text'], $this);
         }
         $txt .= '</div>';
         $input['msg_text'] = $txt;
@@ -838,4 +838,8 @@ function format_msg_part_section($struct, $output_mod, $part, $level=0) {
     return $res;
 }
 
+function format_msg_text($str, $output_mod) {
+    $str = nl2br(str_replace('  ', '&#160;&#32;', ($output_mod->html_safe($str))));
+    return $str;
+}
 ?>
