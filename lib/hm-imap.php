@@ -890,7 +890,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $res = mb_convert_encoding($res, 'UTF-8', $struct['charset']);
             }
         }
-error_log(print_r($res,true));
         if ($status) {
             return $this->cache_return_val($res, $cache_command);
         }
