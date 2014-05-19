@@ -41,6 +41,7 @@ add_handler('message', 'load_imap_servers_from_config', true, 'imap', 'load_user
 add_handler('message', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('message', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('message', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
+add_output('message', 'imap_msg_from_cache', true, 'imap', 'message_start', 'after');
 
 /* page not found */
 add_handler('notfound', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
@@ -72,6 +73,7 @@ add_handler('ajax_imap_message_content', 'save_imap_servers',  true);
 add_handler('ajax_imap_message_content', 'date', true, 'core');
 add_output('ajax_imap_message_content', 'filter_message_headers', true);
 add_output('ajax_imap_message_content', 'filter_message_body', true);
+add_output('ajax_imap_message_content', 'filter_message_struct', true);
 
 /* ajax unread callback data */
 add_handler('ajax_imap_unread', 'login', false, 'core');
@@ -157,7 +159,8 @@ return array(
         'force_update' => FILTER_VALIDATE_BOOLEAN,
         'formatted_unread_data' => FILTER_UNSAFE_RAW,
         'imap_folder_state' => FILTER_UNSAFE_RAW,
-        'imap_msg_uid' => FILTER_VALIDATE_INT
+        'imap_msg_uid' => FILTER_VALIDATE_INT,
+        'imap_msg_part' => FILTER_SANITIZE_STRING
     )
 );
 

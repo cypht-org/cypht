@@ -119,7 +119,7 @@ var imap_unread_update = function(loading) {
 
 var toggle_long_headers = function() {
     $('.long_header').toggle(600);
-    $('.header_toggle').toggle(600);
+    $('.header_toggle').toggle(0);
     return false;
 };
 
@@ -210,10 +210,13 @@ var expand_imap_mailbox = function(res) {
 
 var display_msg_content = function(res) {
     Hm_Notices.hide(true);
+    window.scrollTo(0,0);
+    $('.msg_text').html('');
     $('.msg_text').append(res.msg_headers);
     $('.msg_text').append(res.msg_text);
+    $('.msg_text').append(res.msg_parts);
 };
-var get_message_content = function() {
+var get_message_content = function(msg_part) {
     var uid = $('.msg_uid').val();
     var detail = parse_folder_path(hm_list_path, 'imap');
     if (detail && uid) {
@@ -221,6 +224,7 @@ var get_message_content = function() {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
             {'name': 'imap_msg_uid', 'value': uid},
+            {'name': 'imap_msg_part', 'value': msg_part},
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
             display_msg_content,
@@ -228,6 +232,7 @@ var get_message_content = function() {
             false
         );
     }
+    return false;
 };
 
 var set_unread_state = function() {
@@ -261,7 +266,9 @@ if (hm_page_name == 'message_list') {
 }
 else if (hm_page_name == 'message') {
     if (hm_list_path.substring(0, 4) == 'imap') {
-        get_message_content();
+        if ($('.msg_text').children().length == 0) {
+            get_message_content();
+        }
     }
 }
 else if (hm_page_name == 'servers') {
