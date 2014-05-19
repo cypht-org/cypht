@@ -414,13 +414,11 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output($input, $format) {
         $txt = '<div class="msg_text_inner">';
         if (isset($input['msg_text'])) {
-            if (isset($input['msg_struct_current']) && isset($input['msg_struct_current']['subtype'])) {
-                if ($input['msg_struct_current']['subtype'] == 'html') {
-                    $txt .= format_msg_html($input['msg_text'], $this);
-                }
-                else {
-                    $txt .= format_msg_text($input['msg_text'], $this);
-                }
+            if (isset($input['msg_struct_current']) && isset($input['msg_struct_current']['subtype']) && $input['msg_struct_current']['subtype'] == 'html') {
+                $txt .= format_msg_html($input['msg_text']);
+            }
+            elseif (isset($input['msg_struct_current']['type']) && $input['msg_struct_current']['type'] == 'image') {
+                $txt .= format_msg_image($input['msg_text'], $input['msg_struct_current']['subtype']);
             }
             else {
                 $txt .= format_msg_text($input['msg_text'], $this);
@@ -818,6 +816,31 @@ function build_page_links($detail, $path) {
 }
 
 function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
+    $allowed = array(
+        'textplain',
+        'texthtml',
+        'messagedisposition-notification',
+        'messagedelivery-status',
+        'messagerfc822-headers',
+        'textcsv',
+        'textunknown',
+        'textx-vcard',
+        'textcalendar',
+        'textx-vCalendar',
+        'textx-sql',
+        'textx-comma-separated-values',
+        'textenriched',
+        'textrfc822-headers',
+        'textx-diff',
+        'textx-patch',
+        'applicationpgp-signature',
+        'applicationx-httpd-php',
+        'imagepng',
+        'imagejpg',
+        'imagejpeg',
+        'imagepjpeg',
+        'imagegif',
+    );
     if ($level > 6) {
         $class = 'row_indent_max';
     }
@@ -840,9 +863,15 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     if ($id == $part) {
         $res .= ' class="selected_part"';
     }
-    $res .= '><td><div class="'.$class.'"><a href="#" onclick="return get_message_content(\''.$output_mod->html_safe($id).'\');">'.$output_mod->html_safe($vals['type']).
-        ' / '.$output_mod->html_safe($vals['subtype']).
-        '</a></td><td>'.$output_mod->html_safe($vals['encoding']).
+    $res .= '><td><div class="'.$class.'">';
+    if (in_array($vals['type'].$vals['subtype'], $allowed)) {
+        $res .= '<a href="#" onclick="return get_message_content(\''.$output_mod->html_safe($id).'\');">'.$output_mod->html_safe($vals['type']).
+            ' / '.$output_mod->html_safe($vals['subtype']).'</a>';
+    }
+    else {
+        $res .= $output_mod->html_safe($vals['type']).' / '.$output_mod->html_safe($vals['subtype']);
+    }
+    $res .= '</td><td>'.$output_mod->html_safe($vals['encoding']).
         '</td><td>'.(isset($vals['charset']) && trim($vals['charset']) ? $output_mod->html_safe($vals['charset']) : '-').
         '</td><td>'.$output_mod->html_safe($desc).'</td></tr>';
     return $res;
@@ -866,7 +895,7 @@ function format_msg_part_section($struct, $output_mod, $part, $level=0) {
     return $res;
 }
 
-function format_msg_html($str, $output_mod) {
+function format_msg_html($str) {
     require 'lib/HTMLPurifier.standalone.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
@@ -878,6 +907,11 @@ function format_msg_html($str, $output_mod) {
     $purifier = new HTMLPurifier($config);
     $res = $purifier->purify($str);
     return $res;
+}
+
+function format_msg_image($str, $mime_type) {
+    return '<img src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
+
 }
 function format_msg_text($str, $output_mod) {
     $str = nl2br(str_replace(' ', '&#160;&#8203;', ($output_mod->html_safe($str))));
