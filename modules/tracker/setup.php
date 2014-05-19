@@ -31,10 +31,10 @@ add_handler('ajax_imap_unread', 'imap_tracker', true, 'tracker', 'imap_unread', 
 add_output('ajax_imap_unread', 'tracker', false, 'tracker');
 add_output('ajax_imap_unread', 'show_debug', false, 'tracker');
 
-add_handler('ajax_imap_msg_text', 'tracker', false, 'tracker',  'imap_message_text', 'after');
-add_handler('ajax_imap_msg_text', 'imap_tracker', true, 'tracker', 'imap_message_text', 'after');
-add_output('ajax_imap_msg_text', 'tracker', false, 'tracker');
-add_output('ajax_imap_msg_text', 'show_debug', false, 'tracker');
+add_handler('ajax_imap_message_content', 'tracker', false, 'tracker',  'imap_message_content', 'after');
+add_handler('ajax_imap_message_content', 'imap_tracker', true, 'tracker', 'imap_message_content', 'after');
+add_output('ajax_imap_message_content', 'tracker', false, 'tracker');
+add_output('ajax_imap_message_content', 'show_debug', false, 'tracker');
 
 add_handler('ajax_imap_folder_expand', 'tracker', false, 'tracker',  'imap_folder_expand', 'after');
 add_handler('ajax_imap_folder_expand', 'imap_tracker', true, 'tracker', 'imap_folder_expand', 'after');
@@ -64,5 +64,13 @@ add_output('ajax_imap_save_folder_state', 'show_debug', false, 'tracker');
 add_handler('settings', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('settings', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('settings', 'tracker', false, 'tracker', 'content_end', 'before');
+
+add_handler('profiles', 'tracker', false, 'tracker', 'http_headers', 'after');
+add_output('profiles', 'show_debug', false, 'tracker', 'content_end', 'before');
+add_output('profiles', 'tracker', false, 'tracker', 'content_end', 'before');
+
+add_handler('message', 'tracker', false, 'tracker', 'http_headers', 'after');
+add_output('message', 'show_debug', false, 'tracker', 'content_end', 'before');
+add_output('message', 'tracker', false, 'tracker', 'content_end', 'before');
 
 ?>
