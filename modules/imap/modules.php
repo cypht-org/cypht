@@ -853,7 +853,7 @@ function format_msg_part_section($struct, $output_mod, $part, $level=0) {
 }
 
 function format_msg_text($str, $output_mod) {
-    $str = nl2br(str_replace('  ', '&#160;&#32;', ($output_mod->html_safe($str))));
+    $str = nl2br(str_replace(' ', '&#160;&#8203;', ($output_mod->html_safe($str))));
     return $str;
 }
 ?>
