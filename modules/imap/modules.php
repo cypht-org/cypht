@@ -525,6 +525,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 }
                 $res .= '</form></div>';
             }
+            $res .= '<br class="clear_float" /></div>';
         }
         return $res;
     }
@@ -533,9 +534,9 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<form class="add_server" method="POST"><input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.
-                '<div class="subtitle">Add an IMAP Server</div>'.
-                '<table>'.
+            return '<div class="imap_server_setup"><div class="content_title">IMAP Servers</div><form class="add_server" method="POST">'.
+                '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.
+                '<div class="subtitle">Add an IMAP Server</div><table>'.
                 '<tr><td colspan="2"><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
                 '<tr><td colspan="2"><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
                 '<tr><td colspan="2"><input type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.

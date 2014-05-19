@@ -571,7 +571,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             '<img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.$this->trans('Site').'</a></li>'.
             '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
             '<img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.$this->trans('Profiles').'</a></li>'.
-            '</ul></div></div>';
+            '</ul></div>';
 
         return $res;
     }

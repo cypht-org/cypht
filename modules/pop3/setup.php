@@ -14,7 +14,7 @@ add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'lang
 add_handler('message_list', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('message_list', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('message_list', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
-add_output('message_list', 'pop3_message_list', true, 'pop3', 'folder_list_end', 'before');
+add_output('message_list', 'pop3_message_list', true, 'pop3', 'content_section_start', 'after');
 
 /* message view page */
 add_handler('message', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
