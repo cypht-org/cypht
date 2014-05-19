@@ -33,7 +33,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .server_title { font-size: 100%; margin-bottom: 0px; color: #666; }
 .server_subtitle { margin-bottom: 20px; color: #666; }
 .msg_text { background-color: #fff; height: 100%; }
-.msg_text_inner { font-family: monospace; width: 90%; padding: 30px; padding-left: 40px; font-size: 95%; }
+.msg_text_inner { font-family: monospace; width: 90%; padding: 30px; padding-left: 40px; }
 .msg_headers { border-bottom: solid 1px #ddd; color: #777; padding: 0px; padding-bottom: 10px; }
 .msg_headers th { padding: 3px; padding-top: 5px; padding-left: 30px; font-weight: normal; text-align: left; white-space: nowrap; width: 1%; padding-right: 13px; }
 .msg_headers td { padding: 3px; padding-top: 5px; }
@@ -63,3 +63,5 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .row_indent_max { display: inline; padding-left: 140px; }
 .header_links{ font-variant: small-caps; }
 .selected_part { background-color: #f5f5f5; }
+.imap_server_setup { background-color: #fff; }
+

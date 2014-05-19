@@ -372,10 +372,14 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 if ($imap->select_mailbox($form['folder'])) {
                     $data['msg_struct'] = $imap->get_message_structure($form['imap_msg_uid']);
                     if ($part) {
-                        $data['msg_text'] = $imap->get_message_content($form['imap_msg_uid'], $part, false, $data['msg_struct']);
+                        $struct = $imap->search_bodystructure( $data['msg_struct'], array('imap_part_number' => $part));
+                        $data['msg_struct_current'] = array_shift($struct);
+                        $data['msg_text'] = $imap->get_message_content($form['imap_msg_uid'], $part, false, $data['msg_struct_current']);
                     }
                     else {
-                        list($part, $data['msg_text']) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'plain', $data['msg_struct']);
+                        list($part, $data['msg_text']) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $data['msg_struct']);
+                        $struct = $imap->search_bodystructure( $data['msg_struct'], array('imap_part_number' => $part));
+                        $data['msg_struct_current'] = array_shift($struct);
                     }
                     $data['msg_headers'] = $imap->get_message_headers($form['imap_msg_uid']);
                     $data['imap_msg_part'] = $part;
@@ -410,7 +414,17 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output($input, $format) {
         $txt = '<div class="msg_text_inner">';
         if (isset($input['msg_text'])) {
-            $txt .= format_msg_text($input['msg_text'], $this);
+            if (isset($input['msg_struct_current']) && isset($input['msg_struct_current']['subtype'])) {
+                if ($input['msg_struct_current']['subtype'] == 'html') {
+                    $txt .= format_msg_html($input['msg_text'], $this);
+                }
+                else {
+                    $txt .= format_msg_text($input['msg_text'], $this);
+                }
+            }
+            else {
+                $txt .= format_msg_text($input['msg_text'], $this);
+            }
         }
         $txt .= '</div>';
         $input['msg_text'] = $txt;
@@ -852,6 +866,19 @@ function format_msg_part_section($struct, $output_mod, $part, $level=0) {
     return $res;
 }
 
+function format_msg_html($str, $output_mod) {
+    require 'lib/HTMLPurifier.standalone.php';
+    $config = HTMLPurifier_Config::createDefault();
+    $config->set('Cache.DefinitionImpl', null);
+    $config->set('URI.DisableResources', true);
+    $config->set('URI.DisableExternalResources', true);
+    $config->set('URI.DisableExternal', true);
+    $config->set('HTML.TargetBlank', true);
+    $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
+    $purifier = new HTMLPurifier($config);
+    $res = $purifier->purify($str);
+    return $res;
+}
 function format_msg_text($str, $output_mod) {
     $str = nl2br(str_replace(' ', '&#160;&#8203;', ($output_mod->html_safe($str))));
     return $str;
