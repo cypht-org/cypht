@@ -843,7 +843,7 @@ trait Hm_Modules {
                 self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement);
             }
             else {
-                Hm_Debug::add(sprintf('failed to insert module %s', $module));
+                Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
             }
         }
     }
