@@ -64,4 +64,4 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .header_links{ font-variant: small-caps; }
 .selected_part { background-color: #f5f5f5; }
 .imap_server_setup { background-color: #fff; }
-
+.gravatar { width: 80px; height: 80px; position: absolute; top: 95px; right: 15px; }

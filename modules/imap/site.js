@@ -212,6 +212,7 @@ var display_msg_content = function(res) {
     Hm_Notices.hide(true);
     window.scrollTo(0,0);
     $('.msg_text').html('');
+    $('.msg_text').append(res.msg_gravatar);
     $('.msg_text').append(res.msg_headers);
     $('.msg_text').append(res.msg_text);
     $('.msg_text').append(res.msg_parts);

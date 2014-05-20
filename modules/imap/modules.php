@@ -452,12 +452,16 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['msg_headers'])) {
             $txt = '';
+            $from = '';
             $small_headers = array('subject', 'date', 'from');
             $headers = $input['msg_headers'];
             $txt .= '<table class="msg_headers" cellspacing="0" cellpadding="0">';
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
                     if ($fld == strtolower($name)) {
+                        if ($fld == 'from') {
+                            $from = $value;
+                        }
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><td colspan="2"><div class="content_title">'.$this->html_safe($value).'</div></td></tr>';
                         }
@@ -480,10 +484,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 ' | <a href="#">forward</a>'.
                 ' | <a href="#">attach</a>'.
                 ' | <a href="#">raw</a>'.
+                ' | <a href="#">flag</a>'.
                 '</th></tr></table>';
 
             $input['msg_headers'] = $txt;
+            $input['msg_gravatar'] =  build_msg_gravatar($from);
             Hm_Page_Cache::add($input['msg_cache_suffix'].'_headers', $txt);
+            Hm_Page_Cache::add($input['msg_cache_suffix'].'_gravatar', $input['msg_gravatar']);
         }
         return $input;
     }
@@ -657,10 +664,11 @@ class Hm_Output_imap_msg_from_cache extends Hm_Output_Module {
         $key = $input['list_path'].'_'.$input['uid'];
         $body_cache = Hm_Page_Cache::get($key.'_text');
         $header_cache = Hm_Page_Cache::get($key.'_headers');
+        $grav_cache = Hm_Page_Cache::get($key.'_gravatar');
         $parts_cache = Hm_Page_Cache::get($key.'_parts');
 
-        if ($body_cache && $header_cache && $parts_cache) {
-            return $header_cache.$body_cache.$parts_cache;
+        if ($body_cache && $grav_cache && $header_cache && $parts_cache) {
+            return $header_cache.$grav_cache.$body_cache.$parts_cache;
         }
         return '';
     }
@@ -913,8 +921,17 @@ function format_msg_image($str, $mime_type) {
     return '<img src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
 
 }
+
 function format_msg_text($str, $output_mod) {
     $str = nl2br(str_replace(' ', '&#160;&#8203;', ($output_mod->html_safe($str))));
     return $str;
+}
+
+function build_msg_gravatar( $from ) {
+    error_log($from);
+    if (preg_match("/[\S]+\@[\S]+/", $from, $matches)) {
+        $hash = md5(strtolower(trim($matches[0], " \"><'\t\n\r\0\x0B")));
+        return '<img class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';
+    }
 }
 ?>
