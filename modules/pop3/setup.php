@@ -37,6 +37,18 @@ add_handler('settings', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_fr
 add_handler('settings', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('settings', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 
+/* compose page */
+add_handler('compose', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
+add_handler('compose', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_handler('compose', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_output('compose', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
+
+/* search page */
+add_handler('search', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
+add_handler('search', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_handler('search', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_output('search', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
+
 /* profile page */
 add_handler('profiles', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('profiles', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
