@@ -108,7 +108,6 @@ Hm_Notices = {
             return v;
         });
         $('.sys_messages').html(msg_list.join(', '));
-        Hm_Notices.hide();
     },
 
     hide: function(now) {
@@ -123,11 +122,11 @@ Hm_Notices = {
         }
         else {
             Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').fadeOut(5000, function() {
+                $('.sys_messages').fadeOut(1000, function() {
                     $('.sys_messages').html('');
                     $('.sys_messages').show('');
                 });
-            }, 3000);
+            }, 5000);
         }
     }
 };
@@ -223,6 +222,3 @@ if (hm_page_name == 'home') {
     $('table', $('.server_summary')).tablesorter();
 }
 $('.menu_'+hm_page_name).addClass('selected_menu');
-
-/* setup hiding of any user notifications */
-Hm_Notices.hide();

@@ -328,7 +328,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
                 $title .= ' '.implode('-', array_slice($input['mailbox_list_title'], 1));
             }
             elseif (isset($input['router_page_name'])) {
-                if ($input['router_page_name'] == 'message_list') {
+                if (isset($input['list_path']) && $input['router_page_name'] == 'message_list') {
                     $title .= ' '.ucfirst($input['list_path']);
                 }
                 elseif ($input['router_page_name'] == 'notfound') {

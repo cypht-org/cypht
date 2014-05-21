@@ -50,6 +50,9 @@ class Hm_Handler_save_unread_state extends Hm_Handler_Module {
         if ($success) {
             Hm_Page_Cache::add('formatted_unread_data', $form['formatted_unread_data']);
         }
+        else {
+            Hm_Page_Cache::add('formatted_unread_data', '');
+        }
     }
 }
 
@@ -152,7 +155,6 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                    //$imap->read_only = true;
                     $server_details = Hm_IMAP_List::dump($id);
                     if ($imap->select_mailbox('INBOX')) {
                         $unseen = $imap->search('UNSEEN');
@@ -368,13 +370,18 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if ($imap) {
-                //$imap->read_only = true;
                 if ($imap->select_mailbox($form['folder'])) {
                     $data['msg_struct'] = $imap->get_message_structure($form['imap_msg_uid']);
-                    if ($part) {
+                    if ($part !== false) {
+                        if ($part == 0) {
+                            $max = 50000;
+                        }
+                        else {
+                            $max = false;
+                        }
                         $struct = $imap->search_bodystructure( $data['msg_struct'], array('imap_part_number' => $part));
                         $data['msg_struct_current'] = array_shift($struct);
-                        $data['msg_text'] = $imap->get_message_content($form['imap_msg_uid'], $part, false, $data['msg_struct_current']);
+                        $data['msg_text'] = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $data['msg_struct_current']);
                     }
                     else {
                         list($part, $data['msg_text']) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $data['msg_struct']);
@@ -479,11 +486,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="header_toggle" onclick="return toggle_long_headers();">all</a>'.
-                '<a class="header_toggle" style="display: none;" href="#" onclick="return toggle_long_headers();">Small</a>'.
-                ' | <a href="#">reply</a>'.
-                ' | <a href="#">forward</a>'.
-                ' | <a href="#">attach</a>'.
-                ' | <a href="#">raw</a>'.
+                '<a class="header_toggle" style="display: none;" href="#" onclick="return toggle_long_headers();">small</a>'.
+                ' | <a href="?page=compose">reply</a>'.
+                ' | <a href="?page=compose">forward</a>'.
+                ' | <a href="?page=compose">attach</a>'.
+                ' | <a onclick="return get_message_content(0);" href="#">raw</a>'.
                 ' | <a href="#">flag</a>'.
                 '</th></tr></table>';
 
@@ -767,13 +774,22 @@ function imap_flagged_list() {
 }
 
 function imap_message_list_unread() {
-    $cache = (string) Hm_Page_Cache::get('formatted_unread_data');
+    $cache = Hm_Page_Cache::get('formatted_unread_data');
+    if ($cache === false) {
+        error_log('hmmmm....');
+        $cache = '';
+        $empty_list = '';
+    }
+    elseif (!$cache) {
+        error_log('wtf....');
+        $empty_list = '<div class="empty_list">No unread messages found!</div>';
+    }
     return '<div class="message_list"><div class="content_title">Unread'.
         '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a></div>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
         '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
         '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
-        '<tbody>'.$cache.'</tbody></table></div>';
+        '<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
 
 function build_page_links($detail, $path) {

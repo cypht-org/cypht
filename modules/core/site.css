@@ -14,7 +14,6 @@ td { vertical-align: top; }
 .title { float: left; font-weight: normal; padding: 0px; font-size: 2em; color: #000; opacity: .4; margin: 0px; margin-left: 15px; letter-spacing: -1px; font-family: monospace; width: 50px; }
 .loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 6px; margin-left: 10px; vertical-align: -5px; }
 .loading_icon img { visibility: inherit; }
-.empty_table { text-align: center; color: #666 !important; padding-top: 50px !important; padding-bottom: 50px !important; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .logout { cursor: pointer; background: #fff url('/hm3/images/open_iconic/power-standby-2x.png') no-repeat 6px 4px; padding-left: 25px; color: #000; opacity: .6; }
 .search_content, .profile_content, .user_settings { min-height: 400px; background: #fff; height: 100%; margin-left: margin-right: 20px; padding-bottom: 40px; }

@@ -78,6 +78,9 @@ var imap_test_action = function() {
 var update_unread_message_display = function(res) {
     var ids = res.unread_server_ids.split(',');
     var msg_ids = [];
+    if (res.formatted_unread_data && !jQuery.isEmptyObject(res.formatted_unread_data)) {
+        $('.empty_list').remove();
+    }
     for (index in res.formatted_unread_data) {
         row = res.formatted_unread_data[index][0];
         id = res.formatted_unread_data[index][1];
@@ -87,15 +90,17 @@ var update_unread_message_display = function(res) {
         }
         msg_ids.push(id);
     }
+    var count = $('.message_table tbody tr').length;
     for (i=0;i<ids.length;i++) {
         $('.message_table tbody tr[class^=imap_'+ids[i]+'_]').filter(function() {
             var id = this.className;
             if (jQuery.inArray(id, msg_ids) == -1) {
-                $(this).fadeOut(600, function() { $('.'+id).remove(); });
+                count--;
+                $(this).remove();
             }
         });
     }
-    document.title = 'HM3 '+$('.message_table tbody tr').length+' Unread';
+    document.title = 'HM3 '+count+' Unread';
 };
 
 var imap_unread_update = function(loading) {
@@ -118,7 +123,7 @@ var imap_unread_update = function(loading) {
 };
 
 var toggle_long_headers = function() {
-    $('.long_header').toggle(600);
+    $('.long_header').toggle(300);
     $('.header_toggle').toggle(0);
     return false;
 };
@@ -240,6 +245,11 @@ var set_unread_state = function() {
     Hm_Notices.hide(true);
     if ($('.message_table tr').length > 1) {
         $('.message_table').tablesorter({headers: { 3: { sorter: 'dt' } }, sortList: [[3,1],[2,0]]});
+    }
+    else {
+        if (!$('.empty_list').length) {
+            $('.message_list').append('<div class="empty_list">No unread messages found!</div>');
+        }
     }
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
