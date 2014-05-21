@@ -69,6 +69,10 @@ add_handler('profiles', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('profiles', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('profiles', 'tracker', false, 'tracker', 'content_end', 'before');
 
+add_handler('compose', 'tracker', false, 'tracker', 'http_headers', 'after');
+add_output('compose', 'show_debug', false, 'tracker', 'content_end', 'before');
+add_output('compose', 'tracker', false, 'tracker', 'content_end', 'before');
+
 add_handler('message', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('message', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('message', 'tracker', false, 'tracker', 'content_end', 'before');

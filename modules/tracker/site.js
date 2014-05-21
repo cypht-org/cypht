@@ -6,7 +6,7 @@ $(document).ajaxSuccess(function(event, xhr, settings) {
         return;
     }
     tracker_update_count++;
-    if (tracker_update_count == 10) {
+    if (tracker_update_count == 20) {
         $(".module_list").html('');
         $(".hm3_debug").html('');
         $(".hm3_imap_debug").html('');
