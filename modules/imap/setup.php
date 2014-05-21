@@ -22,19 +22,33 @@ add_output('servers', 'add_imap_server_dialog', true, 'imap', 'content_section_s
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap_server_dialog', 'after');
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
-/* settings page date */
+/* settings page data */
 add_handler('settings', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('settings', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('settings', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('settings', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
-/* profile page date */
+/* profile page data */
 add_handler('profiles', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('profiles', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('profiles', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('profiles', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 add_output('profiles', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+
+/* compose page data */
+add_handler('compose', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('compose', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('compose', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('compose', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
+add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+
+/* search page data */
+add_handler('search', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('search', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('search', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('search', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
+add_output('search', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* message list pages */
 add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');

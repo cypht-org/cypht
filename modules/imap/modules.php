@@ -152,7 +152,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                    $imap->read_only = true;
+                    //$imap->read_only = true;
                     $server_details = Hm_IMAP_List::dump($id);
                     if ($imap->select_mailbox('INBOX')) {
                         $unseen = $imap->search('UNSEEN');
@@ -368,7 +368,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if ($imap) {
-                $imap->read_only = true;
+                //$imap->read_only = true;
                 if ($imap->select_mailbox($form['folder'])) {
                     $data['msg_struct'] = $imap->get_message_structure($form['imap_msg_uid']);
                     if ($part) {
@@ -463,7 +463,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $from = $value;
                         }
                         if ($fld == 'subject') {
-                            $txt .= '<tr class="header_'.$fld.'"><td colspan="2"><div class="content_title">'.$this->html_safe($value).'</div></td></tr>';
+                            $txt .= '<tr class="header_'.$fld.'"><td colspan="2"><div class="content_title"><img class="account_icon" onclick="window.history.back()" src="images/open_iconic/arrow-circle-left-2x.png" />'.$this->html_safe($value).'</div></td></tr>';
                         }
                         else {
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
@@ -928,7 +928,6 @@ function format_msg_text($str, $output_mod) {
 }
 
 function build_msg_gravatar( $from ) {
-    error_log($from);
     if (preg_match("/[\S]+\@[\S]+/", $from, $matches)) {
         $hash = md5(strtolower(trim($matches[0], " \"><'\t\n\r\0\x0B")));
         return '<img class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';

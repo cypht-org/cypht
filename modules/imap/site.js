@@ -238,16 +238,21 @@ var get_message_content = function(msg_part) {
 
 var set_unread_state = function() {
     Hm_Notices.hide(true);
-    $('.message_table').tablesorter({headers: { 3: { sorter: 'dt' } }, sortList: [[3,1],[2,0]]});
+    if ($('.message_table tr').length > 1) {
+        $('.message_table').tablesorter({headers: { 3: { sorter: 'dt' } }, sortList: [[3,1],[2,0]]});
+    }
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_unread_state'},
-        {'name': 'formatted_unread_data', 'value': data.html()}],
-        false,
-        [],
-        true
-    );
+    var request = function() {
+            Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_unread_state'},
+            {'name': 'formatted_unread_data', 'value': data.html()}],
+            false,
+            [],
+            true
+        );
+    };
+    setTimeout(request, 1000);
 };
 
 if (hm_page_name == 'message_list') {
