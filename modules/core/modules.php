@@ -542,6 +542,8 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             '<img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.$this->trans('Flagged').'</a></li>'.
             '<li class="menu_search"><a class="unread_link" href="?page=search">'.
             '<img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.$this->trans('Search').'</a></li>'.
+            '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
+            '<img class="account_icon" src="images/open_iconic/document-2x.png" alt="" /> '.$this->trans('Compose').'</a></li>'.
             '</ul></div>';
         if (isset($input['folder_sources'])) {
             foreach ($input['folder_sources'] as $src) {

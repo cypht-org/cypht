@@ -2,7 +2,7 @@
 handler_source('core');
 output_source('core');
 
-/* homepage data */
+/* homepage */
 add_handler('home', 'create_user', false);
 add_handler('home', 'login', false);
 add_handler('home', 'load_user_data', true);
@@ -12,8 +12,6 @@ add_handler('home', 'date', true);
 add_handler('home', 'save_user_data', true);
 add_handler('home', 'logout', true);
 add_handler('home', 'http_headers', true);
-
-/* homepage output */
 add_output('home', 'header_start', false);
 add_output('home', 'js_data', true);
 add_output('home', 'header_css', false);
@@ -41,7 +39,7 @@ add_output('home', 'two_col_layout_end', true);
 add_output('home', 'page_js', true);
 add_output('home', 'content_end', true);
 
-/* servers page data */
+/* servers page */
 add_handler('servers', 'login', false);
 add_handler('servers', 'load_user_data', true);
 add_handler('servers', 'language',  true);
@@ -50,8 +48,6 @@ add_handler('servers', 'date', true);
 add_handler('servers', 'save_user_data', true);
 add_handler('servers', 'logout', true);
 add_handler('servers', 'http_headers', true);
-
-/* servers page output */
 add_output('servers', 'header_start', false);
 add_output('servers', 'js_data', true);
 add_output('servers', 'header_css', false);
@@ -77,7 +73,41 @@ add_output('servers', 'page_js', true);
 add_output('servers', 'content_end', true);
 
 
-/* settings data */
+/* compose */
+add_handler('compose', 'create_user', false);
+add_handler('compose', 'login', false);
+add_handler('compose', 'load_user_data', true);
+add_handler('compose', 'language',  true);
+add_handler('compose', 'title', true);
+add_handler('compose', 'date', true);
+add_handler('compose', 'save_user_data', true);
+add_handler('compose', 'logout', true);
+add_handler('compose', 'http_headers', true);
+add_output('compose', 'header_start', false);
+add_output('compose', 'js_data', true);
+add_output('compose', 'header_css', false);
+add_output('compose', 'jquery', false);
+add_output('compose', 'header_content', false);
+add_output('compose', 'header_end', false);
+add_output('compose', 'content_start', false);
+add_output('compose', 'toolbar_start', true);
+add_output('compose', 'logout', true);
+add_output('compose', 'date', true);
+add_output('compose', 'login', false);
+add_output('compose', 'title', true);
+add_output('compose', 'loading_icon', true);
+add_output('compose', 'msgs', false);
+add_output('compose', 'toolbar_end', true);
+add_output('compose', 'two_col_layout_start', true);
+add_output('compose', 'folder_list_start', true);
+add_output('compose', 'folder_list_end', true);
+add_output('compose', 'content_section_start', true);
+add_output('compose', 'content_section_end', true);
+add_output('compose', 'two_col_layout_end', true);
+add_output('compose', 'page_js', true);
+add_output('compose', 'content_end', true);
+
+/* settings */
 add_handler('settings', 'create_user', false);
 add_handler('settings', 'login', false);
 add_handler('settings', 'load_user_data', true);
@@ -90,8 +120,6 @@ add_handler('settings', 'save_user_settings', true);
 add_handler('settings', 'save_user_data', true);
 add_handler('settings', 'logout', true);
 add_handler('settings', 'http_headers', true);
-
-/* settings output */
 add_output('settings', 'header_start', false);
 add_output('settings', 'js_data', true);
 add_output('settings', 'header_css', false);
@@ -155,7 +183,6 @@ add_output('search', 'content_section_end', true);
 add_output('search', 'two_col_layout_end', true);
 add_output('search', 'page_js', true);
 add_output('search', 'content_end', true);
-
 
 /* profile page */
 add_handler('profiles', 'create_user', false);
@@ -319,6 +346,7 @@ add_handler('ajax_hm_folders', 'date', true, 'core');
 return array(
     'allowed_pages' => array(
         'home',
+        'compose',
         'message_list',
         'message',
         'settings',
