@@ -296,7 +296,7 @@ var imap_message_action = function(action_type) {
         );
     }
     return false;
-}
+};
 
 if (hm_page_name == 'message_list') {
     $(':checkbox').each(function () { this.checked = false; });
