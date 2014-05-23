@@ -1085,8 +1085,7 @@ class Hm_IMAP_List {
             'port'      => $server['port'],
             'tls'       => $server['tls'],
             'username'  => $user,
-            'password'  => $pass,
-            'blacklisted_extensions' => array('ENABLE')
+            'password'  => $pass
         ));
     }
     public static function get_cache($session, $id) {
