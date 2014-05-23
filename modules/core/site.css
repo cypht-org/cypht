@@ -23,7 +23,7 @@ td { vertical-align: top; }
 option, select { padding: 3px; }
 .toolbar { padding-top: 10px; padding-left: 10px; height: 30px; margin-bottom: 10px; }
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 400px; margin: 0px; background-color: #fff; width: 240px; padding-left: 20px; }
-.login_form input { padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
+.login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }
 .elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
 .server_summary { height: 100%; background-color: #fff; }

@@ -653,4 +653,39 @@ class Hm_Output_server_summary_end extends Hm_Output_Module {
     }
 }
 
+function human_readable_interval($date_str) {
+
+    $precision     = 2;
+    $interval_time = array();
+    $now           = time();
+    $date          = strtotime($date_str);
+    $interval      = $now - $date;
+    $res           = array();
+
+    $t['minute'] = 60;
+    $t['hour']   = $t['minute']*60;
+    $t['day']    = $t['hour']*24;
+    $t['week']   = $t['day']*7;
+    $t['month']  = $t['day']*30;
+    $t['year']   = $t['week']*52;
+
+    foreach (array_reverse($t) as $name => $val) {
+        if ($interval_time[$name] = ($interval/$val > 0) ? floor($interval/$val) : false) {
+            $interval -= $val*$interval_time[$name];
+        }
+    }
+
+    $interval_time = array_slice(array_filter($interval_time, function($v) { return $v > 0; }), 0, $precision);
+
+    foreach($interval_time as $name => $val) {
+        if ($val > 1) {
+            $res[] = sprintf('%d %ss', $val, $name);
+        }
+        else {
+            $res[] = sprintf('%d %s', $val, $name);
+        }
+    }
+    return implode(', ', $res);
+}
+
 ?>

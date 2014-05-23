@@ -115,7 +115,7 @@ Hm_Notices = {
             clearTimeout(Hm_Notices.hide_id);
         }
         if (now) {
-            $('.sys_messages').fadeOut(1000, function() {
+            $('.sys_messages').fadeOut(300, function() {
                 $('.sys_messages').html('');
                 $('.sys_messages').show('');
             });
