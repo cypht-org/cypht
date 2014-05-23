@@ -391,15 +391,6 @@ class Hm_Output_content_end extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_jquery_table extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<script type="text/javascript" src="modules/imap/jquery.tablesorter.min.js"></script>';
-        }
-        return '';
-    }
-}
-
 class Hm_Output_jquery extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
@@ -654,7 +645,6 @@ class Hm_Output_server_summary_end extends Hm_Output_Module {
 }
 
 function human_readable_interval($date_str) {
-
     $precision     = 2;
     $interval_time = array();
     $now           = time();
@@ -662,7 +652,8 @@ function human_readable_interval($date_str) {
     $interval      = $now - $date;
     $res           = array();
 
-    $t['minute'] = 60;
+    $t['second'] = 1;
+    $t['minute'] = $t['second']*60;
     $t['hour']   = $t['minute']*60;
     $t['day']    = $t['hour']*24;
     $t['week']   = $t['day']*7;
