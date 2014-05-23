@@ -48,10 +48,11 @@ class Hm_Handler_save_unread_state extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('formatted_unread_data'));
         if ($success) {
-            Hm_Page_Cache::add('formatted_unread_data', $form['formatted_unread_data']);
+            $rows = array_map(function($v) { return '<tr'.$v; }, array_filter(explode('<tr', $form['formatted_unread_data'])));
+            Hm_Page_Cache::add('formatted_unread_data', $rows);
         }
         else {
-            Hm_Page_Cache::add('formatted_unread_data', '');
+            Hm_Page_Cache::add('formatted_unread_data', array());
         }
     }
 }
@@ -142,6 +143,59 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
         $data['imap_folders'] = $folders;
         return $data;
     }
+}
+
+class Hm_Handler_imap_message_action extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_action_type', 'imap_message_ids'));
+        if ($success) {
+            if (in_array($form['imap_action_type'], array('delete', 'read', 'unread'))) {
+                $ids = process_imap_message_ids($form['imap_message_ids']);
+                $errs = 0;
+                $msgs = 0;
+                foreach ($ids as $server => $folders) {
+                    $cache = Hm_IMAP_List::get_cache($this->session, $server);
+                    $imap = Hm_IMAP_List::connect($server, $cache);
+                    if (is_object($imap) && $imap->get_state() == 'authenticated') {
+                        foreach ($folders as $folder => $uids) {
+                            if ($imap->select_mailbox($folder)) {
+                                if (!$imap->message_action(strtoupper($form['imap_action_type']), $uids)) {
+                                    $errs++;
+                                }
+                                else {
+                                    $msgs += count($uids);
+                                }
+                            }
+                        }
+                    }
+                }
+                if ($errs > 0) {
+                    Hm_Msgs::add(sprintf('ERRAn error occured trying to %s some messages!', $form['imap_action_type'], $server));
+                }
+                else {
+                    Hm_Msgs::add(sprintf('Message action completed (%s: %d)', $form['imap_action_type'], $msgs));
+                }
+            }
+        }
+    }
+}
+function process_imap_message_ids($ids) {
+    $res = array();
+    foreach (explode(',', $ids) as $id) {
+        if (preg_match("/imap_(\d+)_(\d+)_(\S+)$/", $id, $matches)) {
+            $server = $matches[1];
+            $uid = $matches[2];
+            $folder = $matches[3];
+            if (!isset($res[$server])) {
+                $res[$server] = array();
+            }
+            if (!isset($res[$server][$folder])) {
+                $res[$server][$folder] = array();
+            }
+            $res[$server][$folder][] = $uid;
+        }
+    }
+    return $res;
 }
 
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
@@ -391,11 +445,25 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $data['msg_headers'] = $imap->get_message_headers($form['imap_msg_uid']);
                     $data['imap_msg_part'] = $part;
                     $data['msg_cache_suffix'] = 'imap_'.$form['imap_server_id'].'_'.$form['folder'].'_'.$form['imap_msg_uid'];
+                    update_unread_cache($form['imap_server_id'], $form['imap_msg_uid'], 'INBOX');
+
                 }
             }
         }
         return $data;
     }
+}
+function update_unread_cache($server_id, $msg_uid, $folder) {
+    $unread_cache = Hm_Page_Cache::get('formatted_unread_data');
+    $new_cache = array();
+    if (is_array($unread_cache) && !empty($unread_cache)) {
+        foreach ($unread_cache as $line) {
+            if (!strstr($line, 'imap_'.$server_id.'_'.$msg_uid.'_'.$folder)) {
+                $new_cache[] = $line;
+            }
+        }
+    }
+    Hm_Page_Cache::add('formatted_unread_data', $new_cache);
 }
 
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
@@ -470,7 +538,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $from = $value;
                         }
                         if ($fld == 'subject') {
-                            $txt .= '<tr class="header_'.$fld.'"><td colspan="2"><div class="content_title"><img class="account_icon" onclick="window.history.back()" src="images/open_iconic/arrow-circle-left-2x.png" />'.$this->html_safe($value).'</div></td></tr>';
+                            $txt .= '<tr class="header_'.$fld.'"><td colspan="2"><div class="content_title">'.$this->html_safe($value).'</div></td></tr>';
                         }
                         else {
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
@@ -730,13 +798,19 @@ function format_imap_message_list($msg_list, $output_module) {
         if ($msg['server_name'] == 'Default-Auth-Server') {
             $msg['server_name'] = 'Default';
         }
-        $id = sprintf("imap_%s_%s", $output_module->html_safe($msg['server_id']), $output_module->html_safe($msg['uid']));
+        $id = $output_module->html_safe(sprintf("imap_%s_%s_%s", $msg['server_id'], $msg['uid'], $msg['folder']));
+        if (!trim($msg['subject'])) {
+            $msg['subject'] = '[No Subject]';
+        }
         $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
         $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
         $from = str_replace("&quot;", '', $from);
-        $date = date('Y-m-d G:i:s', strtotime($output_module->html_safe($msg['internal_date'])));
-        $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
-            '<td class="subject"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
+        $date = $output_module->html_safe(human_readable_interval($msg['internal_date']));
+        $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
+            '</td><td class="checkbox_row"><input type="checkbox" value="'.$output_module->html_safe($id).'" /></td>'.
+            '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
+            '<td class="subject'.(!stristr($msg['flags'], 'seen') ? ' unseen' : '').
+            (stristr($msg['flags'], 'deleted') ? ' deleted' : '').'"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
             '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).'">'.$subject.'</a>'.
             '</td><td class="from">'.$from.'</div></td>'.
             '<td class="msg_date">'.$date.'</td></tr>', $id);
@@ -744,6 +818,26 @@ function format_imap_message_list($msg_list, $output_module) {
     return $res;
 }
 
+function imap_message_controls() {
+    return '<div class="msg_controls">'.
+        '<a href="#" onclick="return imap_message_action(\'read\');" class="disabled_link">Read</a>'.
+        '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
+        '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
+        '<a href="#" onclick="return imap_message_action(\'delete\');" class="disabled_link">Delete</a>'.
+        '<a href="#" onclick="return imap_message_action(\'expunge\');" class="disabled_link">Expunge</a>'.
+        '<a href="#" onclick="return imap_message_action(\'move\');" class="disabled_link">Move</a>'.
+        '<a href="#" onclick="return imap_message_action(\'copy\');" class="disabled_link">Copy</a>'.
+        '</div>';
+}
+
+function imap_message_list_headers() {
+    return '<table class="message_table" cellpadding="0" cellspacing="0">'.
+        '<colgroup><col class="chkbox_col"><col class="source_col">'.
+        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
+        '<thead><tr><th class="checkbox_header"><a href="#" onclick="return toggle_rows()">'.
+        '<img class="account_icon" src="images/open_iconic/check-2x.png" /></a></th>'.
+        '<th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>';
+}
 function imap_message_list_folder($input, $output_module) {
     $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path'].'_'.$input['list_page']);
     $rows = '';
@@ -757,39 +851,31 @@ function imap_message_list_folder($input, $output_module) {
     }
     $title = implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']);
     return '<div class="message_list"><div class="content_title">'.$title.
-        '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a></div>'.
-        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
-        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
-        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
+        '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.
+        $output_module->html_safe($input['list_path']).'\', true)">[update]</a>'.
+        imap_message_controls().'</div>'.imap_message_list_headers().
         '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
 }
 
 function imap_flagged_list() {
     return '<div class="message_list"><div class="content_title">Flagged'.
-        '<a class="update_unread" href="#"">[update]</a></div>'.
-        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
-        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
-        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
-        '<tbody></tbody></table></div>';
+        '<a class="update_unread" href="#"">[update]</a>'.imap_message_controls().'</div>'.
+        imap_message_list_headers().'<tbody></tbody></table></div>';
 }
 
 function imap_message_list_unread() {
     $cache = Hm_Page_Cache::get('formatted_unread_data');
+    $empty_list = '';
     if ($cache === false) {
-        error_log('hmmmm....');
-        $cache = '';
-        $empty_list = '';
+        $cache = array();
     }
     elseif (!$cache) {
-        error_log('wtf....');
         $empty_list = '<div class="empty_list">No unread messages found!</div>';
     }
+    $cache = implode('', $cache);
     return '<div class="message_list"><div class="content_title">Unread'.
-        '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a></div>'.
-        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
-        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
-        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
-        '<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
+        '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a>'.
+        imap_message_controls().'</div>'.imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
 
 function build_page_links($detail, $path) {
@@ -949,4 +1035,5 @@ function build_msg_gravatar( $from ) {
         return '<img class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';
     }
 }
+
 ?>
