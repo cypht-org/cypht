@@ -179,24 +179,6 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
         }
     }
 }
-function process_imap_message_ids($ids) {
-    $res = array();
-    foreach (explode(',', $ids) as $id) {
-        if (preg_match("/imap_(\d+)_(\d+)_(\S+)$/", $id, $matches)) {
-            $server = $matches[1];
-            $uid = $matches[2];
-            $folder = $matches[3];
-            if (!isset($res[$server])) {
-                $res[$server] = array();
-            }
-            if (!isset($res[$server][$folder])) {
-                $res[$server][$folder] = array();
-            }
-            $res[$server][$folder][] = $uid;
-        }
-    }
-    return $res;
-}
 
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
@@ -207,9 +189,11 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             foreach($ids as $id) {
                 $id = intval($id);
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
+                $start = microtime(true);
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if (is_object($imap) && $imap->get_state() == 'authenticated') {
                     $server_details = Hm_IMAP_List::dump($id);
+                    error_log(sprintf("%s - %f", $server_details['server'], (microtime(true) - $start)));
                     if ($imap->select_mailbox('INBOX')) {
                         $unseen = $imap->search('UNSEEN');
                         if ($unseen) {
@@ -375,6 +359,7 @@ class Hm_Handler_imap_forget extends Hm_Handler_Module {
                 Hm_IMAP_List::forget_credentials($form['imap_server_id']);
                 $data['just_forgot_credentials'] = true;
                 Hm_Msgs::add('Server credentials forgotten');
+                Hm_Page_Cache::flush($this->session);
             }
             else {
                 $data['old_form'] = $form;
@@ -398,6 +383,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                 if ($imap->get_state() == 'authenticated') {
                     $data['just_saved_credentials'] = true;
                     Hm_Msgs::add("Server saved");
+                    Hm_Page_Cache::flush($this->session);
                 }
                 else {
                     Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
@@ -475,6 +461,7 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
                 if ($res) {
                     $data['deleted_server_id'] = $form['imap_server_id'];
                     Hm_Msgs::add('Server deleted');
+                    Hm_Page_Cache::flush($this->session);
                 }
             }
             else {
@@ -803,16 +790,16 @@ function format_imap_message_list($msg_list, $output_module) {
             $msg['subject'] = '[No Subject]';
         }
         $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
-        $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
+        $from = preg_replace("/(\&lt;.+\&gt;)/U", '', $output_module->html_safe($msg['from']));
         $from = str_replace("&quot;", '', $from);
         $date = $output_module->html_safe(human_readable_interval($msg['internal_date']));
         $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
             '</td><td class="checkbox_row"><input type="checkbox" value="'.$output_module->html_safe($id).'" /></td>'.
             '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
+            '<td class="from">'.$from.'</div></td>'.
             '<td class="subject'.(!stristr($msg['flags'], 'seen') ? ' unseen' : '').
             (stristr($msg['flags'], 'deleted') ? ' deleted' : '').'"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
-            '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).'">'.$subject.'</a>'.
-            '</td><td class="from">'.$from.'</div></td>'.
+            '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).'">'.$subject.'</a></td>'.
             '<td class="msg_date">'.$date.'</td></tr>', $id);
     }
     return $res;
@@ -830,14 +817,31 @@ function imap_message_controls() {
         '</div>';
 }
 
+function process_imap_message_ids($ids) {
+    $res = array();
+    foreach (explode(',', $ids) as $id) {
+        if (preg_match("/imap_(\d+)_(\d+)_(\S+)$/", $id, $matches)) {
+            $server = $matches[1];
+            $uid = $matches[2];
+            $folder = $matches[3];
+            if (!isset($res[$server])) {
+                $res[$server] = array();
+            }
+            if (!isset($res[$server][$folder])) {
+                $res[$server][$folder] = array();
+            }
+            $res[$server][$folder][] = $uid;
+        }
+    }
+    return $res;
+}
+
 function imap_message_list_headers() {
     return '<table class="message_table" cellpadding="0" cellspacing="0">'.
         '<colgroup><col class="chkbox_col"><col class="source_col">'.
-        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
-        '<thead><tr><th class="checkbox_header"><a href="#" onclick="return toggle_rows()">'.
-        '<img class="account_icon" src="images/open_iconic/check-2x.png" /></a></th>'.
-        '<th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>';
+        '<col class="from_col"><col class="subject_col"><col class="date_col"></colgroup>';
 }
+
 function imap_message_list_folder($input, $output_module) {
     $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path'].'_'.$input['list_page']);
     $rows = '';
@@ -1021,7 +1025,6 @@ function format_msg_html($str) {
 
 function format_msg_image($str, $mime_type) {
     return '<img src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
-
 }
 
 function format_msg_text($str, $output_mod) {

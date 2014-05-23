@@ -18,8 +18,8 @@
 .msg_date { color: #666; }
 .chkbox_col { width: 32px; }
 .source_col { width: 8%; }
-.subject_col { width: 50%; }
-.from_col { width: 20%; }
+.subject_col { width: 60%; }
+.from_col { width: 10%; }
 .date_col { width: 20%; }
 .hl { padding-right: 5px; color: #666; }
 .dl { color: #888; }
