@@ -792,6 +792,7 @@ function format_imap_message_list($msg_list, $output_module) {
         $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
         $from = preg_replace("/(\&lt;.+\&gt;)/U", '', $output_module->html_safe($msg['from']));
         $from = str_replace("&quot;", '', $from);
+        $timestamp = $output_module->html_safe(strtotime($msg['internal_date']));
         $date = $output_module->html_safe(human_readable_interval($msg['internal_date']));
         $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
             '</td><td class="checkbox_row"><input type="checkbox" value="'.$output_module->html_safe($id).'" /></td>'.
@@ -800,7 +801,7 @@ function format_imap_message_list($msg_list, $output_module) {
             '<td class="subject'.(!stristr($msg['flags'], 'seen') ? ' unseen' : '').
             (stristr($msg['flags'], 'deleted') ? ' deleted' : '').'"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
             '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).'">'.$subject.'</a></td>'.
-            '<td class="msg_date">'.$date.'</td></tr>', $id);
+            '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td></tr>', $id);
     }
     return $res;
 }

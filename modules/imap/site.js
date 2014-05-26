@@ -70,30 +70,12 @@ var imap_test_action = function() {
     );
 };
 
-var format_time = function(s) {
-    s = s.replace(/second(s|)/, '1');
-    s = s.replace(/minute(s|)/, '60');
-    s = s.replace(/hour(s|)/, '3600');
-    parts = s.split(',');
-    total = 0;
-    for (i=0;i<parts.length;i++) {
-        section = parts[i].trim();
-        numbers = section.split(' ');
-        if (numbers.length == 2) {
-            total += (numbers[0]*1 * numbers[1]*1);
-        }
-    }
-    return total;
-};
-var unread_sort = function(s1, s2) {
-    return format_time(s2) >= format_time(s1);
-};
 var unread_insert = function(row) {
-    timestr = $('.msg_date', $(row)).html();
-    element = false;
+    var timestr = $('.msg_timestamp', $(row)).val();
+    var element = false;
     $('.message_table tbody tr').each(function() {
-        timestr2 = $('.msg_date', $(this)).html();
-        if (unread_sort(timestr, timestr2)) {
+        timestr2 = $('.msg_timestamp', $(this)).val();
+        if ((timestr*1) >= (timestr2*1)) {
             element = $(this);
             return false;
         }
@@ -106,7 +88,19 @@ var unread_insert = function(row) {
     }
 };
 
+var defer_unread_update = function(res) {
+    console.log('deferred!');
+    setTimeout(function() { update_unread_message_display(res); }, 50);
+};
+var unread_table_updating = false;
 var update_unread_message_display = function(res) {
+    if (unread_table_updating) {
+        defer_unread_update(res);
+        return;
+    }
+    else {
+        unread_table_updating = true;
+    }
     var ids = res.unread_server_ids.split(',');
     var msg_ids = [];
     if (res.formatted_unread_data && !jQuery.isEmptyObject(res.formatted_unread_data)) {
@@ -121,7 +115,9 @@ var update_unread_message_display = function(res) {
         }
         else {
             timestr = $('.msg_date', $(row)).html();
+            timeint = $('.msg_timestamp', $(row)).val();
             $('.msg_date', $('.'+clean_selector(id))).html(timestr);
+            $('.msg_timestamp', $('.'+clean_selector(id))).val(timeint);
         }
         msg_ids.push(id);
     }
@@ -137,6 +133,7 @@ var update_unread_message_display = function(res) {
     }
     document.title = 'HM3 '+count+' Unread';
     $('.sys_messages').html($('.sys_messages').html()+'.');
+    unread_table_updating = false;
 };
 
 var imap_unread_update = function(loading) {
