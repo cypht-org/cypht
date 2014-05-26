@@ -137,6 +137,7 @@ var update_unread_message_display = function(res) {
 };
 
 var imap_unread_update = function(loading) {
+    Hm_Timer.cancel(imap_unread_update);
     var ids = $('#imap_server_ids').val().split(',');
     if ( ids && ids != '') {
         Hm_Notices.show({0: 'Updating unread messages '});
@@ -307,6 +308,7 @@ var set_unread_state = function() {
         toggle_msg_controls();
     });
     setTimeout(request, 1000);
+    Hm_Timer.add_job(imap_unread_update, 60, true);
 };
 
 var toggle_msg_controls = function() {
