@@ -146,6 +146,16 @@ Hm_Timer = {
         }
     },
 
+    cancel: function(job) {
+        for (index in Hm_Timer.jobs) {
+            if (Hm_Timer.jobs[index][0] == job) {
+                Hm_Timer.jobs.splice(index, 1);
+                return true;
+            }
+        }
+        return false;
+    },
+
     fire: function() {
         var job;
         for (index in Hm_Timer.jobs) {
