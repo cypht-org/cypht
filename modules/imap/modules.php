@@ -189,11 +189,9 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             foreach($ids as $id) {
                 $id = intval($id);
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
-                $start = microtime(true);
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 if (is_object($imap) && $imap->get_state() == 'authenticated') {
                     $server_details = Hm_IMAP_List::dump($id);
-                    error_log(sprintf("%s - %f", $server_details['server'], (microtime(true) - $start)));
                     if ($imap->select_mailbox('INBOX')) {
                         $unseen = $imap->search('UNSEEN');
                         if ($unseen) {
