@@ -202,9 +202,11 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $date = false;
             if (in_array($form['imap_unread_since'], array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'))) {
                 $date = date('j-M-Y', strtotime($form['imap_unread_since']));
+                $this->user_config->set('imap_unread_since', $form['imap_unread_since']);
             }
             elseif ($form['imap_unread_since'] == 'today') {
                 $date = date('j-M-Y');
+                $this->user_config->set('imap_unread_since', $form['imap_unread_since']);
             }
             $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date);
             $data['imap_unread_data'] = $msg_list;
@@ -306,6 +308,7 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
             $data['imap_servers'] = $servers;
             $data['folder_sources'][] = 'imap_folders';
         }
+        $data['imap_unread_since'] = $this->user_config->get('imap_unread_since', false);
         return $data;
     }
 }
@@ -434,18 +437,6 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
         }
         return $data;
     }
-}
-function update_unread_cache($server_id, $msg_uid, $folder) {
-    $unread_cache = Hm_Page_Cache::get('formatted_unread_data');
-    $new_cache = array();
-    if (is_array($unread_cache) && !empty($unread_cache)) {
-        foreach ($unread_cache as $line) {
-            if (!strstr($line, 'imap_'.$server_id.'_'.$msg_uid.'_'.$folder)) {
-                $new_cache[] = $line;
-            }
-        }
-    }
-    Hm_Page_Cache::add('formatted_unread_data', $new_cache);
 }
 
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
@@ -716,7 +707,7 @@ class Hm_Output_imap_message_list extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['list_path'])) {
             if ($input['list_path'] == 'unread') {
-                return imap_message_list_unread();     
+                return imap_message_list_unread($input);     
             }
             elseif ($input['list_path'] == 'flagged') {
                 return imap_flagged_list();
@@ -878,7 +869,7 @@ function imap_flagged_list() {
         imap_message_list_headers().'<tbody></tbody></table></div>';
 }
 
-function imap_message_list_unread() {
+function imap_message_list_unread($input) {
     $cache = Hm_Page_Cache::get('formatted_unread_data');
     $empty_list = '';
     if ($cache === false) {
@@ -888,18 +879,33 @@ function imap_message_list_unread() {
         $empty_list = '<div class="empty_list">No unread messages found!</div>';
     }
     $cache = implode('', $cache);
-    return '<div class="message_list"><div class="content_title">Unread'.
-        '<select class="unread_since">'.
-        '<option value="today">Today</option>'.
-        '<option selected="selected" value="-1 week">Last Week</option>'.
-        '<option value="-2 weeks">Last 2 Weeks</option>'.
-        '<option value="-4 weeks">Last 4 Weeks</option>'.
-        '<option value="-6 weeks">Last 6 Weeks</option>'.
-        '<option value="-6 months">Last 6 Months</option>'.
-        '<option value="-1 year">Last Year </option>'.
-        '</select>'.
-        '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a>'.
+    if (isset($input['imap_unread_since'])) {
+        $since = $input['imap_unread_since'];
+    }
+    else {
+        $since = '-1 week';
+    }
+    $times = array(
+        'today' => 'Today',
+        '-1 week' => 'Last 7 days',
+        '-2 weeks' => 'Last 2 weeks',
+        '-4 weeks' => 'Last 4 weeks',
+        '-6 weeks' => 'Last 6 weeks',
+        '-6 months' => 'Last 6 months',
+        '-1 year' => 'Last year'
+    );
+
+    $res = '<div class="message_list"><div class="content_title">Unread<select class="unread_since">';
+    foreach ($times as $val => $label) {
+        $res .= '<option';
+        if ($val == $since) {
+            $res .= ' selected="selected"';
+        }
+        $res .= ' value="'.$val.'">'.$label.'</option>';
+    }
+    $res .= '</select><a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a>'.
         imap_message_controls().'</div>'.imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
+    return $res;
 }
 
 function build_page_links($detail, $path) {
@@ -1092,6 +1098,19 @@ function merge_imap_search_results($ids, $search_type, $session, $since = false,
         return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
     });
     return $msg_list;
+}
+
+function update_unread_cache($server_id, $msg_uid, $folder) {
+    $unread_cache = Hm_Page_Cache::get('formatted_unread_data');
+    $new_cache = array();
+    if (is_array($unread_cache) && !empty($unread_cache)) {
+        foreach ($unread_cache as $line) {
+            if (!strstr($line, 'imap_'.$server_id.'_'.$msg_uid.'_'.$folder)) {
+                $new_cache[] = $line;
+            }
+        }
+    }
+    Hm_Page_Cache::add('formatted_unread_data', $new_cache);
 }
 
 ?>

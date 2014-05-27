@@ -103,6 +103,7 @@ add_handler('ajax_imap_unread', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_unread', 'imap_unread',  true);
 add_handler('ajax_imap_unread', 'save_imap_cache',  true);
 add_handler('ajax_imap_unread', 'save_imap_servers',  true);
+add_handler('ajax_imap_unread', 'save_user_data',  true, 'core');
 add_handler('ajax_imap_unread', 'date', true, 'core');
 add_output('ajax_imap_unread', 'filter_unread_data', true);
 
