@@ -127,6 +127,7 @@ var remove_rows_from_message_list = function(ids, msg_ids) {
             }
         });
     }
+    return count;
 };
 
 var update_message_list = function(ids, msg_list) {
@@ -147,6 +148,7 @@ var update_flagged_message_display = function(res) {
 
 var imap_unread_update = function(loading) {
     Hm_Timer.cancel(imap_unread_update);
+    var since = $('.unread_since option:selected').val();
     var ids = $('#imap_server_ids').val().split(',');
     if ( ids && ids != '') {
         Hm_Notices.show({0: 'Updating unread messages '});
@@ -154,6 +156,7 @@ var imap_unread_update = function(loading) {
             id=ids[i];
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
+                {'name': 'imap_unread_since', 'value': since},
                 {'name': 'imap_server_ids', 'value': id}],
                 update_unread_message_display,
                 [],

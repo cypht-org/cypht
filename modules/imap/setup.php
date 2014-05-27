@@ -204,7 +204,8 @@ return array(
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_msg_part' => FILTER_SANITIZE_STRING,
         'imap_message_ids' => FILTER_SANITIZE_STRING,
-        'imap_action_type' => FILTER_SANITIZE_STRING
+        'imap_action_type' => FILTER_SANITIZE_STRING,
+        'imap_unread_since' => FILTER_SANITIZE_STRING
     )
 );
 

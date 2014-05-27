@@ -195,11 +195,17 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
 
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        list($success, $form) = $this->process_form(array('imap_unread_since', 'imap_server_ids'));
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
-            $date = date('j-M-Y', strtotime('-2 weeks'));
+            $date = false;
+            if (in_array($form['imap_unread_since'], array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'))) {
+                $date = date('j-M-Y', strtotime($form['imap_unread_since']));
+            }
+            elseif ($form['imap_unread_since'] == 'today') {
+                $date = date('j-M-Y');
+            }
             $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date);
             $data['imap_unread_data'] = $msg_list;
             $data['unread_server_ids'] = $form['imap_server_ids'];
@@ -883,6 +889,15 @@ function imap_message_list_unread() {
     }
     $cache = implode('', $cache);
     return '<div class="message_list"><div class="content_title">Unread'.
+        '<select class="unread_since">'.
+        '<option value="today">Today</option>'.
+        '<option selected="selected" value="-1 week">Last Week</option>'.
+        '<option value="-2 weeks">Last 2 Weeks</option>'.
+        '<option value="-4 weeks">Last 4 Weeks</option>'.
+        '<option value="-6 weeks">Last 6 Weeks</option>'.
+        '<option value="-6 months">Last 6 Months</option>'.
+        '<option value="-1 year">Last Year </option>'.
+        '</select>'.
         '<a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a>'.
         imap_message_controls().'</div>'.imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
@@ -1044,7 +1059,7 @@ function build_msg_gravatar( $from ) {
     }
 }
 
-function merge_imap_search_results($ids, $search_type, $session, $since = false, $folder = 'INBOX') {
+function merge_imap_search_results($ids, $search_type, $session, $since = false, $folders = array('INBOX')) {
     $msg_list = array();
     foreach($ids as $id) {
         $id = intval($id);
@@ -1052,19 +1067,21 @@ function merge_imap_search_results($ids, $search_type, $session, $since = false,
         $imap = Hm_IMAP_List::connect($id, $cache);
         if (is_object($imap) && $imap->get_state() == 'authenticated') {
             $server_details = Hm_IMAP_List::dump($id);
-            if ($imap->select_mailbox($folder)) {
-                if ($since) {
-                    $msgs = $imap->search($search_type, false, 'SINCE', $since);
-                }
-                else {
-                    $msgs = $imap->search($search_type);
-                }
-                if ($msgs) {
-                    foreach ($imap->get_message_list($msgs) as $msg) {
-                        $msg['server_id'] = $id;
-                        $msg['folder'] = $folder;
-                        $msg['server_name'] = $server_details['name'];
-                        $msg_list[] = $msg;
+            foreach ($folders as $folder) {
+                if ($imap->select_mailbox($folder)) {
+                    if ($since) {
+                        $msgs = $imap->search($search_type, false, 'SINCE', $since);
+                    }
+                    else {
+                        $msgs = $imap->search($search_type);
+                    }
+                    if ($msgs) {
+                        foreach ($imap->get_message_list($msgs) as $msg) {
+                            $msg['server_id'] = $id;
+                            $msg['folder'] = $folder;
+                            $msg['server_name'] = $server_details['name'];
+                            $msg_list[] = $msg;
+                        }
                     }
                 }
             }
