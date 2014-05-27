@@ -106,6 +106,16 @@ add_handler('ajax_imap_unread', 'save_imap_servers',  true);
 add_handler('ajax_imap_unread', 'date', true, 'core');
 add_output('ajax_imap_unread', 'filter_unread_data', true);
 
+/* ajax flagged callback data */
+add_handler('ajax_imap_flagged', 'login', false, 'core');
+add_handler('ajax_imap_flagged', 'load_user_data', true, 'core');
+add_handler('ajax_imap_flagged', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_flagged', 'imap_flagged',  true);
+add_handler('ajax_imap_flagged', 'save_imap_cache',  true);
+add_handler('ajax_imap_flagged', 'save_imap_servers',  true);
+add_handler('ajax_imap_flagged', 'date', true, 'core');
+add_output('ajax_imap_flagged', 'filter_flagged_data', true);
+
 /* ajax message action callback */
 add_handler('ajax_imap_message_action', 'login', false, 'core');
 add_handler('ajax_imap_message_action', 'load_user_data', true, 'core');
@@ -153,6 +163,7 @@ return array(
         'ajax_imap_debug',
         'ajax_imap_summary',
         'ajax_imap_unread',
+        'ajax_imap_flagged',
         'ajax_imap_folder_expand',
         'ajax_imap_folder_display',
         'ajax_imap_save_unread_state',

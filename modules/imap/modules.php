@@ -180,35 +180,27 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_imap_flagged extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $ids = explode(',', $form['imap_server_ids']);
+            $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session);
+            $data['imap_flagged_data'] = $msg_list;
+            $data['flagged_server_ids'] = $form['imap_server_ids'];
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
-            foreach($ids as $id) {
-                $id = intval($id);
-                $cache = Hm_IMAP_List::get_cache($this->session, $id);
-                $imap = Hm_IMAP_List::connect($id, $cache);
-                if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                    $server_details = Hm_IMAP_List::dump($id);
-                    if ($imap->select_mailbox('INBOX')) {
-                        $unseen = $imap->search('UNSEEN');
-                        if ($unseen) {
-                            foreach ($imap->get_message_list($unseen) as $msg) {
-                                $msg['server_id'] = $id;
-                                $msg['folder'] = 'INBOX';
-                                $msg['server_name'] = $server_details['name'];
-                                $msg_list[] = $msg;
-                            }
-                        }
-                    }
-                }
-            }
-            usort($msg_list, function($a, $b) {
-                if ($a['internal_date'] == $b['internal_date']) return 0;
-                return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
-            });
+            $date = date('j-M-Y', strtotime('-2 weeks'));
+            $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date);
             $data['imap_unread_data'] = $msg_list;
             $data['unread_server_ids'] = $form['imap_server_ids'];
         }
@@ -686,6 +678,20 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_filter_flagged_data extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['imap_flagged_data'])) {
+            $res = format_imap_message_list($input['imap_flagged_data'], $this);
+            $input['formatted_flagged_data'] = $res;
+            unset($input['imap_flagged_data']);
+        }
+        elseif (!isset($input['formatted_flagged_data'])) {
+            $input['formatted_flagged_data'] = array();
+        }
+        return $input;
+    }
+}
+
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_unread_data'])) {
@@ -1036,6 +1042,39 @@ function build_msg_gravatar( $from ) {
         $hash = md5(strtolower(trim($matches[0], " \"><'\t\n\r\0\x0B")));
         return '<img class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';
     }
+}
+
+function merge_imap_search_results($ids, $search_type, $session, $since = false, $folder = 'INBOX') {
+    $msg_list = array();
+    foreach($ids as $id) {
+        $id = intval($id);
+        $cache = Hm_IMAP_List::get_cache($session, $id);
+        $imap = Hm_IMAP_List::connect($id, $cache);
+        if (is_object($imap) && $imap->get_state() == 'authenticated') {
+            $server_details = Hm_IMAP_List::dump($id);
+            if ($imap->select_mailbox($folder)) {
+                if ($since) {
+                    $msgs = $imap->search($search_type, false, 'SINCE', $since);
+                }
+                else {
+                    $msgs = $imap->search($search_type);
+                }
+                if ($msgs) {
+                    foreach ($imap->get_message_list($msgs) as $msg) {
+                        $msg['server_id'] = $id;
+                        $msg['folder'] = $folder;
+                        $msg['server_name'] = $server_details['name'];
+                        $msg_list[] = $msg;
+                    }
+                }
+            }
+        }
+    }
+    usort($msg_list, function($a, $b) {
+        if ($a['internal_date'] == $b['internal_date']) return 0;
+        return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
+    });
+    return $msg_list;
 }
 
 ?>

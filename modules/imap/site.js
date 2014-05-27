@@ -70,7 +70,7 @@ var imap_test_action = function() {
     );
 };
 
-var unread_insert = function(row) {
+var insert_into_message_list = function(row) {
     var timestr = $('.msg_timestamp', $(row)).val();
     var element = false;
     $('.message_table tbody tr').each(function() {
@@ -88,29 +88,21 @@ var unread_insert = function(row) {
     }
 };
 
-var defer_unread_update = function(res) {
-    console.log('deferred!');
-    setTimeout(function() { update_unread_message_display(res); }, 50);
-};
-var unread_table_updating = false;
+
 var update_unread_message_display = function(res) {
-    if (unread_table_updating) {
-        defer_unread_update(res);
-        return;
-    }
-    else {
-        unread_table_updating = true;
-    }
     var ids = res.unread_server_ids.split(',');
+    var count = update_message_list(ids, res.formatted_unread_data);
+    document.title = 'HM3 '+count+' Unread';
+    $('.sys_messages').html($('.sys_messages').html()+'.');
+};
+
+var add_rows_to_message_list = function(msg_list) {
     var msg_ids = [];
-    if (res.formatted_unread_data && !jQuery.isEmptyObject(res.formatted_unread_data)) {
-        $('.empty_list').remove();
-    }
-    for (index in res.formatted_unread_data) {
-        row = res.formatted_unread_data[index][0];
-        id = res.formatted_unread_data[index][1];
+    for (index in msg_list) {
+        row = msg_list[index][0];
+        id = msg_list[index][1];
         if (!$('.'+clean_selector(id)).length) {
-            unread_insert(row);
+            insert_into_message_list(row);
             $('.'+clean_selector(id)).fadeIn(600);
         }
         else {
@@ -121,6 +113,10 @@ var update_unread_message_display = function(res) {
         }
         msg_ids.push(id);
     }
+    return msg_ids;
+};
+
+var remove_rows_from_message_list = function(ids, msg_ids) {
     var count = $('.message_table tbody tr').length;
     for (i=0;i<ids.length;i++) {
         $('.message_table tbody tr[class^=imap_'+ids[i]+'_]').filter(function() {
@@ -131,9 +127,22 @@ var update_unread_message_display = function(res) {
             }
         });
     }
-    document.title = 'HM3 '+count+' Unread';
+};
+
+var update_message_list = function(ids, msg_list) {
+    if (msg_list && !jQuery.isEmptyObject(msg_list)) {
+        $('.empty_list').remove();
+    }
+    var msg_ids = add_rows_to_message_list(msg_list);
+    var count = remove_rows_from_message_list(ids, msg_ids);
+    return count;
+};
+
+var update_flagged_message_display = function(res) {
+    var ids = res.flagged_server_ids.split(',');
+    var count = update_message_list(ids, res.formatted_flagged_data);
+    document.title = 'HM3 '+count+' Flagged';
     $('.sys_messages').html($('.sys_messages').html()+'.');
-    unread_table_updating = false;
 };
 
 var imap_unread_update = function(loading) {
@@ -150,6 +159,25 @@ var imap_unread_update = function(loading) {
                 [],
                 loading,
                 set_unread_state
+            );
+        }
+    }
+    return false;
+};
+
+var imap_flagged_update = function(loading) {
+    var ids = $('#imap_server_ids').val().split(',');
+    if ( ids && ids != '') {
+        Hm_Notices.show({0: 'Updating flagged messages '});
+        for (i=0;i<ids.length;i++) {
+            id=ids[i];
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_flagged'},
+                {'name': 'imap_server_ids', 'value': id}],
+                update_flagged_message_display,
+                [],
+                loading,
+                set_flagged_state
             );
         }
     }
@@ -286,6 +314,9 @@ var get_message_content = function(msg_part) {
     return false;
 };
 
+var set_flagged_state = function() {
+    Hm_Notices.hide(true);
+}
 var set_unread_state = function() {
     Hm_Notices.hide(true);
     if (!$('.message_table tr').length) {
@@ -320,9 +351,6 @@ var toggle_msg_controls = function() {
     }
 };
 
-var update_message_list = function(res) {
-};
-
 var imap_message_action = function(action_type) {
     var msg_list = $('.message_list');
     var selected = [];
@@ -335,7 +363,7 @@ var imap_message_action = function(action_type) {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_action'},
             {'name': 'imap_action_type', 'value': action_type},
             {'name': 'imap_message_ids', 'value': selected}],
-            update_message_list,
+            false,
             [],
             false
         );
@@ -369,6 +397,9 @@ if (hm_page_name == 'message_list') {
         $('.message_table tr').fadeIn(100);
     }
     else if (hm_list_path == 'flagged') {
+        if ($('.message_table tbody tr').length == 0) {
+            imap_flagged_update();
+        }
         $('.menu_flagged').addClass('selected_menu');
     }
     else if (hm_list_path.substring(0, 4) == 'imap') {
