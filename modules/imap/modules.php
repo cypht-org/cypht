@@ -172,9 +172,6 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 if ($errs > 0) {
                     Hm_Msgs::add(sprintf('ERRAn error occured trying to %s some messages!', $form['imap_action_type'], $server));
                 }
-                else {
-                    Hm_Msgs::add(sprintf('Message action completed (%s: %d)', $form['imap_action_type'], $msgs));
-                }
             }
         }
     }
@@ -638,7 +635,7 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_servers'])) {
-                return '<input type="hidden" id="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+            return '<input type="hidden" id="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
         }
     }
 }

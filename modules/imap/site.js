@@ -88,7 +88,6 @@ var insert_into_message_list = function(row) {
     }
 };
 
-
 var update_unread_message_display = function(res) {
     var ids = res.unread_server_ids.split(',');
     var count = update_message_list(ids, res.formatted_unread_data);
@@ -103,7 +102,7 @@ var add_rows_to_message_list = function(msg_list) {
         id = msg_list[index][1];
         if (!$('.'+clean_selector(id)).length) {
             insert_into_message_list(row);
-            $('.'+clean_selector(id)).fadeIn(600);
+            $('.'+clean_selector(id)).fadeIn(300);
         }
         else {
             timestr = $('.msg_date', $(row)).html();
@@ -221,14 +220,14 @@ var display_imap_mailbox = function(res) {
         id = res.formatted_mailbox_page[index][1];
         if (!$('.'+clean_selector(id)).length) {
             $('.message_table tbody').append(row);
-            $('.'+clean_selector(id)).fadeIn(600);
+            $('.'+clean_selector(id)).fadeIn(300);
         }
         msg_ids.push(id);
     }
     $('.message_table tbody tr[class^=imap_'+imap_id+'_]').filter(function() {
         var id = this.className;
         if (jQuery.inArray(id, msg_ids) == -1) {
-            $(this).fadeOut(600, function() { $('.'+id).remove(); });
+            $(this).fadeOut(300, function() { $('.'+id).remove(); });
         }
     });
     if (res.imap_page_links) {
@@ -341,7 +340,7 @@ var set_unread_state = function() {
     $(':checkbox').click(function() {
         toggle_msg_controls();
     });
-    setTimeout(request, 1000);
+    setTimeout(request, 500);
     Hm_Timer.add_job(imap_unread_update, 60, true);
 };
 
@@ -354,21 +353,41 @@ var toggle_msg_controls = function() {
     }
 };
 
+var update_message_list_after_action = function(action_type, selected) {
+    var remove = false;
+    var row = false;
+    var class_name = false;
+    if (action_type == 'read' && hm_list_path == 'unread') {
+        remove = true;
+    }
+    else if (action_type == 'delete') {
+        remove = true;
+    }
+    if (remove) {
+        for (index in selected) {
+            class_name = selected[index];
+            $('.'+clean_selector(class_name)).remove();
+        }
+    }
+};
+
 var imap_message_action = function(action_type) {
     var msg_list = $('.message_list');
     var selected = [];
-    $(':checked', msg_list).each(function() {
+    $('input[type=checkbox]:checked', msg_list).each(function() {
         selected.push($(this).val());
     });
     if (selected.length > 0) {
-        Hm_Notices.show({0: 'Performing message action ...'});
+        Hm_Notices.show({0: 'Updating remote server ...'});
+        update_message_list_after_action(action_type, selected);
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_action'},
             {'name': 'imap_action_type', 'value': action_type},
             {'name': 'imap_message_ids', 'value': selected}],
             false,
             [],
-            false
+            true,
+            set_unread_state
         );
     }
     return false;
@@ -385,8 +404,15 @@ var save_to_local_storage = function(key, val) {
     return false;
 };
 
-if (hm_page_name == 'message_list') {
+var reset_checkboxes = function() {
     $(':checkbox').each(function () { this.checked = false; });
+    $(':checkbox').click(function() {
+        toggle_msg_controls();
+    });
+};
+
+if (hm_page_name == 'message_list') {
+    reset_checkboxes();
     if (hm_list_path == 'unread') {
         $('.menu_unread').addClass('selected_menu');
         if ($('.message_table tbody tr').length > 0) {
@@ -399,7 +425,7 @@ if (hm_page_name == 'message_list') {
         Hm_Timer.add_job(imap_unread_update, 60, defer);
         $('.message_table tr').fadeIn(100);
     }
-    else if (hm_list_path == 'flagged') {
+    if (hm_list_path == 'flagged') {
         if ($('.message_table tbody tr').length == 0) {
             imap_flagged_update();
         }
@@ -413,9 +439,6 @@ if (hm_page_name == 'message_list') {
         }
         $('.message_table tr').fadeIn(100);
     }
-    $(':checkbox').click(function() {
-        toggle_msg_controls();
-    });
 
 }
 else if (hm_page_name == 'message') {
