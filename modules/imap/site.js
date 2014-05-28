@@ -318,7 +318,7 @@ var get_message_content = function(msg_part) {
 
 var set_flagged_state = function() {
     Hm_Notices.hide(true);
-}
+};
 var set_unread_state = function() {
     Hm_Notices.hide(true);
     if (!$('.message_table tr').length) {
@@ -439,7 +439,6 @@ if (hm_page_name == 'message_list') {
         }
         $('.message_table tr').fadeIn(100);
     }
-
 }
 else if (hm_page_name == 'message') {
     if (hm_list_path.substring(0, 4) == 'imap') {
