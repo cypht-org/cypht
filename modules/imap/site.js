@@ -148,7 +148,7 @@ var update_flagged_message_display = function(res) {
 var imap_unread_update = function(loading) {
     Hm_Timer.cancel(imap_unread_update);
     var since = $('.unread_since option:selected').val();
-    var ids = $('#imap_server_ids').val().split(',');
+    var ids = $('.imap_server_ids').val().split(',');
     if ( ids && ids != '') {
         Hm_Notices.show({0: 'Updating unread messages '});
         for (i=0;i<ids.length;i++) {
@@ -168,7 +168,7 @@ var imap_unread_update = function(loading) {
 };
 
 var imap_flagged_update = function(loading) {
-    var ids = $('#imap_server_ids').val().split(',');
+    var ids = $('.imap_server_ids').val().split(',');
     if ( ids && ids != '') {
         Hm_Notices.show({0: 'Updating flagged messages '});
         for (i=0;i<ids.length;i++) {

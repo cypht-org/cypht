@@ -164,6 +164,9 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                 }
                                 else {
                                     $msgs += count($uids);
+                                    if ($form['imap_action_type'] == 'delete') {
+                                        $imap->message_action('EXPUNGE', $uids);
+                                    }
                                 }
                             }
                         }
@@ -635,7 +638,7 @@ class Hm_Output_display_imap_summary extends Hm_Output_Module {
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_servers'])) {
-            return '<input type="hidden" id="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
+            return '<input type="hidden" class="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
         }
     }
 }
