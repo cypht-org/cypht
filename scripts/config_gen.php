@@ -1,5 +1,7 @@
 <?php
 
+define("DEBUG_MODE", false);
+
 require 'lib/framework.php';
 
 $options = getopt('', array('ini_file::', 'debug'));
