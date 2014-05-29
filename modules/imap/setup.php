@@ -63,6 +63,7 @@ add_output('message_list', 'filter_imap_folders', true, 'imap', 'folder_list_sta
 add_handler('message', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('message', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('message', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('message', 'adjust_unread_cache', true, 'imap', 'folder_list_start', 'before'); 
 add_output('message', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 add_output('message', 'imap_msg_from_cache', true, 'imap', 'message_start', 'after');
 

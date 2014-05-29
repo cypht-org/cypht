@@ -93,6 +93,7 @@ var update_unread_message_display = function(res) {
     var count = update_message_list(ids, res.formatted_unread_data);
     document.title = 'HM3 '+count+' Unread';
     $('.sys_messages').html($('.sys_messages').html()+'.');
+    $('.unread_count').text(count);
 };
 
 var add_rows_to_message_list = function(msg_list) {
@@ -368,6 +369,9 @@ var update_message_list_after_action = function(action_type, selected) {
             class_name = selected[index];
             $('.'+clean_selector(class_name)).remove();
         }
+    }
+    if (hm_list_path == 'unread') {
+        $('.unread_count').text($(".message_list tbody tr").length);
     }
 };
 

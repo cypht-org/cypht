@@ -51,9 +51,11 @@ class Hm_Handler_save_unread_state extends Hm_Handler_Module {
         if ($success) {
             $rows = array_map(function($v) { return '<tr'.$v; }, array_filter(explode('<tr', $form['formatted_unread_data'])));
             Hm_Page_Cache::add('formatted_unread_data', $rows);
+            Hm_Page_Cache::add('formatted_unread_count', count($rows));
         }
         else {
             Hm_Page_Cache::add('formatted_unread_data', array());
+            Hm_Page_Cache::add('formatted_unread_count', 0);
         }
     }
 }
@@ -167,6 +169,9 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     $msgs += count($uids);
                                     if ($form['imap_action_type'] == 'delete') {
                                         $imap->message_action('EXPUNGE', $uids);
+                                    }
+                                    foreach ($uids as $uid) {
+                                        update_unread_cache($server, $uid, $folder);
                                     }
                                 }
                             }
@@ -460,6 +465,13 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
     }
 }
 
+class Hm_Output_adjust_unread_cache extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $bits = explode('_', $input['list_path'], 3);
+        update_unread_cache($bits[1], $input['uid'], $bits[2]);
+    }
+}
+
 class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output($input, $format) {
         $txt = '<div class="msg_text_inner">';
@@ -730,7 +742,7 @@ class Hm_Output_imap_msg_from_cache extends Hm_Output_Module {
         $header_cache = Hm_Page_Cache::get($key.'_headers');
         $grav_cache = Hm_Page_Cache::get($key.'_gravatar');
         $parts_cache = Hm_Page_Cache::get($key.'_parts');
-
+        
         if ($body_cache && $grav_cache && $header_cache && $parts_cache) {
             return $header_cache.$grav_cache.$body_cache.$parts_cache;
         }
@@ -1112,6 +1124,7 @@ function update_unread_cache($server_id, $msg_uid, $folder) {
         }
     }
     Hm_Page_Cache::add('formatted_unread_data', $new_cache);
+    Hm_Page_Cache::add('formatted_unread_count', count($new_cache));
 }
 
 ?>

@@ -521,6 +521,7 @@ class Hm_Output_two_col_layout_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
+        $unread_count = Hm_Page_Cache::get('formatted_unread_count');
         $res = '<div class="folder_cell"><div class="folder_list">';
         $res .= '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
         if (isset($input['section_state']['.main'])) {
@@ -530,7 +531,8 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             '<li class="menu_home"><a class="unread_link" href="?page=home">'.
             '<img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.$this->trans('Home').'</a></li>'.
             '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-            '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$this->trans('Unread').'</a></li>'.
+            '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$this->trans('Unread').
+            ' <span class="unread_count">'.$this->html_safe($unread_count).'</span></a></li>'.
             '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
             '<img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.$this->trans('Flagged').'</a></li>'.
             '<li class="menu_search"><a class="unread_link" href="?page=search">'.

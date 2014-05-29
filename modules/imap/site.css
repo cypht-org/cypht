@@ -77,3 +77,4 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .deleted a { text-decoration: line-through !important; color: #aaa !important; }
 .unread_controls { float: left; }
 .float_title { float: left; }
+.unread_count { color: #333; font-weight: bold; }
