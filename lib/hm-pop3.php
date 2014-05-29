@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 class Hm_POP3 {
     var $server;
     var $starttls;

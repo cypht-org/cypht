@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 return array(
     'interface_lang' => 'en_US',
     'Username' => false,

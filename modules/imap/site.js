@@ -386,7 +386,7 @@ var imap_message_action = function(action_type) {
             {'name': 'imap_message_ids', 'value': selected}],
             false,
             [],
-            true,
+            false,
             set_unread_state
         );
     }

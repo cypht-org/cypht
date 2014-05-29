@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 /* INPUT */
 
 class Hm_Handler_http_headers extends Hm_Handler_Module {

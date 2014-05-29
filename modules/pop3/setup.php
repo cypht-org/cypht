@@ -1,4 +1,7 @@
 <?php
+
+if (!defined('DEBUG_MODE')) { die(); }
+
 handler_source('pop3');
 output_source('pop3');
 

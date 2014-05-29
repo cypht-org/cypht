@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 /* base configuration */
 abstract class Hm_Config {
 
@@ -1165,6 +1167,17 @@ class Hm_Page_Cache {
     }
 }
 
+function check_bad_request_target() {
+    if (isset($_SERVER['REQUEST_URI'])) {
+        if (!preg_match("/php/", $_SERVER['REQUEST_URI'])) {
+            return;
+        }
+        elseif (preg_match("/index.php", $_SERVER['REQUEST_URI'])) {
+            return;
+        }
+        die("That's bad");
+    }
+}
 function handler_source($source) {
     Hm_Handler_Modules::set_source($source);
 }

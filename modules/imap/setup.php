@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 handler_source('imap');
 output_source('imap');
 

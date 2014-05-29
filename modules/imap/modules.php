@@ -1,5 +1,6 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
 require 'lib/hm-imap.php';
 
 class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {

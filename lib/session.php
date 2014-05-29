@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 /* persistant storage between pages, abstract interface */
 abstract class Hm_Session {
 

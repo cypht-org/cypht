@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 /*  hm-imap.php: Generic PHP5 IMAP client library.
 
     This code is derived from the IMAP library used in Hastymail2 (www.hastymail.org)

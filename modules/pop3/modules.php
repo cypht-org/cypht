@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 require 'lib/hm-pop3.php';
 
 class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
