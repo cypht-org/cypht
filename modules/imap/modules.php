@@ -36,6 +36,26 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_save_flagged_state extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('formatted_flagged_data'));
+        if ($success) {
+            $rows = array_map(function($v) { return '<tr'.$v; }, array_filter(explode('<tr', $form['formatted_flagged_data'])));
+            Hm_Page_Cache::add('formatted_flagged_data', $rows);
+        }
+    }
+}
+
+class Hm_Handler_save_combined_inbox extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('formatted_combined_inbox'));
+        if ($success) {
+            $rows = array_map(function($v) { return '<tr'.$v; }, array_filter(explode('<tr', $form['formatted_combined_inbox'])));
+            Hm_Page_Cache::add('formatted_combined_inbox', $rows);
+        }
+    }
+}
+
 class Hm_Handler_save_folder_state extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_folder_state'));
@@ -183,6 +203,19 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
             }
         }
+    }
+}
+
+class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $ids = explode(',', $form['imap_server_ids']);
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, false, array('INBOX'), 20);
+            $data['imap_combined_inbox_data'] = $msg_list;
+            $data['combined_inbox_server_ids'] = $form['imap_server_ids'];
+        }
+        return $data;
     }
 }
 
@@ -722,6 +755,9 @@ class Hm_Output_imap_message_list extends Hm_Output_Module {
             if ($input['list_path'] == 'unread') {
                 return imap_message_list_unread($input);     
             }
+            elseif ($input['list_path'] == 'combined_inbox') {
+                return imap_combined_inbox_list();
+            }
             elseif ($input['list_path'] == 'flagged') {
                 return imap_flagged_list();
             }
@@ -750,6 +786,19 @@ class Hm_Output_imap_msg_from_cache extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['imap_combined_inbox_data']) && !empty($input['imap_combined_inbox_data'])) {
+            $res = format_imap_message_list($input['imap_combined_inbox_data'], $this);
+            $input['formatted_combined_inbox'] = $res;
+            unset($input['imap_combined_inbox_data']);
+        }
+        else {
+            $input['formatted_combined_inbox'] = array();
+        }
+        return $input;
+    }
+}
 class Hm_Output_filter_folder_page extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = array();
@@ -812,9 +861,9 @@ function format_imap_message_list($msg_list, $output_module) {
             '</td><td class="checkbox_row"><input type="checkbox" value="'.$output_module->html_safe($id).'" /></td>'.
             '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
             '<td class="from">'.$from.'</div></td>'.
-            '<td class="subject'.(!stristr($msg['flags'], 'seen') ? ' unseen' : '').
+            '<td class="subject"><div class="'.(!stristr($msg['flags'], 'seen') ? ' unseen' : '').
             (stristr($msg['flags'], 'deleted') ? ' deleted' : '').'"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
-            '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).'">'.$subject.'</a></td>'.
+            '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).'">'.$subject.'</a></div></td>'.
             '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td></tr>', $id);
     }
     return $res;
@@ -876,10 +925,34 @@ function imap_message_list_folder($input, $output_module) {
         '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
 }
 
+function imap_combined_inbox_list() {
+    $cache = Hm_Page_Cache::get('formatted_combined_inbox');
+    $empty_list = '';
+    if ($cache === false) {
+        $cache = array();
+    }
+    elseif (!$cache) {
+        $empty_list = '<div class="empty_list">No messages found!</div>';
+    }
+    $cache = implode('', $cache);
+    return '<div class="message_list"><div class="content_title">Combined Inbox'.
+        '<a class="update_unread" onclick="return imap_combined_inbox()" href="#">[update]</a>'.imap_message_controls().'</div>'.
+        imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
+}
 function imap_flagged_list() {
+    $cache = Hm_Page_Cache::get('formatted_flagged_data');
+    $empty_list = '';
+    if ($cache === false) {
+        $cache = array();
+    }
+    elseif (!$cache) {
+        $empty_list = '<div class="empty_list">No flagged messages found!</div>';
+    }
+    $cache = implode('', $cache);
+    error_log($cache);
     return '<div class="message_list"><div class="content_title">Flagged'.
-        '<a class="update_unread" href="#"">[update]</a>'.imap_message_controls().'</div>'.
-        imap_message_list_headers().'<tbody></tbody></table></div>';
+        '<a class="update_unread" onclick="return imap_flagged_update()" href="#">[update]</a>'.imap_message_controls().'</div>'.
+        imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
 
 function imap_message_list_unread($input) {
@@ -1077,8 +1150,12 @@ function build_msg_gravatar( $from ) {
         return '<img class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';
     }
 }
+function sort_by_internal_date($a, $b) {
+    if ($a['internal_date'] == $b['internal_date']) return 0;
+    return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
+}
 
-function merge_imap_search_results($ids, $search_type, $session, $since = false, $folders = array('INBOX')) {
+function merge_imap_search_results($ids, $search_type, $session, $since = false, $folders = array('INBOX'), $limit=0) {
     $msg_list = array();
     foreach($ids as $id) {
         $id = intval($id);
@@ -1095,6 +1172,10 @@ function merge_imap_search_results($ids, $search_type, $session, $since = false,
                         $msgs = $imap->search($search_type);
                     }
                     if ($msgs) {
+                        if ($limit) {
+                            rsort($msgs);
+                            $msgs = array_slice($msgs, 0, $limit);
+                        }
                         foreach ($imap->get_message_list($msgs) as $msg) {
                             $msg['server_id'] = $id;
                             $msg['folder'] = $folder;
@@ -1106,10 +1187,7 @@ function merge_imap_search_results($ids, $search_type, $session, $since = false,
             }
         }
     }
-    usort($msg_list, function($a, $b) {
-        if ($a['internal_date'] == $b['internal_date']) return 0;
-        return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
-    });
+    usort($msg_list, 'sort_by_internal_date');
     return $msg_list;
 }
 

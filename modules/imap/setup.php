@@ -135,6 +135,18 @@ add_handler('ajax_imap_save_unread_state', 'load_user_data', true, 'core');
 add_handler('ajax_imap_save_unread_state', 'save_unread_state', true);
 add_handler('ajax_imap_save_unread_state', 'date', true, 'core');
 
+/* save combined inbox state */
+add_handler('ajax_imap_save_combined_inbox', 'login', false, 'core');
+add_handler('ajax_imap_save_combined_inbox', 'load_user_data', true, 'core');
+add_handler('ajax_imap_save_combined_inbox', 'save_combined_inbox', true);
+add_handler('ajax_imap_save_combined_inbox', 'date', true, 'core');
+
+/* save flagged list state */
+add_handler('ajax_imap_save_flagged_state', 'login', false, 'core');
+add_handler('ajax_imap_save_flagged_state', 'load_user_data', true, 'core');
+add_handler('ajax_imap_save_flagged_state', 'save_flagged_state', true);
+add_handler('ajax_imap_save_flagged_state', 'date', true, 'core');
+
 /* save folder list state */
 add_handler('ajax_imap_save_folder_state', 'login', false, 'core');
 add_handler('ajax_imap_save_folder_state', 'load_user_data', true, 'core');
@@ -161,6 +173,16 @@ add_handler('ajax_imap_folder_display', 'save_imap_servers',  true);
 add_handler('ajax_imap_folder_display', 'date', true, 'core');
 add_output('ajax_imap_folder_display', 'filter_folder_page', true);
 
+/* combined inbox */
+add_handler('ajax_imap_combined_inbox', 'login', false, 'core');
+add_handler('ajax_imap_combined_inbox', 'load_user_data', true, 'core');
+add_handler('ajax_imap_combined_inbox', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_combined_inbox', 'imap_combined_inbox',  true);
+add_handler('ajax_imap_combined_inbox', 'save_imap_cache',  true);
+add_handler('ajax_imap_combined_inbox', 'save_imap_servers',  true);
+add_handler('ajax_imap_combined_inbox', 'date', true, 'core');
+add_output('ajax_imap_combined_inbox', 'filter_combined_inbox', true);
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -170,9 +192,12 @@ return array(
         'ajax_imap_flagged',
         'ajax_imap_folder_expand',
         'ajax_imap_folder_display',
+        'ajax_imap_combined_inbox',
         'ajax_imap_save_unread_state',
+        'ajax_imap_save_combined_inbox',
         'ajax_imap_message_content',
         'ajax_imap_save_folder_state',
+        'ajax_imap_save_flagged_state',
         'ajax_imap_message_action'
     ),
 
@@ -204,6 +229,8 @@ return array(
         'folder' => FILTER_SANITIZE_STRING,
         'force_update' => FILTER_VALIDATE_BOOLEAN,
         'formatted_unread_data' => FILTER_UNSAFE_RAW,
+        'formatted_combined_inbox' => FILTER_UNSAFE_RAW,
+        'formatted_flagged_data' => FILTER_UNSAFE_RAW,
         'imap_folder_state' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_msg_part' => FILTER_SANITIZE_STRING,

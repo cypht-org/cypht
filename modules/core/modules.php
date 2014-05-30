@@ -184,6 +184,9 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             elseif ($path == 'flagged') {
                 $data['list_path'] = 'flagged';
             }
+            elseif ($path == 'combined_inbox') {
+                $data['list_path'] = 'combined_inbox';
+            }
             elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 3);
@@ -331,7 +334,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
             }
             elseif (isset($input['router_page_name'])) {
                 if (isset($input['list_path']) && $input['router_page_name'] == 'message_list') {
-                    $title .= ' '.ucfirst($input['list_path']);
+                    $title .= ' '.ucwords(str_replace('_', ' ', $input['list_path']));
                 }
                 elseif ($input['router_page_name'] == 'notfound') {
                     $title .= ' Nope';
@@ -530,6 +533,8 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
         $res .= 'class="main"><ul class="folders">'.
             '<li class="menu_home"><a class="unread_link" href="?page=home">'.
             '<img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.$this->trans('Home').'</a></li>'.
+            '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
+            '<img class="account_icon" src="images/open_iconic/box-2x.png" alt="" /> '.$this->trans('Inbox').'</a></li>'.
             '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
             '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$this->trans('Unread').
             ' <span class="unread_count">'.$this->html_safe($unread_count).'</span></a></li>'.

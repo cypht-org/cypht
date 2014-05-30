@@ -107,8 +107,10 @@ var add_rows_to_message_list = function(msg_list) {
         }
         else {
             timestr = $('.msg_date', $(row)).html();
+            subject = $('.subject', $(row)).html();
             timeint = $('.msg_timestamp', $(row)).val();
             $('.msg_date', $('.'+clean_selector(id))).html(timestr);
+            $('.subject', $('.'+clean_selector(id))).html(subject);
             $('.msg_timestamp', $('.'+clean_selector(id))).val(timeint);
         }
         msg_ids.push(id);
@@ -168,9 +170,58 @@ var imap_unread_update = function(loading) {
     return false;
 };
 
+var display_imap_combined_inbox = function(res) {
+    var ids = res.combined_inbox_server_ids.split(',');
+    var count = update_message_list(ids, res.formatted_combined_inbox);
+    $('.sys_messages').html($('.sys_messages').html()+'.');
+};
+
+var set_combined_inbox_state = function() {
+    Hm_Notices.hide(true);
+    if (!$('.message_table tr').length) {
+        if (!$('.empty_list').length) {
+            $('.message_list').append('<div class="empty_list">No messages found!</div>');
+        }
+    }
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    var request = function() {
+            Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_combined_inbox'},
+            {'name': 'formatted_combined_inbox', 'value': data.html()}],
+            false,
+            [],
+            true
+        );
+    };
+    $(':checkbox').click(function() {
+        toggle_msg_controls();
+    });
+    setTimeout(request, 500);
+};
+
+var imap_combined_inbox = function(path, force) {
+    var ids = $('.imap_server_ids').val().split(',');
+    if (ids && ids != '') {
+        Hm_Notices.show({0: 'Loading messages '});
+        for (i=0;i<ids.length;i++) {
+            id=ids[i];
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_combined_inbox'},
+                {'name': 'imap_server_ids', 'value': id}],
+                display_imap_combined_inbox,
+                [],
+                false,
+                set_combined_inbox_state
+            );
+        }
+    }
+    return false;
+};
+
 var imap_flagged_update = function(loading) {
     var ids = $('.imap_server_ids').val().split(',');
-    if ( ids && ids != '') {
+    if (ids && ids != '') {
         Hm_Notices.show({0: 'Updating flagged messages '});
         for (i=0;i<ids.length;i++) {
             id=ids[i];
@@ -214,23 +265,8 @@ var select_imap_folder = function(path, force) {
 
 var display_imap_mailbox = function(res) {
     Hm_Notices.hide(true);
-    var imap_id = res.imap_server_id;
-    var msg_ids = [];
-    for (index in res.formatted_mailbox_page) {
-        row = res.formatted_mailbox_page[index][0];
-        id = res.formatted_mailbox_page[index][1];
-        if (!$('.'+clean_selector(id)).length) {
-            $('.message_table tbody').append(row);
-            $('.'+clean_selector(id)).fadeIn(300);
-        }
-        msg_ids.push(id);
-    }
-    $('.message_table tbody tr[class^=imap_'+imap_id+'_]').filter(function() {
-        var id = this.className;
-        if (jQuery.inArray(id, msg_ids) == -1) {
-            $(this).fadeOut(300, function() { $('.'+id).remove(); });
-        }
-    });
+    var ids = [res.imap_server_id];
+    var count = update_message_list(ids, res.formatted_mailbox_page);
     if (res.imap_page_links) {
         $('.imap_page_links').html(res.imap_page_links);
     }
@@ -319,7 +355,28 @@ var get_message_content = function(msg_part) {
 
 var set_flagged_state = function() {
     Hm_Notices.hide(true);
+    if (!$('.message_table tr').length) {
+        if (!$('.empty_list').length) {
+            $('.message_list').append('<div class="empty_list">No flagged messages found!</div>');
+        }
+    }
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    var request = function() {
+            Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_flagged_state'},
+            {'name': 'formatted_flagged_data', 'value': data.html()}],
+            false,
+            [],
+            true
+        );
+    };
+    $(':checkbox').click(function() {
+        toggle_msg_controls();
+    });
+    setTimeout(request, 500);
 };
+
 var set_unread_state = function() {
     Hm_Notices.hide(true);
     if (!$('.message_table tr').length) {
@@ -429,7 +486,13 @@ if (hm_page_name == 'message_list') {
         Hm_Timer.add_job(imap_unread_update, 60, defer);
         $('.message_table tr').fadeIn(100);
     }
-    if (hm_list_path == 'flagged') {
+    else if (hm_list_path == 'combined_inbox') {
+        $('.menu_combined_inbox').addClass('selected_menu');
+        if ($('.message_table tbody tr').length == 0) {
+            imap_combined_inbox();
+        }
+    }
+    else if (hm_list_path == 'flagged') {
         if ($('.message_table tbody tr').length == 0) {
             imap_flagged_update();
         }
