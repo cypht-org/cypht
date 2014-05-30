@@ -857,20 +857,28 @@ function format_imap_message_list($msg_list, $output_module) {
         $from = str_replace("&quot;", '', $from);
         $timestamp = $output_module->html_safe(strtotime($msg['internal_date']));
         $date = $output_module->html_safe(human_readable_interval($msg['internal_date']));
+        error_log(print_r($msg,true));
         $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
             '</td><td class="checkbox_row"><input type="checkbox" value="'.$output_module->html_safe($id).'" /></td>'.
             '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
             '<td class="from">'.$from.'</div></td>'.
-            '<td class="subject"><div class="'.(!stristr($msg['flags'], 'seen') ? ' unseen' : '').
-            (stristr($msg['flags'], 'deleted') ? ' deleted' : '').'"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
+            '<td class="subject"><div class="'.
+            (!stristr($msg['flags'], 'seen') ? ' unseen' : '').
+            (stristr($msg['flags'], 'deleted') ? ' deleted' : '').
+            (stristr($msg['flags'], 'flagged') ? ' flagged' : '').
+            '"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
             '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).'">'.$subject.'</a></div></td>'.
-            '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td></tr>', $id);
+            '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td>'.
+            '<td class="icon">'.
+            (stristr($msg['flags'], 'flagged') ? '<img src="images/open_iconic/star-2x.png" />' : '').
+            '</td></tr>', $id);
     }
     return $res;
 }
 
 function imap_message_controls() {
     return '<div class="msg_controls">'.
+        '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="images/open_iconic/check.png" /></a>'.
         '<a href="#" onclick="return imap_message_action(\'read\');" class="disabled_link">Read</a>'.
         '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
         '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
@@ -903,7 +911,8 @@ function process_imap_message_ids($ids) {
 function imap_message_list_headers() {
     return '<table class="message_table" cellpadding="0" cellspacing="0">'.
         '<colgroup><col class="chkbox_col"><col class="source_col">'.
-        '<col class="from_col"><col class="subject_col"><col class="date_col"></colgroup>';
+        '<col class="from_col"><col class="subject_col"><col class="date_col">
+        <col class="icon_col"></colgroup>';
 }
 
 function imap_message_list_folder($input, $output_module) {
@@ -921,7 +930,7 @@ function imap_message_list_folder($input, $output_module) {
     return '<div class="message_list"><div class="content_title">'.$title.
         '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.
         $output_module->html_safe($input['list_path']).'\', true)">[update]</a>'.
-        imap_message_controls().'</div>'.imap_message_list_headers().
+        '</div>'.imap_message_controls().imap_message_list_headers().
         '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
 }
 
@@ -936,7 +945,7 @@ function imap_combined_inbox_list() {
     }
     $cache = implode('', $cache);
     return '<div class="message_list"><div class="content_title">Combined Inbox'.
-        '<a class="update_unread" onclick="return imap_combined_inbox()" href="#">[update]</a>'.imap_message_controls().'</div>'.
+        '<a class="update_unread" onclick="return imap_combined_inbox()" href="#">[update]</a></div>'.imap_message_controls().
         imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
 function imap_flagged_list() {
@@ -951,7 +960,7 @@ function imap_flagged_list() {
     $cache = implode('', $cache);
     error_log($cache);
     return '<div class="message_list"><div class="content_title">Flagged'.
-        '<a class="update_unread" onclick="return imap_flagged_update()" href="#">[update]</a>'.imap_message_controls().'</div>'.
+        '<a class="update_unread" onclick="return imap_flagged_update()" href="#">[update]</a></div>'.imap_message_controls().
         imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
 
@@ -990,7 +999,7 @@ function imap_message_list_unread($input) {
         $res .= ' value="'.$val.'">'.$label.'</option>';
     }
     $res .= '</select><a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a>'.
-        imap_message_controls().'</div>'.imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
+        '</div>'.imap_message_controls().imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
     return $res;
 }
 
