@@ -741,8 +741,9 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 
 class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['imap_connect_status']) && $input['imap_connect_status'] == 'authenticated') {
-            $input['imap_status_display'] = '<span class="online">Online</span> Connected in '.$input['imap_connect_time'];
+        if (isset($input['imap_connect_status']) && $input['imap_connect_status'] != 'diconnected') {
+            $input['imap_status_display'] = '<span class="online">'.
+                $this->html_safe(ucwords($input['imap_connect_status'])).'</span> Connected in '.$input['imap_connect_time'];
             $input['imap_detail_display'] = '';
         }
         else {
