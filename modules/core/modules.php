@@ -605,6 +605,21 @@ class Hm_Output_server_summary_start extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_server_status_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<div class="server_status"><div class="content_title">Status</div>';
+        $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Status</th><th>Details</th></tr>'.
+                '</thead><tbody>';
+        return $res;
+    }
+}
+
+class Hm_Output_server_status_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</tbody></table></div>';
+    }
+}
+
 class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';

@@ -26,10 +26,10 @@ option, select { padding: 3px; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }
 .elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
-.server_summary { height: 100%; background-color: #fff; }
-.server_summary table { padding: 20px; padding-bottom: 40px; }
-.server_summary table th, .message_table th { font-style: italic; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #666; font-size: 80%; font-weight: normal; }
-.server_summary table td { padding: 5px; }
+.server_status, .server_summary { height: 100%; background-color: #fff; }
+.server_status table, .server_summary table { width: 75%; padding: 20px; padding-bottom: 40px; }
+.server_status table th, .server_summary table th, .message_table th { font-style: italic; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #666; font-size: 80%; font-weight: normal; }
+.server_status table td, .server_summary table td { padding: 5px; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
 .inner_list { margin-bottom: 10px; } 

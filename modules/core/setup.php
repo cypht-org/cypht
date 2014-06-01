@@ -36,6 +36,8 @@ add_output('home', 'folder_list_end', true);
 add_output('home', 'content_section_start', true);
 add_output('home', 'server_summary_start', true);
 add_output('home', 'server_summary_end', true);
+add_output('home', 'server_status_start', true);
+add_output('home', 'server_status_end', true);
 add_output('home', 'content_section_end', true);
 add_output('home', 'two_col_layout_end', true);
 add_output('home', 'page_js', true);
