@@ -148,6 +148,33 @@ var update_flagged_message_display = function(res) {
     $('.sys_messages').html($('.sys_messages').html()+'.');
 };
 
+var update_imap_status_display = function(res) {
+    var id = res.imap_status_server_id;
+    $('.imap_status_'+id).html(res.imap_status_display);
+};
+
+var end_status_update = function() {
+    Hm_Notices.hide(true);
+};
+var imap_status_update = function() {
+    var ids = $('.imap_server_ids').val().split(',');
+    if ( ids && ids != '') {
+        Hm_Notices.show({0: 'Updating server status '});
+        for (i=0;i<ids.length;i++) {
+            id=ids[i];
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
+                {'name': 'imap_server_ids', 'value': id}],
+                update_imap_status_display,
+                [],
+                false,
+                end_status_update
+            );
+        }
+    }
+    return false;
+};
+
 var imap_unread_update = function(loading) {
     Hm_Timer.cancel(imap_unread_update);
     var since = $('.unread_since option:selected').val();
@@ -526,4 +553,7 @@ else if (hm_page_name == 'servers') {
     $('.save_imap_connection').on('click', imap_save_action);
     $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
+}
+else if (hm_page_name == 'home') {
+    imap_status_update();
 }

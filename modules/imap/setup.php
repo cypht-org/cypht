@@ -11,6 +11,7 @@ add_handler('home', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_
 add_handler('home', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('home', 'filter_imap_folders', true, 'imap', 'folder_list_start', 'before');
 add_output('home', 'display_imap_summary', true, 'imap', 'server_summary_start', 'after');
+add_output('home', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
 add_output('home', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
@@ -110,6 +111,17 @@ add_handler('ajax_imap_unread', 'save_user_data',  true, 'core');
 add_handler('ajax_imap_unread', 'date', true, 'core');
 add_output('ajax_imap_unread', 'filter_unread_data', true);
 
+/* ajax status callback data */
+add_handler('ajax_imap_status', 'login', false, 'core');
+add_handler('ajax_imap_status', 'load_user_data', true, 'core');
+add_handler('ajax_imap_status', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_status', 'imap_status',  true);
+add_handler('ajax_imap_status', 'save_imap_cache',  true);
+add_handler('ajax_imap_status', 'save_imap_servers',  true);
+add_handler('ajax_imap_status', 'save_user_data',  true, 'core');
+add_handler('ajax_imap_status', 'date', true, 'core');
+add_output('ajax_imap_status', 'filter_imap_status_data', true);
+
 /* ajax flagged callback data */
 add_handler('ajax_imap_flagged', 'login', false, 'core');
 add_handler('ajax_imap_flagged', 'load_user_data', true, 'core');
@@ -187,7 +199,7 @@ add_output('ajax_imap_combined_inbox', 'filter_combined_inbox', true);
 return array(
     'allowed_pages' => array(
         'ajax_imap_debug',
-        'ajax_imap_summary',
+        'ajax_imap_status',
         'ajax_imap_unread',
         'ajax_imap_flagged',
         'ajax_imap_folder_expand',

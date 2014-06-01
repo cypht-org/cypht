@@ -232,6 +232,25 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_imap_status extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $ids = explode(',', $form['imap_server_ids']);
+            foreach ($ids as $id) {
+                $cache = Hm_IMAP_List::get_cache($this->session, $id);
+                $start_time = microtime(true);
+                $imap = Hm_IMAP_List::connect($id, $cache);
+                $data['imap_connect_time'] = microtime(true) - $start_time;
+                $data['imap_connect_status'] = $imap->get_state();
+                $data['imap_status_inbox'] = $imap->select_mailbox('INBOX');
+                $data['imap_status_server_id'] = $id;
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_unread_since', 'imap_server_ids'));
@@ -661,6 +680,23 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_display_imap_status extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if ($format == 'HTML5') {
+            $res = '';
+            if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
+                foreach ($input['imap_servers'] as $index => $vals) {
+                    if ($vals['name'] == 'Default-Auth-Server') {
+                        $vals['name'] = 'Default';
+                    }
+                    $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
+                        '<td class="imap_detail_'.$index.'"></td></tr>';
+                }
+            }
+            return $res;
+        }
+    }
+}
 class Hm_Output_display_imap_summary extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
@@ -703,6 +739,19 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['imap_connect_status']) && $input['imap_connect_status'] == 'authenticated') {
+            $input['imap_status_display'] = '<span class="online">Online</span> Connected in '.$input['imap_connect_time'];
+            $input['imap_detail_display'] = '';
+        }
+        else {
+            $input['imap_status_display'] = '<span class="down">Down</span>';
+            $input['imap_detail_display'] = '';
+        }
+        return $input;
+    }
+}
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $cache = Hm_Page_Cache::get('imap_folders');
