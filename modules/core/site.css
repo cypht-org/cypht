@@ -1,23 +1,24 @@
 a { text-decoration: none; color: green; }
 a:hover { color: #000 !important; }
 br { clear: both; }
-html, body { max-width: 100%; min-height: 100%; background: linear-gradient(180deg, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #fff); }
-body { font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; background-color: #fff; }
+html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
+body { background: linear-gradient(180deg, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #fff); }
+body { font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; }
 .framework { width: 100%; height: 100%; }
 table { width: 100%; }
 td { vertical-align: top; }
 .subtitle { color: green; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
 .date { float: right; clear: none; color: #888; padding-right: 30px; padding-top: 6px;}
-.sys_messages { float: left; color: green; margin-left: 20px; margin-top: 5px; }
+.sys_messages { float: left; color: green; margin-left: 15px; margin-top: 2px; }
 .logout_form { float: right; clear: none; padding-right: 20px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
-.title { float: left; font-weight: normal; padding: 0px; font-size: 2em; color: #000; opacity: .4; margin: 0px; margin-left: 15px; letter-spacing: -1px; font-family: monospace; width: 50px; }
-.loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 6px; margin-left: 10px; vertical-align: -5px; }
+.title { float: left; font-weight: normal; padding: 0px; font-size: 1.55em; color: #000; opacity: .4; margin: 0px; margin-left: 0px; letter-spacing: -1px; font-family: monospace; }
+.loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 3px; margin-left: 15px; }
 .loading_icon img { visibility: inherit; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .logout { cursor: pointer; background: #fff url('/hm3/images/open_iconic/power-standby-2x.png') no-repeat 6px 4px; padding-left: 25px; color: #000; opacity: .6; }
-.search_content, .profile_content, .user_settings { min-height: 400px; background: #fff; height: 100%; margin-left: margin-right: 20px; padding-bottom: 40px; }
-.user_settings table { width: 50%; white-space: nowrap; margin-left: 10px; }
+.search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-left: margin-right: 20px; padding-bottom: 40px; }
+.user_settings table { table-layout: fixed; width: 100%; white-space: nowrap; padding-left: 10px; }
 .user_settings table td { padding: 5px; }
 .save_settings { float: none !important; }
 option, select { padding: 3px; }
@@ -26,8 +27,8 @@ option, select { padding: 3px; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }
 .elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
-.server_status, .server_summary { height: 100%; background-color: #fff; }
-.server_status table, .server_summary table { width: 75%; padding: 20px; padding-bottom: 40px; }
+.server_status, .server_summary { width: 100%; height: 100%; background-color: #fff; }
+.server_status table, .server_summary table { table-layout: fixed; width: 100%; padding: 20px; padding-bottom: 40px; }
 .server_status table th, .server_summary table th, .message_table th { font-style: italic; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #666; font-size: 80%; font-weight: normal; }
 .server_status table td, .server_summary table td { padding: 5px; }
 .inner_list a { padding-right: 5px; }
@@ -52,3 +53,4 @@ option, select { padding: 3px; }
 .content_title { margin-top: 0px; color: #777; background-color: #fff; border-bottom: solid 1px #aaa; padding-bottom: 5px; padding-top: 5px; letter-spacing: -1px; font-size: 1.1em; padding-left: 20px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
+.list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }

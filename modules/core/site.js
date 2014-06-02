@@ -206,16 +206,17 @@ var parse_folder_path = function(path, path_type) {
 
 var toggle_section = function(class_name) {
     if ($(class_name).length) {
-        var section_state = $(class_name).css('display').toLowerCase();
-        $(class_name).toggle(300);
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_save_section_state'},
-            {'name': 'section_state', 'value': section_state},
-            {'name': 'section_class', 'value': class_name}],
-            false,
-            [],
-            true
-        );
+        $(class_name).toggle(200, function() {
+            var section_state = $(class_name).css('display').toLowerCase();
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_save_section_state'},
+                {'name': 'section_state', 'value': section_state},
+                {'name': 'section_class', 'value': class_name}],
+                false,
+                [],
+                true
+            );
+        });
     }
     return false;
 };

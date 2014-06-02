@@ -31,9 +31,9 @@ class Hm_Handler_process_language_setting extends Hm_Handler_Module {
 class Hm_Handler_save_section_state extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('section_state', 'section_class'));
-        if ($success && in_array($form['section_state'], array('block', 'none'))) {
+        if ($success && in_array($form['section_state'], array('block', 'none', 'table-cell'))) {
             $state = $this->session->get('section_state', array());
-            $state[$form['section_class']] = $form['section_state'] == 'block' ? 'none' : 'block';
+            $state[$form['section_class']] = $form['section_state'];
             $this->session->set('section_state', $state);
         }
         return $data;
@@ -229,7 +229,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<h1 class="title">HM3</h1>';
+            return '<h1 class="title"><a href="#" onclick="return toggle_section(\'.folder_cell\')" ><img class="list_toggle" src="images/open_iconic/list-2x.png" /></a>HM3</h1>';
         }
     }
 }
@@ -525,7 +525,15 @@ class Hm_Output_two_col_layout_end extends Hm_Output_Module {
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $unread_count = Hm_Page_Cache::get('formatted_unread_count');
-        $res = '<div class="folder_cell"><div class="folder_list">';
+        $res = '<div class="folder_cell"';
+        if (isset($input['section_state']['.folder_cell'])) {
+            error_log($input['section_state']['.folder_cell']);
+            if ($input['section_state']['.folder_cell'] == 'block') {
+                $input['section_state']['.folder_cell'] = 'table-cell';
+            }
+            $res .= ' style="display: '.$this->html_safe($input['section_state']['.folder_cell']).'"';
+        }
+        $res .= '><div class="folder_list">';
         $res .= '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
         if (isset($input['section_state']['.main'])) {
             $res .= 'style="display: '.$this->html_safe($input['section_state']['.main']).'" ';
