@@ -52,9 +52,8 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .disabled_link { opacity: .5; color: #999 !important; }
 .account_row { cursor: pointer; }
 .expand_link { display: block; width: 16px; height: 16px; float: left; margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
-.header_subject td { padding: 0px; }
-.header_subject td div img { margin-right: 10px; margin-left: 11px; }
-.header_date th, .header_date td { padding-top: 16px; }
+.header_subject th { font-size: 1.3em; padding-top: 10px; }
+.header_subject th div img { margin-right: 10px; margin-left: 11px; }
 .msg_parts { border-top: solid 1px #ddd; padding-top: 20px; padding-left: 40px; width: 100%; padding-bottom: 40px; }
 .msg_parts td { padding: 3px; }
 .row_indent_0 { display: inline; padding: 0px; }

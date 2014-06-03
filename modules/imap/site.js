@@ -347,7 +347,17 @@ var display_msg_content = function(res) {
     $('.msg_text').append(res.msg_headers);
     $('.msg_text').append(res.msg_text);
     $('.msg_text').append(res.msg_parts);
+    set_message_content(res);
     document.title = 'HM3 '+$('.content_title').text();
+};
+
+var set_message_content = function() {
+    var key = hm_msg_uid+'_'+hm_list_path;
+    save_to_local_storage(key, $('.msg_text').html());
+};
+var get_local_message_content = function() {
+    var key = hm_msg_uid+'_'+hm_list_path;
+    return get_from_local_storage(key);
 };
 
 var get_message_content = function(msg_part) {
@@ -480,6 +490,7 @@ if (hm_page_name == 'message_list') {
             $('.message_table tbody').html(unread_data);
             defer = true;
             document.title = 'HM3 '+$('.message_table tbody tr').length+' Unread';
+            $('.unread_count').html($('.message_table tbody tr').length);
         }
         else {
             defer = false;
@@ -517,17 +528,18 @@ if (hm_page_name == 'message_list') {
     }
 }
 else if (hm_page_name == 'message') {
+    var msg_content = get_local_message_content();
+    console.log(msg_content);
+    if (!msg_content || !msg_content.length) {
+        get_message_content();
+    }
+    else {
+        $('.msg_text').html(msg_content);
+        document.title = 'HM3 '+$('.header_subject th').text();
+    }
     if (hm_list_path.substring(0, 4) == 'imap') {
-        if ($('.msg_text').children().length == 0) {
-            get_message_content();
-        }
-        else {
-            document.title = 'HM3 '+$('.content_title').text();
-        }
-        if (hm_list_path.substring(0, 4) == 'imap') {
-            $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
-            $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
-        }
+        $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
+        $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
     }
 }
 else if (hm_page_name == 'servers') {

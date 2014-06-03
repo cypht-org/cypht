@@ -418,10 +418,6 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
         if ($success) {
             $data['msg_text_uid'] = $form['imap_msg_uid'];
-            $page_cache = Hm_Page_Cache::get('imap_msg_text_'.$form['imap_server_id'].'_'.$form['imap_msg_uid']);
-            if ($page_cache) {
-                $data['msg_text'] = $page_cache;
-            }
             $part = false;
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
                 $part = $this->request->post['imap_msg_part'];
@@ -499,7 +495,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
         }
         $txt .= '</div>';
         $input['msg_text'] = $txt;
-        Hm_Page_Cache::add($input['msg_cache_suffix'].'_text', $txt);
+        //Hm_Page_Cache::add($input['msg_cache_suffix'].'_text', $txt);
         return $input;
     }
 }
@@ -516,7 +512,7 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
         }
         $res .= '</table>';
         $input['msg_parts'] = $res;
-        Hm_Page_Cache::add($input['msg_cache_suffix'].'_parts', $res);
+        //Hm_Page_Cache::add($input['msg_cache_suffix'].'_parts', $res);
         return $input;
     }
 }
@@ -524,15 +520,6 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['msg_headers'])) {
-            if (isset($input['list_parent'])) {
-                $title = ucwords(str_replace('_', ' ', $input['list_parent']));
-            }
-            elseif (isset($input['mailbox_list_title'])) {
-                $title = implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']);
-            }
-            else {
-                $title = '';
-            }
             $txt = '';
             $from = '';
             $small_headers = array('subject', 'date', 'from');
@@ -545,7 +532,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $from = $value;
                         }
                         if ($fld == 'subject') {
-                            $txt .= '<tr class="header_'.$fld.'"><td colspan="2"><div class="content_title">'.$title.' '.$this->html_safe($value).'</div></td></tr>';
+                            $txt .= '<tr class="header_'.$fld.'"><th colspan="2">'.$this->html_safe($value).'</th></tr>';
                         }
                         else {
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
@@ -571,8 +558,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $input['msg_headers'] = $txt;
             $input['msg_gravatar'] =  build_msg_gravatar($from);
-            Hm_Page_Cache::add($input['msg_cache_suffix'].'_headers', $txt);
-            Hm_Page_Cache::add($input['msg_cache_suffix'].'_gravatar', $input['msg_gravatar']);
+            //Hm_Page_Cache::add($input['msg_cache_suffix'].'_headers', $txt);
+            //Hm_Page_Cache::add($input['msg_cache_suffix'].'_gravatar', $input['msg_gravatar']);
         }
         return $input;
     }
@@ -793,7 +780,7 @@ class Hm_Output_imap_message_list extends Hm_Output_Module {
 
 class Hm_Output_imap_msg_from_cache extends Hm_Output_Module {
     protected function output($input, $format) {
-        $key = $input['list_path'].'_'.$input['uid'];
+        /*$key = $input['list_path'].'_'.$input['uid'];
         $body_cache = Hm_Page_Cache::get($key.'_text');
         $header_cache = Hm_Page_Cache::get($key.'_headers');
         $grav_cache = Hm_Page_Cache::get($key.'_gravatar');
@@ -801,7 +788,7 @@ class Hm_Output_imap_msg_from_cache extends Hm_Output_Module {
         
         if ($body_cache && $grav_cache && $header_cache && $parts_cache) {
             return $header_cache.$grav_cache.$body_cache.$parts_cache;
-        }
+        }*/
         return '';
     }
 }

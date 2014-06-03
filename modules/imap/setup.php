@@ -92,7 +92,6 @@ add_handler('ajax_imap_debug', 'date', true, 'core');
 add_handler('ajax_imap_message_content', 'login', false, 'core');
 add_handler('ajax_imap_message_content', 'load_user_data', true, 'core');
 add_handler('ajax_imap_message_content', 'load_imap_servers_from_config',  true);
-add_handler('ajax_imap_message_content', 'message_list_type', true, 'core');
 add_handler('ajax_imap_message_content', 'imap_message_content',  true);
 add_handler('ajax_imap_message_content', 'save_imap_cache',  true);
 add_handler('ajax_imap_message_content', 'save_imap_servers',  true);

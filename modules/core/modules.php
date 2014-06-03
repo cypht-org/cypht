@@ -418,6 +418,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
                 'var hm_url_path = "'.$input['router_url_path'].'";'.
                 'var hm_page_name = "'.$input['router_page_name'].'";'.
                 'var hm_list_path = "'.(isset($input['list_path']) ? $input['list_path'] : '').'";'.
+                'var hm_msg_uid = '.(isset($input['uid']) ? $input['uid'] : 0).';'.
                 '</script>';
         }
     }
@@ -635,10 +636,22 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
 
 class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
+        if (isset($input['list_parent']) && trim($input['list_parent'])) {
+            $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_parent']).
+                '">'.ucwords(str_replace('_', ' ', $this->html_safe($input['list_parent']))).'</a>';
+        }
+        elseif (isset($input['mailbox_list_title'])) {
+            $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_path']).'">'.
+                implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']).'</a>';
+        }
+        else {
+            $title = '';
+        }
         $res = '';
         if (isset($input['uid'])) {
             $res .= '<input type="hidden" class="msg_uid" value="'.$this->html_safe($input['uid']).'" />';
         }
+        $res .= '<div class="content_title">'.$title.'</div>';
         $res .= '<div class="msg_text">';
         return $res;
     }
