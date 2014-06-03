@@ -12,7 +12,7 @@ td { vertical-align: top; }
 .sys_messages { float: left; color: green; margin-left: 15px; margin-top: 2px; }
 .logout_form { float: right; clear: none; padding-right: 20px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
-.title { float: left; font-weight: normal; padding: 0px; font-size: 1.55em; color: #000; opacity: .4; margin: 0px; margin-left: 0px; letter-spacing: -1px; font-family: monospace; }
+.title { float: left; font-weight: normal; padding: 0px; font-size: 1.6em; color: #666; opacity: .4; margin: 0px; margin-left: 0px; letter-spacing: -1px; font-family: monospace; }
 .loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 3px; margin-left: 15px; }
 .loading_icon img { visibility: inherit; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
@@ -22,7 +22,7 @@ td { vertical-align: top; }
 .user_settings table td { padding: 5px; }
 .save_settings { float: none !important; }
 option, select { padding: 3px; }
-.toolbar { padding-top: 10px; padding-left: 10px; height: 30px; margin-bottom: 10px; }
+.toolbar { width: 100%; padding-top: 10px; height: 30px; margin-bottom: 10px; }
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 600px; margin: 0px; background-color: #fff; width: 240px; padding-left: 20px; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }

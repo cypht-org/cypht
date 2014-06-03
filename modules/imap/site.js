@@ -212,19 +212,10 @@ var set_combined_inbox_state = function() {
     }
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
-    var request = function() {
-            Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_combined_inbox'},
-            {'name': 'formatted_combined_inbox', 'value': data.html()}],
-            false,
-            [],
-            true
-        );
-    };
+    save_to_local_storage('formatted_combined_inbox', data.html());
     $(':checkbox').click(function() {
         toggle_msg_controls();
     });
-    setTimeout(request, 500);
 };
 
 var imap_combined_inbox = function(path, force) {
@@ -389,19 +380,10 @@ var set_flagged_state = function() {
     }
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
-    var request = function() {
-            Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_flagged_state'},
-            {'name': 'formatted_flagged_data', 'value': data.html()}],
-            false,
-            [],
-            true
-        );
-    };
+    save_to_local_storage('formatted_flagged_data', data.html());
     $(':checkbox').click(function() {
         toggle_msg_controls();
     });
-    setTimeout(request, 500);
 };
 
 var set_unread_state = function() {
@@ -413,20 +395,10 @@ var set_unread_state = function() {
     }
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
-    var request = function() {
-            Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_save_unread_state'},
-            {'name': 'formatted_unread_data', 'value': data.html()}],
-            false,
-            [],
-            true
-        );
-    };
+    save_to_local_storage('formatted_unread_data', data.html());
     $(':checkbox').click(function() {
         toggle_msg_controls();
     });
-    setTimeout(request, 500);
-    Hm_Timer.add_job(imap_unread_update, 60, true);
 };
 
 var toggle_msg_controls = function() {
@@ -482,12 +454,12 @@ var imap_message_action = function(action_type) {
 };
 
 var get_from_local_storage = function(key) {
-    return localStorage.getItem(key);
+    return sessionStorage.getItem(key);
 };
 
 var save_to_local_storage = function(key, val) {
     if (typeof(Storage) !== "undefined") {
-        localStorage.setItem(key, val);
+        sessionStorage.setItem(key, val);
     }
     return false;
 };
@@ -503,7 +475,9 @@ if (hm_page_name == 'message_list') {
     reset_checkboxes();
     if (hm_list_path == 'unread') {
         $('.menu_unread').addClass('selected_menu');
-        if ($('.message_table tbody tr').length > 0) {
+        var unread_data = get_from_local_storage('formatted_unread_data');
+        if (unread_data && unread_data.length) {
+            $('.message_table tbody').html(unread_data);
             defer = true;
             document.title = 'HM3 '+$('.message_table tbody tr').length+' Unread';
         }
@@ -515,13 +489,21 @@ if (hm_page_name == 'message_list') {
     }
     else if (hm_list_path == 'combined_inbox') {
         $('.menu_combined_inbox').addClass('selected_menu');
-        if ($('.message_table tbody tr').length == 0) {
+        var combined_inbox_data = get_from_local_storage('formatted_combined_inbox');
+        if (!combined_inbox_data || !combined_inbox_data.length) {
             imap_combined_inbox();
+        }
+        else {
+            $('.message_table tbody').html(combined_inbox_data);
         }
     }
     else if (hm_list_path == 'flagged') {
-        if ($('.message_table tbody tr').length == 0) {
+        var flagged_data = get_from_local_storage('formatted_flagged_data');
+        if (!flagged_data || !flagged_data.length) {
             imap_flagged_update();
+        }
+        else {
+            $('.message_table tbody').html(flagged_data);
         }
         $('.menu_flagged').addClass('selected_menu');
     }

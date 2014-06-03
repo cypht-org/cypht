@@ -207,6 +207,12 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 }
             }
         }
+        if (isset($this->request->get['list_parent']) && in_array($this->request->get['list_parent'], array('unread', 'flagged', 'combined_inbox'))) {
+            $data['list_parent'] = $this->request->get['list_parent'];
+        }
+        else {
+            $data['list_parent'] = false;
+        }
         if (isset($this->request->get['list_page'])) {
             $data['list_page'] = (int) $this->request->get['list_page'];
             if ($data['list_page'] < 1) {
@@ -266,7 +272,7 @@ class Hm_Output_date extends Hm_Output_Module {
 class Hm_Output_logout extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' && $input['router_login_state']) {
-            return '<form class="logout_form" method="POST"><input type="submit" class="logout" name="logout" value="Logout" /></form>';
+            return '<form class="logout_form" method="POST"><input type="submit" onclick="sessionStorage.clear(); return true;" class="logout" name="logout" value="Logout" /></form>';
         }
     }
 }
@@ -516,6 +522,7 @@ class Hm_Output_two_col_layout_start extends Hm_Output_Module {
         return '<div class="framework">';
     }
 }
+
 class Hm_Output_two_col_layout_end extends Hm_Output_Module {
     protected function output($input, $format) {
         return '</div><br class="end_float" />';
@@ -524,10 +531,8 @@ class Hm_Output_two_col_layout_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $unread_count = Hm_Page_Cache::get('formatted_unread_count');
         $res = '<div class="folder_cell"';
         if (isset($input['section_state']['.folder_cell'])) {
-            error_log($input['section_state']['.folder_cell']);
             if ($input['section_state']['.folder_cell'] == 'block') {
                 $input['section_state']['.folder_cell'] = 'table-cell';
             }
@@ -545,7 +550,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             '<img class="account_icon" src="images/open_iconic/box-2x.png" alt="" /> '.$this->trans('Inbox').'</a></li>'.
             '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
             '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$this->trans('Unread').
-            ' <span class="unread_count">'.$this->html_safe($unread_count).'</span></a></li>'.
+            ' <span class="unread_count"></span></a></li>'.
             '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
             '<img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.$this->trans('Flagged').'</a></li>'.
             '<li class="menu_search"><a class="unread_link" href="?page=search">'.

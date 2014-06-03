@@ -92,6 +92,7 @@ add_handler('ajax_imap_debug', 'date', true, 'core');
 add_handler('ajax_imap_message_content', 'login', false, 'core');
 add_handler('ajax_imap_message_content', 'load_user_data', true, 'core');
 add_handler('ajax_imap_message_content', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_message_content', 'message_list_type', true, 'core');
 add_handler('ajax_imap_message_content', 'imap_message_content',  true);
 add_handler('ajax_imap_message_content', 'save_imap_cache',  true);
 add_handler('ajax_imap_message_content', 'save_imap_servers',  true);
@@ -141,24 +142,6 @@ add_handler('ajax_imap_message_action', 'save_imap_cache',  true);
 add_handler('ajax_imap_message_action', 'save_imap_servers',  true);
 add_handler('ajax_imap_message_action', 'date', true, 'core');
 
-/* save unread page state */
-add_handler('ajax_imap_save_unread_state', 'login', false, 'core');
-add_handler('ajax_imap_save_unread_state', 'load_user_data', true, 'core');
-add_handler('ajax_imap_save_unread_state', 'save_unread_state', true);
-add_handler('ajax_imap_save_unread_state', 'date', true, 'core');
-
-/* save combined inbox state */
-add_handler('ajax_imap_save_combined_inbox', 'login', false, 'core');
-add_handler('ajax_imap_save_combined_inbox', 'load_user_data', true, 'core');
-add_handler('ajax_imap_save_combined_inbox', 'save_combined_inbox', true);
-add_handler('ajax_imap_save_combined_inbox', 'date', true, 'core');
-
-/* save flagged list state */
-add_handler('ajax_imap_save_flagged_state', 'login', false, 'core');
-add_handler('ajax_imap_save_flagged_state', 'load_user_data', true, 'core');
-add_handler('ajax_imap_save_flagged_state', 'save_flagged_state', true);
-add_handler('ajax_imap_save_flagged_state', 'date', true, 'core');
-
 /* save folder list state */
 add_handler('ajax_imap_save_folder_state', 'login', false, 'core');
 add_handler('ajax_imap_save_folder_state', 'load_user_data', true, 'core');
@@ -205,11 +188,8 @@ return array(
         'ajax_imap_folder_expand',
         'ajax_imap_folder_display',
         'ajax_imap_combined_inbox',
-        'ajax_imap_save_unread_state',
-        'ajax_imap_save_combined_inbox',
         'ajax_imap_message_content',
         'ajax_imap_save_folder_state',
-        'ajax_imap_save_flagged_state',
         'ajax_imap_message_action'
     ),
 

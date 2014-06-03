@@ -379,6 +379,7 @@ return array(
         'page' => FILTER_SANITIZE_STRING,
         'msgs' => FILTER_SANITIZE_STRING,
         'list_path' => FILTER_SANITIZE_STRING,
+        'list_parent' => FILTER_SANITIZE_STRING,
         'list_page' => FILTER_VALIDATE_INT,
         'uid' => FILTER_VALIDATE_INT,
     ),
