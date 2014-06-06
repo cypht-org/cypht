@@ -522,7 +522,12 @@ var setup_unread_page = function() {
         $('.unread_count').html($('.message_table tbody tr').length);
     }
     else {
-        defer = false;
+        if (initial_error) {
+            defer = true;
+        }
+        else {
+            defer = false;
+        }
     }
     Hm_Timer.add_job(imap_unread_update, 60, defer);
     $('.message_table tr').fadeIn(100);
@@ -582,6 +587,8 @@ var setup_server_page = function() {
     $('.test_imap_connect').on('click', imap_test_action);
 };
 
+var initial_error = $('.err').length;
+
 if (hm_page_name == 'message_list') {
     reset_checkboxes();
     if (hm_list_path == 'unread') {
@@ -604,6 +611,8 @@ else if (hm_page_name == 'servers') {
     setup_server_page();
 }
 else if (hm_page_name == 'home') {
-    imap_status_update();
+    if (!initial_error) {
+        imap_status_update();
+    }
 }
 set_unread_count();

@@ -40,7 +40,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .msg_headers th { padding: 3px; padding-top: 5px; padding-left: 30px; font-weight: normal; text-align: left; white-space: nowrap; width: 1%; padding-right: 13px; }
 .msg_headers td { padding: 3px; padding-top: 5px; }
 .imap_update a, .update_unread { color: green; font-size: 75%; vertical-align: 1px; text-decoration: none; padding-left: 10px; letter-spacing: 0px; }
-.unread_since { 75%; vertical-align: 1px; border: solid 1px #ccc; text-decoration: none; margin: 0px; margin-left: 20px; letter-spacing: 0px; padding: 0px; color: #666; }
+.unread_since { vertical-align: 1px; border: solid 1px #ccc; text-decoration: none; margin: 0px; margin-left: 20px; letter-spacing: 0px; padding: 0px; color: #666; }
 .close_link { float: right; padding-right: 20px; text-decoration: none; color: green; font-size: 90%; margin-bottom: 10px;}
 .header_links { padding-top: 10px !important; }
 .header_links a { float: none !important; padding-left: 3px !important; padding-right: 3px !important; }
