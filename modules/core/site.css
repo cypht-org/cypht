@@ -47,7 +47,7 @@ option, select { padding: 3px; }
 .path_delim { opacity: .4; padding-left: 5px; vertical-align: 1px; padding-right: 3px; }
 .not_found { font-size: 150%; color: #999; padding: 50px; height: 100%; border-left: solid 1px #ddd; background-color: #fff; }
 .no_servers { text-align: center; padding: 50px; margin: auto; padding-bottom: 100px; }
-.selected_menu, .selected_menu a { color: green !important; line-height: 1.25em;}
+.selected_menu, .selected_menu a { color: Teal !important; line-height: 1.25em;}
 
 .src_name { border-left: solid 1px #eee; cursor: pointer; padding-left: 25px; margin-top: 0px; margin-right: -20px; background-color: #fff; border-bottom: solid 1px #aaa; color: #777; padding-top: 5px; font-size: 1.1em; letter-spacing: -1px; padding-bottom: 5px; }
 .content_title { margin-top: 0px; color: #777; background-color: #fff; border-bottom: solid 1px #aaa; padding-bottom: 5px; padding-top: 5px; letter-spacing: -1px; font-size: 1.1em; padding-left: 20px; }
