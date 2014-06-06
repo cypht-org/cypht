@@ -130,6 +130,9 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
                 $this->start($request);
                 $this->just_started();
             }
+            else {
+                Hm_Msgs::add("ERRInvalid username or password");
+            }
         }
         elseif (isset($request->cookie[$this->cname])) {
             $this->set_key($request);
@@ -147,7 +150,6 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
                 }
             }
         }
-        Hm_Msgs::add("Invalid username or password");
         return false;
     }
 
@@ -165,7 +167,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
         if ($sql->execute(array($user))) {
             $res = $sql->fetch();
             if (!empty($res)) {
-                Hm_Msgs::add("That username is already in use");
+                Hm_Msgs::add("ERRThat username is already in use");
             }
             else {
                 $sql = $this->dbh->prepare("insert into hm_user values(?,?)");
