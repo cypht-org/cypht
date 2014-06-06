@@ -542,7 +542,7 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
             return '<tr><td class="submit_cell" colspan="2">'.
                 '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
                 '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
-                '<div class="password_notice">* You must re-enter your password to save your settings on the server</div>'.
+                '<div class="password_notice">* You must enter your password to save your settings on the server</div>'.
                 '</td></tr></table></form></div>';
         }
     }
