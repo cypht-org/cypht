@@ -8,7 +8,7 @@ abstract class Hm_Config {
     protected $source = false;
     protected $config = array();
 
-    abstract public function load($source);
+    abstract public function load($source, $key);
 
     public function dump() {
         return $this->config;
@@ -39,13 +39,12 @@ class Hm_User_Config_File extends Hm_Config {
         return sprintf('%s/%s.txt', $path, $username);
     }
 
-    public function load($username) {
+    public function load($username, $key) {
         $source = $this->get_path($username);
         if (is_readable($source)) {
             $str_data = file_get_contents($source);
             if ($str_data) {
-                $enc_key = $this->site_config->get('enc_key', 'youshouldbesettingthis!');
-                $data = @unserialize(Hm_Crypt::plaintext($str_data, $enc_key));
+                $data = @unserialize(Hm_Crypt::plaintext($str_data, $key));
                 if (is_array($data)) {
                     $this->config = array_merge($this->config, $data);
                     $this->set_tz();
@@ -59,10 +58,9 @@ class Hm_User_Config_File extends Hm_Config {
         $this->set_tz();
     }
 
-    public function save($username) {
+    public function save($username, $key) {
         $destination = $this->get_path($username);
-        $enc_key = $this->site_config->get('enc_key', 'youshouldbesettingthis!');
-        $data = Hm_Crypt::ciphertext(serialize($this->config), $enc_key);
+        $data = Hm_Crypt::ciphertext(serialize($this->config), $key);
         file_put_contents($destination, $data);
     }
 }
@@ -77,8 +75,7 @@ class Hm_User_Config_DB extends Hm_Config {
         $this->site_config = $config;
     }
 
-    public function load($username) {
-        $enc_key = $this->site_config->get('enc_key', 'youshouldbesettingthis!');
+    public function load($username, $key) {
         if ($this->connect()) {
             $sql = $this->dbh->prepare("select * from hm_user_settings where username=?");
             if ($sql->execute(array($username))) {
@@ -91,7 +88,7 @@ class Hm_User_Config_DB extends Hm_Config {
                     }
                 }
                 else {
-                    $data = @unserialize(Hm_Crypt::plaintext($data['settings'], $enc_key));
+                    $data = @unserialize(Hm_Crypt::plaintext($data['settings'], $key));
                     if (is_array($data)) {
                         $this->config = array_merge($this->config, $data);
                         $this->set_tz();
@@ -114,9 +111,8 @@ class Hm_User_Config_DB extends Hm_Config {
         return false;
     }
 
-    public function save($username) {
-        $enc_key = $this->site_config->get('enc_key', 'youshouldbesettingthis!');
-        $config = Hm_Crypt::ciphertext(serialize($this->config), $enc_key);
+    public function save($username, $key) {
+        $config = Hm_Crypt::ciphertext(serialize($this->config), $key);
         if ($this->connect()) {
             $sql = $this->dbh->prepare("update hm_user_settings set settings=? where username=?");
             if ($sql->execute(array($config, $username))) {
@@ -130,10 +126,10 @@ class Hm_User_Config_DB extends Hm_Config {
 class Hm_Site_Config_File extends Hm_Config {
 
     public function __construct($source) {
-        $this->load($source);
+        $this->load($source, false);
     }
 
-    public function load($source) {
+    public function load($source, $key) {
         if (is_readable($source)) {
             $data = unserialize(file_get_contents($source));
             if ($data) {
