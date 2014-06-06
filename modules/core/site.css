@@ -17,10 +17,11 @@ td { vertical-align: top; }
 .loading_icon img { visibility: inherit; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .logout { cursor: pointer; background: #fff url('/hm3/images/open_iconic/power-standby-2x.png') no-repeat 6px 4px; padding-left: 25px; color: #000; opacity: .6; }
-.search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-left: margin-right: 20px; padding-bottom: 40px; }
+.search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { table-layout: fixed; width: 100%; white-space: nowrap; padding-left: 10px; }
 .user_settings table td { padding: 5px; }
-.save_settings { float: none !important; }
+.save_settings { float: left !important; }
+.save_settings_password { float: left; margin-left: 10px; padding: 4px; }
 option, select { padding: 3px; }
 .toolbar { width: 100%; padding-top: 10px; height: 30px; margin-bottom: 10px; }
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 600px; margin: 0px; background-color: #fff; width: 240px; padding-left: 20px; }
@@ -54,3 +55,9 @@ option, select { padding: 3px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
+.settings_col { width: 90%; }
+.label_col { width: 10%; }
+.submit_cell { padding-top: 20px !important; }
+.password_notice { float: left; margin-left: 10px; font-size: .9em; color: #666; padding-top: 5px; }
+.confirm_logout { display: none; width: 450px; background-color: #fff; padding: 20px; position: absolute; right: 0px; top: 0px; border: solid 1px #ccc; }
+.confirm_text {  padding-left: 10px; padding-bottom: 10px; }

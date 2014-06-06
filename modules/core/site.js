@@ -84,9 +84,6 @@ Hm_Ajax_Request = function() { return {
         Hm_Ajax.request_count--;
         if (Hm_Ajax.request_count == 0) {
             if (Hm_Ajax.batch_callback) {
-                Hm_Notices.hide(true);
-            }
-            if (Hm_Ajax.batch_callback) {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
             }
@@ -169,6 +166,11 @@ Hm_Timer = {
         }
         setTimeout(Hm_Timer.fire, Hm_Timer.interval);
     }
+};
+
+var confirm_logout = function() {
+    $('.confirm_logout').show(100);
+    return false;
 };
 
 var parse_folder_path = function(path, path_type) {

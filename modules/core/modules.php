@@ -55,18 +55,32 @@ class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
 
 class Hm_Handler_save_user_settings extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('save_settings'));
-        if ($success && isset($data['new_user_settings'])) {
-            foreach ($data['new_user_settings'] as $name => $value) {
-                $this->user_config->set($name, $value);
+        list($success, $form) = $this->process_form(array('save_settings', 'password'));
+        if ($success) {
+            if (isset($data['new_user_settings'])) {
+                foreach ($data['new_user_settings'] as $name => $value) {
+                    $this->user_config->set($name, $value);
+                }
+                $user = $this->session->get('username', false);
+                $path = $this->config->get('user_settings_dir', false);
+                if ($this->session->auth($user, $form['password'])) {
+                    $pass = $form['password'];
+                }
+                else {
+                    Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
+                    /* TODO: save current settings in session */
+                    $pass = false;
+                }
+                if ($user && $path && $pass) {
+                    $this->user_config->save($user, $pass);
+                    Hm_Msgs::add('Settings saved');
+                }
+                Hm_Page_Cache::flush($this->session);
             }
-            $user = $this->session->get('username', false);
-            $path = $this->config->get('user_settings_dir', false);
-            if ($user && $path) {
-                $this->user_config->save($user);
-                Hm_Msgs::add('Settings saved');
-            }
-            Hm_Page_Cache::flush($this->session);
+        }
+        elseif (isset($this->request->post['save_settings'])) {
+            /* TODO: save current settings in session */
+            Hm_Msgs::add('ERRYour password is required to save your settings to the server');
         }
         return $data;
     }
@@ -126,16 +140,20 @@ class Hm_Handler_create_user extends Hm_Handler_Module {
 
 class Hm_Handler_load_user_data extends Hm_Handler_Module {
     public function process($data) {
-        $user_data = $this->session->get('user_data', array());
-        if (!empty($user_data)) {
-            $this->user_config->reload($user_data);
-        }
-        else {
-            $user = $this->session->get('username', false);
-            $this->user_config->load($user);
-            $pages = $this->user_config->get('saved_pages', array());
-            if (!empty($pages)) {
-                $this->session->set('saved_pages', $pages);
+        list($success, $form) = $this->process_form(array('username', 'password'));
+        if ($this->session->is_active()) {
+            if ($success) {
+                $this->user_config->load($form['username'], $form['password']);
+            }
+            else {
+                $user_data = $this->session->get('user_data', array());
+                if (!empty($user_data)) {
+                    $this->user_config->reload($user_data);
+                }
+                $pages = $this->user_config->get('saved_pages', array());
+                if (!empty($pages)) {
+                    $this->session->set('saved_pages', $pages);
+                }
             }
         }
         $data['section_state'] = $this->session->get('section_state', array());
@@ -156,18 +174,35 @@ class Hm_Handler_save_user_data extends Hm_Handler_Module {
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
-            $user = $this->session->get('username', false);
-            $path = $this->config->get('user_settings_dir', false);
-            $pages = $this->session->get('saved_pages', array());
-            if (!empty($pages)) {
-                $this->user_config->set('saved_pages', $pages);
-            }
-            if ($user && $path) {
-                $this->user_config->save($user);
-                Hm_Msgs::add('Saved user data on logout');
-            }
             $this->session->destroy();
             Hm_Msgs::add('Session destroyed on logout');
+        }
+        elseif (isset($this->request->post['save_and_logout'])) {
+            list($success, $form) = $this->process_form(array('password'));
+            if ($success) {
+                $user = $this->session->get('username', false);
+                $path = $this->config->get('user_settings_dir', false);
+                $pages = $this->session->get('saved_pages', array());
+                if (!empty($pages)) {
+                    $this->user_config->set('saved_pages', $pages);
+                }
+                if ($this->session->auth($user, $form['password'])) {
+                    $pass = $form['password'];
+                }
+                else {
+                    Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
+                    $pass = false;
+                }
+                if ($user && $path && $pass) {
+                    $this->user_config->save($user, $pass);
+                    $this->session->destroy();
+                    Hm_Msgs::add('Saved user data on logout');
+                    Hm_Msgs::add('Session destroyed on logout');
+                }
+            }
+            else {
+                Hm_Msgs::add('ERRYour password is required to save your settings to the server');
+            }
         }
         return $data;
     }
@@ -272,7 +307,15 @@ class Hm_Output_date extends Hm_Output_Module {
 class Hm_Output_logout extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' && $input['router_login_state']) {
-            return '<form class="logout_form" method="POST"><input type="submit" onclick="sessionStorage.clear(); return true;" class="logout" name="logout" value="Logout" /></form>';
+            return '<form class="logout_form" method="POST">'.
+                '<input type="button" onclick="return confirm_logout()" class="logout" value="Logout" />'.
+                '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
+                '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+                '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
+                '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
+                '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(100); return false;" type="button" value="Cancel" />'.
+                '</div>'.
+                '</form>';
         }
     }
 }
@@ -436,7 +479,8 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<div class="user_settings"><div class="content_title">Site Settings</div><br />'.
-                '<form method="POST" action=""><table class="settings_table">';
+                '<form method="POST" action=""><table class="settings_table"><colgroup>'.
+                '<col class="label_col"><col class="setting_col"></colgroup>';
         }
     }
 }
@@ -495,9 +539,11 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
 class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<tr><td colspan="2" class="submit_cell">'.
+            return '<tr><td class="submit_cell" colspan="2">'.
                 '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
-                '</tr></table></form></div>';
+                '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+                '<div class="password_notice">* You must re-enter your password to save your settings on the server</div>'.
+                '</td></tr></table></form></div>';
         }
     }
 }
