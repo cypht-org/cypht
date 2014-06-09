@@ -81,7 +81,7 @@ class Hm_Output_show_debug extends Hm_Output_Module {
             }
             if ($format == 'HTML5') {
                 return '<div style="width: 100%; clear: both; "></div><div class="tracker_debug"><div class="subtitle">HM3 Debug</div><pre class="hm3_debug">'.Hm_Debug::show('return').'</pre></div>'.
-                '</div><div class="pop3_summary_debug"><div class="subtitle">POP3 Debug</div><pre class="hm3_pop3_debug">'.print_r($pop3_debug, true).'</pre></div>'.
+                '<div class="pop3_summary_debug"><div class="subtitle">POP3 Debug</div><pre class="hm3_pop3_debug">'.print_r($pop3_debug, true).'</pre></div>'.
                     '<div class="imap_summary_debug"><div class="subtitle">IMAP Debug</div><pre class="hm3_imap_debug">'.print_r($imap_debug, true).'</pre></div>';
             }
             elseif ($format == 'JSON') {
@@ -109,7 +109,7 @@ class Hm_Output_tracker extends Hm_Output_Module {
                 return '';
             }
             $res = '<div class="tracker_output"><div class="subtitle">Registered Modules</div><table class="module_list">';
-            $res .= '<tr><td colspan="2"><b>page: '.$this->html_safe($input['router_page_name']).'</b></td></tr>';
+            $res .= '<tr><td colspan="4"><b>page: '.$this->html_safe($input['router_page_name']).'</b></td></tr>';
             if (isset($input['module_debug'])) {
                 foreach ($input['module_debug'] as $vals) {
                     $res .= $this->format_row($vals);
@@ -122,7 +122,7 @@ class Hm_Output_tracker extends Hm_Output_Module {
             if (!DEBUG_MODE) {
                 return $input;
             }
-            $res = '<tr><td colspan="2"><b>page: '.$this->html_safe($input['router_page_name']).'</b></td></tr>';
+            $res = '<tr><td colspan="4"><b>page: '.$this->html_safe($input['router_page_name']).'</b></td></tr>';
             foreach ($input['module_debug'] as $vals) {
                 $res .= $this->format_row($vals);
             }
