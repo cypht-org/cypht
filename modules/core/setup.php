@@ -32,7 +32,6 @@ add_output('home', 'msgs', false);
 add_output('home', 'toolbar_end', true);
 add_output('home', 'two_col_layout_start', true);
 add_output('home', 'folder_list_start', true);
-add_output('home', 'folder_list_content', true);
 add_output('home', 'folder_list_end', true);
 add_output('home', 'content_section_start', true);
 add_output('home', 'server_summary_start', true);
@@ -70,7 +69,6 @@ add_output('servers', 'msgs', false);
 add_output('servers', 'toolbar_end', true);
 add_output('servers', 'two_col_layout_start', true);
 add_output('servers', 'folder_list_start', true);
-add_output('servers', 'folder_list_content', true);
 add_output('servers', 'folder_list_end', true);
 add_output('servers', 'content_section_start', true);
 add_output('servers', 'content_section_end', true);
@@ -106,7 +104,6 @@ add_output('compose', 'msgs', false);
 add_output('compose', 'toolbar_end', true);
 add_output('compose', 'two_col_layout_start', true);
 add_output('compose', 'folder_list_start', true);
-add_output('compose', 'folder_list_content', true);
 add_output('compose', 'folder_list_end', true);
 add_output('compose', 'content_section_start', true);
 add_output('compose', 'content_section_end', true);
@@ -144,7 +141,6 @@ add_output('settings', 'msgs', false);
 add_output('settings', 'toolbar_end', true);
 add_output('settings', 'two_col_layout_start', true);
 add_output('settings', 'folder_list_start', true);
-add_output('settings', 'folder_list_content', true);
 add_output('settings', 'folder_list_end', true);
 add_output('settings', 'content_section_start', true);
 add_output('settings', 'start_settings_form', true);
@@ -184,7 +180,6 @@ add_output('search', 'msgs', false);
 add_output('search', 'toolbar_end', true);
 add_output('search', 'two_col_layout_start', true);
 add_output('search', 'folder_list_start', true);
-add_output('search', 'folder_list_content', true);
 add_output('search', 'folder_list_end', true);
 add_output('search', 'content_section_start', true);
 add_output('search', 'search_content', true);
@@ -221,7 +216,6 @@ add_output('profiles', 'msgs', false);
 add_output('profiles', 'toolbar_end', true);
 add_output('profiles', 'two_col_layout_start', true);
 add_output('profiles', 'folder_list_start', true);
-add_output('profiles', 'folder_list_content', true);
 add_output('profiles', 'folder_list_end', true);
 add_output('profiles', 'content_section_start', true);
 add_output('profiles', 'profile_content', true);
@@ -258,7 +252,6 @@ add_output('message_list', 'msgs', false);
 add_output('message_list', 'toolbar_end', true);
 add_output('message_list', 'two_col_layout_start', true);
 add_output('message_list', 'folder_list_start', true);
-add_output('message_list', 'folder_list_content', true);
 add_output('message_list', 'folder_list_end', true);
 add_output('message_list', 'content_section_start', true);
 add_output('message_list', 'imap_server_ids', true);
@@ -295,7 +288,6 @@ add_output('message', 'msgs', false);
 add_output('message', 'toolbar_end', true);
 add_output('message', 'two_col_layout_start', true);
 add_output('message', 'folder_list_start', true);
-add_output('message', 'folder_list_content', true);
 add_output('message', 'folder_list_end', true);
 add_output('message', 'content_section_start', true);
 add_output('message', 'imap_server_ids', true);
@@ -305,12 +297,6 @@ add_output('message', 'content_section_end', true);
 add_output('message', 'two_col_layout_end', true);
 add_output('message', 'page_js', true);
 add_output('message', 'content_end', true);
-
-/* save folder tree collapsed state */
-add_handler('ajax_save_section_state', 'login', false);
-add_handler('ajax_save_section_state', 'load_user_data', true);
-add_handler('ajax_save_section_state', 'save_section_state', true);
-add_handler('ajax_save_section_state', 'date', true);
 
 /* not-found page data and output */
 add_handler('notfound', 'login', false);
@@ -338,7 +324,6 @@ add_output('notfound', 'msgs', false);
 add_output('notfound', 'toolbar_end', true);
 add_output('notfound', 'two_col_layout_start', true);
 add_output('notfound', 'folder_list_start', true);
-add_output('notfound', 'folder_list_content', true);
 add_output('notfound', 'folder_list_end', true);
 add_output('notfound', 'content_section_start', true);
 add_output('notfound', 'notfound_content', true);
@@ -348,9 +333,10 @@ add_output('notfound', 'page_js', true);
 add_output('notfound', 'content_end', true);
 
 
-add_handler('ajax_hm_folders', 'login', false, 'core');
-add_handler('ajax_hm_folders', 'load_user_data', true, 'core');
-add_handler('ajax_hm_folders', 'date', true, 'core');
+add_handler('ajax_hm_folders', 'login', false);
+add_handler('ajax_hm_folders', 'load_user_data', true);
+add_handler('ajax_hm_folders', 'date', true);
+add_output('ajax_hm_folders', 'folder_list_content', true);
 
 /* allowed input */
 return array(

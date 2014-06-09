@@ -4,7 +4,7 @@ br { clear: both; }
 html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #fff); }
 body { font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; }
-.framework { width: 100%; height: 100%; }
+.framework { layout: table; width: 100%; height: 100%; }
 table { width: 100%; }
 td { vertical-align: top; }
 .subtitle { color: green; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
@@ -12,7 +12,8 @@ td { vertical-align: top; }
 .sys_messages { float: left; color: green; margin-left: 15px; margin-top: 2px; }
 .logout_form { float: right; clear: none; padding-right: 20px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
-.title { float: left; font-weight: normal; padding: 0px; font-size: 1.6em; color: #666; opacity: .4; margin: 0px; margin-left: 0px; letter-spacing: -1px; font-family: monospace; }
+.placeholder { width: 100px !important; }
+.title { float: left; font-weight: normal; padding: 0px; font-size: 1.6em; color: #666; margin: 0px; margin-left: 25px; letter-spacing: -1px; font-family: monospace; }
 .loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 3px; margin-left: 15px; }
 .loading_icon img { visibility: inherit; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
@@ -61,3 +62,4 @@ option, select { padding: 3px; }
 .password_notice { float: left; margin-left: 10px; font-size: .9em; color: #666; padding-top: 5px; }
 .confirm_logout { display: none; width: 450px; background-color: #fff; padding: 20px; position: absolute; right: 0px; top: 0px; border: solid 1px #ccc; }
 .confirm_text {  padding-left: 10px; padding-bottom: 10px; }
+.folder_list .update_unread { float: right; margin-top: 20px; }

@@ -209,15 +209,7 @@ var parse_folder_path = function(path, path_type) {
 var toggle_section = function(class_name) {
     if ($(class_name).length) {
         $(class_name).toggle(200, function() {
-            var section_state = $(class_name).css('display').toLowerCase();
-            Hm_Ajax.request(
-                [{'name': 'hm_ajax_hook', 'value': 'ajax_save_section_state'},
-                {'name': 'section_state', 'value': section_state},
-                {'name': 'section_class', 'value': class_name}],
-                false,
-                [],
-                true
-            );
+            save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         });
     }
     return false;
@@ -234,11 +226,35 @@ var save_to_local_storage = function(key, val) {
     return false;
 };
 
+var update_folder_list_display = function(res) {
+    $('.folder_list').html(res.formatted_folder_list);
+    save_to_local_storage('formatted_folder_list', res.formatted_folder_list);
+    $('.folder_list').find('*').removeClass('selected_menu');
+    $('.menu_'+hm_page_name).addClass('selected_menu');
+};
+
+var update_folder_list = function() {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'}],
+        update_folder_list_display,
+        [],
+        true
+    );
+    return false;
+};
+
 var clean_selector = function(str) {
     return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
 };
 
 Hm_Timer.fire();
-
-$('.folder_list').find('*').removeClass('selected_menu');
-$('.menu_'+hm_page_name).addClass('selected_menu');
+var folder_list = get_from_local_storage('formatted_folder_list');
+if (folder_list) {
+    $('.folder_list').html(folder_list);
+    $('.folder_list').find('*').removeClass('selected_menu');
+    $('.menu_'+hm_page_name).addClass('selected_menu');
+}
+else {
+    update_folder_list();
+}
+$('body').fadeIn(200);

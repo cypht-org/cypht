@@ -28,17 +28,6 @@ class Hm_Handler_process_language_setting extends Hm_Handler_Module {
         return $data;
     }
 }
-class Hm_Handler_save_section_state extends Hm_Handler_Module {
-    public function process($data) {
-        list($success, $form) = $this->process_form(array('section_state', 'section_class'));
-        if ($success && in_array($form['section_state'], array('block', 'none', 'table-cell'))) {
-            $state = $this->session->get('section_state', array());
-            $state[$form['section_class']] = $form['section_state'];
-            $this->session->set('section_state', $state);
-        }
-        return $data;
-    }
-}
 
 class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
     public function process($data) {
@@ -156,7 +145,6 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
                 }
             }
         }
-        $data['section_state'] = $this->session->get('section_state', array());
         return $data;
     }
 }
@@ -270,7 +258,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<h1 class="title"><a href="#" onclick="return toggle_section(\'.folder_cell\')" ><img class="list_toggle" alt="Toggle List" src="images/open_iconic/list-2x.png" /></a>HM3</h1>';
+            return '<h1 class="title">HM3</h1>';
         }
     }
 }
@@ -369,7 +357,12 @@ class Hm_Output_header_end extends Hm_Output_Module {
 class Hm_Output_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '<body>';
+            if (!$input['router_login_state']) {
+                return '<body>';
+            }
+            else {
+                return '<body style="display: none;">';
+            }
         }
     }
 }
@@ -540,8 +533,8 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<tr><td class="submit_cell" colspan="2">'.
-                '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
                 '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+                '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
                 '<div class="password_notice">* You must enter your password to save your settings on the server</div>'.
                 '</td></tr></table></form></div>';
         }
@@ -578,14 +571,7 @@ class Hm_Output_two_col_layout_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="folder_cell"';
-        if (isset($input['section_state']['.folder_cell'])) {
-            if ($input['section_state']['.folder_cell'] == 'block') {
-                $input['section_state']['.folder_cell'] = 'table-cell';
-            }
-            $res .= ' style="display: '.$this->html_safe($input['section_state']['.folder_cell']).'"';
-        }
-        $res .= '><div class="folder_list">';
+        $res = '<div class="folder_cell"><div class="folder_list">';
         return $res;
     }
 }
@@ -593,9 +579,6 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
 class Hm_Output_folder_list_content extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
-        if (isset($input['section_state']['.main'])) {
-            $res .= 'style="display: '.$this->html_safe($input['section_state']['.main']).'" ';
-        }
         $res .= 'class="main"><ul class="folders">'.
             '<li class="menu_home"><a class="unread_link" href="?page=home">'.
             '<img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.$this->trans('Home').'</a></li>'.
@@ -616,9 +599,6 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
                 $name = strtoupper(explode('_', $src)[0]);
                 $res .= '<div onclick="return toggle_section(\'.'.$this->html_safe($src).'\');" class="src_name">'.$this->html_safe($name).'</div>';
                 $res .= '<div ';
-                if (isset($input['section_state']['.'.$src])) {
-                    $res .= 'style="display: '.$this->html_safe($input['section_state']['.'.$src]).'" ';
-                }
                 $res .= 'class="'.$this->html_safe($src).'">';
                 $cache = Hm_Page_Cache::get($src);
                 if ($cache) {
@@ -627,12 +607,7 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
                 $res .= '</div>';
             }
         }
-        $res .= '<div onclick="return toggle_section(\'.settings\');" class="src_name">Settings</div><ul ';
-
-        if (isset($input['section_state']['.settings'])) {
-            $res .= 'style="display: '.$this->html_safe($input['section_state']['.settings']).'" ';
-        }
-        $res .= 'class="settings folders">'.
+        $res .= '<div onclick="return toggle_section(\'.settings\');" class="src_name">Settings</div><ul class="settings folders">'.
             '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
             '<img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.$this->trans('Servers').'</a></li>'.
             '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
@@ -641,13 +616,19 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
             '<img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.$this->trans('Profiles').'</a></li>'.
             '</ul></div>';
 
-        return $res;
+        $res .= '<a href="#" onclick="return update_folder_list();" class="update_unread">[reload]</a>';
+
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] = $res;
+        return $input;
     }
 }
 
 class Hm_Output_folder_list_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '</div>';
+        return '</div></div>';
     }
 }
 class Hm_Output_content_section_start extends Hm_Output_Module {
