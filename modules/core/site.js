@@ -238,7 +238,7 @@ var update_folder_list = function() {
         [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'}],
         update_folder_list_display,
         [],
-        true
+        false
     );
     return false;
 };
