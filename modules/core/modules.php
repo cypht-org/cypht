@@ -270,7 +270,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<h1 class="title"><a href="#" onclick="return toggle_section(\'.folder_cell\')" ><img class="list_toggle" src="images/open_iconic/list-2x.png" /></a>HM3</h1>';
+            return '<h1 class="title"><a href="#" onclick="return toggle_section(\'.folder_cell\')" ><img class="list_toggle" alt="Toggle List" src="images/open_iconic/list-2x.png" /></a>HM3</h1>';
         }
     }
 }
@@ -361,7 +361,7 @@ class Hm_Output_header_start extends Hm_Output_Module {
 class Hm_Output_header_end extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            return '</head><body>';
+            return '</head>';
         }
     }
 }
@@ -586,7 +586,13 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
             $res .= ' style="display: '.$this->html_safe($input['section_state']['.folder_cell']).'"';
         }
         $res .= '><div class="folder_list">';
-        $res .= '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
+        return $res;
+    }
+}
+
+class Hm_Output_folder_list_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
         if (isset($input['section_state']['.main'])) {
             $res .= 'style="display: '.$this->html_safe($input['section_state']['.main']).'" ';
         }
