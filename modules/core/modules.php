@@ -301,7 +301,7 @@ class Hm_Output_logout extends Hm_Output_Module {
                 '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
                 '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
                 '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
-                '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(100); return false;" type="button" value="Cancel" />'.
+                '<input class="save_settings" onclick="$(\'.confirm_logout\').fadeOut(200); return false;" type="button" value="Cancel" />'.
                 '</div>'.
                 '</form>';
         }
@@ -357,12 +357,11 @@ class Hm_Output_header_end extends Hm_Output_Module {
 class Hm_Output_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
+            $res = '<body>';
             if (!$input['router_login_state']) {
-                return '<body>';
+                $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
             }
-            else {
-                return '<body style="display: none;">';
-            }
+            return $res;
         }
     }
 }

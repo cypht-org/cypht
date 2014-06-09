@@ -169,7 +169,7 @@ Hm_Timer = {
 };
 
 var confirm_logout = function() {
-    $('.confirm_logout').show(100);
+    $('.confirm_logout').fadeIn(200);
     return false;
 };
 
@@ -257,4 +257,4 @@ if (folder_list) {
 else {
     update_folder_list();
 }
-$('body').fadeIn(200);
+$('body').hide().fadeIn(200);
