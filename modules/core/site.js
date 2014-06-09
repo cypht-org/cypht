@@ -223,11 +223,22 @@ var toggle_section = function(class_name) {
     return false;
 };
 
+var get_from_local_storage = function(key) {
+    return sessionStorage.getItem(key);
+};
+
+var save_to_local_storage = function(key, val) {
+    if (typeof(Storage) !== "undefined") {
+        sessionStorage.setItem(key, val);
+    }
+    return false;
+};
+
 var clean_selector = function(str) {
     return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
 };
 
-/* start the scheduler */
 Hm_Timer.fire();
+
 $('.folder_list').find('*').removeClass('selected_menu');
 $('.menu_'+hm_page_name).addClass('selected_menu');

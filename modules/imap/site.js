@@ -480,17 +480,6 @@ var imap_message_action = function(action_type) {
     return false;
 };
 
-var get_from_local_storage = function(key) {
-    return sessionStorage.getItem(key);
-};
-
-var save_to_local_storage = function(key, val) {
-    if (typeof(Storage) !== "undefined") {
-        sessionStorage.setItem(key, val);
-    }
-    return false;
-};
-
 var reset_checkboxes = function() {
     $(':checkbox').each(function () { this.checked = false; });
     $(':checkbox').click(function() {
