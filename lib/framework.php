@@ -768,7 +768,7 @@ abstract class Hm_Output_Module {
     protected function build_nonce($name) {
         return hash_hmac('sha256', $name, $this->nonce_base);
     }
-    protected function trans($string) {
+    public function trans($string) {
         if (isset($this->lstr[$string])) {
             if ($this->lstr[$string] === false) {
                 return $string;
