@@ -7,23 +7,17 @@ output_source('pop3');
 
 /* add stuff to the home page */
 add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('home', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('home', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('home', 'display_pop3_summary', true, 'pop3', 'server_summary_start', 'after');
-add_output('home', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 
 /* message list page */
 add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('message_list', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('message_list', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('message_list', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 add_output('message_list', 'pop3_message_list', true, 'pop3', 'content_section_start', 'after');
 
 /* message view page */
 add_handler('message', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('message', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('message', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('message', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 add_output('message', 'pop3_message_list', true, 'pop3', 'folder_list_end', 'before');
 
 /* servers page */
@@ -36,32 +30,28 @@ add_output('servers', 'display_configured_pop3_servers', true, 'pop3', 'add_pop3
 
 /* settings page */
 add_handler('settings', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('settings', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('settings', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('settings', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 
 /* compose page */
 add_handler('compose', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('compose', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('compose', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('compose', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 
 /* search page */
 add_handler('search', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('search', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('search', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('search', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 
 /* profile page */
 add_handler('profiles', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('profiles', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('profiles', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('profiles', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
 
+/* not found */
 add_handler('notfound', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('notfound', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('notfound', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('notfound', 'filter_pop3_folders', true, 'pop3', 'folder_list_start', 'before');
+
+add_handler('ajax_hm_folders', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
+add_handler('ajax_hm_folders', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_handler('ajax_hm_folders', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_output('ajax_hm_folders', 'filter_pop3_folders', true, 'pop3', 'folder_list_content', 'before');
 
 /* select pop3 "folder" */
 add_handler('ajax_pop3_folder_display', 'login', false, 'core');
