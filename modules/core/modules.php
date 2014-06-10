@@ -357,9 +357,12 @@ class Hm_Output_header_end extends Hm_Output_Module {
 class Hm_Output_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
-            $res = '<body>';
+            $res = '<body';
             if (!$input['router_login_state']) {
-                $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
+                $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
+            }
+            else {
+                $res .= ' style="display: none;">';
             }
             return $res;
         }
@@ -453,6 +456,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
                 'var hm_url_path = "'.$input['router_url_path'].'";'.
                 'var hm_page_name = "'.$input['router_page_name'].'";'.
                 'var hm_list_path = "'.(isset($input['list_path']) ? $input['list_path'] : '').'";'.
+                'var hm_list_parent = "'.(isset($input['list_parent']) ? $input['list_parent'] : '').'";'.
                 'var hm_msg_uid = '.(isset($input['uid']) ? $input['uid'] : 0).';'.
                 '</script>';
         }
@@ -577,52 +581,63 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
 
 class Hm_Output_folder_list_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
-        $res .= 'class="main"><ul class="folders">'.
-            '<li class="menu_home"><a class="unread_link" href="?page=home">'.
-            '<img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.$this->trans('Home').'</a></li>'.
-            '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
-            '<img class="account_icon" src="images/open_iconic/box-2x.png" alt="" /> '.$this->trans('Inbox').'</a></li>'.
-            '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-            '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$this->trans('Unread').
-            ' <span class="unread_count"></span></a></li>'.
-            '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
-            '<img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.$this->trans('Flagged').'</a></li>'.
-            '<li class="menu_search"><a class="unread_link" href="?page=search">'.
-            '<img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.$this->trans('Search').'</a></li>'.
-            '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
-            '<img class="account_icon" src="images/open_iconic/document-2x.png" alt="" /> '.$this->trans('Compose').'</a></li>'.
-            '</ul></div>';
-        if (isset($input['folder_sources'])) {
-            foreach ($input['folder_sources'] as $src) {
-                $name = strtoupper(explode('_', $src)[0]);
-                $res .= '<div onclick="return toggle_section(\'.'.$this->html_safe($src).'\');" class="src_name">'.$this->html_safe($name).'</div>';
-                $res .= '<div ';
-                $res .= 'class="'.$this->html_safe($src).'">';
-                $cache = Hm_Page_Cache::get($src);
-                if ($cache) {
-                    $res .= $cache;
-                }
-                $res .= '</div>';
-            }
-        }
-        $res .= '<div onclick="return toggle_section(\'.settings\');" class="src_name">Settings</div><ul class="settings folders">'.
-            '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
-            '<img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.$this->trans('Servers').'</a></li>'.
-            '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
-            '<img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.$this->trans('Site').'</a></li>'.
-            '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
-            '<img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.$this->trans('Profiles').'</a></li>'.
-            '</ul></div>';
-
+        $res = main_menu($input, $this);
+        $res .= folder_source_menu($input, $this);
+        $res .= settings_menu($input, $this);
         $res .= '<a href="#" onclick="return update_folder_list();" class="update_unread">[reload]</a>';
-
         if ($format == 'HTML5') {
             return $res;
         }
         $input['formatted_folder_list'] = $res;
         return $input;
     }
+}
+
+function main_menu ($input, $output_mod) {
+    $res = '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
+    $res .= 'class="main"><ul class="folders">'.
+        '<li class="menu_home"><a class="unread_link" href="?page=home">'.
+        '<img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.$output_mod->trans('Home').'</a></li>'.
+        '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
+        '<img class="account_icon" src="images/open_iconic/box-2x.png" alt="" /> '.$output_mod->trans('Inbox').'</a></li>'.
+        '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
+        '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$output_mod->trans('Unread').
+        ' <span class="unread_count"></span></a></li>'.
+        '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
+        '<img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.$output_mod->trans('Flagged').'</a></li>'.
+        '<li class="menu_search"><a class="unread_link" href="?page=search">'.
+        '<img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.$output_mod->trans('Search').'</a></li>'.
+        '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
+        '<img class="account_icon" src="images/open_iconic/document-2x.png" alt="" /> '.$output_mod->trans('Compose').'</a></li>'.
+        '</ul></div>';
+    return $res;
+}
+function folder_source_menu( $input, $output_mod) {
+    $res = '';
+    if (isset($input['folder_sources'])) {
+        foreach ($input['folder_sources'] as $src) {
+            $name = strtoupper(explode('_', $src)[0]);
+            $res .= '<div onclick="return toggle_section(\'.'.$output_mod->html_safe($src).'\');" class="src_name">'.$output_mod->html_safe($name).'</div>';
+            $res .= '<div ';
+            $res .= 'class="'.$output_mod->html_safe($src).'">';
+            $cache = Hm_Page_Cache::get($src);
+            if ($cache) {
+                $res .= $cache;
+            }
+            $res .= '</div>';
+        }
+    }
+    return $res;
+}
+function settings_menu( $input, $output_mod) {
+    return '<div onclick="return toggle_section(\'.settings\');" class="src_name">Settings</div><ul class="settings folders">'.
+        '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
+        '<img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.$output_mod->trans('Servers').'</a></li>'.
+        '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
+        '<img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.$output_mod->trans('Site').'</a></li>'.
+        '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
+        '<img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.$output_mod->trans('Profiles').'</a></li>'.
+        '</ul></div>';
 }
 
 class Hm_Output_folder_list_end extends Hm_Output_Module {

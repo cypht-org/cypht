@@ -245,6 +245,7 @@ var update_folder_list = function() {
 var clean_selector = function(str) {
     return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
 };
+
 var hl_selected_menu = function() {
     $('.folder_list').find('*').removeClass('selected_menu');
     if (hm_page_name == 'message_list') {
@@ -256,13 +257,17 @@ var hl_selected_menu = function() {
             $('.menu_'+clean_selector(hm_list_path)).addClass('selected_menu');
         }
     }
+    else if (hm_list_parent) {
+        $('.menu_'+clean_selector(hm_list_parent)).addClass('selected_menu');
+    }
     else {
         $('.menu_'+hm_page_name).addClass('selected_menu');
     }
-}
+};
 
-Hm_Timer.fire();
 var folder_list = get_from_local_storage('formatted_folder_list');
+
+
 if (folder_list) {
     $('.folder_list').html(folder_list);
     hl_selected_menu();
@@ -270,4 +275,7 @@ if (folder_list) {
 else {
     update_folder_list();
 }
-$('body').hide().fadeIn(200);
+
+$('body').hide().fadeIn(300);
+
+Hm_Timer.fire();
