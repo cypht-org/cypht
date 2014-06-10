@@ -496,7 +496,6 @@ var update_unread_cache = function(class_name) {
 };
 
 var setup_unread_page = function() {
-    $('.menu_unread').addClass('selected_menu');
     var unread_data = get_from_local_storage('formatted_unread_data');
     if (unread_data && unread_data.length) {
         $('.message_table tbody').html(unread_data);
@@ -518,7 +517,6 @@ var setup_unread_page = function() {
 };
 
 var setup_combined_inbox = function() {
-    $('.menu_combined_inbox').addClass('selected_menu');
     var combined_inbox_data = get_from_local_storage('formatted_combined_inbox');
     if (!combined_inbox_data || !combined_inbox_data.length) {
         imap_combined_inbox();
@@ -538,12 +536,9 @@ var setup_flagged_page = function() {
         $('.message_table tbody').html(flagged_data);
         reset_checkboxes();
     }
-    $('.menu_flagged').addClass('selected_menu');
 };
 
 var setup_imap_folder_page = function() {
-    $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
-    $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
     if ($('.message_table tbody tr').length == 0) {
         select_imap_folder(hm_list_path, true);
     }
@@ -560,8 +555,6 @@ var setup_message_view_page = function() {
         document.title = 'HM3 '+$('.header_subject th').text();
     }
     if (hm_list_path.substring(0, 4) == 'imap') {
-        $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
-        $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
     }
     update_unread_cache();
 };

@@ -548,7 +548,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 '</th></tr></table>';
 
             $input['msg_headers'] = $txt;
-            $input['msg_gravatar'] =  build_msg_gravatar($from);
+            $input['msg_gravatar'] = build_msg_gravatar($from);
             //Hm_Page_Cache::add($input['msg_cache_suffix'].'_headers', $txt);
             //Hm_Page_Cache::add($input['msg_cache_suffix'].'_gravatar', $input['msg_gravatar']);
         }

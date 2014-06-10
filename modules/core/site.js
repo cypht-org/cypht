@@ -229,8 +229,7 @@ var save_to_local_storage = function(key, val) {
 var update_folder_list_display = function(res) {
     $('.folder_list').html(res.formatted_folder_list);
     save_to_local_storage('formatted_folder_list', res.formatted_folder_list);
-    $('.folder_list').find('*').removeClass('selected_menu');
-    $('.menu_'+hm_page_name).addClass('selected_menu');
+    hl_selected_menu();
 };
 
 var update_folder_list = function() {
@@ -246,13 +245,27 @@ var update_folder_list = function() {
 var clean_selector = function(str) {
     return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
 };
+var hl_selected_menu = function() {
+    $('.folder_list').find('*').removeClass('selected_menu');
+    if (hm_page_name == 'message_list') {
+        if (hm_list_path.substring(0, 4) == 'imap') {
+            $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
+            $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
+        }
+        else {
+            $('.menu_'+clean_selector(hm_list_path)).addClass('selected_menu');
+        }
+    }
+    else {
+        $('.menu_'+hm_page_name).addClass('selected_menu');
+    }
+}
 
 Hm_Timer.fire();
 var folder_list = get_from_local_storage('formatted_folder_list');
 if (folder_list) {
     $('.folder_list').html(folder_list);
-    $('.folder_list').find('*').removeClass('selected_menu');
-    $('.menu_'+hm_page_name).addClass('selected_menu');
+    hl_selected_menu();
 }
 else {
     update_folder_list();

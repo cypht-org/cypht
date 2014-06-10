@@ -670,7 +670,11 @@ class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['list_parent']) && trim($input['list_parent'])) {
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_parent']).
-                '">'.ucwords(str_replace('_', ' ', $this->html_safe($input['list_parent']))).'</a>';
+                '">'.ucwords(str_replace('_', ' ', $this->html_safe($input['list_parent'])));
+            $title .= '</a>';
+            if (isset($input['mailbox_list_title']) && count($input['mailbox_list_title'] > 1)) {
+                $title .= ' - '.$this->html_safe($input['mailbox_list_title'][1]);
+            }
         }
         elseif (isset($input['mailbox_list_title'])) {
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_path']).'">'.
