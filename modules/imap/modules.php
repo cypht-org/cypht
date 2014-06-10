@@ -523,7 +523,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $from = $value;
                         }
                         if ($fld == 'subject') {
-                            $txt .= '<tr class="header_'.$fld.'"><th colspan="2">'.$this->html_safe($value).'</th></tr>';
+                            $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
+                            if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
+                                $txt .= ' <img class="account_icon" src="images/open_iconic/star-2x.png" /> ';
+                            }
+                            $txt .= $this->html_safe($value).'</th></tr>';
                         }
                         else {
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';

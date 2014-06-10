@@ -83,3 +83,4 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .toggle_link { margin-right: 14px !important; width: 8px !important; display: block; float: left; opacity: 1 !important; }
 .online { color: green; }
 .down { color: red; }
+.header_subject .account_icon { vertical-align: 0px; }

@@ -59,7 +59,6 @@ var imap_forget_action = function() {
 var imap_test_action = function() {
     $('.imap_debug_data').empty();
     $('.imap_folder_data').empty();
-    Hm_Notices.show({0: 'Testing connection...'});
     event.preventDefault();
     var form = $(this).parent();
     var id = form.find('#imap_server_id');
@@ -108,7 +107,6 @@ var update_unread_message_display = function(res) {
     var ids = res.unread_server_ids.split(',');
     var count = update_message_list(ids, res.formatted_unread_data);
     document.title = 'HM3 '+count+' Unread';
-    $('.sys_messages').html($('.sys_messages').html()+'.');
     set_unread_count(count);
 };
 
@@ -161,7 +159,6 @@ var update_flagged_message_display = function(res) {
     var ids = res.flagged_server_ids.split(',');
     var count = update_message_list(ids, res.formatted_flagged_data);
     document.title = 'HM3 '+count+' Flagged';
-    $('.sys_messages').html($('.sys_messages').html()+'.');
 };
 
 var update_imap_status_display = function(res) {
@@ -170,12 +167,11 @@ var update_imap_status_display = function(res) {
 };
 
 var end_status_update = function() {
-    Hm_Notices.hide(true);
 };
+
 var imap_status_update = function() {
     var ids = $('.imap_server_ids').val().split(',');
     if ( ids && ids != '') {
-        Hm_Notices.show({0: 'Updating server status '});
         for (i=0;i<ids.length;i++) {
             id=ids[i];
             Hm_Ajax.request(
@@ -196,7 +192,6 @@ var imap_unread_update = function() {
     var since = $('.unread_since option:selected').val();
     var ids = $('.imap_server_ids').val().split(',');
     if ( ids && ids != '') {
-        Hm_Notices.show({0: 'Updating unread messages '});
         for (i=0;i<ids.length;i++) {
             id=ids[i];
             Hm_Ajax.request(
@@ -216,11 +211,9 @@ var imap_unread_update = function() {
 var display_imap_combined_inbox = function(res) {
     var ids = res.combined_inbox_server_ids.split(',');
     var count = update_message_list(ids, res.formatted_combined_inbox);
-    $('.sys_messages').html($('.sys_messages').html()+'.');
 };
 
 var set_combined_inbox_state = function() {
-    Hm_Notices.hide(true);
     if (!$('.message_table tr').length) {
         if (!$('.empty_list').length) {
             $('.message_list').append('<div class="empty_list">No messages found!</div>');
@@ -237,7 +230,6 @@ var set_combined_inbox_state = function() {
 var imap_combined_inbox = function(path, force) {
     var ids = $('.imap_server_ids').val().split(',');
     if (ids && ids != '') {
-        Hm_Notices.show({0: 'Loading messages '});
         for (i=0;i<ids.length;i++) {
             id=ids[i];
             Hm_Ajax.request(
@@ -256,7 +248,6 @@ var imap_combined_inbox = function(path, force) {
 var imap_flagged_update = function(loading) {
     var ids = $('.imap_server_ids').val().split(',');
     if (ids && ids != '') {
-        Hm_Notices.show({0: 'Updating flagged messages '});
         for (i=0;i<ids.length;i++) {
             id=ids[i];
             Hm_Ajax.request(
@@ -282,7 +273,6 @@ var select_imap_folder = function(path, force) {
     var detail = parse_folder_path(path, 'imap');
     if (detail) {
         if (force) {
-            Hm_Notices.show({0: 'Loading messages ...'});
         }
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_display'},
@@ -298,7 +288,6 @@ var select_imap_folder = function(path, force) {
 };
 
 var display_imap_mailbox = function(res) {
-    Hm_Notices.hide(true);
     var ids = [res.imap_server_id];
     var count = update_message_list(ids, res.formatted_mailbox_page);
     if (res.imap_page_links) {
@@ -315,7 +304,6 @@ var expand_imap_folders = function(path) {
     if ($('li', list).length == 0) {
         $('.expand_link', list).html('-');
         if (detail) {
-            Hm_Notices.show({0: 'Loading folder ...'});
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
                 {'name': 'imap_server_id', 'value': detail.server_id},
@@ -349,7 +337,6 @@ var expand_imap_mailbox = function(res) {
 };
 
 var display_msg_content = function(res) {
-    Hm_Notices.hide(true);
     $('.msg_text').html('');
     $('.msg_text').append(res.msg_gravatar);
     $('.msg_text').append(res.msg_headers);
@@ -374,7 +361,6 @@ var get_message_content = function(msg_part) {
     if (detail && uid) {
         window.scrollTo(0,0);
         $('.msg_text_inner').html('');
-        Hm_Notices.show({0: 'Fetching message ... '});
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
             {'name': 'imap_msg_uid', 'value': uid},
@@ -390,7 +376,6 @@ var get_message_content = function(msg_part) {
 };
 
 var set_flagged_state = function() {
-    Hm_Notices.hide(true);
     if (!$('.message_table tr').length) {
         if (!$('.empty_list').length) {
             $('.message_list').append('<div class="empty_list">No flagged messages found!</div>');
@@ -405,7 +390,6 @@ var set_flagged_state = function() {
 };
 
 var set_unread_state = function() {
-    Hm_Notices.hide(true);
     if (!$('.message_table tr').length) {
         if (!$('.empty_list').length) {
             $('.message_list').append('<div class="empty_list">No unread messages found!</div>');
@@ -458,7 +442,6 @@ var imap_message_action = function(action_type) {
         selected.push($(this).val());
     });
     if (selected.length > 0) {
-        Hm_Notices.show({0: 'Updating remote server ...'});
         update_message_list_after_action(action_type, selected);
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_action'},
