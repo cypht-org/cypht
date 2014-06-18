@@ -15,6 +15,8 @@ abstract class Hm_Session {
     abstract protected function check($request);
     abstract protected function start($request);
     abstract protected function just_started();
+    abstract protected function check_fingerprint($request);
+    abstract protected function set_fingerprint($request);
     abstract protected function auth($user, $pass);
     abstract protected function get($name, $default=false);
     abstract protected function set($name, $value);
@@ -34,6 +36,32 @@ class Hm_PHP_Session extends Hm_Session {
     }
     protected function just_started() {
     }
+
+    protected function check_fingerprint($request) {
+        $id = $this->build_fingerprint($request);
+        $fingerprint = $this->get('fingerprint', false);
+        if (!$fingerprint || $fingerprint !== $id) {
+            $this->end();
+        }
+    }
+    private function build_fingerprint($request) {
+        $env = $request->server;
+        $id = '';
+        $id .= (isset($env['REMOTE_ADDR'])) ? $env['REMOTE_ADDR'] : '';
+        $id .= (isset($env['HTTP_USER_AGENT'])) ? $env['HTTP_USER_AGENT'] : '';
+        $id .= (isset($env['REQUEST_SCHEME'])) ? $env['REQUEST_SCHEME'] : '';
+        $id .= (isset($env['HTTP_ACCEPT_LANGUAGE'])) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
+        $id .= (isset($env['HTTP_ACCEPT_ENCODING'])) ? $env['HTTP_ACCEPT_ENCODING'] : '';
+        $id .= (isset($env['HTTP_ACCEPT_CHARSET'])) ? $env['HTTP_ACCEPT_CHARSET'] : '';
+        $id .= (isset($env['HTTP_HOST'])) ? $env['HTTP_HOST'] : '';
+        return hash('sha256', $id);
+    }
+
+    protected function set_fingerprint($request) {
+        $id = $this->build_fingerprint($request);
+        $this->set('fingerprint', $id);
+    }
+
     protected function ciphertext($data) {
         return Hm_Crypt::ciphertext(serialize($data), $this->enc_key);
     }
@@ -52,7 +80,14 @@ class Hm_PHP_Session extends Hm_Session {
 
     public function check($request) {
         $this->set_key($request);
-        $this->start($request);
+        if (isset($request->cookie[$this->cname])) {
+            $this->start($request);
+            $this->check_fingerprint($request);
+        }
+        else {
+            $this->start($request);
+            $this->set_fingerprint($request);
+        }
     }
 
     public function auth($user, $pass) {
@@ -128,6 +163,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
                 Hm_Msgs::add('login accepted, starting PHP session');
                 $this->loaded = true;
                 $this->start($request);
+                $this->set_fingerprint($request);
                 $this->just_started();
             }
             else {
@@ -137,6 +173,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
         elseif (isset($request->cookie[$this->cname])) {
             $this->set_key($request);
             $this->start($request);
+            $this->check_fingerprint($request);
         }
     }
 
