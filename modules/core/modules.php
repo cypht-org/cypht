@@ -220,13 +220,21 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             }
             elseif (preg_match("/^pop3_\d+/", $path)) {
                 $data['list_path'] = $path;
-                $parts = explode('_', $path, 3);
+                $parts = explode('_', $path, 2);
                 $details = Hm_POP3_List::dump(intval($parts[1]));
                 if (!empty($details)) {
                     if ($details['name'] == 'Default-Auth-Server') {
                         $details['name'] = 'Default';
                     }
                     $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
+                }
+            }
+            elseif (preg_match("/^feed_\d+/", $path)) {
+                $data['list_path'] = $path;
+                $parts = explode('_', $path, 2);
+                $details = Hm_Feed_List::dump(intval($parts[1]));
+                if (!empty($details)) {
+                    $data['mailbox_list_title'] = array('Feeds', $details['name']);
                 }
             }
         }
@@ -616,7 +624,7 @@ function folder_source_menu( $input, $output_mod) {
     $res = '';
     if (isset($input['folder_sources'])) {
         foreach ($input['folder_sources'] as $src) {
-            $name = strtoupper(explode('_', $src)[0]);
+            $name = ucfirst(strtolower(explode('_', $src)[0]));
             $res .= '<div onclick="return toggle_section(\'.'.$output_mod->html_safe($src).'\');" class="src_name">'.$output_mod->html_safe($name).'</div>';
             $res .= '<div ';
             $res .= 'class="'.$output_mod->html_safe($src).'">';

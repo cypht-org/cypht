@@ -276,6 +276,5 @@ else {
     update_folder_list();
 }
 
-$('body').hide().fadeIn(300);
-
+$('body').fadeIn(300);
 Hm_Timer.fire();
