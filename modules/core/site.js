@@ -168,6 +168,156 @@ Hm_Timer = {
     }
 };
 
+/* message list */
+var Hm_Message_List = {
+
+    range_start: '',
+
+    update: function(ids, msgs, type) {
+        if (msgs && !jQuery.isEmptyObject(msgs)) {
+            $('.empty_list').remove();
+        }
+        var msg_ids = Hm_Message_List.add_rows(msgs, type);
+        var count = Hm_Message_List.remove_rows(ids, msg_ids);
+        return count;
+    },
+
+    remove_rows: function(ids, msg_ids, type) {
+        var count = $('.message_table tbody tr').length;
+        for (i=0;i<ids.length;i++) {
+            $('.message_table tbody tr[class^='+type+'_'+ids[i]+'_]').filter(function() {
+                var id = this.className;
+                if (jQuery.inArray(id, msg_ids) == -1) {
+                    count--;
+                    $(this).remove();
+                }
+            });
+        }
+        return count;
+    },
+
+    add_rows: function(msgs) {
+        var msg_ids = [];
+        for (index in msgs) {
+            row = msgs[index][0];
+            id = msgs[index][1];
+            if (!$('.'+clean_selector(id)).length) {
+                insert_into_message_list(row);
+                $('.'+clean_selector(id)).fadeIn(300);
+            }
+            else {
+                timestr = $('.msg_date', $(row)).html();
+                subject = $('.subject', $(row)).html();
+                timeint = $('.msg_timestamp', $(row)).val();
+                $('.msg_date', $('.'+clean_selector(id))).html(timestr);
+                $('.subject', $('.'+clean_selector(id))).html(subject);
+                $('.msg_timestamp', $('.'+clean_selector(id))).val(timeint);
+            }
+            msg_ids.push(id);
+        }
+        return msg_ids;
+    },
+
+    reset_checkboxes: function() {
+        $(':checkbox').each(function () { this.checked = false; });
+        Hm_Message_List.toggle_msg_controls();
+        $(':checkbox').click(function(e) {
+            Hm_Message_List.toggle_msg_controls();
+            Hm_Message_List.check_select_range(e);
+        });
+    },
+
+    select_range: function(start, end) {
+        var found = false;
+        var other = false;
+        $('.message_table tbody tr').each(function() {
+            if (found) {
+                console.log($(':checkbox', $(this)));
+                $(':checkbox', $(this)).prop('checked', true);
+                if ($(this).prop('class') == other) {
+                    return false;
+                }
+            }
+            if ($(this).prop('class') == start) {
+                found = true;
+                other = end;
+            }
+            if ($(this).prop('class') == end) {
+                found = true;
+                other = start;
+            }
+        });
+        
+    },
+
+    check_select_range: function(event_object) {
+        var start;
+        var end;
+        if (event_object && event_object.shiftKey) {
+            if (event_object.target.checked) {
+                if (Hm_Message_List.range_start) {
+                    start = Hm_Message_List.range_start;
+                    end = event_object.target.value;
+                    Hm_Message_List.select_range(start, end);
+                    Hm_Message_List.range_start = '';
+                }
+                else {
+                   Hm_Message_List.range_start = event_object.target.value; 
+                }
+            }
+        }
+
+    },
+
+    remove_from_cache: function(cached_list_name, row_class) {
+        var count = 0;
+        var cache_data = get_from_local_storage(cached_list_name);
+        if (cache_data) {
+            var adjusted_data = $('<div></div>').append(cache_data).find('tr').remove('.'+clean_selector(row_class)).end().html();
+            save_to_local_storage(cached_list_name, adjusted_data);
+            count = $(adjusted_data).length;
+        }
+        return count;
+    },
+
+    toggle_msg_controls: function() {
+        if ($('input:checked').length > 0) {
+            $('.msg_controls a').removeClass('disabled_link');
+        }
+        else {
+            $('.msg_controls a').addClass('disabled_link');
+        }
+    },
+
+    update_after_action: function(action_type, selected) {
+        var remove = false;
+        var row = false;
+        var class_name = false;
+        var count = $(".message_list tbody tr").length;
+        if (action_type == 'read' && hm_list_path == 'unread') {
+            remove = true;
+        }
+        else if (action_type == 'delete') {
+            remove = true;
+        }
+        if (remove) {
+            for (index in selected) {
+                class_name = selected[index];
+                count--;
+                $('.'+clean_selector(class_name)).fadeOut(200, function() { $(this).remove(); });
+            }
+        }
+        if (hm_list_path == 'unread') {
+            set_unread_count(count);
+        }
+        for (index in selected) {
+            class_name = selected[index];
+            Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);
+        }
+        Hm_Message_List.reset_checkboxes();
+    }
+};
+
 var confirm_logout = function() {
     $('.confirm_logout').fadeIn(200);
     return false;

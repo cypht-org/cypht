@@ -105,59 +105,14 @@ var set_unread_count = function(count) {
 
 var update_unread_message_display = function(res) {
     var ids = res.unread_server_ids.split(',');
-    var count = update_message_list(ids, res.formatted_unread_data);
+    var count = Hm_Message_List.update(ids, res.formatted_unread_data, 'imap');
     document.title = 'HM3 '+count+' Unread';
     set_unread_count(count);
 };
 
-var add_rows_to_message_list = function(msg_list) {
-    var msg_ids = [];
-    for (index in msg_list) {
-        row = msg_list[index][0];
-        id = msg_list[index][1];
-        if (!$('.'+clean_selector(id)).length) {
-            insert_into_message_list(row);
-            $('.'+clean_selector(id)).fadeIn(300);
-        }
-        else {
-            timestr = $('.msg_date', $(row)).html();
-            subject = $('.subject', $(row)).html();
-            timeint = $('.msg_timestamp', $(row)).val();
-            $('.msg_date', $('.'+clean_selector(id))).html(timestr);
-            $('.subject', $('.'+clean_selector(id))).html(subject);
-            $('.msg_timestamp', $('.'+clean_selector(id))).val(timeint);
-        }
-        msg_ids.push(id);
-    }
-    return msg_ids;
-};
-
-var remove_rows_from_message_list = function(ids, msg_ids) {
-    var count = $('.message_table tbody tr').length;
-    for (i=0;i<ids.length;i++) {
-        $('.message_table tbody tr[class^=imap_'+ids[i]+'_]').filter(function() {
-            var id = this.className;
-            if (jQuery.inArray(id, msg_ids) == -1) {
-                count--;
-                $(this).remove();
-            }
-        });
-    }
-    return count;
-};
-
-var update_message_list = function(ids, msg_list) {
-    if (msg_list && !jQuery.isEmptyObject(msg_list)) {
-        $('.empty_list').remove();
-    }
-    var msg_ids = add_rows_to_message_list(msg_list);
-    var count = remove_rows_from_message_list(ids, msg_ids);
-    return count;
-};
-
 var update_flagged_message_display = function(res) {
     var ids = res.flagged_server_ids.split(',');
-    var count = update_message_list(ids, res.formatted_flagged_data);
+    var count = Hm_Message_List.update(ids, res.formatted_flagged_data, 'imap');
     document.title = 'HM3 '+count+' Flagged';
 };
 
@@ -210,7 +165,7 @@ var imap_unread_update = function() {
 
 var display_imap_combined_inbox = function(res) {
     var ids = res.combined_inbox_server_ids.split(',');
-    var count = update_message_list(ids, res.formatted_combined_inbox);
+    var count = Hm_Message_List.update(ids, res.formatted_combined_inbox, 'imap');
 };
 
 var set_combined_inbox_state = function() {
@@ -223,7 +178,7 @@ var set_combined_inbox_state = function() {
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_combined_inbox', data.html());
     $(':checkbox').click(function() {
-        toggle_msg_controls();
+        Hm_Message_List.toggle_msg_controls();
     });
 };
 
@@ -289,12 +244,12 @@ var select_imap_folder = function(path, force) {
 
 var display_imap_mailbox = function(res) {
     var ids = [res.imap_server_id];
-    var count = update_message_list(ids, res.formatted_mailbox_page);
+    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'imap');
     if (res.imap_page_links) {
         $('.imap_page_links').html(res.imap_page_links);
     }
     $(':checkbox').click(function() {
-        toggle_msg_controls();
+        Hm_Message_List.toggle_msg_controls();
     });
 };
 
@@ -328,7 +283,7 @@ var save_folder_list = function() {
 
 var toggle_rows = function() {
     $(':checkbox').each(function () { this.checked = !this.checked; });
-    toggle_msg_controls();
+    Hm_Message_List.toggle_msg_controls();
     return false;
 };
 var expand_imap_mailbox = function(res) {
@@ -384,7 +339,7 @@ var set_flagged_state = function() {
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_flagged_data', data.html());
     $(':checkbox').click(function() {
-        toggle_msg_controls();
+        Hm_Message_List.toggle_msg_controls();
     });
 };
 
@@ -398,42 +353,9 @@ var set_unread_state = function() {
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_unread_data', data.html());
     $(':checkbox').click(function() {
-        toggle_msg_controls();
+        Hm_Message_List.toggle_msg_controls();
     });
     Hm_Timer.add_job(imap_unread_update, 60, true);
-};
-
-var toggle_msg_controls = function() {
-    if ($('input:checked').length > 0) {
-        $('.msg_controls a').removeClass('disabled_link');
-    }
-    else {
-        $('.msg_controls a').addClass('disabled_link');
-    }
-};
-
-var update_message_list_after_action = function(action_type, selected) {
-    var remove = false;
-    var row = false;
-    var class_name = false;
-    var count = $(".message_list tbody tr").length;
-    if (action_type == 'read' && hm_list_path == 'unread') {
-        remove = true;
-    }
-    else if (action_type == 'delete') {
-        remove = true;
-    }
-    if (remove) {
-        for (index in selected) {
-            class_name = selected[index];
-            count--;
-            $('.'+clean_selector(class_name)).fadeOut(200, function() { $(this).remove(); });
-        }
-    }
-    if (hm_list_path == 'unread') {
-        set_unread_count(count);
-    }
-    reset_checkboxes();
 };
 
 var imap_message_action = function(action_type) {
@@ -443,7 +365,7 @@ var imap_message_action = function(action_type) {
         selected.push($(this).val());
     });
     if (selected.length > 0) {
-        update_message_list_after_action(action_type, selected);
+        Hm_Message_List.update_after_action(action_type, selected);
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_action'},
             {'name': 'imap_action_type', 'value': action_type},
@@ -456,29 +378,9 @@ var imap_message_action = function(action_type) {
     return false;
 };
 
-var reset_checkboxes = function() {
-    $(':checkbox').each(function () { this.checked = false; });
-    toggle_msg_controls();
-    $(':checkbox').click(function() {
-        toggle_msg_controls();
-    });
-};
 var update_unread_cache = function(class_name) {
-    if (!class_name) {
-        detail = parse_folder_path(hm_list_path, 'imap');
-        if (detail) {
-            class_name = 'imap_'+detail.server_id+'_'+hm_msg_uid+'_'+detail.folder;
-            var unread_data = get_from_local_storage('formatted_unread_data');
-            if (unread_data) {
-                var adjusted_data = $('<div></div>').append(unread_data).find('tr').remove('.'+clean_selector(class_name)).end().html();
-                set_unread_count($(adjusted_data).length);
-                save_to_local_storage('formatted_unread_data', adjusted_data);
-            }
-            else {
-                set_unread_count(0);
-            }
-        }
-    }
+    count = Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);
+    set_unread_count(count);
 };
 
 var setup_unread_page = function() {
@@ -488,7 +390,7 @@ var setup_unread_page = function() {
         defer = true;
         document.title = 'HM3 '+$('.message_table tbody tr').length+' Unread';
         set_unread_count($('.message_table tbody tr').length);
-        reset_checkboxes();
+        Hm_Message_List.reset_checkboxes();
     }
     else {
         if (initial_error) {
@@ -509,7 +411,7 @@ var setup_combined_inbox = function() {
     }
     else {
         $('.message_table tbody').html(combined_inbox_data);
-        reset_checkboxes();
+        Hm_Message_List.reset_checkboxes();
     }
 };
 
@@ -520,7 +422,7 @@ var setup_flagged_page = function() {
     }
     else {
         $('.message_table tbody').html(flagged_data);
-        reset_checkboxes();
+        Hm_Message_List.reset_checkboxes();
     }
 };
 
@@ -540,9 +442,11 @@ var setup_message_view_page = function() {
         $('.msg_text').html(msg_content);
         document.title = 'HM3 '+$('.header_subject th').text();
     }
-    if (hm_list_path.substring(0, 4) == 'imap') {
+    detail = parse_folder_path(hm_list_path, 'imap');
+    if (detail) {
+        class_name = 'imap_'+detail.server_id+'_'+hm_msg_uid+'_'+detail.folder;
+        update_unread_cache(class_name);
     }
-    update_unread_cache();
 };
 
 var setup_server_page = function() {
@@ -555,7 +459,7 @@ var setup_server_page = function() {
 var initial_error = $('.err').length;
 
 if (hm_page_name == 'message_list') {
-    reset_checkboxes();
+    Hm_Message_List.reset_checkboxes();
     if (hm_list_path == 'unread') {
         setup_unread_page();
     }
