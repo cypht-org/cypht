@@ -461,11 +461,12 @@ class Hm_Output_js_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5' ) {
             return '<script type="text/javascript">'.
-                'var hm_url_path = "'.$input['router_url_path'].'";'.
-                'var hm_page_name = "'.$input['router_page_name'].'";'.
-                'var hm_list_path = "'.(isset($input['list_path']) ? $input['list_path'] : '').'";'.
-                'var hm_list_parent = "'.(isset($input['list_parent']) ? $input['list_parent'] : '').'";'.
-                'var hm_msg_uid = '.(isset($input['uid']) ? $input['uid'] : 0).';'.
+                'var hm_url_path = "'.$this->html_safe($input['router_url_path']).'";'.
+                'var hm_page_name = "'.$this->html_safe($input['router_page_name']).'";'.
+                'var hm_list_path = "'.(isset($input['list_path']) ? $this->html_safe($input['list_path']) : '').'";'.
+                'var hm_list_parent = "'.(isset($input['list_parent']) ? $this->html_safe($input['list_parent']) : '').'";'.
+                'var hm_msg_uid = '.(isset($input['uid']) ? $this->html_safe($input['uid']) : 0).';'.
+                'var hm_module_list = "'.$this->html_safe($input['router_module_list']).'";'.
                 '</script>';
         }
     }

@@ -172,6 +172,7 @@ Hm_Timer = {
 var Hm_Message_List = {
 
     range_start: '',
+    sorts: {'source': 'asc', 'from': 'asc', 'subject': 'asc', 'msg_date': 'asc'},
 
     update: function(ids, msgs, type) {
         if (msgs && !jQuery.isEmptyObject(msgs)) {
@@ -194,6 +195,93 @@ var Hm_Message_List = {
             });
         }
         return count;
+    },
+
+    sort_rows: function(sort_list, sort_type, dir) {
+        switch(sort_type+dir) {
+            case 'numericasc':
+                sort_list.sort(function(a, b) { return Hm_Message_List.sort_numeric_asc(a, b); });
+                break;
+            case 'numericdesc':
+                sort_list.sort(function(a, b) { return Hm_Message_List.sort_numeric_desc(a, b); });
+                break;
+            case 'alphadesc':
+                sort_list.sort(function(a, b) { return Hm_Message_List.sort_alpha_desc(a, b); });
+                break;
+            case 'alphaasc':
+                sort_list.sort(function(a, b) { return Hm_Message_List.sort_alpha_asc(a, b); });
+            default:
+                break;
+        }
+        return sort_list;
+    },
+
+    sort_alpha_desc: function(a, b) {
+        var res =  b[0][0].localeCompare(a[0][0]);
+        if (res == 0) {
+            return b[2] - a[2];
+        }
+        else {
+            return res;
+        }
+    },
+
+    sort_alpha_asc: function(a, b) {
+        var res =  a[0][0].localeCompare(b[0][0]);
+        if (res == 0) {
+            return b[2] - a[2];
+        }
+        else {
+            return res;
+        }
+    },
+
+    sort_numeric_asc: function(a, b) {
+        return a[0] - b[0];
+    },
+
+    sort_numeric_desc: function(a, b) {
+        return b[0] - a[0];
+    },
+
+    sort_by_col: function(col_class) {
+        var sort_val;
+        var sort_type;
+        var row_id;
+        var sort_list = [];
+        var new_list = [];
+        var second_sort;
+        var dir = Hm_Message_List.sorts[col_class];
+        if (dir == 'asc') {
+            Hm_Message_List.sorts[col_class] = 'desc';
+        }
+        else if (dir == 'desc') {
+            Hm_Message_List.sorts[col_class] = 'asc';
+        }
+
+        if (col_class == 'msg_date') {
+            sort_type = 'numeric';
+        }
+        else {
+            sort_type = 'alpha';
+        }
+        $('.message_table tbody tr').each(function() {
+            row_id = $(this).prop('class');
+            if (col_class == 'msg_date') {
+                sort_val = $('td.'+col_class+' input', $(this)).val();
+                second_sort = sort_val;
+            }
+            else {
+                sort_val = $('td.'+col_class, $(this)).text().toUpperCase();
+                second_sort = $('td.msg_date input', $(this)).val();
+            }
+            sort_list.push([sort_val, row_id, second_sort]);
+        });
+        sort_list = Hm_Message_List.sort_rows(sort_list, sort_type, dir);
+        for (i=0;i<sort_list.length;i++) {
+            new_list.push($('.message_table tbody tr.'+sort_list[i][1]));
+        }
+        $('.message_table tbody').html(new_list);
     },
 
     add_rows: function(msgs) {
@@ -423,6 +511,12 @@ if (folder_list) {
 }
 else {
     update_folder_list();
+}
+if (hm_page_name == 'message_list') {
+    $('.message_table th').click(function() {
+        var sort_type = $(this).prop('class');
+        Hm_Message_List.sort_by_col(sort_type, 'asc');
+    });
 }
 
 $('body').fadeIn(300);
