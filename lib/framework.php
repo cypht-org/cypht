@@ -335,7 +335,8 @@ class Hm_Router {
             'router_sapi_name'    => $request->sapi,
             'router_format_name'  => $request->format,
             'router_login_state'  => $session->active,
-            'router_url_path'     => $request->path
+            'router_url_path'     => $request->path,
+            'router_module_list'  => $config->get('modules', '')
         ));
     }
 
