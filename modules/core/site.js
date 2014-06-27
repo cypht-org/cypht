@@ -232,7 +232,6 @@ var Hm_Message_List = {
         var other = false;
         $('.message_table tbody tr').each(function() {
             if (found) {
-                console.log($(':checkbox', $(this)));
                 $(':checkbox', $(this)).prop('checked', true);
                 if ($(this).prop('class') == other) {
                     return false;
@@ -255,7 +254,7 @@ var Hm_Message_List = {
         var end;
         if (event_object && event_object.shiftKey) {
             if (event_object.target.checked) {
-                if (Hm_Message_List.range_start) {
+                if (Hm_Message_List.range_start != '') {
                     start = Hm_Message_List.range_start;
                     end = event_object.target.value;
                     Hm_Message_List.select_range(start, end);
