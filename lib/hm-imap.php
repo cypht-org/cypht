@@ -134,7 +134,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $this->server = 'tls://'.$this->server;
             } 
             $this->debug[] = 'Connecting to '.$this->server.' on port '.$this->port;
-            $this->handle = fsockopen($this->server, $this->port, $errorno, $errorstr, 30);
+            $this->handle = @fsockopen($this->server, $this->port, $errorno, $errorstr, 30);
             if (is_resource($this->handle)) {
                 $this->debug[] = 'Successfully opened port to the IMAP server';
                 $this->state = 'connected';
