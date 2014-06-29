@@ -239,6 +239,8 @@ class Hm_Feed {
                 case 'GUID':
                 case 'PUBDATE':
                 case 'DC:DATE':
+                case 'DC:CREATOR':
+                case 'AUTHOR':
                     $this->collect = strtolower($tagname);
                     break;
             }
