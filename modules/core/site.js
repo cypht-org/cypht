@@ -502,22 +502,54 @@ var hl_selected_menu = function() {
     }
 };
 
+var load_combined_inbox_data = function() {
+    var ids;
+    var loader;
+    var tmp;
+    var mods = hm_module_list.split(',');
+    for (i=0;i<mods.length;i++) {
+        if (mods[i] == 'feeds' || mods[i] == 'imap' || mods[i] == 'pop3') {
+            ids = $('.'+mods[i]+'_server_ids').val();
+            if (ids) {
+                loader = mods[i]+'_combined_inbox';
+                try { window[loader](); } catch(e) { console.log(e); }
+            }
+        }
+    }
+    return false;
+};
+
+var setup_combined_inbox = function() {
+    var combined_inbox_data = get_from_local_storage('formatted_combined_inbox');
+    if (!combined_inbox_data || !combined_inbox_data.length) {
+        load_combined_inbox_data();
+    }
+    else {
+        $('.message_table tbody').html(combined_inbox_data);
+        Hm_Message_List.reset_checkboxes();
+    }
+};
+
 var folder_list = get_from_local_storage('formatted_folder_list');
 
 
-if (folder_list) {
-    $('.folder_list').html(folder_list);
-    hl_selected_menu();
-}
-else {
-    update_folder_list();
-}
-if (hm_page_name == 'message_list') {
-    $('.message_table th').click(function() {
-        var sort_type = $(this).prop('class');
-        Hm_Message_List.sort_by_col(sort_type, 'asc');
-    });
-}
-
-$('body').fadeIn(300);
-Hm_Timer.fire();
+$(function() {
+    if (folder_list) {
+        $('.folder_list').html(folder_list);
+        hl_selected_menu();
+    }
+    else {
+        update_folder_list();
+    }
+    if (hm_page_name == 'message_list') {
+        $('.message_table th').click(function() {
+            var sort_type = $(this).prop('class');
+            Hm_Message_List.sort_by_col(sort_type, 'asc');
+        });
+        if (hm_list_path == 'combined_inbox') {
+            setup_combined_inbox();
+        }
+    }
+    $('body').fadeIn(300);
+    Hm_Timer.fire();
+});

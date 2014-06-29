@@ -861,7 +861,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false)
         $timestamp = $output_module->html_safe(strtotime($msg['internal_date']));
         $date = $output_module->html_safe(human_readable_interval($msg['internal_date']));
         $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
-            '</td><td class="checkbox_row"><input type="checkbox" value="'.$output_module->html_safe($id).'" /></td>'.
+            '<td class="checkbox_row"><input type="checkbox" value="'.$id.'" /></td>'.
             '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
             '<td class="from">'.$from.'</div></td>'.
             '<td class="subject"><div class="'.
@@ -949,7 +949,7 @@ function imap_combined_inbox_list() {
     }
     $cache = implode('', $cache);
     return '<div class="message_list"><div class="content_title">Combined Inbox'.
-        '<a class="update_unread" onclick="return imap_combined_inbox()" href="#">[update]</a></div>'.imap_message_controls().
+        '<a class="update_unread" onclick="return load_combined_inbox_data()" href="#">[update]</a></div>'.imap_message_controls().
         imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
 function imap_flagged_list() {
