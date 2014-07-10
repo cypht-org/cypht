@@ -606,18 +606,18 @@ function main_menu ($input, $output_mod) {
     $res = '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
     $res .= 'class="main"><ul class="folders">'.
         '<li class="menu_home"><a class="unread_link" href="?page=home">'.
-        '<img class="account_icon" src="images/open_iconic/home-2x.png" alt="" /> '.$output_mod->trans('Home').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" /> '.$output_mod->trans('Home').'</a></li>'.
         '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
-        '<img class="account_icon" src="images/open_iconic/box-2x.png" alt="" /> '.$output_mod->trans('Inbox').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" /> '.$output_mod->trans('Inbox').'</a></li>'.
         '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-        '<img class="account_icon" src="images/open_iconic/envelope-closed-2x.png" alt="" /> '.$output_mod->trans('Unread').
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Unread').
         ' <span class="unread_count"></span></a></li>'.
         '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
-        '<img class="account_icon" src="images/open_iconic/star-2x.png" alt="" /> '.$output_mod->trans('Flagged').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" /> '.$output_mod->trans('Flagged').'</a></li>'.
         '<li class="menu_search"><a class="unread_link" href="?page=search">'.
-        '<img class="account_icon" src="images/open_iconic/globe-2x.png" alt="" /> '.$output_mod->trans('Search').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" /> '.$output_mod->trans('Search').'</a></li>'.
         '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
-        '<img class="account_icon" src="images/open_iconic/document-2x.png" alt="" /> '.$output_mod->trans('Compose').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" /> '.$output_mod->trans('Compose').'</a></li>'.
         '</ul></div>';
     return $res;
 }
@@ -641,11 +641,11 @@ function folder_source_menu( $input, $output_mod) {
 function settings_menu( $input, $output_mod) {
     return '<div onclick="return toggle_section(\'.settings\');" class="src_name">Settings</div><ul class="settings folders">'.
         '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
-        '<img class="account_icon" src="images/open_iconic/monitor-2x.png" alt="" /> '.$output_mod->trans('Servers').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$monitor).'" alt="" /> '.$output_mod->trans('Servers').'</a></li>'.
         '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
-        '<img class="account_icon" src="images/open_iconic/cog-2x.png" alt="" /> '.$output_mod->trans('Site').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$cog).'" alt="" /> '.$output_mod->trans('Site').'</a></li>'.
         '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
-        '<img class="account_icon" src="images/open_iconic/people-2x.png" alt="" /> '.$output_mod->trans('Profiles').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$people).'" alt="" /> '.$output_mod->trans('Profiles').'</a></li>'.
         '</ul></div>';
 }
 

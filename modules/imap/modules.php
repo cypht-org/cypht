@@ -525,7 +525,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
                             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                                $txt .= ' <img class="account_icon" src="images/open_iconic/star-2x.png" /> ';
+                                $txt .= ' <img class="account_icon" src="'.Hm_Image_Sources::$folder.'" /> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
@@ -712,7 +712,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
             $res = '<ul class="folders">';
             if (isset($input['imap_folders'])) {
                 foreach ($input['imap_folders'] as $id => $folder) {
-                    $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="images/open_iconic/folder-2x.png" /> '.
+                    $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" /> '.
                         $this->html_safe($folder).'</a></li>';
                 }
             }
@@ -829,7 +829,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
             $results .= '<a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
         }
         else {
-            $results .= ' <img class="folder_icon" src="images/open_iconic/folder.png" alt="" />';
+            $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" />';
         }
         if (!$folder['noselect']) {
             $results .= '<a href="?page=message_list&amp;list_path='.
@@ -873,7 +873,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false)
             '&amp;list_parent='.$output_module->html_safe($parent_list).'">'.$subject.'</a></div></td>'.
             '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td>'.
             '<td class="icon">'.
-            (stristr($msg['flags'], 'flagged') ? '<img src="images/open_iconic/star-2x.png" />' : '').
+            (stristr($msg['flags'], 'flagged') ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').
             '</td></tr>', $id);
     }
     return $res;
@@ -881,7 +881,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false)
 
 function imap_message_controls() {
     return '<div class="msg_controls">'.
-        '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="images/open_iconic/check.png" /></a>'.
+        '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" /></a>'.
         '<a href="#" onclick="return imap_message_action(\'read\');" class="disabled_link">Read</a>'.
         '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
         '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
@@ -916,7 +916,7 @@ function imap_message_list_headers() {
         '<colgroup><col class="chkbox_col"><col class="source_col">'.
         '<col class="from_col"><col class="subject_col"><col class="date_col">'.
         '<col class="icon_col"></colgroup>'.
-        '<thead><tr><th></th><th class="source">Source</th><th class="from">From</th><th class="subject">Subject</th><th class="msg_date">Date</th><th></th></tr></thead>';
+        '<thead><tr><th colspan="2" class="source">Source</th><th class="from">From</th><th class="subject">Subject</th><th class="msg_date">Date</th><th></th></tr></thead>';
 }
 
 function imap_message_list_folder($input, $output_module) {
@@ -930,7 +930,7 @@ function imap_message_list_folder($input, $output_module) {
     if ($links_cache) {
         $links = $links_cache;
     }
-    $title = implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']);
+    $title = implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']);
     return '<div class="message_list"><div class="content_title">'.$title.
         '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.
         $output_module->html_safe($input['list_path']).'\', true)">[update]</a>'.
@@ -1001,7 +1001,7 @@ function imap_message_list_unread($input) {
         }
         $res .= ' value="'.$val.'">'.$label.'</option>';
     }
-    $res .= '</select><a class="update_unread" href="#" onclick="return imap_unread_update(false, true);">[update]</a>'.
+    $res .= '</select><a class="update_unread" href="#" onclick="return Hm_Message_List.load_sources();">[update]</a>'.
         '</div>'.imap_message_controls().imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
     return $res;
 }

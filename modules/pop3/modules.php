@@ -331,7 +331,7 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
             foreach ($input['pop3_folders'] as $id => $folder) {
                 $res .= '<li class="pop3_'.$this->html_safe($id).'">'.
                     '<a href="?page=message_list&list_path=pop3_'.$this->html_safe($id).'">'.
-                    '<img class="account_icon" alt="Toggle folder" src="images/open_iconic/folder-2x.png" /> '.
+                    '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
@@ -371,7 +371,7 @@ function pop3_message_list($input, $output_module) {
     if ($page_cache) {
         $rows = implode(array_map(function($v) { return $v[0]; }, $page_cache));
     }
-    $title = implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']);
+    $title = implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']);
     return '<div class="message_list"><div class="content_title">'.$title.
         '<a class="update_unread" href="#"  onclick="return select_pop3_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a></div>'.
         '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
