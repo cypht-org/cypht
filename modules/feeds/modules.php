@@ -180,17 +180,19 @@ class Hm_Output_filter_feed_combined_inbox extends Hm_Output_Module {
         $res = array();
         if (isset($input['feed_combined_inbox_data'])) {
             foreach ($input['feed_combined_inbox_data'] as $item) {
-                if (isset($item['pubdate'])) {
+                error_log(print_r($item,true));
+                if (isset($item['guid'])) {
                     $id = $this->html_safe(sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid'])));
                     $timestamp = $this->html_safe(strtotime($item['pubdate']));
                     $date = $this->html_safe(human_readable_interval($item['pubdate']));
-                    $from = isset($item['author']) ? $item['author'] : '';
-                    $from = !$from && isset($item['dc:creator']) ? $item['dc:creator'] : $from;
+                    $from = isset($item['author']) ? $this->html_safe($item['author']) : '';
+                    $from = !$from && isset($item['dc:creator']) ? $this->html_safe($item['dc:creator']) : $from;
+                    $from = !$from ? '<span class="hl">[No From]</span>' : $from;
                     $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
                         '<td class="checkbox_row"><input type="checkbox" value="'.$id.'"></td>'.
                         '<td class="source">'.$this->html_safe($item['server_name']).'</td>'.
-                        '<td class="from">'.$this->html_safe($from).'</td>'.
-                        '<td class="subject">'.$this->html_safe($item['title']).'</td>'.
+                        '<td class="from">'.$from.'</td>'.
+                        '<td class="subject"><div>'.$this->html_safe($item['title']).'</div></td>'.
                         '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td>'.
                         '<td class="icon"></td></tr>'
                         , $id);
@@ -209,7 +211,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
             foreach ($input['feed_folders'] as $id => $folder) {
                 $res .= '<li class="feed_'.$this->html_safe($id).'">'.
                     '<a href="?page=message_list&list_path=feed_'.$this->html_safe($id).'">'.
-                    '<img class="account_icon" alt="Toggle folder" src="images/open_iconic/folder-2x.png" /> '.
+                    '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
