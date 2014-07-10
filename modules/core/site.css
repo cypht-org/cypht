@@ -17,7 +17,7 @@ td { vertical-align: top; }
 .loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 3px; margin-left: 15px; }
 .loading_icon img { visibility: inherit; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
-.logout { cursor: pointer; background: #fff url('/hm3/images/open_iconic/power-standby-2x.png') no-repeat 6px 4px; padding-left: 25px; color: #000; opacity: .6; }
+.logout { cursor: pointer; background: #fff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAOlJREFUOI2VkjFuwkAQRV+sNKZEKJh7UCEBl4BwhEhpQpSSFu5CgyjgIECiSIhLBBpoAhT+lker9dqMNPLsnz9f650PxXFTBiMqIzwq8BzghnoAvAI/QF1n+wsN4BcYFg0PgasG3jwCY9X/wMAdbgJHEd4N7j7iROcjkFiBqRpzR9i3hZWwmQV3AjsVBPrCvi14ERhTHrG4lwywayw1DfDkciPgoLpdQSDj7K3AWvVHBYFPfdcWbAEnXSsk8kW+xqbbHJEbaQF0SR+sBvSApXpXAm4cmZv48g+PC91ISE2yBc7KDanZXnwDd6ZsRKAfKovZAAAAAElFTkSuQmCC') no-repeat 6px 4px; padding-left: 25px; color: #000; opacity: .6; }
 .search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { table-layout: fixed; width: 100%; white-space: nowrap; padding-left: 10px; }
 .user_settings table td { padding: 5px; }
@@ -31,7 +31,7 @@ option, select { padding: 3px; }
 .elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
 .server_status, .server_summary { width: 100%; height: 100%; background-color: #fff; }
 .server_status table, .server_summary table { table-layout: fixed; width: 100%; padding: 20px; padding-bottom: 40px; }
-.server_status table th, .server_summary table th, .message_table th { font-style: italic; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #666; font-size: 80%; font-weight: normal; }
+.server_status table th, .server_summary table th, .message_table th { font-style: normal; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #aaa; font-size: 75%; font-weight: normal; border-bottom: solid 1px #ddd; }
 .server_status table td, .server_summary table td { padding: 5px; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
