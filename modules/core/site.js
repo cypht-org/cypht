@@ -172,7 +172,9 @@ Hm_Timer = {
 var Hm_Message_List = {
 
     range_start: '',
+    sources: [],
     sorts: {'source': 'asc', 'from': 'asc', 'subject': 'asc', 'msg_date': 'asc'},
+    sort_type: 'date',
 
     update: function(ids, msgs, type) {
         if (msgs && !jQuery.isEmptyObject(msgs)) {
@@ -213,6 +215,7 @@ var Hm_Message_List = {
             default:
                 break;
         }
+        Hm_Message_List.sort_type = sort_type;
         return sort_list;
     },
 
@@ -290,7 +293,7 @@ var Hm_Message_List = {
             row = msgs[index][0];
             id = msgs[index][1];
             if (!$('.'+clean_selector(id)).length) {
-                insert_into_message_list(row);
+                Hm_Message_List.insert_into_message_list(row);
                 $('.'+clean_selector(id)).fadeIn(300);
             }
             else {
@@ -305,6 +308,23 @@ var Hm_Message_List = {
         }
         return msg_ids;
     },
+    insert_into_message_list: function(row) {
+        var timestr = $('.msg_timestamp', $(row)).val();
+        var element = false;
+        $('.message_table tbody tr').each(function() {
+            timestr2 = $('.msg_timestamp', $(this)).val();
+            if ((timestr*1) >= (timestr2*1)) {
+                element = $(this);
+                return false;
+            }
+        });
+        if (element) {
+            $(row).insertBefore(element);
+        }
+        else {
+            $('.message_table tbody').append(row);
+        }
+    },
 
     reset_checkboxes: function() {
         $(':checkbox').each(function () { this.checked = false; });
@@ -313,6 +333,7 @@ var Hm_Message_List = {
             Hm_Message_List.toggle_msg_controls();
             Hm_Message_List.check_select_range(e);
         });
+        Hm_Message_List.enable_sort();
     },
 
     select_range: function(start, end) {
@@ -402,6 +423,32 @@ var Hm_Message_List = {
             Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);
         }
         Hm_Message_List.reset_checkboxes();
+    },
+
+    enable_sort: function() {
+        $('.message_table th').click(function() {
+            var sort_type = $(this).prop('class');
+            Hm_Message_List.sort_by_col(sort_type, 'asc');
+        });
+    },
+
+    load_sources: function() {
+        for (index in Hm_Message_List.sources) {
+            source = Hm_Message_List.sources[index];
+            source.callback(source.id);
+        }
+        return false;
+    },
+
+    setup_combined_view: function(cache_name) {
+        var data = get_from_local_storage(cache_name);
+        if (!data || !data.length) {
+            Hm_Message_List.load_sources();
+        }
+        else {
+            $('.message_table tbody').html(data);
+            Hm_Message_List.reset_checkboxes();
+        }
     }
 };
 
@@ -502,36 +549,17 @@ var hl_selected_menu = function() {
     }
 };
 
-var load_combined_inbox_data = function() {
-    var ids;
-    var loader;
-    var tmp;
-    var mods = hm_module_list.split(',');
-    for (i=0;i<mods.length;i++) {
-        if (mods[i] == 'feeds' || mods[i] == 'imap' || mods[i] == 'pop3') {
-            ids = $('.'+mods[i]+'_server_ids').val();
-            if (ids) {
-                loader = mods[i]+'_combined_inbox';
-                try { window[loader](); } catch(e) { console.log(e); }
-            }
-        }
-    }
-    return false;
-};
-
 var setup_combined_inbox = function() {
     var combined_inbox_data = get_from_local_storage('formatted_combined_inbox');
     if (!combined_inbox_data || !combined_inbox_data.length) {
-        load_combined_inbox_data();
+        Hm_Message_List.load_sources();
     }
     else {
         $('.message_table tbody').html(combined_inbox_data);
         Hm_Message_List.reset_checkboxes();
     }
 };
-
 var folder_list = get_from_local_storage('formatted_folder_list');
-
 
 $(function() {
     if (folder_list) {
@@ -542,12 +570,14 @@ $(function() {
         update_folder_list();
     }
     if (hm_page_name == 'message_list') {
-        $('.message_table th').click(function() {
-            var sort_type = $(this).prop('class');
-            Hm_Message_List.sort_by_col(sort_type, 'asc');
-        });
         if (hm_list_path == 'combined_inbox') {
-            setup_combined_inbox();
+            Hm_Message_List.setup_combined_view('formatted_combined_inbox');
+        }
+        else if (hm_list_path == 'unread') {
+            Hm_Message_List.setup_combined_view('formatted_unread_data');
+        }
+        else if (hm_list_path == 'flagged') {
+            Hm_Message_List.setup_combined_view('formatted_flagged_data');
         }
     }
     $('body').fadeIn(300);
