@@ -100,7 +100,7 @@ var update_unread_message_display = function(res) {
 };
 
 var set_unread_state = function() {
-    if (!$('.message_table tr').length) {
+    if (!$('.message_table tbody tr').length) {
         if (!$('.empty_list').length) {
             $('.message_list').append('<div class="empty_list">No unread messages found!</div>');
         }
@@ -342,7 +342,6 @@ var imap_message_action = function(action_type) {
         selected.push($(this).val());
     });
     if (selected.length > 0) {
-        Hm_Message_List.update_after_action(action_type, selected);
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_action'},
             {'name': 'imap_action_type', 'value': action_type},
@@ -351,6 +350,7 @@ var imap_message_action = function(action_type) {
             [],
             false
         );
+        Hm_Message_List.update_after_action(action_type, selected);
     }
     return false;
 };
