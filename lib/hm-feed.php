@@ -272,7 +272,7 @@ class Hm_Feed {
         }
         if ($this->data_block && $this->collect) {
             if ($this->collect == 'dc:date') {
-                $this->collect = 'pubdate';
+                $this->collect = 'dc:date';
             }
             if (isset($this->parsed_data[$this->item_count][$this->collect])) {
                 $this->parsed_data[$this->item_count][$this->collect] .= trim($data);
