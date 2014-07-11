@@ -95,7 +95,6 @@ var imap_combined_unread_content = function(id) {
 var update_unread_message_display = function(res) {
     var ids = $('.imap_server_ids').val().split(',');
     var count = Hm_Message_List.update(ids, res.formatted_unread_data, 'imap');
-    document.title = 'HM3 '+count+' Unread';
     set_unread_count(count);
 };
 
@@ -387,6 +386,7 @@ var set_unread_count = function(count) {
     if (!count && count !== 0) {
         if (hm_list_path == 'unread') {
             count = $('.message_list tbody tr').length;
+            document.title = 'HM3 '+count+' Unread';
         }
         else {
             count = get_from_local_storage('unread_count');
@@ -426,4 +426,3 @@ else if (hm_page_name == 'home') {
         imap_status_update();
     }
 }
-set_unread_count();
