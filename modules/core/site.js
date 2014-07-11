@@ -174,7 +174,8 @@ var Hm_Message_List = {
     range_start: '',
     sources: [],
     sorts: {'source': 'asc', 'from': 'asc', 'subject': 'asc', 'msg_date': 'asc'},
-    sort_type: 'date',
+    sort_type: 'numericasc',
+    sort_fld: 'msg_date',
 
     update: function(ids, msgs, type) {
         if (msgs && !jQuery.isEmptyObject(msgs)) {
