@@ -84,3 +84,4 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .online { color: green; }
 .down { color: red; }
 .header_subject .account_icon { vertical-align: 0px; }
+.folder_list .update_message_list{ float: right; }

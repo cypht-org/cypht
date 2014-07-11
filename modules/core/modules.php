@@ -162,7 +162,7 @@ class Hm_Handler_save_user_data extends Hm_Handler_Module {
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['logout']) && !$this->session->loaded) {
-            $this->session->destroy();
+            $this->session->destroy($this->request);
             Hm_Msgs::add('Session destroyed on logout');
         }
         elseif (isset($this->request->post['save_and_logout'])) {
@@ -183,7 +183,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                 }
                 if ($user && $path && $pass) {
                     $this->user_config->save($user, $pass);
-                    $this->session->destroy();
+                    $this->session->destroy($this->request);
                     Hm_Msgs::add('Saved user data on logout');
                     Hm_Msgs::add('Session destroyed on logout');
                 }
@@ -549,7 +549,7 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
         $res = main_menu($input, $this);
         $res .= folder_source_menu($input, $this);
         $res .= settings_menu($input, $this);
-        $res .= '<a href="#" onclick="return update_folder_list();" class="update_unread">[reload]</a>';
+        $res .= '<a href="#" onclick="return update_folder_list();" class="update_message_list">[reload]</a>';
         if ($format == 'HTML5') {
             return $res;
         }
