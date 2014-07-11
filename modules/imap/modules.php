@@ -932,7 +932,7 @@ function imap_message_list_folder($input, $output_module) {
     }
     $title = implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']);
     return '<div class="message_list"><div class="content_title">'.$title.
-        '<a class="update_unread" href="#"  onclick="return select_imap_folder(\''.
+        '<a class="update_message_list" href="#"  onclick="return select_imap_folder(\''.
         $output_module->html_safe($input['list_path']).'\', true)">[update]</a>'.
         '</div>'.imap_message_controls().imap_message_list_headers().
         '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
@@ -949,7 +949,7 @@ function imap_combined_inbox_list() {
     }
     $cache = implode('', $cache);
     return '<div class="message_list"><div class="content_title">Combined Inbox'.
-        '<a class="update_unread" onclick="return load_combined_inbox_data()" href="#">[update]</a></div>'.imap_message_controls().
+        '<a class="update_message_list" onclick="return Hm_Message_List.load_sources()" href="#">[update]</a></div>'.imap_message_controls().
         imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
 function imap_flagged_list() {
@@ -963,7 +963,7 @@ function imap_flagged_list() {
     }
     $cache = implode('', $cache);
     return '<div class="message_list"><div class="content_title">Flagged'.
-        '<a class="update_unread" onclick="return imap_flagged_update()" href="#">[update]</a></div>'.imap_message_controls().
+        '<a class="update_message_list" onclick="return Hm_Message_List.load_sources()" href="#">[update]</a></div>'.imap_message_controls().
         imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
 }
 
@@ -1001,7 +1001,7 @@ function imap_message_list_unread($input) {
         }
         $res .= ' value="'.$val.'">'.$label.'</option>';
     }
-    $res .= '</select><a class="update_unread" href="#" onclick="return Hm_Message_List.load_sources();">[update]</a>'.
+    $res .= '</select><a class="update_message_list" href="#" onclick="return Hm_Message_List.load_sources();">[update]</a>'.
         '</div>'.imap_message_controls().imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
     return $res;
 }

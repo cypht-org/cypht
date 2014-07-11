@@ -111,7 +111,6 @@ var set_unread_state = function() {
     $(':checkbox').click(function() {
         Hm_Message_List.toggle_msg_controls();
     });
-    Hm_Timer.add_job(Hm_Message_List.load_sources, 60, true);
 };
 
 /* flagged page */
@@ -121,7 +120,7 @@ var imap_combined_flagged_content = function(id) {
         {'name': 'imap_server_ids', 'value': id}],
         update_flagged_message_display,
         [],
-        true,
+        false,
         set_flagged_state
     );
     return false;
