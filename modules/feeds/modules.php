@@ -180,7 +180,6 @@ class Hm_Output_filter_feed_combined_inbox extends Hm_Output_Module {
         $res = array();
         if (isset($input['feed_combined_inbox_data'])) {
             foreach ($input['feed_combined_inbox_data'] as $item) {
-                error_log(print_r($item,true));
                 if (isset($item['guid'])) {
                     $id = $this->html_safe(sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid'])));
                     $timestamp = $this->html_safe(strtotime($item['pubdate']));
