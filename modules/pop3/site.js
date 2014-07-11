@@ -72,6 +72,7 @@ var pop3_delete_action = function() {
         {'pop3_delete': 1}
     );
 };
+
 var display_pop3_mailbox = function(res) {
     Hm_Notices.hide(true);
     var pop3_id = res.pop3_server_id;
@@ -112,6 +113,7 @@ var select_pop3_folder = function(path, force) {
     }
     return false;
 };
+
 if (hm_page_name == 'servers') {
     $('.test_pop3_connect').on('click', pop3_test_action);
     $('.save_pop3_connection').on('click', pop3_save_action);
