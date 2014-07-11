@@ -22,7 +22,6 @@ add_output('ajax_hm_folders', 'filter_feed_folders',  true, 'feeds', 'folder_lis
 /* message list page */
 add_handler('message_list', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
 add_handler('message_list', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
-add_output('message_list', 'feed_message_list', true, 'feeds', 'content_section_start', 'after');
 add_output('message_list', 'feed_ids', true, 'feeds', 'page_js', 'before');
 
 /* combined inbox */
