@@ -386,23 +386,6 @@ class Hm_Request {
             $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
             $this->is_tls();
         }
-        if ($this->type == 'CLI') {
-            $this->fetch_cli_vars();
-        }
-    }
-
-    private function fetch_cli_vars() {
-        global $argv;
-        if (empty($this->get) && empty($this->post)) {
-            if (isset($argv) && !empty($argv)) {
-                foreach($argv as $val) {
-                    if (strstr($val, '=')) {
-                        $arg_parts = explode('=', $val, 2);
-                        $this->get[$arg_parts[0]] = $arg_parts[1];
-                    }
-                }
-            }
-        }
     }
 
     private function is_tls() {
@@ -416,8 +399,7 @@ class Hm_Request {
 
     private function get_request_type() {
         if ($this->is_cli()) {
-            $this->type = 'CLI';
-            $this->format = 'Hm_Format_Terminal';
+            die("CLI support not implemented\n");
         }
         elseif ($this->is_ajax()) {
             $this->type = 'AJAX';
@@ -589,14 +571,6 @@ class Hm_Format_HTML5 extends HM_Format {
     public function content($input, $lang_str) {
         $output = $this->run_modules($input, 'HTML5', $lang_str);
         return implode('', $output);
-    }
-}
-
-/* CLI compatible output format */
-class Hm_Format_Terminal extends HM_Format {
-
-    public function content($input, $lang_str) {
-        return implode('', $this->run_modules($input, 'CLI', $lang_str));
     }
 }
 
