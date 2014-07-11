@@ -268,28 +268,24 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
 
 class Hm_Output_title extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<h1 class="title">HM3</h1>';
-        }
+        return '<h1 class="title">HM3</h1>';
     }
 }
 
 class Hm_Output_login extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            if (!$input['router_login_state']) {
-                $res = '<form class="login_form" method="POST">'.
-                    '<h1 class="title">HM3</h1>'.
-                    ' <input type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
-                    ' <input type="password" placeholder="'.$this->trans('Password').'" name="password">'.
-                    ' <input type="submit" value="Login" />';
-                if (($input['session_type'] == 'Hm_DB_Session_DB_Auth' || $input['session_type'] == 'Hm_PHP_Session_DB_Auth') &&
-                    $input['router_page_name'] == 'home') {
-                    $res .= ' <input type="submit" name="create_hm_user" value="Create" />';
-                }
-                $res .= '</form>';
-                return $res;
+        if (!$input['router_login_state']) {
+            $res = '<form class="login_form" method="POST">'.
+                '<h1 class="title">HM3</h1>'.
+                ' <input type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
+                ' <input type="password" placeholder="'.$this->trans('Password').'" name="password">'.
+                ' <input type="submit" value="Login" />';
+            if (($input['session_type'] == 'Hm_DB_Session_DB_Auth' || $input['session_type'] == 'Hm_PHP_Session_DB_Auth') &&
+                $input['router_page_name'] == 'home') {
+                $res .= ' <input type="submit" name="create_hm_user" value="Create" />';
             }
+            $res .= '</form>';
+            return $res;
         }
         return '';
     }
@@ -297,278 +293,235 @@ class Hm_Output_login extends Hm_Output_Module {
 
 class Hm_Output_date extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<div class="date">'.$this->html_safe($input['date']).'</div>';
-        }
+        return '<div class="date">'.$this->html_safe($input['date']).'</div>';
     }
 }
 
 class Hm_Output_logout extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' && $input['router_login_state']) {
-            return '<form class="logout_form" method="POST">'.
-                '<input type="button" onclick="return confirm_logout()" class="logout" value="Logout" />'.
-                '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
-                '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
-                '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
-                '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
-                '<input class="save_settings" onclick="$(\'.confirm_logout\').fadeOut(200); return false;" type="button" value="Cancel" />'.
-                '</div>'.
-                '</form>';
-        }
+        return '<form class="logout_form" method="POST">'.
+            '<input type="button" onclick="return confirm_logout()" class="logout" value="Logout" />'.
+            '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
+            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
+            '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
+            '<input class="save_settings" onclick="$(\'.confirm_logout\').fadeOut(200); return false;" type="button" value="Cancel" />'.
+            '</div>'.
+            '</form>';
     }
 }
 
 class Hm_Output_msgs extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            $res = '';
-            $msgs = Hm_Msgs::get();
-            $res .= '<div class="sys_messages">';
-            if (!empty($msgs)) {
-                $res .= implode(',', array_map(function($v) {
-                    if (preg_match("/ERR/", $v)) {
-                        return sprintf('<span class="err">%s</span>', substr($this->html_safe($v), 3));
-                    }
-                    else {
-                        return $this->html_safe($v);
-                    }
-                }, $msgs));
-            }
-            $res .= '</div>';
-            return $res;
+        $res = '';
+        $msgs = Hm_Msgs::get();
+        $res .= '<div class="sys_messages">';
+        if (!empty($msgs)) {
+            $res .= implode(',', array_map(function($v) {
+                if (preg_match("/ERR/", $v)) {
+                    return sprintf('<span class="err">%s</span>', substr($this->html_safe($v), 3));
+                }
+                else {
+                    return $this->html_safe($v);
+                }
+            }, $msgs));
         }
-        return '';
+        $res .= '</div>';
+        return $res;
     }
 }
 
 class Hm_Output_header_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            $lang = '';
-            if ($this->lang) {
-                $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
-            }
-            return '<!DOCTYPE html><html '.$lang.'><head>';
+        $lang = '';
+        if ($this->lang) {
+            $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
         }
-        elseif ($format == 'CLI') {
-            return sprintf("\nHM3 CLI Interface\n\n");
-        }
+        return '<!DOCTYPE html><html '.$lang.'><head>';
     }
 }
 
 class Hm_Output_header_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '</head>';
-        }
+        return '</head>';
     }
 }
 
 class Hm_Output_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            $res = '<body';
-            if (!$input['router_login_state']) {
-                $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
-            }
-            else {
-                $res .= ' style="display: none;">';
-            }
-            return $res;
+        $res = '<body';
+        if (!$input['router_login_state']) {
+            $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
         }
+        else {
+            $res .= ' style="display: none;">';
+        }
+        return $res;
     }
 }
 
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            $title = 'HM3';
-            if (isset($input['mailbox_list_title'])) {
-                $title .= ' '.implode('-', array_slice($input['mailbox_list_title'], 1));
-            }
-            elseif (isset($input['router_page_name'])) {
-                if (isset($input['list_path']) && $input['router_page_name'] == 'message_list') {
-                    $title .= ' '.ucwords(str_replace('_', ' ', $input['list_path']));
-                }
-                elseif ($input['router_page_name'] == 'notfound') {
-                    $title .= ' Nope';
-                }
-                else {
-                    $title .= ' '.ucfirst($input['router_page_name']);
-                }
-            }
-            return '<title>'.$this->html_safe($title).'</title><meta charset="utf-8" />'.
-                '<link rel="icon" type="image/png" href="images/open_iconic/envelope-closed-2x.png">'.
-                '<base href="'.$this->html_safe($input['router_url_path']).'" />';
+        $title = 'HM3';
+        if (isset($input['mailbox_list_title'])) {
+            $title .= ' '.implode('-', array_slice($input['mailbox_list_title'], 1));
         }
+        elseif (isset($input['router_page_name'])) {
+            if (isset($input['list_path']) && $input['router_page_name'] == 'message_list') {
+                $title .= ' '.ucwords(str_replace('_', ' ', $input['list_path']));
+            }
+            elseif ($input['router_page_name'] == 'notfound') {
+                $title .= ' Nope';
+            }
+            else {
+                $title .= ' '.ucfirst($input['router_page_name']);
+            }
+        }
+        return '<title>'.$this->html_safe($title).'</title><meta charset="utf-8" />'.
+            '<link rel="icon" type="image/png" href="images/open_iconic/envelope-closed-2x.png">'.
+            '<base href="'.$this->html_safe($input['router_url_path']).'" />';
     }
 }
 
 class Hm_Output_header_css extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            $res = '';
-            if (DEBUG_MODE) {
-                foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
-                    if (is_readable(sprintf("%ssite.css", $name))) {
-                        $res .= '<link href="'.sprintf("%ssite.css", $name).'" media="all" rel="stylesheet" type="text/css" />';
-                    }
+        $res = '';
+        if (DEBUG_MODE) {
+            foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+                if (is_readable(sprintf("%ssite.css", $name))) {
+                    $res .= '<link href="'.sprintf("%ssite.css", $name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
             }
-            else {
-                $res .= '<link href="site.css" media="all" rel="stylesheet" type="text/css" />';
-            }
-            return $res;
         }
+        else {
+            $res .= '<link href="site.css" media="all" rel="stylesheet" type="text/css" />';
+        }
+        return $res;
     }
 }
 
 class Hm_Output_page_js extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            if (DEBUG_MODE) {
-                $res = '';
-                foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
-                    if (is_readable(sprintf("%ssite.js", $name))) {
-                        $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $name).'"></script>';
-                    }
+        if (DEBUG_MODE) {
+            $res = '';
+            foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+                if (is_readable(sprintf("%ssite.js", $name))) {
+                    $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $name).'"></script>';
                 }
-                return $res;
             }
-            else {
-                return '<script type="text/javascript" src="site.js"></script>';
-            }
+            return $res;
+        }
+        else {
+            return '<script type="text/javascript" src="site.js"></script>';
         }
     }
 }
 
 class Hm_Output_content_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<div class="elapsed"></div></body></html>';
-        }
+        return '<div class="elapsed"></div></body></html>';
     }
 }
 
 class Hm_Output_jquery extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<script type="text/javascript" src="modules/core/jquery-1.11.0.min.js"></script>';
-        }
-        return '';
+        return '<script type="text/javascript" src="modules/core/jquery-1.11.0.min.js"></script>';
     }
 }
 
 class Hm_Output_js_data extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<script type="text/javascript">'.
-                'var hm_url_path = "'.$this->html_safe($input['router_url_path']).'";'.
-                'var hm_page_name = "'.$this->html_safe($input['router_page_name']).'";'.
-                'var hm_list_path = "'.(isset($input['list_path']) ? $this->html_safe($input['list_path']) : '').'";'.
-                'var hm_list_parent = "'.(isset($input['list_parent']) ? $this->html_safe($input['list_parent']) : '').'";'.
-                'var hm_msg_uid = '.(isset($input['uid']) ? $this->html_safe($input['uid']) : 0).';'.
-                'var hm_module_list = "'.$this->html_safe($input['router_module_list']).'";'.
-                '</script>';
-        }
+        return '<script type="text/javascript">'.
+            'var hm_url_path = "'.$this->html_safe($input['router_url_path']).'";'.
+            'var hm_page_name = "'.$this->html_safe($input['router_page_name']).'";'.
+            'var hm_list_path = "'.(isset($input['list_path']) ? $this->html_safe($input['list_path']) : '').'";'.
+            'var hm_list_parent = "'.(isset($input['list_parent']) ? $this->html_safe($input['list_parent']) : '').'";'.
+            'var hm_msg_uid = '.(isset($input['uid']) ? $this->html_safe($input['uid']) : 0).';'.
+            'var hm_module_list = "'.$this->html_safe($input['router_module_list']).'";'.
+            '</script>';
     }
 }
 
 class Hm_Output_loading_icon extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<div class="loading_icon"><img alt="Loading..." src="images/ajax-loader.gif" width="16" height="16" /></div>';
-        }
+        return '<div class="loading_icon"><img alt="Loading..." src="images/ajax-loader.gif" width="16" height="16" /></div>';
     }
 }
 
 class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<div class="user_settings"><div class="content_title">Site Settings</div><br />'.
-                '<form method="POST" action=""><table class="settings_table"><colgroup>'.
-                '<col class="label_col"><col class="setting_col"></colgroup>';
-        }
+        return '<div class="user_settings"><div class="content_title">Site Settings</div><br />'.
+            '<form method="POST" action=""><table class="settings_table"><colgroup>'.
+            '<col class="label_col"><col class="setting_col"></colgroup>';
     }
 }
 
 class Hm_Output_language_setting extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            $langs = array(
-                'en_US' => 'English',
-                'es_ES' => 'Spanish'
-            );
-            if (isset($input['user_settings']['language'])) {
-                $mylang = $input['user_settings']['language'];
-            }
-            else {
-                $mylang = false;
-            }
-            $res = '<tr><td>Interface Language</td><td><select name="language_setting">';
-            foreach ($langs as $id => $lang) {
-                $res .= '<option ';
-                if ($id == $mylang) {
-                    $res .= 'selected="selected" ';
-                }
-                $res .= 'value="'.$id.'">'.$lang.'</option>';
-            }
-            $res .= '</select></td></tr>';
-            return $res;
+        $langs = array(
+            'en_US' => 'English',
+            'es_ES' => 'Spanish'
+        );
+        if (isset($input['user_settings']['language'])) {
+            $mylang = $input['user_settings']['language'];
         }
+        else {
+            $mylang = false;
+        }
+        $res = '<tr><td>Interface Language</td><td><select name="language_setting">';
+        foreach ($langs as $id => $lang) {
+            $res .= '<option ';
+            if ($id == $mylang) {
+                $res .= 'selected="selected" ';
+            }
+            $res .= 'value="'.$id.'">'.$lang.'</option>';
+        }
+        $res .= '</select></td></tr>';
+        return $res;
     }
 }
 
 class Hm_Output_timezone_setting extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            $zones = timezone_identifiers_list();
-            if (isset($input['user_settings']['timezone'])) {
-                $myzone = $input['user_settings']['timezone'];
-            }
-            else {
-                $myzone = false;
-            }
-            $res = '<tr><td>Timezone</td><td><select name="timezone_setting">';
-            foreach ($zones as $zone) {
-                $res .= '<option ';
-                if ($zone == $myzone) {
-                    $res .= 'selected="selected" ';
-                }
-                $res .= 'value="'.$zone.'">'.$zone.'</option>';
-            }
-            $res .= '</select></td></tr>';
-            return $res;
+        $zones = timezone_identifiers_list();
+        if (isset($input['user_settings']['timezone'])) {
+            $myzone = $input['user_settings']['timezone'];
         }
+        else {
+            $myzone = false;
+        }
+        $res = '<tr><td>Timezone</td><td><select name="timezone_setting">';
+        foreach ($zones as $zone) {
+            $res .= '<option ';
+            if ($zone == $myzone) {
+                $res .= 'selected="selected" ';
+            }
+            $res .= 'value="'.$zone.'">'.$zone.'</option>';
+        }
+        $res .= '</select></td></tr>';
+        return $res;
     }
 }
 
 class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<tr><td class="submit_cell" colspan="2">'.
-                '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
-                '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
-                '<div class="password_notice">* You must enter your password to save your settings on the server</div>'.
-                '</td></tr></table></form></div>';
-        }
+        return '<tr><td class="submit_cell" colspan="2">'.
+            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
+            '<div class="password_notice">* You must enter your password to save your settings on the server</div>'.
+            '</td></tr></table></form></div>';
     }
 }
 
 class Hm_Output_toolbar_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '<div class="toolbar">';
-        }
+        return '<div class="toolbar">';
     }
 }
 
 class Hm_Output_toolbar_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5' ) {
-            return '</div>';
-        }
+        return '</div>';
     }
 }
 
