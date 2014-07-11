@@ -203,12 +203,15 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             $path = $this->request->get['list_path'];
             if ($path == 'unread') {
                 $data['list_path'] = 'unread';
+                $data['mailbox_list_title'] = array('Unread');
             }
             elseif ($path == 'flagged') {
                 $data['list_path'] = 'flagged';
+                $data['mailbox_list_title'] = array('Flagged');
             }
             elseif ($path == 'combined_inbox') {
                 $data['list_path'] = 'combined_inbox';
+                $data['mailbox_list_title'] = array('Inbox');
             }
             elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
                 $data['list_path'] = $path;
@@ -754,6 +757,36 @@ class Hm_Output_server_summary_end extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_message_list_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<table class="message_table" cellpadding="0" cellspacing="0">'.
+            '<colgroup><col class="chkbox_col"><col class="source_col">'.
+            '<col class="from_col"><col class="subject_col"><col class="date_col">'.
+            '<col class="icon_col"></colgroup><thead><tr><th colspan="2" class="source">'.
+            'Source</th><th class="from">From</th><th class="subject">Subject</th>'.
+            '<th class="msg_date">Date</th><th></th></tr></thead><tbody>';
+        return $res;
+    }
+}
+
+class Hm_Output_message_list_heading extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<div class="message_list"><div class="content_title">'.
+            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']).
+            ' <a class="update_message_list" onclick="return Hm_Message_List.load_sources()"'.
+            ' href="#">[update]</a></div>'.message_controls();
+
+        return $res;
+    }
+}
+
+class Hm_Output_message_list_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '</tbody></table></div>';
+        return $res;
+    }
+}
+
 function human_readable_interval($date_str) {
     $precision     = 2;
     $interval_time = array();
@@ -788,5 +821,19 @@ function human_readable_interval($date_str) {
     }
     return implode(', ', $res);
 }
+
+function message_controls() {
+    return '<div class="msg_controls">'.
+        '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" /></a>'.
+        '<a href="#" onclick="return imap_message_action(\'read\');" class="disabled_link">Read</a>'.
+        '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
+        '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
+        '<a href="#" onclick="return imap_message_action(\'delete\');" class="disabled_link">Delete</a>'.
+        '<a href="#" onclick="return imap_message_action(\'expunge\');" class="disabled_link">Expunge</a>'.
+        '<a href="#" onclick="return imap_message_action(\'move\');" class="disabled_link">Move</a>'.
+        '<a href="#" onclick="return imap_message_action(\'copy\');" class="disabled_link">Copy</a>'.
+        '</div>';
+}
+
 
 ?>

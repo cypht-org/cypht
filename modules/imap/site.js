@@ -79,7 +79,7 @@ var imap_test_action = function() {
 
 /* unread page */
 var imap_combined_unread_content = function(id) {
-    var since = $('.unread_since option:selected').val();
+    var since = '-1 week'; /*$('.unread_since option:selected').val();*/
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
         {'name': 'imap_unread_since', 'value': since},
@@ -93,7 +93,7 @@ var imap_combined_unread_content = function(id) {
 };
 
 var update_unread_message_display = function(res) {
-    var ids = res.unread_server_ids.split(',');
+    var ids = $('.imap_server_ids').val().split(',');
     var count = Hm_Message_List.update(ids, res.formatted_unread_data, 'imap');
     document.title = 'HM3 '+count+' Unread';
     set_unread_count(count);
@@ -405,8 +405,7 @@ if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
         add_imap_sources(imap_combined_inbox_content);
     }
-    Hm_Message_List.reset_checkboxes();
-    if (hm_list_path == 'unread') {
+    else if (hm_list_path == 'unread') {
         add_imap_sources(imap_combined_unread_content);
     }
     else if (hm_list_path == 'flagged') {

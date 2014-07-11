@@ -464,12 +464,6 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
     }
 }
 
-class Hm_Output_adjust_unread_cache extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $bits = explode('_', $input['list_path'], 3);
-    }
-}
-
 class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output($input, $format) {
         $txt = '<div class="msg_text_inner">';
@@ -486,7 +480,6 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
         }
         $txt .= '</div>';
         $input['msg_text'] = $txt;
-        //Hm_Page_Cache::add($input['msg_cache_suffix'].'_text', $txt);
         return $input;
     }
 }
@@ -503,7 +496,6 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
         }
         $res .= '</table>';
         $input['msg_parts'] = $res;
-        //Hm_Page_Cache::add($input['msg_cache_suffix'].'_parts', $res);
         return $input;
     }
 }
@@ -553,8 +545,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $input['msg_headers'] = $txt;
             $input['msg_gravatar'] = build_msg_gravatar($from);
-            //Hm_Page_Cache::add($input['msg_cache_suffix'].'_headers', $txt);
-            //Hm_Page_Cache::add($input['msg_cache_suffix'].'_gravatar', $input['msg_gravatar']);
         }
         return $input;
     }
@@ -751,43 +741,6 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_imap_message_list extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if (isset($input['list_path'])) {
-            if ($input['list_path'] == 'unread') {
-                return imap_message_list_unread($input);     
-            }
-            elseif ($input['list_path'] == 'combined_inbox') {
-                return imap_combined_inbox_list();
-            }
-            elseif ($input['list_path'] == 'flagged') {
-                return imap_flagged_list();
-            }
-            elseif (preg_match("/^imap_/", $input['list_path'])) {
-                return imap_message_list_folder($input, $this);
-            }
-        }
-        else {
-            // TODO: default/not found message list type
-        }
-    }
-}
-
-class Hm_Output_imap_msg_from_cache extends Hm_Output_Module {
-    protected function output($input, $format) {
-        /*$key = $input['list_path'].'_'.$input['uid'];
-        $body_cache = Hm_Page_Cache::get($key.'_text');
-        $header_cache = Hm_Page_Cache::get($key.'_headers');
-        $grav_cache = Hm_Page_Cache::get($key.'_gravatar');
-        $parts_cache = Hm_Page_Cache::get($key.'_parts');
-        
-        if ($body_cache && $grav_cache && $header_cache && $parts_cache) {
-            return $header_cache.$grav_cache.$body_cache.$parts_cache;
-        }*/
-        return '';
-    }
-}
-
 class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_combined_inbox_data']) && !empty($input['imap_combined_inbox_data'])) {
@@ -879,19 +832,6 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false)
     return $res;
 }
 
-function imap_message_controls() {
-    return '<div class="msg_controls">'.
-        '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" /></a>'.
-        '<a href="#" onclick="return imap_message_action(\'read\');" class="disabled_link">Read</a>'.
-        '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
-        '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
-        '<a href="#" onclick="return imap_message_action(\'delete\');" class="disabled_link">Delete</a>'.
-        '<a href="#" onclick="return imap_message_action(\'expunge\');" class="disabled_link">Expunge</a>'.
-        '<a href="#" onclick="return imap_message_action(\'move\');" class="disabled_link">Move</a>'.
-        '<a href="#" onclick="return imap_message_action(\'copy\');" class="disabled_link">Copy</a>'.
-        '</div>';
-}
-
 function process_imap_message_ids($ids) {
     $res = array();
     foreach (explode(',', $ids) as $id) {
@@ -911,78 +851,7 @@ function process_imap_message_ids($ids) {
     return $res;
 }
 
-function imap_message_list_headers() {
-    return '<table class="message_table" cellpadding="0" cellspacing="0">'.
-        '<colgroup><col class="chkbox_col"><col class="source_col">'.
-        '<col class="from_col"><col class="subject_col"><col class="date_col">'.
-        '<col class="icon_col"></colgroup>'.
-        '<thead><tr><th colspan="2" class="source">Source</th><th class="from">From</th><th class="subject">Subject</th><th class="msg_date">Date</th><th></th></tr></thead>';
-}
-
-function imap_message_list_folder($input, $output_module) {
-    $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path'].'_'.$input['list_page']);
-    $rows = '';
-    $links = '';
-    if ($page_cache) {
-        $rows = implode(array_map(function($v) { return $v[0]; }, $page_cache));
-    }
-    $links_cache = Hm_Page_Cache::get('imap_page_links_'.$input['list_path'].'_'.$input['list_page']);
-    if ($links_cache) {
-        $links = $links_cache;
-    }
-    $title = implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']);
-    return '<div class="message_list"><div class="content_title">'.$title.
-        '<a class="update_message_list" href="#"  onclick="return select_imap_folder(\''.
-        $output_module->html_safe($input['list_path']).'\', true)">[update]</a>'.
-        '</div>'.imap_message_controls().imap_message_list_headers().
-        '<tbody>'.$rows.'</tbody></table><div class="imap_page_links">'.$links.'</div></div>';
-}
-
-function imap_combined_inbox_list() {
-    $cache = false; //Hm_Page_Cache::get('formatted_combined_inbox');
-    $empty_list = '';
-    if ($cache === false) {
-        $cache = array();
-    }
-    elseif (!$cache) {
-        $empty_list = '<div class="empty_list">No messages found!</div>';
-    }
-    $cache = implode('', $cache);
-    return '<div class="message_list"><div class="content_title">Combined Inbox'.
-        '<a class="update_message_list" onclick="return Hm_Message_List.load_sources()" href="#">[update]</a></div>'.imap_message_controls().
-        imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
-}
-function imap_flagged_list() {
-    $cache = false; //Hm_Page_Cache::get('formatted_flagged_data');
-    $empty_list = '';
-    if ($cache === false) {
-        $cache = array();
-    }
-    elseif (!$cache) {
-        $empty_list = '<div class="empty_list">No flagged messages found!</div>';
-    }
-    $cache = implode('', $cache);
-    return '<div class="message_list"><div class="content_title">Flagged'.
-        '<a class="update_message_list" onclick="return Hm_Message_List.load_sources()" href="#">[update]</a></div>'.imap_message_controls().
-        imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
-}
-
-function imap_message_list_unread($input) {
-    $cache = false; //Hm_Page_Cache::get('formatted_unread_data');
-    $empty_list = '';
-    if ($cache === false) {
-        $cache = array();
-    }
-    elseif (!$cache) {
-        $empty_list = '<div class="empty_list">No unread messages found!</div>';
-    }
-    $cache = implode('', $cache);
-    if (isset($input['imap_unread_since'])) {
-        $since = $input['imap_unread_since'];
-    }
-    else {
-        $since = '-1 week';
-    }
+function unread_since_dropdown($since) {
     $times = array(
         'today' => 'Today',
         '-1 week' => 'Last 7 days',
@@ -992,8 +861,7 @@ function imap_message_list_unread($input) {
         '-6 months' => 'Last 6 months',
         '-1 year' => 'Last year'
     );
-
-    $res = '<div class="message_list"><div class="content_title">Unread<select class="unread_since">';
+    $res = '<select class="unread_since">';
     foreach ($times as $val => $label) {
         $res .= '<option';
         if ($val == $since) {
@@ -1001,8 +869,7 @@ function imap_message_list_unread($input) {
         }
         $res .= ' value="'.$val.'">'.$label.'</option>';
     }
-    $res .= '</select><a class="update_message_list" href="#" onclick="return Hm_Message_List.load_sources();">[update]</a>'.
-        '</div>'.imap_message_controls().imap_message_list_headers().'<tbody>'.$cache.'</tbody></table>'.$empty_list.'</div>';
+    $res .= '</select>';
     return $res;
 }
 
