@@ -159,7 +159,7 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
                     $res .= '<input type="submit" value="Test" class="test_feed_connect" />';
                     $res .= '<input type="submit" value="Delete" class="feed_delete" />';
                     $res .= '<input type="hidden" value="ajax_feed_debug" name="hm_ajax_hook" />';
-                    $res .= '</form></div></div>';
+                    $res .= '</form></div>';
                 }
             }
         }
