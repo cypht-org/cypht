@@ -238,89 +238,83 @@ class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
 
 class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<div class="pop3_server_setup"><div class="content_title">POP3 Servers</div><form class="add_server" method="POST">'.
-                '<div class="subtitle">Add a POP3 Server</div><input type="hidden" name="hm_nonce" value="'.$this->build_nonce( 'add_pop3_server' ).'" />'.
-                '<table><tr><td colspan="2"><input type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
-                '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
-                '<td align="right"><input type="submit" value="Add" name="submit_pop3_server" /></td></tr>'.
-                '</table></form>';
-        }
+        return '<div class="pop3_server_setup"><div class="content_title">POP3 Servers</div><form class="add_server" method="POST">'.
+            '<div class="subtitle">Add a POP3 Server</div><input type="hidden" name="hm_nonce" value="'.$this->build_nonce( 'add_pop3_server' ).'" />'.
+            '<table><tr><td colspan="2"><input type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+            '<tr><td colspan="2"><input type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
+            '<tr><td colspan="2"><input type="text" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+            '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
+            '<td align="right"><input type="submit" value="Add" name="submit_pop3_server" /></td></tr>'.
+            '</table></form>';
     }
 }
 
 class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            $res = '';
-            if (isset($input['pop3_servers'])) {
-                foreach ($input['pop3_servers'] as $index => $vals) {
+        $res = '';
+        if (isset($input['pop3_servers'])) {
+            foreach ($input['pop3_servers'] as $index => $vals) {
 
-                    $no_edit = false;
+                $no_edit = false;
 
-                    if (isset($vals['user'])) {
-                        $disabled = 'disabled="disabled"';
-                        $user_pc = $vals['user'];
-                        $pass_pc = '[saved]';
+                if (isset($vals['user'])) {
+                    $disabled = 'disabled="disabled"';
+                    $user_pc = $vals['user'];
+                    $pass_pc = '[saved]';
+                }
+                else {
+                    $user_pc = '';
+                    $pass_pc = 'Password';
+                    $disabled = '';
+                }
+                if ($vals['name'] == 'Default-Auth-Server') {
+                    $vals['name'] = 'Default';
+                    if (stristr($input['session_type'], 'pop3')) {
+                        $no_edit = true;
+                    }
+                }
+                $res .= '<div class="configured_server">';
+                $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
+                    $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
+                $res .= 
+                    '<form class="pop3_connect" method="POST">'.
+                    '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
+                    '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
+                    '<span> <input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
+                if (!$no_edit) {
+                    $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
+                    if (!isset($vals['user']) || !$vals['user']) {
+                        $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
+                        $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
                     }
                     else {
-                        $user_pc = '';
-                        $pass_pc = 'Password';
-                        $disabled = '';
+                        $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
+                        $res .= '<input type="submit" value="Forget" class="forget_pop3_connection" />';
                     }
-                    if ($vals['name'] == 'Default-Auth-Server') {
-                        $vals['name'] = 'Default';
-                        if (stristr($input['session_type'], 'pop3')) {
-                            $no_edit = true;
-                        }
-                    }
-                    $res .= '<div class="configured_server">';
-                    $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
-                        $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
-                    $res .= 
-                        '<form class="pop3_connect" method="POST">'.
-                        '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                        '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
-                        '<span> <input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
-                    if (!$no_edit) {
-                        $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
-                        if (!isset($vals['user']) || !$vals['user']) {
-                            $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
-                            $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
-                        }
-                        else {
-                            $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
-                            $res .= '<input type="submit" value="Forget" class="forget_pop3_connection" />';
-                        }
-                        $res .= '<input type="hidden" value="ajax_pop3_debug" name="hm_ajax_hook" />';
-                    }
-                    $res .= '</form></div>';
+                    $res .= '<input type="hidden" value="ajax_pop3_debug" name="hm_ajax_hook" />';
                 }
-                $res .= '<br class="clear_float" /></div>';
+                $res .= '</form></div>';
             }
-        return $res;
+            $res .= '<br class="clear_float" /></div>';
         }
+        return $res;
     }
 }
 
 class Hm_Output_display_pop3_summary extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            $res = '';
-            if (isset($input['pop3_servers']) && !empty($input['pop3_servers'])) {
-                foreach ($input['pop3_servers'] as $index => $vals) {
-                    if ($vals['name'] == 'Default-Auth-Server') {
-                        $vals['name'] = 'Default';
-                    }
-                    $res .= '<tr><td>POP3</td><td>'.$vals['name'].'</td>'.
-                        '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
-                        '<td>'.$vals['tls'].'</td></tr>';
+        $res = '';
+        if (isset($input['pop3_servers']) && !empty($input['pop3_servers'])) {
+            foreach ($input['pop3_servers'] as $index => $vals) {
+                if ($vals['name'] == 'Default-Auth-Server') {
+                    $vals['name'] = 'Default';
                 }
+                $res .= '<tr><td>POP3</td><td>'.$vals['name'].'</td>'.
+                    '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
+                    '<td>'.$vals['tls'].'</td></tr>';
             }
-            return $res;
         }
+        return $res;
     }
 }
 

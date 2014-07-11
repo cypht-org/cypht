@@ -553,108 +553,99 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if ($format == 'HTML5') {
-            $res = '';
-            foreach ($input['imap_servers'] as $index => $vals) {
+        foreach ($input['imap_servers'] as $index => $vals) {
 
-                $no_edit = false;
+            $no_edit = false;
 
-                if (isset($vals['user'])) {
-                    $disabled = 'disabled="disabled"';
-                    $user_pc = $vals['user'];
-                    $pass_pc = '[saved]';
+            if (isset($vals['user'])) {
+                $disabled = 'disabled="disabled"';
+                $user_pc = $vals['user'];
+                $pass_pc = '[saved]';
+            }
+            else {
+                $user_pc = '';
+                $pass_pc = 'Password';
+                $disabled = '';
+            }
+            if ($vals['name'] == 'Default-Auth-Server') {
+                $vals['name'] = 'Default';
+                if (stristr($input['session_type'], 'imap')) {
+                    $no_edit = true;
+                }
+            }
+            $res .= '<div class="configured_server">';
+            $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
+                $vals['tls'] ? 'TLS' : '' );
+            $res .= 
+                '<form class="imap_connect" method="POST">'.
+                '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
+                '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
+                '<span> <input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
+            if (!$no_edit) {
+                $res .= '<input type="submit" value="Test" class="test_imap_connect" />';
+                if (!isset($vals['user']) || !$vals['user']) {
+                    $res .= '<input type="submit" value="Delete" class="imap_delete" />';
+                    $res .= '<input type="submit" value="Save" class="save_imap_connection" />';
                 }
                 else {
-                    $user_pc = '';
-                    $pass_pc = 'Password';
-                    $disabled = '';
+                    $res .= '<input type="submit" value="Delete" class="imap_delete" />';
+                    $res .= '<input type="submit" value="Forget" class="forget_imap_connection" />';
                 }
-                if ($vals['name'] == 'Default-Auth-Server') {
-                    $vals['name'] = 'Default';
-                    if (stristr($input['session_type'], 'imap')) {
-                        $no_edit = true;
-                    }
-                }
-                $res .= '<div class="configured_server">';
-                $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
-                    $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
-                    $vals['tls'] ? 'TLS' : '' );
-                $res .= 
-                    '<form class="imap_connect" method="POST">'.
-                    '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                    '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
-                    '<span> <input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
-                if (!$no_edit) {
-                    $res .= '<input type="submit" value="Test" class="test_imap_connect" />';
-                    if (!isset($vals['user']) || !$vals['user']) {
-                        $res .= '<input type="submit" value="Delete" class="imap_delete" />';
-                        $res .= '<input type="submit" value="Save" class="save_imap_connection" />';
-                    }
-                    else {
-                        $res .= '<input type="submit" value="Delete" class="imap_delete" />';
-                        $res .= '<input type="submit" value="Forget" class="forget_imap_connection" />';
-                    }
-                    $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-                }
-                $res .= '</form></div>';
+                $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
             }
-            $res .= '<br class="clear_float" /></div>';
+            $res .= '</form></div>';
         }
+        $res .= '<br class="clear_float" /></div>';
         return $res;
     }
 }
 
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            return '<div class="imap_server_setup"><div class="content_title">IMAP Servers</div><form class="add_server" method="POST">'.
-                '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.
-                '<div class="subtitle">Add an IMAP Server</div><table>'.
-                '<tr><td colspan="2"><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
-                '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
-                '<td align="right"><input type="submit" value="Add" name="submit_imap_server" /></td></tr>'.
-                '</table></form>';
-        }
+        return '<div class="imap_server_setup"><div class="content_title">IMAP Servers</div><form class="add_server" method="POST">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.
+            '<div class="subtitle">Add an IMAP Server</div><table>'.
+            '<tr><td colspan="2"><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+            '<tr><td colspan="2"><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
+            '<tr><td colspan="2"><input type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+            '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
+            '<td align="right"><input type="submit" value="Add" name="submit_imap_server" /></td></tr>'.
+            '</table></form>';
     }
 }
 
 class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            $res = '';
-            if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
-                foreach ($input['imap_servers'] as $index => $vals) {
-                    if ($vals['name'] == 'Default-Auth-Server') {
-                        $vals['name'] = 'Default';
-                    }
-                    $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
-                        '<td class="imap_detail_'.$index.'"></td></tr>';
+        $res = '';
+        if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
+            foreach ($input['imap_servers'] as $index => $vals) {
+                if ($vals['name'] == 'Default-Auth-Server') {
+                    $vals['name'] = 'Default';
                 }
+                $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
+                    '<td class="imap_detail_'.$index.'"></td></tr>';
             }
-            return $res;
         }
+        return $res;
     }
 }
 
 class Hm_Output_display_imap_summary extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($format == 'HTML5') {
-            $res = '';
-            if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
-                foreach ($input['imap_servers'] as $index => $vals) {
-                    if ($vals['name'] == 'Default-Auth-Server') {
-                        $vals['name'] = 'Default';
-                    }
-                    $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td>'.
-                        '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
-                        '<td>'.$vals['tls'].'</td>'.
-                        '</tr>';
+        $res = '';
+        if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
+            foreach ($input['imap_servers'] as $index => $vals) {
+                if ($vals['name'] == 'Default-Auth-Server') {
+                    $vals['name'] = 'Default';
                 }
+                $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td>'.
+                    '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
+                    '<td>'.$vals['tls'].'</td>'.
+                    '</tr>';
             }
-            return $res;
         }
+        return $res;
     }
 }
 
