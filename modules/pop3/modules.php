@@ -340,16 +340,7 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
         return '';
     }
 }
-class Hm_Output_pop3_message_list extends Hm_Output_Module {
-    protected function output($input, $format) {
-        if (isset($input['list_path']) && preg_match("/^pop3_/", $input['list_path'])) {
-            return pop3_message_list($input, $this);
-        }
-        else {
-            // TODO: default
-        }
-    }
-}
+
 class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
     protected function output($input, $format) {
         $input['formatted_mailbox_page'] = array();
@@ -364,22 +355,6 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
 }
 
 
-function pop3_message_list($input, $output_module) {
-    $page_cache = Hm_Page_Cache::get('formatted_mailbox_page_'.$input['list_path']);
-    $rows = '';
-    $links = '';
-    if ($page_cache) {
-        $rows = implode(array_map(function($v) { return $v[0]; }, $page_cache));
-    }
-    $title = implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']);
-    return '<div class="message_list"><div class="content_title">'.$title.
-        '<a class="update_unread" href="#"  onclick="return select_pop3_folder(\''.$output_module->html_safe($input['list_path']).'\', true)">[update]</a></div>'.
-        '<table class="message_table" cellpadding="0" cellspacing="0"><colgroup><col class="source_col">'.
-        '<col class="subject_col"><col class="from_col"><col class="date_col"></colgroup>'.
-        '<thead><tr><th>Source</th><th>Subject</th><th>From</th><th>Date</th></tr></thead>'.
-        '<tbody>'.$rows.'</tbody></table><div class="pop3_page_links">'.$links.'</div></div>';
-}
-
 function format_pop3_message_list($msg_list, $output_module) {
     $res = array();
     foreach($msg_list as $msg_id => $msg) {
@@ -391,11 +366,12 @@ function format_pop3_message_list($msg_list, $output_module) {
         $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
         $from = str_replace("&quot;", '', $from);
         $date = date('Y-m-d G:i:s', strtotime($output_module->html_safe($msg['date'])));
-        $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
+        $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="checkbox_row"></td>'.
+            '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
+            '<td class="from">'.$from.'</div></td>'.
             '<td onclick="return msg_preview('.$output_module->html_safe($msg_id).', '.
             $output_module->html_safe($msg['server_id']).')" class="subject">'.$subject.
-            '</td><td class="from">'.$from.'</div></td>'.
-            '<td class="msg_date">'.$date.'</td></tr>', $id);
+            '</td><td class="msg_date">'.$date.'</td><td class="icon"></td></tr>', $id);
     }
     return $res;
 }

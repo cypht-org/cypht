@@ -13,12 +13,10 @@ add_output('home', 'display_pop3_summary', true, 'pop3', 'server_summary_start',
 /* message list page */
 add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('message_list', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('message_list', 'pop3_message_list', true, 'pop3', 'content_section_start', 'after');
 
 /* message view page */
 add_handler('message', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('message', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('message', 'pop3_message_list', true, 'pop3', 'folder_list_end', 'before');
 
 /* servers page */
 add_handler('servers', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
