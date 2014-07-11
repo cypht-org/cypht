@@ -279,7 +279,7 @@ class Hm_Router {
             if (is_array($msgs)) {
                 array_walk($msgs, function($v) { Hm_Msgs::add($v); });
             }
-            setcookie('hm_msgs', '', 0);
+            secure_cookie($request, 'hm_msgs', '', 0);
         }
         return $res;
     }
@@ -288,7 +288,7 @@ class Hm_Router {
         if (!empty($request->post) && $request->type == 'HTTP') {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
-                setcookie('hm_msgs', base64_encode(serialize($msgs)), 0);
+                secure_cookie($request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
             }
             $session->end();
             $this->redirect($request->server['REQUEST_URI']);
@@ -1188,6 +1188,15 @@ function add_handler($page, $mod, $logged_in, $source=false, $marker=false, $pla
 }
 function add_output($page, $mod, $logged_in, $source=false, $marker=false, $placement='after', $queue=true) {
     Hm_Output_Modules::add($page, $mod, $logged_in, $marker, $placement, $queue, $source);
+}
+function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='') {
+    if ($request->tls) {
+        $secure = true;
+    }
+    else {
+        $secure = false;
+    }
+    setcookie($name, $value, $lifetime, $path, $domain, $secure);
 }
 
 ?>

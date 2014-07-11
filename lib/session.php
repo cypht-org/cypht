@@ -23,7 +23,7 @@ abstract class Hm_Session {
     abstract protected function del($name);
     abstract protected function is_active();
     abstract protected function end();
-    abstract protected function destroy();
+    abstract protected function destroy($request);
 }
 
 /* session persistant storage with vanilla PHP sessions and no local authentication */
@@ -74,7 +74,7 @@ class Hm_PHP_Session extends Hm_Session {
         }
         else {
             $this->enc_key = base64_encode(openssl_random_pseudo_bytes(128));
-            setcookie('hm_id', $this->enc_key, 0);
+            secure_cookie($request, 'hm_id', $this->enc_key);
         }
     }
 
@@ -132,12 +132,12 @@ class Hm_PHP_Session extends Hm_Session {
         return $this->active;
     }
 
-    public function destroy() {
+    public function destroy($request) {
         session_unset();
         @session_destroy();
         $params = session_get_cookie_params();
-        setcookie($this->cname, '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-        setcookie('hm_id', '', 0);
+        secure_cookie($request, $this->cname, '', 0, $params['path'], $params['domain']);
+        secure_cookie($request, 'hm_id', '', 0);
         $this->active = false;
     }
 
@@ -237,14 +237,14 @@ class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
         if ($this->connect()) {
             if ($this->loaded) {
                 $this->session_key = base64_encode(openssl_random_pseudo_bytes(128));
-                setcookie($this->cname, $this->session_key, 0);
+                secure_cookie($request, $this->cname, $this->session_key, 0);
                 if ($this->insert_session_row()) {
                     $this->active = true;
                 }
             }
             else {
                 if (!isset($request->cookie[$this->cname])) {
-                    $this->destroy();
+                    $this->destroy($request);
                 }
                 else {
                     $this->session_key = $request->cookie[$this->cname];
@@ -273,13 +273,13 @@ class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
         $this->active = false;
     }
 
-    public function destroy() {
+    public function destroy($request) {
         if ($this->dbh) {
             $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
             $sql->execute(array($this->session_key));
         }
-        setcookie($this->cname, '', 0);
-        setcookie('hm_id', '', 0);
+        secure_cookie($request, $this->cname, '', 0);
+        secure_cookie($request, 'hm_id', '', 0);
         $this->active = false;
     }
 }
