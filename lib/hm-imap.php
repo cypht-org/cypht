@@ -1990,7 +1990,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         $matches = $this->search_bodystructure($struct, $flds, false);
         if (!empty($matches)) {
 
-            $msg_part_num = array_slice(array_keys($matches), 0, 1)[0];
+            $subset = array_slice(array_keys($matches), 0, 1);
+            $msg_part_num = $subset[0];
             $struct = array_slice($matches, 0, 1);
 
             if (isset($struct[$msg_part_num])) {
