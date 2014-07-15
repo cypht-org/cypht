@@ -1031,6 +1031,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                         }
                     }
                     elseif ($v != ']' && !$search) {
+                        $v = preg_replace("/(?!\r)\n/", "\r\n", $v);
                         $parts = explode("\r\n", $v);
                         if (is_array($parts) && !empty($parts)) {
                             $i = 0;
