@@ -416,9 +416,6 @@ var Hm_Message_List = {
                 $('.'+clean_selector(class_name)).fadeOut(200, function() { $(this).remove(); });
             }
         }
-        if (hm_list_path == 'unread') {
-            set_unread_count(count);
-        }
         for (index in selected) {
             class_name = selected[index];
             Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);

@@ -331,7 +331,6 @@ var setup_message_view_page = function() {
         class_name = 'imap_'+detail.server_id+'_'+hm_msg_uid+'_'+detail.folder;
         update_unread_cache(class_name);
     }
-                console.log(loader);
 };
 
 /* other */
