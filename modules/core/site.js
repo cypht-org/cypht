@@ -181,8 +181,8 @@ var Hm_Message_List = {
         if (msgs && !jQuery.isEmptyObject(msgs)) {
             $('.empty_list').remove();
         }
-        var msg_ids = Hm_Message_List.add_rows(msgs, type);
-        var count = Hm_Message_List.remove_rows(ids, msg_ids);
+        var msg_ids = Hm_Message_List.add_rows(msgs);
+        var count = Hm_Message_List.remove_rows(ids, msg_ids, type);
         return count;
     },
 
@@ -295,7 +295,7 @@ var Hm_Message_List = {
             id = msgs[index][1];
             if (!$('.'+clean_selector(id)).length) {
                 Hm_Message_List.insert_into_message_list(row);
-                $('.'+clean_selector(id)).fadeIn(300);
+                $('.'+clean_selector(id)).show();
             }
             else {
                 timestr = $('.msg_date', $(row)).html();

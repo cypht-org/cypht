@@ -725,8 +725,19 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<div class="message_list"><div class="content_title">'.
-            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']).
-            ' <a class="update_message_list" onclick="return Hm_Message_List.load_sources()"'.
+            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']);
+
+        if ($input['list_path'] == 'unread') {
+            if (isset($input['message_list_since'])) {
+                $since = $input['message_list_since'];
+            }
+            else {
+                $since = 'today';
+            }
+            $res .= message_since_dropdown($since);
+        }
+
+        $res .= ' <a class="update_message_list" onclick="return Hm_Message_List.load_sources()"'.
             ' href="#">[update]</a></div>'.message_controls();
 
         return $res;
@@ -735,7 +746,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
 
 class Hm_Output_message_list_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '</tbody></table></div>';
+        $res = '</tbody></table><div class="page_links"></div></div>';
         return $res;
     }
 }
@@ -786,6 +797,41 @@ function message_controls() {
         '<a href="#" onclick="return imap_message_action(\'move\');" class="disabled_link">Move</a>'.
         '<a href="#" onclick="return imap_message_action(\'copy\');" class="disabled_link">Copy</a>'.
         '</div>';
+}
+
+function message_since_dropdown($since) {
+    $times = array(
+        'today' => 'Today',
+        '-1 week' => 'Last 7 days',
+        '-2 weeks' => 'Last 2 weeks',
+        '-4 weeks' => 'Last 4 weeks',
+        '-6 weeks' => 'Last 6 weeks',
+        '-6 months' => 'Last 6 months',
+        '-1 year' => 'Last year'
+    );
+    $res = '<select class="message_list_since">';
+    foreach ($times as $val => $label) {
+        $res .= '<option';
+        if ($val == $since) {
+            $res .= ' selected="selected"';
+        }
+        $res .= ' value="'.$val.'">'.$label.'</option>';
+    }
+    $res .= '</select>';
+    return $res;
+}
+
+function process_since_argument($val, $config) {
+    $date = false;
+    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'))) {
+        $date = date('j-M-Y', strtotime($val));
+        $config->set('message_list_since', $val);
+    }
+    elseif ($val == 'today') {
+        $date = date('j-M-Y');
+        $config->set('message_list_since', $val);
+    }
+    return $date;
 }
 
 

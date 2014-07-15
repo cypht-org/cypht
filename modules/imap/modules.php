@@ -208,17 +208,9 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_unread_since', 'imap_server_ids'));
         if ($success) {
+            $date = process_since_argument($form['imap_unread_since'], $this->user_config);
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
-            $date = false;
-            if (in_array($form['imap_unread_since'], array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'))) {
-                $date = date('j-M-Y', strtotime($form['imap_unread_since']));
-                $this->user_config->set('imap_unread_since', $form['imap_unread_since']);
-            }
-            elseif ($form['imap_unread_since'] == 'today') {
-                $date = date('j-M-Y');
-                $this->user_config->set('imap_unread_since', $form['imap_unread_since']);
-            }
             $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date);
             $data['imap_unread_data'] = $msg_list;
             $data['unread_server_ids'] = $form['imap_server_ids'];
@@ -319,7 +311,7 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
             $data['imap_servers'] = $servers;
             $data['folder_sources'][] = 'imap_folders';
         }
-        $data['imap_unread_since'] = $this->user_config->get('imap_unread_since', false);
+        $data['message_list_since'] = $this->user_config->get('message_list_since', false);
         return $data;
     }
 }
@@ -753,8 +745,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
             $res = format_imap_message_list($input['imap_mailbox_page'], $this);
             $input['formatted_mailbox_page'] = $res;
             Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $res);
-            $input['imap_page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
-            Hm_Page_Cache::add('imap_page_links_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $input['imap_page_links']);
+            $input['page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
             unset($input['imap_mailbox_page']);
             unset($input['imap_folder_detail']);
         }
@@ -839,28 +830,6 @@ function process_imap_message_ids($ids) {
             $res[$server][$folder][] = $uid;
         }
     }
-    return $res;
-}
-
-function unread_since_dropdown($since) {
-    $times = array(
-        'today' => 'Today',
-        '-1 week' => 'Last 7 days',
-        '-2 weeks' => 'Last 2 weeks',
-        '-4 weeks' => 'Last 4 weeks',
-        '-6 weeks' => 'Last 6 weeks',
-        '-6 months' => 'Last 6 months',
-        '-1 year' => 'Last year'
-    );
-    $res = '<select class="unread_since">';
-    foreach ($times as $val => $label) {
-        $res .= '<option';
-        if ($val == $since) {
-            $res .= ' selected="selected"';
-        }
-        $res .= ' value="'.$val.'">'.$label.'</option>';
-    }
-    $res .= '</select>';
     return $res;
 }
 
@@ -1023,6 +992,7 @@ function build_msg_gravatar( $from ) {
         return '<img class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';
     }
 }
+
 function sort_by_internal_date($a, $b) {
     if ($a['internal_date'] == $b['internal_date']) return 0;
     return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;

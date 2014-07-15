@@ -63,3 +63,7 @@ option, select { padding: 3px; }
 .confirm_logout { display: none; width: 450px; background-color: #fff; padding: 20px; position: absolute; right: 0px; top: 0px; border: solid 1px #ccc; }
 .confirm_text {  padding-left: 10px; padding-bottom: 10px; }
 .folder_list .update_unread { float: right; margin-top: 20px; }
+.page_links a { text-decoration: none; color: #111; }
+.page_links a img { vertical-align: -2px; }
+.page_links { text-align: center; padding-top: 20px; }
+.message_list_since { vertical-align: 1px; border: solid 1px #ccc; text-decoration: none; margin: 0px; margin-left: 20px; letter-spacing: 0px; padding: 0px; color: #666; }

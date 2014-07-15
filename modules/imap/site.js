@@ -79,7 +79,10 @@ var imap_test_action = function() {
 
 /* unread page */
 var imap_combined_unread_content = function(id) {
-    var since = '-1 week'; /*$('.unread_since option:selected').val();*/
+    var since = 'today';
+    if ($('.message_list_since').length) {
+        since = $('.message_list_since option:selected').val();
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
         {'name': 'imap_unread_since', 'value': since},
@@ -93,7 +96,8 @@ var imap_combined_unread_content = function(id) {
 };
 
 var update_unread_message_display = function(res) {
-    var ids = $('.imap_server_ids').val().split(',');
+    console.log(res);
+    var ids = res.unread_server_ids.split(',');
     var count = Hm_Message_List.update(ids, res.formatted_unread_data, 'imap');
 };
 
@@ -176,10 +180,15 @@ var end_status_update = function() {
 };
 
 /* combined inbox page */
-var imap_combined_inbox_content= function(id) {
+var imap_combined_inbox_content = function(id) {
+    var since = 'today';
+    if ($('.message_list_since').length) {
+        since = $('.message_list_since option:selected').val();
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_combined_inbox'},
-        {'name': 'imap_server_ids', 'value': id}],
+        {'name': 'imap_server_ids', 'value': id},
+        {'name': 'imap_unread_since', 'value': since}],
         display_imap_combined_inbox,
         [],
         false,
@@ -236,8 +245,8 @@ var select_imap_folder = function(path, force) {
 var display_imap_mailbox = function(res) {
     var ids = [res.imap_server_id];
     var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'imap');
-    if (res.imap_page_links) {
-        $('.imap_page_links').html(res.imap_page_links);
+    if (res.page_links) {
+        $('.page_links').html(res.page_links);
     }
     $(':checkbox').click(function() {
         Hm_Message_List.toggle_msg_controls();
