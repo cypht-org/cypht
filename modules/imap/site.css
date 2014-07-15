@@ -11,7 +11,7 @@
 .message_table td { padding: 5px; padding-left: 10px; padding-top: 7px; padding-bottom: 3px; color: #333; }
 .message_table { table-layout: fixed; width: 100%; padding: 20px; padding-top: 10px; padding-bottom: 40px; }
 .message_table th:hover { color: #000; }
-.subject div, .msg_date, .from, .source { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.subject div, .msg_date, .from, .source { overflow: hidden; color: #999; text-overflow: ellipsis; white-space: nowrap; }
 .subject { cursor: pointer; font-size: 110%; }
 .subject a { color: #333 !important; }
 .source { font-style: italic; color: #666; font-size: 75%; }
