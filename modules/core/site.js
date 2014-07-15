@@ -450,6 +450,15 @@ var Hm_Message_List = {
             $('.message_table tbody').html(data);
             Hm_Message_List.reset_checkboxes();
         }
+    },
+
+    update_count: function(type) {
+        if (type == 'unread') {
+            var list = get_from_local_storage('formatted_unread_data');
+            var count = $('<div></div>').append(list).find('tr').length;
+            $('.unread_count').text(count);
+            save_folder_list();
+        }
     }
 };
 
