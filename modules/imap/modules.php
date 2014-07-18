@@ -85,6 +85,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
 class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_IMAP_List::dump();
+        error_log(print_r($servers, true));
         $folders = array();
         if (!empty($servers)) {
             foreach ($servers as $id => $server) {
@@ -171,9 +172,16 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
                 $start_time = microtime(true);
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 $data['imap_connect_time'] = microtime(true) - $start_time;
-                $data['imap_connect_status'] = $imap->get_state();
-                $data['imap_status_inbox'] = $imap->select_mailbox('INBOX');
-                $data['imap_status_server_id'] = $id;
+                if ($imap) {
+                    $data['imap_connect_status'] = $imap->get_state();
+                    $data['imap_status_inbox'] = $imap->select_mailbox('INBOX');
+                    $data['imap_status_server_id'] = $id;
+                }
+                else {
+                    $data['imap_connect_status'] = 'disconnected';
+                    $data['imap_status_inbox'] = false;
+                    $data['imap_status_server_id'] = $id;
+                }
             }
         }
         return $data;
@@ -642,7 +650,7 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 
 class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['imap_connect_status']) && $input['imap_connect_status'] != 'diconnected') {
+        if (isset($input['imap_connect_status']) && $input['imap_connect_status'] != 'disconnected') {
             $input['imap_status_display'] = '<span class="online">'.
                 $this->html_safe(ucwords($input['imap_connect_status'])).'</span> in '.$input['imap_connect_time'];
             $input['imap_detail_display'] = '';
@@ -657,18 +665,15 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
 
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
-        $cache = Hm_Page_Cache::get('imap_folders');
-        if (!$cache) {
-            $res = '<ul class="folders">';
-            if (isset($input['imap_folders'])) {
-                foreach ($input['imap_folders'] as $id => $folder) {
-                    $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" /> '.
-                        $this->html_safe($folder).'</a></li>';
-                }
+        $res = '<ul class="folders">';
+        if (isset($input['imap_folders'])) {
+            foreach ($input['imap_folders'] as $id => $folder) {
+                $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" /> '.
+                    $this->html_safe($folder).'</a></li>';
             }
-            $res .= '</ul>';
-            Hm_Page_Cache::add('imap_folders', $res, true);
         }
+        $res .= '</ul>';
+        Hm_Page_Cache::add('imap_folders', $res, true);
         return '';
     }
 }
