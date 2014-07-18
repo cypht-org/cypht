@@ -293,7 +293,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                         $url .= '&amp;list_parent=combined_inbox';
                     }
                     else {
-                        $url .= '&amp;list_parent=pop3_'.$this->html_safe($item['server_id']);
+                        $url .= '&amp;list_parent=feeds_'.$this->html_safe($item['server_id']);
                     }
                     $from = isset($item['author']) ? $this->html_safe($item['author']) : '';
                     $from = !$from && isset($item['dc:creator']) ? $this->html_safe($item['dc:creator']) : $from;
