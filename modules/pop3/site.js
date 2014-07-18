@@ -97,20 +97,14 @@ var display_pop3_mailbox = function(res) {
     }
 };
 
-var select_pop3_folder = function(path, force) {
-    var detail = parse_folder_path(path, 'pop3');
-    if (detail) {
-        if (force) {
-            Hm_Notices.show({0: 'Loading messages ...'});
-        }
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
-            {'name': 'pop3_server_id', 'value': detail.server_id}],
-            display_pop3_mailbox,
-            [],
-            false
-        );
-    }
+var load_pop3_list = function(id) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
+        {'name': 'pop3_server_id', 'value': detail.server_id}],
+        display_pop3_mailbox,
+        [],
+        false
+    );
     return false;
 };
 
@@ -136,6 +130,37 @@ var display_pop3_message = function(res) {
     document.title = 'HM3 '+$('.header_subject th').text();
 };
 
+var add_pop3_sources = function() {
+    if ($('.pop3_server_ids').length) {
+        var ids = $('.pop3_server_ids').val().split(',');
+        if (ids && ids != '') {
+            for (i=0;i<ids.length;i++) {
+                id=ids[i];
+                Hm_Message_List.sources.push({type: 'pop3', id: id, callback: pop3_combined_inbox_content});
+            }
+        }
+    }
+};
+var pop3_combined_inbox_content= function(id) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
+        {'name': 'limit', 'value': 20},
+        {'name': 'pop3_server_id', 'value': id}],
+        display_pop3_combined_inbox,
+        [],
+        false,
+        set_combined_inbox_state
+    );
+    return false;
+};
+
+var display_pop3_combined_inbox = function(res) {
+    console.log(res);
+    var ids = [res.pop3_server_id];
+    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+};
+
+
 if (hm_page_name == 'servers') {
     $('.test_pop3_connect').on('click', pop3_test_action);
     $('.save_pop3_connection').on('click', pop3_save_action);
@@ -143,10 +168,17 @@ if (hm_page_name == 'servers') {
     $('.delete_pop3_connection').on('click', pop3_delete_action);
 }
 else if (hm_page_name == 'message_list') {
+    if (hm_list_path == 'combined_inbox') {
+        add_pop3_sources();
+    }
     if (hm_list_path.substring(0, 4) == 'pop3') {
-        $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
         if ($('.message_table tbody tr').length == 0) {
-            select_pop3_folder(hm_list_path, true);
+            var detail = parse_folder_path(hm_list_path, 'pop3');
+            if (detail) {
+                Hm_Message_List.sources.push({type: 'pop3', id: detail.server_id, callback: load_pop3_list});
+            }
+            Hm_Message_List.load_sources();
+            
         }
         $('.message_table tr').fadeIn(100);
     }
