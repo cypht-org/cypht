@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'lib/hm-feed.php';
 
-class Hm_Handler_feed_combined_inbox extends Hm_Handler_Module {
+class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
         if ($success) {
@@ -25,8 +25,11 @@ class Hm_Handler_feed_combined_inbox extends Hm_Handler_Module {
                     }
                 }
             }
-            $data['feed_combined_inbox_data'] = $res;
-            $data['combined_inbox_feed_server_ids'] = $form['feed_server_ids'];
+            $data['feed_list_data'] = $res;
+            if (isset($this->request->get['list_path'])) {
+                $data['feed_list_parent'] = $this->request->get['list_path'];
+            }
+            $data['feed_server_ids'] = $form['feed_server_ids'];
         }
         return $data;
     }
@@ -218,7 +221,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                     $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
                 }
                 elseif ($name == 'link') {
-                    $header_str .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td><a target="_blank" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
+                    $header_str .= '<tr class="header_'.$name.'"><th>'.$this->html_safe($name).'</th><td><a target="_blank" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
                 }
                 else {
                     $header_str .= '<tr><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
@@ -234,11 +237,12 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
         return $input;
     }
 }
-class Hm_Output_filter_feed_combined_inbox extends Hm_Output_Module {
+
+class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = array();
-        if (isset($input['feed_combined_inbox_data'])) {
-            foreach ($input['feed_combined_inbox_data'] as $item) {
+        if (isset($input['feed_list_data'])) {
+            foreach ($input['feed_list_data'] as $item) {
                 if (isset($item['guid'])) {
                     $id = $this->html_safe(sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid'])));
                     if (isset($item['dc:date'])) {
@@ -253,7 +257,10 @@ class Hm_Output_filter_feed_combined_inbox extends Hm_Output_Module {
                         $date = '';
                         $timestamp = 0;
                     }
-                    $url = '?page=message&uid='.$this->html_safe(urlencode($item['guid'])).'&amp;list_path=feeds_'.$this->html_safe($item['server_id']).'&amp;list_parent=combined_inbox';
+                    $url = '?page=message&uid='.$this->html_safe(urlencode($item['guid'])).'&amp;list_path=feeds_'.$this->html_safe($item['server_id']);
+                    if (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'combined_inbox') {
+                        $url .= '&amp;list_parent=combined_inbox';
+                    }
                     $from = isset($item['author']) ? $this->html_safe($item['author']) : '';
                     $from = !$from && isset($item['dc:creator']) ? $this->html_safe($item['dc:creator']) : $from;
                     $from = !$from ? '<span class="hl">[No From]</span>' : $from;
@@ -267,6 +274,7 @@ class Hm_Output_filter_feed_combined_inbox extends Hm_Output_Module {
                         , $id);
                 }
             }
+            unset($input['feed_list_data']);
         }
         $input['formatted_feed_data'] = $res;
         return $input;
@@ -279,7 +287,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
         if (isset($input['feed_folders'])) {
             foreach ($input['feed_folders'] as $id => $folder) {
                 $res .= '<li class="feed_'.$this->html_safe($id).'">'.
-                    '<a href="?page=message_list&list_path=feed_'.$this->html_safe($id).'">'.
+                    '<a href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">'.
                     '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
