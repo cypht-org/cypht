@@ -134,7 +134,7 @@ var display_pop3_message = function(res) {
     $('.msg_text').append(res.msg_text);
     set_message_content();
     document.title = 'HM3 '+$('.header_subject th').text();
-}
+};
 
 if (hm_page_name == 'servers') {
     $('.test_pop3_connect').on('click', pop3_test_action);
