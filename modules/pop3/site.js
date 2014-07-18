@@ -74,27 +74,13 @@ var pop3_delete_action = function() {
 };
 
 var display_pop3_mailbox = function(res) {
-    Hm_Notices.hide(true);
-    var pop3_id = res.pop3_server_id;
-    var msg_ids = [];
-    for (index in res.formatted_mailbox_page) {
-        row = res.formatted_mailbox_page[index][0];
-        id = res.formatted_mailbox_page[index][1];
-        if (!$('.'+id).length) {
-            $('.message_table tbody').append(row);
-            $('.'+id).fadeIn(600);
-        }
-        msg_ids.push(id);
-    }
-    $('.message_table tbody tr[class^=pop3_'+pop3_id+'_]').filter(function() {
-        var id = this.className;
-        if (jQuery.inArray(id, msg_ids) == -1) {
-            $(this).fadeOut(600, function() { $('.'+id).remove(); });
-        }
-    });
-    if (res.pop3_page_links) {
-        $('.pop3_page_links').html(res.pop3_page_links);
-    }
+    ids = [res.pop3_server_id];
+    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+    key = 'pop3_'+res.pop3_server_id;
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    save_to_local_storage(key, data.html());
+
 };
 
 var load_pop3_list = function(id) {
@@ -141,7 +127,7 @@ var add_pop3_sources = function() {
         }
     }
 };
-var pop3_combined_inbox_content= function(id) {
+var pop3_combined_inbox_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
         {'name': 'limit', 'value': 10},
@@ -193,13 +179,13 @@ else if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
         add_pop3_sources();
     }
-    if (hm_list_path.substring(0, 4) == 'pop3') {
+    else if (hm_list_path.substring(0, 4) == 'pop3') {
         if ($('.message_table tbody tr').length == 0) {
             var detail = parse_folder_path(hm_list_path, 'pop3');
             if (detail) {
                 Hm_Message_List.sources.push({type: 'pop3', id: detail.server_id, callback: load_pop3_list});
             }
-            Hm_Message_List.load_sources();
+            Hm_Message_List.setup_combined_view(hm_list_path);
             
         }
         $('.message_table tr').fadeIn(100);
