@@ -51,7 +51,7 @@ add_handler('servers', 'title', true);
 add_handler('servers', 'date', true);
 add_handler('servers', 'save_user_data', true);
 add_handler('servers', 'logout', true);
-add_handler('settings', 'reload_folder_cookie', true);
+add_handler('servers', 'reload_folder_cookie', true);
 add_handler('servers', 'http_headers', true);
 add_output('servers', 'header_start', false);
 add_output('servers', 'js_data', true);
