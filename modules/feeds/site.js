@@ -27,7 +27,7 @@ var add_feed_sources = function() {
     }
 };
 
-var feed_view = function() {
+var feed_item_view = function() {
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_item_content'},
@@ -39,6 +39,7 @@ var feed_view = function() {
     );
     return false;
 };
+
 var display_feed_item_content = function(res) {
     $('.msg_text').html('');
     $('.msg_text').append(res.feed_msg_headers);
@@ -76,5 +77,5 @@ if (hm_page_name == 'message_list') {
     }
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'feed') {
-    feed_view();
+    feed_item_view();
 }
