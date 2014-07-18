@@ -27,8 +27,31 @@ var add_feed_sources = function() {
     }
 };
 
+var display_feed_item_content = function(res) {
+    $('.msg_text').html('');
+    $('.msg_text').append(res.feed_msg_headers);
+    $('.msg_text').append(res.feed_msg_text);
+    set_message_content();
+    document.title = 'HM3 '+$('.header_subject th').text();
+};
+var feed_view = function() {
+    $('.msg_text_inner').html('');
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_item_content'},
+        {'name': 'feed_list_path', 'value': hm_list_path},
+        {'name': 'feed_uid', 'value': hm_msg_uid}],
+        display_feed_item_content,
+        [],
+        false
+    );
+    return false;
+};
+
 if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
         add_feed_sources();
     }
+}
+else if (hm_page_name == 'message') {
+    feed_view();
 }

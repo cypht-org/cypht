@@ -32,17 +32,28 @@ add_handler('ajax_feed_combined_inbox', 'feed_combined_inbox',  true);
 add_handler('ajax_feed_combined_inbox', 'date', true, 'core');
 add_output('ajax_feed_combined_inbox', 'filter_feed_combined_inbox', true);
 
+/* message view */
+add_handler('ajax_feed_item_content', 'login', false, 'core');
+add_handler('ajax_feed_item_content', 'load_user_data', true, 'core');
+add_handler('ajax_feed_item_content', 'load_feeds_from_config',  true);
+add_handler('ajax_feed_item_content', 'feed_item_content',  true);
+add_handler('ajax_feed_item_content', 'date', true, 'core');
+add_output('ajax_feed_item_content', 'filter_feed_item_content', true);
+
 return array(
 
     'allowed_pages' => array(
-        'ajax_feed_combined_inbox'
+        'ajax_feed_combined_inbox',
+        'ajax_feed_item_content'
     ),
 
     'allowed_post' => array(
         'feed_server_ids' => FILTER_SANITIZE_STRING,
         'submit_feed' => FILTER_SANITIZE_STRING,
         'new_feed_name' => FILTER_SANITIZE_STRING,
-        'new_feed_address' => FILTER_SANITIZE_STRING
+        'new_feed_address' => FILTER_SANITIZE_STRING,
+        'feed_list_path' => FILTER_SANITIZE_STRING,
+        'feed_uid' => FILTER_SANITIZE_STRING
     )
 );
 

@@ -32,6 +32,40 @@ class Hm_Handler_feed_combined_inbox extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_feed_item_content extends Hm_Handler_Module {
+    public function process($data) {
+        $content = '';
+        $headers = array();
+        list($success, $form) = $this->process_form(array('feed_uid', 'feed_list_path'));
+        if ($success) {
+            $path = explode('_', $form['feed_list_path']);
+            $id = $path[1];
+            $feed_data = Hm_Feed_List::dump($id);
+            if ($feed_data) {
+                $feed = is_feed($feed_data['server']);
+                if ($feed->parsed_data) {
+                    foreach ($feed->parsed_data as $item) {
+                        if (isset($item['guid']) && $item['guid'] == $form['feed_uid']) {
+                            if (isset($item['description'])) {
+                                $content = $item['description'];
+                                unset($item['description']);
+                                $headers = $item;
+                                $headers['server_id'] = $id;
+                                $headers['server_name'] = $feed_data['name'];
+                            }
+                        }
+                    }
+                }
+            }
+            if ($content) {
+                $data['feed_message_content'] = $content;
+                $data['feed_message_headers'] = $headers;
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_process_add_feed extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_feed'])) {
@@ -175,6 +209,28 @@ class Hm_Output_feed_ids extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['feed_message_content'])) {
+            $header_str = '<table class="msg_headers" cellspacing="0" cellpadding="0">';
+            foreach ($input['feed_message_headers'] as $name => $value) {
+                if ($name == 'title') {
+                    $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
+                }
+                else {
+                    $header_str .= '<tr><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                }
+            }
+            $header_str .= '</table>';
+            $txt = '<div class="msg_text_inner">'.$this->html_safe($input['feed_message_content']).'</div>';
+            unset($input['feed_message_content']);
+            unset($input['feed_message_headers']);
+            $input['feed_msg_text'] = $txt;
+            $input['feed_msg_headers'] = $header_str;
+        }
+        return $input;
+    }
+}
 class Hm_Output_filter_feed_combined_inbox extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = array();
@@ -182,8 +238,19 @@ class Hm_Output_filter_feed_combined_inbox extends Hm_Output_Module {
             foreach ($input['feed_combined_inbox_data'] as $item) {
                 if (isset($item['guid'])) {
                     $id = $this->html_safe(sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid'])));
-                    $timestamp = $this->html_safe(strtotime($item['pubdate']));
-                    $date = $this->html_safe(human_readable_interval($item['pubdate']));
+                    if (isset($item['dc:date'])) {
+                        $date = $this->html_safe(human_readable_interval($item['dc:date']));
+                        $timestamp = $this->html_safe(strtotime($item['dc:date']));
+                    }
+                    elseif (isset($item['pubdate'])) {
+                        $date = $this->html_safe(human_readable_interval($item['pubdate']));
+                        $timestamp = $this->html_safe(strtotime($item['pubdate']));
+                    }
+                    else {
+                        $date = '';
+                        $timestamp = 0;
+                    }
+                    $url = '?page=message&uid='.$this->html_safe(urlencode($item['guid'])).'&amp;list_path=feeds_'.$this->html_safe($item['server_id']).'&amp;list_parent=combined_inbox';
                     $from = isset($item['author']) ? $this->html_safe($item['author']) : '';
                     $from = !$from && isset($item['dc:creator']) ? $this->html_safe($item['dc:creator']) : $from;
                     $from = !$from ? '<span class="hl">[No From]</span>' : $from;
@@ -191,7 +258,7 @@ class Hm_Output_filter_feed_combined_inbox extends Hm_Output_Module {
                         '<td class="checkbox_row"><input type="checkbox" value="'.$id.'"></td>'.
                         '<td class="source">'.$this->html_safe($item['server_name']).'</td>'.
                         '<td class="from">'.$from.'</td>'.
-                        '<td class="subject"><div>'.$this->html_safe($item['title']).'</div></td>'.
+                        '<td class="subject"><div><a href="'.$url.'">'.$this->html_safe($item['title']).'</a></div></td>'.
                         '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td>'.
                         '<td class="icon"></td></tr>'
                         , $id);
