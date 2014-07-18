@@ -4,6 +4,25 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'lib/hm-pop3.php';
 
+class Hm_Handler_pop3_status extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('pop3_server_ids'));
+        if ($success) {
+            $ids = explode(',', $form['pop3_server_ids']);
+            foreach ($ids as $id) {
+                $start_time = microtime(true);
+                $pop3 = Hm_POP3_List::connect($id, false);
+                if ($pop3->state = 'authed') {
+                    $data['pop3_connect_time'] = microtime(true) - $start_time;
+                    $data['pop3_connect_status'] = 'Authenticated';
+                    $data['pop3_status_server_id'] = $id;
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
     public function process($data) {
 
@@ -11,8 +30,8 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('pop3_server_id'));
         if ($success) {
             $limit = 0;
-            if (isset($this->request->get['limit'])) {
-                $limit = (int) $this->request->get['limit'];
+            if (isset($this->request->post['limit'])) {
+                $limit = (int) $this->request->post['limit'];
             }
             if (!$limit) {
                 $limit = 20;
@@ -455,6 +474,38 @@ class Hm_Output_pop3_server_ids extends Hm_Output_Module {
         }
     }
 }
+
+class Hm_Output_display_pop3_status extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if (isset($input['pop3_servers']) && !empty($input['pop3_servers'])) {
+            foreach ($input['pop3_servers'] as $index => $vals) {
+                if ($vals['name'] == 'Default-Auth-Server') {
+                    $vals['name'] = 'Default';
+                }
+                $res .= '<tr><td>POP3</td><td>'.$vals['name'].'</td><td class="pop3_status_'.$index.'"></td>'.
+                    '<td class="pop3_detail_'.$index.'"></td></tr>';
+            }
+        }
+        return $res;
+    }
+}
+
+class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['pop3_connect_status']) && $input['pop3_connect_status'] == 'Authenticated') {
+            $input['pop3_status_display'] = '<span class="online">'.
+                $this->html_safe(ucwords($input['pop3_connect_status'])).'</span> in '.$input['pop3_connect_time'];
+            $input['pop3_detail_display'] = '';
+        }
+        else {
+            $input['pop3_status_display'] = '<span class="down">Down</span>';
+            $input['pop3_detail_display'] = '';
+        }
+        return $input;
+    }
+}
+
 
 function format_pop3_message_list($msg_list, $output_module) {
     $res = array();

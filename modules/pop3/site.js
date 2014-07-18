@@ -155,9 +155,31 @@ var pop3_combined_inbox_content= function(id) {
 };
 
 var display_pop3_combined_inbox = function(res) {
-    console.log(res);
     var ids = [res.pop3_server_id];
     var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+};
+
+var pop3_status_update = function() {
+    if ($('.pop3_server_ids').length) {
+        var ids = $('.pop3_server_ids').val().split(',');
+        if ( ids && ids != '') {
+            for (i=0;i<ids.length;i++) {
+                id=ids[i];
+                Hm_Ajax.request(
+                    [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_status'},
+                    {'name': 'pop3_server_ids', 'value': id}],
+                    update_pop3_status_display,
+                    [],
+                    false
+                );
+            }
+        }
+    }
+    return false;
+};
+var update_pop3_status_display = function(res) {
+    var id = res.pop3_status_server_id;
+    $('.pop3_status_'+id).html(res.pop3_status_display);
 };
 
 
@@ -185,4 +207,7 @@ else if (hm_page_name == 'message_list') {
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'pop3') {
     pop3_message_view();
+}
+else if (hm_page_name == 'home') {
+    pop3_status_update();
 }

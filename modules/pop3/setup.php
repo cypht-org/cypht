@@ -9,6 +9,8 @@ output_source('pop3');
 add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('home', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('home', 'display_pop3_summary', true, 'pop3', 'server_summary_start', 'after');
+add_output('home', 'display_pop3_status', true, 'pop3', 'server_status_start', 'after');
+add_output('home', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
 /* message list page */
 add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
@@ -76,6 +78,14 @@ add_handler('ajax_pop3_message_display', 'pop3_message_content', true);
 add_handler('ajax_pop3_message_display', 'date', true, 'core');
 add_output('ajax_pop3_message_display', 'filter_pop3_message_content', true);
 
+/* ajax status callback data */
+add_handler('ajax_pop3_status', 'login', false, 'core');
+add_handler('ajax_pop3_status', 'load_user_data', true, 'core');
+add_handler('ajax_pop3_status', 'load_pop3_servers_from_config',  true);
+add_handler('ajax_pop3_status', 'pop3_status',  true);
+add_handler('ajax_pop3_status', 'date', true, 'core');
+add_output('ajax_pop3_status', 'filter_pop3_status_data', true);
+
 /* ajax server setup callback data */
 add_handler('ajax_pop3_debug', 'login', false, 'core');
 add_handler('ajax_pop3_debug', 'load_user_data',  true, 'core');
@@ -98,6 +108,7 @@ return array(
         'ajax_pop3_message_display',
         'ajax_pop3_folder_display',
         'ajax_pop3_combined_inbox',
+        'ajax_pop3_status'
     ),
     'allowed_post' => array(
         'new_pop3_name' => FILTER_SANITIZE_STRING,
@@ -109,6 +120,7 @@ return array(
         'pop3_delete' => FILTER_VALIDATE_INT,
         'submit_pop3_server' => FILTER_SANITIZE_STRING,
         'pop3_server_id' => FILTER_VALIDATE_INT,
+        'pop3_server_ids' => FILTER_SANITIZE_STRING,
         'pop3_user' => FILTER_SANITIZE_STRING,
         'pop3_pass' => FILTER_SANITIZE_STRING,
         'pop3_list_path' => FILTER_SANITIZE_STRING,
