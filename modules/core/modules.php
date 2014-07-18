@@ -232,7 +232,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                     $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
                 }
             }
-            elseif (preg_match("/^feed_\d+/", $path)) {
+            elseif (preg_match("/^feeds_\d+/", $path)) {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 2);
                 $details = Hm_Feed_List::dump(intval($parts[1]));
@@ -436,7 +436,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_page_name = "'.$this->html_safe($input['router_page_name']).'";'.
             'var hm_list_path = "'.(isset($input['list_path']) ? $this->html_safe($input['list_path']) : '').'";'.
             'var hm_list_parent = "'.(isset($input['list_parent']) ? $this->html_safe($input['list_parent']) : '').'";'.
-            'var hm_msg_uid = '.(isset($input['uid']) ? $this->html_safe($input['uid']) : 0).';'.
+            'var hm_msg_uid = "'.(isset($input['uid']) ? $this->html_safe($input['uid']) : 0).'";'.
             'var hm_module_list = "'.$this->html_safe($input['router_module_list']).'";'.
             '</script>';
     }
@@ -792,11 +792,11 @@ function message_controls() {
         '<a href="#" onclick="return imap_message_action(\'read\');" class="disabled_link">Read</a>'.
         '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
         '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
-        '<a href="#" onclick="return imap_message_action(\'delete\');" class="disabled_link">Delete</a>'.
-        '<a href="#" onclick="return imap_message_action(\'expunge\');" class="disabled_link">Expunge</a>'.
+        '<a href="#" onclick="return imap_message_action(\'delete\');" class="disabled_link">Delete</a></div>';
+        /*'<a href="#" onclick="return imap_message_action(\'expunge\');" class="disabled_link">Expunge</a>'.
         '<a href="#" onclick="return imap_message_action(\'move\');" class="disabled_link">Move</a>'.
         '<a href="#" onclick="return imap_message_action(\'copy\');" class="disabled_link">Copy</a>'.
-        '</div>';
+        '</div>';*/
 }
 
 function message_since_dropdown($since) {

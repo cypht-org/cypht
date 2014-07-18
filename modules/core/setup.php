@@ -384,7 +384,7 @@ return array(
         'list_path' => FILTER_SANITIZE_STRING,
         'list_parent' => FILTER_SANITIZE_STRING,
         'list_page' => FILTER_VALIDATE_INT,
-        'uid' => FILTER_VALIDATE_INT,
+        'uid' => FILTER_SANITIZE_STRING,
     ),
 
     'allowed_post' => array(
