@@ -131,6 +131,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
             }
         }
+        return $data;
     }
 }
 
