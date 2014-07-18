@@ -82,31 +82,6 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_prep_imap_summary_display extends Hm_Handler_Module {
-    public function process($data) {
-        list($success, $form) = $this->process_form(array('summary_ids'));
-        if ($success) {
-            $ids = explode(',', $form['summary_ids']);
-            foreach($ids as $id) {
-                $id = intval($id);
-                $details = Hm_IMAP_List::dump($id);
-                $cache = Hm_IMAP_List::get_cache($this->session, $id);
-                $imap = Hm_IMAP_List::connect($id, $cache);
-                if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                    $data['imap_summary'][$id] = $imap->get_mailbox_status('INBOX');
-                }
-                else {
-                    if (!$imap) {
-                        Hm_Msgs::add(sprintf('ERRCould not access IMAP server "%s" (%s:%d)', $details['name'], $details['server'], $details['port']));
-                    }
-                    $data['imap_summary'][$id] = array('messages' => '?', 'unseen' => '?');
-                }
-            }
-        }
-        return $data;
-    }
-}
-
 class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_IMAP_List::dump();

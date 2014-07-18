@@ -161,8 +161,7 @@ var imap_status_update = function() {
                     {'name': 'imap_server_ids', 'value': id}],
                     update_imap_status_display,
                     [],
-                    false,
-                    end_status_update
+                    false
                 );
             }
         }
@@ -173,9 +172,6 @@ var imap_status_update = function() {
 var update_imap_status_display = function(res) {
     var id = res.imap_status_server_id;
     $('.imap_status_'+id).html(res.imap_status_display);
-};
-
-var end_status_update = function() {
 };
 
 /* combined inbox page */
@@ -391,9 +387,6 @@ var toggle_long_headers = function() {
     return false;
 };
 
-var initial_error = $('.err').length;
-
-
 /* setup */
 if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
@@ -416,7 +409,5 @@ else if (hm_page_name == 'servers') {
     setup_server_page();
 }
 else if (hm_page_name == 'home') {
-    if (!initial_error) {
-        imap_status_update();
-    }
+    imap_status_update();
 }
