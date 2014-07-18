@@ -50,8 +50,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                                 $content = $item['description'];
                                 unset($item['description']);
                                 $headers = $item;
-                                $headers['server_id'] = $id;
-                                $headers['server_name'] = $feed_data['name'];
+                                $headers['source'] = $feed_data['name'];
                             }
                         }
                     }
@@ -212,17 +211,21 @@ class Hm_Output_feed_ids extends Hm_Output_Module {
 class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['feed_message_content'])) {
-            $header_str = '<table class="msg_headers" cellspacing="0" cellpadding="0">';
+            $header_str = '<table class="msg_headers" cellspacing="0" cellpadding="0">'.
+                '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($input['feed_message_headers'] as $name => $value) {
                 if ($name == 'title') {
                     $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
+                }
+                elseif ($name == 'link') {
+                    $header_str .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td><a target="_blank" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
                 }
                 else {
                     $header_str .= '<tr><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
             }
             $header_str .= '</table>';
-            $txt = '<div class="msg_text_inner">'.$this->html_safe($input['feed_message_content']).'</div>';
+            $txt = '<div class="msg_text_inner">'.format_msg_html($input['feed_message_content']).'</div>';
             unset($input['feed_message_content']);
             unset($input['feed_message_headers']);
             $input['feed_msg_text'] = $txt;

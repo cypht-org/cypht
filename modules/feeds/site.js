@@ -52,6 +52,6 @@ if (hm_page_name == 'message_list') {
         add_feed_sources();
     }
 }
-else if (hm_page_name == 'message') {
+else if (hm_page_name == 'message' && hm_list_path.indexOf("feeds") > -1) {
     feed_view();
 }
