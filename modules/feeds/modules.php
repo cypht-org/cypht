@@ -10,6 +10,13 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
         if ($success) {
             $ids = explode(',', $form['feed_server_ids']);
             $res = array();
+            $limit = 0;
+            if (isset($this->request->get['limit'])) {
+                $limit = (int) $this->request->get['limit'];
+            }
+            if (!$limit) {
+                $limit = 20;
+            }
             foreach($ids as $id) {
                 $feed_data = Hm_Feed_List::dump($id);
                 if ($feed_data) {
@@ -17,6 +24,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                     if ($feed->parsed_data) {
                         $items = array();
                         foreach ($feed->parsed_data as $item) {
+                            if (count($items) == $limit) {
+                                break;
+                            }
                             $item['server_id'] = $id;
                             $item['server_name'] = $feed_data['name'];
                             $items[] = $item;
@@ -268,7 +278,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $from = !$from && isset($item['dc:creator']) ? $this->html_safe($item['dc:creator']) : $from;
                     $from = !$from ? '<span class="hl">[No From]</span>' : $from;
                     $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
-                        '<td class="checkbox_row"><input type="checkbox" value="'.$id.'"></td>'.
+                        '<td class="checkbox_row"><input type="checkbox" value="'.$id.'"/></td>'.
                         '<td class="source">'.$this->html_safe($item['server_name']).'</td>'.
                         '<td class="from">'.$from.'</td>'.
                         '<td class="subject"><div><a href="'.$url.'">'.$this->html_safe($item['title']).'</a></div></td>'.

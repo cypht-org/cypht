@@ -42,7 +42,6 @@ add_output('ajax_feed_list_display', 'filter_feed_list_data', true);
 
 add_handler('message', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
 add_handler('message', 'add_feeds_to_page_data',  true, 'feeds', 'load_feeds_from_config', 'after');
-add_output('message', 'imap_server_ids', true, 'feeds', 'page_js', 'before');
 
 /* message view */
 add_handler('ajax_feed_item_content', 'login', false, 'core');

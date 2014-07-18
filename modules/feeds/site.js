@@ -69,11 +69,13 @@ if (hm_page_name == 'message_list') {
         add_feed_sources();
     }
     else if (hm_list_path.substring(0, 4) == 'feed') {
-        var detail = parse_folder_path(hm_list_path, 'feeds');
-        if (detail) {
-            Hm_Message_List.sources.push({type: 'feed', id: detail.server_id, callback: load_feed_list});
+        if ($('.message_table tbody tr').length == 0) {
+            var detail = parse_folder_path(hm_list_path, 'feeds');
+            if (detail) {
+                Hm_Message_List.sources.push({type: 'feed', id: detail.server_id, callback: load_feed_list});
+            }
+            Hm_Message_List.load_sources();
         }
-        Hm_Message_List.load_sources();
     }
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'feed') {
