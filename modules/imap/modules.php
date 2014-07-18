@@ -784,6 +784,12 @@ function format_imap_folder_section($folders, $id, $output_mod) {
 function format_imap_message_list($msg_list, $output_module, $parent_list=false) {
     $res = array();
     foreach($msg_list as $msg) {
+        if (!$parent_list) {
+            $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
+        }
+        else {
+            $parent_value = $parent_list;
+        }
         if ($msg['server_name'] == 'Default-Auth-Server') {
             $msg['server_name'] = 'Default';
         }
@@ -806,7 +812,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false)
             (stristr($msg['flags'], 'flagged') ? ' flagged' : '').
             '"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
             '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).
-            '&amp;list_parent='.$output_module->html_safe($parent_list).'">'.$subject.'</a></div></td>'.
+            '&amp;list_parent='.$output_module->html_safe($parent_value).'">'.$subject.'</a></div></td>'.
             '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td>'.
             '<td class="icon">'.
             (stristr($msg['flags'], 'flagged') ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').

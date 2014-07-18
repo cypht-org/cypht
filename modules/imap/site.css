@@ -39,7 +39,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .msg_text { min-height: 600px; background-color: #fff; height: 100%; }
 .msg_text_inner { min-height: 300px; font-family: monospace; width: 90%; padding: 30px; padding-left: 40px; }
 .msg_headers { table-layout: fixed; width: 100%; border-bottom: solid 1px #ddd; color: #777; padding: 0px; padding-bottom: 10px; }
-.msg_headers th { vertical-align: top; padding: 3px; padding-top: 5px; padding-left: 30px; font-weight: normal; text-align: left; white-space: nowrap; padding-right: 13px; }
+.msg_headers th { overflow: hidden; text-overflow: ellipsis; vertical-align: top; padding: 3px; padding-top: 5px; padding-left: 30px; font-weight: normal; text-align: left; white-space: nowrap; padding-right: 13px; }
 .msg_headers td { word-wrap: break-word; padding: 3px; padding-top: 5px; }
 .imap_update a, .update_message_list { color: green; font-size: 75%; vertical-align: 1px; text-decoration: none; padding-left: 10px; letter-spacing: 0px; }
 .close_link { float: right; padding-right: 20px; text-decoration: none; color: green; font-size: 90%; margin-bottom: 10px;}
