@@ -114,6 +114,28 @@ var select_pop3_folder = function(path, force) {
     return false;
 };
 
+var pop3_message_view = function() {
+    $('.msg_text_inner').html('');
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_message_display'},
+        {'name': 'pop3_list_path', 'value': hm_list_path},
+        {'name': 'pop3_uid', 'value': hm_msg_uid}],
+        display_pop3_message,
+        [],
+        false
+    );
+    return false;
+};
+
+var display_pop3_message = function(res) {
+    $('.msg_text').html('');
+    $('.msg_text').append(res.msg_gravatar);
+    $('.msg_text').append(res.msg_headers);
+    $('.msg_text').append(res.msg_text);
+    set_message_content();
+    document.title = 'HM3 '+$('.header_subject th').text();
+}
+
 if (hm_page_name == 'servers') {
     $('.test_pop3_connect').on('click', pop3_test_action);
     $('.save_pop3_connection').on('click', pop3_save_action);
@@ -128,4 +150,7 @@ else if (hm_page_name == 'message_list') {
         }
         $('.message_table tr').fadeIn(100);
     }
+}
+else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'pop3') {
+    pop3_message_view();
 }

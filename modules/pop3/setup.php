@@ -59,6 +59,14 @@ add_handler('ajax_pop3_folder_display', 'pop3_folder_page', true);
 add_handler('ajax_pop3_folder_display', 'date', true, 'core');
 add_output('ajax_pop3_folder_display', 'filter_pop3_message_list', true);
 
+/* view pop3 message */
+add_handler('ajax_pop3_message_display', 'login', false, 'core');
+add_handler('ajax_pop3_message_display', 'load_user_data', true, 'core');
+add_handler('ajax_pop3_message_display', 'load_pop3_servers_from_config', true);
+add_handler('ajax_pop3_message_display', 'pop3_message_content', true);
+add_handler('ajax_pop3_message_display', 'date', true, 'core');
+add_output('ajax_pop3_message_display', 'filter_pop3_message_content', true);
+
 /* ajax server setup callback data */
 add_handler('ajax_pop3_debug', 'login', false, 'core');
 add_handler('ajax_pop3_debug', 'load_user_data',  true, 'core');
@@ -78,6 +86,7 @@ return array(
     'allowed_pages' => array(
         'ajax_pop3_debug',
         'ajax_pop3_summary',
+        'ajax_pop3_message_display',
         'ajax_pop3_folder_display',
     ),
     'allowed_post' => array(
@@ -92,6 +101,8 @@ return array(
         'pop3_server_id' => FILTER_VALIDATE_INT,
         'pop3_user' => FILTER_SANITIZE_STRING,
         'pop3_pass' => FILTER_SANITIZE_STRING,
+        'pop3_list_path' => FILTER_SANITIZE_STRING,
+        'pop3_uid' => FILTER_VALIDATE_INT
     )
 );
 

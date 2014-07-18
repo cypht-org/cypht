@@ -40,6 +40,50 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
+    public function process($data) {
+
+        list($success, $form) = $this->process_form(array('pop3_uid', 'pop3_list_path'));
+        if ($success) {
+            $id = (int) substr($form['pop3_list_path'], 4);
+            $pop3 = Hm_POP3_List::connect($id, false);
+            $details = Hm_POP3_List::dump($id);
+            if ($pop3->state = 'authed') {
+                $msg_lines = $pop3->retr_full($form['pop3_uid']);
+                $header_list = array();
+                $body = array();
+                $headers = true;
+                $last_header = false;
+                foreach ($msg_lines as $line) {
+                    if ($headers) {
+                        if (substr($line, 0, 1) == "\t") {
+                            $header_list[$last_header] .= ' '.trim($line);
+                        }
+                        elseif (strstr($line, ':')) {
+                            $parts = explode(':', $line, 2);
+                            if (count($parts) == 2) {
+                                $header_list[$parts[0]] = trim($parts[1]);
+                                $last_header = $parts[0];
+                            }
+                        }
+                    }
+                    else {
+                        $body[] = $line;
+                    }
+                    if (!trim($line)) {
+                        $headers = false;
+                    }
+                }
+                $data['pop3_message_headers'] = $header_list;
+                $data['pop3_message_body'] = $body;
+                $data['pop3_mailbox_page_path'] = $form['pop3_list_path'];
+                $data['pop3_server_id'] = $id;
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_pop3_save extends Hm_Handler_Module {
     public function process($data) {
         $data['just_saved_credentials'] = false;
@@ -335,6 +379,62 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['pop3_message_headers'])) {
+            $txt = '';
+            $from = '';
+            $small_headers = array('subject', 'date', 'from');
+            $headers = $input['pop3_message_headers'];
+            $txt .= '<table class="msg_headers" cellspacing="0" cellpadding="0">'.
+                '<col class="header_name_col"><col class="header_val_col"></colgroup>';
+            foreach ($small_headers as $fld) {
+                foreach ($headers as $name => $value) {
+                    if ($fld == strtolower($name)) {
+                        if ($fld == 'from') {
+                            $from = $value;
+                        }
+                        if ($fld == 'subject') {
+                            $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
+                            if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
+                                $txt .= ' <img class="account_icon" src="'.Hm_Image_Sources::$folder.'" /> ';
+                            }
+                            $txt .= $this->html_safe($value).'</th></tr>';
+                        }
+                        else {
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                        }
+                        break;
+                    }
+                }
+            }
+            foreach ($headers as $name => $value) {
+                if (!in_array(strtolower($name), $small_headers)) {
+                    $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                }
+            }
+            $txt .= '<tr><th colspan="2" class="header_links">'.
+                '<a href="#" class="header_toggle" onclick="return toggle_long_headers();">all</a>'.
+                '<a class="header_toggle" style="display: none;" href="#" onclick="return toggle_long_headers();">small</a>'.
+                ' | <a href="?page=compose">reply</a>'.
+                ' | <a href="?page=compose">forward</a>'.
+                ' | <a href="?page=compose">attach</a>'.
+                ' | <a onclick="return get_message_content(0);" href="#">raw</a>'.
+                ' | <a href="#">flag</a>'.
+                '</th></tr></table>';
+
+            $input['msg_headers'] = $txt;
+            $input['msg_gravatar'] = build_msg_gravatar($from);
+        }
+        $txt = '<div class="msg_text_inner">';
+        if (isset($input['pop3_message_body'])) {
+            $txt .= format_msg_text(implode('', $input['pop3_message_body']), $this);
+        }
+        $txt .= '</div>';
+        $input['msg_text'] = $txt;
+        return $input;
+    }
+}
 class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
     protected function output($input, $format) {
         $input['formatted_mailbox_page'] = array();
@@ -359,13 +459,16 @@ function format_pop3_message_list($msg_list, $output_module) {
         $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
         $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
         $from = str_replace("&quot;", '', $from);
+        $url = '?page=message&amp;uid='.$output_module->html_safe($msg_id).
+            '&amp;list_path='.$output_module->html_safe(sprintf('pop3_%d', $msg['server_id'])).
+            '&amp;list_parent='.$output_module->html_safe(sprintf('pop3_%d', $msg['server_id']));
         $date = date('Y-m-d G:i:s', strtotime($output_module->html_safe($msg['date'])));
         $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="checkbox_row"></td>'.
             '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
             '<td class="from">'.$from.'</div></td>'.
             '<td onclick="return msg_preview('.$output_module->html_safe($msg_id).', '.
-            $output_module->html_safe($msg['server_id']).')" class="subject">'.$subject.
-            '</td><td class="msg_date">'.$date.'</td><td class="icon"></td></tr>', $id);
+            $output_module->html_safe($msg['server_id']).')" class="subject"><a href="'.$url.'">'.$subject.
+            '</a></td><td class="msg_date">'.$date.'</td><td class="icon"></td></tr>', $id);
     }
     return $res;
 }
