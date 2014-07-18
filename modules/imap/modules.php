@@ -140,8 +140,15 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
+            $limit = 0;
+            if (isset($this->request->post['limit'])) {
+                $limit = (int) $this->request->post['limit'];
+            }
+            if (!$limit) {
+                $limit = 10;
+            }
             $ids = explode(',', $form['imap_server_ids']);
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, false, array('INBOX'), 20);
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, false, array('INBOX'), $limit);
             $data['imap_combined_inbox_data'] = $msg_list;
             $data['combined_inbox_server_ids'] = $form['imap_server_ids'];
         }

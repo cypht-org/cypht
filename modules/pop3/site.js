@@ -144,7 +144,7 @@ var add_pop3_sources = function() {
 var pop3_combined_inbox_content= function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
-        {'name': 'limit', 'value': 20},
+        {'name': 'limit', 'value': 10},
         {'name': 'pop3_server_id', 'value': id}],
         display_pop3_combined_inbox,
         [],

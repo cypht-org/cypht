@@ -119,6 +119,7 @@ var set_unread_state = function() {
 var imap_combined_flagged_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_flagged'},
+        {'name': 'limit', 'value': 10},
         {'name': 'imap_server_ids', 'value': id}],
         update_flagged_message_display,
         [],

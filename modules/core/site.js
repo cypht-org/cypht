@@ -571,6 +571,7 @@ var setup_combined_inbox = function() {
         Hm_Message_List.reset_checkboxes();
     }
 };
+
 var folder_list = get_from_local_storage('formatted_folder_list');
 
 $(function() {
