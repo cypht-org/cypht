@@ -241,7 +241,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 }
             }
         }
-        if (isset($this->request->get['list_parent']) && in_array($this->request->get['list_parent'], array('unread', 'flagged', 'combined_inbox'))) {
+        if (isset($this->request->get['list_parent'])) { //&& in_array($this->request->get['list_parent'], array('unread', 'flagged', 'combined_inbox'))) {
             $data['list_parent'] = $this->request->get['list_parent'];
         }
         else {
@@ -648,7 +648,7 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
 
 class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['list_parent']) && trim($input['list_parent'])) {
+        if (isset($input['list_parent']) && in_array($input['list_parent'], array('flagged', 'combined_inbox', 'unread'))) {
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_parent']).
                 '">'.ucwords(str_replace('_', ' ', $this->html_safe($input['list_parent'])));
             $title .= '</a>';
