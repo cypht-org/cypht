@@ -776,6 +776,10 @@ function human_readable_interval($date_str) {
     $t['month']  = $t['day']*30;
     $t['year']   = $t['week']*52;
 
+    if ($interval < 0) {
+        return 'From the future!';
+    }
+
     foreach (array_reverse($t) as $name => $val) {
         if ($interval_time[$name] = ($interval/$val > 0) ? floor($interval/$val) : false) {
             $interval -= $val*$interval_time[$name];
