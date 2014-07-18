@@ -64,7 +64,6 @@ var display_feed_list = function(res) {
 };
 
 if (hm_page_name == 'message_list') {
-    console.log(hm_list_path);
     if (hm_list_path == 'combined_inbox') {
         add_feed_sources();
     }

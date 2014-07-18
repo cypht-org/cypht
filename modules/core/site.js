@@ -540,7 +540,7 @@ var clean_selector = function(str) {
 var hl_selected_menu = function() {
     $('.folder_list').find('*').removeClass('selected_menu');
     if (hm_page_name == 'message_list') {
-        if (hm_list_path.substring(0, 4) == 'imap') {
+        if (hm_list_path.substring(0, 4) == 'imap' || hm_list_path.substring(0, 5) == 'feeds' || hm_list_path.substring(0,4) == 'pop3') {
             $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
             $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
         }
