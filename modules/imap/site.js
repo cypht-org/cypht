@@ -96,7 +96,6 @@ var imap_combined_unread_content = function(id) {
 };
 
 var update_unread_message_display = function(res) {
-    console.log(res);
     var ids = res.unread_server_ids.split(',');
     var count = Hm_Message_List.update(ids, res.formatted_unread_data, 'imap');
 };
@@ -293,7 +292,7 @@ var display_msg_content = function(res) {
     $('.msg_text').append(res.msg_headers);
     $('.msg_text').append(res.msg_text);
     $('.msg_text').append(res.msg_parts);
-    set_message_content(res);
+    set_message_content();
     document.title = 'HM3 '+$('.header_subject th').text();
 };
 
