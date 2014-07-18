@@ -1,6 +1,7 @@
 var feeds_combined_inbox_content= function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined_inbox'},
+        {'name': 'limit', 'value': 10},
         {'name': 'feed_server_ids', 'value': id}],
         display_feeds_combined_inbox,
         [],
@@ -16,8 +17,8 @@ var display_feeds_combined_inbox = function(res) {
 };
 
 var add_feed_sources = function() {
-    if ($('.feeds_server_ids').length) {
-        var ids = $('.feeds_server_ids').val().split(',');
+    if ($('.feed_server_ids').length) {
+        var ids = $('.feed_server_ids').val().split(',');
         if (ids && ids != '') {
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
@@ -51,6 +52,7 @@ var display_feed_item_content = function(res) {
 var load_feed_list = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_list_display'},
+        {'name': 'limit', 'value': 40},
         {'name': 'feed_server_ids', 'value': detail.server_id}],
         display_feed_list,
         [],
@@ -62,6 +64,31 @@ var load_feed_list = function(id) {
 var display_feed_list = function(res) {
     ids = [res.feed_server_ids];
     var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+};
+
+var feed_status_update = function() {
+    if ($('.feed_server_ids').length) {
+        var ids = $('.feed_server_ids').val().split(',');
+        if ( ids && ids != '') {
+            for (i=0;i<ids.length;i++) {
+                id=ids[i];
+                Hm_Ajax.request(
+                    [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_status'},
+                    {'name': 'feed_server_ids', 'value': id}],
+                    update_feed_status_display,
+                    [],
+                    false
+                );
+            }
+        }
+    }
+    return false;
+};
+
+var update_feed_status_display = function(res) {
+    console.log(res);
+    var id = res.feed_status_server_id;
+    $('.feeds_status_'+id).html(res.feed_status_display);
 };
 
 if (hm_page_name == 'message_list') {
@@ -80,4 +107,7 @@ if (hm_page_name == 'message_list') {
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'feed') {
     feed_item_view();
+}
+else if (hm_page_name == 'home') {
+    feed_status_update();
 }

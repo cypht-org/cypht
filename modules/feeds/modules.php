@@ -4,6 +4,28 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'lib/hm-feed.php';
 
+class Hm_Handler_feed_status extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('feed_server_ids'));
+        if ($success) {
+            $ids = explode(',', $form['feed_server_ids']);
+            foreach ($ids as $id) {
+                $start_time = microtime(true);
+                $feed_data = Hm_Feed_List::dump($id);
+                if ($feed_data) {
+                    $feed = is_feed($feed_data['server']);
+                    if ($feed->parsed_data) {
+                        $data['feed_connect_time'] = microtime(true) - $start_time;
+                        $data['feed_connect_status'] = 'Connected';
+                        $data['feed_status_server_id'] = $id;
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
@@ -11,8 +33,8 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
             $ids = explode(',', $form['feed_server_ids']);
             $res = array();
             $limit = 0;
-            if (isset($this->request->get['limit'])) {
-                $limit = (int) $this->request->get['limit'];
+            if (isset($this->request->post['limit'])) {
+                $limit = (int) $this->request->post['limit'];
             }
             if (!$limit) {
                 $limit = 20;
@@ -20,13 +42,10 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
             foreach($ids as $id) {
                 $feed_data = Hm_Feed_List::dump($id);
                 if ($feed_data) {
-                    $feed = is_feed($feed_data['server']);
+                    $feed = is_feed($feed_data['server'], $limit);
                     if ($feed->parsed_data) {
                         $items = array();
                         foreach ($feed->parsed_data as $item) {
-                            if (count($items) == $limit) {
-                                break;
-                            }
                             $item['server_id'] = $id;
                             $item['server_name'] = $feed_data['name'];
                             $items[] = $item;
@@ -124,6 +143,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRFeed Name and Address are required');
             }
             if ($found) {
+                $data['reload_folders'] = true;
                 Hm_Feed_List::add(array(
                     'name' => $form['new_feed_name'],
                     'server' => $href,
@@ -132,6 +152,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                 ));
             }
         }
+        return $data;
     }
 }
 
@@ -216,7 +237,7 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
 class Hm_Output_feed_ids extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['feeds'])) {
-            return '<input type="hidden" class="feeds_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['feeds']))).'" />';
+            return '<input type="hidden" class="feed_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['feeds']))).'" />';
         }
     }
 }
@@ -311,6 +332,48 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_display_feeds_summary extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if (isset($input['feeds']) && !empty($input['feeds'])) {
+            foreach ($input['feeds'] as $index => $vals) {
+                $res .= '<tr><td>FEED</td><td>'.$vals['name'].'</td>'.
+                    '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
+                    '<td>'.$vals['tls'].'</td></tr>';
+            }
+        }
+        return $res;
+    }
+}
+
+class Hm_Output_display_feeds_status extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if (isset($input['feeds']) && !empty($input['feeds'])) {
+            foreach ($input['feeds'] as $index => $vals) {
+                $res .= '<tr><td>FEED</td><td>'.$vals['name'].'</td><td class="feeds_status_'.$index.'"></td>'.
+                    '<td class="feeds_detail_'.$index.'"></td></tr>';
+            }
+        }
+        return $res;
+    }
+}
+
+class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['feed_connect_status']) && $input['feed_connect_status'] == 'Connected') {
+            $input['feed_status_display'] = '<span class="online">'.
+                $this->html_safe(ucwords($input['feed_connect_status'])).'</span> in '.$input['feed_connect_time'];
+            $input['feed_detail_display'] = '';
+        }
+        else {
+            $input['feed_status_display'] = '<span class="down">Down</span>';
+            $input['feed_detail_display'] = '';
+        }
+        return $input;
+    }
+}
+
 function address_from_url($str) {
     $res = $str;
     $url_bits = parse_url($str);
@@ -320,8 +383,9 @@ function address_from_url($str) {
     return $res;
 }
 
-function is_feed($url) {
+function is_feed($url, $limit=20) {
     $feed = new Hm_Feed();
+    $feed->limit = $limit;
     $feed->parse_feed($url);
     $feed_data = array_filter($feed->parsed_data);
     if (empty($feed_data)) {

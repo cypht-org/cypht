@@ -5,6 +5,13 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('feeds');
 output_source('feeds');
 
+/* add stuff to the home page */
+add_handler('home', 'load_feeds_from_config', true, 'feeds', 'language', 'after');
+add_handler('home', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
+add_output('home', 'display_feeds_summary', true, 'feeds', 'server_summary_start', 'after');
+add_output('home', 'display_feeds_status', true, 'feeds', 'server_status_start', 'after');
+add_output('home', 'feed_ids', true, 'feeds', 'page_js', 'before');
+
 /* servers page data */
 add_handler('servers', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');
 add_handler('servers', 'process_add_feed', true, 'feeds', 'load_feeds_from_config', 'after');
@@ -51,12 +58,20 @@ add_handler('ajax_feed_item_content', 'feed_item_content',  true);
 add_handler('ajax_feed_item_content', 'date', true, 'core');
 add_output('ajax_feed_item_content', 'filter_feed_item_content', true);
 
+add_handler('ajax_feed_status', 'login', false, 'core');
+add_handler('ajax_feed_status', 'load_user_data', true, 'core');
+add_handler('ajax_feed_status', 'load_feeds_from_config',  true);
+add_handler('ajax_feed_status', 'feed_status',  true);
+add_handler('ajax_feed_status', 'date', true, 'core');
+add_output('ajax_feed_status', 'filter_feed_status_data', true);
+
 return array(
 
     'allowed_pages' => array(
         'ajax_feed_combined_inbox',
         'ajax_feed_list_display',
-        'ajax_feed_item_content'
+        'ajax_feed_item_content',
+        'ajax_feed_status'
     ),
 
     'allowed_post' => array(
