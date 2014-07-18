@@ -834,5 +834,40 @@ function process_since_argument($val, $config) {
     return $date;
 }
 
+function format_msg_html($str) {
+    require 'lib/HTMLPurifier.standalone.php';
+    $config = HTMLPurifier_Config::createDefault();
+    $config->set('Cache.DefinitionImpl', null);
+    $config->set('URI.DisableResources', true);
+    $config->set('URI.DisableExternalResources', true);
+    $config->set('URI.DisableExternal', true);
+    $config->set('HTML.TargetBlank', true);
+    $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
+    $purifier = new HTMLPurifier($config);
+    $res = $purifier->purify($str);
+    return $res;
+}
+
+function format_msg_image($str, $mime_type) {
+    return '<img src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
+}
+
+function format_msg_text($str, $output_mod) {
+    $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,\[\]%[:alnum:]])+)/m";
+    $str = nl2br(str_replace(' ', '&#160;&#8203;', ($output_mod->html_safe($str))));
+    $str = preg_replace($link_regex, "<a target=\"_blank\" href=\"$1\">$1</a>", $str);
+
+    return $str;
+}
+
+function build_msg_gravatar( $from ) {
+    if (preg_match("/[\S]+\@[\S]+/", $from, $matches)) {
+        $hash = md5(strtolower(trim($matches[0], " \"><'\t\n\r\0\x0B")));
+        return '<img class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';
+    }
+}
+
+
+
 
 ?>
