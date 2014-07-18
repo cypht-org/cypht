@@ -453,7 +453,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
 
 class Hm_Output_loading_icon extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="loading_icon"><img alt="Loading..." src="images/ajax-loader.gif" width="16" height="16" /></div>';
+        return '<div class="loading_icon"><img alt="Loading..." src="'.Hm_Image_Sources::$spinner.'" width="16" height="16" /></div>';
     }
 }
 

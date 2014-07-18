@@ -454,6 +454,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
         return $input;
     }
 }
+
 class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
     protected function output($input, $format) {
         $input['formatted_mailbox_page'] = array();
