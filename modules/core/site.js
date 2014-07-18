@@ -484,7 +484,7 @@ var parse_folder_path = function(path, path_type) {
             return {'type': type, 'server_id' : server_id, 'folder' : folder}
         }
     }
-    else if (path_type == 'pop3') {
+    else if (path_type == 'pop3' || path_type == 'feeds') {
         parts = path.split('_', 2);
         if (parts.length == 2) {
             type = parts[0];
