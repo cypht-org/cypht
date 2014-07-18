@@ -64,6 +64,10 @@ var load_feed_list = function(id) {
 var display_feed_list = function(res) {
     ids = [res.feed_server_ids];
     var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+    key = 'feeds_'+res.feed_server_ids;
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    save_to_local_storage(key, data.html());
 };
 
 var feed_status_update = function() {
@@ -100,7 +104,7 @@ if (hm_page_name == 'message_list') {
             if (detail) {
                 Hm_Message_List.sources.push({type: 'feed', id: detail.server_id, callback: load_feed_list});
             }
-            Hm_Message_List.load_sources();
+            Hm_Message_List.setup_combined_view(hm_list_path);
         }
     }
 }
