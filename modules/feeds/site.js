@@ -86,7 +86,6 @@ var feed_status_update = function() {
 };
 
 var update_feed_status_display = function(res) {
-    console.log(res);
     var id = res.feed_status_server_id;
     $('.feeds_status_'+id).html(res.feed_status_display);
 };
