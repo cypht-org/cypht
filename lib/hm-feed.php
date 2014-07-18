@@ -1,23 +1,5 @@
 <?php
 
-function get_feed($tools, $url, $type, $limit, $feed_id, $ttl) {
-    if ($ttl > 0) {
-        $cache = hm_new('cache');
-        $cache->ttl = $ttl;
-        $data = $cache->get_feed($feed_id);
-        if ($data) {
-            return $data;
-        }
-    }
-    $feed = hm_new('feed');
-    $feed->limit = $limit;
-    $feed->feed_type = $type;
-    $feed->parse_feed($url);
-    $cache = hm_new('cache');
-    $cache->save_feed($feed_id, $feed->parsed_data);
-    return $feed->parsed_data;
-}
-
 class Hm_Feed {
     var $url;
     var $id;
@@ -38,7 +20,7 @@ class Hm_Feed {
 
     function __construct() {
         $this->sort = true;
-        $this->limit = 5;
+        $this->limit = 20;
         $this->cache_limit = 0;
         $this->url = false;
         $this->xml_data = false;
@@ -88,11 +70,19 @@ class Hm_Feed {
         return $buffer;
     }
     function sort_by_time($a, $b) {
-        if (!isset($a['pubdate']) || !isset($b['pubdate'])) {
+        if (isset($a['dc:date']) && isset($b['dc:date'])) {
+            $adate = $a['dc:date'];
+            $bdate = $b['dc:date'];
+        }
+        elseif (isset($a['pubdate']) && isset($b['pubdate'])) {
+            $adate = $a['pubdate'];
+            $bdate = $b['pubdate'];
+        }
+        else {
             return 0;
         }
-        $time1 = strtotime($a['pubdate']);
-        $time2 = strtotime($b['pubdate']);
+        $time1 = strtotime($adate);
+        $time2 = strtotime($bdate);
         if ($time1 == $time2) {
             return 0;
         }
