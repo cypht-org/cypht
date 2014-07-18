@@ -510,6 +510,13 @@ var get_from_local_storage = function(key) {
     return sessionStorage.getItem(key);
 };
 
+var reload_folders = function() {
+    if (document.cookie.indexOf('hm_reload_folders=1') > -1) {
+        update_folder_list();
+        document.cookie = 'hm_reload_folders=; expires=' + new Date(0).toUTCString();
+    }
+};
+
 var save_to_local_storage = function(key, val) {
     if (typeof(Storage) !== "undefined") {
         sessionStorage.setItem(key, val);
@@ -584,6 +591,9 @@ $(function() {
         else if (hm_list_path == 'flagged') {
             Hm_Message_List.setup_combined_view('formatted_flagged_data');
         }
+    }
+    else if (hm_page_name == 'settings' || hm_page_name == 'servers') {
+        reload_folders();
     }
     $('body').fadeIn(300);
     Hm_Timer.fire();

@@ -63,6 +63,7 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                 if ($user && $path && $pass) {
                     $this->user_config->save($user, $pass);
                     Hm_Msgs::add('Settings saved');
+                    $data['reload_folders'] = true;
                 }
                 Hm_Page_Cache::flush($this->session);
             }
@@ -260,6 +261,14 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             $data['uid'] = $this->request->get['uid'];
         }
         return $data;
+    }
+}
+
+class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
+    public function process($data) {
+        if (isset($data['reload_folders'])) {
+            secure_cookie($this->request, 'hm_reload_folders', '1');
+        }
     }
 }
 
