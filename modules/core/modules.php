@@ -614,7 +614,9 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
 }
 
 function main_menu ($input, $output_mod) {
-    $res = '<div onclick="return toggle_section(\'.main\');" class="src_name">Main</div><div ';
+    $res = '<div class="src_name">Main'.
+        '<img class="menu_caret" onclick="return toggle_section(\'.main\');" src="images/open_iconic/chevron-bottom.png" />'.
+        '</div><div ';
     $res .= 'class="main"><ul class="folders">'.
         '<li class="menu_home"><a class="unread_link" href="?page=home">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" /> '.$output_mod->trans('Home').'</a></li>'.
@@ -637,8 +639,10 @@ function folder_source_menu( $input, $output_mod) {
     if (isset($input['folder_sources'])) {
         foreach ($input['folder_sources'] as $src) {
             $name = ucfirst(strtolower(explode('_', $src)[0]));
-            $res .= '<div onclick="return toggle_section(\'.'.$output_mod->html_safe($src).'\');" class="src_name">'.$output_mod->html_safe($name).'</div>';
-            $res .= '<div ';
+            $res .= '<div class="src_name">'.$output_mod->html_safe($name).
+                '<img class="menu_caret" onclick="return toggle_section(\'.'.$output_mod->html_safe($src).
+                '\');" src="images/open_iconic/chevron-bottom.png" /></div>';
+            $res .= '<div style="display: none;" ';
             $res .= 'class="'.$output_mod->html_safe($src).'">';
             $cache = Hm_Page_Cache::get($src);
             if ($cache) {
@@ -650,7 +654,9 @@ function folder_source_menu( $input, $output_mod) {
     return $res;
 }
 function settings_menu( $input, $output_mod) {
-    return '<div onclick="return toggle_section(\'.settings\');" class="src_name">Settings</div><ul class="settings folders">'.
+    return '<div class="src_name">Settings'.
+        '<img class="menu_caret" onclick="return toggle_section(\'.settings\');" src="images/open_iconic/chevron-bottom.png" />'.
+        '</div><ul style="display: none;" class="settings folders">'.
         '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$monitor).'" alt="" /> '.$output_mod->trans('Servers').'</a></li>'.
         '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.

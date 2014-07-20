@@ -37,7 +37,7 @@ option, select { padding: 3px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
 .inner_list { margin-bottom: 10px; } 
 .folders a { color: #555; text-decoration: none; line-height: 1.25em; }
-.folder_list { background-color: #fff; margin-right: 20px; padding-right: 20px; padding-bottom: 20px; min-width: 150px; }
+.folder_list { background-color: #fff; margin-right: 20px; padding-right: 20px; padding-bottom: 40px; min-width: 150px; }
 .folder_cell { vertical-align: top; height: 100%; width: 10%; display: table-cell; padding: 0px; margin: 0px; }
 .content_cell { vertical-align: top; height: 100%;  width: 90%; padding: 0px; margin: 0px; display: table-cell; padding-right: 0px; }
 .folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; padding-right: 0px; }
@@ -51,7 +51,7 @@ option, select { padding: 3px; }
 .no_servers { text-align: center; padding: 50px; margin: auto; padding-bottom: 100px; }
 .selected_menu, .selected_menu a { color: Teal !important; line-height: 1.25em;}
 
-.src_name { border-left: solid 1px #eee; cursor: pointer; padding-left: 25px; margin-top: 0px; margin-right: -20px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 1.1em; letter-spacing: -1px; padding-bottom: 5px; }
+.src_name { border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -20px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 1.1em; letter-spacing: -1px; padding-bottom: 5px; }
 .content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 5px; padding-top: 5px; letter-spacing: -1px; font-size: 1.1em; padding-left: 20px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
@@ -68,3 +68,4 @@ option, select { padding: 3px; }
 .page_links { text-align: center; padding-top: 20px; }
 .message_list_since { vertical-align: 1px; border: solid 1px #ccc; text-decoration: none; margin: 0px; margin-left: 20px; letter-spacing: 0px; padding: 0px; color: #666; }
 .checkbox_cell { width: 20px; padding-right: 10px !important; }
+.menu_caret { cursor: pointer; padding-right: 7px; padding-top: 7px; float: right; opacity: .4; }
