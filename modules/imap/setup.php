@@ -89,6 +89,7 @@ add_output('ajax_imap_message_content', 'filter_message_struct', true);
 /* ajax unread callback data */
 add_handler('ajax_imap_unread', 'login', false, 'core');
 add_handler('ajax_imap_unread', 'load_user_data', true, 'core');
+add_handler('ajax_imap_unread', 'message_list_type', true, 'core');
 add_handler('ajax_imap_unread', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_unread', 'imap_unread',  true);
 add_handler('ajax_imap_unread', 'save_imap_cache',  true);
@@ -111,6 +112,7 @@ add_output('ajax_imap_status', 'filter_imap_status_data', true);
 /* ajax flagged callback data */
 add_handler('ajax_imap_flagged', 'login', false, 'core');
 add_handler('ajax_imap_flagged', 'load_user_data', true, 'core');
+add_handler('ajax_imap_flagged', 'message_list_type', true, 'core');
 add_handler('ajax_imap_flagged', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_flagged', 'imap_flagged',  true);
 add_handler('ajax_imap_flagged', 'save_imap_cache',  true);
@@ -140,6 +142,7 @@ add_output('ajax_imap_folder_expand', 'filter_expanded_folder_data', true);
 /* select folder */
 add_handler('ajax_imap_folder_display', 'login', false, 'core');
 add_handler('ajax_imap_folder_display', 'load_user_data', true, 'core');
+add_handler('ajax_imap_folder_display', 'message_list_type', true, 'core');
 add_handler('ajax_imap_folder_display', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_folder_display', 'imap_folder_page',  true);
 add_handler('ajax_imap_folder_display', 'save_imap_cache',  true);
@@ -150,6 +153,7 @@ add_output('ajax_imap_folder_display', 'filter_folder_page', true);
 /* combined inbox */
 add_handler('ajax_imap_combined_inbox', 'login', false, 'core');
 add_handler('ajax_imap_combined_inbox', 'load_user_data', true, 'core');
+add_handler('ajax_imap_combined_inbox', 'message_list_type', true, 'core');
 add_handler('ajax_imap_combined_inbox', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_combined_inbox', 'imap_combined_inbox',  true);
 add_handler('ajax_imap_combined_inbox', 'save_imap_cache',  true);

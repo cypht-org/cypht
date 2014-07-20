@@ -16,6 +16,24 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'list_style'));
+        if ($success) {
+            if (in_array($form['list_style'], array('email_style', 'news_style'))) {
+                $data['new_user_settings']['list_style'] = $form['list_style'];
+            }
+            else {
+                $data['user_settings']['list_style'] = $this->user_config->get('list_style', false);
+            }
+        }
+        else {
+            $data['user_settings']['list_style'] = $this->user_config->get('list_style', false);
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
@@ -260,6 +278,11 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         if (isset($this->request->get['uid']) && preg_match("/\d+/", $this->request->get['uid'])) {
             $data['uid'] = $this->request->get['uid'];
         }
+        $list_style = $this->user_config->get('list_style', false);
+        if ($list_style == 'news_style') {
+            $data['no_message_list_headers'] = true;
+            $data['news_list_style'] = true;
+        }
         return $data;
     }
 }
@@ -462,6 +485,29 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
         return '<div class="user_settings"><div class="content_title">Site Settings</div><br />'.
             '<form method="POST" action=""><table class="settings_table"><colgroup>'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
+    }
+}
+
+class Hm_Output_list_style_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $options = array('email_style' => 'Email', 'news_style' => 'News');
+
+        if (isset($input['user_settings']['list_style'])) {
+            $list_style = $input['user_settings']['list_style'];
+        }
+        else {
+            $list_style = false;
+        }
+        $res = '<tr><td>Message list style</td><td><select name="list_style">';
+        foreach ($options as $val => $label) {
+            $res .= '<option ';
+            if ($list_style == $val) {
+                $res .= 'selected="selected" ';
+            }
+            $res .= 'value="'.$val.'">'.$label.'</option>';
+        }
+        $res .= '</select></td></tr>';
+        return $res;
     }
 }
 
@@ -721,12 +767,15 @@ class Hm_Output_server_summary_end extends Hm_Output_Module {
 
 class Hm_Output_message_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<table class="message_table" cellpadding="0" cellspacing="0">'.
-            '<colgroup><col class="chkbox_col"><col class="source_col">'.
+        $res = '<table class="message_table" cellpadding="0" cellspacing="0">';
+        if (!isset($input['no_message_list_headers']) || !$input['no_message_list_headers']) {
+            $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
             '<col class="from_col"><col class="subject_col"><col class="date_col">'.
             '<col class="icon_col"></colgroup><thead><tr><th colspan="2" class="source">'.
             'Source</th><th class="from">From</th><th class="subject">Subject</th>'.
-            '<th class="msg_date">Date</th><th></th></tr></thead><tbody>';
+            '<th class="msg_date">Date</th><th></th></tr></thead>';
+        }
+        $res .= '<tbody>';
         return $res;
     }
 }
@@ -799,6 +848,34 @@ function human_readable_interval($date_str) {
     return implode(', ', $res);
 }
 
+function message_list_row($subject, $date, $timestamp, $from, $source, $id, $flags, $style, $url, $output_mod) {
+        if ($style == 'email') {
+            return array(
+                '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
+                    '<td class="checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
+                    '<td class="source">'.$output_mod->html_safe($source).'</td>'.
+                    '<td class="from">'.$output_mod->html_safe($from).'</td>'.
+                    '<td class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
+                        '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
+                    '</div></td>'.
+                    '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></td>'.
+                    '<td class="icon">'.(in_array('flagged', $flags) ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').'</td>'.
+                '</tr>', $id);
+        }
+        else {
+            return array(
+                '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
+                    '<td class="checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
+                    '<td><div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
+                        '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
+                    '</div></div>'.
+                    '<div class="from">'.$output_mod->html_safe($from).' - '.$output_mod->html_safe($source).'</div>'.
+                    '<div class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></div>'.
+                    '<div class="icon">'.(in_array('flagged', $flags) ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').'</div></td>'.
+                '</tr>', $id);
+        }
+}
+
 function message_controls() {
     return '<div class="msg_controls">'.
         '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" /></a>'.
@@ -806,10 +883,6 @@ function message_controls() {
         '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
         '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
         '<a href="#" onclick="return imap_message_action(\'delete\');" class="disabled_link">Delete</a></div>';
-        /*'<a href="#" onclick="return imap_message_action(\'expunge\');" class="disabled_link">Expunge</a>'.
-        '<a href="#" onclick="return imap_message_action(\'move\');" class="disabled_link">Move</a>'.
-        '<a href="#" onclick="return imap_message_action(\'copy\');" class="disabled_link">Copy</a>'.
-        '</div>';*/
 }
 
 function message_since_dropdown($since) {

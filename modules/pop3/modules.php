@@ -459,7 +459,8 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
     protected function output($input, $format) {
         $input['formatted_mailbox_page'] = array();
         if (isset($input['pop3_mailbox_page'])) {
-            $res = format_pop3_message_list($input['pop3_mailbox_page'], $this);
+            $style = isset($input['news_list_style']) ? 'news' : 'email';
+            $res = format_pop3_message_list($input['pop3_mailbox_page'], $this, $style);
             $input['formatted_mailbox_page'] = $res;
             Hm_Page_Cache::add('formatted_mailbox_page_'.$input['pop3_mailbox_page_path'], $res);
             unset($input['pop3_mailbox_page']);
@@ -508,28 +509,21 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
 }
 
 
-function format_pop3_message_list($msg_list, $output_module) {
+function format_pop3_message_list($msg_list, $output_module, $style) {
     $res = array();
     foreach($msg_list as $msg_id => $msg) {
         if ($msg['server_name'] == 'Default-Auth-Server') {
             $msg['server_name'] = 'Default';
         }
-        $id = sprintf("pop3_%s_%s", $output_module->html_safe($msg['server_id']), $output_module->html_safe($msg_id));
-        $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
-        $from = preg_replace("/(\&lt;.+\&gt;)/U", '<span class="dl">$1</span>', $output_module->html_safe($msg['from']));
-        $from = str_replace("&quot;", '', $from);
-        $date = $output_module->html_safe(human_readable_interval($msg['date']));
-        $timestamp = $output_module->html_safe(strtotime($msg['date']));
-        $url = '?page=message&amp;uid='.$output_module->html_safe($msg_id).
-            '&amp;list_path='.$output_module->html_safe(sprintf('pop3_%d', $msg['server_id'])).
-            '&amp;list_parent='.$output_module->html_safe(sprintf('pop3_%d', $msg['server_id']));
-        $res[$id] = array('<tr style="display: none;" class="'.$id.'"><td class="checkbox_row"><input type="checkbox" value="'.$id.'" /></td>'.
-            '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
-            '<td class="from">'.$from.'</div></td>'.
-            '<td onclick="return msg_preview('.$output_module->html_safe($msg_id).', '.
-            $output_module->html_safe($msg['server_id']).')" class="subject"><a href="'.$url.'">'.$subject.
-            '</a></td><td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.
-            $timestamp.'" /></td><td class="icon"></td></tr>', $id);
+        $id = sprintf("pop3_%s_%s", $msg['server_id'], $msg_id);
+        $subject = $msg['subject'];
+        $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
+        $from = str_replace('"', '', $from);
+        $date = human_readable_interval($msg['date']);
+        $timestamp = strtotime($msg['date']);
+        $url = '?page=message&uid='.$msg_id.'&list_path='.sprintf('pop3_%d', $msg['server_id']).'&list_parent='.sprintf('pop3_%d', $msg['server_id']);
+        $flags = array();
+        $res[$id] = message_list_row($subject, $date, $timestamp, $from, $msg['server_name'], $id, $flags, $style, $url, $output_module);
     }
     return $res;
 }

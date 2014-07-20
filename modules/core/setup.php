@@ -120,6 +120,7 @@ add_handler('settings', 'language',  true);
 add_handler('settings', 'title', true);
 add_handler('settings', 'date', true);
 add_handler('settings', 'process_language_setting', true);
+add_handler('settings', 'process_list_style_setting', true);
 add_handler('settings', 'process_timezone_setting', true);
 add_handler('settings', 'save_user_settings', true);
 add_handler('settings', 'save_user_data', true);
@@ -148,6 +149,7 @@ add_output('settings', 'content_section_start', true);
 add_output('settings', 'start_settings_form', true);
 add_output('settings', 'language_setting', true);
 add_output('settings', 'timezone_setting', true);
+add_output('settings', 'list_style_setting', true);
 add_output('settings', 'end_settings_form', true);
 add_output('settings', 'content_section_end', true);
 add_output('settings', 'two_col_layout_end', true);
@@ -400,6 +402,7 @@ return array(
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'save_settings' => FILTER_SANITIZE_STRING,
         'language_setting' => FILTER_SANITIZE_STRING,
+        'list_style' => FILTER_SANITIZE_STRING,
         'timezone_setting' => FILTER_SANITIZE_STRING,
         'section_state' => FILTER_SANITIZE_STRING,
         'section_class' => FILTER_SANITIZE_STRING

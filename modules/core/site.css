@@ -67,3 +67,4 @@ option, select { padding: 3px; }
 .page_links a img { vertical-align: -2px; }
 .page_links { text-align: center; padding-top: 20px; }
 .message_list_since { vertical-align: 1px; border: solid 1px #ccc; text-decoration: none; margin: 0px; margin-left: 20px; letter-spacing: 0px; padding: 0px; color: #666; }
+.checkbox_cell { width: 20px; padding-right: 10px !important; }

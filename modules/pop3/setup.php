@@ -57,6 +57,7 @@ add_output('ajax_hm_folders', 'filter_pop3_folders', true, 'pop3', 'folder_list_
 /* select pop3 "folder" */
 add_handler('ajax_pop3_folder_display', 'login', false, 'core');
 add_handler('ajax_pop3_folder_display', 'load_user_data', true, 'core');
+add_handler('ajax_pop3_folder_display', 'message_list_type', true, 'core');
 add_handler('ajax_pop3_folder_display', 'load_pop3_servers_from_config', true);
 add_handler('ajax_pop3_folder_display', 'pop3_folder_page', true);
 add_handler('ajax_pop3_folder_display', 'date', true, 'core');
@@ -65,6 +66,7 @@ add_output('ajax_pop3_folder_display', 'filter_pop3_message_list', true);
 /* combined inbox */
 add_handler('ajax_pop3_combined_inbox', 'login', false, 'core');
 add_handler('ajax_pop3_combined_inbox', 'load_user_data', true, 'core');
+add_handler('ajax_pop3_combined_inbox', 'message_list_type', true, 'core');
 add_handler('ajax_pop3_combined_inbox', 'load_pop3_servers_from_config',  true);
 add_handler('ajax_pop3_combined_inbox', 'pop3_folder_page',  true);
 add_handler('ajax_pop3_combined_inbox', 'date', true, 'core');

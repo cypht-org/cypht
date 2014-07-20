@@ -688,7 +688,8 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
 class Hm_Output_filter_flagged_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_flagged_data'])) {
-            $res = format_imap_message_list($input['imap_flagged_data'], $this, 'flagged');
+            $style = isset($input['news_list_style']) ? 'news' : 'email';
+            $res = format_imap_message_list($input['imap_flagged_data'], $this, 'flagged', $style);
             $input['formatted_flagged_data'] = $res;
             unset($input['imap_flagged_data']);
         }
@@ -702,7 +703,8 @@ class Hm_Output_filter_flagged_data extends Hm_Output_Module {
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_unread_data'])) {
-            $res = format_imap_message_list($input['imap_unread_data'], $this, 'unread');
+            $style = isset($input['news_list_style']) ? 'news' : 'email';
+            $res = format_imap_message_list($input['imap_unread_data'], $this, 'unread', $style);
             $input['formatted_unread_data'] = $res;
             unset($input['imap_unread_data']);
         }
@@ -716,7 +718,8 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
 class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_combined_inbox_data']) && !empty($input['imap_combined_inbox_data'])) {
-            $res = format_imap_message_list($input['imap_combined_inbox_data'], $this, 'combined_inbox');
+            $style = isset($input['news_list_style']) ? 'news' : 'email';
+            $res = format_imap_message_list($input['imap_combined_inbox_data'], $this, 'combined_inbox', $style);
             $input['formatted_combined_inbox'] = $res;
             unset($input['imap_combined_inbox_data']);
         }
@@ -731,7 +734,8 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = array();
         if (isset($input['imap_mailbox_page']) && !empty($input['imap_mailbox_page'])) {
-            $res = format_imap_message_list($input['imap_mailbox_page'], $this);
+            $style = isset($input['news_list_style']) ? 'news' : 'email';
+            $res = format_imap_message_list($input['imap_mailbox_page'], $this, false, $style);
             $input['formatted_mailbox_page'] = $res;
             Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $res);
             $input['page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
@@ -769,7 +773,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
     return $results;
 }
 
-function format_imap_message_list($msg_list, $output_module, $parent_list=false) {
+function format_imap_message_list($msg_list, $output_module, $parent_list=false, $style='email') {
     $res = array();
     foreach($msg_list as $msg) {
         if (!$parent_list) {
@@ -781,30 +785,27 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false)
         if ($msg['server_name'] == 'Default-Auth-Server') {
             $msg['server_name'] = 'Default';
         }
-        $id = $output_module->html_safe(sprintf("imap_%s_%s_%s", $msg['server_id'], $msg['uid'], $msg['folder']));
+        $id = sprintf("imap_%s_%s_%s", $msg['server_id'], $msg['uid'], $msg['folder']);
         if (!trim($msg['subject'])) {
             $msg['subject'] = '[No Subject]';
         }
-        $subject = preg_replace("/(\[.+\])/U", '<span class="hl">$1</span>', $output_module->html_safe($msg['subject']));
-        $from = preg_replace("/(\&lt;.+\&gt;)/U", '', $output_module->html_safe($msg['from']));
-        $from = str_replace("&quot;", '', $from);
-        $timestamp = $output_module->html_safe(strtotime($msg['internal_date']));
-        $date = $output_module->html_safe(human_readable_interval($msg['internal_date']));
-        $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
-            '<td class="checkbox_row"><input type="checkbox" value="'.$id.'" /></td>'.
-            '<td class="source">'.$output_module->html_safe($msg['server_name']).'</td>'.
-            '<td class="from">'.$from.'</div></td>'.
-            '<td class="subject"><div class="'.
-            (!stristr($msg['flags'], 'seen') ? ' unseen' : '').
-            (stristr($msg['flags'], 'deleted') ? ' deleted' : '').
-            (stristr($msg['flags'], 'flagged') ? ' flagged' : '').
-            '"><a href="?page=message&amp;uid='.$output_module->html_safe($msg['uid']).
-            '&amp;list_path='.$output_module->html_safe(sprintf('imap_%d_%s', $msg['server_id'], $msg['folder'])).
-            '&amp;list_parent='.$output_module->html_safe($parent_value).'">'.$subject.'</a></div></td>'.
-            '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td>'.
-            '<td class="icon">'.
-            (stristr($msg['flags'], 'flagged') ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').
-            '</td></tr>', $id);
+        $subject = $msg['subject'];
+        $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
+        $from = str_replace('"', '', $from);
+        $timestamp = strtotime($msg['internal_date']);
+        $date = human_readable_interval($msg['internal_date']);
+        $flags = array();
+        if (!stristr($msg['flags'], 'seen')) {
+           $flags[] = 'unseen';
+        }
+        if (stristr($msg['flags'], 'deleted')) {
+            $flags[] = 'deleted';
+        }
+        if (stristr($msg['flags'], 'flagged')) {
+            $flags[] = 'flagged';
+        }
+        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
+        $res[$id] = message_list_row($subject, $date, $timestamp, $from, $msg['server_name'], $id, $flags, $style, $url, $output_module);
     }
     return $res;
 }

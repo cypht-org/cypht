@@ -273,39 +273,41 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = array();
         if (isset($input['feed_list_data'])) {
+error_log(print_r(array_keys($input),true));
             foreach ($input['feed_list_data'] as $item) {
                 if (isset($item['guid'])) {
-                    $id = $this->html_safe(sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid'])));
+
+                    $id = sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid']));
                     if (isset($item['dc:date'])) {
-                        $date = $this->html_safe(human_readable_interval($item['dc:date']));
-                        $timestamp = $this->html_safe(strtotime($item['dc:date']));
+                        $date = human_readable_interval($item['dc:date']);
+                        $timestamp = strtotime($item['dc:date']);
                     }
                     elseif (isset($item['pubdate'])) {
-                        $date = $this->html_safe(human_readable_interval($item['pubdate']));
-                        $timestamp = $this->html_safe(strtotime($item['pubdate']));
+                        $date = human_readable_interval($item['pubdate']);
+                        $timestamp = strtotime($item['pubdate']);
                     }
                     else {
                         $date = '';
                         $timestamp = 0;
                     }
-                    $url = '?page=message&uid='.$this->html_safe(urlencode($item['guid'])).'&amp;list_path=feeds_'.$this->html_safe($item['server_id']);
+                    $url = '?page=message&uid='.urlencode($item['guid']).'&list_path=feeds_'.$item['server_id'];
                     if (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'combined_inbox') {
-                        $url .= '&amp;list_parent=combined_inbox';
+                        $url .= '&list_parent=combined_inbox';
                     }
                     else {
-                        $url .= '&amp;list_parent=feeds_'.$this->html_safe($item['server_id']);
+                        $url .= '&list_parent=feeds_'.$item['server_id'];
                     }
-                    $from = isset($item['author']) ? $this->html_safe($item['author']) : '';
-                    $from = !$from && isset($item['dc:creator']) ? $this->html_safe($item['dc:creator']) : $from;
-                    $from = !$from ? '<span class="hl">[No From]</span>' : $from;
-                    $res[$id] = array('<tr style="display: none;" class="'.$id.'">'.
-                        '<td class="checkbox_row"><input type="checkbox" value="'.$id.'"/></td>'.
-                        '<td class="source">'.$this->html_safe($item['server_name']).'</td>'.
-                        '<td class="from">'.$from.'</td>'.
-                        '<td class="subject"><div><a href="'.$url.'">'.$this->html_safe($item['title']).'</a></div></td>'.
-                        '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$timestamp.'" /></td>'.
-                        '<td class="icon"></td></tr>'
-                        , $id);
+                    if (isset($input['news_list_style'])) {
+                        $style = 'news';
+                    }
+                    else {
+                        $style = 'email';
+                    }
+                    $from = isset($item['author']) ? $item['author'] : '';
+                    $from = !$from && isset($item['dc:creator']) ? $item['dc:creator'] : $from;
+                    $from = !$from ? '[No From]' : $from;
+                    $flags = array();
+                    $res[$id] = message_list_row($item['title'], $date, $timestamp, $from, $item['server_name'], $id, $flags, $style, $url, $this);
                 }
             }
             unset($input['feed_list_data']);

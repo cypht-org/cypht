@@ -34,6 +34,7 @@ add_output('message_list', 'feed_ids', true, 'feeds', 'page_js', 'before');
 /* combined inbox */
 add_handler('ajax_feed_combined_inbox', 'login', false, 'core');
 add_handler('ajax_feed_combined_inbox', 'load_user_data', true, 'core');
+add_handler('ajax_feed_combined_inbox', 'message_list_type', true, 'core');
 add_handler('ajax_feed_combined_inbox', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_combined_inbox', 'feed_list_content',  true);
 add_handler('ajax_feed_combined_inbox', 'date', true, 'core');
@@ -42,6 +43,7 @@ add_output('ajax_feed_combined_inbox', 'filter_feed_list_data', true);
 /* feed list */
 add_handler('ajax_feed_list_display', 'login', false, 'core');
 add_handler('ajax_feed_list_display', 'load_user_data', true, 'core');
+add_handler('ajax_feed_list_display', 'message_list_type', false, 'core');
 add_handler('ajax_feed_list_display', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_list_display', 'feed_list_content',  true);
 add_handler('ajax_feed_list_display', 'date', true, 'core');
