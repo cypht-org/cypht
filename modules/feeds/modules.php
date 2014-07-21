@@ -273,7 +273,6 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = array();
         if (isset($input['feed_list_data'])) {
-error_log(print_r(array_keys($input),true));
             foreach ($input['feed_list_data'] as $item) {
                 if (isset($item['guid'])) {
 
