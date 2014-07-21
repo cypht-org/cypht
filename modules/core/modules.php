@@ -615,13 +615,13 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
 
 function main_menu ($input, $output_mod) {
     $res = '<div class="src_name">Main'.
-        '<img class="menu_caret" onclick="return toggle_section(\'.main\');" src="images/open_iconic/chevron-bottom.png" />'.
+        '<img class="menu_caret" onclick="return toggle_section(\'.main\');" src="'.Hm_Image_Sources::$chevron.'" />'.
         '</div><div ';
     $res .= 'class="main"><ul class="folders">'.
         '<li class="menu_home"><a class="unread_link" href="?page=home">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" /> '.$output_mod->trans('Home').'</a></li>'.
         '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" /> '.$output_mod->trans('Inbox').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" /> '.$output_mod->trans('Everything').'</a></li>'.
         '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Unread').
         ' <span class="unread_count"></span></a></li>'.
@@ -641,7 +641,7 @@ function folder_source_menu( $input, $output_mod) {
             $name = ucfirst(strtolower(explode('_', $src)[0]));
             $res .= '<div class="src_name">'.$output_mod->html_safe($name).
                 '<img class="menu_caret" onclick="return toggle_section(\'.'.$output_mod->html_safe($src).
-                '\');" src="images/open_iconic/chevron-bottom.png" /></div>';
+                '\');" src="'.Hm_Image_Sources::$chevron.'" /></div>';
             $res .= '<div style="display: none;" ';
             $res .= 'class="'.$output_mod->html_safe($src).'">';
             $cache = Hm_Page_Cache::get($src);
@@ -655,7 +655,7 @@ function folder_source_menu( $input, $output_mod) {
 }
 function settings_menu( $input, $output_mod) {
     return '<div class="src_name">Settings'.
-        '<img class="menu_caret" onclick="return toggle_section(\'.settings\');" src="images/open_iconic/chevron-bottom.png" />'.
+        '<img class="menu_caret" onclick="return toggle_section(\'.settings\');" src="'.Hm_Image_Sources::$chevron.'" />'.
         '</div><ul style="display: none;" class="settings folders">'.
         '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$monitor).'" alt="" /> '.$output_mod->trans('Servers').'</a></li>'.
@@ -871,8 +871,8 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
         else {
             return array(
                 '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
-                    '<td class="checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
-                    '<td><div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
+                    '<td class="news_cell checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
+                    '<td class="news_cell"><div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
                         '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
                     '</div></div>'.
                     '<div class="from">'.$output_mod->html_safe($from).' - '.$output_mod->html_safe($source).'</div>'.
@@ -888,6 +888,7 @@ function message_controls() {
         '<a href="#" onclick="return imap_message_action(\'read\');" class="disabled_link">Read</a>'.
         '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
         '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
+        '<a href="#" onclick="return imap_message_action(\'unflag\');" class="disabled_link">Unflag</a>'.
         '<a href="#" onclick="return imap_message_action(\'delete\');" class="disabled_link">Delete</a></div>';
 }
 
