@@ -85,7 +85,6 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
 class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_IMAP_List::dump();
-        error_log(print_r($servers, true));
         $folders = array();
         if (!empty($servers)) {
             foreach ($servers as $id => $server) {
@@ -104,7 +103,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_action_type', 'imap_message_ids'));
         if ($success) {
-            if (in_array($form['imap_action_type'], array('delete', 'read', 'unread'))) {
+            if (in_array($form['imap_action_type'], array('delete', 'read', 'unread', 'flag', 'unflag'))) {
                 $ids = process_imap_message_ids($form['imap_message_ids']);
                 $errs = 0;
                 $msgs = 0;
