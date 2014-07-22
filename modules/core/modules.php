@@ -224,6 +224,10 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['list_path'] = 'unread';
                 $data['mailbox_list_title'] = array('Unread');
             }
+            elseif ($path == 'feeds') {
+                $data['list_path'] = 'feeds';
+                $data['mailbox_list_title'] = array('Feeds');
+            }
             elseif ($path == 'flagged') {
                 $data['list_path'] = 'flagged';
                 $data['mailbox_list_title'] = array('Flagged');
@@ -614,6 +618,16 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
 }
 
 function main_menu ($input, $output_mod) {
+    $email = false;
+    $feeds = false;
+    if (isset($input['folder_sources']) && is_array($input['folder_sources'])) {
+        if (in_array('pop3_folders', $input['folder_sources']) || in_array('imap_folders', $input['folder_sources'])) {
+            $email = true;
+        }
+        if (in_array('feeds_folders', $input['folder_sources'])) {
+            $feeds = true;
+        }
+    }
     $res = '<div class="src_name">Main'.
         '<img class="menu_caret" onclick="return toggle_section(\'.main\');" src="'.Hm_Image_Sources::$chevron.'" />'.
         '</div><div ';
@@ -621,14 +635,20 @@ function main_menu ($input, $output_mod) {
         '<li class="menu_home"><a class="unread_link" href="?page=home">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" /> '.$output_mod->trans('Home').'</a></li>'.
         '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" /> '.$output_mod->trans('Everything').'</a></li>'.
-        '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Unread').
-        ' <span class="unread_count"></span></a></li>'.
-        '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" /> '.$output_mod->trans('Everything').'</a></li>';
+    if ($email) {
+        $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
+            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Unread').
+            ' <span class="unread_count"></span></a></li>';
+    }
+    if ($feeds) {
+        $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">'.
+            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Feeds').'</a></li>';
+    }
+    $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" /> '.$output_mod->trans('Flagged').'</a></li>'.
-        '<li class="menu_search"><a class="unread_link" href="?page=search">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" /> '.$output_mod->trans('Search').'</a></li>'.
+        '<!--<li class="menu_search"><a class="unread_link" href="?page=search">'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" /> '.$output_mod->trans('Search').'</a></li>-->'.
         '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" /> '.$output_mod->trans('Compose').'</a></li>'.
         '</ul></div>';
@@ -709,7 +729,7 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
 
 class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['list_parent']) && in_array($input['list_parent'], array('flagged', 'combined_inbox', 'unread'))) {
+        if (isset($input['list_parent']) && in_array($input['list_parent'], array('flagged', 'combined_inbox', 'unread', 'feeds'))) {
             if ($input['list_parent'] == 'combined_inbox') {
                 $list_name = 'Everything';
             }
@@ -796,7 +816,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res = '<div class="message_list"><div class="content_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']);
 
-        if ($input['list_path'] == 'unread') {
+        if ($input['list_path'] == 'unread' || $input['list_path'] == 'feeds') {
             if (isset($input['message_list_since'])) {
                 $since = $input['message_list_since'];
             }
@@ -894,7 +914,7 @@ function message_controls() {
         '<!--<a href="#" onclick="return message_action(\'unread\');" class="disabled_link">Unread</a>-->'.
         '<a href="#" onclick="return message_action(\'flag\');" class="disabled_link">Flag</a>'.
         '<a href="#" onclick="return message_action(\'unflag\');" class="disabled_link">Unflag</a>'.
-        '<!--<a href="#" onclick="return message_action(\'delete\');" class="disabled_link">Delete</a>--></div>';
+        '<a href="#" onclick="return message_action(\'delete\');" class="disabled_link">Delete</a></div>';
 }
 
 function message_since_dropdown($since) {

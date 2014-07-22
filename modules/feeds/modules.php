@@ -73,10 +73,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 $date = process_since_argument($this->request->post['unread_since'], $this->user_config);
                 $cutoff_timestamp = strtotime($date);
                 if ($login_time && $login_time > $cutoff_timestamp) {
-                    $cutoff_timestamp = $login_time;
-                }
-                if ($login_time && $login_time > $cutoff_timestamp) {
-                    $cutoff_timestamp = $login_time;
+                    //$cutoff_timestamp = $login_time;
                 }
             }
             else {
@@ -352,6 +349,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $url = '?page=message&uid='.urlencode(md5($item['guid'])).'&list_path=feeds_'.$item['server_id'];
                     if (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'combined_inbox') {
                         $url .= '&list_parent=combined_inbox';
+                    }
+                    elseif (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'feeds') {
+                        $url .= '&list_parent=feeds';
                     }
                     else {
                         $url .= '&list_parent=feeds_'.$item['server_id'];

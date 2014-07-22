@@ -10,9 +10,18 @@ var feeds_combined_unread_content= function(id) {
         display_feeds_combined_unread,
         [],
         false,
-        set_combined_inbox_state
+        set_combined_feeds_unread_state
     );
     return false;
+};
+
+var set_combined_feeds_unread_state = function() {
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    save_to_local_storage('formatted_feed_data', data.html());
+    $(':checkbox').click(function() {
+        Hm_Message_List.toggle_msg_controls();
+    });
 };
 
 var display_feeds_combined_unread = function(res) {
@@ -120,7 +129,7 @@ if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
         add_feed_sources(feeds_combined_inbox_content);
     }
-    else if (hm_list_path == 'unread') {
+    else if (hm_list_path == 'feeds') {
         add_feed_sources(feeds_combined_unread_content);
     }
     else if (hm_list_path.substring(0, 4) == 'feed') {
