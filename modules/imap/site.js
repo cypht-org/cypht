@@ -85,9 +85,9 @@ var imap_combined_unread_content = function(id) {
     }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-        {'name': 'imap_unread_since', 'value': since},
+        {'name': 'unread_since', 'value': since},
         {'name': 'imap_server_ids', 'value': id}],
-        update_unread_message_display,
+        update_imap_unread_display,
         [],
         false,
         set_unread_state
@@ -95,7 +95,7 @@ var imap_combined_unread_content = function(id) {
     return false;
 };
 
-var update_unread_message_display = function(res) {
+var update_imap_unread_display = function(res) {
     var ids = res.unread_server_ids.split(',');
     var count = Hm_Message_List.update(ids, res.formatted_unread_data, 'imap');
 };
@@ -184,7 +184,7 @@ var imap_combined_inbox_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_combined_inbox'},
         {'name': 'imap_server_ids', 'value': id},
-        {'name': 'imap_unread_since', 'value': since}],
+        {'name': 'unread_since', 'value': since}],
         display_imap_combined_inbox,
         [],
         false,
@@ -334,29 +334,13 @@ var setup_message_view_page = function() {
     detail = parse_folder_path(hm_list_path, 'imap');
     if (detail) {
         class_name = 'imap_'+detail.server_id+'_'+hm_msg_uid+'_'+detail.folder;
+        prev_next_links(hm_list_path, class_name);
         update_unread_cache(class_name);
     }
 };
 
-/* other */
-var imap_message_action = function(action_type) {
-    var msg_list = $('.message_list');
-    var selected = [];
-    $('input[type=checkbox]:checked', msg_list).each(function() {
-        selected.push($(this).val());
-    });
-    if (selected.length > 0) {
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_action'},
-            {'name': 'imap_action_type', 'value': action_type},
-            {'name': 'imap_message_ids', 'value': selected}],
-            false,
-            [],
-            false
-        );
-        Hm_Message_List.update_after_action(action_type, selected);
-    }
-    return false;
+var prev_next_links = function(path, class_name) {
+    /* get links here */
 };
 
 var add_imap_sources = function(callback) {

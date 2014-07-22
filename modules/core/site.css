@@ -71,3 +71,4 @@ option, select { padding: 3px; }
 .menu_caret { cursor: pointer; padding-right: 7px; padding-top: 7px; float: right; opacity: .15; }
 .news_cell { border: none !important; padding-bottom: 10px !important; padding-top: 10px !important; }
 .news_cell .subject { padding-bottom: 5px !important; }
+.news_cell .icon { float: right; }

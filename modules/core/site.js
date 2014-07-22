@@ -459,6 +459,26 @@ var Hm_Message_List = {
     }
 };
 
+var message_action = function(action_type) {
+    var msg_list = $('.message_list');
+    var selected = [];
+    $('input[type=checkbox]:checked', msg_list).each(function() {
+        selected.push($(this).val());
+    });
+    if (selected.length > 0) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
+            {'name': 'action_type', 'value': action_type},
+            {'name': 'message_ids', 'value': selected}],
+            false,
+            [],
+            false
+        );
+        Hm_Message_List.update_after_action(action_type, selected);
+    }
+    return false;
+};
+
 var confirm_logout = function() {
     $('.confirm_logout').fadeIn(200);
     return false;

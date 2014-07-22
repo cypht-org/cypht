@@ -26,6 +26,11 @@ add_handler('ajax_hm_folders', 'load_feed_folders',  true, 'feeds', 'load_feeds_
 add_handler('ajax_hm_folders', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
 add_output('ajax_hm_folders', 'filter_feed_folders',  true, 'feeds', 'folder_list_content', 'before');
 
+/* message action callback */
+add_handler('ajax_message_action', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
+add_handler('ajax_message_action', 'feed_message_action', true, 'feeds', 'load_feeds_from_config', 'after');
+add_handler('ajax_message_action', 'save_feeds', true, 'feeds', 'feed_message_action', 'after');
+
 /* message list page */
 add_handler('message_list', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
 add_handler('message_list', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
@@ -39,6 +44,16 @@ add_handler('ajax_feed_combined_inbox', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_combined_inbox', 'feed_list_content',  true);
 add_handler('ajax_feed_combined_inbox', 'date', true, 'core');
 add_output('ajax_feed_combined_inbox', 'filter_feed_list_data', true);
+
+/* unread */
+add_handler('ajax_feed_unread', 'login', false, 'core');
+add_handler('ajax_feed_unread', 'load_user_data', true, 'core');
+add_handler('ajax_feed_unread', 'message_list_type', true, 'core');
+add_handler('ajax_feed_unread', 'load_feeds_from_config',  true);
+add_handler('ajax_feed_unread', 'feed_list_content',  true);
+add_handler('ajax_feed_unread', 'date', true, 'core');
+add_output('ajax_feed_unread', 'filter_feed_list_data', true);
+
 
 /* feed list */
 add_handler('ajax_feed_list_display', 'login', false, 'core');
@@ -57,6 +72,7 @@ add_handler('ajax_feed_item_content', 'login', false, 'core');
 add_handler('ajax_feed_item_content', 'load_user_data', true, 'core');
 add_handler('ajax_feed_item_content', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_item_content', 'feed_item_content',  true);
+add_handler('ajax_feed_item_content', 'save_feeds',  true);
 add_handler('ajax_feed_item_content', 'date', true, 'core');
 add_output('ajax_feed_item_content', 'filter_feed_item_content', true);
 
@@ -73,6 +89,7 @@ return array(
         'ajax_feed_combined_inbox',
         'ajax_feed_list_display',
         'ajax_feed_item_content',
+        'ajax_feed_unread',
         'ajax_feed_status'
     ),
 

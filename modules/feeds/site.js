@@ -1,3 +1,25 @@
+var feeds_combined_unread_content= function(id) {
+    var since = 'today';
+    if ($('.message_list_since').length) {
+        since = $('.message_list_since option:selected').val();
+    }
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_unread'},
+        {'name': 'unread_since', 'value': since},
+        {'name': 'feed_server_ids', 'value': id}],
+        display_feeds_combined_unread,
+        [],
+        false,
+        set_combined_inbox_state
+    );
+    return false;
+};
+
+var display_feeds_combined_unread = function(res) {
+    var ids = res.feed_server_ids.split(',');
+    var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+};
+
 var feeds_combined_inbox_content= function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined_inbox'},
@@ -16,13 +38,13 @@ var display_feeds_combined_inbox = function(res) {
     var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
 };
 
-var add_feed_sources = function() {
+var add_feed_sources = function(callback) {
     if ($('.feed_server_ids').length) {
         var ids = $('.feed_server_ids').val().split(',');
         if (ids && ids != '') {
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
-                Hm_Message_List.sources.push({type: 'feed', id: id, callback: feeds_combined_inbox_content});
+                Hm_Message_List.sources.push({type: 'feed', id: id, callback: callback});
             }
         }
     }
@@ -96,7 +118,10 @@ var update_feed_status_display = function(res) {
 
 if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
-        add_feed_sources();
+        add_feed_sources(feeds_combined_inbox_content);
+    }
+    else if (hm_list_path == 'unread') {
+        add_feed_sources(feeds_combined_unread_content);
     }
     else if (hm_list_path.substring(0, 4) == 'feed') {
         if ($('.message_table tbody tr').length == 0) {

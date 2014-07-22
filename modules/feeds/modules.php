@@ -26,6 +26,31 @@ class Hm_Handler_feed_status extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_feed_message_action extends Hm_Handler_Module {
+    public function process($data) {
+
+        list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
+        if ($success) {
+            $id_list = explode(',', $form['message_ids']);
+            foreach ($id_list as $msg_id) {
+                if (preg_match("/^feeds_(\d)+_.+$/", $msg_id)) {
+                    $parts = explode('_', $msg_id, 3);
+                    $guid = $parts[2];
+                    switch($form['action_type']) {
+                        case 'unread':
+                            Hm_Feed_Seen_Cache::remove($guid);
+                            break;
+                        case 'read':
+                            Hm_Feed_Seen_Cache::add($guid);
+                            break;
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
@@ -39,18 +64,46 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
             if (!$limit) {
                 $limit = 20;
             }
+            $login_time = $this->session->get('login_time', false);
+            if ($login_time) {
+                $data['login_time'] = $login_time;
+            }
+            if (isset($this->request->post['unread_since'])) {
+                $unread_only = true;
+                $date = process_since_argument($this->request->post['unread_since'], $this->user_config);
+                $cutoff_timestamp = strtotime($date);
+                if ($login_time && $login_time > $cutoff_timestamp) {
+                    $cutoff_timestamp = $login_time;
+                }
+                if ($login_time && $login_time > $cutoff_timestamp) {
+                    $cutoff_timestamp = $login_time;
+                }
+            }
+            else {
+                $unread_only = false;
+                $cutoff_timestamp = 0;
+            }
             foreach($ids as $id) {
                 $feed_data = Hm_Feed_List::dump($id);
                 if ($feed_data) {
                     $feed = is_feed($feed_data['server'], $limit);
                     if ($feed->parsed_data) {
-                        $items = array();
                         foreach ($feed->parsed_data as $item) {
-                            $item['server_id'] = $id;
-                            $item['server_name'] = $feed_data['name'];
-                            $items[] = $item;
+                            if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
+                                continue;
+                            }
+                            elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
+                                continue;
+                            }
+                            elseif ($unread_only && isset($item['guid']) && Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
+                                continue;
+                            }
+                            else {
+                                $item['server_id'] = $id;
+                                $item['server_name'] = $feed_data['name'];
+                                $res[] = $item;
+                            }
                         }
-                        $res = array_merge($res, $items);
                     }
                 }
             }
@@ -77,7 +130,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                 $feed = is_feed($feed_data['server']);
                 if ($feed->parsed_data) {
                     foreach ($feed->parsed_data as $item) {
-                        if (isset($item['guid']) && $item['guid'] == $form['feed_uid']) {
+                        if (isset($item['guid']) && md5($item['guid']) == $form['feed_uid']) {
                             if (isset($item['description'])) {
                                 $content = $item['description'];
                                 unset($item['description']);
@@ -89,6 +142,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                 }
             }
             if ($content) {
+                Hm_Feed_Seen_Cache::add($form['feed_uid']);
                 $data['feed_message_content'] = $content;
                 $data['feed_message_headers'] = $headers;
             }
@@ -162,6 +216,7 @@ class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
         foreach ($feeds as $index => $feed) {
             Hm_Feed_List::add($feed, $index);
         }
+        Hm_Feed_Seen_Cache::load($this->session->get('feed_read_uids', array()));
         return $data;
     }
 }
@@ -181,6 +236,7 @@ class Hm_Handler_save_feeds extends Hm_Handler_Module {
     public function process($data) {
         $feeds = Hm_Feed_List::dump();
         $this->user_config->set('feeds', $feeds);
+        $this->session->set('feed_read_uids', Hm_Feed_Seen_Cache::dump());
         return $data;
     }
 }
@@ -272,24 +328,28 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
 class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = array();
+        $login_time = false;
+        if (isset($input['login_time'])) {
+            $login_time = $input['login_time'];
+        }
         if (isset($input['feed_list_data'])) {
             foreach ($input['feed_list_data'] as $item) {
                 if (isset($item['guid'])) {
 
                     $id = sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid']));
                     if (isset($item['dc:date'])) {
-                        $date = human_readable_interval($item['dc:date']);
-                        $timestamp = strtotime($item['dc:date']);
+                        $date = display_value('dc:date', $item, 'date');
+                        $timestamp = display_value('dc:date', $item, 'time');
                     }
                     elseif (isset($item['pubdate'])) {
-                        $date = human_readable_interval($item['pubdate']);
-                        $timestamp = strtotime($item['pubdate']);
+                        $date = display_value('pubdate', $item, 'date');
+                        $timestamp = display_value('pubdate', $item, 'time');
                     }
                     else {
                         $date = '';
                         $timestamp = 0;
                     }
-                    $url = '?page=message&uid='.urlencode($item['guid']).'&list_path=feeds_'.$item['server_id'];
+                    $url = '?page=message&uid='.urlencode(md5($item['guid'])).'&list_path=feeds_'.$item['server_id'];
                     if (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'combined_inbox') {
                         $url .= '&list_parent=combined_inbox';
                     }
@@ -302,10 +362,24 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     else {
                         $style = 'email';
                     }
-                    $from = isset($item['author']) ? $item['author'] : '';
-                    $from = !$from && isset($item['dc:creator']) ? $item['dc:creator'] : $from;
-                    $from = !$from ? '[No From]' : $from;
-                    $flags = array();
+                    if (Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
+                        $flags = array();
+                    }
+                    elseif ($timestamp && $login_time && $timestamp <= $login_time) {
+                        $flags = array();
+                    }
+                    else {
+                        $flags = array('unseen');
+                    }
+                    if (isset($item['author'])) {
+                        $from = display_value('author', $item, 'from');
+                    }
+                    elseif (isset($item['dc:creator'])) {
+                        $from = display_value('dc:creator', $item, 'from');
+                    }
+                    else {
+                        $from = '[No From]';
+                    }
                     $res[$id] = message_list_row($item['title'], $date, $timestamp, $from, $item['server_name'], $id, $flags, $style, $url, $this);
                 }
             }
@@ -364,7 +438,7 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['feed_connect_status']) && $input['feed_connect_status'] == 'Connected') {
             $input['feed_status_display'] = '<span class="online">'.
-                $this->html_safe(ucwords($input['feed_connect_status'])).'</span> in '.$input['feed_connect_time'];
+                $this->html_safe(ucwords($input['feed_connect_status'])).'</span> in '.round($input['feed_connect_time'],3);
             $input['feed_detail_display'] = '';
         }
         else {

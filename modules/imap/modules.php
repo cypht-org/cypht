@@ -101,10 +101,10 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
 
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_action_type', 'imap_message_ids'));
+        list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
-            if (in_array($form['imap_action_type'], array('delete', 'read', 'unread', 'flag', 'unflag'))) {
-                $ids = process_imap_message_ids($form['imap_message_ids']);
+            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag'))) {
+                $ids = process_imap_message_ids($form['message_ids']);
                 $errs = 0;
                 $msgs = 0;
                 foreach ($ids as $server => $folders) {
@@ -113,12 +113,12 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                     if (is_object($imap) && $imap->get_state() == 'authenticated') {
                         foreach ($folders as $folder => $uids) {
                             if ($imap->select_mailbox($folder)) {
-                                if (!$imap->message_action(strtoupper($form['imap_action_type']), $uids)) {
+                                if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
                                     $errs++;
                                 }
                                 else {
                                     $msgs += count($uids);
-                                    if ($form['imap_action_type'] == 'delete') {
+                                    if ($form['action_type'] == 'delete') {
                                         $imap->message_action('EXPUNGE', $uids);
                                     }
                                 }
@@ -196,9 +196,9 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
 
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_unread_since', 'imap_server_ids'));
+        list($success, $form) = $this->process_form(array('unread_since', 'imap_server_ids'));
         if ($success) {
-            $date = process_since_argument($form['imap_unread_since'], $this->user_config);
+            $date = process_since_argument($form['unread_since'], $this->user_config);
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
             $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date);
@@ -658,7 +658,7 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_connect_status']) && $input['imap_connect_status'] != 'disconnected') {
             $input['imap_status_display'] = '<span class="online">'.
-                $this->html_safe(ucwords($input['imap_connect_status'])).'</span> in '.$input['imap_connect_time'];
+                $this->html_safe(ucwords($input['imap_connect_status'])).'</span> in '.round($input['imap_connect_time'],3);
             $input['imap_detail_display'] = '';
         }
         else {

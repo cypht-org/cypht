@@ -121,13 +121,10 @@ add_handler('ajax_imap_flagged', 'date', true, 'core');
 add_output('ajax_imap_flagged', 'filter_flagged_data', true);
 
 /* ajax message action callback */
-add_handler('ajax_imap_message_action', 'login', false, 'core');
-add_handler('ajax_imap_message_action', 'load_user_data', true, 'core');
-add_handler('ajax_imap_message_action', 'load_imap_servers_from_config',  true);
-add_handler('ajax_imap_message_action', 'imap_message_action', true);
-add_handler('ajax_imap_message_action', 'save_imap_cache',  true);
-add_handler('ajax_imap_message_action', 'save_imap_servers',  true);
-add_handler('ajax_imap_message_action', 'date', true, 'core');
+add_handler('ajax_message_action', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_message_action', 'imap_message_action', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_message_action', 'save_imap_cache',  true, 'imap', 'imap_message_action', 'after');
+add_handler('ajax_message_action', 'save_imap_servers',  true, 'imap', 'save_imap_cache', 'after');
 
 /* expand folder */
 add_handler('ajax_imap_folder_expand', 'login', false, 'core');
@@ -209,9 +206,7 @@ return array(
         'imap_folder_state' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_msg_part' => FILTER_SANITIZE_STRING,
-        'imap_message_ids' => FILTER_SANITIZE_STRING,
-        'imap_action_type' => FILTER_SANITIZE_STRING,
-        'imap_unread_since' => FILTER_SANITIZE_STRING
+        'unread_since' => FILTER_SANITIZE_STRING
     )
 );
 

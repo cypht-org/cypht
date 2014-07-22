@@ -230,7 +230,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             }
             elseif ($path == 'combined_inbox') {
                 $data['list_path'] = 'combined_inbox';
-                $data['mailbox_list_title'] = array('Inbox');
+                $data['mailbox_list_title'] = array('Everything');
             }
             elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
                 $data['list_path'] = $path;
@@ -710,9 +710,14 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
 class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['list_parent']) && in_array($input['list_parent'], array('flagged', 'combined_inbox', 'unread'))) {
+            if ($input['list_parent'] == 'combined_inbox') {
+                $list_name = 'Everything';
+            }
+            else {
+                $list_name = ucwords(str_replace('_', ' ', $input['list_parent']));
+            }
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_parent']).
-                '">'.ucwords(str_replace('_', ' ', $this->html_safe($input['list_parent'])));
-            $title .= '</a>';
+                '">'.$this->html_safe($list_name).'</a>';
             if (isset($input['mailbox_list_title']) && count($input['mailbox_list_title'] > 1)) {
                 $title .= ' - '.$this->html_safe($input['mailbox_list_title'][1]);
             }
@@ -872,24 +877,24 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
             return array(
                 '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
                     '<td class="news_cell checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
-                    '<td class="news_cell"><div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
+                    '<td class="news_cell"><div class="icon">'.(in_array('flagged', $flags) ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').'</div>'.
+                    '<div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
                         '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
                     '</div></div>'.
                     '<div class="from">'.$output_mod->html_safe($from).' - '.$output_mod->html_safe($source).'</div>'.
                     '<div class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></div>'.
-                    '<div class="icon">'.(in_array('flagged', $flags) ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').'</div></td>'.
-                '</tr>', $id);
+                '</td></tr>', $id);
         }
 }
 
 function message_controls() {
     return '<div class="msg_controls">'.
         '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" /></a>'.
-        '<a href="#" onclick="return imap_message_action(\'read\');" class="disabled_link">Read</a>'.
-        '<a href="#" onclick="return imap_message_action(\'unread\');" class="disabled_link">Unread</a>'.
-        '<a href="#" onclick="return imap_message_action(\'flag\');" class="disabled_link">Flag</a>'.
-        '<a href="#" onclick="return imap_message_action(\'unflag\');" class="disabled_link">Unflag</a>'.
-        '<a href="#" onclick="return imap_message_action(\'delete\');" class="disabled_link">Delete</a></div>';
+        '<a href="#" onclick="return message_action(\'read\');" class="disabled_link">Read</a>'.
+        '<!--<a href="#" onclick="return message_action(\'unread\');" class="disabled_link">Unread</a>-->'.
+        '<a href="#" onclick="return message_action(\'flag\');" class="disabled_link">Flag</a>'.
+        '<a href="#" onclick="return message_action(\'unflag\');" class="disabled_link">Unflag</a>'.
+        '<!--<a href="#" onclick="return message_action(\'delete\');" class="disabled_link">Delete</a>--></div>';
 }
 
 function message_since_dropdown($since) {
@@ -953,14 +958,38 @@ function format_msg_text($str, $output_mod) {
     return $str;
 }
 
-function build_msg_gravatar( $from ) {
+function build_msg_gravatar($from) {
     if (preg_match("/[\S]+\@[\S]+/", $from, $matches)) {
         $hash = md5(strtolower(trim($matches[0], " \"><'\t\n\r\0\x0B")));
         return '<img class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';
     }
 }
 
-
-
+function display_value($name, $haystack, $type=false, $default='') {
+    if (!isset($haystack[$name])) {
+        return $default;
+    }
+    $value = $haystack[$name];
+    $res = false;
+    if ($type) {
+        $name = $type;
+    }
+    switch($name) {
+        case 'from':
+            $value = preg_replace("/(\<.+\>)/U", '', $value);
+            $res = str_replace('"', '', $value);
+            break;
+        case 'date':
+            $res = human_readable_interval($value);
+            break;
+        case 'time':
+            $res = strtotime($value);
+            break;
+        default:
+            $res = $value;
+            break;
+    }
+    return $res;
+}
 
 ?>

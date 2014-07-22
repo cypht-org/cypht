@@ -116,13 +116,13 @@ var display_pop3_message = function(res) {
     document.title = 'HM3 '+$('.header_subject th').text();
 };
 
-var add_pop3_sources = function() {
+var add_pop3_sources = function(callback) {
     if ($('.pop3_server_ids').length) {
         var ids = $('.pop3_server_ids').val().split(',');
         if (ids && ids != '') {
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
-                Hm_Message_List.sources.push({type: 'pop3', id: id, callback: pop3_combined_inbox_content});
+                Hm_Message_List.sources.push({type: 'pop3', id: id, callback: callback});
             }
         }
     }
@@ -168,6 +168,27 @@ var update_pop3_status_display = function(res) {
     $('.pop3_status_'+id).html(res.pop3_status_display);
 };
 
+var pop3_combined_unread_content = function(id) {
+    var since = 'today';
+    if ($('.message_list_since').length) {
+        since = $('.message_list_since option:selected').val();
+    }
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_unread'},
+        {'name': 'unread_since', 'value': since},
+        {'name': 'pop3_server_id', 'value': id}],
+        update_pop3_unread_display,
+        [],
+        false,
+        set_unread_state
+    );
+    return false;
+};
+var update_pop3_unread_display = function(res) {
+    var ids = [res.pop3_server_id];
+    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+};
+
 
 if (hm_page_name == 'servers') {
     $('.test_pop3_connect').on('click', pop3_test_action);
@@ -177,7 +198,10 @@ if (hm_page_name == 'servers') {
 }
 else if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
-        add_pop3_sources();
+        add_pop3_sources(pop3_combined_inbox_content);
+    }
+    else if (hm_list_path == 'unread') {
+        add_pop3_sources(pop3_combined_unread_content);
     }
     else if (hm_list_path.substring(0, 4) == 'pop3') {
         if ($('.message_table tbody tr').length == 0) {

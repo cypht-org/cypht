@@ -337,6 +337,9 @@ add_output('notfound', 'two_col_layout_end', true);
 add_output('notfound', 'page_js', true);
 add_output('notfound', 'content_end', true);
 
+add_handler('ajax_message_action', 'login', false);
+add_handler('ajax_message_action', 'load_user_data', true);
+add_handler('ajax_message_action', 'date', true);
 
 add_handler('ajax_hm_folders', 'login', false);
 add_handler('ajax_hm_folders', 'load_user_data', true);
@@ -353,7 +356,7 @@ return array(
         'settings',
         'servers',
         'ajax_hm_folders',
-        'ajax_save_section_state',
+        'ajax_message_action',
         'notfound',
         'profiles',
         'search',
@@ -405,7 +408,9 @@ return array(
         'list_style' => FILTER_SANITIZE_STRING,
         'timezone_setting' => FILTER_SANITIZE_STRING,
         'section_state' => FILTER_SANITIZE_STRING,
-        'section_class' => FILTER_SANITIZE_STRING
+        'section_class' => FILTER_SANITIZE_STRING,
+        'message_ids' => FILTER_SANITIZE_STRING,
+        'action_type' => FILTER_SANITIZE_STRING,
     )
 );
 
