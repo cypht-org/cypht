@@ -299,6 +299,9 @@ class Hm_Router {
         if ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook']) && in_array($request->post['hm_ajax_hook'], $pages)) {
             $this->page = $request->post['hm_ajax_hook'];
         }
+        elseif ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook']) && !in_array($request->post['hm_ajax_hook'], $pages)) {
+            die(json_encode(array('status' => 'not callable')));;
+        }
         elseif (isset($request->get['page']) && in_array($request->get['page'], $pages)) {
             $this->page = $request->get['page'];
         }
@@ -1152,14 +1155,19 @@ class Hm_Page_Cache {
     }
 }
 
-trait Hm_Seen_Cache {
+trait Hm_Uid_Cache {
 
     private static $uids;
     
     public static function load($uid_array) {
-        self::$uids = array_combine($uid_array, array_fill(0, count($uid_array), 0));
+        if (!empty($uid_array)) {
+            self::$uids = array_combine($uid_array, array_fill(0, count($uid_array), 0));
+        }
+        else {
+            self::$uids = array();
+        }
     }
-    public static function is_read($uid) {
+    public static function is_present($uid) {
         return isset(self::$uids[$uid]);
     }
     public static function dump() {
@@ -1168,13 +1176,20 @@ trait Hm_Seen_Cache {
     public static function add($uid) {
         self::$uids[$uid] = 0;
     }
+    public static function remove($uid) {
+        if (isset(self::$uids)) {
+            unset(self::$uids[$uid]);
+            return true;
+        }
+        return false;
+    }
 }
 
 class Hm_POP3_Seen_Cache {
-    use Hm_Seen_Cache;
+    use Hm_Uid_Cache;
 }
 class Hm_Feed_Seen_Cache {
-    use Hm_Seen_Cache;
+    use Hm_Uid_Cache;
 }
 
 class Hm_Image_Sources {
