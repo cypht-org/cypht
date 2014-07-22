@@ -35,6 +35,7 @@ class Hm_PHP_Session extends Hm_Session {
         $this->site_config = $config;
     }
     protected function just_started() {
+        $this->set('login_time', time());
     }
 
     protected function check_fingerprint($request) {
@@ -325,6 +326,7 @@ trait Hm_POP3_Auth {
         return array($server, $port, $tls);
     }
     protected function just_started() {
+        $this->set('login_time', time());
         $this->set('pop3_auth_server_settings', $this->pop3_settings);
     }
 
@@ -368,6 +370,7 @@ trait Hm_IMAP_Auth {
         return array($server, $port, $tls);
     }
     protected function just_started() {
+        $this->set('login_time', time());
         $this->set('imap_auth_server_settings', $this->imap_settings);
     }
 }
