@@ -528,12 +528,9 @@ var get_from_local_storage = function(key) {
 };
 
 var reload_folders = function() {
-    console.log('here');
     if (document.cookie.indexOf('hm_reload_folders=1') > -1) {
         update_folder_list();
         sessionStorage.clear();
-        console.log(sessionStorage);
-        console.log('yep');
         document.cookie = 'hm_reload_folders=; expires=' + new Date(0).toUTCString();
     }
 };
