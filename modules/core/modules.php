@@ -635,7 +635,8 @@ function main_menu ($input, $output_mod) {
         '<li class="menu_home"><a class="unread_link" href="?page=home">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$output_mod->trans('Home').'</a></li>'.
         '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> '.$output_mod->trans('Everything').'</a></li>';
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> '.$output_mod->trans('Everything').
+        '</a><span class="combined_inbox_count"></span></li>';
     if ($email) {
         $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
             '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Unread').

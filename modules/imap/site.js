@@ -198,20 +198,6 @@ var display_imap_combined_inbox = function(res) {
     var count = Hm_Message_List.update(ids, res.formatted_combined_inbox, 'imap');
 };
 
-var set_combined_inbox_state = function() {
-    if (!$('.message_table tr').length) {
-        if (!$('.empty_list').length) {
-            $('.message_list').append('<div class="empty_list">No messages found!</div>');
-        }
-    }
-    var data = $('.message_table tbody');
-    data.find('*[style]').attr('style', '');
-    save_to_local_storage('formatted_combined_inbox', data.html());
-    $(':checkbox').click(function() {
-        Hm_Message_List.toggle_msg_controls();
-    });
-};
-
 /* imap mailbox list */
 var setup_imap_folder_page = function() {
     if ($('.message_table tbody tr').length == 0) {

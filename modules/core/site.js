@@ -457,10 +457,15 @@ var Hm_Message_List = {
             $('.flagged_count').text(count);
             document.title = 'HM3 '+count+' Flagged';
         }
+        else if (type == 'combined_inbox') {
+            var count = $('.message_table tbody tr').length;
+            $('.combined_inbox_count').text(count);
+            document.title = 'HM3 '+count+' in Everything';
+        }
         else if (type == 'feeds') {
             var count = $('.unseen', $('.message_table tbody')).length;
             $('.unread_feed_count').text(count);
-            document.title = 'HM3 '+count+' New in feeds';
+            document.title = 'HM3 '+count+' New in Feeds';
         }
         save_folder_list();
     }
@@ -589,6 +594,20 @@ var hl_selected_menu = function() {
     }
 };
 
+var set_combined_inbox_state = function() {
+    if (!$('.message_table tr').length) {
+        if (!$('.empty_list').length) {
+            $('.message_list').append('<div class="empty_list">No messages found!</div>');
+        }
+    }
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    save_to_local_storage('formatted_combined_inbox', data.html());
+    $(':checkbox').click(function() {
+        Hm_Message_List.toggle_msg_controls();
+    });
+    Hm_Message_List.update_count('combined_inbox');
+};
 
 var folder_list = get_from_local_storage('formatted_folder_list');
 
