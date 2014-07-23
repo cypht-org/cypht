@@ -438,7 +438,7 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
             foreach ($input['pop3_folders'] as $id => $folder) {
                 $res .= '<li class="pop3_'.$this->html_safe($id).'">'.
                     '<a href="?page=message_list&list_path=pop3_'.$this->html_safe($id).'">'.
-                    '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" /> '.
+                    '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
@@ -466,7 +466,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
                             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                                $txt .= ' <img class="account_icon" src="'.Hm_Image_Sources::$folder.'" /> ';
+                                $txt .= ' <img class="account_icon" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }

@@ -629,30 +629,30 @@ function main_menu ($input, $output_mod) {
         }
     }
     $res = '<div class="src_name">Main'.
-        '<img class="menu_caret" onclick="return toggle_section(\'.main\');" src="'.Hm_Image_Sources::$chevron.'" />'.
+        '<img class="menu_caret" onclick="return toggle_section(\'.main\');" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div ';
     $res .= 'class="main"><ul class="folders">'.
         '<li class="menu_home"><a class="unread_link" href="?page=home">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" /> '.$output_mod->trans('Home').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$output_mod->trans('Home').'</a></li>'.
         '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" /> '.$output_mod->trans('Everything').'</a></li>';
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> '.$output_mod->trans('Everything').'</a></li>';
     if ($email) {
         $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Unread').
+            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Unread').
             ' <span class="unread_count"></span></a></li>';
     }
     if ($feeds) {
         $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">'.
-            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Feeds').
+            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Feeds').
             '</a> <span class="unread_feed_count"></span></li>';
     }
     $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" /> '.$output_mod->trans('Flagged').
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$output_mod->trans('Flagged').
         '</a> <span class="flagged_count"></span></li>'.
         '<!--<li class="menu_search"><a class="unread_link" href="?page=search">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" /> '.$output_mod->trans('Search').'</a></li>-->'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> '.$output_mod->trans('Search').'</a></li>-->'.
         '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" /> '.$output_mod->trans('Compose').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$output_mod->trans('Compose').'</a></li>'.
         '</ul></div>';
     return $res;
 }
@@ -663,7 +663,7 @@ function folder_source_menu( $input, $output_mod) {
             $name = ucfirst(strtolower(explode('_', $src)[0]));
             $res .= '<div class="src_name">'.$output_mod->html_safe($name).
                 '<img class="menu_caret" onclick="return toggle_section(\'.'.$output_mod->html_safe($src).
-                '\');" src="'.Hm_Image_Sources::$chevron.'" /></div>';
+                '\');" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>';
             $res .= '<div style="display: none;" ';
             $res .= 'class="'.$output_mod->html_safe($src).'">';
             $cache = Hm_Page_Cache::get($src);
@@ -677,14 +677,14 @@ function folder_source_menu( $input, $output_mod) {
 }
 function settings_menu( $input, $output_mod) {
     return '<div class="src_name">Settings'.
-        '<img class="menu_caret" onclick="return toggle_section(\'.settings\');" src="'.Hm_Image_Sources::$chevron.'" />'.
+        '<img class="menu_caret" onclick="return toggle_section(\'.settings\');" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><ul style="display: none;" class="settings folders">'.
         '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$monitor).'" alt="" /> '.$output_mod->trans('Servers').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$monitor).'" alt="" width="16" height="16" /> '.$output_mod->trans('Servers').'</a></li>'.
         '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$cog).'" alt="" /> '.$output_mod->trans('Site').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$cog).'" alt="" width="16" height="16" /> '.$output_mod->trans('Site').'</a></li>'.
         '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$people).'" alt="" /> '.$output_mod->trans('Profiles').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$people).'" alt="" width="16" height="16" /> '.$output_mod->trans('Profiles').'</a></li>'.
         '</ul></div>';
 }
 
@@ -816,7 +816,7 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<div class="message_list"><div class="content_title">'.
-            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']);
+            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
 
         if ($input['list_path'] == 'unread' || $input['list_path'] == 'feeds') {
             if (isset($input['message_list_since'])) {
@@ -892,14 +892,14 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
                         '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
                     '</div></td>'.
                     '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></td>'.
-                    '<td class="icon">'.(in_array('flagged', $flags) ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').'</td>'.
+                    '<td class="icon">'.(in_array('flagged', $flags) ? '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : '').'</td>'.
                 '</tr>', $id);
         }
         else {
             return array(
                 '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
                     '<td class="news_cell checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
-                    '<td class="news_cell"><div class="icon">'.(in_array('flagged', $flags) ? '<img src="'.Hm_Image_Sources::$star.'" />' : '').'</div>'.
+                    '<td class="news_cell"><div class="icon">'.(in_array('flagged', $flags) ? '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : '').'</div>'.
                     '<div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
                         '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
                     '</div></div>'.
@@ -911,7 +911,7 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
 
 function message_controls() {
     return '<div class="msg_controls">'.
-        '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" /></a>'.
+        '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
         '<a href="#" onclick="return message_action(\'read\');" class="disabled_link">Read</a>'.
         '<!--<a href="#" onclick="return message_action(\'unread\');" class="disabled_link">Unread</a>-->'.
         '<a href="#" onclick="return message_action(\'flag\');" class="disabled_link">Flag</a>'.

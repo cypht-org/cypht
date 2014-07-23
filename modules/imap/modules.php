@@ -500,7 +500,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
                             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                                $txt .= ' <img class="account_icon" src="'.Hm_Image_Sources::$folder.'" /> ';
+                                $txt .= ' <img class="account_icon" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
@@ -674,7 +674,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '<ul class="folders">';
         if (isset($input['imap_folders'])) {
             foreach ($input['imap_folders'] as $id => $folder) {
-                $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" /> '.
+                $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
@@ -756,7 +756,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
             $results .= '<a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
         }
         else {
-            $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" />';
+            $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
         }
         if (!$folder['noselect']) {
             $results .= '<a href="?page=message_list&amp;list_path='.
