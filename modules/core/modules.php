@@ -952,13 +952,15 @@ function process_since_argument($val, $config) {
     return $date;
 }
 
-function format_msg_html($str) {
+function format_msg_html($str, $external_resources=false) {
     require 'lib/HTMLPurifier.standalone.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
-    $config->set('URI.DisableResources', true);
-    $config->set('URI.DisableExternalResources', true);
-    $config->set('URI.DisableExternal', true);
+    if (!$external_resources) {
+        $config->set('URI.DisableResources', true);
+        $config->set('URI.DisableExternalResources', true);
+        $config->set('URI.DisableExternal', true);
+    }
     $config->set('HTML.TargetBlank', true);
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
     $purifier = new HTMLPurifier($config);
