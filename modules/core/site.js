@@ -443,16 +443,26 @@ var Hm_Message_List = {
         if (data && data.length) {
             $('.message_table tbody').html(data);
         }
-        Hm_Message_List.load_sources();
+        Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
     },
 
     update_count: function(type) {
         if (type == 'unread') {
-            var list = get_from_local_storage('formatted_unread_data');
-            var count = $('<div></div>').append(list).find('tr').length;
+            var count = $('.message_table tbody tr').length;
             $('.unread_count').text(count);
-            save_folder_list();
+            document.title = 'HM3 '+count+' Unread';
         }
+        else if (type == 'flagged') {
+            var count = $('.message_table tbody tr').length;
+            $('.flagged_count').text(count);
+            document.title = 'HM3 '+count+' Flagged';
+        }
+        else if (type == 'feeds') {
+            var count = $('.unseen', $('.message_table tbody')).length;
+            $('.unread_feed_count').text(count);
+            document.title = 'HM3 '+count+' New in feeds';
+        }
+        save_folder_list();
     }
 };
 

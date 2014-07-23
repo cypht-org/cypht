@@ -132,7 +132,7 @@ var imap_combined_flagged_content = function(id) {
 var update_flagged_message_display = function(res) {
     var ids = res.flagged_server_ids.split(',');
     var count = Hm_Message_List.update(ids, res.formatted_flagged_data, 'imap');
-    document.title = 'HM3 '+count+' Flagged';
+    Hm_Message_List.update_count('flagged');
 };
 
 var set_flagged_state = function() {

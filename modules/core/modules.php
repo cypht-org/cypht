@@ -643,10 +643,12 @@ function main_menu ($input, $output_mod) {
     }
     if ($feeds) {
         $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">'.
-            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Feeds').'</a></li>';
+            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" /> '.$output_mod->trans('Feeds').
+            '</a> <span class="unread_feed_count"></span></li>';
     }
     $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" /> '.$output_mod->trans('Flagged').'</a></li>'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" /> '.$output_mod->trans('Flagged').
+        '</a> <span class="flagged_count"></span></li>'.
         '<!--<li class="menu_search"><a class="unread_link" href="?page=search">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" /> '.$output_mod->trans('Search').'</a></li>-->'.
         '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.

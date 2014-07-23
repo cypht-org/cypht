@@ -22,6 +22,7 @@ var set_combined_feeds_unread_state = function() {
     $(':checkbox').click(function() {
         Hm_Message_List.toggle_msg_controls();
     });
+    Hm_Message_List.update_count('feeds');
 };
 
 var display_feeds_combined_unread = function(res) {
