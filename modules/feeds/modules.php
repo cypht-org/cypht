@@ -69,7 +69,6 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 $data['login_time'] = $login_time;
             }
             if (isset($this->request->post['unread_since'])) {
-                $unread_only = true;
                 $date = process_since_argument($this->request->post['unread_since'], $this->user_config);
                 $cutoff_timestamp = strtotime($date);
                 if ($login_time && $login_time > $cutoff_timestamp) {
@@ -90,9 +89,6 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                                 continue;
                             }
                             elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
-                                continue;
-                            }
-                            elseif ($unread_only && isset($item['guid']) && Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
                                 continue;
                             }
                             else {
@@ -315,7 +311,8 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                 }
             }
             $header_str .= '</table>';
-            $txt = '<div class="msg_text_inner">'.format_msg_html($input['feed_message_content']).'</div>';
+            $input['feed_message_content'] = str_replace(array('<', '>', '&ldquo;'), array(' <', '> ', ' &ldquo;'), $input['feed_message_content']);
+            $txt = '<div class="msg_text_inner">'.format_msg_html($input['feed_message_content'], true).'</div>';
             unset($input['feed_message_content']);
             unset($input['feed_message_headers']);
             $input['feed_msg_text'] = $txt;
