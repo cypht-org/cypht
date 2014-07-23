@@ -387,7 +387,8 @@ if (hm_page_name == 'message_list') {
         setup_imap_folder_page();
     }
 }
-else if (hm_page_name == 'message') {
+else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'imap') {
+    console.log(hm_msg_uid);
     setup_message_view_page();
 }
 else if (hm_page_name == 'servers') {
