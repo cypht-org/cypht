@@ -82,6 +82,9 @@ var display_feed_item_content = function(res) {
     if (hm_list_parent == 'feeds') {
         prev_next_links('formatted_feed_data', hm_list_path+'_'+hm_msg_uid);
     }
+    else if (hm_list_parent == 'combined_inbox') {
+        prev_next_links('formatted_combined_inbox', hm_list_path+'_'+hm_msg_uid);
+    }
 };
 
 var load_feed_list = function(id) {

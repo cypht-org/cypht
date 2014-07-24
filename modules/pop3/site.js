@@ -114,7 +114,22 @@ var display_pop3_message = function(res) {
     $('.msg_text').append(res.msg_text);
     set_message_content();
     document.title = 'HM3 '+$('.header_subject th').text();
+    pop3_message_view_finished();
 };
+
+var pop3_message_view_finished = function() {
+    detail = parse_folder_path(hm_list_path, 'pop3');
+    if (detail) {
+        class_name = 'pop3_'+detail.server_id+'_'+hm_msg_uid;
+        if (hm_list_parent == 'combined_inbox') {
+            prev_next_links('formatted_combined_inbox', class_name);
+        }
+        else if (hm_list_parent == 'unread') {
+            prev_next_links('formatted_unread_data', class_name);
+            update_unread_cache(class_name);
+        }
+    }
+}
 
 var add_pop3_sources = function(callback) {
     if ($('.pop3_server_ids').length) {

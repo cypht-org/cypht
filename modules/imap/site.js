@@ -277,6 +277,7 @@ var display_msg_content = function(res) {
     $('.msg_text').append(res.msg_parts);
     set_message_content();
     document.title = 'HM3 '+$('.header_subject th').text();
+    imap_message_view_finished();
 };
 
 var set_message_content = function() {
@@ -316,7 +317,11 @@ var setup_message_view_page = function() {
     else {
         $('.msg_text').html(msg_content);
         document.title = 'HM3 '+$('.header_subject th').text();
+        imap_message_view_finished();
     }
+};
+
+var imap_message_view_finished = function() {
     detail = parse_folder_path(hm_list_path, 'imap');
     if (detail) {
         class_name = 'imap_'+detail.server_id+'_'+hm_msg_uid+'_'+detail.folder;
@@ -325,8 +330,8 @@ var setup_message_view_page = function() {
         }
         else if (hm_list_parent == 'unread') {
             prev_next_links('formatted_unread_data', class_name);
+            update_unread_cache(class_name);
         }
-        update_unread_cache(class_name);
     }
 };
 
