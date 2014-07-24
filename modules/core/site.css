@@ -16,7 +16,7 @@ td { vertical-align: top; }
 .title { float: left; font-weight: normal; padding: 0px; font-size: 1.6em; color: #666; margin: 0px; margin-left: 25px; letter-spacing: -1px; font-family: monospace; }
 .loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 3px; margin-left: 15px; }
 .loading_icon img { visibility: inherit; }
-.combined_inbox_count, .unread_feed_count, .flagged_count, .unread_count { float: right; }
+.combined_inbox_count, .unread_feed_count, .flagged_count, .unread_count { float: right; color: #aaa; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .logout { cursor: pointer; background: #fff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAOlJREFUOI2VkjFuwkAQRV+sNKZEKJh7UCEBl4BwhEhpQpSSFu5CgyjgIECiSIhLBBpoAhT+lker9dqMNPLsnz9f650PxXFTBiMqIzwq8BzghnoAvAI/QF1n+wsN4BcYFg0PgasG3jwCY9X/wMAdbgJHEd4N7j7iROcjkFiBqRpzR9i3hZWwmQV3AjsVBPrCvi14ERhTHrG4lwywayw1DfDkciPgoLpdQSDj7K3AWvVHBYFPfdcWbAEnXSsk8kW+xqbbHJEbaQF0SR+sBvSApXpXAm4cmZv48g+PC91ISE2yBc7KDanZXnwDd6ZsRKAfKovZAAAAAElFTkSuQmCC') no-repeat 6px 4px; padding-left: 25px; color: #000; opacity: .6; }
 .search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
@@ -52,7 +52,7 @@ option, select { padding: 3px; }
 .no_servers { text-align: center; padding: 50px; margin: auto; padding-bottom: 100px; }
 .selected_menu, .selected_menu a { color: Teal !important; line-height: 1.25em;}
 
-.src_name { border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 1.1em; letter-spacing: -1px; padding-bottom: 5px; }
+.src_name { cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 1.1em; letter-spacing: -1px; padding-bottom: 5px; }
 .content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 5px; padding-top: 5px; letter-spacing: -1px; font-size: 1.1em; padding-left: 20px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
@@ -69,7 +69,7 @@ option, select { padding: 3px; }
 .page_links { text-align: center; padding-top: 20px; }
 .message_list_since { vertical-align: 1px; border: solid 1px #ccc; text-decoration: none; margin: 0px; margin-left: 20px; letter-spacing: 0px; padding: 0px; color: #666; }
 .checkbox_cell { width: 20px; padding-right: 10px !important; }
-.menu_caret { cursor: pointer; padding-right: 7px; padding-top: 7px; float: right; opacity: .15; }
+.menu_caret { padding: 7px; float: right; opacity: .15; }
 .news_cell { border: none !important; padding-bottom: 10px !important; padding-top: 10px !important; }
 .news_cell .subject { padding-bottom: 5px !important; }
 .news_cell .icon { float: right; }

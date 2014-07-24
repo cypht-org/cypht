@@ -641,8 +641,9 @@ var set_combined_inbox_state = function() {
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_combined_inbox', data.html());
-    $(':checkbox').click(function() {
+    $(':checkbox').click(function(e) {
         Hm_Message_List.toggle_msg_controls();
+        Hm_Message_List.check_select_range(e);
     });
     Hm_Message_List.update_count('combined_inbox');
 };

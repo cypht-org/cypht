@@ -628,8 +628,8 @@ function main_menu ($input, $output_mod) {
             $feeds = true;
         }
     }
-    $res = '<div class="src_name">Main'.
-        '<img class="menu_caret" onclick="return toggle_section(\'.main\');" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+    $res = '<div class="src_name" onclick="return toggle_section(\'.main\');">Main'.
+        '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div ';
     $res .= 'class="main"><ul class="folders">'.
         '<li class="menu_home"><a class="unread_link" href="?page=home">'.
@@ -662,9 +662,10 @@ function folder_source_menu( $input, $output_mod) {
     if (isset($input['folder_sources'])) {
         foreach ($input['folder_sources'] as $src) {
             $name = ucfirst(strtolower(explode('_', $src)[0]));
-            $res .= '<div class="src_name">'.$output_mod->html_safe($name).
-                '<img class="menu_caret" onclick="return toggle_section(\'.'.$output_mod->html_safe($src).
-                '\');" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>';
+            $res .= '<div class="src_name" onclick="return toggle_section(\'.'.$output_mod->html_safe($src).
+                '\');">'.$output_mod->html_safe($name).
+                '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>';
+
             $res .= '<div style="display: none;" ';
             $res .= 'class="'.$output_mod->html_safe($src).'">';
             $cache = Hm_Page_Cache::get($src);
@@ -677,8 +678,8 @@ function folder_source_menu( $input, $output_mod) {
     return $res;
 }
 function settings_menu( $input, $output_mod) {
-    return '<div class="src_name">Settings'.
-        '<img class="menu_caret" onclick="return toggle_section(\'.settings\');" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+    return '<div class="src_name" onclick="return toggle_section(\'.settings\');">Settings'.
+        '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><ul style="display: none;" class="settings folders">'.
         '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$monitor).'" alt="" width="16" height="16" /> '.$output_mod->trans('Servers').'</a></li>'.
