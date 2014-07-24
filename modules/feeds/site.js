@@ -79,6 +79,9 @@ var display_feed_item_content = function(res) {
     $('.msg_text').append(res.feed_msg_text);
     set_message_content();
     document.title = 'HM3 '+$('.header_subject th').text();
+    if (hm_list_parent == 'feeds') {
+        prev_next_links('formatted_feed_data', hm_list_path+'_'+hm_msg_uid);
+    }
 };
 
 var load_feed_list = function(id) {
