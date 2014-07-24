@@ -320,13 +320,14 @@ var setup_message_view_page = function() {
     detail = parse_folder_path(hm_list_path, 'imap');
     if (detail) {
         class_name = 'imap_'+detail.server_id+'_'+hm_msg_uid+'_'+detail.folder;
-        prev_next_links(hm_list_path, class_name);
+        if (hm_list_parent == 'combined_inbox') {
+            prev_next_links('formatted_combined_inbox', class_name);
+        }
+        else if (hm_list_parent == 'unread') {
+            prev_next_links('formatted_unread_data', class_name);
+        }
         update_unread_cache(class_name);
     }
-};
-
-var prev_next_links = function(path, class_name) {
-    /* get links here */
 };
 
 var add_imap_sources = function(callback) {
@@ -374,7 +375,6 @@ if (hm_page_name == 'message_list') {
     }
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'imap') {
-    console.log(hm_msg_uid);
     setup_message_view_page();
 }
 else if (hm_page_name == 'servers') {
