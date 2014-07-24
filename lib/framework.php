@@ -389,6 +389,10 @@ class Hm_Request {
             $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
             $this->is_tls();
         }
+        unset($_POST);
+        unset($_SERVER);
+        unset($_GET);
+        unset($_COOKIE);
     }
 
     private function is_tls() {
