@@ -516,7 +516,7 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
             else {
                 $login_time = false;
             }
-            $res = format_pop3_message_list($input['pop3_mailbox_page'], $this, $style, $login_time, $input['list_parent']);
+            $res = format_pop3_message_list($input['pop3_mailbox_page'], $this, $style, $login_time, $input['list_path']);
             $input['formatted_mailbox_page'] = $res;
             Hm_Page_Cache::add('formatted_mailbox_page_'.$input['pop3_mailbox_page_path'], $res);
             unset($input['pop3_mailbox_page']);
