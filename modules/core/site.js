@@ -499,10 +499,11 @@ var confirm_logout = function() {
 var parse_folder_path = function(path, path_type) {
     var type = false;
     var server_id = false;
+    var uid = false;
     var folder = '';
 
     if (path_type == 'imap') {
-        parts = path.split('_', 3);
+        parts = path.split('_', 4);
         if (parts.length == 2) {
             type = parts[0];
             server_id = parts[1];
@@ -512,22 +513,59 @@ var parse_folder_path = function(path, path_type) {
             server_id = parts[1];
             folder = parts[2];
         }
+        else if (parts.length == 4) {
+            type = parts[0];
+            server_id = parts[1];
+            uid = parts[2];
+            folder = parts[3];
+        }
         if (type && server_id) {
-            return {'type': type, 'server_id' : server_id, 'folder' : folder}
+            return {'type': type, 'server_id' : server_id, 'folder' : folder, 'uid': uid}
         }
     }
     else if (path_type == 'pop3' || path_type == 'feeds') {
-        parts = path.split('_', 2);
-        if (parts.length == 2) {
+        parts = path.split('_', 3);
+        if (parts.length > 1) {
             type = parts[0];
             server_id = parts[1];
         }
+        if (parts.length == 3) {
+            uid = parts[2];
+        }
         if (type && server_id) {
-            return {'type': type, 'server_id' : server_id}
+            return {'type': type, 'server_id' : server_id, 'uid': uid}
         }
     }
     return false;
 };
+
+var prev_next_links = function(cache, class_name) {
+    var href;
+    var plink = false;
+    var nlink = false;
+    var list = get_from_local_storage(cache);
+    var current = $('<div></div>').append(list).find('.'+clean_selector(class_name));
+    var prev = current.prev();
+    var next = current.next();
+    var header_links = $('.header_links');
+    if (header_links.length) {
+        target = header_links.parent();
+    }
+    else {
+        target = $('.msg_headers tr').last();
+    }
+    if (prev.length) {
+        href = prev.find('.subject').find('a').prop('href');
+        plink = '<a class="plink" href="'+href+'">'+prev.find('.subject').text()+'</a>';
+        $('<tr class="prev"><th>Previous</th><td>'+plink+'</td></tr>').insertBefore(target);
+    }
+    if (next.length) {
+        href = next.find('.subject').find('a').prop('href');
+        nlink = '<a class="nlink" href="'+href+'">'+next.find('.subject').text()+'</a>';
+        $('<tr class="next"><th>Next</th><td>'+nlink+'</td></tr>').insertBefore(target);
+    }
+};
+
 
 var toggle_section = function(class_name) {
     if ($(class_name).length) {
