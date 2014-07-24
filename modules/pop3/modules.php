@@ -516,7 +516,7 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
             else {
                 $login_time = false;
             }
-            $res = format_pop3_message_list($input['pop3_mailbox_page'], $this, $style, $login_time);
+            $res = format_pop3_message_list($input['pop3_mailbox_page'], $this, $style, $login_time, $input['list_parent']);
             $input['formatted_mailbox_page'] = $res;
             Hm_Page_Cache::add('formatted_mailbox_page_'.$input['pop3_mailbox_page_path'], $res);
             unset($input['pop3_mailbox_page']);
@@ -565,7 +565,7 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
 }
 
 
-function format_pop3_message_list($msg_list, $output_module, $style, $login_time) {
+function format_pop3_message_list($msg_list, $output_module, $style, $login_time, $list_parent) {
     $res = array();
     foreach($msg_list as $msg_id => $msg) {
         if ($msg['server_name'] == 'Default-Auth-Server') {
@@ -576,7 +576,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         $from = display_value('from', $msg);
         $date = display_value('date', $msg);
         $timestamp = display_value('date', $msg, 'time');
-        $url = '?page=message&uid='.$msg_id.'&list_path='.sprintf('pop3_%d', $msg['server_id']).'&list_parent='.sprintf('pop3_%d', $msg['server_id']);
+        $url = '?page=message&uid='.$msg_id.'&list_path='.sprintf('pop3_%d', $msg['server_id']).'&list_parent='.$list_parent;
         if (Hm_POP3_Seen_Cache::is_present($id)) {
             $flags = array();
         }
