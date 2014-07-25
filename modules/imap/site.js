@@ -260,10 +260,6 @@ var expand_imap_folders = function(path) {
     return false;
 };
 
-var save_folder_list = function() {
-    save_to_local_storage('formatted_folder_list', $('.folder_list').html());
-};
-
 var expand_imap_mailbox = function(res) {
     $('.'+clean_selector(res.imap_expanded_folder_path)).append(res.imap_expanded_folder_formatted);
 };

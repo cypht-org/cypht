@@ -1,7 +1,7 @@
 .configured_server, .add_server { margin-top: 10px; color: #666; background-color: #fff; margin-bottom: 20px; padding: 10px; width: 200px; }
 .message_list { min-height: 600px; background-color: #fff; height: 100%; padding-bottom: 20px; }
 .message_table td { border-bottom: solid 1px #eee; }
-.configured_server { float: left; margin-right: 25px; width: 230px; height: 220px; }
+.configured_server { float: left; margin-right: 25px; width: 230px; height: 220px; border: solid 1px #ddd; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #aaa; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
@@ -9,7 +9,7 @@
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; }
 .save_settings, .server_link { line-height: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .message_table td { padding: 5px; padding-left: 10px; padding-top: 7px; padding-bottom: 3px; color: #333; }
-.message_table { table-layout: fixed; width: 100%; padding: 20px; padding-top: 10px; padding-bottom: 40px; }
+.message_table { table-layout: fixed; width: 100%; padding: 20px; padding-top: 10px; padding-bottom: 40px; padding-left: 30px; }
 .message_table th:hover { color: #000; }
 .subject div, .msg_date, .from, .source { overflow: hidden; color: #333; text-overflow: ellipsis; white-space: nowrap; }
 .subject { cursor: pointer; font-size: 110%; }
@@ -69,7 +69,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .unseen { font-weight: 700; }
 .checkbox_row { padding-right: 10px !important; }
 .checkbox_header img { padding-left: 3px; padding-right: 0px; }
-.msg_controls { margin-left: 32px; margin-top: 15px;}
+.msg_controls { margin-left: 42px; margin-top: 15px;}
 .msg_controls a { font-size: .7em; letter-spacing: 0px; color: #666; margin-right: 5px; background-color: #fff; border: solid 1px #ccc; padding: 3px; padding-bottom: 1px; padding-top: 1px; width: 30px; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .msg_controls img { opacity: .6; vertical-align: -2px; }
 .deleted a { text-decoration: line-through !important; color: #aaa !important; }

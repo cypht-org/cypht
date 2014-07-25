@@ -222,7 +222,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             $path = $this->request->get['list_path'];
             if ($path == 'unread') {
                 $data['list_path'] = 'unread';
-                $data['mailbox_list_title'] = array('Unread');
+                $data['mailbox_list_title'] = array('Unread Mail');
             }
             elseif ($path == 'feeds') {
                 $data['list_path'] = 'feeds';
@@ -302,12 +302,6 @@ class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
 
 /* OUTPUT */
 
-class Hm_Output_title extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<h1 class="title">HM3</h1>';
-    }
-}
-
 class Hm_Output_login extends Hm_Output_Module {
     protected function output($input, $format) {
         if (!$input['router_login_state']) {
@@ -330,20 +324,6 @@ class Hm_Output_login extends Hm_Output_Module {
 class Hm_Output_date extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="date">'.$this->html_safe($input['date']).'</div>';
-    }
-}
-
-class Hm_Output_logout extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<form class="logout_form" method="POST">'.
-            '<input type="button" onclick="return confirm_logout()" class="logout" value="Logout" />'.
-            '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
-            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
-            '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
-            '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
-            '<input class="save_settings" onclick="$(\'.confirm_logout\').fadeOut(200); return false;" type="button" value="Cancel" />'.
-            '</div>'.
-            '</form>';
     }
 }
 
@@ -480,7 +460,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
 
 class Hm_Output_loading_icon extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="loading_icon"><img alt="Loading..." src="'.Hm_Image_Sources::$spinner.'" width="16" height="16" /></div>';
+        return '<div class="loading_icon"><img alt="Loading..." src="images/ajax-loader.gif" width="67" height="10" /></div>';
     }
 }
 
@@ -572,18 +552,6 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_toolbar_start extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<div class="toolbar">';
-    }
-}
-
-class Hm_Output_toolbar_end extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '</div>';
-    }
-}
-
 class Hm_Output_two_col_layout_start extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="framework">';
@@ -628,10 +596,10 @@ function main_menu ($input, $output_mod) {
             $feeds = true;
         }
     }
-    $res = '<div class="src_name" onclick="return toggle_section(\'.main\');">Main'.
+    $res = '';
+    $res .= '<div class="src_name main_menu" onclick="return toggle_section(\'.main\');">Main'.
         '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
-        '</div><div ';
-    $res .= 'class="main"><ul class="folders">'.
+        '</div><div class="main"><ul class="folders">'.
         '<li class="menu_home"><a class="unread_link" href="?page=home">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$output_mod->trans('Home').'</a></li>'.
         '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
@@ -639,7 +607,7 @@ function main_menu ($input, $output_mod) {
         '</a><span class="combined_inbox_count"></span></li>';
     if ($email) {
         $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Unread').
+            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Unread Mail').
             ' <span class="unread_count"></span></a></li>';
     }
     if ($feeds) {
@@ -653,8 +621,17 @@ function main_menu ($input, $output_mod) {
         '<!--<li class="menu_search"><a class="unread_link" href="?page=search">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> '.$output_mod->trans('Search').'</a></li>-->'.
         '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$output_mod->trans('Compose').'</a></li>'.
-        '</ul></div>';
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$output_mod->trans('Compose').'</a></li>';
+
+    $res .=  '<li><form class="logout_form" method="POST">'.
+        '<a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
+        $output_mod->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$output_mod->trans('Logout').'</a>'.
+        '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
+        '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+        '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
+        '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
+        '<input class="save_settings" onclick="$(\'.confirm_logout\').fadeOut(200); return false;" type="button" value="Cancel" />'.
+        '</div></form></li></ul></div>';
     return $res;
 }
 function folder_source_menu( $input, $output_mod) {

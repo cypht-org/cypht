@@ -312,7 +312,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
             }
             $header_str .= '<tr><td colspan="2"></td></tr></table>';
             $input['feed_message_content'] = str_replace(array('<', '>', '&ldquo;'), array(' <', '> ', ' &ldquo;'), $input['feed_message_content']);
-            $txt = '<div class="msg_text_inner">'.format_msg_html($input['feed_message_content'], true).'</div>';
+            $txt = '<div class="msg_text_inner">'.format_msg_html($input['feed_message_content']).'</div>';
             unset($input['feed_message_content']);
             unset($input['feed_message_headers']);
             $input['feed_msg_text'] = $txt;

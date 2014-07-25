@@ -4,43 +4,42 @@ br { clear: both; }
 html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #fff); }
 body { font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; }
-.framework { layout: table; width: 100%; height: 100%; }
+.framework { layout: table; width: 100%; height: 100%; padding-top: 0px; }
 table { width: 100%; }
 td { vertical-align: top; }
 .subtitle { color: green; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
-.date { float: right; clear: none; color: #888; padding-right: 30px; padding-top: 6px;}
-.sys_messages { float: left; color: green; margin-left: 15px; margin-top: 2px; }
-.logout_form { float: right; clear: none; padding-right: 20px; }
+.date { position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
+.sys_messages { display: none; position: absolute; opacity: .9; background-color: #fff; color: green; left: 33%; right: 33%; width: 33%; margin-top: 0px; text-align: center; background-color: #eee; padding: 8px; white-space: nowrap; border: solid 1px #ddd; }
+.logout_form { padding: 0px; margin: 0px; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .placeholder { width: 100px !important; }
-.title { float: left; font-weight: normal; padding: 0px; font-size: 1.6em; color: #666; margin: 0px; margin-left: 25px; letter-spacing: -1px; font-family: monospace; }
-.loading_icon { float: left; visibility: hidden; width: 16px; height: 16px; margin-top: 3px; margin-left: 15px; }
-.loading_icon img { visibility: inherit; }
+.loading_icon { text-align: center; display: none; position: absolute; left: 50%; top: 20px; }
+.loading_icon img { position: relative; left: -50%; width: 67px; height: 10px; visibility: inherit; }
 .combined_inbox_count, .unread_feed_count, .flagged_count, .unread_count { float: right; color: #aaa; }
-.logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #aaa; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
-.logout { cursor: pointer; background: #fff url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAOlJREFUOI2VkjFuwkAQRV+sNKZEKJh7UCEBl4BwhEhpQpSSFu5CgyjgIECiSIhLBBpoAhT+lker9dqMNPLsnz9f650PxXFTBiMqIzwq8BzghnoAvAI/QF1n+wsN4BcYFg0PgasG3jwCY9X/wMAdbgJHEd4N7j7iROcjkFiBqRpzR9i3hZWwmQV3AjsVBPrCvi14ERhTHrG4lwywayw1DfDkciPgoLpdQSDj7K3AWvVHBYFPfdcWbAEnXSsk8kW+xqbbHJEbaQF0SR+sBvSApXpXAm4cmZv48g+PC91ISE2yBc7KDanZXnwDd6ZsRKAfKovZAAAAAElFTkSuQmCC') no-repeat 6px 4px; padding-left: 25px; color: #000; opacity: .6; }
+.logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
+.logout:hover { background-color: #eee; }
+.logout { cursor: pointer; background: #fff font-size: 100%; }
 .search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { table-layout: fixed; width: 100%; white-space: nowrap; padding-left: 10px; }
 .user_settings table td { padding: 5px; }
 .save_settings { float: left !important; }
 .save_settings_password { float: left; margin-left: 10px; padding: 4px; }
 option, select { padding: 3px; }
-.toolbar { width: 100%; padding-top: 10px; height: 30px; margin-bottom: 10px; }
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 600px; margin: 0px; background-color: #fff; width: 240px; padding-left: 20px; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }
 .elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
 .server_status, .server_summary { width: 100%; height: 100%; background-color: #fff; }
-.server_status table, .server_summary table { table-layout: fixed; width: 100%; padding: 20px; padding-bottom: 40px; }
+.server_status table, .server_summary table { table-layout: fixed; width: 100%; padding: 20px; padding-bottom: 40px; padding-left: 30px; }
 .server_status table th, .server_summary table th, .message_table th { font-style: normal; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #aaa; font-size: 75%; font-weight: normal; border-bottom: solid 1px #ddd; }
 .server_status table td, .server_summary table td { padding: 5px; overflow: hidden; text-overflow: ellipsis; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
 .inner_list { margin-bottom: 10px; } 
 .folders a { color: #555; text-decoration: none; line-height: 1.25em; }
-.folder_list { background-color: #fff; margin-right: 20px; padding-right: 15px; padding-bottom: 40px; min-width: 150px; }
-.folder_cell { vertical-align: top; height: 100%; width: 10%; min-width: 220px; display: table-cell; padding: 0px; margin: 0px; }
-.content_cell { vertical-align: top; height: 100%;  width: 90%; padding: 0px; margin: 0px; display: table-cell; padding-right: 0px; }
+.folder_list { background-color: #fff; margin-right: 20px; padding-right: 15px; padding-bottom: 40px; min-width: 150px; padding-top: 15px; }
+.folder_cell { vertical-align: top; height: 100%; width: 10%; min-width: 240px; display: table-cell; padding: 0px; margin: 0px; }
+.content_cell { vertical-align: top; height: 100%;  width: 90%; padding: 0px; margin: 0px; display: table-cell; background-color: #fff; padding-top: 15px; }
 .folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; padding-right: 0px; }
 .folders li, .inner_list li { padding: 4px; padding-left: 10px; color: #555; padding-bottom: 0px; margin: 2px; white-space: nowrap; }
 .loading_folders { text-align: center; margin: 10px; margin-top: 20px; color: #666; }
@@ -53,7 +52,7 @@ option, select { padding: 3px; }
 .selected_menu, .selected_menu a { color: Teal !important; line-height: 1.25em;}
 
 .src_name { cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 1.1em; letter-spacing: -1px; padding-bottom: 5px; }
-.content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 5px; padding-top: 5px; letter-spacing: -1px; font-size: 1.1em; padding-left: 20px; }
+.content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 5px; padding-top: 5px; letter-spacing: -1px; font-size: 1.1em; padding-left: 30px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
@@ -61,7 +60,7 @@ option, select { padding: 3px; }
 .label_col { width: 20%; }
 .submit_cell { padding-top: 20px !important; }
 .password_notice { float: left; margin-left: 10px; font-size: .9em; color: #666; padding-top: 5px; }
-.confirm_logout { display: none; width: 450px; background-color: #fff; padding: 20px; position: absolute; right: 0px; top: 0px; border: solid 1px #ccc; }
+.confirm_logout { display: none; width: 450px; background-color: #eee; padding: 20px; position: absolute; left: 0px; top: 0px; border: solid 1px #ccc; z-index: 100; }
 .confirm_text {  padding-left: 10px; padding-bottom: 10px; }
 .folder_list .update_unread { float: right; margin-top: 20px; }
 .page_links a { text-decoration: none; color: #111; }
@@ -73,3 +72,4 @@ option, select { padding: 3px; }
 .news_cell { border: none !important; padding-bottom: 10px !important; padding-top: 10px !important; }
 .news_cell .subject { padding-bottom: 5px !important; }
 .news_cell .icon { float: right; }
+.wait { cursor: progress; }

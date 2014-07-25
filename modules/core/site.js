@@ -7,7 +7,8 @@ Hm_Ajax = {
         var ajax = new Hm_Ajax_Request();
         if (Hm_Ajax.request_count == 0) {
             if (!no_icon) {
-                $('.loading_icon').css('visibility', 'visible');
+                $('.loading_icon').fadeIn(300);
+                $('body').addClass('wait');
             }
         }
         Hm_Ajax.request_count++;
@@ -87,7 +88,8 @@ Hm_Ajax_Request = function() { return {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
             }
-            $('.loading_icon').css('visibility', 'hidden');
+            $('.loading_icon').fadeOut(300);
+            $('body').removeClass('wait');
         }
     }
 }; };
@@ -105,6 +107,7 @@ Hm_Notices = {
             return v;
         });
         $('.sys_messages').html(msg_list.join(', '));
+        $('.sys_messages').slideDown(300);
     },
 
     hide: function(now) {
@@ -112,14 +115,14 @@ Hm_Notices = {
             clearTimeout(Hm_Notices.hide_id);
         }
         if (now) {
-            $('.sys_messages').fadeOut(300, function() {
+            $('.sys_messages').slideUp(300, function() {
                 $('.sys_messages').html('');
                 $('.sys_messages').show('');
             });
         }
         else {
             Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').fadeOut(1000, function() {
+                $('.sys_messages').slideUp(1000, function() {
                     $('.sys_messages').html('');
                     $('.sys_messages').show('');
                 });
@@ -471,6 +474,10 @@ var Hm_Message_List = {
     }
 };
 
+var save_folder_list = function() {
+    save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+};
+
 var message_action = function(action_type) {
     var msg_list = $('.message_list');
     var selected = [];
@@ -677,4 +684,7 @@ $(function() {
     }
     $('body').fadeIn(300);
     Hm_Timer.fire();
+    if ($('.sys_messages').text().length) {
+        $('.sys_messages').fadeIn();
+    }
 });
