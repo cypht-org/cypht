@@ -129,7 +129,7 @@ var pop3_message_view_finished = function() {
             update_unread_cache(class_name);
         }
     }
-}
+};
 
 var add_pop3_sources = function(callback) {
     if ($('.pop3_server_ids').length) {
