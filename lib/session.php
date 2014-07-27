@@ -161,7 +161,6 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
         if ($user && $pass) {
             if ($this->auth($user, $pass)) {
                 $this->set_key($request);
-                Hm_Msgs::add('login accepted, starting PHP session');
                 $this->loaded = true;
                 $this->start($request);
                 $this->set_fingerprint($request);
