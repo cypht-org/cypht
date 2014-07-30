@@ -316,7 +316,7 @@ class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
         $servers = Hm_POP3_List::dump();
         if (!empty($servers)) {
             $data['pop3_servers'] = $servers;
-            $data['folder_sources'][] = 'pop3_folders';
+            $data['folder_sources'][] = 'email_folders';
         }
         return $data;
     }
@@ -433,7 +433,7 @@ class Hm_Output_display_pop3_summary extends Hm_Output_Module {
 
 class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<ul class="folders">';
+        $res = '';
         if (isset($input['pop3_folders'])) {
             foreach ($input['pop3_folders'] as $id => $folder) {
                 $res .= '<li class="pop3_'.$this->html_safe($id).'">'.
@@ -442,8 +442,7 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
                     $this->html_safe($folder).'</a></li>';
             }
         }
-        $res .= '</ul>';
-        Hm_Page_Cache::add('pop3_folders', $res, true);
+        Hm_Page_Cache::concat('email_folders', $res, true);
         return '';
     }
 }

@@ -396,7 +396,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
 
 class Hm_Output_filter_feed_folders extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<ul class="folders">';
+        $res = '';
         if (isset($input['feed_folders'])) {
             foreach ($input['feed_folders'] as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
@@ -405,7 +405,6 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
                     $this->html_safe($folder).'</a></li>';
             }
         }
-        $res .= '</ul>';
         Hm_Page_Cache::add('feeds_folders', $res, true);
         return '';
     }

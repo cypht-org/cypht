@@ -299,7 +299,7 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
         $servers = Hm_IMAP_List::dump();
         if (!empty($servers)) {
             $data['imap_servers'] = $servers;
-            $data['folder_sources'][] = 'imap_folders';
+            $data['folder_sources'][] = 'email_folders';
         }
         $data['message_list_since'] = $this->user_config->get('message_list_since', false);
         return $data;
@@ -671,15 +671,14 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
 
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<ul class="folders">';
+        $res = '';
         if (isset($input['imap_folders'])) {
             foreach ($input['imap_folders'] as $id => $folder) {
                 $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
-        $res .= '</ul>';
-        Hm_Page_Cache::add('imap_folders', $res, true);
+        Hm_Page_Cache::concat('email_folders', $res, true);
         return '';
     }
 }

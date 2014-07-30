@@ -181,9 +181,6 @@ var Hm_Message_List = {
     sort_fld: 'msg_date',
 
     update: function(ids, msgs, type) {
-        if (msgs && !jQuery.isEmptyObject(msgs)) {
-            $('.empty_list').remove();
-        }
         var msg_ids = Hm_Message_List.add_rows(msgs);
         var count = Hm_Message_List.remove_rows(ids, msg_ids, type);
         return count;
@@ -434,6 +431,7 @@ var Hm_Message_List = {
     },
 
     load_sources: function() {
+        $('.empty_list').remove();
         for (index in Hm_Message_List.sources) {
             source = Hm_Message_List.sources[index];
             source.callback(source.id);
@@ -513,7 +511,7 @@ var reload_after_message_action = function() {
 };
 
 var confirm_logout = function() {
-    $('.confirm_logout').fadeIn(200);
+    $('.confirm_logout').slideDown(200);
     return false;
 };
 
@@ -605,8 +603,7 @@ var toggle_section = function(class_name) {
         $(class_name).toggle(200, function() {
             if ($('.main').css('display') == 'none' &&
                 $('.settings').css('display') == 'none' &&
-                ($('.imap_folders').length == 0 || $('.imap_folders').css('display') == 'none') &&
-                ($('.pop3_folders').length == 0 || $('.pop3_folders').css('display') == 'none') &&
+                ($('.email_folders').length == 0 || $('.email_folders').css('display') == 'none') &&
                 ($('.feeds_folders').legnth == 0 || $('.feeds_folders').css('display') == 'none')) {
 
                 $('.folder_list').toggle(200, function() {
@@ -695,7 +692,7 @@ var check_empty_list = function() {
     var count = $('.message_table tbody tr').length;
     if (!count) {
         if (!$('.empty_list').length) {
-            $('.message_list').append('<div class="empty_list">So Alone!</div>');
+            $('.message_list').append('<div class="empty_list">So alone</div>');
         }
     }
     return count == 0;

@@ -111,7 +111,7 @@ class Hm_Handler_language extends Hm_Handler_Module {
 
 class Hm_Handler_date extends Hm_Handler_Module {
     public function process($data) {
-        $data['date'] = date('Y-m-d h:i:s');
+        $data['date'] = date('G:i:s');
         return $data;
     }
 }
@@ -590,7 +590,7 @@ function main_menu ($input, $output_mod) {
     $email = false;
     $feeds = false;
     if (isset($input['folder_sources']) && is_array($input['folder_sources'])) {
-        if (in_array('pop3_folders', $input['folder_sources']) || in_array('imap_folders', $input['folder_sources'])) {
+        if (in_array('email_folders', $input['folder_sources'])) {
             $email = true;
         }
         if (in_array('feeds_folders', $input['folder_sources'])) {
@@ -631,26 +631,26 @@ function main_menu ($input, $output_mod) {
         '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
         '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
         '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
-        '<input class="save_settings" onclick="$(\'.confirm_logout\').fadeOut(200); return false;" type="button" value="Cancel" />'.
+        '<input class="save_settings" onclick="$(\'.confirm_logout\').slideUp(200); return false;" type="button" value="Cancel" />'.
         '</div></form></li></ul></div>';
     return $res;
 }
 function folder_source_menu( $input, $output_mod) {
     $res = '';
     if (isset($input['folder_sources'])) {
-        foreach ($input['folder_sources'] as $src) {
+        foreach (array_unique($input['folder_sources']) as $src) {
             $name = ucfirst(strtolower(explode('_', $src)[0]));
             $res .= '<div class="src_name" onclick="return toggle_section(\'.'.$output_mod->html_safe($src).
                 '\');">'.$output_mod->html_safe($name).
                 '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>';
 
             $res .= '<div style="display: none;" ';
-            $res .= 'class="'.$output_mod->html_safe($src).'">';
+            $res .= 'class="'.$output_mod->html_safe($src).'"><ul class="folders">';
             $cache = Hm_Page_Cache::get($src);
             if ($cache) {
                 $res .= $cache;
             }
-            $res .= '</div>';
+            $res .= '</ul></div>';
         }
     }
     return $res;
@@ -1003,17 +1003,17 @@ function list_settings($output_mod, $since) {
     $res = '<div class="list_controls">'.
         '<a onclick="return Hm_Message_List.load_sources()" href="#"><img class="refresh_list" src="'.
         Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>'.
-        '<a onclick="$(\'.list_settings_dialog\').toggle(100); return false;" href="#" ><img class="list_settings_link" src="'.
+        '<a onclick="$(\'.list_settings_dialog\').slideToggle(200); return false;" href="#" ><img class="list_settings_link" src="'.
         Hm_Image_Sources::$big_cog.'" width="20" height="20" /></a>'.
-        '</div><div class="list_settings_dialog">'.
+        '<div class="list_settings_dialog">'.
         '<table>'.
         '<tr><th>Time period</th><td>'.message_since_dropdown($since).'</td></tr>'.
         '<tr><th>Max per source</th><td></td></tr>'.
-        '<tr><td><input onclick="Hm_Message_List.load_sources(); $(\'.list_settings_dialog\').toggle(100); return flase;" type="button" value="Apply" />'.
-        '<input onclick="$(\'.list_settings_dialog\').toggle(100); return flase;" type="button" value="Cancel" />'.
+        '<tr><td><input onclick="Hm_Message_List.load_sources(); $(\'.list_settings_dialog\').slideToggle(200); return flase;" type="button" value="Apply" />'.
+        '<input onclick="$(\'.list_settings_dialog\').slideToggle(200); return flase;" type="button" value="Cancel" />'.
         '</td></tr>'.
         '</table>'.
-        '</div>';
+        '</div></div>';
     return $res;
 }
 
