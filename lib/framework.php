@@ -1132,7 +1132,7 @@ class Hm_Page_Cache {
             self::$pages[$key] = array($page, $save);
         }
     }
-    public static function del() {
+    public static function del($key) {
         if (isset(self::$pages[$key])) {
             unset(self::$pages[$key]);
             return true;
