@@ -603,7 +603,12 @@ var hide_folder_list = function() {
 var toggle_section = function(class_name) {
     if ($(class_name).length) {
         $(class_name).toggle(200, function() {
-            if ($('.main').css('display') == 'none' && $('.settings').css('display') == 'none' && $('.imap_folders').css('display') == 'none' && $('.pop3_folders').css('display') == 'none' && $('.feeds_folders').css('display') == 'none') {
+            if ($('.main').css('display') == 'none' &&
+                $('.settings').css('display') == 'none' &&
+                ($('.imap_folders').length == 0 || $('.imap_folders').css('display') == 'none') &&
+                ($('.pop3_folders').length == 0 || $('.pop3_folders').css('display') == 'none') &&
+                ($('.feeds_folders').legnth == 0 || $('.feeds_folders').css('display') == 'none')) {
+
                 $('.folder_list').toggle(200, function() {
                     hide_folder_list();
                 });
