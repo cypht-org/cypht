@@ -450,8 +450,17 @@ var Hm_Message_List = {
     },
 
     update_count: function(type) {
+        var count = 0;
         if (type == 'unread') {
-            var count = $('.message_table tbody tr').length;
+            if (hm_list_path == 'unread') {
+                count = $('.message_table tbody tr').length;
+            }
+            else {
+                var data = get_from_local_storage('formatted_unread_data');
+                if (data) {
+                    count = $('<div></div>').append(data).find('tr').length;
+                }
+            }
             $('.unread_count').text(count);
             document.title = 'HM3 '+count+' Unread';
         }
@@ -679,7 +688,6 @@ var set_combined_inbox_state = function() {
 
 var check_empty_list = function() {
     var count = $('.message_table tbody tr').length;
-    console.log(count);
     if (!count) {
         if (!$('.empty_list').length) {
             $('.message_list').append('<div class="empty_list">So Alone!</div>');

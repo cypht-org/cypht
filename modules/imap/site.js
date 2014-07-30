@@ -325,7 +325,8 @@ var imap_message_view_finished = function() {
         }
         else if (hm_list_parent == 'unread') {
             prev_next_links('formatted_unread_data', class_name);
-            update_unread_cache(class_name);
+            var count = update_unread_cache(class_name);
+            Hm_Message_List.update_count('unread');
         }
     }
 };
@@ -351,6 +352,7 @@ var toggle_rows = function() {
 };
 var update_unread_cache = function(class_name) {
     count = Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);
+    return count;
 };
 
 var toggle_long_headers = function() {
