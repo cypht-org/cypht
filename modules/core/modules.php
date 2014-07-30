@@ -566,7 +566,8 @@ class Hm_Output_two_col_layout_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="folder_cell"><div class="folder_list">';
+        $res = '<a class="folder_toggle" href="#" onclick="return open_folder_list();"><img src="'.Hm_Image_Sources::$big_caret.'" width="16" height="16" /></a>'.
+            '<div class="folder_cell"><div class="folder_list">';
         return $res;
     }
 }
@@ -664,7 +665,7 @@ function settings_menu( $input, $output_mod) {
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$cog).'" alt="" width="16" height="16" /> '.$output_mod->trans('Site').'</a></li>'.
         '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$people).'" alt="" width="16" height="16" /> '.$output_mod->trans('Profiles').'</a></li>'.
-        '</ul></div>';
+        '</ul>';
 }
 
 class Hm_Output_folder_list_end extends Hm_Output_Module {
@@ -783,9 +784,9 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
         if (!isset($input['no_message_list_headers']) || !$input['no_message_list_headers']) {
             $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
             '<col class="from_col"><col class="subject_col"><col class="date_col">'.
-            '<col class="icon_col"></colgroup><thead><tr><th colspan="2" class="source">'.
+            '<col class="icon_col"></colgroup><!--<thead><tr><th colspan="2" class="source">'.
             'Source</th><th class="from">From</th><th class="subject">Subject</th>'.
-            '<th class="msg_date">Date</th><th></th></tr></thead>';
+            '<th class="msg_date">Date</th><th></th></tr></thead>-->';
         }
         $res .= '<tbody>';
         return $res;
@@ -804,12 +805,13 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             else {
                 $since = 'today';
             }
-            $res .= message_since_dropdown($since);
         }
-
-        $res .= ' <a class="update_message_list" onclick="return Hm_Message_List.load_sources()"'.
-            ' href="#">[update]</a></div>'.message_controls();
-
+        else {
+            $since = false;
+        }
+        $res .= list_settings($this, $since);
+        $res .= message_controls();
+        $res .= '</div>';
         return $res;
     }
 }
@@ -839,6 +841,9 @@ function human_readable_interval($date_str) {
 
     if ($interval < 0) {
         return 'From the future!';
+    }
+    elseif ($interval == 0) {
+        return 'Just now';
     }
 
     foreach (array_reverse($t) as $name => $val) {
@@ -992,6 +997,23 @@ function display_value($name, $haystack, $type=false, $default='') {
             $res = $value;
             break;
     }
+    return $res;
+}
+function list_settings($output_mod, $since) {
+    $res = '<div class="list_controls">'.
+        '<a onclick="return Hm_Message_List.load_sources()" href="#"><img class="refresh_list" src="'.
+        Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>'.
+        '<a onclick="$(\'.list_settings_dialog\').toggle(100); return false;" href="#" ><img class="list_settings_link" src="'.
+        Hm_Image_Sources::$big_cog.'" width="20" height="20" /></a>'.
+        '</div><div class="list_settings_dialog">'.
+        '<table>'.
+        '<tr><th>Time period</th><td>'.message_since_dropdown($since).'</td></tr>'.
+        '<tr><th>Max per source</th><td></td></tr>'.
+        '<tr><td><input onclick="Hm_Message_List.load_sources(); $(\'.list_settings_dialog\').toggle(100); return flase;" type="button" value="Apply" />'.
+        '<input onclick="$(\'.list_settings_dialog\').toggle(100); return flase;" type="button" value="Cancel" />'.
+        '</td></tr>'.
+        '</table>'.
+        '</div>';
     return $res;
 }
 

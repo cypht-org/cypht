@@ -297,8 +297,8 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
             $header_str = '<table class="msg_headers" cellspacing="0" cellpadding="0">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($input['feed_message_headers'] as $name => $value) {
-                if (!strstr($value, ' ') && strlen($value) > 100) {
-                    $value = substr($value, 0, 100).'...';
+                if ($name != 'link' && !strstr($value, ' ') && strlen($value) > 75) {
+                    $value = substr($value, 0, 75).'...';
                 }
                 if ($name == 'title') {
                     $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
@@ -345,6 +345,10 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     else {
                         $date = '';
                         $timestamp = 0;
+                    }
+                    if ($timestamp > time()) {
+                        $date = human_readable_interval(date('r'));
+                        $timestamp = time();
                     }
                     $url = '?page=message&uid='.urlencode(md5($item['guid'])).'&list_path=feeds_'.$item['server_id'];
                     if (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'combined_inbox') {

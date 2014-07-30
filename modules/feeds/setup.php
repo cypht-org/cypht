@@ -8,7 +8,7 @@ output_source('feeds');
 /* add stuff to the home page */
 add_handler('home', 'load_feeds_from_config', true, 'feeds', 'language', 'after');
 add_handler('home', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
-add_output('home', 'display_feeds_summary', true, 'feeds', 'server_summary_start', 'after');
+//add_output('home', 'display_feeds_summary', true, 'feeds', 'server_summary_start', 'after');
 add_output('home', 'display_feeds_status', true, 'feeds', 'server_status_start', 'after');
 add_output('home', 'feed_ids', true, 'feeds', 'page_js', 'before');
 

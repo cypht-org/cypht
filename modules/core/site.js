@@ -186,6 +186,11 @@ var Hm_Message_List = {
         }
         var msg_ids = Hm_Message_List.add_rows(msgs);
         var count = Hm_Message_List.remove_rows(ids, msg_ids, type);
+        if (count == 0) {
+            if (!$('.empty_list').length) {
+                $('.message_list').append('<div class="empty_list">So Alone!</div>');
+            }
+        }
         return count;
     },
 
@@ -394,10 +399,10 @@ var Hm_Message_List = {
 
     toggle_msg_controls: function() {
         if ($('input:checked').length > 0) {
-            $('.msg_controls a').removeClass('disabled_link');
+            $('.msg_controls a').filter(function(index) { return this.className != 'toggle_link'; }).removeClass('disabled_link');
         }
         else {
-            $('.msg_controls a').addClass('disabled_link');
+            $('.msg_controls a').filter(function(index) { return this.className != 'toggle_link'; }).addClass('disabled_link');
         }
     },
 
@@ -491,11 +496,16 @@ var message_action = function(action_type) {
             {'name': 'message_ids', 'value': selected}],
             false,
             [],
-            false
+            false,
+            reload_after_message_action
         );
         Hm_Message_List.update_after_action(action_type, selected);
     }
     return false;
+};
+
+var reload_after_message_action = function() {
+    Hm_Message_List.load_sources();
 };
 
 var confirm_logout = function() {
@@ -564,20 +574,39 @@ var prev_next_links = function(cache, class_name) {
     if (prev.length) {
         href = prev.find('.subject').find('a').prop('href');
         plink = '<a class="plink" href="'+href+'">'+prev.find('.subject').text()+'</a>';
-        $('<tr class="prev"><th>Previous</th><td>'+plink+'</td></tr>').insertBefore(target);
+        $('<tr class="prev"><th colspan="2"><img class="prevnext" src="images/open_iconic/arrow-circle-top-2x.png" width="16" height="16" /> '+plink+'</th></tr>').insertBefore(target);
     }
     if (next.length) {
         href = next.find('.subject').find('a').prop('href');
         nlink = '<a class="nlink" href="'+href+'">'+next.find('.subject').text()+'</a>';
-        $('<tr class="next"><th>Next</th><td>'+nlink+'</td></tr>').insertBefore(target);
+        $('<tr class="next"><th colspan="2"><img class="prevnext" src="images/open_iconic/arrow-circle-bottom-2x.png" width="16" height="16" /> '+nlink+'</th></tr>').insertBefore(target);
     }
 };
+var open_folder_list = function() {
+    $('.folder_list').toggle(200);
+    toggle_section('.main');
+    $('.folder_toggle').toggle(100);
+    save_to_local_storage('hide_folder_list', '');
+    return false;
+};
 
+var hide_folder_list = function() {
+    $('.folder_toggle').toggle(100);
+    save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+    save_to_local_storage('hide_folder_list', '1');
+};
 
 var toggle_section = function(class_name) {
     if ($(class_name).length) {
         $(class_name).toggle(200, function() {
-            save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+            if ($('.main').css('display') == 'none' && $('.settings').css('display') == 'none' && $('.imap_folders').css('display') == 'none' && $('.pop3_folders').css('display') == 'none' && $('.feeds_folders').css('display') == 'none') {
+                $('.folder_list').toggle(200, function() {
+                    hide_folder_list();
+                });
+            }
+            else {
+                save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+            }
         });
     }
     return false;
@@ -640,11 +669,6 @@ var hl_selected_menu = function() {
 };
 
 var set_combined_inbox_state = function() {
-    if (!$('.message_table tr').length) {
-        if (!$('.empty_list').length) {
-            $('.message_list').append('<div class="empty_list">No messages found!</div>');
-        }
-    }
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_combined_inbox', data.html());
@@ -660,6 +684,10 @@ var folder_list = get_from_local_storage('formatted_folder_list');
 $(function() {
     if (folder_list) {
         $('.folder_list').html(folder_list);
+        if (get_from_local_storage('hide_folder_list') == '1') {
+            $('.folder_list').hide();
+            $('.folder_toggle').show();
+        }
         hl_selected_menu();
     }
     else {

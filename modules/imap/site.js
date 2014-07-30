@@ -101,11 +101,6 @@ var update_imap_unread_display = function(res) {
 };
 
 var set_unread_state = function() {
-    if (!$('.message_table tbody tr').length) {
-        if (!$('.empty_list').length) {
-            $('.message_list').append('<div class="empty_list">No unread messages found!</div>');
-        }
-    }
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_unread_data', data.html());
@@ -136,11 +131,6 @@ var update_flagged_message_display = function(res) {
 };
 
 var set_flagged_state = function() {
-    if (!$('.message_table tr').length) {
-        if (!$('.empty_list').length) {
-            $('.message_list').append('<div class="empty_list">No flagged messages found!</div>');
-        }
-    }
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_flagged_data', data.html());

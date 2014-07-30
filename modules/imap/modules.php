@@ -982,6 +982,9 @@ function merge_imap_search_results($ids, $search_type, $session, $since = false,
                             $msgs = array_slice($msgs, 0, $limit);
                         }
                         foreach ($imap->get_message_list($msgs) as $msg) {
+                            if (stristr($msg['flags'], 'deleted')) {
+                                continue;
+                            }
                             $msg['server_id'] = $id;
                             $msg['folder'] = $folder;
                             $msg['server_name'] = $server_details['name'];
