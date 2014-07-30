@@ -186,11 +186,6 @@ var Hm_Message_List = {
         }
         var msg_ids = Hm_Message_List.add_rows(msgs);
         var count = Hm_Message_List.remove_rows(ids, msg_ids, type);
-        if (count == 0) {
-            if (!$('.empty_list').length) {
-                $('.message_list').append('<div class="empty_list">So Alone!</div>');
-            }
-        }
         return count;
     },
 
@@ -672,14 +667,31 @@ var set_combined_inbox_state = function() {
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_combined_inbox', data.html());
-    $(':checkbox').click(function(e) {
-        Hm_Message_List.toggle_msg_controls();
-        Hm_Message_List.check_select_range(e);
-    });
     Hm_Message_List.update_count('combined_inbox');
+    var empty = check_empty_list();
+    if (!empty) {
+        $(':checkbox').click(function(e) {
+            Hm_Message_List.toggle_msg_controls();
+            Hm_Message_List.check_select_range(e);
+        });
+    }
+};
+
+var check_empty_list = function() {
+    var count = $('.message_table tbody tr').length;
+    console.log(count);
+    if (!count) {
+        if (!$('.empty_list').length) {
+            $('.message_list').append('<div class="empty_list">So Alone!</div>');
+        }
+    }
+    return count == 0;
 };
 
 var folder_list = get_from_local_storage('formatted_folder_list');
+
+var update_unread_count = function() {
+};
 
 $(function() {
     if (folder_list) {

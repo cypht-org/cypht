@@ -105,9 +105,13 @@ var set_unread_state = function() {
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_unread_data', data.html());
     Hm_Message_List.update_count('unread');
-    $(':checkbox').click(function() {
-        Hm_Message_List.toggle_msg_controls();
-    });
+    var empty = check_empty_list();
+    if (!empty) {
+        $(':checkbox').click(function() {
+            Hm_Message_List.toggle_msg_controls();
+            Hm_Message_List.check_select_range(e);
+        });
+    }
 };
 
 /* flagged page */
@@ -134,9 +138,13 @@ var set_flagged_state = function() {
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_flagged_data', data.html());
-    $(':checkbox').click(function() {
-        Hm_Message_List.toggle_msg_controls();
-    });
+    var empty = check_empty_list();
+    if (!empty) {
+        $(':checkbox').click(function() {
+            Hm_Message_List.toggle_msg_controls();
+            Hm_Message_List.check_select_range(e);
+        });
+    }
 };
 
 
@@ -222,6 +230,7 @@ var display_imap_mailbox = function(res) {
     }
     $(':checkbox').click(function() {
         Hm_Message_List.toggle_msg_controls();
+        Hm_Message_List.check_select_range(e);
     });
 };
 
