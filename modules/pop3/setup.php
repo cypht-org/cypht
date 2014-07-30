@@ -8,7 +8,7 @@ output_source('pop3');
 /* add stuff to the home page */
 add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('home', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('home', 'display_pop3_summary', true, 'pop3', 'server_summary_start', 'after');
+//add_output('home', 'display_pop3_summary', true, 'pop3', 'server_summary_start', 'after');
 add_output('home', 'display_pop3_status', true, 'pop3', 'server_status_start', 'after');
 add_output('home', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 

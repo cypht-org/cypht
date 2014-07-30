@@ -8,7 +8,7 @@ output_source('imap');
 /* add stuff to the home page */
 add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('home', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
-add_output('home', 'display_imap_summary', true, 'imap', 'server_summary_start', 'after');
+//add_output('home', 'display_imap_summary', true, 'imap', 'server_summary_start', 'after');
 add_output('home', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
 add_output('home', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
