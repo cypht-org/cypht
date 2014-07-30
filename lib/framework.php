@@ -1119,6 +1119,19 @@ class Hm_Page_Cache {
     public static function add($key, $page, $save=false) {
         self::$pages[$key] = array($page, $save);
     }
+    public static function concat($key, $page, $save = false, $delim=false) {
+        if (isset(self::$pages[$key])) {
+            if ($delim) {
+                self::$pages[$key][0] .= $delim.$page;
+            }
+            else {
+                self::$pages[$key][0] .= $page;
+            }
+        }
+        else {
+            self::$pages[$key] = array($page, $save);
+        }
+    }
     public static function del() {
         if (isset(self::$pages[$key])) {
             unset(self::$pages[$key]);
