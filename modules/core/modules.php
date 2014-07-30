@@ -647,6 +647,7 @@ function folder_source_menu( $input, $output_mod) {
             $res .= '<div style="display: none;" ';
             $res .= 'class="'.$output_mod->html_safe($src).'"><ul class="folders">';
             $cache = Hm_Page_Cache::get($src);
+            Hm_Page_Cache::del($src);
             if ($cache) {
                 $res .= $cache;
             }

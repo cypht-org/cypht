@@ -678,7 +678,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
                     $this->html_safe($folder).'</a></li>';
             }
         }
-        Hm_Page_Cache::concat('email_folders', $res, true);
+        Hm_Page_Cache::concat('email_folders', $res);
         return '';
     }
 }
