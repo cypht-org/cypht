@@ -1185,7 +1185,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
                 }
             }
         }
-        if ($full_change || $attributes['nomodseq']) {
+        if ($full_change || (isset($attributes['nomodseq']) && $attributes['nomodseq'])) {
             $this->bust_cache($mailbox);
         }
         elseif ($partial_change) {
