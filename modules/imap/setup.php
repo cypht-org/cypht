@@ -49,11 +49,13 @@ add_output('message_list', 'imap_server_ids', true, 'imap', 'page_js', 'before')
 /* message view page */
 add_handler('message', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('message', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* page not found */
 add_handler('notfound', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('notfound', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('notfound', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
+add_output('notfound', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* folder list */
 add_handler('ajax_hm_folders', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
@@ -158,6 +160,16 @@ add_handler('ajax_imap_combined_inbox', 'save_imap_servers',  true);
 add_handler('ajax_imap_combined_inbox', 'date', true, 'core');
 add_output('ajax_imap_combined_inbox', 'filter_combined_inbox', true);
 
+/* unread message counter update */
+add_handler('ajax_unread_count', 'login', false, 'core');
+add_handler('ajax_unread_count', 'load_user_data', true, 'core');
+add_handler('ajax_unread_count', 'message_list_type', true, 'core');
+add_handler('ajax_unread_count', 'load_imap_servers_from_config',  true);
+add_handler('ajax_unread_count', 'imap_unread_total',  true);
+add_handler('ajax_unread_count', 'save_imap_cache',  true);
+add_handler('ajax_unread_count', 'save_imap_servers',  true);
+add_handler('ajax_unread_count', 'date', true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -168,6 +180,7 @@ return array(
         'ajax_imap_folder_expand',
         'ajax_imap_folder_display',
         'ajax_imap_combined_inbox',
+        'ajax_unread_count',
         'ajax_imap_message_content',
         'ajax_imap_save_folder_state',
         'ajax_imap_message_action'
