@@ -81,3 +81,5 @@ option, select { padding: 3px; }
 .list_settings_dialog table th { font-size: 90%; font-weight: normal; text-align: left; }
 .folder_toggle { position: absolute; top: 20px; left: 7px; opacity: .5; display: none; }
 .prevnext { opacity: .4; margin-right: 5px; vertical-align: -2px; }
+.plink, .nlink { color: #666; }
+.plink:hover, .nlink:hover { color: green !important; }

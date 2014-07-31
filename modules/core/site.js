@@ -575,13 +575,13 @@ var prev_next_links = function(cache, class_name) {
     }
     if (prev.length) {
         href = prev.find('.subject').find('a').prop('href');
-        plink = '<a class="plink" href="'+href+'">'+prev.find('.subject').text()+'</a>';
-        $('<tr class="prev"><th colspan="2"><img class="prevnext" src="images/open_iconic/arrow-circle-top-2x.png" width="16" height="16" /> '+plink+'</th></tr>').insertBefore(target);
+        plink = '<a class="plink" href="'+href+'"><img class="prevnext" src="images/open_iconic/arrow-circle-top-2x.png" width="16" height="16" /> '+prev.find('.subject').text()+'</a>';
+        $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
     }
     if (next.length) {
         href = next.find('.subject').find('a').prop('href');
-        nlink = '<a class="nlink" href="'+href+'">'+next.find('.subject').text()+'</a>';
-        $('<tr class="next"><th colspan="2"><img class="prevnext" src="images/open_iconic/arrow-circle-bottom-2x.png" width="16" height="16" /> '+nlink+'</th></tr>').insertBefore(target);
+        nlink = '<a class="nlink" href="'+href+'"><img class="prevnext" src="images/open_iconic/arrow-circle-bottom-2x.png" width="16" height="16" /> '+next.find('.subject').text()+'</a>';
+        $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
     }
 };
 var open_folder_list = function() {
@@ -700,9 +700,6 @@ var check_empty_list = function() {
 
 var folder_list = get_from_local_storage('formatted_folder_list');
 
-var update_unread_count = function() {
-};
-
 $(function() {
     if (folder_list) {
         $('.folder_list').html(folder_list);
@@ -732,9 +729,10 @@ $(function() {
     else if (hm_page_name == 'settings' || hm_page_name == 'servers') {
         reload_folders();
     }
-    $('body').fadeIn(300);
     Hm_Timer.fire();
+
+    $('body').fadeIn(300);
     if ($('.sys_messages').text().length) {
-        $('.sys_messages').fadeIn();
+        $('.sys_messages').slideDown();
     }
 });

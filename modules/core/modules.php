@@ -394,7 +394,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
             }
         }
         return '<title>'.$this->html_safe($title).'</title><meta charset="utf-8" />'.
-            '<link rel="icon" type="image/png" href="images/open_iconic/envelope-closed-2x.png">'.
+            '<link rel="icon" class="tab_icon" type="image/png" href="'.Hm_Image_Sources::$env_closed.'">'.
             '<base href="'.$this->html_safe($input['router_url_path']).'" />';
     }
 }
