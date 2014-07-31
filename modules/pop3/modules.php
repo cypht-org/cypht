@@ -2,7 +2,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require 'lib/hm-pop3.php';
+require 'modules/pop3/hm-pop3.php';
 
 class Hm_Handler_pop3_status extends Hm_Handler_Module {
     public function process($data) {
