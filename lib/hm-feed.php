@@ -125,7 +125,6 @@ class Hm_Feed {
                 if ($this->sort) {
                     $this->sort_parsed_data();
                 }
-                /* cache here ... */
                 return true;
             }
             else {
@@ -274,27 +273,4 @@ class Hm_Feed {
         }
     }
 }
-class cache {
-    var $ttl;
-    function cache() {
-        $this->ttl = 300;
-        if (!isset($_SESSION['news_cache'])) {
-            $_SESSION['news_cache'] = array();
-        }
-    }
-    function save_feed($id, $data) {
-        $_SESSION['news_cache'][$id] = array(time(), $data);
-    }
-    function get_feed($id) {
-        if (isset($_SESSION['news_cache'][$id])) {
-            $start_time = $_SESSION['news_cache'][$id][0];
-            $diff = time() - $start_time;
-            if ($diff < $this->ttl) {
-                return $_SESSION['news_cache'][$id][1];
-            }
-        }
-        return false;
-    }
-}
-
 ?>
