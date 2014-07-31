@@ -566,7 +566,7 @@ class Hm_Output_two_col_layout_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<a class="folder_toggle" href="#" onclick="return open_folder_list();"><img src="'.Hm_Image_Sources::$big_caret.'" width="16" height="16" /></a>'.
+        $res = '<a class="folder_toggle" href="#" onclick="return open_folder_list();"><img src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
             '<div class="folder_cell"><div class="folder_list">';
         return $res;
     }
