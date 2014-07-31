@@ -346,10 +346,6 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                         $date = '';
                         $timestamp = 0;
                     }
-                    if ($timestamp > time()) {
-                        $date = human_readable_interval(date('r'));
-                        $timestamp = time();
-                    }
                     $url = '?page=message&uid='.urlencode(md5($item['guid'])).'&list_path=feeds_'.$item['server_id'];
                     if (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'combined_inbox') {
                         $url .= '&list_parent=combined_inbox';
