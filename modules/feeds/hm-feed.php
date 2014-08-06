@@ -110,7 +110,6 @@ class Hm_Feed {
         $this->parsed_data = $final_list;
     }
     function parse_feed($url) {
-        global $dbwrap;
         $this->get_feed_data($url);
         if (!empty($this->parsed_data)) {
             return true;
