@@ -197,7 +197,7 @@ class Hm_Router {
     }
 
     private function check_for_tls($config, $request) {
-        if (!$request->tls && $config->get('force_tls', false)) {
+        if (!$request->tls && !$config->get('disable_tls', false)) {
             $this->redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
         }
     }
