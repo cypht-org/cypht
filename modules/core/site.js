@@ -468,9 +468,9 @@ var Hm_Message_List = {
             document.title = 'HM3 '+count+' Flagged';
         }
         else if (type == 'combined_inbox') {
-            var count = $('.message_table tbody tr').length;
+            var count = $('.unseen', $('.message_table tbody')).length;
             $('.combined_inbox_count').text(count);
-            document.title = 'HM3 '+count+' in Everything';
+            document.title = 'HM3 '+count+' New in Everything';
         }
         else if (type == 'feeds') {
             var count = $('.unseen', $('.message_table tbody')).length;
