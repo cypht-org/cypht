@@ -631,13 +631,18 @@ function folder_source_menu( $input, $output_mod) {
     $res = '';
     if (isset($input['folder_sources'])) {
         foreach (array_unique($input['folder_sources']) as $src) {
-            $name = ucfirst(strtolower(explode('_', $src)[0]));
+            $parts = explode('_', $src);
+            $name = ucfirst(strtolower($parts[0]));
             $res .= '<div class="src_name" onclick="return toggle_section(\'.'.$output_mod->html_safe($src).
                 '\');">'.$output_mod->html_safe($name).
                 '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>';
 
             $res .= '<div style="display: none;" ';
             $res .= 'class="'.$output_mod->html_safe($src).'"><ul class="folders">';
+            if ($name == 'Email') {
+                $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">'.
+                '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> '.$output_mod->trans('All').'</a> <span class="unread_mail_count"></span></li>';
+            }
             $cache = Hm_Page_Cache::get($src);
             Hm_Page_Cache::del($src);
             if ($cache) {

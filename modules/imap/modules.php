@@ -697,8 +697,6 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if (isset($input['imap_folders'])) {
-            $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> '.$this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
             foreach ($input['imap_folders'] as $id => $folder) {
                 $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';

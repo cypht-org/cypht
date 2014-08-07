@@ -659,19 +659,21 @@ var clean_selector = function(str) {
 };
 
 var hl_selected_menu = function() {
-    $('.folder_list').find('*').removeClass('selected_menu');
-    if (hm_page_name == 'message_list') {
-        $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
-        $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
-        $('.menu_'+clean_selector(hm_list_path)).addClass('selected_menu');
-    }
-    else if (hm_list_parent) {
-        $('a:eq(0)', $('.'+clean_selector(hm_list_parent))).addClass('selected_menu');
-        $('a:eq(1)', $('.'+clean_selector(hm_list_parent))).addClass('selected_menu');
-        $('.menu_'+clean_selector(hm_list_parent)).addClass('selected_menu');
-    }
-    else {
-        $('.menu_'+hm_page_name).addClass('selected_menu');
+    if (hm_list_path.length) {
+        $('.folder_list').find('*').removeClass('selected_menu');
+        if (hm_page_name == 'message_list') {
+            $('a:eq(0)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
+            $('a:eq(1)', $('.'+clean_selector(hm_list_path))).addClass('selected_menu');
+            $('.menu_'+clean_selector(hm_list_path)).addClass('selected_menu');
+        }
+        else if (hm_list_parent) {
+            $('a:eq(0)', $('.'+clean_selector(hm_list_parent))).addClass('selected_menu');
+            $('a:eq(1)', $('.'+clean_selector(hm_list_parent))).addClass('selected_menu');
+            $('.menu_'+clean_selector(hm_list_parent)).addClass('selected_menu');
+        }
+        else {
+            $('.menu_'+hm_page_name).addClass('selected_menu');
+        }
     }
 };
 
