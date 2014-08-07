@@ -50,30 +50,20 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
     public function process($data) {
 
         $msgs = array();
-        list($success, $form) = $this->process_form(array('pop3_server_id'));
+        list($success, $form) = $this->process_form(array('pop3_server_id', 'message_list_since'));
         if ($success) {
-            $limit = 0;
-            if (isset($this->request->post['limit'])) {
-                $limit = (int) $this->request->post['limit'];
-            }
-            if (!$limit) {
-                $limit = 20;
-            }
+            $limit = process_limit_argument($this->request->post, $this->user_config);
             $login_time = $this->session->get('login_time', false);
             if ($login_time) {
                 $data['login_time'] = $login_time;
             }
-            if (isset($this->request->post['unread_since'])) {
+            $date = process_since_argument($this->request->post['message_list_since'], $this->user_config);
+            $cutoff_timestamp = strtotime($date);
+            if (isset($this->request->post['pop3_unread_only'])) {
                 $unread_only = true;
-                $date = process_since_argument($this->request->post['unread_since'], $this->user_config);
-                $cutoff_timestamp = strtotime($date);
                 if ($login_time && $login_time > $cutoff_timestamp) {
                     $cutoff_timestamp = $login_time;
                 }
-            }
-            else {
-                $unread_only = false;
-                $cutoff_timestamp = 0;
             }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
@@ -164,6 +154,7 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
                 if ($pop3->state == 'authed') {
                     $data['just_saved_credentials'] = true;
                     Hm_Msgs::add("Server saved");
+                    $this->session->record_unsaved('POP3 server saved');
                 }
                 else {
                     Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
@@ -183,6 +174,7 @@ class Hm_Handler_pop3_forget extends Hm_Handler_Module {
                 Hm_POP3_List::forget_credentials($form['pop3_server_id']);
                 $data['just_forgot_credentials'] = true;
                 Hm_Msgs::add('Server credentials forgotten');
+                $this->session->record_unsaved('POP3 server credentials forgotten');
             }
             else {
                 $data['old_form'] = $form;
@@ -201,6 +193,7 @@ class Hm_Handler_pop3_delete extends Hm_Handler_Module {
                 if ($res) {
                     $data['deleted_server_id'] = $form['pop3_server_id'];
                     Hm_Msgs::add('Server deleted');
+                    $this->session->record_unsaved('POP3 server deleted');
                 }
             }
             else {
@@ -300,6 +293,7 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
                         'port' => $form['new_pop3_port'],
                         'tls' => $tls));
                     Hm_Msgs::add('Added server!');
+                    $this->session->record_unsaved('POP3 server added');
                 }
                 else {
                     Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));

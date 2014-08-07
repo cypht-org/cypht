@@ -375,6 +375,7 @@ return array(
         'section_class' => FILTER_SANITIZE_STRING,
         'message_ids' => FILTER_SANITIZE_STRING,
         'action_type' => FILTER_SANITIZE_STRING,
+        'message_list_since' => FILTER_SANITIZE_STRING
     )
 );
 

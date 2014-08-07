@@ -38,6 +38,7 @@ class Hm_Handler_delete_feed extends Hm_Handler_Module {
                     $data['deleted_server_id'] = $form['feed_id'];
                     $data['reload_folders'] = true;
                     Hm_Msgs::add('Feed deleted');
+                    $this->session->record_unsaved('Feed deleted');
                 }
             }
             else {
@@ -96,31 +97,23 @@ class Hm_Handler_feed_message_action extends Hm_Handler_Module {
 
 class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('feed_server_ids'));
+        list($success, $form) = $this->process_form(array('feed_server_ids', 'message_list_since'));
         if ($success) {
             $ids = explode(',', $form['feed_server_ids']);
             $res = array();
-            $limit = 0;
-            if (isset($this->request->post['limit'])) {
-                $limit = (int) $this->request->post['limit'];
-            }
-            if (!$limit) {
-                $limit = 20;
-            }
+            $unread_only = false;
+            $limit = process_limit_argument($this->request->post, $this->user_config);
             $login_time = $this->session->get('login_time', false);
             if ($login_time) {
                 $data['login_time'] = $login_time;
             }
-            if (isset($this->request->post['unread_since'])) {
-                $date = process_since_argument($this->request->post['unread_since'], $this->user_config);
-                $cutoff_timestamp = strtotime($date);
+            $date = process_since_argument($this->request->post['message_list_since'], $this->user_config);
+            $cutoff_timestamp = strtotime($date);
+            if (isset($this->request->post['feed_unread_only'])) {
+                $unread_only = true;
                 if ($login_time && $login_time > $cutoff_timestamp) {
-                    //$cutoff_timestamp = $login_time;
+                    $cutoff_timestamp = $login_time;
                 }
-            }
-            else {
-                $unread_only = false;
-                $cutoff_timestamp = 0;
             }
             foreach($ids as $id) {
                 $feed_data = Hm_Feed_List::dump($id);
@@ -132,6 +125,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                                 continue;
                             }
                             elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
+                                continue;
+                            }
+                            if (isset($item['guid']) && $unread_only && Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
                                 continue;
                             }
                             else {
@@ -240,6 +236,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                     'tls' => false,
                     'port' => 80
                 ));
+                $this->session->record_unsaved('Feed added');
             }
         }
         return $data;
@@ -393,8 +390,8 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     if (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'combined_inbox') {
                         $url .= '&list_parent=combined_inbox';
                     }
-                    elseif (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'feeds') {
-                        $url .= '&list_parent=feeds';
+                    elseif (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'unread') {
+                        $url .= '&list_parent=unread';
                     }
                     else {
                         $url .= '&list_parent=feeds';
@@ -437,6 +434,8 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if (isset($input['feed_folders'])) {
+            $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> '.$this->trans('All').'</a> <span class="unread_feed_count"></span></li>';
             foreach ($input['feed_folders'] as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
                     '<a href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">'.

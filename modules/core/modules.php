@@ -223,11 +223,11 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             $path = $this->request->get['list_path'];
             if ($path == 'unread') {
                 $data['list_path'] = 'unread';
-                $data['mailbox_list_title'] = array('Unread Mail');
+                $data['mailbox_list_title'] = array('Unread');
             }
             elseif ($path == 'feeds') {
                 $data['list_path'] = 'feeds';
-                $data['mailbox_list_title'] = array('Feeds');
+                $data['mailbox_list_title'] = array('All Feeds');
             }
             elseif ($path == 'flagged') {
                 $data['list_path'] = 'flagged';
@@ -589,13 +589,9 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
 
 function main_menu ($input, $output_mod) {
     $email = false;
-    $feeds = false;
     if (isset($input['folder_sources']) && is_array($input['folder_sources'])) {
         if (in_array('email_folders', $input['folder_sources'])) {
             $email = true;
-        }
-        if (in_array('feeds_folders', $input['folder_sources'])) {
-            $feeds = true;
         }
     }
     $res = '';
@@ -609,13 +605,8 @@ function main_menu ($input, $output_mod) {
         '</a><span class="combined_inbox_count"></span></li>';
     if ($email) {
         $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Unread Mail').
+            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Unread').
             ' <span class="unread_count"></span></a></li>';
-    }
-    if ($feeds) {
-        $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">'.
-            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Feeds').
-            '</a> <span class="unread_feed_count"></span></li>';
     }
     $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$output_mod->trans('Flagged').
@@ -801,7 +792,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res = '<div class="message_list"><div class="content_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
 
-        if ($input['list_path'] == 'unread' || $input['list_path'] == 'feeds') {
+        if (in_array($input['list_path'], array('unread', 'feeds', 'combined_inbox', 'flagged'))) {
             if (isset($input['message_list_since'])) {
                 $since = $input['message_list_since'];
             }
@@ -934,11 +925,25 @@ function process_since_argument($val, $config) {
         $date = date('j-M-Y', strtotime($val));
         $config->set('message_list_since', $val);
     }
-    elseif ($val == 'today') {
+    else {
+        $val == 'today';
         $date = date('j-M-Y');
         $config->set('message_list_since', $val);
     }
     return $date;
+}
+function process_limit_argument($post, $config) {
+    if (isset($post['limit'])) {
+        $limit = (int) $post['limit'];
+    }
+    if (!$limit) {
+        $limit = 20;
+    }
+    if ($limit > 40) {
+        $limit = 40;
+    }
+    $config->set('message_list_limit', $limit);
+    return $limit;
 }
 
 function format_msg_html($str, $external_resources=false) {
@@ -1002,21 +1007,26 @@ function display_value($name, $haystack, $type=false, $default='') {
     }
     return $res;
 }
+
 function list_settings($output_mod, $since) {
     $res = '<div class="list_controls">'.
         '<a onclick="return Hm_Message_List.load_sources()" href="#"><img class="refresh_list" src="'.
-        Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>'.
-        '<a onclick="$(\'.list_settings_dialog\').slideToggle(200); return false;" href="#" ><img class="list_settings_link" src="'.
+        Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+
+    if ($since) {
+        $res .= '<a onclick="$(\'.list_settings_dialog\').slideToggle(200); return false;" href="#" ><img class="list_settings_link" src="'.
         Hm_Image_Sources::$big_cog.'" width="20" height="20" /></a>'.
         '<div class="list_settings_dialog">'.
         '<table>'.
         '<tr><th>Time period</th><td>'.message_since_dropdown($since).'</td></tr>'.
-        '<tr><th>Max per source</th><td></td></tr>'.
-        '<tr><td><input onclick="Hm_Message_List.load_sources(); $(\'.list_settings_dialog\').slideToggle(200); return flase;" type="button" value="Apply" />'.
-        '<input onclick="$(\'.list_settings_dialog\').slideToggle(200); return flase;" type="button" value="Cancel" />'.
+        '<tr><th>Max per source</th><td><input class="limit" type="text" value="20" /></td></tr>'.
+        '<tr><td><input onclick="Hm_Message_List.load_sources(); $(\'.list_settings_dialog\').slideToggle(200); return false;" type="button" value="Apply" />'.
+        '<input onclick="$(\'.list_settings_dialog\').slideToggle(200); return false;" type="button" value="Cancel" />'.
         '</td></tr>'.
         '</table>'.
-        '</div></div>';
+        '</div>';
+    }
+    $res .= '</div>';
     return $res;
 }
 

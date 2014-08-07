@@ -83,3 +83,4 @@ option, select { padding: 3px; }
 .prevnext { opacity: .4; margin-right: 5px; vertical-align: -2px; }
 .plink, .nlink { color: #666; }
 .plink:hover, .nlink:hover { color: green !important; }
+.limit { width: 50px; margin-left: 20px; }

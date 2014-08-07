@@ -82,9 +82,14 @@ var imap_combined_unread_content = function(id) {
     if ($('.message_list_since').length) {
         since = $('.message_list_since option:selected').val();
     }
+    var limit = 20;
+    if ($('.limit').length) {
+        limit = $('.limit').val();
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-        {'name': 'unread_since', 'value': since},
+        {'name': 'message_list_since', 'value': since},
+        {'name': 'limit', 'value': limit},
         {'name': 'imap_server_ids', 'value': id}],
         update_imap_unread_display,
         [],
@@ -115,9 +120,18 @@ var set_unread_state = function() {
 
 /* flagged page */
 var imap_combined_flagged_content = function(id) {
+    var limit = 20;
+    if ($('.limit').length) {
+        limit = $('.limit').val();
+    }
+    var since = 'today';
+    if ($('.message_list_since').length) {
+        since = $('.message_list_since option:selected').val();
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_flagged'},
-        {'name': 'limit', 'value': 10},
+        {'name': 'limit', 'value': limit},
+        {'name': 'message_list_since', 'value': since},
         {'name': 'imap_server_ids', 'value': id}],
         update_flagged_message_display,
         [],
@@ -178,10 +192,15 @@ var imap_combined_inbox_content = function(id) {
     if ($('.message_list_since').length) {
         since = $('.message_list_since option:selected').val();
     }
+    var limit = 20;
+    if ($('.limit').length) {
+        limit = $('.limit').val();
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_combined_inbox'},
         {'name': 'imap_server_ids', 'value': id},
-        {'name': 'unread_since', 'value': since}],
+        {'name': 'limit', 'value': limit},
+        {'name': 'message_list_since', 'value': since}],
         display_imap_combined_inbox,
         [],
         false,
@@ -411,6 +430,6 @@ else if (hm_page_name == 'servers') {
 else if (hm_page_name == 'home') {
     imap_status_update();
 }
-if (hm_page_name != 'message_list' || hm_list_path != 'unread') {
+/*if (hm_page_name != 'message_list' || hm_list_path != 'unread') {
     Hm_Timer.add_job(update_unread_count, 60, true);
-}
+}*/

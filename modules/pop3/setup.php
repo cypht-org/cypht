@@ -142,7 +142,8 @@ return array(
         'pop3_user' => FILTER_SANITIZE_STRING,
         'pop3_pass' => FILTER_SANITIZE_STRING,
         'pop3_list_path' => FILTER_SANITIZE_STRING,
-        'pop3_uid' => FILTER_VALIDATE_INT
+        'pop3_uid' => FILTER_VALIDATE_INT,
+        'pop3_unread_only' => FILTER_VALIDATE_INT,
     )
 );
 

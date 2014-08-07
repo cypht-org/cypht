@@ -44,6 +44,15 @@ add_handler('ajax_feed_combined_inbox', 'feed_list_content',  true);
 add_handler('ajax_feed_combined_inbox', 'date', true, 'core');
 add_output('ajax_feed_combined_inbox', 'filter_feed_list_data', true);
 
+/* combined feeds */
+add_handler('ajax_feed_combined', 'login', false, 'core');
+add_handler('ajax_feed_combined', 'load_user_data', true, 'core');
+add_handler('ajax_feed_combined', 'message_list_type', true, 'core');
+add_handler('ajax_feed_combined', 'load_feeds_from_config',  true);
+add_handler('ajax_feed_combined', 'feed_list_content',  true);
+add_handler('ajax_feed_combined', 'date', true, 'core');
+add_output('ajax_feed_combined', 'filter_feed_list_data', true);
+
 /* unread */
 add_handler('ajax_feed_unread', 'login', false, 'core');
 add_handler('ajax_feed_unread', 'load_user_data', true, 'core');
@@ -97,7 +106,7 @@ return array(
         'ajax_feed_combined_inbox',
         'ajax_feed_list_display',
         'ajax_feed_item_content',
-        'ajax_feed_unread',
+        'ajax_feed_combined',
         'ajax_feed_debug',
         'ajax_feed_status'
     ),
@@ -112,7 +121,8 @@ return array(
         'feed_delete' => FILTER_VALIDATE_INT,
         'new_feed_address' => FILTER_SANITIZE_STRING,
         'feed_list_path' => FILTER_SANITIZE_STRING,
-        'feed_uid' => FILTER_SANITIZE_STRING
+        'feed_uid' => FILTER_SANITIZE_STRING,
+        'feed_unread_only' => FILTER_VALIDATE_INT
     )
 );
 

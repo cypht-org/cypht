@@ -137,17 +137,12 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
 
 class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        list($success, $form) = $this->process_form(array('imap_server_ids', 'message_list_since', 'limit'));
         if ($success) {
-            $limit = 0;
-            if (isset($this->request->post['limit'])) {
-                $limit = (int) $this->request->post['limit'];
-            }
-            if (!$limit) {
-                $limit = 10;
-            }
+            $limit = process_limit_argument($this->request->post, $this->user_config);
+            $date = process_since_argument($form['message_list_since'], $this->user_config);
             $ids = explode(',', $form['imap_server_ids']);
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, false, array('INBOX'), $limit);
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, $date, array('INBOX'), $limit);
             $data['imap_combined_inbox_data'] = $msg_list;
             $data['combined_inbox_server_ids'] = $form['imap_server_ids'];
         }
@@ -157,10 +152,12 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
 
 class Hm_Handler_imap_flagged extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        list($success, $form) = $this->process_form(array('imap_server_ids', 'message_list_since', 'limit'));
         if ($success) {
+            $limit = process_limit_argument($this->request->post, $this->user_config);
             $ids = explode(',', $form['imap_server_ids']);
-            $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session);
+            $date = process_since_argument($form['message_list_since'], $this->user_config);
+            $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, $date, array('INBOX'), $limit);
             $data['imap_flagged_data'] = $msg_list;
             $data['flagged_server_ids'] = $form['imap_server_ids'];
         }
@@ -218,12 +215,13 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
 
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('unread_since', 'imap_server_ids'));
+        list($success, $form) = $this->process_form(array('message_list_since', 'imap_server_ids', 'limit'));
         if ($success) {
-            $date = process_since_argument($form['unread_since'], $this->user_config);
+            $limit = process_limit_argument($this->request->post, $this->user_config);
+            $date = process_since_argument($form['message_list_since'], $this->user_config);
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
-            $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date);
+            $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date, array('INBOX'), $limit);
             $data['imap_unread_data'] = $msg_list;
             $data['unread_server_ids'] = $form['imap_server_ids'];
         }
@@ -251,6 +249,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                         'port' => $form['new_imap_port'],
                         'tls' => $tls));
                     Hm_Msgs::add('Added server!');
+                    $this->session->record_unsaved('IMAP server added');
                 }
                 else {
                     Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));
@@ -373,6 +372,7 @@ class Hm_Handler_imap_forget extends Hm_Handler_Module {
                 Hm_IMAP_List::forget_credentials($form['imap_server_id']);
                 $data['just_forgot_credentials'] = true;
                 Hm_Msgs::add('Server credentials forgotten');
+                $this->session->record_unsaved('IMAP server credentials forgotten');
                 Hm_Page_Cache::flush($this->session);
             }
             else {
@@ -397,6 +397,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                 if ($imap->get_state() == 'authenticated') {
                     $data['just_saved_credentials'] = true;
                     Hm_Msgs::add("Server saved");
+                    $this->session->record_unsaved('IMAP server saved');
                     Hm_Page_Cache::flush($this->session);
                 }
                 else {
@@ -457,6 +458,7 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
                 if ($res) {
                     $data['deleted_server_id'] = $form['imap_server_id'];
                     Hm_Msgs::add('Server deleted');
+                    $this->session->record_unsaved('IMAP server deleted');
                     Hm_Page_Cache::flush($this->session);
                 }
             }
