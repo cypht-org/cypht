@@ -22,6 +22,7 @@ abstract class Hm_Session {
     abstract protected function set($name, $value);
     abstract protected function del($name);
     abstract protected function is_active();
+    abstract protected function record_unsaved($value);
     abstract protected function end();
     abstract protected function destroy($request);
 }
@@ -131,6 +132,9 @@ class Hm_PHP_Session extends Hm_Session {
     }
     public function is_active() {
         return $this->active;
+    }
+    public function record_unsaved($value) {
+        $this->data['changed_settings'][] = $value;
     }
 
     public function destroy($request) {
