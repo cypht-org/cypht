@@ -1,3 +1,33 @@
+var feed_test_action = function() {
+    event.preventDefault();
+    var form = $(this).parent();
+    var id = form.find('#feed_id');
+    Hm_Ajax.request(
+        form.serializeArray(),
+        function(res) {
+            Hm_Notices.show(res.router_user_msgs);
+        },
+        {'feed_connect': 1}
+    );
+};
+
+var feed_delete_action = function() {
+    event.preventDefault();
+    var form = $(this).parent();
+    var id = form.find('#feed_id');
+    Hm_Ajax.request(
+        form.serializeArray(),
+        function(res) {
+            Hm_Notices.show(res.router_user_msgs);
+            if (res.deleted_server_id > -1 ) {
+                reload_folders(true);
+                form.parent().remove();
+            }
+        },
+        {'delete_feed': 1}
+    );
+};
+
 var feeds_combined_unread_content= function(id) {
     var since = 'today';
     if ($('.message_list_since').length) {
@@ -151,6 +181,10 @@ if (hm_page_name == 'message_list') {
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'feed') {
     feed_item_view();
+}
+else if (hm_page_name == 'servers') {
+    $('.feed_delete').on('click', feed_delete_action);
+    $('.test_feed_connect').on('click', feed_test_action);
 }
 else if (hm_page_name == 'home') {
     feed_status_update();

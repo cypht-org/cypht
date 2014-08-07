@@ -4,6 +4,49 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'modules/feeds/hm-feed.php';
 
+class Hm_Handler_feed_connect extends Hm_Handler_Module {
+    public function process($data) {
+        $failed = true; 
+        error_log('here');
+        if (isset($this->request->post['feed_connect'])) {
+            list($success, $form) = $this->process_form(array('feed_id'));
+            if ($success) {
+                $feed_data = Hm_Feed_List::dump($form['feed_id']);
+                error_log(print_r($feed_data,true));
+                if ($feed_data) {
+                    $feed = is_feed($feed_data['server']);
+                    if ($feed) {
+                        $failed = false;
+                        Hm_Msgs::add("Successfully connected to the feed");
+                    }
+                }
+            }
+            if ($failed) {
+                Hm_Msgs::add("ERRFailed to connect to the feed");
+            }
+        }
+        return $data;
+    }
+}
+class Hm_Handler_delete_feed extends Hm_Handler_Module {
+    public function process($data) {
+        if (isset($this->request->post['delete_feed'])) {
+            list($success, $form) = $this->process_form(array('feed_id'));
+            if ($success) {
+                $res = Hm_Feed_List::del($form['feed_id']);
+                if ($res) {
+                    $data['deleted_server_id'] = $form['feed_id'];
+                    $data['reload_folders'] = true;
+                    Hm_Msgs::add('Feed deleted');
+                }
+            }
+            else {
+                $data['old_form'] = $form;
+            }
+        }
+        return $data;
+    }
+}
 class Hm_Handler_feed_status extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
@@ -269,7 +312,7 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
             if (isset($input['feeds'])) {
                 foreach ($input['feeds'] as $index => $vals) {
                     $res .= '<div class="configured_server">';
-                    $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s</div>', $this->html_safe($vals['name']), $this->html_safe($vals['server']));
+                    $res .= sprintf('<div class="server_title">%s</div><div title="%s" class="server_subtitle">%s</div>', $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['server']));
                     $res .= '<form class="feed_connect" method="POST">';
                     $res .= '<input type="hidden" name="feed_id" value="'.$this->html_safe($index).'" />';
                     $res .= '<input type="submit" value="Test" class="test_feed_connect" />';
@@ -354,7 +397,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                         $url .= '&list_parent=feeds';
                     }
                     else {
-                        $url .= '&list_parent=feeds_'.$item['server_id'];
+                        $url .= '&list_parent=feeds';
                     }
                     if (isset($input['news_list_style'])) {
                         $style = 'news';
