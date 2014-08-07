@@ -621,8 +621,8 @@ function main_menu ($input, $output_mod) {
         '</a> <span class="flagged_count"></span></li>'.
         '<!--<li class="menu_search"><a class="unread_link" href="?page=search">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> '.$output_mod->trans('Search').'</a></li>-->'.
-        '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$output_mod->trans('Compose').'</a></li>';
+        '<!-- <li class="menu_compose"><a class="unread_link" href="?page=compose">'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$output_mod->trans('Compose').'</a></li>-->';
 
     $res .=  '<li><form class="logout_form" method="POST">'.
         '<a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
