@@ -164,9 +164,18 @@ var display_feed_item_content = function(res) {
 };
 
 var load_feed_list = function(id) {
+    var since = 'today';
+    if ($('.message_list_since').length) {
+        since = $('.message_list_since option:selected').val();
+    }
+    var limit = 20;
+    if ($('.limit').length) {
+        limit = $('.limit').val();
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_list_display'},
-        {'name': 'limit', 'value': 40},
+        {'name': 'message_list_since', 'value': since},
+        {'name': 'limit', 'value': limit},
         {'name': 'feed_server_ids', 'value': detail.server_id}],
         display_feed_list,
         [],
