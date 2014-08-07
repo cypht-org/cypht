@@ -568,6 +568,7 @@ class Hm_Format_JSON extends HM_Format {
     public function content($input, $lang_str) {
         $input['router_user_msgs'] = Hm_Msgs::get();
         $output = $this->run_modules($input, 'JSON', $lang_str);
+        unset($output['session_type']);
         return json_encode($output, JSON_FORCE_OBJECT);
     }
 }
