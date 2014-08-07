@@ -215,6 +215,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
     }
 }
 
+/* TODO: move module specific logic out of core */
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
     public function process($data) {
         $data['list_path'] = false;
@@ -264,7 +265,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 }
             }
         }
-        if (isset($this->request->get['list_parent'])) { //&& in_array($this->request->get['list_parent'], array('unread', 'flagged', 'combined_inbox'))) {
+        if (isset($this->request->get['list_parent'])) {
             $data['list_parent'] = $this->request->get['list_parent'];
         }
         else {
@@ -722,12 +723,13 @@ class Hm_Output_message_start extends Hm_Output_Module {
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_parent']).
                 '">'.$this->html_safe($list_name).'</a>';
             if (isset($input['mailbox_list_title']) && count($input['mailbox_list_title'] > 1)) {
-                $title .= ' - '.$this->html_safe($input['mailbox_list_title'][1]);
+                $title .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
+                    '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_path']).'">'.$this->html_safe($input['mailbox_list_title'][1]).'</a>';
             }
         }
         elseif (isset($input['mailbox_list_title'])) {
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_path']).'">'.
-                implode('<img class="path_delim" src="images/open_iconic/caret-right.png" alt="&gt;" />', $input['mailbox_list_title']).'</a>';
+                implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']).'</a>';
         }
         else {
             $title = '';
