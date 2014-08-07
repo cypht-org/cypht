@@ -1,6 +1,5 @@
 /* server page actions */
 var imap_delete_action = function() {
-    $('.imap_debug_data').empty();
     event.preventDefault();
     var form = $(this).parent();
     var id = form.find('#imap_server_id');
@@ -9,6 +8,7 @@ var imap_delete_action = function() {
         function(res) {
             if (res.deleted_server_id > -1 ) {
                 form.parent().remove();
+                reload_folders(true);
             }
         },
         {'imap_delete': 1}
@@ -16,7 +16,6 @@ var imap_delete_action = function() {
 };
 
 var imap_save_action = function() {
-    $('.imap_debug_data').empty();
     event.preventDefault();
     var form = $(this).parent();
     var id = form.find('#imap_server_id');
@@ -30,6 +29,7 @@ var imap_save_action = function() {
                 form.find('.imap_password').attr('placeholder', '[saved]');
                 form.append('<input type="submit" value="Forget" class="forget_imap_connection" />');
                 $('.forget_imap_connection').on('click', imap_forget_action);
+                reload_folders(true);
             }
         },
         {'imap_save': 1}
@@ -37,7 +37,6 @@ var imap_save_action = function() {
 };
 
 var imap_forget_action = function() {
-    $('.imap_debug_data').empty();
     event.preventDefault();
     var form = $(this).parent();
     var id = form.find('#imap_server_id');
@@ -51,6 +50,7 @@ var imap_forget_action = function() {
                 form.append('<input type="submit" value="Save" class="save_imap_connection" />');
                 $('.save_imap_connection').on('click', imap_save_action);
                 $('.forget_imap_connection', form).fadeOut(200);
+                reload_folders(true);
             }
         },
         {'imap_forget': 1}
@@ -65,7 +65,6 @@ var setup_server_page = function() {
 };
 
 var imap_test_action = function() {
-    $('.imap_debug_data').empty();
     $('.imap_folder_data').empty();
     event.preventDefault();
     var form = $(this).parent();
