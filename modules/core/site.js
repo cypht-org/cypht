@@ -100,6 +100,7 @@ Hm_Notices = {
     hide_id: false,
 
     show: function(msgs) {
+        window.scrollTo(0,0);
         var msg_list = $.map(msgs, function(v) {
             if (v.match(/^ERR/)) {
                 return '<span class="err">'+v.substring(3)+'</span>';
@@ -622,8 +623,8 @@ var get_from_local_storage = function(key) {
     return sessionStorage.getItem(key);
 };
 
-var reload_folders = function() {
-    if (document.cookie.indexOf('hm_reload_folders=1') > -1) {
+var reload_folders = function(force) {
+    if (document.cookie.indexOf('hm_reload_folders=1') > -1 || force) {
         update_folder_list();
         sessionStorage.clear();
         document.cookie = 'hm_reload_folders=; expires=' + new Date(0).toUTCString();
