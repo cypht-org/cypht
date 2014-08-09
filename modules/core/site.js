@@ -335,7 +335,7 @@ var Hm_Message_List = {
             Hm_Message_List.toggle_msg_controls();
             Hm_Message_List.check_select_range(e);
         });
-        Hm_Message_List.enable_sort();
+        /*Hm_Message_List.enable_sort();*/
     },
 
     select_range: function(start, end) {
