@@ -802,7 +802,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res = '<div class="message_list"><div class="content_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
 
-        if (in_array($input['list_path'], array('unread', 'feeds', 'combined_inbox', 'flagged'))) {
+        if (!strstr($input['list_path'], 'imap')) {
             if (isset($input['message_list_since'])) {
                 $since = $input['message_list_since'];
             }
