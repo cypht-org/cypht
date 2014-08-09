@@ -375,24 +375,34 @@ class Hm_Request {
     public $sapi = false;
     public $format = false;
     public $tls = false;
+    public $mobile = false;
     public $path = '';
 
     public function __construct($filters) {
         $this->sapi = php_sapi_name();
         $this->get_request_type();
 
-        if ($this->type == 'HTTP' || $this->type == 'AJAX') {
-            $this->server = filter_input_array(INPUT_SERVER, $filters['allowed_server'], false);
-            $this->post = filter_input_array(INPUT_POST, $filters['allowed_post'], false);
-            $this->get = filter_input_array(INPUT_GET, $filters['allowed_get'], false);
-            $this->cookie = filter_input_array(INPUT_COOKIE, $filters['allowed_cookie'], false);
-            $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
-            $this->is_tls();
-        }
+        $this->server = filter_input_array(INPUT_SERVER, $filters['allowed_server'], false);
+        $this->post = filter_input_array(INPUT_POST, $filters['allowed_post'], false);
+        $this->get = filter_input_array(INPUT_GET, $filters['allowed_get'], false);
+        $this->cookie = filter_input_array(INPUT_COOKIE, $filters['allowed_cookie'], false);
+        $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
+
+        $this->is_tls();
+        $this->mobile_check();
+
         unset($_POST);
         unset($_SERVER);
         unset($_GET);
         unset($_COOKIE);
+    }
+
+    private function mobile_check() {
+        if (isset($this->server['HTTP_USER_AGENT'])) {
+            if (preg_match("/(iphone|ipod|ipad|android|blackberry|webos)/i", $this->server['HTTP_USER_AGENT'])) {
+                $this->mobile = true;
+            }
+        }
     }
 
     private function is_tls() {
