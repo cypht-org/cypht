@@ -76,7 +76,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .float_title { float: left; }
 .icon img { opacity: .6; vertical-align: -3px; padding-right: 5px; }
 .toggle_link img { vertical-align: 1px; opacity: .6 !important; }
-.toggle_link { padding: 0px; line-height: 10px; margin-top: 3px; margin-right: 5px !important; width: 8px !important; display: inline; opacity: 1 !important; margin-left: 0px; }
+.toggle_link { padding: 0px; line-height: 10px; margin-top: 3px; margin-right: 15px !important; width: 8px !important; display: inline; opacity: 1 !important; margin-left: 0px; }
 .online { color: green; }
 .down { color: red; }
 .header_subject .account_icon { vertical-align: 0px; }
