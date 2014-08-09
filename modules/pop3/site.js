@@ -83,8 +83,18 @@ var display_pop3_mailbox = function(res) {
 };
 
 var load_pop3_list = function(id) {
+    var since = 'today';
+    if ($('.message_list_since').length) {
+        since = $('.message_list_since option:selected').val();
+    }
+    var limit = 20;
+    if ($('.limit').length) {
+        limit = $('.limit').val();
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
+        {'name': 'limit', 'value': limit},
+        {'name': 'message_list_since', 'value': since},
         {'name': 'pop3_server_id', 'value': detail.server_id}],
         display_pop3_mailbox,
         [],
