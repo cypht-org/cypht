@@ -33,7 +33,7 @@ option, select { padding: 3px; }
 .server_status, .server_summary { width: 100%; height: 100%; background-color: #fff; }
 .server_status table, .server_summary table { table-layout: fixed; width: 100%; padding: 20px; padding-bottom: 40px; padding-left: 30px; }
 .server_status table th, .server_summary table th, .message_table th { font-style: normal; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #aaa; font-size: 75%; font-weight: normal; border-bottom: solid 1px #ddd; }
-.server_status table td, .server_summary table td { padding: 5px; overflow: hidden; text-overflow: ellipsis; }
+.server_status table td, .server_summary table td { white-space: nowrap; padding: 5px; overflow: hidden; text-overflow: ellipsis; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
 .inner_list { margin-bottom: 10px; } 
@@ -84,3 +84,16 @@ option, select { padding: 3px; }
 .plink, .nlink { color: #666; }
 .plink:hover, .nlink:hover { color: green !important; }
 .limit { width: 50px; margin-left: 20px; }
+
+@media screen and (max-device-width:1080px){
+/*@media screen and (max-width:7000px){*/
+    .account_icon, { width: 24px; height: 24px; vertical-align: -5px; }
+    .list_settings_link, .refresh_list { width: 30px; height: 30px; margin-top: -5px; }
+    .folder_toggle img { width: 30px; height: 30px; }
+    .folder_toggle{ top: 11px; left: 0px; }
+    .combined_inbox_count, .flagged_count, .unread_count { display: none; }
+    .loading_icon { top: 1px; left: 30px; right: auto; }
+    .content_title { padding-left: 35px; }
+    .checkbox_cell { padding-left: 15px !important; }
+    .folder_list { min-width: 150px; }
+}

@@ -711,6 +711,9 @@ class Hm_Output_filter_flagged_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_flagged_data'])) {
             $style = isset($input['news_list_style']) ? 'news' : 'email';
+            if ($input['is_mobile']) {
+                $style = 'news';
+            }
             $res = format_imap_message_list($input['imap_flagged_data'], $this, 'flagged', $style);
             $input['formatted_flagged_data'] = $res;
             unset($input['imap_flagged_data']);
@@ -726,6 +729,9 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_unread_data'])) {
             $style = isset($input['news_list_style']) ? 'news' : 'email';
+            if ($input['is_mobile']) {
+                $style = 'news';
+            }
             $res = format_imap_message_list($input['imap_unread_data'], $this, 'unread', $style);
             $input['formatted_unread_data'] = $res;
             unset($input['imap_unread_data']);
@@ -741,6 +747,9 @@ class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_combined_inbox_data']) && !empty($input['imap_combined_inbox_data'])) {
             $style = isset($input['news_list_style']) ? 'news' : 'email';
+            if ($input['is_mobile']) {
+                $style = 'news';
+            }
             $res = format_imap_message_list($input['imap_combined_inbox_data'], $this, 'combined_inbox', $style);
             $input['formatted_combined_inbox'] = $res;
             unset($input['imap_combined_inbox_data']);
@@ -757,6 +766,9 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         $res = array();
         if (isset($input['imap_mailbox_page']) && !empty($input['imap_mailbox_page'])) {
             $style = isset($input['news_list_style']) ? 'news' : 'email';
+            if ($input['is_mobile']) {
+                $style = 'news';
+            }
             $res = format_imap_message_list($input['imap_mailbox_page'], $this, false, $style);
             $input['formatted_mailbox_page'] = $res;
             Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $res);

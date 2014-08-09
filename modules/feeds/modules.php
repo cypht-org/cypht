@@ -7,12 +7,10 @@ require 'modules/feeds/hm-feed.php';
 class Hm_Handler_feed_connect extends Hm_Handler_Module {
     public function process($data) {
         $failed = true; 
-        error_log('here');
         if (isset($this->request->post['feed_connect'])) {
             list($success, $form) = $this->process_form(array('feed_id'));
             if ($success) {
                 $feed_data = Hm_Feed_List::dump($form['feed_id']);
-                error_log(print_r($feed_data,true));
                 if ($feed_data) {
                     $feed = is_feed($feed_data['server']);
                     if ($feed) {
@@ -401,6 +399,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     }
                     else {
                         $style = 'email';
+                    }
+                    if ($input['is_mobile']) {
+                        $style = 'news';
                     }
                     if (Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
                         $flags = array();

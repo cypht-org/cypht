@@ -164,6 +164,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
                 }
             }
         }
+        $data['is_mobile'] = $this->request->mobile;
         return $data;
     }
 }
@@ -284,6 +285,9 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             $data['uid'] = $this->request->get['uid'];
         }
         $list_style = $this->user_config->get('list_style', false);
+        if ($data['is_mobile']) {
+            $list_style = 'news_style';
+        }
         if ($list_style == 'news_style') {
             $data['no_message_list_headers'] = true;
             $data['news_list_style'] = true;
@@ -395,6 +399,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
             }
         }
         return '<title>'.$this->html_safe($title).'</title><meta charset="utf-8" />'.
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
             '<link rel="icon" class="tab_icon" type="image/png" href="'.Hm_Image_Sources::$env_closed.'">'.
             '<base href="'.$this->html_safe($input['router_url_path']).'" />';
     }

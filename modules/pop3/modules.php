@@ -52,6 +52,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
         $msgs = array();
         list($success, $form) = $this->process_form(array('pop3_server_id', 'message_list_since'));
         if ($success) {
+            $unread_only = false;
             $limit = process_limit_argument($this->request->post, $this->user_config);
             $login_time = $this->session->get('login_time', false);
             if ($login_time) {
@@ -503,6 +504,9 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
         $input['formatted_mailbox_page'] = array();
         if (isset($input['pop3_mailbox_page'])) {
             $style = isset($input['news_list_style']) ? 'news' : 'email';
+            if ($input['is_mobile']) {
+                $style = 'news';
+            }
             if (isset($input['login_time'])) {
                 $login_time = $input['login_time'];
             }
