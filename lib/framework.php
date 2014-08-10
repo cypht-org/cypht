@@ -239,7 +239,7 @@ class Hm_Router {
         return $session;
     }
     private function get_active_mods($mod_list) {
-        return array_unique(array_values(array_map(function($v) { return $v['source']; }, $mod_list)));
+        return array_unique(array_values(array_map(function($v) { return $v[0]; }, $mod_list)));
     }
 
     private function load_modules($config, $handlers=array(), $output=array()) {
@@ -247,7 +247,7 @@ class Hm_Router {
         foreach ($handlers as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
                 if ($this->page == $page) {
-                    Hm_Handler_Modules::add($page, $name, $vals['logged_in'], false, 'after', true, $vals['source']);
+                    Hm_Handler_Modules::add($page, $name, $vals[1], false, 'after', true, $vals[0]);
                 }
             }
         }
@@ -256,7 +256,7 @@ class Hm_Router {
         foreach ($output as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
                 if ($this->page == $page) {
-                    Hm_Output_Modules::add($page, $name, $vals['logged_in'], false, 'after', true, $vals['source']);
+                    Hm_Output_Modules::add($page, $name, $vals[1], false, 'after', true, $vals[0]);
                 }
             }
         }
@@ -503,8 +503,8 @@ class Hm_Request_Handler {
             $input = false;
             $name = "Hm_Handler_$name";
             if (class_exists($name)) {
-                if (!$args['logged_in'] || ($args['logged_in'] && $this->session->active)) {
-                    $mod = new $name( $this, $args['logged_in']);
+                if (!$args[1] || ($args[1] && $this->session->active)) {
+                    $mod = new $name( $this, $args[1]);
                     $input = $mod->process($this->response);
                 }
             }
@@ -548,7 +548,7 @@ abstract class HM_Format {
         foreach ($this->modules as $name => $args) {
             $name = "Hm_Output_$name";
             if (class_exists($name)) {
-                if (!$args['logged_in'] || ($args['logged_in'] && $input['router_login_state'])) {
+                if (!$args[1] || ($args[1] && $input['router_login_state'])) {
                     $mod = new $name($input);
                     if ($format == 'JSON') {
                         $mod_output = $mod->output_content($input, $format, $lang_str);
@@ -819,14 +819,14 @@ trait Hm_Modules {
                 }
                 $list = self::$module_list[$page];
                 self::$module_list[$page] = array_merge(array_slice($list, 0, $index), 
-                    array($module => array('source' => $source, 'logged_in' => $logged_in)),
+                    array($module => array($source, $logged_in)),
                     array_slice($list, $index));
                 $inserted = true;
             }
         }
         else {
             $inserted = true;
-            self::$module_list[$page][$module] = array('source' => $source, 'logged_in' => $logged_in);
+            self::$module_list[$page][$module] = array($source, $logged_in);
         }
         if (!$inserted) {
             if ($queue) {
