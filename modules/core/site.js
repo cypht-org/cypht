@@ -493,8 +493,8 @@ var prev_next_links = function(cache, class_name) {
     }
 };
 var open_folder_list = function() {
-    $('.folder_list').toggle(200);
-    toggle_section('.main');
+    $('.folder_list').slideDown(200);
+    toggle_section('.main', true);
     $('.folder_toggle').toggle(100);
     save_to_local_storage('hide_folder_list', '');
     return false;
@@ -506,8 +506,11 @@ var hide_folder_list = function() {
     save_to_local_storage('hide_folder_list', '1');
 };
 
-var toggle_section = function(class_name) {
+var toggle_section = function(class_name, force_on) {
     if ($(class_name).length) {
+        if (force_on) {
+            $(class_name).css('display', 'none');
+        }
         $(class_name).toggle(200, function() {
             if ($('.main').css('display') == 'none' &&
                 $('.settings').css('display') == 'none' &&

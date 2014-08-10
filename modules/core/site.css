@@ -121,12 +121,16 @@ option, select { padding: 3px; }
     .msg_text_inner { font-size: 140%; }
 }
 @media screen and (max-device-width:480px) and (orientation : portrait) {
+    .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
     body { font-size: 90%; min-width: 100%; }
     .folder_list { display: none; width: 340px; }
-    .content_cell { min-width: 360px; }
-    .folder_toggle { display: block; top: 26px; left: 0px; }
+    .content_cell { min-width: 360px; max-width: 480px; }
+    .content_title { padding-left: 30px; padding-top: 5px; margin-bottom: 5px; }
+    .folder_toggle { display: block; top: 19px; left: 0px; }
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
-    .list_settings_link, .refresh_list { width: 24px; height: 24px; }
+    .list_settings_link, .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
     .folder_toggle img { width: 24px; height: 24px; }
     .update_message_list { margin-right: 20px; }
+    .msg_text { font-size: 100%; }
+    .msg_text_inner { font-size: 100%; }
 }
