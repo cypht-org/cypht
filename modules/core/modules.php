@@ -898,13 +898,13 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
 }
 
 function message_controls() {
-    return '<div class="msg_controls">'.
-        '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
-        '<a href="#" onclick="return message_action(\'read\');" class="disabled_link">Read</a>'.
-        '<!--<a href="#" onclick="return message_action(\'unread\');" class="disabled_link">Unread</a>-->'.
-        '<a href="#" onclick="return message_action(\'flag\');" class="disabled_link">Flag</a>'.
-        '<a href="#" onclick="return message_action(\'unflag\');" class="disabled_link">Unflag</a>'.
-        '<a href="#" onclick="return message_action(\'delete\');" class="disabled_link">Delete</a></div>';
+    return '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
+        '<div class="msg_controls">'.
+        '<a href="#" onclick="return message_action(\'read\');">Read</a>'.
+        '<!--<a href="#" onclick="return message_action(\'unread\');">Unread</a>-->'.
+        '<a href="#" onclick="return message_action(\'flag\');">Flag</a>'.
+        '<a href="#" onclick="return message_action(\'unflag\');">Unflag</a>'.
+        '<a href="#" onclick="return message_action(\'delete\');">Delete</a></div>';
 }
 
 function message_since_dropdown($since) {
