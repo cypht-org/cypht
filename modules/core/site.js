@@ -58,6 +58,9 @@ Hm_Ajax_Request = function() { return {
         }
         else {
             res = jQuery.parseJSON(res);
+            if (!res.router_login_state) {
+                window.location.href = "?page=home";
+            }
             if (res.date) {
                 $('.date').html(res.date);
             }
