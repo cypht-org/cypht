@@ -123,11 +123,13 @@ option, select { padding: 3px; }
 @media screen and (max-device-width:480px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
     body { font-size: 90%; min-width: 100%; }
+    .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
     .folder_list { display: none; width: 340px; }
     .content_cell { min-width: 360px; max-width: 480px; }
     .content_title { padding-left: 30px; padding-top: 5px; margin-bottom: 5px; }
     .folder_toggle { display: block; top: 19px; left: 0px; }
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
+    .message_table { padding-left: 10px !important; }
     .list_settings_link, .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
     .folder_toggle img { width: 24px; height: 24px; }
     .update_message_list { margin-right: 20px; }
