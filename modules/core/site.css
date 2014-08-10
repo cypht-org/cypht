@@ -52,8 +52,8 @@ option, select { padding: 3px; }
 .no_servers { text-align: center; padding: 50px; margin: auto; padding-bottom: 100px; }
 .selected_menu, .selected_menu a { color: Teal !important; line-height: 1.25em;}
 
-.src_name { cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 125%; letter-spacing: -1px; padding-bottom: 5px; }
-.content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 5px; padding-top: 5px; letter-spacing: -1px; font-size: 125%; padding-left: 30px; }
+.src_name { cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
+.content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 10px; padding-top: 5px; letter-spacing: -1px; font-size: 125%; padding-left: 30px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
@@ -74,7 +74,7 @@ option, select { padding: 3px; }
 .news_cell .subject { padding-bottom: 5px !important; }
 .news_cell .icon { float: right; }
 .wait { cursor: progress; }
-.refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 10px; vertical-align: -2px; }
+.refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 10px; vertical-align: -10px; }
 .list_settings_dialog { display: none; padding: 10px; position: absolute; top: 0px; right: 0px; width: 600px; background-color: #efefef; border: solid 1px #ccc; }
 .list_controls { margin-top: -20px; padding: 10px; padding-right: 20px; float: right; }
 .list_settings_dialog table { width: 1%; white-space: nowrap; }
@@ -89,7 +89,7 @@ option, select { padding: 3px; }
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }
     .list_settings_link, .refresh_list { width: 38px; height: 38px; margin-top: -3px; }
     .folder_toggle img { width: 36px; height: 42px; }
-    .folder_toggle{ top: 20px; left: 0px; }
+    .folder_toggle{ top: 25px; left: 0px; }
     .folders a { font-size: 125%; }
     .combined_inbox_count, .flagged_count, .unread_count { display: none; }
     .folders li { padding-bottom: 5px; padding-top: 5px; }
@@ -97,9 +97,11 @@ option, select { padding: 3px; }
     .content_title { padding-left: 35px; }
     .checkbox_cell { padding-left: 15px !important; }
     .folder_list { min-width: 150px; }
-    .src_name, .content_title { font-size: 165%; padding-bottom: 15px; padding-top: 15px; }
+    .src_name, .content_title { font-size: 140%; padding-bottom: 15px; padding-top: 15px; }
+    body { font-size: 150%; }
     .gravatar { display: none; }
     .list_controls { padding-right: 10px; }
+    .msg_text { font-size: 125%; }
 }
 @media screen and (max-device-width:1080px) and (orientation : landscape) {
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
@@ -109,10 +111,10 @@ option, select { padding: 3px; }
     .folders a { font-size: 115%; }
     .combined_inbox_count, .flagged_count, .unread_count { display: none; }
     .loading_icon { top: 1px; left: 30px; right: auto; }
-    .content_title { padding-left: 35px; padding-top: 3px; padding-bottom: 7px; }
+    .content_title { padding-left: 35px; }
     .checkbox_cell { padding-left: 15px !important; }
     .folder_list { min-width: 150px; }
-    .src_name, .content_title { font-size: 135%; }
+    .src_name, .content_title { font-size: 125%; }
     .gravatar { display: none; }
     .list_controls { padding-right: 10px; }
 }
