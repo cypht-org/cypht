@@ -60,8 +60,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     /* use built in caching. strongly recommended */
     public $use_cache = true;
 
-    /* limit LIST/LSUB responses to this many folders */
-    public $folder_max = 500;
+    /* limit LIST/LSUB responses to this many characters */
+    public $folder_max = 50000;
 
     /* number of commands and responses to keep in memory. */
     public $max_history = 1000;
@@ -306,6 +306,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
             $this->send_command($command);
             $result = $this->get_response($this->folder_max, true);
+            error_log(print_r($result, true));
 
             /* loop through the "parsed" response. Each iteration is one folder */
             foreach ($result as $vals) {
