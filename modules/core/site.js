@@ -569,7 +569,6 @@ var clean_selector = function(str) {
 };
 
 var hl_selected_menu = function() {
-    console.log(hm_page_name);
     if (hm_list_path.length) {
         $('.folder_list').find('*').removeClass('selected_menu');
         if (hm_page_name == 'message_list') {
