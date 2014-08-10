@@ -14,7 +14,7 @@ td { vertical-align: top; }
 .logout_form a {}
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .placeholder { width: 100px !important; }
-.loading_icon { text-align: center; display: none; position: absolute; right: 120px; top: 15px; }
+.loading_icon { text-align: center; display: none; position: absolute; right: 120px; top: 17px; }
 .loading_icon img { width: 67px; height: 10px; visibility: inherit; }
 .combined_inbox_count, .unread_feed_count, .flagged_count, .unread_count { float: right; color: #aaa; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
