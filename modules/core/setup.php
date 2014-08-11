@@ -107,6 +107,7 @@ add_handler('settings', 'load_user_data', true);
 add_handler('settings', 'language',  true);
 add_handler('settings', 'title', true);
 add_handler('settings', 'date', true);
+add_handler('settings', 'process_change_password', true);
 add_handler('settings', 'process_language_setting', true);
 add_handler('settings', 'process_list_style_setting', true);
 add_handler('settings', 'process_timezone_setting', true);
@@ -133,6 +134,7 @@ add_output('settings', 'content_section_start', true);
 add_output('settings', 'start_settings_form', true);
 add_output('settings', 'language_setting', true);
 add_output('settings', 'timezone_setting', true);
+add_output('settings', 'change_password', true);
 add_output('settings', 'list_style_setting', true);
 add_output('settings', 'end_settings_form', true);
 add_output('settings', 'content_section_end', true);
@@ -375,7 +377,9 @@ return array(
         'section_class' => FILTER_SANITIZE_STRING,
         'message_ids' => FILTER_SANITIZE_STRING,
         'action_type' => FILTER_SANITIZE_STRING,
-        'message_list_since' => FILTER_SANITIZE_STRING
+        'message_list_since' => FILTER_SANITIZE_STRING,
+        'new_pass1' => FILTER_SANITIZE_STRING,
+        'new_pass2' => FILTER_SANITIZE_STRING
     )
 );
 

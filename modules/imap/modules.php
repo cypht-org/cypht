@@ -576,9 +576,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             }
             if ($vals['name'] == 'Default-Auth-Server') {
                 $vals['name'] = 'Default';
-                if (stristr($input['session_type'], 'imap')) {
-                    $no_edit = true;
-                }
+                $no_edit = true;
             }
             $res .= '<div class="configured_server">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',

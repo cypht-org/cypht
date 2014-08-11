@@ -34,6 +34,28 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_process_change_password extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2'));
+        if ($success) {
+            if ($this->session->internal_users) {
+                if ($form['new_pass1'] && $form['new_pass2']) {
+                    if ($form['new_pass1'] != $form['new_pass2']) {
+                        Hm_Msgs::add("ERRNew passwords don't match");
+                    }
+                    else {
+                        $user = $this->session->get('username', false);
+                        if ($this->session->change_pass($user, $form['new_pass1'])) {
+                            $data['new_password'] = $form['new_pass1'];
+                        }
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
@@ -70,7 +92,11 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                 }
                 $user = $this->session->get('username', false);
                 $path = $this->config->get('user_settings_dir', false);
-                if ($this->session->auth($user, $form['password'])) {
+
+                if (isset($data['new_password'])) {
+                    $pass = $data['new_password'];
+                }
+                elseif ($this->session->auth($user, $form['password'])) {
                     $pass = $form['password'];
                 }
                 else {
@@ -127,7 +153,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
             else {
                 $this->session->check($this->request);
             }
-            $data['session_type'] = get_class($this->session);
+            $data['internal_users'] = $this->session->internal_users;
             if ($this->session->is_active()) {
                 Hm_Page_Cache::load($this->session);
             }
@@ -140,7 +166,9 @@ class Hm_Handler_create_user extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('username', 'password', 'create_hm_user'));
         if ($success) {
-            $this->session->create($this->request, $form['username'], $form['password']);
+            if ($this->session->internal_users) {
+                $this->session->create($this->request, $form['username'], $form['password']);
+            }
         }
         return $data;
     }
@@ -315,8 +343,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 ' <input type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
                 ' <input type="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" />';
-            if (($input['session_type'] == 'Hm_DB_Session_DB_Auth' || $input['session_type'] == 'Hm_PHP_Session_DB_Auth') &&
-                $input['router_page_name'] == 'home') {
+            if (isset($input['internal_users']) && $input['internal_users'] && $input['router_page_name'] == 'home') {
                 $res .= ' <input type="submit" name="create_hm_user" value="Create" />';
             }
             $res .= '</form>';
@@ -497,6 +524,17 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
             $res .= 'value="'.$val.'">'.$label.'</option>';
         }
         $res .= '</select></td></tr>';
+        return $res;
+    }
+}
+
+class Hm_Output_change_password extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if (isset($input['internal_users']) && $input['internal_users']) {
+            $res .= '<tr><td>New Password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
+                ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
+        }
         return $res;
     }
 }
