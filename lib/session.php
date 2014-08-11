@@ -7,6 +7,8 @@ abstract class Hm_Session {
 
     public $active = false;
     public $loaded = false;
+    public $internal_users = false;
+
     protected $enc_key = '';
     protected $data = array();
     protected $cname = false;
@@ -159,6 +161,7 @@ class Hm_PHP_Session extends Hm_Session {
 /* persistant storage with vanilla PHP sessions and DB based authentication */
 class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
 
+    public $internal_users = true;
     protected $dbh = false;
 
     public function check($request, $user=false, $pass=false) {
@@ -197,6 +200,17 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
     protected function connect() {
         $this->dbh = Hm_DB::connect($this->site_config);
         if ($this->dbh) {
+            return true;
+        }
+        return false;
+    }
+
+    public function change_pass($user, $pass) {
+        $this->connect();
+        $hash = pbkdf2_create_hash($pass);
+        $sql = $this->dbh->prepare("update hm_user set hash=? where username=?");
+        if ($sql->execute(array($hash, $user))) {
+            Hm_Msgs::add("Password changed");
             return true;
         }
         return false;
@@ -380,21 +394,25 @@ trait Hm_IMAP_Auth {
 
 /* persistant storage with vanilla PHP sessions and IMAP based authentication */
 class Hm_PHP_Session_IMAP_Auth extends Hm_PHP_Session_DB_Auth {
+    public $internal_users = false;
     use Hm_IMAP_Auth;
 }
 
 /* persistant storage with vanilla PHP sessions and POP3 based authentication */
 class Hm_PHP_Session_POP3_Auth extends Hm_PHP_Session_DB_Auth {
+    public $internal_users = false;
     use Hm_POP3_Auth;
 }
 
 /* persistant storage with custom DB sessions and IMAP based authentication */
 class Hm_DB_Session_IMAP_Auth extends Hm_DB_Session_DB_Auth {
+    public $internal_users = false;
     use Hm_IMAP_Auth;
 }
 
 /* persistant storage with custom DB sessions and POP3 based authentication */
 class Hm_DB_Session_POP3_Auth extends Hm_DB_Session_DB_Auth {
+    public $internal_users = false;
     use Hm_POP3_Auth;
 }
 
