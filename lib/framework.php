@@ -319,6 +319,7 @@ class Hm_Router {
         $response = $handler->process_request($this->page, $request, $session, $config);
         return $response;
     }
+
     private function build_nonce_base($session, $config, $request) {
         $result = $session->get('username', false);
         if (isset($request->cookie['hm_id'])) {
