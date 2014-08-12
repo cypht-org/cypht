@@ -548,8 +548,21 @@ var save_to_local_storage = function(key, val) {
     return false;
 };
 
+var sort_list = function(class_name, exclude_name) {
+	var folder = $('.'+class_name+' ul');
+	var listitems = $('li:not(.'+exclude_name+')', folder);
+	listitems.sort(function(a, b) {
+		if ($(b).text().toUpperCase() == 'ALL') {
+			return true;
+		}
+	   return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+	});
+	jQuery.each(listitems, function(idx, itm) { folder.append(itm); });
+}
 var update_folder_list_display = function(res) {
     $('.folder_list').html(res.formatted_folder_list);
+	sort_list('email_folders', 'menu_email');
+	sort_list('feeds_folders', 'menu_feeds');
     save_to_local_storage('formatted_folder_list', res.formatted_folder_list);
     hl_selected_menu();
 };
