@@ -254,6 +254,10 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['list_path'] = 'unread';
                 $data['mailbox_list_title'] = array('Unread');
             }
+            elseif ($path == 'email') {
+                $data['list_path'] = 'email';
+                $data['mailbox_list_title'] = array('All Email');
+            }
             elseif ($path == 'feeds') {
                 $data['list_path'] = 'feeds';
                 $data['mailbox_list_title'] = array('All Feeds');
@@ -967,17 +971,19 @@ function message_since_dropdown($since) {
     return $res;
 }
 
-function process_since_argument($val, $config) {
+function process_since_argument($val, $config, $page='') {
     $date = false;
+    if ($page) {
+        $page = '_'.$page;
+    }
     if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'))) {
         $date = date('j-M-Y', strtotime($val));
-        $config->set('message_list_since', $val);
     }
     else {
         $val == 'today';
         $date = date('j-M-Y');
-        $config->set('message_list_since', $val);
     }
+    $config->set('message_list_since'.$page, $val);
     return $date;
 }
 function process_limit_argument($post, $config) {
