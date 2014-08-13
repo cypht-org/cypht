@@ -558,7 +558,8 @@ var sort_list = function(class_name, exclude_name) {
 	   return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
 	});
 	jQuery.each(listitems, function(idx, itm) { folder.append(itm); });
-}
+};
+
 var update_folder_list_display = function(res) {
     $('.folder_list').html(res.formatted_folder_list);
 	sort_list('email_folders', 'menu_email');
@@ -607,7 +608,6 @@ var set_combined_inbox_state = function() {
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_combined_inbox', data.html());
-    Hm_Message_List.update_count('combined_inbox');
     var empty = check_empty_list();
     if (!empty) {
         $(':checkbox').click(function(e) {
@@ -645,8 +645,11 @@ $(function() {
         if (hm_list_path == 'feeds') {
             Hm_Message_List.setup_combined_view('formatted_feed_data');
         }
-        if (hm_list_path == 'combined_inbox') {
+        else if (hm_list_path == 'combined_inbox') {
             Hm_Message_List.setup_combined_view('formatted_combined_inbox');
+        }
+        else if (hm_list_path == 'email') {
+            Hm_Message_List.setup_combined_view('formatted_email_data');
         }
         else if (hm_list_path == 'unread') {
             Hm_Message_List.setup_combined_view('formatted_unread_data');
