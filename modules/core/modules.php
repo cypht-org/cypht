@@ -6,7 +6,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 class Hm_Handler_http_headers extends Hm_Handler_Module {
     public function process($data) {
-        if (isset($data['language'])) {
+        if (array_key_exists('language', $data)) {
             $data['http_headers'][] = 'Content-Language: '.substr($data['language'], 0, 2);
         }
         if ($this->request->tls) {
@@ -86,14 +86,14 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'password'));
         if ($success) {
-            if (isset($data['new_user_settings'])) {
+            if (array_key_exists('new_user_settings', $data)) {
                 foreach ($data['new_user_settings'] as $name => $value) {
                     $this->user_config->set($name, $value);
                 }
                 $user = $this->session->get('username', false);
                 $path = $this->config->get('user_settings_dir', false);
 
-                if (isset($data['new_password'])) {
+                if (array_key_exists('new_password', $data)) {
                     $pass = $data['new_password'];
                 }
                 elseif ($this->session->auth($user, $form['password'])) {
@@ -112,7 +112,7 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                 Hm_Page_Cache::flush($this->session);
             }
         }
-        elseif (isset($this->request->post['save_settings'])) {
+        elseif (array_key_exists('save_settings', $this->request->post)) {
             /* TODO: save current settings in session */
             Hm_Msgs::add('ERRYour password is required to save your settings to the server');
         }
@@ -144,7 +144,7 @@ class Hm_Handler_date extends Hm_Handler_Module {
 
 class Hm_Handler_login extends Hm_Handler_Module {
     public function process($data) {
-        if (!isset($this->request->post['create_hm_user'])) {
+        if (!array_key_exists('create_hm_user', $this->request->post)) {
             list($success, $form) = $this->process_form(array('username', 'password'));
             if ($success) {
                 $this->session->check($this->request, $form['username'], $form['password']);
@@ -209,11 +209,11 @@ class Hm_Handler_save_user_data extends Hm_Handler_Module {
 
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process($data) {
-        if (isset($this->request->post['logout']) && !$this->session->loaded) {
+        if (array_key_exists('logout', $this->request->post) && !$this->session->loaded) {
             $this->session->destroy($this->request);
             Hm_Msgs::add('Session destroyed on logout');
         }
-        elseif (isset($this->request->post['save_and_logout'])) {
+        elseif (array_key_exists('save_and_logout', $this->request->post)) {
             list($success, $form) = $this->process_form(array('password'));
             if ($success) {
                 $user = $this->session->get('username', false);
@@ -248,7 +248,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
     public function process($data) {
         $data['list_path'] = false;
-        if (isset($this->request->get['list_path'])) {
+        if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if ($path == 'unread') {
                 $data['list_path'] = 'unread';
@@ -298,13 +298,13 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 }
             }
         }
-        if (isset($this->request->get['list_parent'])) {
+        if (array_key_exists('list_parent', $this->request->get)) {
             $data['list_parent'] = $this->request->get['list_parent'];
         }
         else {
             $data['list_parent'] = false;
         }
-        if (isset($this->request->get['list_page'])) {
+        if (array_key_exists('list_page', $this->request->get)) {
             $data['list_page'] = (int) $this->request->get['list_page'];
             if ($data['list_page'] < 1) {
                 $data['list_page'] = 1;
@@ -313,7 +313,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         else {
             $data['list_page'] = 1;
         }
-        if (isset($this->request->get['uid']) && preg_match("/\d+/", $this->request->get['uid'])) {
+        if (array_key_exists('uid', $this->request->get) && preg_match("/\d+/", $this->request->get['uid'])) {
             $data['uid'] = $this->request->get['uid'];
         }
         $list_style = $this->user_config->get('list_style', false);
@@ -330,7 +330,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
 
 class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
     public function process($data) {
-        if (isset($data['reload_folders'])) {
+        if (array_key_exists('reload_folders', $data)) {
             secure_cookie($this->request, 'hm_reload_folders', '1');
         }
     }
@@ -347,7 +347,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 ' <input type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
                 ' <input type="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" />';
-            if (isset($input['internal_users']) && $input['internal_users'] && $input['router_page_name'] == 'home') {
+            if (array_key_exists('internal_users', $input) && $input['internal_users'] && $input['router_page_name'] == 'home') {
                 $res .= ' <input type="submit" name="create_hm_user" value="Create" />';
             }
             $res .= '</form>';
@@ -415,11 +415,11 @@ class Hm_Output_content_start extends Hm_Output_Module {
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($input, $format) {
         $title = 'HM3';
-        if (isset($input['mailbox_list_title'])) {
+        if (array_key_exists('mailbox_list_title', $input)) {
             $title .= ' '.implode('-', array_slice($input['mailbox_list_title'], 1));
         }
-        elseif (isset($input['router_page_name'])) {
-            if (isset($input['list_path']) && $input['router_page_name'] == 'message_list') {
+        elseif (array_key_exists('router_page_name', $input)) {
+            if (array_key_exists('list_path', $input) && $input['router_page_name'] == 'message_list') {
                 $title .= ' '.ucwords(str_replace('_', ' ', $input['list_path']));
             }
             elseif ($input['router_page_name'] == 'notfound') {
@@ -487,9 +487,9 @@ class Hm_Output_js_data extends Hm_Output_Module {
         return '<script type="text/javascript">'.
             'var hm_url_path = "'.$this->html_safe($input['router_url_path']).'";'.
             'var hm_page_name = "'.$this->html_safe($input['router_page_name']).'";'.
-            'var hm_list_path = "'.(isset($input['list_path']) ? $this->html_safe($input['list_path']) : '').'";'.
-            'var hm_list_parent = "'.(isset($input['list_parent']) ? $this->html_safe($input['list_parent']) : '').'";'.
-            'var hm_msg_uid = "'.(isset($input['uid']) ? $this->html_safe($input['uid']) : 0).'";'.
+            'var hm_list_path = "'.(array_key_exists('list_path', $input) ? $this->html_safe($input['list_path']) : '').'";'.
+            'var hm_list_parent = "'.(array_key_exists('list_parent', $input) ? $this->html_safe($input['list_parent']) : '').'";'.
+            'var hm_msg_uid = "'.(array_key_exists('uid', $input) ? $this->html_safe($input['uid']) : 0).'";'.
             'var hm_module_list = "'.$this->html_safe($input['router_module_list']).'";'.
             '</script>';
     }
@@ -513,7 +513,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
     protected function output($input, $format) {
         $options = array('email_style' => 'Email', 'news_style' => 'News');
 
-        if (isset($input['user_settings']['list_style'])) {
+        if (array_key_exists('user_settings', $input) && array_key_exists('list_style', $input['user_settings'])) {
             $list_style = $input['user_settings']['list_style'];
         }
         else {
@@ -535,7 +535,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
 class Hm_Output_change_password extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['internal_users']) && $input['internal_users']) {
+        if (array_key_exists('internal_users', $input) && $input['internal_users']) {
             $res .= '<tr><td>Change Password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
                 ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
         }
@@ -549,7 +549,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
             'en_US' => 'English',
             'es_ES' => 'Spanish'
         );
-        if (isset($input['user_settings']['language'])) {
+        if (array_key_exists('user_settings', $input) && array_key_exists('language', $input['user_settings'])) {
             $mylang = $input['user_settings']['language'];
         }
         else {
@@ -571,7 +571,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
 class Hm_Output_timezone_setting extends Hm_Output_Module {
     protected function output($input, $format) {
         $zones = timezone_identifiers_list();
-        if (isset($input['user_settings']['timezone'])) {
+        if (array_key_exists('user_settings', $input) && array_key_exists('timezone', $input['user_settings'])) {
             $myzone = $input['user_settings']['timezone'];
         }
         else {
@@ -636,7 +636,7 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
 
 function main_menu ($input, $output_mod) {
     $email = false;
-    if (isset($input['folder_sources']) && is_array($input['folder_sources'])) {
+    if (array_key_exists('folder_sources', $input) && is_array($input['folder_sources'])) {
         if (in_array('email_folders', $input['folder_sources'])) {
             $email = true;
         }
@@ -676,7 +676,7 @@ function main_menu ($input, $output_mod) {
 }
 function folder_source_menu( $input, $output_mod) {
     $res = '';
-    if (isset($input['folder_sources'])) {
+    if (array_key_exists('folder_sources', $input) && is_array($input['folder_sources'])) {
         foreach (array_unique($input['folder_sources']) as $src) {
             $parts = explode('_', $src);
             $name = ucfirst(strtolower($parts[0]));
@@ -756,7 +756,7 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
 
 class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['list_parent']) && in_array($input['list_parent'], array('flagged', 'combined_inbox', 'unread', 'feeds'))) {
+        if (array_key_exists('list_parent', $input) && in_array($input['list_parent'], array('flagged', 'combined_inbox', 'unread', 'feeds'))) {
             if ($input['list_parent'] == 'combined_inbox') {
                 $list_name = 'Everything';
             }
@@ -765,12 +765,12 @@ class Hm_Output_message_start extends Hm_Output_Module {
             }
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_parent']).
                 '">'.$this->html_safe($list_name).'</a>';
-            if (isset($input['mailbox_list_title']) && count($input['mailbox_list_title'] > 1)) {
+            if (array_key_exists('mailbox_list_title', $input) && count($input['mailbox_list_title'] > 1)) {
                 $title .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
                     '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_path']).'">'.$this->html_safe($input['mailbox_list_title'][1]).'</a>';
             }
         }
-        elseif (isset($input['mailbox_list_title'])) {
+        elseif (array_key_exists('mailbox_list_title', $input)) {
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_path']).'">'.
                 implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']).'</a>';
         }
@@ -778,7 +778,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
             $title = '';
         }
         $res = '';
-        if (isset($input['uid'])) {
+        if (array_key_exists('uid', $input)) {
             $res .= '<input type="hidden" class="msg_uid" value="'.$this->html_safe($input['uid']).'" />';
         }
         $res .= '<div class="content_title">'.$title.'</div>';
@@ -815,8 +815,8 @@ class Hm_Output_search_content extends Hm_Output_Module {
 class Hm_Output_server_summary_end extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if ((!isset($input['imap_servers']) || empty($input['imap_servers'])) &&
-            (!isset($input['pop3_servers']) || empty($input['pop3_servers']))) {
+        if ((!array_key_exists('imap_servers', $input) || empty($input['imap_servers'])) &&
+            (!array_key_exists('pop3_servers', $input) || empty($input['pop3_servers']))) {
             $res .= '<tr><td colspan="5"><div class="no_servers">No IMAP or POP3 Servers configured! You should <a href="?page=servers">add some</a>.</div></td></tr>';
         }
         $res .= '</tbody></table></div>';
@@ -827,7 +827,7 @@ class Hm_Output_server_summary_end extends Hm_Output_Module {
 class Hm_Output_message_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<table class="message_table" cellpadding="0" cellspacing="0">';
-        if (!isset($input['no_message_list_headers']) || !$input['no_message_list_headers']) {
+        if (!array_key_exists('no_message_list_headers', $input) || !$input['no_message_list_headers']) {
             $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
             '<col class="from_col"><col class="subject_col"><col class="date_col">'.
             '<col class="icon_col"></colgroup><!--<thead><tr><th colspan="2" class="source">'.
@@ -845,7 +845,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
 
         if (!strstr($input['list_path'], 'imap')) {
-            if (isset($input['message_list_since'])) {
+            if (array_key_exists('message_list_since', $input)) {
                 $since = $input['message_list_since'];
             }
             else {
@@ -987,7 +987,7 @@ function process_since_argument($val, $config, $page='') {
     return $date;
 }
 function process_limit_argument($post, $config) {
-    if (isset($post['limit'])) {
+    if (array_key_exists('limit', $post)) {
         $limit = (int) $post['limit'];
     }
     if (!$limit) {
@@ -1036,7 +1036,7 @@ function build_msg_gravatar($from) {
 }
 
 function display_value($name, $haystack, $type=false, $default='') {
-    if (!isset($haystack[$name])) {
+    if (!array_key_exists($name, $haystack)) {
         return $default;
     }
     $value = $haystack[$name];
