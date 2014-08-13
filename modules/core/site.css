@@ -110,7 +110,6 @@ input, option, select { padding: 3px; }
     .folder_toggle img { width: 24px; height: 24px; }
     .folder_toggle{ top: 16px; left: 0px; }
     .folders a { font-size: 115%; }
-    .combined_inbox_count, .flagged_count, .unread_count { display: none; }
     .loading_icon { top: 1px; left: 30px; right: auto; }
     .content_title { padding-left: 35px; }
     .checkbox_cell { padding-left: 15px !important; }
