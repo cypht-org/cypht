@@ -306,7 +306,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
             $this->send_command($command);
             $result = $this->get_response($this->folder_max, true);
-            error_log(print_r($result, true));
 
             /* loop through the "parsed" response. Each iteration is one folder */
             foreach ($result as $vals) {
