@@ -84,6 +84,7 @@ input, option, select { padding: 3px; }
 .plink, .nlink { color: #666; }
 .plink:hover, .nlink:hover { color: green !important; }
 .limit { width: 50px; margin-left: 20px; }
+.noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ccc; opacity: 1; padding-top: 100px; text-align: center; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }

@@ -406,7 +406,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
         }
         else {
-            $res .= ' style="display: none;">';
+            $res .= ' style=""><noscript class="noscript">You Need to have Javascript enabled to use HM3. Sorry about that!</noscript>';
         }
         return $res;
     }

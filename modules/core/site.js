@@ -663,7 +663,7 @@ $(function() {
     }
     Hm_Timer.fire();
 
-    $('body').fadeIn(300);
+    $('body').hide().fadeIn(300);
     if ($('.sys_messages').text().length) {
         $('.sys_messages').slideDown();
     }
