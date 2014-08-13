@@ -19,7 +19,7 @@ abstract class Hm_Config {
     }
 
     public function get($name, $default=false) {
-        return isset($this->config[$name]) ? $this->config[$name] : $default;
+        return array_key_exists($name, $this->config) ? $this->config[$name] : $default;
     }
     protected function set_tz() {
         date_default_timezone_set($this->get('timezone_setting', 'UTC'));
@@ -80,7 +80,7 @@ class Hm_User_Config_DB extends Hm_Config {
             $sql = $this->dbh->prepare("select * from hm_user_settings where username=?");
             if ($sql->execute(array($username))) {
                 $data = $sql->fetch();
-                if (!$data || !isset($data['settings'])) {
+                if (!$data || !array_key_exists('settings', $data)) {
                     $sql = $this->dbh->prepare("insert into hm_user_settings values(?,?)");
                     if ($sql->execute(array($username, ''))) {
                         Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
@@ -274,7 +274,7 @@ class Hm_Router {
 
     private function forward_redirect_data($session, $request) {
         $res = array();
-        if (isset($request->cookie['hm_msgs']) && trim($request->cookie['hm_msgs'])) {
+        if (array_key_exists('hm_msgs', $request->cookie) && trim($request->cookie['hm_msgs'])) {
             $msgs = @unserialize(base64_decode($request->cookie['hm_msgs']));
             if (is_array($msgs)) {
                 array_walk($msgs, function($v) { Hm_Msgs::add($v); });
@@ -296,16 +296,16 @@ class Hm_Router {
     }
 
     private function get_page($request, $pages) {
-        if ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook']) && in_array($request->post['hm_ajax_hook'], $pages)) {
+        if ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post) && in_array($request->post['hm_ajax_hook'], $pages)) {
             $this->page = $request->post['hm_ajax_hook'];
         }
-        elseif ($request->type == 'AJAX' && isset($request->post['hm_ajax_hook']) && !in_array($request->post['hm_ajax_hook'], $pages)) {
+        elseif ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post) && !in_array($request->post['hm_ajax_hook'], $pages)) {
             die(json_encode(array('status' => 'not callable')));;
         }
-        elseif (isset($request->get['page']) && in_array($request->get['page'], $pages)) {
+        elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $pages)) {
             $this->page = $request->get['page'];
         }
-        elseif (!isset($request->get['page'])) {
+        elseif (!array_key_exists('page', $request->get)) {
             $this->page = 'home';
         }
         else {
@@ -322,7 +322,7 @@ class Hm_Router {
 
     private function build_nonce_base($session, $config, $request) {
         $result = $session->get('username', false);
-        if (isset($request->cookie['hm_id'])) {
+        if (array_key_exists('hm_id', $request->cookie)) {
             $result .= $request->cookie['hm_id']; 
         }
         elseif ($config->get('enc_key', false)) {
@@ -352,7 +352,7 @@ class Hm_Router {
 
     static public function merge_filters($existing, $new) {
         foreach (array('allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
-            if (isset($new[$v])) {
+            if (array_key_exists($v, $new)) {
                 if ($v == 'allowed_pages') {
                     $existing[$v] = array_merge($existing[$v], $new[$v]);
                 }
@@ -381,7 +381,6 @@ class Hm_Request {
 
     public function __construct($filters) {
         $this->sapi = php_sapi_name();
-        $this->get_request_type();
 
         $this->server = filter_input_array(INPUT_SERVER, $filters['allowed_server'], false);
         $this->post = filter_input_array(INPUT_POST, $filters['allowed_post'], false);
@@ -389,8 +388,9 @@ class Hm_Request {
         $this->cookie = filter_input_array(INPUT_COOKIE, $filters['allowed_cookie'], false);
         $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
 
+        $this->get_request_type();
         $this->is_tls();
-        $this->mobile_check();
+        $this->is_mobile();
 
         unset($_POST);
         unset($_SERVER);
@@ -398,8 +398,8 @@ class Hm_Request {
         unset($_COOKIE);
     }
 
-    private function mobile_check() {
-        if (isset($this->server['HTTP_USER_AGENT'])) {
+    private function is_mobile() {
+        if (array_key_exists('HTTP_USER_AGENT', $this->server)) {
             if (preg_match("/(iphone|ipod|ipad|android|blackberry|webos)/i", $this->server['HTTP_USER_AGENT'])) {
                 $this->mobile = true;
             }
@@ -407,10 +407,10 @@ class Hm_Request {
     }
 
     private function is_tls() {
-        if (isset($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on') {
+        if (array_key_exists('HTTPS', $this->server) && strtolower($this->server['HTTPS']) == 'on') {
             $this->tls = true;
         }
-        elseif (isset($this->server['REQUEST_SCHEME']) && strtolower($this->server['REQUEST_SCHEME']) == 'https') {
+        elseif (array_key_exists('REQUEST_SCHEME', $this->server) && strtolower($this->server['REQUEST_SCHEME']) == 'https') {
             $this->tls = true;
         }
     }
@@ -434,7 +434,7 @@ class Hm_Request {
     }
 
     private function is_ajax() {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return array_key_exists('HTTP_X_REQUESTED_WITH', $this->server) && strtolower($this->server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     private function get_clean_url_path($uri) {
@@ -491,7 +491,7 @@ class Hm_Request_Handler {
     }
 
     private function default_language() {
-        if (!isset($this->response['language'])) {
+        if (!array_key_exists('language', $this->response)) {
             $default_lang = $this->config->get('default_language', false);
             if ($default_lang) {
                 $this->response['language'] = $default_lang;
@@ -528,7 +528,7 @@ abstract class HM_Format {
 
     public function format_content($input) {
         $lang_strings = array();
-        if (isset($input['language'])) {
+        if (array_key_exists('language', $input)) {
             $lang_strings = $this->get_language($input['language']);
         }
         $this->modules = Hm_Output_Modules::get_for_page($input['router_page_name']);
@@ -579,7 +579,7 @@ class Hm_Format_JSON extends HM_Format {
     public function content($input, $lang_str) {
         $input['router_user_msgs'] = Hm_Msgs::get();
         $output = $this->run_modules($input, 'JSON', $lang_str);
-        if (isset($output['internal_users'])) {
+        if (array_key_exists('internal_users', $output)) {
             unset($output['internal_users']);
         }
         return json_encode($output, JSON_FORCE_OBJECT);
@@ -601,7 +601,7 @@ abstract class Hm_Output {
     abstract protected function output_content($content);
 
     public function send_response($response, $input=array()) {
-        if (isset($input['http_headers'])) {
+        if (array_key_exists('http_headers', $input)) {
             $this->output_content($response, $input['http_headers']);
         }
         else {
@@ -715,7 +715,7 @@ abstract class Hm_Handler_Module {
         $success = false;
         $new_form = array();
         foreach($form as $name) {
-            if (isset($post[$name]) && (trim($post[$name]) || (($post[$name] === '0' ||  $post[$name] === 0 )))) {
+            if (is_array($post) && array_key_exists($name, $post) && (trim($post[$name]) || (($post[$name] === '0' ||  $post[$name] === 0 )))) {
                 $new_form[$name] = $post[$name];
             }
         }
@@ -724,9 +724,9 @@ abstract class Hm_Handler_Module {
         }
         if ($nonce && $success) {
             $success = false;
-            if (isset($post['hm_nonce'])) {
+            if (array_key_exists('hm_nonce', $post)) {
                 $key = $this->session->get('username', false);
-                if (isset($this->request->cookie['hm_id'])) {
+                if (array_key_exists('hm_id', $this->request->cookie)) {
                     $key .= $this->request->cookie['hm_id'];
                 }
                 elseif ($this->config->get('enc_key', false)) {
@@ -765,7 +765,7 @@ abstract class Hm_Output_Module {
         return hash_hmac('sha256', $name, $this->nonce_base);
     }
     public function trans($string) {
-        if (isset($this->lstr[$string])) {
+        if (array_key_exists($string, $this->lstr)) {
             if ($this->lstr[$string] === false) {
                 return $string;
             }
@@ -781,7 +781,7 @@ abstract class Hm_Output_Module {
 
     public function output_content($input, $format, $lang_str) {
         $this->lstr = $lang_str;
-        if (isset($lang_str['interface_lang'])) {
+        if (array_key_exists('interface_lang', $lang_str)) {
             $this->lang = $lang_str['interface_lang'];
         }
         return $this->output($input, $format);
@@ -803,10 +803,10 @@ trait Hm_Modules {
     }
     public static function add($page, $module, $logged_in, $marker=false, $placement='after', $queue=true, $source=false) {
         $inserted = false;
-        if (!isset(self::$module_list[$page])) {
+        if (!array_key_exists($page, self::$module_list)) {
             self::$module_list[$page] = array();
         }
-        if (isset(self::$module_list[$page][$module])) {
+        if (array_key_exists($page, self::$module_list) && array_key_exists($module, self::$module_list[$page])) {
             Hm_Debug::add(sprintf("Already registered module re-attempted: %s", $module));
             return;
         }
@@ -848,14 +848,14 @@ trait Hm_Modules {
     }
 
     public static function del($page, $module) {
-        if (isset(self::$module_list[$page][$module])) {
+        if (array_key_exists($page, self::$module_list) && array_key_exists($module, self::$module_list[$page])) {
             unset(self::$module_list[$page][$module]);
         }
     }
 
     public static function get_for_page($page) {
         $res = array();
-        if (isset(self::$module_list[$page])) {
+        if (array_key_exists($page, self::$module_list)) {
             $res = array_merge($res, self::$module_list[$page]);
         }
         return $res;
@@ -936,7 +936,7 @@ class Hm_DB {
         self::parse_config($site_config);
         $key = self::db_key();
 
-        if (isset(self::$dbh[$key]) && self::$dbh[$key]) {
+        if (array_key_exists($key, self::$dbh) && self::$dbh[$key]) {
             return self::$dbh[$key];
         }
         $dsn = sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
@@ -959,16 +959,16 @@ trait Hm_Server_List {
     private static $server_list = array();
 
     public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
-        if (isset(self::$server_list[$id])) {
+        if (array_key_exists($id, self::$server_list)) {
             $server = self::$server_list[$id];
             if ($server['object']) {
                 return $server['object'];
             }
             else {
-                if ((!$user || !$pass) && (!isset($server['user']) || !isset($server['pass']))) {
+                if ((!$user || !$pass) && (!array_key_exists('user', $server) || !array_key_exists('pass', $server))) {
                     return false;
                 }
-                elseif (isset($server['user']) && isset($server['pass'])) {
+                elseif (array_key_exists('user', $server) && array_key_exists('pass', $server)) {
                     $user = $server['user'];
                     $pass = $server['pass'];
                 }
@@ -989,14 +989,14 @@ trait Hm_Server_List {
     }
 
     public static function reuse($id) {
-        if (isset(self::$server_list[$id]) && is_object(self::$server_list[$id]['object'])) {
+        if (array_key_exists($id, self::$server_list) && is_object(self::$server_list[$id]['object'])) {
             return self::$server_list[$id]['object'];
         }
         return false;
     }
 
     public static function forget_credentials($id) {
-        if (isset(self::$server_list[$id])) {
+        if (array_key_exists($id, self::$server_list)) {
             unset(self::$server_list[$id]['user']);
             unset(self::$server_list[$id]['pass']);
         }
@@ -1014,7 +1014,7 @@ trait Hm_Server_List {
     }
 
     public static function del($id) {
-        if (isset(self::$server_list[$id])) {
+        if (array_key_exists($id, self::$server_list)) {
             unset(self::$server_list[$id]);
             return true;
         }
@@ -1037,10 +1037,10 @@ trait Hm_Server_List {
                     'port' => $server['port'],
                     'tls' => $server['tls']
                 );
-                if (isset($server['user'])) {
+                if (array_key_exists('user', $server)) {
                     $list[$index]['user'] = $server['user'];
                 }
-                if (isset($server['pass'])) {
+                if (array_key_exists('pass', $server)) {
                     $list[$index]['pass'] = $server['pass'];
                 }
             }
@@ -1085,7 +1085,7 @@ class Hm_IMAP_List {
     }
     public static function get_cache($session, $id) {
         $server_cache = $session->get('imap_cache', array());
-        if (isset($server_cache[$id])) {
+        if (array_key_exists($id, $server_cache)) {
             return $server_cache[$id];
         }
         return false;
@@ -1134,7 +1134,7 @@ class Hm_Page_Cache {
         self::$pages[$key] = array($page, $save);
     }
     public static function concat($key, $page, $save = false, $delim=false) {
-        if (isset(self::$pages[$key])) {
+        if (array_key_exists($key, self::$pages)) {
             if ($delim) {
                 self::$pages[$key][0] .= $delim.$page;
             }
@@ -1147,14 +1147,14 @@ class Hm_Page_Cache {
         }
     }
     public static function del($key) {
-        if (isset(self::$pages[$key])) {
+        if (array_key_exists($key, self::$pages)) {
             unset(self::$pages[$key]);
             return true;
         }
         return false;
     }
     public static function get($key) {
-        if (isset(self::$pages[$key])) {
+        if (array_key_exists($key, self::$pages)) {
             Hm_Debug::add(sprintf("PAGE CACHE: %s", $key));
             return self::$pages[$key][0];
         }
@@ -1199,7 +1199,7 @@ trait Hm_Uid_Cache {
         }
     }
     public static function is_present($uid) {
-        return isset(self::$uids[$uid]);
+        return array_key_exists($uid, self::$uids);
     }
     public static function dump() {
         return array_keys(self::$uids);
@@ -1208,7 +1208,7 @@ trait Hm_Uid_Cache {
         self::$uids[$uid] = 0;
     }
     public static function remove($uid) {
-        if (isset(self::$uids)) {
+        if (array_key_exists($uid, self::$uids)) {
             unset(self::$uids[$uid]);
             return true;
         }

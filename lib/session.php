@@ -51,13 +51,13 @@ class Hm_PHP_Session extends Hm_Session {
     private function build_fingerprint($request) {
         $env = $request->server;
         $id = '';
-        $id .= (isset($env['REMOTE_ADDR'])) ? $env['REMOTE_ADDR'] : '';
-        $id .= (isset($env['HTTP_USER_AGENT'])) ? $env['HTTP_USER_AGENT'] : '';
-        $id .= (isset($env['REQUEST_SCHEME'])) ? $env['REQUEST_SCHEME'] : '';
-        $id .= (isset($env['HTTP_ACCEPT_LANGUAGE'])) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
-        $id .= (isset($env['HTTP_ACCEPT_ENCODING'])) ? $env['HTTP_ACCEPT_ENCODING'] : '';
-        $id .= (isset($env['HTTP_ACCEPT_CHARSET'])) ? $env['HTTP_ACCEPT_CHARSET'] : '';
-        $id .= (isset($env['HTTP_HOST'])) ? $env['HTTP_HOST'] : '';
+        $id .= (array_key_exists('REMOTE_ADDR', $env)) ? $env['REMOTE_ADDR'] : '';
+        $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
+        $id .= (array_key_exists('REQUEST_SCHEME', $env)) ? $env['REQUEST_SCHEME'] : '';
+        $id .= (array_key_exists('HTTP_ACCEPT_LANGUAGE', $env)) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
+        $id .= (array_key_exists('HTTP_ACCEPT_ENCODING', $env)) ? $env['HTTP_ACCEPT_ENCODING'] : '';
+        $id .= (array_key_exists('HTTP_ACCEPT_CHARSET', $env)) ? $env['HTTP_ACCEPT_CHARSET'] : '';
+        $id .= (array_key_exists('HTTP_HOST', $env)) ? $env['HTTP_HOST'] : '';
         return hash('sha256', $id);
     }
 
@@ -73,7 +73,7 @@ class Hm_PHP_Session extends Hm_Session {
         return @unserialize(Hm_Crypt::plaintext($data, $this->enc_key));
     }
     protected function set_key($request) {
-        if (isset($request->cookie['hm_id'])) {
+        if (array_key_exists('hm_id', $request->cookie)) {
             $this->enc_key = $request->cookie['hm_id'];
         }
         else {
@@ -84,7 +84,7 @@ class Hm_PHP_Session extends Hm_Session {
 
     public function check($request) {
         $this->set_key($request);
-        if (isset($request->cookie[$this->cname])) {
+        if (array_key_exists($this->cname, $request->cookie)) {
             $this->start($request);
             $this->check_fingerprint($request);
         }
@@ -100,7 +100,7 @@ class Hm_PHP_Session extends Hm_Session {
 
     public function start($request) {
         session_start();
-        if (isset($_SESSION['data'])) {
+        if (array_key_exists('data', $_SESSION)) {
             $data = $this->plaintext($_SESSION['data']);
             if (is_array($data)) {
                 $this->data = $data;
@@ -111,10 +111,10 @@ class Hm_PHP_Session extends Hm_Session {
 
     public function get($name, $default=false, $user=false) {
         if ($user) {
-            return isset($this->data['user_data'][$name]) ? $this->data['user_data'][$name] : $default;
+            return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data) ? $this->data['user_data'][$name] : $default;
         }
         else {
-            return isset($this->data[$name]) ? $this->data[$name] : $default;
+            return array_key_exists($name, $this->data) ? $this->data[$name] : $default;
         }
     }
 
@@ -128,7 +128,7 @@ class Hm_PHP_Session extends Hm_Session {
     }
 
     public function del($name) {
-        if (isset($this->data[$name])) {
+        if (array_key_exists($name, $this->data)) {
             unset($this->data[$name]);
         }
     }
@@ -177,7 +177,7 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
                 Hm_Msgs::add("ERRInvalid username or password");
             }
         }
-        elseif (isset($request->cookie[$this->cname])) {
+        elseif (array_key_exists($this->cname, $request->cookie)) {
             $this->set_key($request);
             $this->start($request);
             $this->check_fingerprint($request);
@@ -261,7 +261,7 @@ class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
                 }
             }
             else {
-                if (!isset($request->cookie[$this->cname])) {
+                if (!array_key_exists($this->cname, $request->cookie)) {
                     $this->destroy($request);
                 }
                 else {
@@ -269,7 +269,7 @@ class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
                     $sql = $this->dbh->prepare('select data from hm_user_session where hm_id=?');
                     if ($sql->execute(array($this->session_key))) {
                         $results = $sql->fetch();
-                        if (isset($results['data'])) {
+                        if (array_key_exists('data', $results)) {
                             $data = $this->plaintext($results['data']);
                             if (is_array($data)) {
                                 $this->active = true;
