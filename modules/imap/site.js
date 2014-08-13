@@ -417,6 +417,9 @@ if (hm_page_name == 'message_list') {
     else if (hm_list_path == 'flagged') {
         add_imap_sources(imap_combined_flagged_content);
     }
+    else if (hm_list_path == 'email') {
+        add_imap_sources(imap_combined_inbox_content);
+    }
     else if (hm_list_path.substring(0, 4) == 'imap') {
         setup_imap_folder_page();
     }

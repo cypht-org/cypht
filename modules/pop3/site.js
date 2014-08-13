@@ -240,6 +240,9 @@ else if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
         add_pop3_sources(pop3_combined_inbox_content);
     }
+    else if (hm_list_path == 'email') {
+        add_pop3_sources(pop3_combined_inbox_content);
+    }
     else if (hm_list_path == 'unread') {
         add_pop3_sources(pop3_combined_unread_content);
     }
