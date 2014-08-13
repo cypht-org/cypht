@@ -62,4 +62,6 @@ add_handler('message', 'tracker', false, 'tracker', 'http_headers', 'after');
 add_output('message', 'show_debug', false, 'tracker', 'content_end', 'before');
 add_output('message', 'tracker', false, 'tracker', 'content_end', 'before');
 
+return array();
+
 ?>
