@@ -536,7 +536,7 @@ class Hm_Output_change_password extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if (isset($input['internal_users']) && $input['internal_users']) {
-            $res .= '<tr><td>New Password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
+            $res .= '<tr><td>Change Password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
                 ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
         }
         return $res;
