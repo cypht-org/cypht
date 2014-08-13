@@ -391,8 +391,11 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     elseif (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'unread') {
                         $url .= '&list_parent=unread';
                     }
-                    else {
+                    elseif (isset($input['feed_list_parent']) && $input['feed_list_parent'] == 'feeds') {
                         $url .= '&list_parent=feeds';
+                    }
+                    else {
+                        $url .= '&list_parent=feeds_'.$item['server_id'];
                     }
                     if (isset($input['news_list_style'])) {
                         $style = 'news';
