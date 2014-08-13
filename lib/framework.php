@@ -382,12 +382,12 @@ class Hm_Request {
     public function __construct($filters) {
         $this->sapi = php_sapi_name();
 
-        $this->server = filter_input_array(INPUT_SERVER, $filters['allowed_server'], false);
-        $this->post = filter_input_array(INPUT_POST, $filters['allowed_post'], false);
-        $this->get = filter_input_array(INPUT_GET, $filters['allowed_get'], false);
-        $this->cookie = filter_input_array(INPUT_COOKIE, $filters['allowed_cookie'], false);
-        $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
+        $this->server = $this->filter_input(INPUT_SERVER, $filters['allowed_server']);
+        $this->post = $this->filter_input(INPUT_POST, $filters['allowed_post']);
+        $this->get = $this->filter_input(INPUT_GET, $filters['allowed_get']);
+        $this->cookie = $this->filter_input(INPUT_COOKIE, $filters['allowed_cookie']);
 
+        $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
         $this->get_request_type();
         $this->is_tls();
         $this->is_mobile();
@@ -396,6 +396,14 @@ class Hm_Request {
         unset($_SERVER);
         unset($_GET);
         unset($_COOKIE);
+    }
+
+    private function filter_input($type, $filters) {
+        $data = filter_input_array($type, $filters, false);
+        if (!$data) {
+            return array();
+        }
+        return $data;
     }
 
     private function is_mobile() {
@@ -715,7 +723,7 @@ abstract class Hm_Handler_Module {
         $success = false;
         $new_form = array();
         foreach($form as $name) {
-            if (is_array($post) && array_key_exists($name, $post) && (trim($post[$name]) || (($post[$name] === '0' ||  $post[$name] === 0 )))) {
+            if (array_key_exists($name, $post) && (trim($post[$name]) || (($post[$name] === '0' ||  $post[$name] === 0 )))) {
                 $new_form[$name] = $post[$name];
             }
         }
