@@ -6,6 +6,12 @@ define('MCRYPT_DATA', true);
 define('BLOCK_MODE', MCRYPT_MODE_CBC);
 define('CIPHER', MCRYPT_RIJNDAEL_128);
 define('RAND_SOURCE', MCRYPT_RAND);
+define('MAX_PER_SOURCE', 100);
+define('DEFAULT_PER_SOURCE', 20);
+define('DEFAULT_SINCE', 'today');
+
+/* compress output if possible */
+ini_set("zlib.output_compression", "On");
 
 /* don't let anything output content until we are ready */
 ob_start();
