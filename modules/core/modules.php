@@ -56,6 +56,102 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'unread_per_source'));
+        if ($success) {
+            if ($form['unread_per_source'] > MAX_PER_SOURCE || $form['unread_per_source'] < 0) {
+                $sources = DEFAULT_PER_SOURCE;
+            }
+            else {
+                $sources = $form['unread_per_source'];
+            }
+            $data['new_user_settings']['unread_per_source_setting'] = $sources;
+        }
+        else {
+            $data['user_settings']['unread_per_source'] = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'all_per_source'));
+        if ($success) {
+            if ($form['all_per_source'] > MAX_PER_SOURCE || $form['all_per_source'] < 0) {
+                $sources = DEFAULT_PER_SOURCE;
+            }
+            else {
+                $sources = $form['all_per_source'];
+            }
+            $data['new_user_settings']['all_per_source_setting'] = $sources;
+        }
+        else {
+            $data['user_settings']['all_per_source'] = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'flagged_per_source'));
+        if ($success) {
+            if ($form['flagged_per_source'] > MAX_PER_SOURCE || $form['flagged_per_source'] < 0) {
+                $sources = DEFAULT_PER_SOURCE;
+            }
+            else {
+                $sources = $form['flagged_per_source'];
+            }
+            $data['new_user_settings']['flagged_per_source_setting'] = $sources;
+        }
+        else {
+            $data['user_settings']['flagged_per_source'] = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'flagged_since'));
+        if ($success) {
+            $data['new_user_settings']['flagged_since_setting'] = process_since_argument($form['flagged_since'], true);
+        }
+        else {
+            $data['user_settings']['flagged_since'] = $this->user_config->get('flagged_since_setting', false);
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'all_since'));
+        if ($success) {
+            $data['new_user_settings']['all_since_setting'] = process_since_argument($form['all_since'], true);
+        }
+        else {
+            $data['user_settings']['all_since'] = $this->user_config->get('all_since_setting', false);
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'unread_since'));
+        if ($success) {
+            $data['new_user_settings']['unread_since_setting'] = process_since_argument($form['unread_since'], true);
+        }
+        else {
+            $data['user_settings']['unread_since'] = $this->user_config->get('unread_since_setting', false);
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
@@ -253,6 +349,8 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             if ($path == 'unread') {
                 $data['list_path'] = 'unread';
                 $data['mailbox_list_title'] = array('Unread');
+                $data['message_list_since'] = $this->user_config->get('unread_since_setting', DEFAULT_SINCE);
+                $data['per_source_limit'] = $this->user_config->get('unread_per_source_setting', DEFAULT_SINCE);
             }
             elseif ($path == 'email') {
                 $data['list_path'] = 'email';
@@ -264,10 +362,14 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             }
             elseif ($path == 'flagged') {
                 $data['list_path'] = 'flagged';
+                $data['message_list_since'] = $this->user_config->get('flagged_since_setting', DEFAULT_SINCE);
+                $data['per_source_limit'] = $this->user_config->get('flagged_per_source_setting', DEFAULT_SINCE);
                 $data['mailbox_list_title'] = array('Flagged');
             }
             elseif ($path == 'combined_inbox') {
                 $data['list_path'] = 'combined_inbox';
+                $data['message_list_since'] = $this->user_config->get('all_since_setting', DEFAULT_SINCE);
+                $data['per_source_limit'] = $this->user_config->get('all_per_source_setting', DEFAULT_SINCE);
                 $data['mailbox_list_title'] = array('Everything');
             }
             elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
@@ -536,12 +638,105 @@ class Hm_Output_change_password extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if (array_key_exists('internal_users', $input) && $input['internal_users']) {
-            $res .= '<tr><td>Change Password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
+            $res .= '<tr><td>Change password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
                 ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
         }
         return $res;
     }
 }
+
+class Hm_Output_start_flagged_settings extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<tr><td colspan="2" class="settings_subtitle">'.
+            '<br /><img src="'.Hm_Image_Sources::$star.'" width="16" height="16" />'.
+            $this->trans('Flagged Page').'</td></tr>';
+    }
+}
+
+class Hm_Output_start_everything_settings extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<tr><td colspan="2" class="settings_subtitle">'.
+            '<br /><img src="'.Hm_Image_Sources::$box.'" width="16" height="16" />'.
+            $this->trans('Everything Page').'</td></tr>';
+    }
+}
+
+class Hm_Output_start_unread_settings extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<tr><td colspan="2" class="settings_subtitle">'.
+            '<br /><img src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+            $this->trans('Unread Page').'</td></tr>';
+    }
+}
+
+class Hm_Output_start_general_settings extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<tr><td colspan="2" class="settings_subtitle">'.
+            '<img src="'.Hm_Image_Sources::$cog.'" width="16" height="16" />'.
+            $this->trans('General').'</td></tr>';
+    }
+}
+
+class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $sources = DEFAULT_PER_SOURCE;
+        if (array_key_exists('user_settings', $input) && array_key_exists('unread_per_source', $input['user_settings'])) {
+            $sources = $input['user_settings']['unread_per_source'];
+        }
+        return '<tr><td>Max messages per source</td><td><input type="text" size="2" name="unread_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+    }
+}
+
+class Hm_Output_unread_since_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $since = false;
+        if (array_key_exists('user_settings', $input) && array_key_exists('unread_since', $input['user_settings'])) {
+            $since = $input['user_settings']['unread_since'];
+        }
+        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown($since, 'unread_since').'</td></tr>';
+    }
+}
+
+class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $sources = DEFAULT_PER_SOURCE;
+        if (array_key_exists('user_settings', $input) && array_key_exists('flagged_per_source', $input['user_settings'])) {
+            $sources = $input['user_settings']['flagged_per_source'];
+        }
+        return '<tr><td>Max messages per source</td><td><input type="text" size="2" name="flagged_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+    }
+}
+
+class Hm_Output_flagged_since_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $since = false;
+        if (array_key_exists('user_settings', $input) && array_key_exists('flagged_since', $input['user_settings'])) {
+            $since = $input['user_settings']['flagged_since'];
+        }
+        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown($since, 'flagged_since').'</td></tr>';
+    }
+}
+
+class Hm_Output_all_source_max_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $sources = DEFAULT_PER_SOURCE;
+        if (array_key_exists('user_settings', $input) && array_key_exists('all_per_source', $input['user_settings'])) {
+            $sources = $input['user_settings']['all_per_source'];
+        }
+        return '<tr><td>Max messages per source</td><td><input type="text" size="2" name="all_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+    }
+}
+
+class Hm_Output_all_since_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $since = false;
+        if (array_key_exists('user_settings', $input) && array_key_exists('all_since', $input['user_settings'])) {
+            $since = $input['user_settings']['all_since'];
+        }
+        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown($since, 'all_since').'</td></tr>';
+    }
+}
+
 
 class Hm_Output_language_setting extends Hm_Output_Module {
     protected function output($input, $format) {
@@ -555,7 +750,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         else {
             $mylang = false;
         }
-        $res = '<tr><td>Interface Language</td><td><select name="language_setting">';
+        $res = '<tr><td>Interface language</td><td><select name="language_setting">';
         foreach ($langs as $id => $lang) {
             $res .= '<option ';
             if ($id == $mylang) {
@@ -652,8 +847,7 @@ function main_menu ($input, $output_mod) {
         '</a><span class="combined_inbox_count"></span></li>';
     if ($email) {
         $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Unread').
-            ' <span class="unread_count"></span></a></li>';
+            '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$output_mod->trans('Unread').'</a></li>';
     }
     $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$output_mod->trans('Flagged').
@@ -730,15 +924,6 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_server_summary_start extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '<div class="server_summary"><div class="content_title">Summary</div>';
-        $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Address</th><th>Port</th>'.
-                '<th>TLS</th></tr></thead><tbody>';
-        return $res;
-    }
-}
-
 class Hm_Output_server_status_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<div class="server_status"><div class="content_title">Status</div>';
@@ -812,18 +997,6 @@ class Hm_Output_search_content extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_server_summary_end extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '';
-        if ((!array_key_exists('imap_servers', $input) || empty($input['imap_servers'])) &&
-            (!array_key_exists('pop3_servers', $input) || empty($input['pop3_servers']))) {
-            $res .= '<tr><td colspan="5"><div class="no_servers">No IMAP or POP3 Servers configured! You should <a href="?page=servers">add some</a>.</div></td></tr>';
-        }
-        $res .= '</tbody></table></div>';
-        return $res;
-    }
-}
-
 class Hm_Output_message_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<table class="message_table" cellpadding="0" cellspacing="0">';
@@ -841,22 +1014,12 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="message_list"><div class="content_title">'.
+        $res = '';
+        $res .= '<div class="message_list"><div class="content_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
-
-        if (!strstr($input['list_path'], 'imap')) {
-            if (array_key_exists('message_list_since', $input)) {
-                $since = $input['message_list_since'];
-            }
-            else {
-                $since = 'today';
-            }
-        }
-        else {
-            $since = false;
-        }
-        $res .= list_settings($this, $since);
+        $res .= '<div class="list_controls"><a onclick="return Hm_Message_List.load_sources()" href="#"><img class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a></div>';
         $res .= message_controls();
+	    $res .= message_list_meta($input, $this);
         $res .= '</div>';
         return $res;
     }
@@ -867,6 +1030,35 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
         $res = '</tbody></table><div class="page_links"></div></div>';
         return $res;
     }
+}
+
+function message_list_meta($input, $output_mod) {
+    $times = array(
+        'today' => 'Today',
+        '-1 week' => 'Last 7 days',
+        '-2 weeks' => 'Last 2 weeks',
+        '-4 weeks' => 'Last 4 weeks',
+        '-6 weeks' => 'Last 6 weeks',
+        '-6 months' => 'Last 6 months',
+        '-1 year' => 'Last year'
+    );
+    if (array_key_exists('per_source_limit', $input)) {
+        $limit = $input['per_source_limit'];
+    }
+    else {
+        $limit = DEFAULT_PER_SOURCE;
+    }
+    if (array_key_exists('message_list_since', $input)) {
+        $since = $input['message_list_since'];
+    }
+    else {
+        $since = DEFAULT_SINCE;
+    }
+    $dt = sprintf('%s', strtolower($times[$since]));
+    $max = sprintf('sources @ %d each', $limit);
+    return '<div class="list_meta">'.$output_mod->html_safe($dt).
+        ' <img src="'.Hm_Image_Sources::$caret.'" /> <span class="src_count"></span> '.$output_mod->html_safe($max).
+        ' <img src="'.Hm_Image_Sources::$caret.'" /> <span class="total"></span> Total</div>';
 }
 
 function human_readable_interval($date_str) {
@@ -926,6 +1118,12 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
                 '</tr>', $id);
         }
         else {
+            if ($from == '[No From]') {
+                $from = '';
+            }
+            else {
+                $from .= ' - ';
+            }
             return array(
                 '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
                     '<td class="news_cell checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
@@ -933,7 +1131,7 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
                     '<div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
                         '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
                     '</div></div>'.
-                    '<div class="from">'.$output_mod->html_safe($from).' - '.$output_mod->html_safe($source).'</div>'.
+                    '<div class="from">'.$output_mod->html_safe($from).' '.$output_mod->html_safe($source).'</div>'.
                     '<div class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></div>'.
                 '</td></tr>', $id);
         }
@@ -949,7 +1147,7 @@ function message_controls() {
         '<a href="#" onclick="return message_action(\'delete\');">Delete</a></div>';
 }
 
-function message_since_dropdown($since) {
+function message_since_dropdown($since, $name) {
     $times = array(
         'today' => 'Today',
         '-1 week' => 'Last 7 days',
@@ -959,7 +1157,7 @@ function message_since_dropdown($since) {
         '-6 months' => 'Last 6 months',
         '-1 year' => 'Last year'
     );
-    $res = '<select class="message_list_since">';
+    $res = '<select name="'.$name.'" class="message_list_since">';
     foreach ($times as $val => $label) {
         $res .= '<option';
         if ($val == $since) {
@@ -971,33 +1169,22 @@ function message_since_dropdown($since) {
     return $res;
 }
 
-function process_since_argument($val, $config, $page='') {
+function process_since_argument($val, $validate=false) {
     $date = false;
-    if ($page) {
-        $page = '_'.$page;
-    }
+    $valid = false;
     if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'))) {
+        $valid = $val;
         $date = date('j-M-Y', strtotime($val));
     }
     else {
-        $val == 'today';
+        $val = 'today';
+        $valid = $val;
         $date = date('j-M-Y');
     }
-    $config->set('message_list_since'.$page, $val);
+    if ($validate) {
+        return $valid;
+    }
     return $date;
-}
-function process_limit_argument($post, $config) {
-    if (array_key_exists('limit', $post)) {
-        $limit = (int) $post['limit'];
-    }
-    if (!$limit) {
-        $limit = 20;
-    }
-    if ($limit > 40) {
-        $limit = 40;
-    }
-    $config->set('message_list_limit', $limit);
-    return $limit;
 }
 
 function format_msg_html($str, $external_resources=false) {
@@ -1059,28 +1246,6 @@ function display_value($name, $haystack, $type=false, $default='') {
             $res = $value;
             break;
     }
-    return $res;
-}
-
-function list_settings($output_mod, $since) {
-    $res = '<div class="list_controls">'.
-        '<a onclick="return Hm_Message_List.load_sources()" href="#"><img class="refresh_list" src="'.
-        Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
-
-    if ($since) {
-        $res .= '<a onclick="$(\'.list_settings_dialog\').slideToggle(200); return false;" href="#" ><img class="list_settings_link" src="'.
-        Hm_Image_Sources::$big_cog.'" width="20" height="20" /></a>'.
-        '<div class="list_settings_dialog">'.
-        '<table>'.
-        '<tr><th>Time period</th><td>'.message_since_dropdown($since).'</td></tr>'.
-        '<tr><th>Max per source</th><td><input class="limit" type="text" value="20" /></td></tr>'.
-        '<tr><td><input onclick="Hm_Message_List.load_sources(); $(\'.list_settings_dialog\').slideToggle(200); return false;" type="button" value="Apply" />'.
-        '<input onclick="$(\'.list_settings_dialog\').slideToggle(200); return false;" type="button" value="Cancel" />'.
-        '</td></tr>'.
-        '</table>'.
-        '</div>';
-    }
-    $res .= '</div>';
     return $res;
 }
 

@@ -340,6 +340,8 @@ var Hm_Message_List = {
 
     load_sources: function() {
         $('.empty_list').remove();
+        $('.src_count').text(Hm_Message_List.sources.length);
+        $('.total').text($('.message_table tbody tr').length);
         for (index in Hm_Message_List.sources) {
             source = Hm_Message_List.sources[index];
             source.callback(source.id);
@@ -354,39 +356,6 @@ var Hm_Message_List = {
         }
         Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
     },
-
-    update_count: function(type) {
-        var count = 0;
-        if (type == 'unread') {
-            if (hm_list_path == 'unread') {
-                count = $('.message_table tbody tr').length;
-            }
-            else {
-                var data = get_from_local_storage('formatted_unread_data');
-                if (data) {
-                    count = $('<div></div>').append(data).find('tr').length;
-                }
-            }
-            $('.unread_count').text(count);
-            document.title = 'HM3 '+count+' Unread';
-        }
-        else if (type == 'flagged') {
-            var count = $('.message_table tbody tr').length;
-            $('.flagged_count').text(count);
-            document.title = 'HM3 '+count+' Flagged';
-        }
-        else if (type == 'combined_inbox') {
-            var count = $('.unseen', $('.message_table tbody')).length;
-            $('.combined_inbox_count').text(count);
-            document.title = 'HM3 '+count+' New in Everything';
-        }
-        else if (type == 'feeds') {
-            var count = $('.unseen', $('.message_table tbody')).length;
-            $('.unread_feed_count').text(count);
-            document.title = 'HM3 '+count+' New in Feeds';
-        }
-        save_folder_list();
-    }
 };
 
 var save_folder_list = function() {
@@ -492,6 +461,7 @@ var prev_next_links = function(cache, class_name) {
         $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
     }
 };
+
 var open_folder_list = function() {
     $('.folder_list').slideDown(200);
     toggle_section('.main', true);
@@ -615,6 +585,7 @@ var set_combined_inbox_state = function() {
             Hm_Message_List.check_select_range(e);
         });
     }
+    $('.total').text($('.message_table tbody tr').length);
 };
 
 var check_empty_list = function() {

@@ -30,8 +30,6 @@ add_output('home', 'msgs', false);
 add_output('home', 'folder_list_start', true);
 add_output('home', 'folder_list_end', true);
 add_output('home', 'content_section_start', true);
-//add_output('home', 'server_summary_start', true);
-//add_output('home', 'server_summary_end', true);
 add_output('home', 'server_status_start', true);
 add_output('home', 'server_status_end', true);
 add_output('home', 'content_section_end', true);
@@ -111,6 +109,12 @@ add_handler('settings', 'process_change_password', true);
 add_handler('settings', 'process_language_setting', true);
 add_handler('settings', 'process_list_style_setting', true);
 add_handler('settings', 'process_timezone_setting', true);
+add_handler('settings', 'process_unread_since_setting', true);
+add_handler('settings', 'process_flagged_since_setting', true);
+add_handler('settings', 'process_flagged_source_max_setting', true);
+add_handler('settings', 'process_unread_source_max_setting', true);
+add_handler('settings', 'process_all_source_max_setting', true);
+add_handler('settings', 'process_all_since_setting', true);
 add_handler('settings', 'save_user_settings', true);
 add_handler('settings', 'save_user_data', true);
 add_handler('settings', 'logout', true);
@@ -132,10 +136,20 @@ add_output('settings', 'folder_list_start', true);
 add_output('settings', 'folder_list_end', true);
 add_output('settings', 'content_section_start', true);
 add_output('settings', 'start_settings_form', true);
+add_output('settings', 'start_general_settings', true);
 add_output('settings', 'language_setting', true);
 add_output('settings', 'timezone_setting', true);
-add_output('settings', 'change_password', true);
 add_output('settings', 'list_style_setting', true);
+add_output('settings', 'change_password', true);
+add_output('settings', 'start_unread_settings', true);
+add_output('settings', 'unread_since_setting', true);
+add_output('settings', 'unread_source_max_setting', true);
+add_output('settings', 'start_flagged_settings', true);
+add_output('settings', 'flagged_since_setting', true);
+add_output('settings', 'flagged_source_max_setting', true);
+add_output('settings', 'start_everything_settings', true);
+add_output('settings', 'all_since_setting', true);
+add_output('settings', 'all_source_max_setting', true);
 add_output('settings', 'end_settings_form', true);
 add_output('settings', 'content_section_end', true);
 add_output('settings', 'two_col_layout_end', true);
@@ -210,9 +224,9 @@ add_output('profiles', 'content_end', true);
 add_handler('message_list', 'create_user', false);
 add_handler('message_list', 'login', false);
 add_handler('message_list', 'load_user_data', true);
+add_handler('message_list', 'message_list_type', true);
 add_handler('message_list', 'language',  true);
 add_handler('message_list', 'title', true);
-add_handler('message_list', 'message_list_type', true);
 add_handler('message_list', 'date', true);
 add_handler('message_list', 'save_user_data', true);
 add_handler('message_list', 'logout', true);
@@ -372,6 +386,12 @@ return array(
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'save_settings' => FILTER_SANITIZE_STRING,
         'language_setting' => FILTER_SANITIZE_STRING,
+        'flagged_per_source' => FILTER_VALIDATE_INT,
+        'flagged_since' => FILTER_SANITIZE_STRING,
+        'unread_per_source' => FILTER_VALIDATE_INT,
+        'unread_since' => FILTER_SANITIZE_STRING,
+        'all_per_source' => FILTER_VALIDATE_INT,
+        'all_since' => FILTER_SANITIZE_STRING,
         'list_style' => FILTER_SANITIZE_STRING,
         'timezone_setting' => FILTER_SANITIZE_STRING,
         'section_state' => FILTER_SANITIZE_STRING,

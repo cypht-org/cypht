@@ -16,13 +16,12 @@ td { vertical-align: top; }
 .placeholder { width: 100px !important; }
 .loading_icon { text-align: center; display: none; position: absolute; right: 120px; top: 17px; }
 .loading_icon img { width: 67px; height: 10px; visibility: inherit; }
-.combined_inbox_count, .unread_feed_count, .flagged_count, .unread_count { float: right; color: #aaa; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
 .logout:hover { background-color: #eee; }
 .logout { cursor: pointer; background: #fff font-size: 100%; }
 .search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
-.user_settings table { table-layout: fixed; width: 100%; white-space: nowrap; padding-left: 25px; }
-.user_settings table td { padding: 5px; }
+.user_settings table { width: 100%; white-space: nowrap; padding-left: 25px; }
+.user_settings table td { padding: 5px; padding-left: 30px; color: #666; }
 .save_settings { float: left !important; }
 .save_settings_password { float: left; margin-left: 0px; padding: 4px; }
 input, option, select { padding: 3px; }
@@ -59,7 +58,7 @@ input, option, select { padding: 3px; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
 .settings_col { width: 80%; }
 .label_col { width: 20%; }
-.submit_cell { padding-top: 20px !important; }
+.submit_cell { padding-top: 30px !important; }
 .password_notice { float: left; margin-left: 10px; font-size: .9em; color: #666; padding-top: 5px; }
 .confirm_logout { display: none; width: 450px; background-color: #eee; padding: 20px; position: absolute; left: 0px; top: 0px; border: solid 1px #ccc; z-index: 100; }
 .confirm_text {  padding-left: 10px; padding-bottom: 10px; }
@@ -67,7 +66,6 @@ input, option, select { padding: 3px; }
 .page_links a { text-decoration: none; color: #111; }
 .page_links a img { vertical-align: -2px; }
 .page_links { text-align: center; padding-top: 20px; }
-.message_list_since { vertical-align: 1px; border: solid 1px #ccc; text-decoration: none; margin: 0px; margin-left: 20px; letter-spacing: 0px; padding: 0px; color: #666; }
 .checkbox_cell { width: 20px; padding-right: 10px !important; }
 .menu_caret { padding: 7px; float: right; opacity: .15; }
 .news_cell { border: none !important; padding-bottom: 10px !important; padding-top: 10px !important; }
@@ -84,6 +82,10 @@ input, option, select { padding: 3px; }
 .plink, .nlink { color: #666; }
 .plink:hover, .nlink:hover { color: green !important; }
 .limit { width: 50px; margin-left: 20px; }
+.settings_subtitle { font-size: 120%; color: #777 !important; letter-spacing: -1px; padding-bottom: 15px !important; padding-left: 5px !important; }
+.settings_subtitle img { opacity: .4; padding-right: 7px; }
+.list_meta { display: inline; font-size: 75% !important; vertical-align: 1px; }
+.list_meta img { opacity: .4; vertical-align: 0px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ccc; opacity: 1; padding-top: 100px; text-align: center; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
@@ -92,7 +94,6 @@ input, option, select { padding: 3px; }
     .folder_toggle img { width: 36px; height: 42px; }
     .folder_toggle{ top: 25px; left: 0px; }
     .folders a { font-size: 125%; }
-    .combined_inbox_count, .flagged_count, .unread_count { display: none; }
     .folders li { padding-bottom: 5px; padding-top: 5px; }
     .loading_icon { top: 5px; left: 30px; right: auto; }
     .content_title { padding-left: 35px; }
