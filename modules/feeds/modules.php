@@ -56,7 +56,7 @@ class Hm_Handler_feed_status extends Hm_Handler_Module {
                 $feed_data = Hm_Feed_List::dump($id);
                 if ($feed_data) {
                     $feed = is_feed($feed_data['server']);
-                    if ($feed->parsed_data) {
+                    if ($feed && $feed->parsed_data) {
                         $data['feed_connect_time'] = microtime(true) - $start_time;
                         $data['feed_connect_status'] = 'Connected';
                         $data['feed_status_server_id'] = $id;
@@ -95,29 +95,39 @@ class Hm_Handler_feed_message_action extends Hm_Handler_Module {
 
 class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('feed_server_ids', 'message_list_since'));
+        list($success, $form) = $this->process_form(array('feed_server_ids'));
         if ($success) {
             $ids = explode(',', $form['feed_server_ids']);
             $res = array();
             $unread_only = false;
-            $limit = process_limit_argument($this->request->post, $this->user_config);
             $login_time = $this->session->get('login_time', false);
             if ($login_time) {
                 $data['login_time'] = $login_time;
             }
-            $date = process_since_argument($this->request->post['message_list_since'], $this->user_config);
-            $cutoff_timestamp = strtotime($date);
-            if (isset($this->request->post['feed_unread_only'])) {
+            if (array_key_exists('list_path', $data) && $data['list_path'] == 'unread') {
+                $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
                 $unread_only = true;
+                $cutoff_timestamp = strtotime($date);
                 if ($login_time && $login_time > $cutoff_timestamp) {
                     $cutoff_timestamp = $login_time;
                 }
+            }
+            elseif (array_key_exists('list_path', $data) && $data['list_path'] == 'combined_inbox') {
+                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+                $cutoff_timestamp = strtotime($date);
+            }
+            else {
+                $limit = DEFAULT_PER_SOURCE; // TODO: add feed settings
+                $date = process_since_argument(DEFAULT_SINCE); // TODO: add feed setting
+                $cutoff_timestamp = strtotime($date);
             }
             foreach($ids as $id) {
                 $feed_data = Hm_Feed_List::dump($id);
                 if ($feed_data) {
                     $feed = is_feed($feed_data['server'], $limit);
-                    if ($feed->parsed_data) {
+                    if ($feed && $feed->parsed_data) {
                         foreach ($feed->parsed_data as $item) {
                             if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
                                 continue;
@@ -158,7 +168,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
             $feed_data = Hm_Feed_List::dump($id);
             if ($feed_data) {
                 $feed = is_feed($feed_data['server']);
-                if ($feed->parsed_data) {
+                if ($feed && $feed->parsed_data) {
                     foreach ($feed->parsed_data as $item) {
                         if (isset($item['guid']) && md5($item['guid']) == $form['feed_uid']) {
                             if (isset($item['description'])) {
@@ -476,6 +486,12 @@ class Hm_Output_display_feeds_status extends Hm_Output_Module {
             }
         }
         return $res;
+    }
+}
+
+class Hm_Output_unread_feeds_included extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<tr><td>Include unread feed items</td><td><input type="checkbox" value="1" name="unread_include_feeds" /></td></tr>';
     }
 }
 

@@ -20,6 +20,9 @@ add_output('servers', 'add_feed_dialog', true, 'feeds', 'content_section_start',
 add_output('servers', 'display_configured_feeds', true, 'feeds', 'add_feed_dialog', 'after');
 add_output('servers', 'feed_ids', true, 'feeds', 'page_js', 'before');
 
+/* settings page */
+add_output('settings', 'unread_feeds_included', true, 'feeds', 'unread_source_max_setting', 'after');
+
 add_handler('ajax_hm_folders', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');
 add_handler('ajax_hm_folders', 'load_feed_folders',  true, 'feeds', 'load_feeds_from_config', 'after');
 add_handler('ajax_hm_folders', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
@@ -31,7 +34,7 @@ add_handler('ajax_message_action', 'feed_message_action', true, 'feeds', 'load_f
 add_handler('ajax_message_action', 'save_feeds', true, 'feeds', 'feed_message_action', 'after');
 
 /* message list page */
-add_handler('message_list', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
+add_handler('message_list', 'load_feeds_from_config', true, 'feeds', 'message_list_type', 'after');
 add_handler('message_list', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
 add_output('message_list', 'feed_ids', true, 'feeds', 'page_js', 'before');
 
@@ -122,7 +125,6 @@ return array(
         'new_feed_address' => FILTER_SANITIZE_STRING,
         'feed_list_path' => FILTER_SANITIZE_STRING,
         'feed_uid' => FILTER_SANITIZE_STRING,
-        'feed_unread_only' => FILTER_VALIDATE_INT
     )
 );
 
