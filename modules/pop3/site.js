@@ -83,18 +83,8 @@ var display_pop3_mailbox = function(res) {
 };
 
 var load_pop3_list = function(id) {
-    var since = 'today';
-    if ($('.message_list_since').length) {
-        since = $('.message_list_since option:selected').val();
-    }
-    var limit = 20;
-    if ($('.limit').length) {
-        limit = $('.limit').val();
-    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
-        {'name': 'limit', 'value': limit},
-        {'name': 'message_list_since', 'value': since},
         {'name': 'pop3_server_id', 'value': detail.server_id}],
         display_pop3_mailbox,
         [],
@@ -152,18 +142,8 @@ var add_pop3_sources = function(callback) {
     }
 };
 var pop3_combined_inbox_content = function(id) {
-    var since = 'today';
-    if ($('.message_list_since').length) {
-        since = $('.message_list_since option:selected').val();
-    }
-    var limit = 20;
-    if ($('.limit').length) {
-        limit = $('.limit').val();
-    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
-        {'name': 'limit', 'value': limit},
-        {'name': 'message_list_since', 'value': since},
         {'name': 'pop3_server_id', 'value': id}],
         display_pop3_combined_inbox,
         [],
@@ -203,18 +183,8 @@ var update_pop3_status_display = function(res) {
 };
 
 var pop3_combined_unread_content = function(id) {
-    var since = 'today';
-    if ($('.message_list_since').length) {
-        since = $('.message_list_since option:selected').val();
-    }
-    var limit = 20;
-    if ($('.limit').length) {
-        limit = $('.limit').val();
-    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_unread'},
-        {'name': 'message_list_since', 'value': since},
-        {'name': 'limit', 'value': limit},
         {'name': 'pop3_unread_only', 'value': 1},
         {'name': 'pop3_server_id', 'value': id}],
         update_pop3_unread_display,

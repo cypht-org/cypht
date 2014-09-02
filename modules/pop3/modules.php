@@ -50,21 +50,31 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
     public function process($data) {
 
         $msgs = array();
-        list($success, $form) = $this->process_form(array('pop3_server_id', 'message_list_since'));
+        list($success, $form) = $this->process_form(array('pop3_server_id'));
         if ($success) {
             $unread_only = false;
-            $limit = process_limit_argument($this->request->post, $this->user_config);
             $login_time = $this->session->get('login_time', false);
             if ($login_time) {
                 $data['login_time'] = $login_time;
             }
-            $date = process_since_argument($this->request->post['message_list_since'], $this->user_config);
-            $cutoff_timestamp = strtotime($date);
-            if (isset($this->request->post['pop3_unread_only'])) {
+            if (array_key_exists('list_path', $data) && $data['list_path'] == 'unread') {
+                $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
                 $unread_only = true;
+                $cutoff_timestamp = strtotime($date);
                 if ($login_time && $login_time > $cutoff_timestamp) {
                     $cutoff_timestamp = $login_time;
                 }
+            }
+            elseif (array_key_exists('list_path', $data) && $data['list_path'] == 'combined_inbox') {
+                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+                $cutoff_timestamp = strtotime($date);
+            }
+            else {
+                $limit = DEFAULT_PER_SOURCE; // TODO: add pop3 settings
+                $date = process_since_argument(DEFAULT_SINCE); // TODO: add pop3 setting
+                $cutoff_timestamp = strtotime($date);
             }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
@@ -312,6 +322,9 @@ class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
         if (!empty($servers)) {
             $data['pop3_servers'] = $servers;
             $data['folder_sources'][] = 'email_folders';
+            if (array_key_exists('source_total', $data)) {
+                $data['source_total'] += count($servers);
+            }
         }
         return $data;
     }
