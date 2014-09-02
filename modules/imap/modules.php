@@ -137,10 +137,10 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
 
 class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_server_ids', 'message_list_since', 'limit'));
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = process_limit_argument($this->request->post, $this->user_config);
-            $date = process_since_argument($form['message_list_since'], $this->user_config);
+            $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, $date, array('INBOX'), $limit);
             $data['imap_combined_inbox_data'] = $msg_list;
@@ -152,11 +152,11 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
 
 class Hm_Handler_imap_flagged extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_server_ids', 'message_list_since', 'limit'));
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = process_limit_argument($this->request->post, $this->user_config);
+            $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
             $ids = explode(',', $form['imap_server_ids']);
-            $date = process_since_argument($form['message_list_since'], $this->user_config);
+            $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_SINCE));
             $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, $date, array('INBOX'), $limit);
             $data['imap_flagged_data'] = $msg_list;
             $data['flagged_server_ids'] = $form['imap_server_ids'];
@@ -215,10 +215,10 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
 
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('message_list_since', 'imap_server_ids', 'limit'));
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = process_limit_argument($this->request->post, $this->user_config);
-            $date = process_since_argument($form['message_list_since'], $this->user_config);
+            $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
             $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date, array('INBOX'), $limit);
@@ -322,7 +322,6 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
             $data['imap_servers'] = $servers;
             $data['folder_sources'][] = 'email_folders';
         }
-        $data['message_list_since'] = $this->user_config->get('message_list_since', false);
         return $data;
     }
 }

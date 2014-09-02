@@ -78,18 +78,8 @@ var imap_test_action = function() {
 
 /* unread page */
 var imap_combined_unread_content = function(id) {
-    var since = 'today';
-    if ($('.message_list_since').length) {
-        since = $('.message_list_since option:selected').val();
-    }
-    var limit = 20;
-    if ($('.limit').length) {
-        limit = $('.limit').val();
-    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-        {'name': 'message_list_since', 'value': since},
-        {'name': 'limit', 'value': limit},
         {'name': 'imap_server_ids', 'value': id}],
         update_imap_unread_display,
         [],
@@ -108,7 +98,6 @@ var set_unread_state = function() {
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_unread_data', data.html());
-    Hm_Message_List.update_count('unread');
     var empty = check_empty_list();
     if (!empty) {
         $(':checkbox').click(function(e) {
@@ -116,22 +105,13 @@ var set_unread_state = function() {
             Hm_Message_List.check_select_range(e);
         });
     }
+    $('.total').text($('.message_table tbody tr').length);
 };
 
 /* flagged page */
 var imap_combined_flagged_content = function(id) {
-    var limit = 20;
-    if ($('.limit').length) {
-        limit = $('.limit').val();
-    }
-    var since = 'today';
-    if ($('.message_list_since').length) {
-        since = $('.message_list_since option:selected').val();
-    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_flagged'},
-        {'name': 'limit', 'value': limit},
-        {'name': 'message_list_since', 'value': since},
         {'name': 'imap_server_ids', 'value': id}],
         update_flagged_message_display,
         [],
@@ -157,6 +137,7 @@ var set_flagged_state = function() {
             Hm_Message_List.check_select_range(e);
         });
     }
+    $('.total').text($('.message_table tbody tr').length);
 };
 
 
@@ -187,19 +168,9 @@ var update_imap_status_display = function(res) {
 
 /* combined inbox page */
 var imap_combined_inbox_content = function(id) {
-    var since = 'today';
-    if ($('.message_list_since').length) {
-        since = $('.message_list_since option:selected').val();
-    }
-    var limit = 20;
-    if ($('.limit').length) {
-        limit = $('.limit').val();
-    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_combined_inbox'},
-        {'name': 'imap_server_ids', 'value': id},
-        {'name': 'limit', 'value': limit},
-        {'name': 'message_list_since', 'value': since}],
+        {'name': 'imap_server_ids', 'value': id}],
         display_imap_combined_inbox,
         [],
         false,
@@ -343,7 +314,6 @@ var imap_message_view_finished = function() {
         else if (hm_list_parent == 'unread') {
             prev_next_links('formatted_unread_data', class_name);
             var count = update_unread_cache(class_name);
-            Hm_Message_List.update_count('unread');
         }
     }
 };
