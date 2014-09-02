@@ -285,6 +285,9 @@ class Hm_Router {
     }
 
     private function check_for_redirect($request, $session, $result) {
+        if (array_key_exists('no_redirect', $result) && $result['no_redirect']) {
+            return;
+        }
         if (!empty($request->post) && $request->type == 'HTTP') {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
