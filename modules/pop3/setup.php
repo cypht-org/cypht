@@ -8,12 +8,11 @@ output_source('pop3');
 /* add stuff to the home page */
 add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('home', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-//add_output('home', 'display_pop3_summary', true, 'pop3', 'server_summary_start', 'after');
 add_output('home', 'display_pop3_status', true, 'pop3', 'server_status_start', 'after');
 add_output('home', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
 /* message list page */
-add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
+add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
 add_handler('message_list', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('message_list', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
@@ -49,6 +48,11 @@ add_handler('profiles', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop
 add_handler('notfound', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('notfound', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 
+/* settings page */
+add_output('settings', 'start_pop3_settings', true, 'pop3', 'end_settings_form', 'before');
+add_output('settings', 'pop3_since_setting', true, 'pop3', 'start_pop3_settings', 'after');
+
+/* folder list */
 add_handler('ajax_hm_folders', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
 add_handler('ajax_hm_folders', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('ajax_hm_folders', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
@@ -121,7 +125,6 @@ add_handler('ajax_pop3_debug', 'date', true, 'core');
 return array(
     'allowed_pages' => array(
         'ajax_pop3_debug',
-        'ajax_pop3_summary',
         'ajax_pop3_message_display',
         'ajax_pop3_folder_display',
         'ajax_pop3_combined_inbox',

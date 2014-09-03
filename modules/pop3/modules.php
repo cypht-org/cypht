@@ -420,23 +420,6 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_display_pop3_summary extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '';
-        if (isset($input['pop3_servers']) && !empty($input['pop3_servers'])) {
-            foreach ($input['pop3_servers'] as $index => $vals) {
-                if ($vals['name'] == 'Default-Auth-Server') {
-                    $vals['name'] = 'Default';
-                }
-                $res .= '<tr><td>POP3</td><td>'.$vals['name'].'</td>'.
-                    '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
-                    '<td>'.$vals['tls'].'</td></tr>';
-            }
-        }
-        return $res;
-    }
-}
-
 class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
@@ -554,6 +537,18 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
             }
         }
         return $res;
+    }
+}
+
+class Hm_Output_start_pop3_settings extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<tr><td colspan="2" class="settings_subtitle"><br /><img src="'.Hm_Image_Sources::$env_closed.'" />POP3 Settings</td></tr>';
+    }
+}
+
+class Hm_Output_pop3_since_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown(false, 'pop3_since').'</td></tr>';
     }
 }
 
