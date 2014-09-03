@@ -635,24 +635,6 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_display_imap_summary extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '';
-        if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
-            foreach ($input['imap_servers'] as $index => $vals) {
-                if ($vals['name'] == 'Default-Auth-Server') {
-                    $vals['name'] = 'Default';
-                }
-                $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td>'.
-                    '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
-                    '<td>'.$vals['tls'].'</td>'.
-                    '</tr>';
-            }
-        }
-        return $res;
-    }
-}
-
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['imap_servers'])) {

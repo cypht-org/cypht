@@ -8,7 +8,6 @@ output_source('imap');
 /* add stuff to the home page */
 add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('home', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
-//add_output('home', 'display_imap_summary', true, 'imap', 'server_summary_start', 'after');
 add_output('home', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
 add_output('home', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
@@ -42,7 +41,7 @@ add_handler('search', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_
 add_output('search', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* message list pages */
-add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'message_list_type', 'after');
+add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('message_list', 'bust_cache',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('message_list', 'add_imap_servers_to_page_data',  true, 'imap', 'bust_cache', 'after');
 add_output('message_list', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -203,7 +202,6 @@ return array(
         'imap_delete' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
         'imap_remember' => FILTER_VALIDATE_INT,
-        'summary_ids' => FILTER_SANITIZE_STRING,
         'imap_folder_ids' => FILTER_SANITIZE_STRING,
         'imap_forget' => FILTER_SANITIZE_STRING,
         'imap_save' => FILTER_SANITIZE_STRING,

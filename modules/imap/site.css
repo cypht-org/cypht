@@ -67,7 +67,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .unseen { font-weight: 700; }
 .checkbox_row { padding-right: 10px !important; }
 .checkbox_header img { padding-left: 3px; padding-right: 0px; }
-.msg_controls { display: none; padding-left: 0px; }
+.msg_controls { display: none; padding-left: 0px; margin-right: 20px; }
 .msg_controls_visible { display: inline; }
 .msg_controls a, .toggle_link { font-size: .6em; letter-spacing: 0px; color: #666; margin-right: 5px; background-color: #fff; border: solid 1px #ccc; padding: 3px; width: 30px; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; vertical-align: 3px; }
 .toggle_link img { opacity: .6; vertical-align: -2px; }
@@ -76,7 +76,7 @@ select, input { border: solid 1px #ccc; background-color: #fff; color: #333; -we
 .float_title { float: left; }
 .icon img { opacity: .6; vertical-align: -3px; padding-right: 5px; }
 .toggle_link img { vertical-align: 1px; opacity: .6 !important; }
-.toggle_link { padding: 4px; line-height: 10px; margin-top: 3px; margin-right: 15px !important; width: 8px !important; display: inline; opacity: 1 !important; margin-left: 10px; }
+.toggle_link { padding: 2px; line-height: 10px; margin-top: 3px; margin-right: 15px !important; width: 8px !important; display: inline; opacity: 1 !important; margin-left: 10px; }
 .online { color: green; }
 .down { color: red; }
 .header_subject .account_icon { vertical-align: 0px; }
