@@ -1033,6 +1033,9 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
 }
 
 function message_list_meta($input, $output_mod) {
+    if (!in_array($input['list_path'], array('flagged', 'unread', 'combined_inbox', 'email', 'feeds'))) {
+        return '';
+    }
     $times = array(
         'today' => 'Today',
         '-1 week' => 'Last 7 days',

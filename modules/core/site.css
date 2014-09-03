@@ -84,8 +84,8 @@ input, option, select { padding: 3px; }
 .limit { width: 50px; margin-left: 20px; }
 .settings_subtitle { font-size: 120%; color: #777 !important; letter-spacing: -1px; padding-bottom: 15px !important; padding-left: 5px !important; }
 .settings_subtitle img { opacity: .4; padding-right: 7px; }
-.list_meta { display: inline; font-size: 75% !important; vertical-align: 1px; }
-.list_meta img { opacity: .4; vertical-align: 0px; }
+.list_meta { display: inline; color: #999 !important; font-size: 75% !important; vertical-align: 1px; }
+.list_meta img { opacity: .7; vertical-align: 0px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ccc; opacity: 1; padding-top: 100px; text-align: center; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
