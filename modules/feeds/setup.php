@@ -21,6 +21,7 @@ add_output('servers', 'display_configured_feeds', true, 'feeds', 'add_feed_dialo
 add_output('servers', 'feed_ids', true, 'feeds', 'page_js', 'before');
 
 /* settings page */
+add_handler('settings', 'process_unread_feeds_setting', true, 'feeds', 'save_user_settings', 'before'); 
 add_output('settings', 'unread_feeds_included', true, 'feeds', 'unread_source_max_setting', 'after');
 
 add_handler('ajax_hm_folders', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');
@@ -123,6 +124,7 @@ return array(
         'new_feed_name' => FILTER_SANITIZE_STRING,
         'feed_delete' => FILTER_VALIDATE_INT,
         'new_feed_address' => FILTER_SANITIZE_STRING,
+        'unread_exclude_feeds' => FILTER_VALIDATE_INT,
         'feed_list_path' => FILTER_SANITIZE_STRING,
         'feed_uid' => FILTER_SANITIZE_STRING,
     )

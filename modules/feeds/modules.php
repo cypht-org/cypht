@@ -4,6 +4,24 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'modules/feeds/hm-feed.php';
 
+class Hm_Handler_process_unread_feeds_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings'));
+        if ($success) {
+            if (array_key_exists('unread_exclude_feeds', $this->request->post)) {
+                $data['new_user_settings']['unread_exclude_feeds'] = true;
+            }
+            else {
+                $data['new_user_settings']['unread_exclude_feeds'] = false;
+            }
+        }
+        else {
+            $data['user_settings']['unread_exclude_feeds'] = $this->user_config->get('unread_exclude_feeds', false);
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_feed_connect extends Hm_Handler_Module {
     public function process($data) {
         $failed = true; 
@@ -264,6 +282,12 @@ class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
 
 class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
     public function process($data) {
+        if (isset($data['list_path']) && $data['list_path'] == 'unread') {
+            $excluded = $this->user_config->get('unread_exclude_feeds', false);
+        }
+        if ($excluded) {
+            return $data;
+        }
         $feeds = Hm_Feed_List::dump();
         if (!empty($feeds)) {
             $data['feeds'] = $feeds;
@@ -462,20 +486,6 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_display_feeds_summary extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '';
-        if (isset($input['feeds']) && !empty($input['feeds'])) {
-            foreach ($input['feeds'] as $index => $vals) {
-                $res .= '<tr><td>FEED</td><td>'.$vals['name'].'</td>'.
-                    '<td>'.$vals['server'].'</td><td>'.$vals['port'].'</td>'.
-                    '<td>'.$vals['tls'].'</td></tr>';
-            }
-        }
-        return $res;
-    }
-}
-
 class Hm_Output_display_feeds_status extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
@@ -491,7 +501,13 @@ class Hm_Output_display_feeds_status extends Hm_Output_Module {
 
 class Hm_Output_unread_feeds_included extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td>Include unread feed items</td><td><input type="checkbox" value="1" name="unread_include_feeds" /></td></tr>';
+        if (array_key_exists('user_settings', $input) && array_key_exists('unread_exclude_feeds', $input['user_settings']) && $input['user_settings']['unread_exclude_feeds']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $checked = '';
+        }
+        return '<tr><td>Exclude unread feed items</td><td><input type="checkbox" '.$checked.' value="1" name="unread_exclude_feeds" /></td></tr>';
     }
 }
 
