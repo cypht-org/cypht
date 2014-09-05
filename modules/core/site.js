@@ -81,10 +81,7 @@ Hm_Ajax_Request = function() { return {
         var dt = new Date();
         var elapsed = dt.getTime() - this.start_time;
         var msg = 'AJAX request finished in ' + elapsed + ' millis';
-        if (elapsed > 2000) {
-            msg += '. Ouch!';
-        }
-        $('.elapsed').html(msg);
+        Hm_Debug.add(msg);
         Hm_Ajax.request_count--;
         if (Hm_Ajax.request_count == 0) {
             if (Hm_Ajax.batch_callback) {
@@ -96,6 +93,27 @@ Hm_Ajax_Request = function() { return {
         }
     }
 }; };
+
+Hm_Debug = {
+    max: 5,
+    count: 0,
+    add: function(msg) {
+        Hm_Debug.count++;
+        $('.debug').prepend('<div>'+msg+'</div>');
+        if (Hm_Debug.check()) {
+            Hm_Debug.prune();
+        }
+    },
+
+    check: function() {
+        return Hm_Debug.count > Hm_Debug.max;
+    },
+
+    prune: function() {
+        $('.debug > div:last-child').remove();
+        Hm_Debug.count--;
+    }
+};
 
 /* user notification manager */
 Hm_Notices = {
@@ -356,6 +374,26 @@ var Hm_Message_List = {
         }
         Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
     },
+
+    update_title: function() {
+        var count = 0;
+        if (hm_list_path == 'unread') {
+            count = $('.message_table tbody tr').length;
+            document.title = 'HM3 '+count+' Unread';
+        }
+        else if (hm_list_path == 'flagged') {
+            count = $('.message_table tbody tr').length;
+            document.title = 'HM3 '+count+' Flagged';
+        }
+        else if (hm_list_path == 'combined_inbox') {
+            count = $('.unseen', $('.message_table tbody')).length;
+            document.title = 'HM3 '+count+' New in Everything';
+        }
+        else if (hm_list_path == 'feeds') {
+            count = $('.unseen', $('.message_table tbody')).length;
+            document.title = 'HM3 '+count+' New in Feeds';
+        }
+    }
 };
 
 var save_folder_list = function() {
@@ -586,6 +624,37 @@ var set_combined_inbox_state = function() {
         });
     }
     $('.total').text($('.message_table tbody tr').length);
+    Hm_Message_List.update_title();
+};
+
+var set_flagged_state = function() {
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    save_to_local_storage('formatted_flagged_data', data.html());
+    var empty = check_empty_list();
+    if (!empty) {
+        $(':checkbox').click(function(e) {
+            Hm_Message_List.toggle_msg_controls();
+            Hm_Message_List.check_select_range(e);
+        });
+    }
+    $('.total').text($('.message_table tbody tr').length);
+    Hm_Message_List.update_title();
+};
+
+var set_unread_state = function() {
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    save_to_local_storage('formatted_unread_data', data.html());
+    var empty = check_empty_list();
+    if (!empty) {
+        $(':checkbox').click(function(e) {
+            Hm_Message_List.toggle_msg_controls();
+            Hm_Message_List.check_select_range(e);
+        });
+    }
+    $('.total').text($('.message_table tbody tr').length);
+    Hm_Message_List.update_title();
 };
 
 var check_empty_list = function() {
