@@ -282,6 +282,7 @@ class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
 
 class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
     public function process($data) {
+        $excluded = false;
         if (isset($data['list_path']) && $data['list_path'] == 'unread') {
             $excluded = $this->user_config->get('unread_exclude_feeds', false);
         }

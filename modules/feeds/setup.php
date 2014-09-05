@@ -35,8 +35,8 @@ add_handler('ajax_message_action', 'feed_message_action', true, 'feeds', 'load_f
 add_handler('ajax_message_action', 'save_feeds', true, 'feeds', 'feed_message_action', 'after');
 
 /* message list page */
-add_handler('message_list', 'load_feeds_from_config', true, 'feeds', 'message_list_type', 'after');
-add_handler('message_list', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
+add_handler('message_list', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
+add_handler('message_list', 'add_feeds_to_page_data', true, 'feeds', 'message_list_type', 'after');
 add_output('message_list', 'feed_ids', true, 'feeds', 'page_js', 'before');
 
 /* combined inbox */
