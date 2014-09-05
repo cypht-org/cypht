@@ -4,6 +4,38 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'modules/pop3/hm-pop3.php';
 
+class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'pop3_limit'));
+        if ($success) {
+            if ($form['pop3_limit'] > MAX_PER_SOURCE || $form['pop3_limit'] < 0) {
+                $limit = DEFAULT_PER_SOURCE;
+            }
+            else {
+                $limit = $form['pop3_limit'];
+            }
+            $data['new_user_settings']['pop3_limit'] = $limit;
+        }
+        else {
+            $data['user_settings']['pop3_limit'] = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_process_pop3_since_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'pop3_since'));
+        if ($success) {
+            $data['new_user_settings']['pop3_since'] = process_since_argument($form['pop3_since'], true);
+        }
+        else {
+            $data['user_settings']['pop3_since'] = $this->user_config->get('pop3_since', false);
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_pop3_status extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('pop3_server_ids'));
@@ -72,8 +104,8 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $cutoff_timestamp = strtotime($date);
             }
             else {
-                $limit = DEFAULT_PER_SOURCE; // TODO: add pop3 settings
-                $date = process_since_argument(DEFAULT_SINCE); // TODO: add pop3 setting
+                $limit = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('pop3_since', DEFAULT_SINCE)); // TODO: add pop3 setting
                 $cutoff_timestamp = strtotime($date);
             }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
@@ -548,7 +580,21 @@ class Hm_Output_start_pop3_settings extends Hm_Output_Module {
 
 class Hm_Output_pop3_since_setting extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown(false, 'pop3_since').'</td></tr>';
+        $since = false;
+        if (array_key_exists('user_settings', $input) && array_key_exists('pop3_since', $input['user_settings'])) {
+            $since = $input['user_settings']['pop3_since'];
+        }
+        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown($since, 'pop3_since').'</td></tr>';
+    }
+}
+
+class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $limit = DEFAULT_PER_SOURCE;
+        if (array_key_exists('user_settings', $input) && array_key_exists('pop3_limit', $input['user_settings'])) {
+            $limit = $input['user_settings']['pop3_limit'];
+        }
+        return '<tr><td>Max messages to display</td><td><input type="text" name="pop3_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
 

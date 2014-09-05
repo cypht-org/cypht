@@ -31,6 +31,13 @@ add_output('servers', 'display_configured_pop3_servers', true, 'pop3', 'add_pop3
 /* settings page */
 add_handler('settings', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('settings', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_handler('settings', 'process_pop3_limit_setting', true, 'pop3', 'save_user_settings', 'before');
+add_handler('settings', 'process_pop3_since_setting', true, 'pop3', 'save_user_settings', 'before');
+add_output('settings', 'start_pop3_settings', true, 'pop3', 'end_settings_form', 'before');
+add_output('settings', 'pop3_since_setting', true, 'pop3', 'start_pop3_settings', 'after');
+add_output('settings', 'pop3_limit_setting', true, 'pop3', 'pop3_since_setting', 'after');
+
+
 
 /* compose page */
 add_handler('compose', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
@@ -47,10 +54,6 @@ add_handler('profiles', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop
 /* not found */
 add_handler('notfound', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('notfound', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-
-/* settings page */
-add_output('settings', 'start_pop3_settings', true, 'pop3', 'end_settings_form', 'before');
-add_output('settings', 'pop3_since_setting', true, 'pop3', 'start_pop3_settings', 'after');
 
 /* folder list */
 add_handler('ajax_hm_folders', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
@@ -146,6 +149,8 @@ return array(
         'pop3_pass' => FILTER_SANITIZE_STRING,
         'pop3_list_path' => FILTER_SANITIZE_STRING,
         'pop3_uid' => FILTER_VALIDATE_INT,
+        'pop3_limit' => FILTER_VALIDATE_INT,
+        'pop3_since' => FILTER_SANITIZE_STRING,
     )
 );
 

@@ -4,6 +4,38 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'modules/feeds/hm-feed.php';
 
+class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'feed_limit'));
+        if ($success) {
+            if ($form['feed_limit'] > MAX_PER_SOURCE || $form['feed_limit'] < 0) {
+                $limit = DEFAULT_PER_SOURCE;
+            }
+            else {
+                $limit = $form['feed_limit'];
+            }
+            $data['new_user_settings']['feed_limit'] = $limit;
+        }
+        else {
+            $data['user_settings']['feed_limit'] = $this->user_config->get('feed_limit', DEFAULT_PER_SOURCE);
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_process_feed_since_setting extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('save_settings', 'feed_since'));
+        if ($success) {
+            $data['new_user_settings']['feed_since'] = process_since_argument($form['feed_since'], true);
+        }
+        else {
+            $data['user_settings']['feed_since'] = $this->user_config->get('feed_since', false);
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_process_unread_feeds_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings'));
@@ -137,8 +169,8 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 $cutoff_timestamp = strtotime($date);
             }
             else {
-                $limit = DEFAULT_PER_SOURCE; // TODO: add feed settings
-                $date = process_since_argument(DEFAULT_SINCE); // TODO: add feed setting
+                $limit = $this->user_config->get('feed_limit', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('feed_since', DEFAULT_SINCE)); 
                 $cutoff_timestamp = strtotime($date);
             }
             foreach($ids as $id) {
@@ -524,6 +556,32 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
             $input['feed_detail_display'] = '';
         }
         return $input;
+    }
+}
+
+class Hm_Output_start_feed_settings extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<tr><td colspan="2" class="settings_subtitle"><br /><img src="'.Hm_Image_Sources::$env_closed.'" />FEED Settings</td></tr>';
+    }
+}
+
+class Hm_Output_feed_since_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $since = false;
+        if (array_key_exists('user_settings', $input) && array_key_exists('feed_since', $input['user_settings'])) {
+            $since = $input['user_settings']['feed_since'];
+        }
+        return '<tr><td>Show feed items received since</td><td>'.message_since_dropdown($since, 'feed_since').'</td></tr>';
+    }
+}
+
+class Hm_Output_feed_limit_setting extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $limit = DEFAULT_PER_SOURCE;
+        if (array_key_exists('user_settings', $input) && array_key_exists('feed_limit', $input['user_settings'])) {
+            $limit = $input['user_settings']['feed_limit'];
+        }
+        return '<tr><td>Max feed items to display</td><td><input type="text" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
 

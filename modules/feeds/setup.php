@@ -23,6 +23,11 @@ add_output('servers', 'feed_ids', true, 'feeds', 'page_js', 'before');
 /* settings page */
 add_handler('settings', 'process_unread_feeds_setting', true, 'feeds', 'save_user_settings', 'before'); 
 add_output('settings', 'unread_feeds_included', true, 'feeds', 'unread_source_max_setting', 'after');
+add_handler('settings', 'process_feed_limit_setting', true, 'feeds', 'save_user_settings', 'before');
+add_handler('settings', 'process_feed_since_setting', true, 'feeds', 'save_user_settings', 'before');
+add_output('settings', 'start_feed_settings', true, 'feeds', 'end_settings_form', 'before');
+add_output('settings', 'feed_since_setting', true, 'feeds', 'start_feed_settings', 'after');
+add_output('settings', 'feed_limit_setting', true, 'feeds', 'feed_since_setting', 'after');
 
 add_handler('ajax_hm_folders', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');
 add_handler('ajax_hm_folders', 'load_feed_folders',  true, 'feeds', 'load_feeds_from_config', 'after');
@@ -127,6 +132,8 @@ return array(
         'unread_exclude_feeds' => FILTER_VALIDATE_INT,
         'feed_list_path' => FILTER_SANITIZE_STRING,
         'feed_uid' => FILTER_SANITIZE_STRING,
+        'feed_since' => FILTER_SANITIZE_STRING,
+        'feed_limit' => FILTER_VALIDATE_INT,
     )
 );
 
