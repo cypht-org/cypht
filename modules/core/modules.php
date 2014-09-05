@@ -1036,6 +1036,8 @@ function message_list_meta($input, $output_mod) {
     if (!in_array($input['list_path'], array('flagged', 'unread', 'combined_inbox', 'email', 'feeds'))) {
         return '';
     }
+    $limit = 0;
+    $since = false;
     $times = array(
         'today' => 'Today',
         '-1 week' => 'Last 7 days',
@@ -1048,13 +1050,13 @@ function message_list_meta($input, $output_mod) {
     if (array_key_exists('per_source_limit', $input)) {
         $limit = $input['per_source_limit'];
     }
-    else {
+    if (!$limit) {
         $limit = DEFAULT_PER_SOURCE;
     }
     if (array_key_exists('message_list_since', $input)) {
         $since = $input['message_list_since'];
     }
-    else {
+    if (!$since) {
         $since = DEFAULT_SINCE;
     }
     $dt = sprintf('%s', strtolower($times[$since]));
