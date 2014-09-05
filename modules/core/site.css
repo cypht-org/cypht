@@ -21,14 +21,14 @@ td { vertical-align: top; }
 .logout { cursor: pointer; background: #fff font-size: 100%; }
 .search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { width: 100%; white-space: nowrap; padding-left: 25px; }
-.user_settings table td { padding: 5px; padding-left: 30px; color: #666; }
+.user_settings table td { vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 0px; color: #666; }
 .save_settings { float: left !important; }
 .save_settings_password { float: left; margin-left: 0px; padding: 4px; }
 input, option, select { padding: 3px; }
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 600px; margin: 0px; background-color: #f5f5f5; width: 240px; padding-left: 20px; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }
-.elapsed { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
+.debug { color: green; font-size: 75%; float: right; clear: both; margin: 20px; }
 .server_status, .server_summary { width: 100%; height: 100%; background-color: #fff; }
 .server_status table, .server_summary table { table-layout: fixed; width: 100%; padding: 20px; padding-bottom: 40px; padding-left: 30px; }
 .server_status table th, .server_summary table th, .message_table th { font-style: normal; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #aaa; font-size: 75%; font-weight: normal; border-bottom: solid 1px #ddd; }
@@ -72,7 +72,7 @@ input, option, select { padding: 3px; }
 .news_cell .subject { padding-bottom: 5px !important; }
 .news_cell .icon { float: right; }
 .wait { cursor: progress; }
-.refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 10px; vertical-align: -10px; }
+.refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 0px; vertical-align: -10px; }
 .list_settings_dialog { display: none; padding: 10px; position: absolute; top: 0px; right: 0px; width: 600px; background-color: #efefef; border: solid 1px #ccc; }
 .list_controls { margin-top: -20px; padding: 10px; padding-right: 20px; float: right; }
 .list_settings_dialog table { width: 1%; white-space: nowrap; }
@@ -82,10 +82,10 @@ input, option, select { padding: 3px; }
 .plink, .nlink { color: #666; }
 .plink:hover, .nlink:hover { color: green !important; }
 .limit { width: 50px; margin-left: 20px; }
-.settings_subtitle { font-size: 120%; color: #777 !important; letter-spacing: -1px; padding-bottom: 15px !important; padding-left: 5px !important; }
-.settings_subtitle img { opacity: .4; padding-right: 7px; }
-.list_meta { display: inline; color: #999 !important; font-size: 75% !important; vertical-align: 1px; }
-.list_meta img { opacity: .7; vertical-align: 0px; }
+.settings_subtitle { font-size: 120%; color: #555 !important; letter-spacing: -1px; padding-bottom: 15px !important; padding-left: 5px !important; }
+.settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; }
+.list_meta { letter-spacing: 0px; display: inline; color: #999 !important; font-size: 70% !important; vertical-align: 1px; font-style: normal; margin-left: 20px; }
+.list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ccc; opacity: 1; padding-top: 100px; text-align: center; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
@@ -124,6 +124,7 @@ input, option, select { padding: 3px; }
 @media screen and (max-device-width:480px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
     body { font-size: 90%; min-width: 100%; }
+    .list_meta { display: block; }
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
     .folder_list { display: none; width: 340px; }
     .content_cell { min-width: 360px; max-width: 480px; }
@@ -136,4 +137,7 @@ input, option, select { padding: 3px; }
     .update_message_list { margin-right: 20px; }
     .msg_text { font-size: 100%; }
     .msg_text_inner { font-size: 100%; }
+}
+.debug {
+    -webkit-mask-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .3) 70%);
 }
