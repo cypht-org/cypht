@@ -372,7 +372,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['per_source_limit'] = $this->user_config->get('all_per_source_setting', DEFAULT_SINCE);
                 $data['mailbox_list_title'] = array('Everything');
             }
-            elseif (preg_match("/^imap_\d+_[^\s]+/", $path)) {
+            elseif (preg_match("/^imap_\d+_[^\s]+$/", $path)) {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
@@ -380,7 +380,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                     $data['mailbox_list_title'] = array('IMAP', $details['name'], $parts[2]);
                 }
             }
-            elseif (preg_match("/^pop3_\d+/", $path)) {
+            elseif (preg_match("/^pop3_\d+$/", $path)) {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 2);
                 $details = Hm_POP3_List::dump(intval($parts[1]));
@@ -391,7 +391,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                     $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
                 }
             }
-            elseif (preg_match("/^feeds_\d+/", $path)) {
+            elseif (preg_match("/^feeds_\d+$/", $path)) {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 2);
                 $details = Hm_Feed_List::dump(intval($parts[1]));
@@ -574,7 +574,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
 
 class Hm_Output_content_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="elapsed"></div></body></html>';
+        return '<div class="debug"></div></body></html>';
     }
 }
 
@@ -926,7 +926,7 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
 
 class Hm_Output_server_status_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="server_status"><div class="content_title">Status</div>';
+        $res = '<div class="server_status"><div class="content_title">Home</div>';
         $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Status</th><th>Details</th></tr>'.
                 '</thead><tbody>';
         return $res;
@@ -1015,10 +1015,10 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        $res .= '<div class="message_list"><div class="content_title">'.
+        $res .= '<div class="message_list"><div class="content_title">';
+        $res .= message_controls().
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
         $res .= '<div class="list_controls"><a onclick="return Hm_Message_List.load_sources()" href="#"><img class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a></div>';
-        $res .= message_controls();
 	    $res .= message_list_meta($input, $this);
         $res .= '</div>';
         return $res;
@@ -1058,10 +1058,14 @@ function message_list_meta($input, $output_mod) {
         $since = DEFAULT_SINCE;
     }
     $dt = sprintf('%s', strtolower($times[$since]));
-    $max = sprintf('sources @ %d each', $limit);
-    return '<div class="list_meta">'.$output_mod->html_safe($dt).
-        ' <img src="'.Hm_Image_Sources::$caret.'" /> <span class="src_count"></span> '.$output_mod->html_safe($max).
-        ' <img src="'.Hm_Image_Sources::$caret.'" /> <span class="total"></span> Total</div>';
+    $max = sprintf('sources@%d each', $limit);
+
+    return '<div class="list_meta">'.
+        $output_mod->html_safe($dt).
+        '<b>-</b>'.
+        '<span class="src_count"></span> '.$output_mod->html_safe($max).
+        '<b>-</b>'.
+        '<span class="total"></span> total</div>';
 }
 
 function human_readable_interval($date_str) {
@@ -1081,7 +1085,10 @@ function human_readable_interval($date_str) {
     $t['year']   = $t['week']*52;
 
     if ($interval < 0) {
-        return 'From the future!';
+        $interval += $t['hour'];
+        if ($interval < 0) {
+            return 'From the future!';
+        }
     }
     elseif ($interval == 0) {
         return 'Just now';
@@ -1210,11 +1217,12 @@ function format_msg_image($str, $mime_type) {
     return '<img src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
 }
 
-function format_msg_text($str, $output_mod) {
-    $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,\[\]%[:alnum:]])+)/m";
+function format_msg_text($str, $output_mod, $links=true) {
     $str = nl2br(str_replace(' ', '&#160;&#8203;', ($output_mod->html_safe($str))));
-    $str = preg_replace($link_regex, "<a target=\"_blank\" href=\"$1\">$1</a>", $str);
-
+    if ($links) {
+        $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,\[\]%[:alnum:]])+)/m";
+        $str = preg_replace($link_regex, "<a target=\"_blank\" href=\"$1\">$1</a>", $str);
+    }
     return $str;
 }
 
