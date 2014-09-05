@@ -359,6 +359,8 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             elseif ($path == 'feeds') {
                 $data['list_path'] = 'feeds';
                 $data['mailbox_list_title'] = array('All Feeds');
+                $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
+                $data['per_source_limit'] = $this->user_config->get('feed_limit', DEFAULT_SINCE);
             }
             elseif ($path == 'flagged') {
                 $data['list_path'] = 'flagged';
@@ -389,9 +391,13 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                         $details['name'] = 'Default';
                     }
                     $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
+                    $data['message_list_since'] = $this->user_config->get('pop3_since', DEFAULT_SINCE);
+                    $data['per_source_limit'] = $this->user_config->get('pop3_limit', DEFAULT_SINCE);
                 }
             }
             elseif (preg_match("/^feeds_\d+$/", $path)) {
+                $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
+                $data['per_source_limit'] = $this->user_config->get('feed_limit', DEFAULT_SINCE);
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 2);
                 $details = Hm_Feed_List::dump(intval($parts[1]));
@@ -1033,7 +1039,7 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
 }
 
 function message_list_meta($input, $output_mod) {
-    if (!in_array($input['list_path'], array('flagged', 'unread', 'combined_inbox', 'email', 'feeds'))) {
+	if (preg_match('/^imap_/', $input['list_path'])) {
         return '';
     }
     $limit = 0;
