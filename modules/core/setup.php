@@ -10,6 +10,7 @@ add_handler('home', 'create_user', false);
 add_handler('home', 'login', false);
 add_handler('home', 'load_user_data', true);
 add_handler('home', 'language',  true);
+add_handler('home', 'process_search_terms', true);
 add_handler('home', 'title', true);
 add_handler('home', 'date', true);
 add_handler('home', 'save_user_data', true);
@@ -41,6 +42,7 @@ add_output('home', 'content_end', true);
 add_handler('servers', 'login', false);
 add_handler('servers', 'load_user_data', true);
 add_handler('servers', 'language',  true);
+add_handler('servers', 'process_search_terms', true);
 add_handler('servers', 'title', true);
 add_handler('servers', 'date', true);
 add_handler('servers', 'save_user_data', true);
@@ -73,6 +75,7 @@ add_handler('compose', 'create_user', false);
 add_handler('compose', 'login', false);
 add_handler('compose', 'load_user_data', true);
 add_handler('compose', 'language',  true);
+add_handler('compose', 'process_search_terms', true);
 add_handler('compose', 'title', true);
 add_handler('compose', 'date', true);
 add_handler('compose', 'save_user_data', true);
@@ -103,6 +106,7 @@ add_handler('settings', 'create_user', false);
 add_handler('settings', 'login', false);
 add_handler('settings', 'load_user_data', true);
 add_handler('settings', 'language',  true);
+add_handler('settings', 'process_search_terms', true);
 add_handler('settings', 'title', true);
 add_handler('settings', 'date', true);
 add_handler('settings', 'process_change_password', true);
@@ -160,7 +164,9 @@ add_output('settings', 'content_end', true);
 add_handler('search', 'create_user', false);
 add_handler('search', 'login', false);
 add_handler('search', 'load_user_data', true);
+add_handler('search', 'message_list_type', true); // TODO: fix this!
 add_handler('search', 'language',  true);
+add_handler('search', 'process_search_terms', true);
 add_handler('search', 'title', true);
 add_handler('search', 'date', true);
 add_handler('search', 'save_user_settings', true);
@@ -193,6 +199,7 @@ add_handler('profiles', 'create_user', false);
 add_handler('profiles', 'login', false);
 add_handler('profiles', 'load_user_data', true);
 add_handler('profiles', 'language',  true);
+add_handler('profiles', 'process_search_terms', true);
 add_handler('profiles', 'title', true);
 add_handler('profiles', 'date', true);
 add_handler('profiles', 'save_user_settings', true);
@@ -226,6 +233,7 @@ add_handler('message_list', 'login', false);
 add_handler('message_list', 'load_user_data', true);
 add_handler('message_list', 'message_list_type', true);
 add_handler('message_list', 'language',  true);
+add_handler('message_list', 'process_search_terms', true);
 add_handler('message_list', 'title', true);
 add_handler('message_list', 'date', true);
 add_handler('message_list', 'save_user_data', true);
@@ -259,6 +267,7 @@ add_handler('message', 'create_user', false);
 add_handler('message', 'login', false);
 add_handler('message', 'load_user_data', true);
 add_handler('message', 'language',  true);
+add_handler('message', 'process_search_terms', true);
 add_handler('message', 'title', true);
 add_handler('message', 'message_list_type', true);
 add_handler('message', 'date', true);
@@ -291,6 +300,7 @@ add_output('message', 'content_end', true);
 add_handler('notfound', 'login', false);
 add_handler('notfound', 'load_user_data', true);
 add_handler('notfound', 'language',  true);
+add_handler('notfound', 'process_search_terms', true);
 add_handler('notfound', 'title', true);
 add_handler('notfound', 'date', true);
 add_handler('notfound', 'save_user_data', true);
@@ -373,6 +383,7 @@ return array(
         'list_parent' => FILTER_SANITIZE_STRING,
         'list_page' => FILTER_VALIDATE_INT,
         'uid' => FILTER_SANITIZE_STRING,
+        'search_terms' => FILTER_SANITIZE_STRING,
     ),
 
     'allowed_post' => array(
@@ -400,7 +411,10 @@ return array(
         'action_type' => FILTER_SANITIZE_STRING,
         'message_list_since' => FILTER_SANITIZE_STRING,
         'new_pass1' => FILTER_SANITIZE_STRING,
-        'new_pass2' => FILTER_SANITIZE_STRING
+        'new_pass2' => FILTER_SANITIZE_STRING,
+        'search_terms' => FILTER_SANITIZE_STRING,
+        'search_fld' => FILTER_SANITIZE_STRING,
+        'search_since' => FILTER_SANITIZE_STRING,
     )
 );
 
