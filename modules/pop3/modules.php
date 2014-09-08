@@ -89,7 +89,20 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             if ($login_time) {
                 $data['login_time'] = $login_time;
             }
-            if (array_key_exists('list_path', $data) && $data['list_path'] == 'unread') {
+            $terms = false;
+            if (array_key_exists('search_terms', $this->request->post)) {
+                $terms = validate_search_terms($this->request->post['search_terms']);
+                $limit = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
+                if (array_key_exists('search_since', $this->request->post)) {
+                    $since = $this->request->post['search_since'];
+                }
+                else {
+                    $since = DEFAULT_SINCE;
+                }
+                $date = process_since_argument($since);
+                $cutoff_timestamp = strtotime($date);
+            }
+            elseif (array_key_exists('list_path', $data) && $data['list_path'] == 'unread') {
                 $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
                 $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
                 $unread_only = true;
@@ -105,7 +118,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             }
             else {
                 $limit = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('pop3_since', DEFAULT_SINCE)); // TODO: add pop3 setting
+                $date = process_since_argument($this->user_config->get('pop3_since', DEFAULT_SINCE));
                 $cutoff_timestamp = strtotime($date);
             }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
@@ -125,6 +138,12 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                         }
                         if ($unread_only && Hm_POP3_Seen_Cache::is_present(sprintf('pop3_%d_%d', $form['pop3_server_id'], $id))) {
                             continue;
+                        }
+                        if ($terms) {
+                            $body = implode('', $pop3->retr_full($id));
+                            if (!stristr($body, $terms)) {
+                                continue;
+                            }
                         }
                         $msg_headers['server_name'] = $details['name'];
                         $msg_headers['server_id'] = $form['pop3_server_id'];
@@ -397,7 +416,7 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
             '<tr><td colspan="2"><input type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
             '<tr><td colspan="2"><input type="text" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
-            '<td align="right"><input type="submit" value="Add" name="submit_pop3_server" /></td></tr>'.
+            '<td><input type="submit" value="Add" name="submit_pop3_server" /></td></tr>'.
             '</table></form>';
     }
 }
@@ -475,7 +494,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
             $from = '';
             $small_headers = array('subject', 'date', 'from');
             $headers = $input['pop3_message_headers'];
-            $txt .= '<table class="msg_headers" cellspacing="0" cellpadding="0">'.
+            $txt .= '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
@@ -486,7 +505,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
                             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                                $txt .= ' <img class="account_icon" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> ';
+                                $txt .= ' <img alt="" class="account_icon" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
@@ -574,7 +593,7 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
 
 class Hm_Output_start_pop3_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" class="settings_subtitle"><br /><img src="'.Hm_Image_Sources::$env_closed.'" />POP3 Settings</td></tr>';
+        return '<tr><td colspan="2" class="settings_subtitle"><br /><img alt="" src="'.Hm_Image_Sources::$env_closed.'" />POP3 Settings</td></tr>';
     }
 }
 

@@ -46,6 +46,7 @@ add_handler('compose', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3
 /* search page */
 add_handler('search', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('search', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_output('search', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
 /* profile page */
 add_handler('profiles', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');

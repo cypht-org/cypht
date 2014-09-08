@@ -182,6 +182,26 @@ var update_pop3_status_display = function(res) {
     $('.pop3_status_'+id).html(res.pop3_status_display);
 };
 
+var pop3_search_page_content = function(id) {
+    if (hm_search_terms) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
+            {'name': 'search_terms', 'value': hm_search_terms},
+            {'name': 'pop3_server_id', 'value': id}],
+            update_pop3_search_result,
+            [],
+            false,
+            false
+        );
+    }
+    return false;
+};
+
+var update_pop3_search_result = function(res) {
+    var ids = [res.pop3_server_id];
+    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+};
+
 var pop3_combined_unread_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_unread'},
@@ -227,6 +247,9 @@ else if (hm_page_name == 'message_list') {
         }
         $('.message_table tr').fadeIn(100);
     }
+}
+else if (hm_page_name == 'search') {
+    add_pop3_sources(pop3_search_page_content);
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'pop3') {
     pop3_message_view();

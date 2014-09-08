@@ -910,9 +910,16 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      *
      * @return array list of IMAP message UIDs that match the search
      */
-    public function search($target='ALL', $uids=false, $fld=false, $term=false, $esearch=array()) {
-        if (($fld && !$this->is_clean($fld, 'search_str')) || !$this->is_clean($this->search_charset, 'charset') || ($term && !$this->is_clean($term, 'search_str')) || !$this->is_clean($target, 'keyword')) {
+    public function search($target='ALL', $uids=false, $terms=array(), $esearch=array()) {
+        if (!$this->is_clean($this->search_charset, 'charset') || !$this->is_clean($target, 'keyword')) {
             return array();
+        }
+        if (!empty($terms)) {
+            foreach ($terms as $fld => $term) {
+                if (!$this->is_clean($fld, 'search_str') || !$this->is_clean($term, 'search_str')) {
+                    return array();
+                }
+            }
         }
         if (!empty($uids)) {
             if (is_array($uids)) {
@@ -932,8 +939,12 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         else {
             $charset = ' ';
         }
-        if ($fld && $term) {
-            $fld = ' '.$fld.' "'.str_replace('"', '\"', $term).'"';
+        if (!empty($terms)) {
+            $flds = array();
+            foreach ($terms as $fld => $term) {
+                $flds[] = $fld.' "'.str_replace('"', '\"', $term).'"';
+            }
+            $fld = ' '.implode(' ', $flds);
         }
         else {
             $fld = '';

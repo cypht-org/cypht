@@ -147,6 +147,10 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
         if ($success) {
+            $terms = false;
+            if (array_key_exists('search_terms', $this->request->post)) {
+                $terms = validate_search_terms($this->request->post['search_terms']);
+            }
             $ids = explode(',', $form['feed_server_ids']);
             $res = array();
             $unread_only = false;
@@ -186,6 +190,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                                 continue;
                             }
                             if (isset($item['guid']) && $unread_only && Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
+                                continue;
+                            }
+                            if ($terms && !search_feed_item($item, $terms)) {
                                 continue;
                             }
                             else {
@@ -359,9 +366,9 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
             return '<div class="imap_server_setup"><div class="content_title">Feeds</div><form class="add_server" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_feed').'"/>'.
                 '<div class="subtitle">Add an RSS/ATOM Feed</div><table>'.
-                '<tr><td colspan="2"><input type="text" name="new_feed_name" class="txt_fld" value="" placeholder="Feed name" /></td></tr>'.
-                '<tr><td colspan="2"><input type="text" name="new_feed_address" class="txt_fld" placeholder="Site address or feed URL" value=""/></td></tr>'.
-                '<tr><td align="right"><input type="submit" value="Add" name="submit_feed" /></td></tr>'.
+                '<tr><td><input type="text" name="new_feed_name" class="txt_fld" value="" placeholder="Feed name" /></td></tr>'.
+                '<tr><td><input type="text" name="new_feed_address" class="txt_fld" placeholder="Site address or feed URL" value=""/></td></tr>'.
+                '<tr><td><input type="submit" value="Add" name="submit_feed" /></td></tr>'.
                 '</table></form>';
         }
     }
@@ -383,6 +390,7 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
                     $res .= '</form></div>';
                 }
             }
+            $res .= '<br class="clear_float" /></div>';
         }
         return $res;
     }
@@ -399,7 +407,7 @@ class Hm_Output_feed_ids extends Hm_Output_Module {
 class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
     protected function output($input, $format) {
         if (isset($input['feed_message_content'])) {
-            $header_str = '<table class="msg_headers" cellspacing="0" cellpadding="0">'.
+            $header_str = '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($input['feed_message_headers'] as $name => $value) {
                 if ($name != 'link' && !strstr($value, ' ') && strlen($value) > 75) {
@@ -561,7 +569,7 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
 
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" class="settings_subtitle"><br /><img src="'.Hm_Image_Sources::$env_closed.'" />FEED Settings</td></tr>';
+        return '<tr><td colspan="2" class="settings_subtitle"><br /><img alt="" src="'.Hm_Image_Sources::$env_closed.'" />Feed Settings</td></tr>';
     }
 }
 
@@ -623,6 +631,17 @@ function search_for_feeds($html) {
         }
     }
     return array($type, $href);
+}
+
+function search_feed_item($item, $terms) {
+    foreach (array('description', 'title', 'dc:creator', 'guid') as $fld) {
+        if (array_key_exists($fld, $item)) {
+            if (stristr($item[$fld], $terms)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 ?>

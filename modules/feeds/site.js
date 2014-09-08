@@ -28,6 +28,26 @@ var feed_delete_action = function() {
     );
 };
 
+var feeds_search_page_content = function(id) {
+    if (hm_search_terms) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined'},
+            {'name': 'search_terms', 'value': hm_search_terms},
+            {'name': 'feed_server_ids', 'value': id}],
+            display_feeds_search_result,
+            [],
+            false,
+            false
+        );
+    }
+    return false;
+};
+
+var display_feeds_search_result = function(res) {
+    var ids = [res.feed_server_ids];
+    var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+};
+
 var feeds_combined_content_unread = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined'},
@@ -40,6 +60,7 @@ var feeds_combined_content_unread = function(id) {
     );
     return false;
 };
+
 var display_feeds_combined_unread = function(res) {
     var ids = [res.feed_server_ids];
     var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
@@ -195,6 +216,9 @@ if (hm_page_name == 'message_list') {
             Hm_Message_List.setup_combined_view(hm_list_path);
         }
     }
+}
+else if (hm_page_name == 'search') {
+    add_feed_sources(feeds_search_page_content);
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'feed') {
     feed_item_view();

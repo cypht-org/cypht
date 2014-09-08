@@ -135,6 +135,20 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_imap_search extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('imap_server_ids', 'imap_search_terms'));
+        if ($success) {
+            $ids = explode(',', $form['imap_server_ids']);
+            $date = process_since_argument(DEFAULT_SINCE);
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), MAX_PER_SOURCE, array('SINCE' => $date, 'TEXT' => $form['imap_search_terms']));
+            $data['imap_search_results'] = $msg_list;
+            $data['imap_search_ids'] = $form['imap_server_ids'];
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -142,7 +156,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
             $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, $date, array('INBOX'), $limit);
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
             $data['imap_combined_inbox_data'] = $msg_list;
             $data['combined_inbox_server_ids'] = $form['imap_server_ids'];
         }
@@ -157,7 +171,7 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
             $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
             $ids = explode(',', $form['imap_server_ids']);
             $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_SINCE));
-            $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, $date, array('INBOX'), $limit);
+            $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
             $data['imap_flagged_data'] = $msg_list;
             $data['flagged_server_ids'] = $form['imap_server_ids'];
         }
@@ -221,7 +235,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
-            $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $date, array('INBOX'), $limit);
+            $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
             $data['imap_unread_data'] = $msg_list;
             $data['unread_server_ids'] = $form['imap_server_ids'];
         }
@@ -491,7 +505,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
 
 class Hm_Output_filter_message_struct extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<table class="msg_parts" cellpadding="0" cellspacing="0">';
+        $res = '<table class="msg_parts">';
         if (isset($input['msg_struct'])) {
             $part = 1;
             if (isset($input['imap_msg_part'])) {
@@ -512,7 +526,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $from = '';
             $small_headers = array('subject', 'date', 'from');
             $headers = $input['msg_headers'];
-            $txt .= '<table class="msg_headers" cellspacing="0" cellpadding="0">'.
+            $txt .= '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
@@ -523,7 +537,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
                             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                                $txt .= ' <img class="account_icon" src="'.Hm_Image_Sources::$star.'" width="16" height="16" /> ';
+                                $txt .= ' <img alt="" class="account_icon" src="'.Hm_Image_Sources::$star.'" width="16" height="16" /> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
@@ -614,7 +628,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             '<tr><td colspan="2"><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
             '<tr><td colspan="2"><input type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
-            '<td align="right"><input type="submit" value="Add" name="submit_imap_server" /></td></tr>'.
+            '<td><input type="submit" value="Add" name="submit_imap_server" /></td></tr>'.
             '</table></form>';
     }
 }
@@ -677,12 +691,30 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if (isset($input['imap_folders'])) {
             foreach ($input['imap_folders'] as $id => $folder) {
-                $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
+                $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img alt="" class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
         Hm_Page_Cache::concat('email_folders', $res);
         return '';
+    }
+}
+
+class Hm_Output_filter_imap_search extends Hm_Output_Module {
+    protected function output($input, $format) {
+        if (isset($input['imap_search_results'])) {
+            $style = isset($input['news_list_style']) ? 'news' : 'email';
+            if ($input['is_mobile']) {
+                $style = 'news';
+            }
+            $res = format_imap_message_list($input['imap_search_results'], $this, 'search', $style);
+            $input['formatted_search_results'] = $res;
+            unset($input['imap_search_results']);
+        }
+        elseif (!isset($input['formatted_search_results'])) {
+            $input['formatted_search_results'] = array();
+        }
+        return $input;
     }
 }
 
@@ -974,7 +1006,7 @@ function sort_by_internal_date($a, $b) {
     return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
 }
 
-function merge_imap_search_results($ids, $search_type, $session, $since = false, $folders = array('INBOX'), $limit=0) {
+function merge_imap_search_results($ids, $search_type, $session, $folders = array('INBOX'), $limit=0, $terms=array()) {
     $msg_list = array();
     foreach($ids as $id) {
         $id = intval($id);
@@ -984,8 +1016,8 @@ function merge_imap_search_results($ids, $search_type, $session, $since = false,
             $server_details = Hm_IMAP_List::dump($id);
             foreach ($folders as $folder) {
                 if ($imap->select_mailbox($folder)) {
-                    if ($since) {
-                        $msgs = $imap->search($search_type, false, 'SINCE', $since);
+                    if (!empty($terms)) {
+                        $msgs = $imap->search($search_type, false, $terms);
                     }
                     else {
                         $msgs = $imap->search($search_type);

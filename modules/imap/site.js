@@ -138,6 +138,27 @@ var update_imap_status_display = function(res) {
     $('.imap_status_'+id).html(res.imap_status_display);
 };
 
+var imap_search_page_content = function(id) {
+    if (hm_search_terms && hm_search_terms.length) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_search'},
+            {'name': 'imap_server_ids', 'value': id},
+            {'name': 'imap_search_terms', 'value': hm_search_terms}],
+            display_imap_search_terms,
+            [],
+            false,
+            false
+        );
+    }
+    return false;
+};
+
+var display_imap_search_terms = function(res) {
+    var ids = res.imap_search_ids.split(',');
+    var count = Hm_Message_List.update(ids, res.formatted_search_results, 'imap');
+};
+
+
 /* combined inbox page */
 var imap_combined_inbox_content = function(id) {
     Hm_Ajax.request(
@@ -364,6 +385,9 @@ if (hm_page_name == 'message_list') {
     else if (hm_list_path.substring(0, 4) == 'imap') {
         setup_imap_folder_page();
     }
+}
+else if (hm_page_name == 'search') {
+    add_imap_sources(imap_search_page_content);
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'imap') {
     setup_message_view_page();

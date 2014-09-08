@@ -20,6 +20,11 @@ add_output('servers', 'add_feed_dialog', true, 'feeds', 'content_section_start',
 add_output('servers', 'display_configured_feeds', true, 'feeds', 'add_feed_dialog', 'after');
 add_output('servers', 'feed_ids', true, 'feeds', 'page_js', 'before');
 
+/* search */
+add_handler('search', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');
+add_handler('search', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
+add_output('search', 'feed_ids', true, 'feeds', 'page_js', 'before');
+
 /* settings page */
 add_handler('settings', 'process_unread_feeds_setting', true, 'feeds', 'save_user_settings', 'before'); 
 add_output('settings', 'unread_feeds_included', true, 'feeds', 'unread_source_max_setting', 'after');
