@@ -2,6 +2,16 @@
 
 define("DEBUG_MODE", false);
 
+/* command that takes js from stdin and outputs compressed results
+ * example: 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type js';
+ */
+$js_compress = false;
+
+/* command that takes css from stdin and outputs compressed results
+ * example: 'java -jar /home/jason/Downloads/yuicompressor-2.4.8.jar --type css';
+ */
+$css_compress = false;
+
 require 'lib/framework.php';
 
 $options = getopt('', array('ini_file::', 'debug'));
@@ -30,11 +40,11 @@ if (!empty($settings)) {
         }
     }
     if ($css) {
-        file_put_contents('site.css', compress($css));
+        file_put_contents('site.css', compress($css, 'css'));
         printf("site.css file created\n");
     }
     if ($js) {
-        file_put_contents('site.js', compress($js));
+        file_put_contents('site.js', compress($js, 'js'));
         printf("site.js file created\n");
     }
     $settings['handler_modules'] = Hm_Handler_Modules::dump();
@@ -52,8 +62,22 @@ else {
     printf("\ncould not find hm3.ini file\n");
 }
 
-function compress($string) {
-    return preg_replace("/(\r\n|\n|\s{2,})/", '', $string);
+function compress($string, $type) {
+
+    global $js_compress;
+    global $css_compress;
+
+    if ($type == 'js' && $js_compress) {
+        exec("echo ".escapeshellarg($string)." | $js_compress", $output);
+        return join('', $output);
+    }
+    elseif ($type == 'css' && $css_compress) {
+        exec("echo ".escapeshellarg($string)." | $css_compress", $output);
+        return join('', $output);
+    }
+    else {
+        return preg_replace("/(\r\n|\n|\s{2,})/", '', $string);
+    }
 }
 
 ?>
