@@ -8,9 +8,9 @@ define("DEBUG_MODE", false);
 $js_compress = false;
 
 /* command that takes css from stdin and outputs compressed results
- * example: 'java -jar /home/jason/Downloads/yuicompressor-2.4.8.jar --type css';
+ * example: 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type css';
  */
-$css_compress = false;
+$css_compress = false; 
 
 require 'lib/framework.php';
 
