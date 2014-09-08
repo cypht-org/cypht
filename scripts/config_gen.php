@@ -53,7 +53,7 @@ else {
 }
 
 function compress($string) {
-    return preg_replace("/(\r\n|\n|\s{2,})/", ' ', $string);
+    return preg_replace("/(\r\n|\n|\s{2,})/", '', $string);
 }
 
 ?>
