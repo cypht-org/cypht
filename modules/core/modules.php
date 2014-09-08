@@ -850,6 +850,7 @@ class Hm_Output_folder_list_content extends Hm_Output_Module {
         $res .= folder_source_menu($input, $this);
         $res .= settings_menu($input, $this);
         $res .= '<a href="#" onclick="return update_folder_list();" class="update_message_list">[reload]</a>';
+        $res .= '<a href="#" onclick="return hide_folder_list();" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.'" alt="Collapse" width="16" height="16" /></a>';
         if ($format == 'HTML5') {
             return $res;
         }

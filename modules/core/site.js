@@ -502,16 +502,18 @@ var prev_next_links = function(cache, class_name) {
 
 var open_folder_list = function() {
     $('.folder_list').slideDown(200);
-    toggle_section('.main', true);
     $('.folder_toggle').toggle(100);
     save_to_local_storage('hide_folder_list', '');
     return false;
 };
 
 var hide_folder_list = function() {
-    $('.folder_toggle').toggle(100);
-    save_to_local_storage('formatted_folder_list', $('.folder_list').html());
-    save_to_local_storage('hide_folder_list', '1');
+    $('.folder_list').toggle(200, function() {
+        $('.folder_toggle').toggle(100);
+        save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+        save_to_local_storage('hide_folder_list', '1');
+    });
+    return false;
 };
 
 var toggle_section = function(class_name, force_on) {
@@ -520,18 +522,7 @@ var toggle_section = function(class_name, force_on) {
             $(class_name).css('display', 'none');
         }
         $(class_name).toggle(200, function() {
-            if ($('.main').css('display') == 'none' &&
-                $('.settings').css('display') == 'none' &&
-                ($('.email_folders').length == 0 || $('.email_folders').css('display') == 'none') &&
-                ($('.feeds_folders').legnth == 0 || $('.feeds_folders').css('display') == 'none')) {
-
-                $('.folder_list').toggle(200, function() {
-                    hide_folder_list();
-                });
-            }
-            else {
-                save_to_local_storage('formatted_folder_list', $('.folder_list').html());
-            }
+            save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         });
     }
     return false;
