@@ -308,6 +308,9 @@ var imap_message_view_finished = function() {
             prev_next_links('formatted_unread_data', class_name);
             var count = update_unread_cache(class_name);
         }
+        else if (hm_list_parent == 'flagged') {
+            prev_next_links('formatted_flagged_data', class_name);
+        }
     }
 };
 
