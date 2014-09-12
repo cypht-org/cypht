@@ -893,18 +893,24 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
 
 class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (array_key_exists('list_parent', $input) && in_array($input['list_parent'], array('flagged', 'combined_inbox', 'unread', 'feeds'))) {
+        if (array_key_exists('list_parent', $input) && in_array($input['list_parent'], array('search', 'flagged', 'combined_inbox', 'unread', 'feeds'))) {
             if ($input['list_parent'] == 'combined_inbox') {
                 $list_name = 'Everything';
             }
             else {
                 $list_name = ucwords(str_replace('_', ' ', $input['list_parent']));
             }
-            $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_parent']).
+            if ($input['list_parent'] == 'search') {
+                $page = 'search';
+            }
+            else {
+                $page = 'message_list';
+            }
+            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($input['list_parent']).
                 '">'.$this->html_safe($list_name).'</a>';
             if (array_key_exists('mailbox_list_title', $input) && count($input['mailbox_list_title'] > 1)) {
                 $title .= '<img alt="" class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
-                    '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_path']).'">'.$this->html_safe($input['mailbox_list_title'][1]).'</a>';
+                    '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($input['list_path']).'">'.$this->html_safe($input['mailbox_list_title'][1]).'</a>';
             }
         }
         elseif (array_key_exists('mailbox_list_title', $input)) {
@@ -1008,11 +1014,11 @@ function main_menu ($input, $output_mod) {
     $res .= '<div class="src_name main_menu" onclick="return toggle_section(\'.main\');">Main'.
         '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div class="main"><ul class="folders">'.
-        '<li class="menu_home"><a class="unread_link" href="?page=home">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$output_mod->trans('Home').'</a></li>'.
         '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$search).'" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
         '<input type="text" class="search_terms" name="search_terms" placeholder="'.$output_mod->trans('Search').'" size="14" /></form></li>'.
+        '<li class="menu_home"><a class="unread_link" href="?page=home">'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$output_mod->trans('Home').'</a></li>'.
         '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> '.$output_mod->trans('Everything').
         '</a><span class="combined_inbox_count"></span></li>';

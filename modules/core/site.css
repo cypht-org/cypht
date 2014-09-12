@@ -90,7 +90,7 @@ input, option, select { padding: 3px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ccc; opacity: 1; padding-top: 100px; text-align: center; }
 .search_form { font-size: 80%; color: #999; display: inline; padding-left: 15px; }
 .search_form input, .search_form select { margin-right: 10px; margin-left: 3px; }
-.hide_folders { float: left; clear: none; margin-top: 10px; margin-left: 10px; }
+.hide_folders { float: left; clear: none; margin-top: 10px; margin-left: 23px; }
 .hide_folders img { opacity: .4; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
