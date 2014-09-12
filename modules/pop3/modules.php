@@ -90,15 +90,11 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $data['login_time'] = $login_time;
             }
             $terms = false;
-            if (array_key_exists('search_terms', $this->request->post)) {
-                $terms = validate_search_terms($this->request->post['search_terms']);
+            if (array_key_exists('pop3_search', $this->request->post)) {
                 $limit = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
-                if (array_key_exists('search_since', $this->request->post)) {
-                    $since = $this->request->post['search_since'];
-                }
-                else {
-                    $since = DEFAULT_SINCE;
-                }
+                $terms = $this->session->get('search_terms', false);
+                $since = $this->session->get('search_since', DEFAULT_SINCE);
+                $fld = $this->session->get('search_fld', 'TEXT');
                 $date = process_since_argument($since);
                 $cutoff_timestamp = strtotime($date);
             }
@@ -141,7 +137,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                         }
                         if ($terms) {
                             $body = implode('', $pop3->retr_full($id));
-                            if (!stristr($body, $terms)) {
+                            if (!search_pop3_msg($body, $msg_headers, $terms, $fld)) {
                                 continue;
                             }
                         }
@@ -155,6 +151,24 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             }
         }
         return $data;
+    }
+}
+
+function search_pop3_msg($body, $headers, $terms, $fld) {
+    if ($fld == 'TEXT') {
+        if (stristr($body, $terms)) {
+            return true;
+        }
+    }
+    if ($fld == 'SUBJECT') {
+        if (array_key_exists('subject', $headers) && stristr($headers['subject'], $terms)) {
+            return true;
+        }
+    }
+    if ($fld == 'FROM') {
+        if (array_key_exists('from', $headers) && stristr($headers['from'], $terms)) {
+            return true;
+        }
     }
 }
 

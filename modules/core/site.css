@@ -38,7 +38,7 @@ input, option, select { padding: 3px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
 .inner_list { margin-bottom: 10px; } 
 .folders a { color: #555; text-decoration: none; line-height: 1.25em; }
-.folder_list { background-color: #fff; margin-right: 20px; padding-right: 15px; padding-bottom: 40px; min-width: 200px; padding-top: 15px; }
+.folder_list { min-height: 600px; background-color: #fff; margin-right: 20px; padding-right: 15px; padding-bottom: 40px; min-width: 200px; padding-top: 15px; }
 .folder_cell { vertical-align: top; height: 100%; max-width: 15%; display: table-cell; padding: 0px; margin: 0px; }
 .content_cell { vertical-align: top; height: 100%;  width: 100%; padding: 0px; margin: 0px; display: table-cell; background-color: #fff; padding-top: 15px; }
 .folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; padding-right: 0px; }

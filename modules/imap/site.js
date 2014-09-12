@@ -142,8 +142,7 @@ var imap_search_page_content = function(id) {
     if (hm_search_terms && hm_search_terms.length) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_search'},
-            {'name': 'imap_server_ids', 'value': id},
-            {'name': 'imap_search_terms', 'value': hm_search_terms}],
+            {'name': 'imap_server_ids', 'value': id}],
             display_imap_search_terms,
             [],
             false,

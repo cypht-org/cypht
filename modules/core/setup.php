@@ -384,6 +384,8 @@ return array(
         'list_page' => FILTER_VALIDATE_INT,
         'uid' => FILTER_SANITIZE_STRING,
         'search_terms' => FILTER_SANITIZE_STRING,
+        'search_since' => FILTER_SANITIZE_STRING,
+        'search_fld' => FILTER_SANITIZE_STRING,
     ),
 
     'allowed_post' => array(
@@ -412,9 +414,6 @@ return array(
         'message_list_since' => FILTER_SANITIZE_STRING,
         'new_pass1' => FILTER_SANITIZE_STRING,
         'new_pass2' => FILTER_SANITIZE_STRING,
-        'search_terms' => FILTER_SANITIZE_STRING,
-        'search_fld' => FILTER_SANITIZE_STRING,
-        'search_since' => FILTER_SANITIZE_STRING,
     )
 );
 

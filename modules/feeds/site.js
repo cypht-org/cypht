@@ -32,7 +32,7 @@ var feeds_search_page_content = function(id) {
     if (hm_search_terms) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined'},
-            {'name': 'search_terms', 'value': hm_search_terms},
+            {'name': 'feed_search', 'value': 1},
             {'name': 'feed_server_ids', 'value': id}],
             display_feeds_search_result,
             [],

@@ -230,7 +230,6 @@ return array(
         'imap_folder_state' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_msg_part' => FILTER_SANITIZE_STRING,
-        'imap_search_terms' => FILTER_SANITIZE_STRING,
     )
 );
 

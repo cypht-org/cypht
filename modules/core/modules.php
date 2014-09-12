@@ -7,23 +7,19 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_process_search_terms extends Hm_Handler_Module {
     public function process($data) {
         if (array_key_exists('search_terms', $this->request->get)) {
-            $terms = validate_search_terms($this->request->get['search_terms']);
-            $this->session->set('search_terms', $terms);
+            $this->session->set('search_terms', validate_search_terms($this->request->get['search_terms']));
         }
-        else {
-            $terms = $this->session->get('search_terms', false);
+        if (array_key_exists('search_since', $this->request->get)) {
+            $this->session->set('search_since', process_since_argument($this->request->get['search_since'], true));
         }
-        $data['search_terms'] = $terms;
+        if (array_key_exists('search_fld', $this->request->get)) {
+            $this->session->set('search_fld', validate_search_fld($this->request->get['search_fld']));
+        }
+        $data['search_since'] = $this->session->get('search_since', DEFAULT_SINCE);
+        $data['search_terms'] = $this->session->get('search_terms', '');
+        $data['search_fld'] = $this->session->get('search_fld', 'TEXT');
         return $data;
     }
-}
-
-function validate_search_terms($terms) {
-    $terms = trim(strip_tags($terms));
-    if (!$terms) {
-        $terms = false;
-    }
-    return $terms;
 }
 
 class Hm_Handler_http_headers extends Hm_Handler_Module {
@@ -623,6 +619,8 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_msg_uid = "'.(array_key_exists('uid', $input) ? $this->html_safe($input['uid']) : 0).'";'.
             'var hm_module_list = "'.$this->html_safe($input['router_module_list']).'";'.
             'var hm_search_terms = "'.(array_key_exists('search_terms', $input) ? $this->html_safe($input['search_terms']) : '').'";'.
+            'var hm_search_fld = "'.(array_key_exists('search_fld', $input) ? $this->html_safe($input['search_fld']) : '').'";'.
+            'var hm_search_since = "'.(array_key_exists('search_since', $input) ? $this->html_safe($input['search_since']) : '').'";'.
             '</script>';
     }
 }
@@ -1312,13 +1310,28 @@ function display_value($name, $haystack, $type=false, $default='') {
     return $res;
 }
 
+function validate_search_terms($terms) {
+    $terms = trim(strip_tags($terms));
+    if (!$terms) {
+        $terms = false;
+    }
+    return $terms;
+}
+
+function validate_search_fld($fld) {
+    if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'))) {
+        return $fld;
+    }
+    return false;
+}
+
+
 function search_field_selection($current) {
     $flds = array(
         'TEXT' => 'Entire message',
-        'BODY' => 'Message text',
+        'BODY' => 'Message body',
         'SUBJECT' => 'Subject',
         'FROM' => 'From',
-        'TO' => 'To',
     );
     $res = '<select name="search_fld">';
     foreach ($flds as $val => $name) {
@@ -1341,8 +1354,8 @@ function search_form($data, $output_mod) {
     $res = '<div class="search_form">'.
         '<form method="get"><input type="hidden" name="page" value="search" />'.
         ' <input type="text" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
-        ' '.search_field_selection(false).
-        ' '.message_since_dropdown(false, 'search_since').
+        ' '.search_field_selection($data['search_fld']).
+        ' '.message_since_dropdown($data['search_since'], 'search_since').
         ' <input type="submit" class="search_update" value="Update" /></form></div>';
     return $res;
 }

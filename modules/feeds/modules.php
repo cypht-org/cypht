@@ -147,9 +147,13 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
         if ($success) {
-            $terms = false;
-            if (array_key_exists('search_terms', $this->request->post)) {
-                $terms = validate_search_terms($this->request->post['search_terms']);
+            if (array_key_exists('feed_search', $this->request->post)) {
+                $terms = $this->session->get('search_terms', false);
+                $since = $this->session->get('search_since', DEFAULT_SINCE);
+                $fld = $this->session->get('search_fld', 'TEXT');
+            }
+            else {
+                $terms = false;
             }
             $ids = explode(',', $form['feed_server_ids']);
             $res = array();
@@ -192,7 +196,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                             if (isset($item['guid']) && $unread_only && Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
                                 continue;
                             }
-                            if ($terms && !search_feed_item($item, $terms)) {
+                            if ($terms && !search_feed_item($item, $terms, $since, $fld)) {
                                 continue;
                             }
                             else {
@@ -633,8 +637,34 @@ function search_for_feeds($html) {
     return array($type, $href);
 }
 
-function search_feed_item($item, $terms) {
-    foreach (array('description', 'title', 'dc:creator', 'guid') as $fld) {
+function search_feed_item($item, $terms, $since, $fld) {
+
+    if (array_key_exists('pubdate', $item)) {
+        if (strtotime($item['pubdate']) < strtotime($since)) {
+            return false;
+        }
+    }
+    if (array_key_exists('dc:date', $item)) {
+        if (strtotime($item['dc:date']) < strtotime($since)) {
+            return false;
+        }
+    }
+    switch ($fld) {
+        case 'BODY':
+            $flds = array('description');
+            break;
+        case 'FROM':
+            $flds = array('dc:creator');
+            break;
+        case 'SUBJECT':
+            $flds = array('title');
+            break;
+        case 'TEXT':
+        default:
+            $flds = array('description', 'title', 'dc:creator', 'guid');
+            break;
+    }
+    foreach ($flds as $fld) {
         if (array_key_exists($fld, $item)) {
             if (stristr($item[$fld], $terms)) {
                 return true;

@@ -152,6 +152,7 @@ return array(
         'pop3_uid' => FILTER_VALIDATE_INT,
         'pop3_limit' => FILTER_VALIDATE_INT,
         'pop3_since' => FILTER_SANITIZE_STRING,
+        'pop3_search' => FILTER_VALIDATE_INT,
     )
 );
 

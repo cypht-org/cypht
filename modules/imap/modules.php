@@ -137,11 +137,14 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
 
 class Hm_Handler_imap_search extends Hm_Handler_Module {
     public function process($data) {
-        list($success, $form) = $this->process_form(array('imap_server_ids', 'imap_search_terms'));
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
+            $terms = $this->session->get('search_terms', false);
+            $since = $this->session->get('search_since', DEFAULT_SINCE);
+            $fld = $this->session->get('search_fld', 'TEXT');
             $ids = explode(',', $form['imap_server_ids']);
-            $date = process_since_argument(DEFAULT_SINCE);
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), MAX_PER_SOURCE, array('SINCE' => $date, 'TEXT' => $form['imap_search_terms']));
+            $date = process_since_argument($since);
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
             $data['imap_search_results'] = $msg_list;
             $data['imap_search_ids'] = $form['imap_server_ids'];
         }

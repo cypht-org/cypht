@@ -186,7 +186,7 @@ var pop3_search_page_content = function(id) {
     if (hm_search_terms) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
-            {'name': 'search_terms', 'value': hm_search_terms},
+            {'name': 'pop3_search', 'value': 1},
             {'name': 'pop3_server_id', 'value': id}],
             update_pop3_search_result,
             [],

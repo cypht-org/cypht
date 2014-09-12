@@ -139,6 +139,7 @@ return array(
         'feed_uid' => FILTER_SANITIZE_STRING,
         'feed_since' => FILTER_SANITIZE_STRING,
         'feed_limit' => FILTER_VALIDATE_INT,
+        'feed_search' => FILTER_VALIDATE_INT,
     )
 );
 
