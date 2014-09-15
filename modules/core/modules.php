@@ -1353,7 +1353,7 @@ function search_form($data, $output_mod) {
     }
     $res = '<div class="search_form">'.
         '<form method="get"><input type="hidden" name="page" value="search" />'.
-        ' <input type="text" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
+        ' <input type="text" class="search_terms" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
         ' '.search_field_selection($data['search_fld']).
         ' '.message_since_dropdown($data['search_since'], 'search_since').
         ' <input type="submit" class="search_update" value="Update" /></form></div>';
