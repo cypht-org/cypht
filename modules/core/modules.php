@@ -970,9 +970,9 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
         if (!array_key_exists('no_message_list_headers', $input) || !$input['no_message_list_headers']) {
             $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
             '<col class="from_col"><col class="subject_col"><col class="date_col">'.
-            '<col class="icon_col"></colgroup><!--<thead><tr><th colspan="2" class="source">'.
+            '<col class="icon_col"></colgroup><thead><tr><th></th><th class="source">'.
             'Source</th><th class="from">From</th><th class="subject">Subject</th>'.
-            '<th class="msg_date">Date</th><th></th></tr></thead>-->';
+            '<th class="msg_date">Date</th><th></th></tr></thead>';
         }
         $res .= '<tbody>';
         return $res;
@@ -1201,7 +1201,7 @@ function message_controls() {
     return '<a class="toggle_link" href="#" onclick="return toggle_rows();"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
         '<div class="msg_controls">'.
         '<a href="#" onclick="return message_action(\'read\');">Read</a>'.
-        '<!--<a href="#" onclick="return message_action(\'unread\');">Unread</a>-->'.
+        '<a href="#" onclick="return message_action(\'unread\');">Unread</a>'.
         '<a href="#" onclick="return message_action(\'flag\');">Flag</a>'.
         '<a href="#" onclick="return message_action(\'unflag\');">Unflag</a>'.
         '<a href="#" onclick="return message_action(\'delete\');">Delete</a></div>';
