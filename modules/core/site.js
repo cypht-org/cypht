@@ -697,7 +697,6 @@ $(function() {
     Hm_Timer.fire();
     $('.search_terms').val(hm_search_terms);
 
-    $('body').hide().fadeIn(300);
     if ($('.sys_messages').text().length) {
         $('.sys_messages').slideDown();
     }
