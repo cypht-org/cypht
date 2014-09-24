@@ -411,10 +411,8 @@ var message_action = function(action_type) {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
             {'name': 'action_type', 'value': action_type},
             {'name': 'message_ids', 'value': selected}],
-            false,
-            [],
-            false,
-            reload_after_message_action
+            reload_after_message_action,
+            []
         );
         Hm_Message_List.update_after_action(action_type, selected);
     }
