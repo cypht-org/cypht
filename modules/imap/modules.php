@@ -345,7 +345,7 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
 
 class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
     public function process($data) {
-        //$this->session->set('imap_cache', array());
+        $this->session->set('imap_cache', array());
         return $data;
     }
 }
