@@ -3,6 +3,23 @@
 if (!defined('DEBUG_MODE')) { die(); }
 require 'modules/imap/hm-imap.php';
 
+class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
+    public function process($data) {
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if (preg_match("/^imap_\d+_.+$/", $path)) {
+                $data['list_path'] = $path;
+                $parts = explode('_', $path, 3);
+                $details = Hm_IMAP_List::dump(intval($parts[1]));
+                if (!empty($details)) {
+                    $data['mailbox_list_title'] = array('IMAP', $details['name'], $parts[2]);
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
     public function process($data) {
         $data['imap_expanded_folder_data'] = array();

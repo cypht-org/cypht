@@ -4,6 +4,28 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'modules/pop3/hm-pop3.php';
 
+class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
+    public function process($data) {
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if (preg_match("/^pop3_\d+$/", $path)) {
+                $data['list_path'] = $path;
+                $parts = explode('_', $path, 2);
+                $details = Hm_POP3_List::dump(intval($parts[1]));
+                if (!empty($details)) {
+                    if ($details['name'] == 'Default-Auth-Server') {
+                        $details['name'] = 'Default';
+                    }
+                    $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
+                    $data['message_list_since'] = $this->user_config->get('pop3_since', DEFAULT_SINCE);
+                    $data['per_source_limit'] = $this->user_config->get('pop3_limit', DEFAULT_SINCE);
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'pop3_limit'));

@@ -358,8 +358,6 @@ class Hm_Handler_logout extends Hm_Handler_Module {
     }
 }
 
-/* TODO: move module specific logic out of core */
-/* TODO: break this up, it's becoming a catch all */
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
     public function process($data) {
         $data['list_path'] = false;
@@ -392,27 +390,6 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['message_list_since'] = $this->user_config->get('all_since_setting', DEFAULT_SINCE);
                 $data['per_source_limit'] = $this->user_config->get('all_per_source_setting', DEFAULT_SINCE);
                 $data['mailbox_list_title'] = array('Everything');
-            }
-            elseif (preg_match("/^imap_\d+_.+$/", $path)) {
-                $data['list_path'] = $path;
-                $parts = explode('_', $path, 3);
-                $details = Hm_IMAP_List::dump(intval($parts[1]));
-                if (!empty($details)) {
-                    $data['mailbox_list_title'] = array('IMAP', $details['name'], $parts[2]);
-                }
-            }
-            elseif (preg_match("/^pop3_\d+$/", $path)) {
-                $data['list_path'] = $path;
-                $parts = explode('_', $path, 2);
-                $details = Hm_POP3_List::dump(intval($parts[1]));
-                if (!empty($details)) {
-                    if ($details['name'] == 'Default-Auth-Server') {
-                        $details['name'] = 'Default';
-                    }
-                    $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
-                    $data['message_list_since'] = $this->user_config->get('pop3_since', DEFAULT_SINCE);
-                    $data['per_source_limit'] = $this->user_config->get('pop3_limit', DEFAULT_SINCE);
-                }
             }
             elseif (preg_match("/^feeds_\d+$/", $path)) {
                 $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
@@ -1108,7 +1085,7 @@ function settings_menu( $input, $output_mod) {
 }
 
 function message_list_meta($input, $output_mod) {
-	if (preg_match('/^imap_/', $input['list_path'])) {
+	if (preg_match('/^imap_/', $input['list_path'])) { //TODO remove imap ref
         return '';
     }
     $limit = 0;
