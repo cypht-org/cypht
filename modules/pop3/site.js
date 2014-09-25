@@ -141,6 +141,18 @@ var add_pop3_sources = function(callback) {
         }
     }
 };
+var pop3_all_mail_content = function(id) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
+        {'name': 'pop3_server_id', 'value': id}],
+        display_pop3_combined_inbox,
+        [],
+        false,
+        set_all_mail_state
+    );
+    return false;
+};
+
 var pop3_combined_inbox_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
@@ -231,7 +243,7 @@ else if (hm_page_name == 'message_list') {
         add_pop3_sources(pop3_combined_inbox_content);
     }
     else if (hm_list_path == 'email') {
-        add_pop3_sources(pop3_combined_inbox_content);
+        add_pop3_sources(pop3_all_mail_content);
     }
     else if (hm_list_path == 'unread') {
         add_pop3_sources(pop3_combined_unread_content);

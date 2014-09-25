@@ -414,7 +414,7 @@ class Hm_Handler_load_pop3_folders extends Hm_Handler_Module {
 
 class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
     public function process($data) {
-        $servers = Hm_POP3_List::dump();
+        $servers = Hm_POP3_List::dump(false, true);
         $this->user_config->set('pop3_servers', $servers);
         $this->session->set('pop3_read_uids', Hm_POP3_Seen_Cache::dump());
         Hm_POP3_List::clean_up();
