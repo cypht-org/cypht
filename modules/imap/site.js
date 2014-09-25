@@ -158,6 +158,19 @@ var display_imap_search_terms = function(res) {
 };
 
 
+/* all mail page */
+var imap_all_mail_content = function(id) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_combined_inbox'},
+        {'name': 'imap_server_ids', 'value': id}],
+        display_imap_combined_inbox,
+        [],
+        false,
+        set_all_mail_state
+    );
+    return false;
+};
+
 /* combined inbox page */
 var imap_combined_inbox_content = function(id) {
     Hm_Ajax.request(
@@ -382,7 +395,7 @@ if (hm_page_name == 'message_list') {
         add_imap_sources(imap_combined_flagged_content);
     }
     else if (hm_list_path == 'email') {
-        add_imap_sources(imap_combined_inbox_content);
+        add_imap_sources(imap_all_mail_content);
     }
     else if (hm_list_path.substring(0, 4) == 'imap') {
         setup_imap_folder_page();

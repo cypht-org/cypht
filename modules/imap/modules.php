@@ -296,7 +296,7 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
 
 class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     public function process($data) {
-        $servers = Hm_IMAP_List::dump();
+        $servers = Hm_IMAP_List::dump(false, true);
         $this->user_config->set('imap_servers', $servers);
         Hm_IMAP_List::clean_up();
         return $data;
