@@ -2,6 +2,32 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+class Hm_IMAP_List {
+    
+    use Hm_Server_List;
+
+    public static function service_connect($id, $server, $user, $pass, $cache=false) {
+        self::$server_list[$id]['object'] = new Hm_IMAP();
+        if ($cache) {
+            self::$server_list[$id]['object']->load_cache($cache, 'string');
+        }
+        return self::$server_list[$id]['object']->connect(array(
+            'server'    => $server['server'],
+            'port'      => $server['port'],
+            'tls'       => $server['tls'],
+            'username'  => $user,
+            'password'  => $pass
+        ));
+    }
+    public static function get_cache($session, $id) {
+        $server_cache = $session->get('imap_cache', array());
+        if (array_key_exists($id, $server_cache)) {
+            return $server_cache[$id];
+        }
+        return false;
+    }
+}
+
 /*  hm-imap.php: Generic PHP5 IMAP client library.
 
     This code is derived from the IMAP library used in Hastymail2 (www.hastymail.org)

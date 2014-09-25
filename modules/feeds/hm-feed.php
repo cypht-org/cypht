@@ -1,5 +1,20 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
+class Hm_Feed_List {
+
+    use Hm_Server_List;
+
+    public static function service_connect($id, $server, $user, $pass, $cache=false) {
+        self::$server_list[$id]['object'] = new Hm_Feed();
+        return self::$server_list[$id]['object'];
+    }
+    public static function get_cache($session, $id) {
+        return false;
+    }
+}
+
 class Hm_Feed {
     var $url;
     var $id;

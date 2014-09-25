@@ -2,6 +2,27 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+class Hm_POP3_List {
+    
+    use Hm_Server_List;
+
+    public static function service_connect($id, $server, $user, $pass, $cache=false) {
+        self::$server_list[$id]['object'] = new Hm_POP3();
+        self::$server_list[$id]['object']->server = $server['server'];
+        self::$server_list[$id]['object']->port = $server['port'];
+        self::$server_list[$id]['object']->ssl = $server['tls'];
+
+        if (self::$server_list[$id]['object']->connect()) {
+            self::$server_list[$id]['object']->auth($user, $pass);
+            return self::$server_list[$id]['object'];
+        }
+        return false;
+    }
+    public static function get_cache($session, $id) {
+        return false;
+    }
+}
+
 class Hm_POP3 {
     var $server;
     var $starttls;

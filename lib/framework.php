@@ -1074,66 +1074,6 @@ trait Hm_Server_List {
     }
 }
 
-class Hm_IMAP_List {
-    
-    use Hm_Server_List;
-
-    public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        self::$server_list[$id]['object'] = new Hm_IMAP();
-        if ($cache) {
-            self::$server_list[$id]['object']->load_cache($cache, 'string');
-        }
-        return self::$server_list[$id]['object']->connect(array(
-            'server'    => $server['server'],
-            'port'      => $server['port'],
-            'tls'       => $server['tls'],
-            'username'  => $user,
-            'password'  => $pass
-        ));
-    }
-    public static function get_cache($session, $id) {
-        $server_cache = $session->get('imap_cache', array());
-        if (array_key_exists($id, $server_cache)) {
-            return $server_cache[$id];
-        }
-        return false;
-    }
-}
-
-class Hm_POP3_List {
-    
-    use Hm_Server_List;
-
-    public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        self::$server_list[$id]['object'] = new Hm_POP3();
-        self::$server_list[$id]['object']->server = $server['server'];
-        self::$server_list[$id]['object']->port = $server['port'];
-        self::$server_list[$id]['object']->ssl = $server['tls'];
-
-        if (self::$server_list[$id]['object']->connect()) {
-            self::$server_list[$id]['object']->auth($user, $pass);
-            return self::$server_list[$id]['object'];
-        }
-        return false;
-    }
-    public static function get_cache($session, $id) {
-        return false;
-    }
-}
-
-class Hm_Feed_List {
-
-    use Hm_Server_List;
-
-    public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        self::$server_list[$id]['object'] = new Hm_Feed();
-        return self::$server_list[$id]['object'];
-    }
-    public static function get_cache($session, $id) {
-        return false;
-    }
-}
-
 class Hm_Page_Cache {
 
     private static $pages = array();
