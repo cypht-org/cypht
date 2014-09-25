@@ -243,6 +243,7 @@ var Hm_Message_List = {
         }
         return msg_ids;
     },
+
     insert_into_message_list: function(row) {
         var timestr = $('.msg_timestamp', $(row)).val();
         var element = false;
@@ -602,6 +603,21 @@ var hl_selected_menu = function() {
     }
 };
 
+var set_all_mail_state = function() {
+    var data = $('.message_table tbody');
+    data.find('*[style]').attr('style', '');
+    save_to_local_storage('formatted_all_mail', data.html());
+    var empty = check_empty_list();
+    if (!empty) {
+        $(':checkbox').click(function(e) {
+            Hm_Message_List.toggle_msg_controls();
+            Hm_Message_List.check_select_range(e);
+        });
+    }
+    $('.total').text($('.message_table tbody tr').length);
+    Hm_Message_List.update_title();
+};
+
 var set_combined_inbox_state = function() {
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
@@ -679,7 +695,7 @@ $(function() {
             Hm_Message_List.setup_combined_view('formatted_combined_inbox');
         }
         else if (hm_list_path == 'email') {
-            Hm_Message_List.setup_combined_view('formatted_email_data');
+            Hm_Message_List.setup_combined_view('formatted_all_mail');
         }
         else if (hm_list_path == 'unread') {
             Hm_Message_List.setup_combined_view('formatted_unread_data');

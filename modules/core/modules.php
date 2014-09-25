@@ -393,7 +393,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['per_source_limit'] = $this->user_config->get('all_per_source_setting', DEFAULT_SINCE);
                 $data['mailbox_list_title'] = array('Everything');
             }
-            elseif (preg_match("/^imap_\d+_[^\s]+$/", $path)) {
+            elseif (preg_match("/^imap_\d+_.+$/", $path)) {
                 $data['list_path'] = $path;
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
@@ -936,8 +936,27 @@ class Hm_Output_message_end extends Hm_Output_Module {
 
 class Hm_Output_notfound_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="not_found">Page Not Found!</div>';
+        $res = '<div class="content_title">Page Not Found!</div>';
+        $res .= '<div class="empty_list"><br />Nothingness</div>';
         return $res;
+    }
+}
+
+class Hm_Output_dev_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<div class="dev_content"><div class="content_title">Developer documentation</div></div>';
+    }
+}
+
+class Hm_Output_bug_report_form extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<div class="bug_report"><div class="content_title">Report a bug</div></div>';
+    }
+}
+
+class Hm_Output_help_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<div class="help_content"><div class="content_title">WTF is going on?!</div></div>';
     }
 }
 
@@ -1077,6 +1096,12 @@ function settings_menu( $input, $output_mod) {
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$cog).'" alt="" width="16" height="16" /> '.$output_mod->trans('Site').'</a></li>'.
         '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$people).'" alt="" width="16" height="16" /> '.$output_mod->trans('Profiles').'</a></li>'.
+        '<li class="menu_help"><a class="unread_link" href="?page=help">'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$info).'" alt="" width="16" height="16" /> '.$output_mod->trans('SOS').'</a></li>'.
+        '<li class="menu_bug_report"><a class="unread_link" href="?page=bug_report">'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> '.$output_mod->trans('WTF?').'</a></li>'.
+        '<li class="menu_dev"><a class="unread_link" href="?page=dev">'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> '.$output_mod->trans('Dev').'</a></li>'.
         '</ul>';
 }
 
@@ -1166,7 +1191,7 @@ function human_readable_interval($date_str) {
 function message_list_row($subject, $date, $timestamp, $from, $source, $id, $flags, $style, $url, $output_mod) {
         if ($style == 'email') {
             return array(
-                '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
+                '<tr style="display: none;" class="'.$output_mod->html_safe(urlencode($id)).'">'.
                     '<td class="checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
                     '<td class="source">'.$output_mod->html_safe($source).'</td>'.
                     '<td class="from">'.$output_mod->html_safe($from).'</td>'.
@@ -1356,7 +1381,7 @@ function search_form($data, $output_mod) {
         ' <input type="text" class="search_terms" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
         ' '.search_field_selection($data['search_fld']).
         ' '.message_since_dropdown($data['search_since'], 'search_since').
-        ' <input type="submit" class="search_update" value="Update" /></form></div>';
+        ' <input type="submit" class="search_update" value="Go!" /></form></div>';
     return $res;
 }
 

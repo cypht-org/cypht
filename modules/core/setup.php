@@ -194,6 +194,105 @@ add_output('search', 'two_col_layout_end', true);
 add_output('search', 'page_js', true);
 add_output('search', 'content_end', true);
 
+/* help page */
+add_handler('help', 'create_user', false);
+add_handler('help', 'login', false);
+add_handler('help', 'load_user_data', true);
+add_handler('help', 'language',  true);
+add_handler('help', 'process_search_terms', true);
+add_handler('help', 'title', true);
+add_handler('help', 'date', true);
+add_handler('help', 'save_user_settings', true);
+add_handler('help', 'save_user_data', true);
+add_handler('help', 'logout', true);
+add_handler('help', 'http_headers', true);
+add_output('help', 'header_start', false);
+add_output('help', 'js_data', true);
+add_output('help', 'header_css', false);
+add_output('help', 'jquery', false);
+add_output('help', 'header_content', false);
+add_output('help', 'header_end', false);
+add_output('help', 'content_start', false);
+add_output('help', 'date', true);
+add_output('help', 'login', false);
+add_output('help', 'msgs', false);
+add_output('help', 'two_col_layout_start', true);
+add_output('help', 'loading_icon', true);
+add_output('help', 'folder_list_start', true);
+add_output('help', 'folder_list_end', true);
+add_output('help', 'content_section_start', true);
+add_output('help', 'help_content', true);
+add_output('help', 'content_section_end', true);
+add_output('help', 'two_col_layout_end', true);
+add_output('help', 'page_js', true);
+add_output('help', 'content_end', true);
+
+/* bug report page */
+add_handler('bug_report', 'create_user', false);
+add_handler('bug_report', 'login', false);
+add_handler('bug_report', 'load_user_data', true);
+add_handler('bug_report', 'language',  true);
+add_handler('bug_report', 'process_search_terms', true);
+add_handler('bug_report', 'title', true);
+add_handler('bug_report', 'date', true);
+add_handler('bug_report', 'save_user_settings', true);
+add_handler('bug_report', 'save_user_data', true);
+add_handler('bug_report', 'logout', true);
+add_handler('bug_report', 'http_headers', true);
+add_output('bug_report', 'header_start', false);
+add_output('bug_report', 'js_data', true);
+add_output('bug_report', 'header_css', false);
+add_output('bug_report', 'jquery', false);
+add_output('bug_report', 'header_content', false);
+add_output('bug_report', 'header_end', false);
+add_output('bug_report', 'content_start', false);
+add_output('bug_report', 'date', true);
+add_output('bug_report', 'login', false);
+add_output('bug_report', 'msgs', false);
+add_output('bug_report', 'two_col_layout_start', true);
+add_output('bug_report', 'loading_icon', true);
+add_output('bug_report', 'folder_list_start', true);
+add_output('bug_report', 'folder_list_end', true);
+add_output('bug_report', 'content_section_start', true);
+add_output('bug_report', 'bug_report_form', true);
+add_output('bug_report', 'content_section_end', true);
+add_output('bug_report', 'two_col_layout_end', true);
+add_output('bug_report', 'page_js', true);
+add_output('bug_report', 'content_end', true);
+
+/* bug report page */
+add_handler('dev', 'create_user', false);
+add_handler('dev', 'login', false);
+add_handler('dev', 'load_user_data', true);
+add_handler('dev', 'language',  true);
+add_handler('dev', 'process_search_terms', true);
+add_handler('dev', 'title', true);
+add_handler('dev', 'date', true);
+add_handler('dev', 'save_user_settings', true);
+add_handler('dev', 'save_user_data', true);
+add_handler('dev', 'logout', true);
+add_handler('dev', 'http_headers', true);
+add_output('dev', 'header_start', false);
+add_output('dev', 'js_data', true);
+add_output('dev', 'header_css', false);
+add_output('dev', 'jquery', false);
+add_output('dev', 'header_content', false);
+add_output('dev', 'header_end', false);
+add_output('dev', 'content_start', false);
+add_output('dev', 'date', true);
+add_output('dev', 'login', false);
+add_output('dev', 'msgs', false);
+add_output('dev', 'two_col_layout_start', true);
+add_output('dev', 'loading_icon', true);
+add_output('dev', 'folder_list_start', true);
+add_output('dev', 'folder_list_end', true);
+add_output('dev', 'content_section_start', true);
+add_output('dev', 'dev_content', true);
+add_output('dev', 'content_section_end', true);
+add_output('dev', 'two_col_layout_end', true);
+add_output('dev', 'page_js', true);
+add_output('dev', 'content_end', true);
+
 /* profile page */
 add_handler('profiles', 'create_user', false);
 add_handler('profiles', 'login', false);
@@ -349,7 +448,10 @@ return array(
         'ajax_message_action',
         'notfound',
         'profiles',
-        'search',
+        'help',
+        'bug_report',
+        'dev',
+        'search'
     ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
