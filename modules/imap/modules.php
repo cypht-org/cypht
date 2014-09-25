@@ -800,7 +800,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
 function format_imap_folder_section($folders, $id, $output_mod) {
     $results = '<ul class="inner_list">';
     foreach ($folders as $folder_name => $folder) {
-        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
+        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe(str_replace(' ', '-', $folder_name)).'">';
         if ($folder['children']) {
             $results .= '<a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
         }

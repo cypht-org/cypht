@@ -1060,6 +1060,7 @@ function main_menu ($input, $output_mod) {
         '</div></form></li></ul></div>';
     return $res;
 }
+
 function folder_source_menu( $input, $output_mod) {
     $res = '';
     if (array_key_exists('folder_sources', $input) && is_array($input['folder_sources'])) {
@@ -1086,6 +1087,7 @@ function folder_source_menu( $input, $output_mod) {
     }
     return $res;
 }
+
 function settings_menu( $input, $output_mod) {
     return '<div class="src_name" onclick="return toggle_section(\'.settings\');">Settings'.
         '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
@@ -1191,7 +1193,7 @@ function human_readable_interval($date_str) {
 function message_list_row($subject, $date, $timestamp, $from, $source, $id, $flags, $style, $url, $output_mod) {
         if ($style == 'email') {
             return array(
-                '<tr style="display: none;" class="'.$output_mod->html_safe(urlencode($id)).'">'.
+                '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id)).'">'.
                     '<td class="checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
                     '<td class="source">'.$output_mod->html_safe($source).'</td>'.
                     '<td class="from">'.$output_mod->html_safe($from).'</td>'.
@@ -1200,7 +1202,7 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
                     '</div></td>'.
                     '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></td>'.
                     '<td class="icon">'.(in_array('flagged', $flags) ? '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : '').'</td>'.
-                '</tr>', $id);
+                '</tr>', str_replace(' ', '-', $id));
         }
         else {
             if ($from == '[No From]') {
