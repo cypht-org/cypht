@@ -36,7 +36,7 @@ function main_menu ($input, $output_mod) {
         '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
         '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
         '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
-        '<input class="save_settings" onclick="$(\'.confirm_logout\').slideUp(200); return false;" type="button" value="Cancel" />'.
+        '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(); return false;" type="button" value="Cancel" />'.
         '</div></form></li></ul></div>';
     return $res;
 }
