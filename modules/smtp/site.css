@@ -1,5 +1,4 @@
 .compose_page { min-height: 400px; background-color: #fff; }
-.compose_form { padding: 20px; padding-left: 30px; }
+.compose_form { display: block; padding: 20px; padding-left: 30px; }
 .compose_subject, .compose_to { padding: 5px; margin: 5px; width: 80%; }
-.cke { margin: 5px !important; padding: 5px !important; max-width: 80%; border: solid 1px #ccc !important; }
-.cke_top { background: none !important; background-color: #fff !important; }
+.compose_body { width: 80%; min-height: 400px; padding: 5px; margin: 5px; }
