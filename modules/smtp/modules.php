@@ -159,8 +159,20 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '<input class="compose_to" type="text" placeholder="To" />'.
             '<input class="compose_subject" type="text" placeholder="Subject" />'.
             '<textarea class="compose_body"></textarea>'.
+            smtp_server_dropdown($input, $this).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" /></form></div>';
     }
+}
+
+function smtp_server_dropdown($input, $output_mod) {
+    $res = '<select name="smtp_server_id" class="compose_server">';
+    if (array_key_exists('smtp_servers', $input)) {
+        foreach ($input['smtp_servers'] as $id => $vals) {
+            $res .= '<option value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['name'], $vals['server'])).'</option>';
+        }
+    }
+    $res .= '</select>';
+    return $res;
 }
 
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {

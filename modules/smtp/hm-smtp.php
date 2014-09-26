@@ -261,7 +261,6 @@ class Hm_SMTP {
                 }
             }
         }
-        error_log("WTF".$result);
         return $result;
     }
 
@@ -280,9 +279,6 @@ class Hm_SMTP {
     /* authenticate the username and password to the server */
     function authenticate($username, $password, $mech) {
         $result = false;
-        error_log($username);
-        error_log($password);
-        error_log($mech);
         switch (strtolower($mech)) {
             case 'external':
                 $command = 'AUTH EXTERNAL '.base64_encode($username);

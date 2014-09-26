@@ -5,6 +5,8 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('smtp');
 output_source('smtp');
 
+add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
+add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('compose', 'compose_form', true, 'smtp', 'content_section_start', 'after');
 
 /* servers page */
