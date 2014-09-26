@@ -318,9 +318,9 @@ var Hm_Message_List = {
         var count = 0;
         var cache_data = get_from_local_storage(cached_list_name);
         if (cache_data) {
-            var adjusted_data = $('<div></div>').append(cache_data).find('tr').remove('.'+clean_selector(row_class)).end().html();
+            /*var adjusted_data = $('<div></div>').append(cache_data).find('tr').remove('.'+clean_selector(row_class)).end().html();
             save_to_local_storage(cached_list_name, adjusted_data);
-            count = $(adjusted_data).length;
+            count = $(adjusted_data).length;*/
         }
         return count;
     },
@@ -354,7 +354,7 @@ var Hm_Message_List = {
         }
         for (index in selected) {
             class_name = selected[index];
-            /*Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);*/
+            Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);
         }
         Hm_Message_List.reset_checkboxes();
     },
