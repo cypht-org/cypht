@@ -897,7 +897,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
         }
         elseif (array_key_exists('mailbox_list_title', $input)) {
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($input['list_path']).'">'.
-                implode('<img alt="" class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']).'</a>';
+                implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $input['mailbox_list_title']).'</a>';
         }
         else {
             $title = '';
@@ -987,7 +987,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res = '';
         $res .= '<div class="message_list"><div class="content_title">';
         $res .= message_controls().
-            implode('<img alt="" class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
+            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
         $res .= '<div class="list_controls">';
         $res .= '<a onclick="return Hm_Message_List.load_sources()" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
         $res .= '</div>';
