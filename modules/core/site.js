@@ -130,6 +130,10 @@ Hm_Notices = {
         });
         $('.sys_messages').html(msg_list.join(', '));
         $('.sys_messages').show();
+        $('.sys_messages').click(function() {
+            $('.sys_messages').hide();
+            $('.sys_messages').html('');
+        });
     },
 
     hide: function(now) {
@@ -350,7 +354,7 @@ var Hm_Message_List = {
         }
         for (index in selected) {
             class_name = selected[index];
-            Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);
+            /*Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);*/
         }
         Hm_Message_List.reset_checkboxes();
     },
