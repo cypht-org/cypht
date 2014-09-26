@@ -520,6 +520,13 @@ var toggle_section = function(class_name, force_on) {
     return false;
 };
 
+var toggle_server_section = function(class_name) {
+    if ($(class_name).length) {
+        $(class_name).toggle();
+        save_to_local_storage(class_name, $(class_name).css('display'));
+    }
+};
+
 var get_from_local_storage = function(key) {
     return sessionStorage.getItem(key);
 };

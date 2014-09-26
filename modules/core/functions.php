@@ -26,8 +26,8 @@ function main_menu ($input, $output_mod) {
     $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
         '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$output_mod->trans('Flagged').
         '</a> <span class="flagged_count"></span></li>'.
-        '<!-- <li class="menu_compose"><a class="unread_link" href="?page=compose">'.
-        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$output_mod->trans('Compose').'</a></li>-->';
+        '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
+        '<img class="account_icon" src="'.$output_mod->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$output_mod->trans('Compose').'</a></li>';
 
     $res .=  '<li><form class="logout_form" method="POST">'.
         '<a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
