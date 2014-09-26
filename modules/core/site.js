@@ -130,7 +130,7 @@ Hm_Notices = {
         });
         $('.sys_messages').html(msg_list.join(', '));
         $('.sys_messages').show();
-        $('.sys_messages').click(function() {
+        $('.sys_messages').on('click', function() {
             $('.sys_messages').hide();
             $('.sys_messages').html('');
         });
@@ -727,5 +727,9 @@ $(function() {
 
     if ($('.sys_messages').text().length) {
         $('.sys_messages').show();
+        $('.sys_messages').on('click', function() {
+            $('.sys_messages').hide();
+            $('.sys_messages').html('');
+        });
     }
 });
