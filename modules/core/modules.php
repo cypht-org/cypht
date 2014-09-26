@@ -891,7 +891,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
             $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($input['list_parent']).
                 '">'.$this->html_safe($list_name).'</a>';
             if (array_key_exists('mailbox_list_title', $input) && count($input['mailbox_list_title'] > 1)) {
-                $title .= '<img alt="" class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
+                $title .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
                     '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($input['list_path']).'">'.$this->html_safe($input['mailbox_list_title'][1]).'</a>';
             }
         }
