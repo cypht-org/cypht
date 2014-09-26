@@ -25,7 +25,9 @@ td { vertical-align: top; }
 .user_settings table td { vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 0px; color: #666; }
 .save_settings { float: left !important; }
 .save_settings_password { float: left; margin-left: 0px; padding: 4px; }
+input:disabled { background-color: #f5f5f5; }
 input, option, select { padding: 3px; }
+textarea, select, input { border: solid 1px #ddd; background-color: #fff; color: #333; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 600px; margin: 0px; background-color: #f5f5f5; width: 240px; padding-left: 20px; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }
