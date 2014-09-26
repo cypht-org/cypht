@@ -15,8 +15,8 @@ td { vertical-align: top; }
 .logout_form a {}
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .placeholder { width: 100px !important; }
-.loading_icon { text-align: center; display: none; position: absolute; right: 120px; top: 17px; }
-.loading_icon img { width: 67px; height: 10px; visibility: inherit; }
+.loading_icon { text-align: center; display: none; position: absolute; right: 70px; top: 17px; }
+.loading_icon img { opacity: .5; width: 67px; height: 10px; visibility: inherit; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
 .logout:hover { background-color: #eee; }
 .logout { cursor: pointer; background: #fff font-size: 100%; }
@@ -79,7 +79,8 @@ input, option, select { padding: 3px; }
 .list_controls { margin-top: -20px; padding: 10px; padding-right: 20px; float: right; }
 .list_settings_dialog table { width: 1%; white-space: nowrap; }
 .list_settings_dialog table th { font-size: 90%; font-weight: normal; text-align: left; }
-.folder_toggle { position: absolute; top: 20px; left: 7px; opacity: .5; display: none; }
+.folder_toggle { position: absolute; top: 20px; left: 7px; display: none; }
+.folder_toggle img { opacity: .5; }
 .prevnext { opacity: .4; margin-right: 5px; vertical-align: -2px; }
 .plink, .nlink { color: #666; }
 .plink:hover, .nlink:hover { color: green !important; }
