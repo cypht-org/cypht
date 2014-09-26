@@ -2,6 +2,65 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+/* POP3 authentication */
+trait Hm_POP3_Auth {
+
+    private $pop3_settings = array();
+
+    public function auth($user, $pass) {
+        if (!class_exists('Hm_POP3')) {
+            require 'lib/hm-pop3.php';
+        }
+        $pop3 = new Hm_POP3();
+        $authed = false;
+        list($server, $port, $tls) = $this->get_pop3_config();
+        if ($user && $pass && $server && $port) {
+            $this->pop3_settings = array(
+                'server' => $server,
+                'port' => $port,
+                'tls' => $tls,
+                'username' => $user,
+                'password' => $pass,
+                'no_caps' => true
+            );
+            $pop3->server = $server;
+            $pop3->port = $port;
+            $pop3->tls = $tls;
+            if ($pop3->connect()) {
+                $authed = $pop3->auth($user, $pass);
+            }
+        }
+        if ($authed) {
+            return true;
+        }
+        Hm_Msgs::add("Invalid username or password");
+        return false;
+    }
+    private function get_pop3_config() {
+        $server = $this->site_config->get('pop3_auth_server', false);
+        $port = $this->site_config->get('pop3_auth_port', false);
+        $tls = $this->site_config->get('pop3_auth_tls', false);
+        return array($server, $port, $tls);
+    }
+    protected function just_started() {
+        $this->set('login_time', time());
+        $this->set('pop3_auth_server_settings', $this->pop3_settings);
+    }
+}
+
+/* persistant storage with vanilla PHP sessions and POP3 based authentication */
+class Hm_PHP_Session_POP3_Auth extends Hm_PHP_Session_DB_Auth {
+    public $internal_users = false;
+    use Hm_POP3_Auth;
+}
+
+/* persistant storage with custom DB sessions and POP3 based authentication */
+class Hm_DB_Session_POP3_Auth extends Hm_DB_Session_DB_Auth {
+    public $internal_users = false;
+    use Hm_POP3_Auth;
+}
+
+/* POP3 connection manager */
 class Hm_POP3_List {
     
     use Hm_Server_List;

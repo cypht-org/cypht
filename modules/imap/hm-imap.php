@@ -2,6 +2,62 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+/* IMAP authentication */
+trait Hm_IMAP_Auth {
+
+    private $imap_settings = array();
+
+    public function auth($user, $pass) {
+        if (!class_exists('Hm_IMAP')) {
+            require 'lib/hm-imap.php';
+        }
+        $imap = new Hm_IMAP();
+        list($server, $port, $tls) = $this->get_imap_config();
+        if ($user && $pass && $server && $port) {
+            $this->imap_settings = array(
+                'server' => $server,
+                'port' => $port,
+                'tls' => $tls,
+                'username' => $user,
+                'password' => $pass,
+                'no_caps' => true,
+                'blacklisted_extensions' => array('enable')
+            );
+            $imap->connect($this->imap_settings);
+        }
+        if ($imap->get_state() == 'authenticated') {
+            return true;
+        }
+        else {
+            Hm_Msgs::add("Invalid username or password");
+        }
+        return false;
+    }
+    private function get_imap_config() {
+        $server = $this->site_config->get('imap_auth_server', false);
+        $port = $this->site_config->get('imap_auth_port', false);
+        $tls = $this->site_config->get('imap_auth_tls', false);
+        return array($server, $port, $tls);
+    }
+    protected function just_started() {
+        $this->set('login_time', time());
+        $this->set('imap_auth_server_settings', $this->imap_settings);
+    }
+}
+
+/* persistant storage with vanilla PHP sessions and IMAP based authentication */
+class Hm_PHP_Session_IMAP_Auth extends Hm_PHP_Session_DB_Auth {
+    public $internal_users = false;
+    use Hm_IMAP_Auth;
+}
+
+/* persistant storage with custom DB sessions and IMAP based authentication */
+class Hm_DB_Session_IMAP_Auth extends Hm_DB_Session_DB_Auth {
+    public $internal_users = false;
+    use Hm_IMAP_Auth;
+}
+
+/* imap connection manager */
 class Hm_IMAP_List {
     
     use Hm_Server_List;
@@ -28,27 +84,7 @@ class Hm_IMAP_List {
     }
 }
 
-/*  hm-imap.php: Generic PHP5 IMAP client library.
-
-    This code is derived from the IMAP library used in Hastymail2 (www.hastymail.org)
-    and is covered by the same license restrictions (GPL2)
-
-    Hastymail is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    Hastymail is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Hastymail; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
-
-/* include base classes */
+/* IMAP base classes */
 require_once('hm-imap-base.php');
 
 /* public interface to IMAP commands */
@@ -2114,22 +2150,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         }
         return $result;
     }
-
 }
 
-/*
- * TODO:
- *
- * - Add debug timing to cache fetching
- * - Test a wider variety of breakage scenerios (from an API point of view)
- * - Provide a recommended production $config
- * - abstract header result parsing
- * - fix fragile get_message_structure internals
- * - fix or remove COMPRESS extension. stream functions don't seem to work ...
- * - add support for more extensions:
- *   - CREATE-SPECIAL-USE support
- *   - MULTI-APPEND support
- *   - ...
- *
- */
 ?>
