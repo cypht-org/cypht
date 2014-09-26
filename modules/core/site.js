@@ -314,17 +314,6 @@ var Hm_Message_List = {
 
     },
 
-    remove_from_cache: function(cached_list_name, row_class) {
-        var count = 0;
-        var cache_data = get_from_local_storage(cached_list_name);
-        if (cache_data) {
-            /*var adjusted_data = $('<div></div>').append(cache_data).find('tr').remove('.'+clean_selector(row_class)).end().html();
-            save_to_local_storage(cached_list_name, adjusted_data);
-            count = $(adjusted_data).length;*/
-        }
-        return count;
-    },
-
     toggle_msg_controls: function() {
         if ($('input[type=checkbox]').filter(function() {return this.checked; }).length > 0) {
             $('.msg_controls').addClass('msg_controls_visible');
@@ -351,10 +340,6 @@ var Hm_Message_List = {
                 count--;
                 $('.'+clean_selector(class_name)).remove();
             }
-        }
-        for (index in selected) {
-            class_name = selected[index];
-            Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);
         }
         Hm_Message_List.reset_checkboxes();
     },
@@ -529,12 +514,7 @@ var toggle_section = function(class_name, force_on) {
         if (force_on) {
             $(class_name).css('display', 'none');
         }
-        if ($(class_name).css('display') == 'none') {
-            $(class_name).show();
-        }
-        else {
-            $(class_name).hide();
-        }
+        $(class_name).toggle();
         save_to_local_storage('formatted_folder_list', $('.folder_list').html());
     }
     return false;
@@ -684,6 +664,19 @@ var check_empty_list = function() {
     }
     return count == 0;
 };
+
+var toggle_rows = function() {
+    $('input[type=checkbox]').each(function () { this.checked = !this.checked; });
+    Hm_Message_List.toggle_msg_controls();
+    return false;
+};
+
+var toggle_long_headers = function() {
+    $('.long_header').toggle();
+    $('.header_toggle').toggle();
+    return false;
+};
+
 
 var folder_list = get_from_local_storage('formatted_folder_list');
 

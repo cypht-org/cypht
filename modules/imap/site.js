@@ -319,7 +319,6 @@ var imap_message_view_finished = function() {
         }
         else if (hm_list_parent == 'unread') {
             prev_next_links('formatted_unread_data', class_name);
-            var count = update_unread_cache(class_name);
         }
         else if (hm_list_parent == 'flagged') {
             prev_next_links('formatted_flagged_data', class_name);
@@ -340,23 +339,6 @@ var add_imap_sources = function(callback) {
     }
 };
 
-/* to move */
-var toggle_rows = function() {
-    $('input[type=checkbox]').each(function () { this.checked = !this.checked; });
-    Hm_Message_List.toggle_msg_controls();
-    return false;
-};
-var update_unread_cache = function(class_name) {
-    count = Hm_Message_List.remove_from_cache('formatted_unread_data', class_name);
-    return count;
-};
-
-var toggle_long_headers = function() {
-    $('.long_header').toggle(300);
-    $('.header_toggle').toggle(0);
-    return false;
-};
-
 var update_unread_count = function() {
     var id;
     var ids = $('.imap_server_ids').val();
@@ -368,9 +350,6 @@ var update_unread_count = function() {
             [],
             true
         );
-    }
-    else {
-        console.log('No imap server ids');
     }
 };
 
