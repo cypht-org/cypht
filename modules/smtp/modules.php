@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 class Hm_Output_ckeditor_includes extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<script type="text/javascript" src="modules/smtp/ckeditor/ckeditor.js"></script>'.

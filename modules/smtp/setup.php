@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 handler_source('smtp');
 output_source('smtp');
 
