@@ -33,7 +33,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                         'server' => $form['new_smtp_address'],
                         'port' => $form['new_smtp_port'],
                         'tls' => $tls));
-                    Hm_Msgs::add('Added server!');
+                    Hm_Msgs::add('Added SMTP server!');
                     $this->session->record_unsaved('SMTP server added');
                 }
                 else {
@@ -60,6 +60,94 @@ class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
     public function process($data) {
         $servers = Hm_SMTP_List::dump(false, true);
         $this->user_config->set('smtp_servers', $servers);
+        return $data;
+    }
+}
+
+class Hm_Handler_smtp_save extends Hm_Handler_Module {
+    public function process($data) {
+        $data['just_saved_credentials'] = false;
+        if (isset($this->request->post['smtp_save'])) {
+            list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
+            if (!$success) {
+                Hm_Msgs::add('ERRUsername and Password are required to save a connection');
+            }
+            else {
+                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
+                if ($smtp->state == 'authed') {
+                    $data['just_saved_credentials'] = true;
+                    Hm_Msgs::add("Server saved");
+                    $this->session->record_unsaved('SMTP server saved');
+                }
+                else {
+                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
+                }
+            }
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_smtp_forget extends Hm_Handler_Module {
+    public function process($data) {
+        $data['just_forgot_credentials'] = false;
+        if (isset($this->request->post['smtp_forget'])) {
+            list($success, $form) = $this->process_form(array('smtp_server_id'));
+            if ($success) {
+                Hm_SMTP_List::forget_credentials($form['smtp_server_id']);
+                $data['just_forgot_credentials'] = true;
+                Hm_Msgs::add('Server credentials forgotten');
+                $this->session->record_unsaved('SMTP server credentials forgotten');
+            }
+            else {
+                $data['old_form'] = $form;
+            }
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_smtp_delete extends Hm_Handler_Module {
+    public function process($data) {
+        if (isset($this->request->post['smtp_delete'])) {
+            list($success, $form) = $this->process_form(array('smtp_server_id'));
+            if ($success) {
+                $res = Hm_SMTP_List::del($form['smtp_server_id']);
+                if ($res) {
+                    $data['deleted_server_id'] = $form['smtp_server_id'];
+                    Hm_Msgs::add('Server deleted');
+                    $this->session->record_unsaved('SMTP server deleted');
+                }
+            }
+            else {
+                $data['old_form'] = $form;
+            }
+        }
+        return $data;
+    }
+}
+
+class Hm_Handler_smtp_connect extends Hm_Handler_Module {
+    public function process($data) {
+        $smtp = false;
+        if (isset($this->request->post['smtp_connect'])) {
+            list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
+            if ($success) {
+                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass']);
+            }
+            elseif (isset($form['smtp_server_id'])) {
+                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
+            }
+            if ($smtp && $smtp->state == 'authed') {
+                Hm_Msgs::add("Successfully authenticated to the SMTP server");
+            }
+            elseif ($smtp && $smtp->state == 'connected') {
+                Hm_Msgs::add("ERRConnected, but failed to authenticated to the SMTP server");
+            }
+            else {
+                Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+            }
+        }
         return $data;
     }
 }

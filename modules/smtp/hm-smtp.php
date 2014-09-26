@@ -17,7 +17,10 @@ class Hm_SMTP_List {
                 'password'  => $pass
             )
         );
-        return self::$server_list[$id]['object']->connect();
+        if (!self::$server_list[$id]['object']->connect()) {
+            return self::$server_list[$id]['object'];
+        }
+        return false;
     }
     public static function get_cache($session, $id) {
         return false;
@@ -41,11 +44,11 @@ class Hm_SMTP {
     private $banner;
     private $capability;
     private $connected;
-    private $state;
     private $crlf;
     private $line_length;
     private $username;
     private $password;
+    public $state;
 
     function __construct($conf) {
 
@@ -54,7 +57,7 @@ class Hm_SMTP {
             $this->hostname = substr($this->hostname, 0, strpos($this->hostname, ':'));
         }
         $this->debug = array();
-        if (isset($conf['smtp_server'])) {
+        if (isset($conf['server'])) {
             $this->server = $conf['server'];
         }
         else {
@@ -66,21 +69,18 @@ class Hm_SMTP {
         else {
             $this->port = 25;
         }
-        /*if (isset($conf['smtp_starttls'])) {
-            $this->starttls = $conf['smtp_starttls'];
-        }
-        else {
-            $this->starttls = false;
-        }*/
         if (isset($conf['tls']) && $conf['tls']) {
             $this->tls = true;
         }
         else {
             $this->tls = false;
         }
+        if (!$this->tls) {
+            $this->starttls = true;
+        }
         $this->smtp_err = '';
         $this->supports_tls = false;
-        $this->auth = false;
+        $this->auth = true;
         $this->supports_auth = array();
         $this->handle = false;
         $this->state = 'started';
@@ -92,8 +92,8 @@ class Hm_SMTP {
         $this->capability = '';
         $this->line_length = 2048;
         $this->connected = false;
-        $this->username = false;
-        $this->password = false;
+        $this->username = $conf['username'];
+        $this->password = $conf['password'];
         $this->max_message_size = 0;
     }
 
@@ -185,7 +185,7 @@ class Hm_SMTP {
                 case 'starttls': // supports starttls
                     $this->supports_tls = true;
                     break;
-                case 'auth.': // supported auth mechanisims
+                case 'auth': // supported auth mechanisims
                     $auth_mecs = array_slice($line[1], 1);
                     $this->supports_auth = $auth_mecs;
                     break;
@@ -250,9 +250,10 @@ class Hm_SMTP {
         }
         else {
             if($this->auth) {
-                //$mech = $this->choose_auth();
-                $mech = $this->auth;
-                $result = $this->authenticate($this->username, $this->password, $mech);
+                $mech = $this->choose_auth();
+                if ($mech) {
+                    $result = $this->authenticate($this->username, $this->password, $mech);
+                }
             }
             else {
                 if ($this->state == 'connected') {
@@ -260,10 +261,14 @@ class Hm_SMTP {
                 }
             }
         }
+        error_log("WTF".$result);
         return $result;
     }
 
     function choose_auth() {
+        if (empty($this->supports_auth)) {
+            return false;
+        }
         $requested = array('cram-md5','login','plain');
         $intersect = array_intersect($requested,$this->supports_auth);
         if(count($intersect) > 0) {
@@ -275,6 +280,9 @@ class Hm_SMTP {
     /* authenticate the username and password to the server */
     function authenticate($username, $password, $mech) {
         $result = false;
+        error_log($username);
+        error_log($password);
+        error_log($mech);
         switch (strtolower($mech)) {
             case 'external':
                 $command = 'AUTH EXTERNAL '.base64_encode($username);
@@ -526,16 +534,11 @@ class Hm_SMTP {
         return $result;
     }
 
-    function puke($commands_only=false) {
-        if ($commands_only) {
-            print_r($this->commands);
-            print_r($this->responses);
-        }
-        else {
-            print_r($this->debug);
-            print_r($this->commands);
-            print_r($this->responses);
-        }
+    function puke() {
+        return
+            print_r($this->debug, true).
+            print_r($this->commands, true).
+            print_r($this->responses, true);
     } 
 
     /* issue a logout and close the socket to the server */
