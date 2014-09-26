@@ -79,3 +79,5 @@
 .down { color: red; }
 .header_subject .account_icon { vertical-align: 0px; }
 .folder_list .update_message_list{ font-size: 80%; padding-top: 10px; float: right; }
+.imap_section { display: none; }
+.imap_server_setup .content_title { cursor: pointer; }

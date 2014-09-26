@@ -62,6 +62,10 @@ var setup_server_page = function() {
     $('.save_imap_connection').on('click', imap_save_action);
     $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
+    var dsp = get_from_local_storage('.imap_section');
+    if (dsp == 'block' || dsp == 'none') {
+        $('.imap_section').css('display', dsp);
+    }
 };
 
 var imap_test_action = function() {

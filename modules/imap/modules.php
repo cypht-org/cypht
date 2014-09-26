@@ -449,6 +449,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
         if ($success) {
             $data['msg_text_uid'] = $form['imap_msg_uid'];
+            $data['msg_server_id'] = $form['imap_server_id'];
+            $data['msg_folder'] = $form['folder'];
             $part = false;
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
                 $part = $this->request->post['imap_msg_part'];
@@ -578,7 +580,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="header_toggle" onclick="return toggle_long_headers();">all</a>'.
                 '<a class="header_toggle" style="display: none;" href="#" onclick="return toggle_long_headers();">small</a>'.
-                ' | <a href="?page=compose">reply</a>'.
+                ' | <a href="?page=compose&amp;reply_uid='.$this->html_safe($input['msg_text_uid']).
+                '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $input['msg_server_id'], $input['msg_folder'])).'">reply</a>'.
                 ' | <a href="?page=compose">forward</a>'.
                 ' | <a href="?page=compose">attach</a>'.
                 ' | <a onclick="return get_message_content(0);" href="#">raw</a>'.
@@ -636,14 +639,14 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             }
             $res .= '</form></div>';
         }
-        $res .= '<br class="clear_float" /></div>';
+        $res .= '<br class="clear_float" /></div></div>';
         return $res;
     }
 }
 
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="imap_server_setup"><div class="content_title">IMAP Servers</div><form class="add_server" method="POST">'.
+        return '<div class="imap_server_setup"><div onclick="return toggle_server_section(\'.imap_section\')" class="content_title"><img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /> IMAP Servers</div><div class="imap_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.
             '<div class="subtitle">Add an IMAP Server</div><table>'.
             '<tr><td colspan="2"><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.

@@ -227,6 +227,10 @@ else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'feed') {
 else if (hm_page_name == 'servers') {
     $('.feed_delete').on('click', feed_delete_action);
     $('.test_feed_connect').on('click', feed_test_action);
+    var dsp = get_from_local_storage('.feed_section');
+    if (dsp == 'block' || dsp == 'none') {
+        $('.feed_section').css('display', dsp);
+    }
 }
 else if (hm_page_name == 'home') {
     feed_status_update();

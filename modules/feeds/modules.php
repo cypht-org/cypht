@@ -392,7 +392,7 @@ class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
 class Hm_Output_add_feed_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($format == 'HTML5') {
-            return '<div class="imap_server_setup"><div class="content_title">Feeds</div><form class="add_server" method="POST">'.
+            return '<div class="feed_server_setup"><div onclick="return toggle_server_section(\'.feed_section\');" class="content_title"><img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /> Feeds</div><div class="feed_section"><form class="add_server" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_feed').'"/>'.
                 '<div class="subtitle">Add an RSS/ATOM Feed</div><table>'.
                 '<tr><td><input type="text" name="new_feed_name" class="txt_fld" value="" placeholder="Feed name" /></td></tr>'.
@@ -419,7 +419,7 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
                     $res .= '</form></div>';
                 }
             }
-            $res .= '<br class="clear_float" /></div>';
+            $res .= '<br class="clear_float" /></div></div>';
         }
         return $res;
     }

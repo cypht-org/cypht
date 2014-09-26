@@ -237,6 +237,10 @@ if (hm_page_name == 'servers') {
     $('.save_pop3_connection').on('click', pop3_save_action);
     $('.forget_pop3_connection').on('click', pop3_forget_action);
     $('.delete_pop3_connection').on('click', pop3_delete_action);
+    var dsp = get_from_local_storage('.pop3_section');
+    if (dsp == 'block' || dsp == 'none') {
+        $('.pop3_section').css('display', dsp);
+    }
 }
 else if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {

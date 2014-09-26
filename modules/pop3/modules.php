@@ -446,7 +446,7 @@ class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
 
 class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="pop3_server_setup"><div class="content_title">POP3 Servers</div><form class="add_server" method="POST">'.
+        return '<div class="pop3_server_setup"><div onclick="return toggle_server_section(\'.pop3_section\');" class="content_title"><img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /> POP3 Servers</div><div class="pop3_section"><form class="add_server" method="POST">'.
             '<div class="subtitle">Add a POP3 Server</div><input type="hidden" name="hm_nonce" value="'.$this->build_nonce( 'add_pop3_server' ).'" />'.
             '<table><tr><td colspan="2"><input type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
             '<tr><td colspan="2"><input type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
@@ -501,7 +501,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 }
                 $res .= '</form></div>';
             }
-            $res .= '<br class="clear_float" /></div>';
+            $res .= '<br class="clear_float" /></div></div>';
         }
         return $res;
     }
