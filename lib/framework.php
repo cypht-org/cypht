@@ -852,6 +852,34 @@ trait Hm_Modules {
             }
         }
     }
+
+    public static function replace($target, $replacement, $page=false) {
+        if ($page && array_key_exists($page, self::$module_list) && array_key_exists($target, self::$module_list[$page])) {
+            self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
+        }
+        else {
+            foreach (self::$module_list as $page => $modules) {
+                if (array_key_exists($target, $modules)) {
+                    self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
+                }
+            }
+        }
+    }
+
+    public static function swap_key($target, $replacement, $modules) {
+        $keys = array_keys($modules);
+        $values = array_values($modules);
+        $size = count($modules);
+        for ($i = 0; $i < $size; $i++) {
+            if ($keys[$i] == $target) {
+                $keys[$i] = $replacement;
+                $values[$i][0] = self::$source;
+                break;
+            }
+        }
+        return array_combine($keys, $values);
+    }
+
     public static function try_queued_modules() {
         foreach (self::$module_queue as $vals) {
             self::add($vals[0], $vals[1], $vals[2], $vals[3], $vals[4], false);
@@ -1201,6 +1229,14 @@ function handler_source($source) {
 }
 function output_source($source) {
     Hm_Output_Modules::set_source($source);
+}
+function replace_module($type, $target, $replacement, $page=false) {
+    if ($type == 'handler') {
+        Hm_Handler_Modules::replace($target, $replacement, $page);
+    }
+    elseif ($type == 'output') {
+        Hm_Output_Modules::replace($target, $replacement, $page);
+    }
 }
 function add_handler($page, $mod, $logged_in, $source=false, $marker=false, $placement='after', $queue=true) {
     Hm_Handler_Modules::add($page, $mod, $logged_in, $marker, $placement, $queue, $source);
