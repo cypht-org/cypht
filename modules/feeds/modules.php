@@ -4,6 +4,31 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'modules/feeds/hm-feed.php';
 
+class Hm_Handler_feed_list_type extends Hm_Handler_Module {
+    public function process($data) {
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if ($path == 'feeds') {
+                $data['list_path'] = 'feeds';
+                $data['mailbox_list_title'] = array('All Feeds');
+                $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
+                $data['per_source_limit'] = $this->user_config->get('feed_limit', DEFAULT_SINCE);
+            }
+            elseif (preg_match("/^feeds_\d+$/", $path)) {
+                $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
+                $data['per_source_limit'] = $this->user_config->get('feed_limit', DEFAULT_SINCE);
+                $data['list_path'] = $path;
+                $parts = explode('_', $path, 2);
+                $details = Hm_Feed_List::dump(intval($parts[1]));
+                if (!empty($details)) {
+                    $data['mailbox_list_title'] = array('Feeds', $details['name']);
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'feed_limit'));

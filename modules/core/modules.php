@@ -363,6 +363,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
     public function process($data) {
         $data['list_path'] = false;
+        $data['list_meta'] = true;
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if ($path == 'unread') {
@@ -375,12 +376,6 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['list_path'] = 'email';
                 $data['mailbox_list_title'] = array('All Email');
             }
-            elseif ($path == 'feeds') {
-                $data['list_path'] = 'feeds';
-                $data['mailbox_list_title'] = array('All Feeds');
-                $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
-                $data['per_source_limit'] = $this->user_config->get('feed_limit', DEFAULT_SINCE);
-            }
             elseif ($path == 'flagged') {
                 $data['list_path'] = 'flagged';
                 $data['message_list_since'] = $this->user_config->get('flagged_since_setting', DEFAULT_SINCE);
@@ -392,16 +387,6 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $data['message_list_since'] = $this->user_config->get('all_since_setting', DEFAULT_SINCE);
                 $data['per_source_limit'] = $this->user_config->get('all_per_source_setting', DEFAULT_SINCE);
                 $data['mailbox_list_title'] = array('Everything');
-            }
-            elseif (preg_match("/^feeds_\d+$/", $path)) {
-                $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
-                $data['per_source_limit'] = $this->user_config->get('feed_limit', DEFAULT_SINCE);
-                $data['list_path'] = $path;
-                $parts = explode('_', $path, 2);
-                $details = Hm_Feed_List::dump(intval($parts[1]));
-                if (!empty($details)) {
-                    $data['mailbox_list_title'] = array('Feeds', $details['name']);
-                }
             }
         }
         if (array_key_exists('list_parent', $this->request->get)) {
