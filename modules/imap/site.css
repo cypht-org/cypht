@@ -65,9 +65,6 @@
 .unseen { font-weight: 700; }
 .checkbox_row { padding-right: 10px !important; }
 .checkbox_header img { padding-left: 3px; padding-right: 0px; }
-.msg_controls { display: none; padding-left: 0px; margin-right: 20px; }
-.msg_controls_visible { display: inline; }
-.msg_controls a, .toggle_link { font-size: .6em; letter-spacing: 0px; color: #666; margin-right: 5px; background-color: #fff; border: solid 1px #ccc; padding: 3px; width: 30px; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; vertical-align: 3px; }
 .toggle_link img { opacity: .6; vertical-align: -2px; }
 .deleted a { text-decoration: line-through !important; color: #aaa !important; }
 .unread_controls { float: left; }

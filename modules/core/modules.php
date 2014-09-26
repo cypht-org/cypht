@@ -572,12 +572,6 @@ class Hm_Output_content_end extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_zepto extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<script type="text/javascript" src="modules/core/zepto.min.js"></script>';
-    }
-}
-
 class Hm_Output_js_data extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<script type="text/javascript">'.
