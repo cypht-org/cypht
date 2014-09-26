@@ -2,57 +2,77 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-class smtp {
-    var $server;
-    var $starttls;
-    var $port;
-    var $tls;
-    var $auth;
-    var $handle;
-    var $debug;
-    var $hostname;
-    var $command_count;
-    var $commands;
-    var $responses;
-    var $smtp_err;
-    var $banner;
-    var $capability;
-    var $connected;
-    var $state;
-    var $crlf;
-    var $line_length;
-    var $username;
-    var $password;
-   
-    /* set defaults */ 
-    function smtp() {
-        global $conf;
-        global $user;
-        $this->hostname = $conf['host_name'];
-        /* SMTP servers (exchange at least) don't like port numbers in the EHLO hostname */
+/* SMTP connection manager */
+class Hm_SMTP_List {
+    
+    use Hm_Server_List;
+
+    public static function service_connect($id, $server, $user, $pass, $cache=false) {
+        self::$server_list[$id]['object'] = new Hm_SMTP(
+            array(
+                'server'    => $server['server'],
+                'port'      => $server['port'],
+                'tls'       => $server['tls'],
+                'username'  => $user,
+                'password'  => $pass
+            )
+        );
+        return self::$server_list[$id]['object']->connect();
+    }
+    public static function get_cache($session, $id) {
+        return false;
+    }
+}
+
+class Hm_SMTP {
+    private $config;
+    private $server;
+    private $starttls;
+    private $port;
+    private $tls;
+    private $auth;
+    private $handle;
+    private $debug;
+    private $hostname;
+    private $command_count;
+    private $commands;
+    private $responses;
+    private $smtp_err;
+    private $banner;
+    private $capability;
+    private $connected;
+    private $state;
+    private $crlf;
+    private $line_length;
+    private $username;
+    private $password;
+
+    function __construct($conf) {
+
+        $this->hostname = php_uname('n');
         if (preg_match("/:\d+$/", $this->hostname)) {
             $this->hostname = substr($this->hostname, 0, strpos($this->hostname, ':'));
         }
         $this->debug = array();
         if (isset($conf['smtp_server'])) {
-            $this->server = $conf['smtp_server'];
+            $this->server = $conf['server'];
         }
         else {
             $this->server = '127.0.0.1';
         }
-        if (isset($conf['smtp_port'])) {
-            $this->port = $conf['smtp_port'];
+        if (isset($conf['port'])) {
+            $this->port = $conf['port'];
         }
         else {
             $this->port = 25;
         }
-        if (isset($conf['smtp_starttls'])) {
+        /*if (isset($conf['smtp_starttls'])) {
             $this->starttls = $conf['smtp_starttls'];
         }
         else {
             $this->starttls = false;
-        }
-        if (isset($conf['smtp_tls']) && $conf['smtp_tls']) {
+        }*/
+        if (isset($conf['tls']) && $conf['tls']) {
             $this->tls = true;
         }
         else {
@@ -74,28 +94,7 @@ class smtp {
         $this->connected = false;
         $this->username = false;
         $this->password = false;
-        $this->max_message_size = 0; //in bytes; 0 = no limit
-        if (isset($conf['smtp_authentication_type'])) {
-            switch (strtolower($conf['smtp_authentication_type'])) {
-                case 'plain':
-                case 'login':
-                case 'cram-md5':
-                    $pass_bits = $user->string_decrypt($_SESSION['user_data']['pass']);
-                    if (is_array($pass_bits) && isset($pass_bits[1])) {
-                        $this->password = $pass_bits[1];
-                        $this->auth = $conf['smtp_authentication_type'];
-                        $this->username = $_SESSION['user_data']['username'];
-                    }
-                    break;
-                case 'user':
-                    if (isset($_SESSION['user_settings']['smtp_auth']) && $_SESSION['user_settings']['smtp_auth'] != 'none') {
-                        $this->auth = $_SESSION['user_settings']['smtp_auth'];
-                        $this->password = $_SESSION['user_settings']['smtp_pass'];
-                        $this->username = $_SESSION['user_settings']['smtp_user'];
-                    }
-                    break;
-            }
-        }
+        $this->max_message_size = 0;
     }
 
     /* send command to the server. Append "\r\n" to the end. */
@@ -201,20 +200,11 @@ class smtp {
     }
 
     /* establish a connection to the server. */
-    function connect($servers_attempted=array()) {
-        global $smtp_server_pool;
-        global $user;
-        global $phpversion;
+    function connect() {
+        $certfile = false;
+        $certpass = false;
         $result = 'An error occured connecting to the SMTP server';
-
-        if ($smtp_server_pool) {
-            // get the list of available smtp servers to connect to
-            $available_servers = array_diff(explode(',', $this->server), $servers_attempted);
-            $server = trim($available_servers[array_rand($available_servers)]);
-        }
-        else {
-            $server = $this->server;
-        }
+        $server = $this->server;
 
         if ($this->tls) {
             $server = 'tls://'.$server;
@@ -237,21 +227,16 @@ class smtp {
         $response = $this->get_response();
         $this->capabilities($response);
         if ($this->starttls && $this->supports_tls) {
-            if ($phpversion < 5) {
-                $result = 'You must have PHP5 to use STARTTLS';
+            $command = 'STARTTLS';
+            $this->send_command($command);
+            $response = $this->get_response();
+            if ($this->compare_response($response, '220') != 0) {
+                $result = 'An error occured during the STARTTLS command';
             }
-            else {
-                $command = 'STARTTLS';
-                $this->send_command($command);
-                $response = $this->get_response();
-                if ($this->compare_response($response, '220') != 0) {
-                    $result = 'An error occured during the STARTTLS command';
-                }
-            }
-            if(isset($user->certfile) && $user->certfile) {
-                stream_context_set_option($this->handle, 'tls', 'local_cert', $user->certfile);
-                if($user->certpass) {
-                    stream_context_set_option($this->handle, 'tls', 'passphrase', $user->certpass);
+            if(isset($certfile) && $certfile) {
+                stream_context_set_option($this->handle, 'tls', 'local_cert', $certfile);
+                if($certpass) {
+                    stream_context_set_option($this->handle, 'tls', 'passphrase', $certpass);
                 }
             }
             stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
@@ -275,56 +260,16 @@ class smtp {
                 }
             }
         }
-
-        // failed to connect
-        if ( $this->state != 'connected' && $this->state != 'authed' ) {
-
-            // recurse if there are more smtp servers to try connecting to
-            if ($smtp_server_pool && count($available_servers) > 1 ) {
-                array_push($servers_attempted, $server);
-                return $this->connect($servers_attempted);
-            }
-
-        }
-
         return $result;
     }
 
-
-    /* Choose an auth mech to use.  The mech choosen is the most secure
-        of the intersection of what we support and what the server supports.
-        The user may optionally reduce the list of what we support, to 
-        eliminate the use of unwanted mechs (ie, PLAIN).  If there is no
-        intersection, the last mech (least preferred) is choosen, since
-        this will generally be considered the most comptabile for a last
-        ditch effort.
-    */ 
     function choose_auth() {
-        global $user;
         $requested = array('cram-md5','login','plain');
-        if (!empty($user->smtp_mechs)) {
-            $requested = array();
-            foreach($user->smtp_mechs as $m) {
-                $m = strtolower($m);
-                if($m == 'external' ||
-                   $m == 'cram-md5' ||
-                   $m == 'login' ||
-                   $m == 'plain') {
-                     $requested[] = $m;
-                }
-            }
-        }
-        else {
-            if($this->tls && $this->cert) {
-                array_unshift($requested,'external');
-            }
-        }
         $intersect = array_intersect($requested,$this->supports_auth);
         if(count($intersect) > 0) {
             return $intersect[0];
         }
-        // No common mechs, so choose the last of the requested mechs
-        return $requested[ count($requested)-1 ];
+        return $requested[ count($requested) - 1 ];
     }
 
     /* authenticate the username and password to the server */
@@ -526,17 +471,6 @@ class smtp {
 
     /* Send a message */
     function send_message($from, $recipients, $message) {
-        global $conf;
-        global $fd;
-        global $max_outbound_recipients;
-        if ($max_outbound_recipients && count($recipients) >= $max_outbound_recipients) {
-            return 'Maximum number of recipients exceeded, sending canceled';
-        }
-        if (isset($conf['site_throttle_outbound_mail']) && $conf['site_throttle_outbound_mail'] != 0) {
-            if (!allow_outbound_msg($conf['site_throttle_outbound_mail'])) {
-                return 'Maximum number of outbound messages per minute reached.';
-            }
-        }
         $this->clean($from);
         $command = 'MAIL FROM:<'.$from.'>';
         $this->send_command($command);
@@ -594,13 +528,13 @@ class smtp {
 
     function puke($commands_only=false) {
         if ($commands_only) {
-            echo_r($this->commands);
-            echo_r($this->responses);
+            print_r($this->commands);
+            print_r($this->responses);
         }
         else {
-            echo_r($this->debug);
-            echo_r($this->commands);
-            echo_r($this->responses);
+            print_r($this->debug);
+            print_r($this->commands);
+            print_r($this->responses);
         }
     } 
 
@@ -616,7 +550,7 @@ class smtp {
     }
     function clean($val) {
         if (!preg_match("/^[^\r\n]+$/", $val)) {
-            echo_r("INVALID SMTP INPUT DETECTED: <b>$val</b>");
+            print_r("INVALID SMTP INPUT DETECTED: <b>$val</b>");
             exit;
         }
     }
