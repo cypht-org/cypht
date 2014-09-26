@@ -82,7 +82,7 @@ var set_combined_feeds_state = function() {
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage('formatted_feed_data', data.html());
-    $(':checkbox').click(function() {
+    $('input[type=checkbox]').click(function() {
         Hm_Message_List.toggle_msg_controls();
     });
     Hm_Message_List.update_title();

@@ -257,7 +257,7 @@ else if (hm_page_name == 'message_list') {
             Hm_Message_List.setup_combined_view(hm_list_path);
             
         }
-        $('.message_table tr').fadeIn(100);
+        $('.message_table tr').show();
     }
 }
 else if (hm_page_name == 'search') {
