@@ -578,7 +578,12 @@ class Hm_Output_page_js extends Hm_Output_Module {
 
 class Hm_Output_content_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="debug"></div></body></html>';
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            return '<div class="debug"></div></body></html>';
+        }
+        else {
+            return '</body></html>';
+        }
     }
 }
 
