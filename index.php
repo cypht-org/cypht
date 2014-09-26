@@ -51,8 +51,7 @@ Hm_Page_Cache::save($session);
 /* close down the session */
 $session->end();
 
-/* log some debug info if not in debug mode */
-if (!DEBUG_MODE) {
+if (DEBUG_MODE) {
     Hm_Debug::load_page_stats();
     Hm_Debug::show('log');
 }
