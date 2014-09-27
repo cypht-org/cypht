@@ -7,7 +7,7 @@ Hm_Ajax = {
         var ajax = new Hm_Ajax_Request();
         if (Hm_Ajax.request_count == 0) {
             if (!no_icon) {
-                $('.loading_icon').show();
+                show_loading_icon();
                 $('body').addClass('wait');
             }
         }
@@ -16,6 +16,19 @@ Hm_Ajax = {
         return ajax.make_request(args, callback, extra);
     }
 };
+
+var loading_id = 0;
+var show_loading_icon = function() {
+    $('.loading_icon').show();
+    var left = $('.loading_icon').css('background-position-x').replace(/(\%|px)/, '')*1 + 5;
+    $('.loading_icon').css('background-position-x', left+'px');
+    loading_id = setTimeout(show_loading_icon, 100);
+};
+
+var stop_loading_icon = function() {
+    $('.loading_icon').hide();
+    clearTimeout(loading_id);
+}
 
 /* Ajax request wrapper */
 Hm_Ajax_Request = function() { return { 
@@ -88,7 +101,7 @@ Hm_Ajax_Request = function() { return {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
             }
-            $('.loading_icon').hide();
+            stop_loading_icon();
             $('body').removeClass('wait');
         }
     }
