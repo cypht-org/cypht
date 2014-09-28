@@ -77,7 +77,7 @@ function compress($string, $type) {
         return join('', $output);
     }
     else {
-        return preg_replace("/(\r\n|\n|\s{2,})/", '', $string);
+        return $string;
     }
 }
 
