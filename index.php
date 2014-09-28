@@ -28,7 +28,7 @@ $start_time = microtime(true);
 /* get includes */
 require 'lib/framework.php';
 require 'lib/session.php';
-require 'lib/pbkdf2.php';
+require 'third_party/pbkdf2.php';
 
 /* get configuration */
 $config = new Hm_Site_Config_File('hm3.rc');
