@@ -547,7 +547,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
 class Hm_Output_page_js extends Hm_Output_Module {
     protected function output($input, $format) {
         if (DEBUG_MODE) {
-            $res = '<script type="text/javascript" src="lib/zepto.min.js"></script>';
+            $res = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
             foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 if (is_readable(sprintf("%ssite.js", $name))) {
                     $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $name).'"></script>';
