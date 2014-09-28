@@ -271,5 +271,5 @@ else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'pop3') {
     pop3_message_view();
 }
 else if (hm_page_name == 'home') {
-    pop3_status_update();
+    setTimeout(pop3_status_update, 100);
 }

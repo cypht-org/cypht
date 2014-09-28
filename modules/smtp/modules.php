@@ -177,7 +177,16 @@ function smtp_server_dropdown($input, $output_mod) {
 
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="smtp_server_setup"><div onclick="return toggle_server_section(\'.smtp_section\')" class="content_title"><img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /> SMTP Servers</div><div class="smtp_section"><form class="add_server" method="POST">'.
+        if (array_key_exists('smtp_servers', $input)) {
+            $count = count($input['smtp_servers']);
+        }
+        else {
+            $count = 0;
+        }
+        $count = sprintf($this->trans('%d configured'), $count);
+        return '<div class="smtp_server_setup"><div onclick="return toggle_server_section(\'.smtp_section\')" class="content_title">'.
+            '<img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+           ' SMTP Servers <div class="server_count">'.$count.'</div></div><div class="smtp_section"><form class="add_server" method="POST">'.
             '<div class="subtitle">Add an SMTP Server</div><input type="hidden" name="hm_nonce" value="'.$this->build_nonce( 'add_smtp_server' ).'" />'.
             '<table><tr><td colspan="2"><input type="text" name="new_smtp_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
             '<tr><td colspan="2"><input type="text" name="new_smtp_address" class="txt_fld" placeholder="smtp server address" value=""/></td></tr>'.

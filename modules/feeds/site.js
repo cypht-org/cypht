@@ -233,5 +233,5 @@ else if (hm_page_name == 'servers') {
     }
 }
 else if (hm_page_name == 'home') {
-    feed_status_update();
+    setTimeout(feed_status_update, 100);
 }

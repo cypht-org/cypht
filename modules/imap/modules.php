@@ -646,7 +646,16 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="imap_server_setup"><div onclick="return toggle_server_section(\'.imap_section\')" class="content_title"><img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /> IMAP Servers</div><div class="imap_section"><form class="add_server" method="POST">'.
+        if (array_key_exists('imap_servers', $input)) {
+            $count = count($input['imap_servers']);
+        }
+        else {
+            $count = 0;
+        }
+        $count = $this->trans(sprintf('%d configured', $count));
+        return '<div class="imap_server_setup"><div onclick="return toggle_server_section(\'.imap_section\')" class="content_title">'.
+            '<img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+           ' IMAP Servers <div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.
             '<div class="subtitle">Add an IMAP Server</div><table>'.
             '<tr><td colspan="2"><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.

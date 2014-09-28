@@ -395,7 +395,7 @@ else if (hm_page_name == 'servers') {
     setup_server_page();
 }
 else if (hm_page_name == 'home') {
-    imap_status_update();
+    setTimeout(imap_status_update, 100);
 }
 /*if (hm_page_name != 'message_list' || hm_list_path != 'unread') {
     Hm_Timer.add_job(update_unread_count, 60, true);
