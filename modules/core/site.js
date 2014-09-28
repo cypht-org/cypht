@@ -17,17 +17,18 @@ Hm_Ajax = {
     }
 };
 
-var loading_id = 0;
+var hm_loading_id = 0;
+var hm_loading_pos = 0;
 var show_loading_icon = function() {
     $('.loading_icon').show();
-    var left = $('.loading_icon').css('background-position-x').replace(/(\%|px)/, '')*1 + 5;
-    $('.loading_icon').css('background-position-x', left+'px');
-    loading_id = setTimeout(show_loading_icon, 100);
+    hm_loading_pos = hm_loading_pos + 5;
+    $('.loading_icon').css('background-position', hm_loading_pos+'px 0');
+    hm_loading_id = setTimeout(show_loading_icon, 100);
 };
 
 var stop_loading_icon = function() {
     $('.loading_icon').hide();
-    clearTimeout(loading_id);
+    clearTimeout(hm_loading_id);
 }
 
 /* Ajax request wrapper */
