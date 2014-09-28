@@ -3,13 +3,13 @@
 define("DEBUG_MODE", false);
 
 /* command that takes js from stdin and outputs compressed results
- * examples: 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type js'
- *           'uglifyjs -nc --unsafe -c -v'
+ *  $js_compress = 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type js';
+ *  $js_compress = 'uglifyjs -nc --unsafe -c -v';
  */
 $js_compress = false;
 
 /* command that takes css from stdin and outputs compressed results
- * example: 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type css';
+ *  $css_compress = 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type css';
  */
 $css_compress = false;
 
@@ -22,7 +22,7 @@ if (isset($options['ini_file'])) {
     $settings = parse_ini_file($options['ini_file']);
 }
 if (!empty($settings)) {
-    $js = file_get_contents("lib/zepto.min.js");
+    $js = file_get_contents("third_party/zepto.min.js");
     $css = '';
     $mod_map = array();
     $filters = array('allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
