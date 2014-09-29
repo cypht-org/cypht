@@ -343,6 +343,42 @@ var add_imap_sources = function(callback) {
     }
 };
 
+var setup_compose_page = function() {
+    var source = $('.imap_reply_source');
+    var uid = $('.imap_reply_uid');
+    if (source.length && uid.length) {
+        detail = parse_folder_path(source.val(), 'imap');
+        if (detail) {
+            $('.compose_to').prop('disabled', true);
+            $('.smtp_send').prop('disabled', true);
+            $('.compose_subject').prop('disabled', true);
+            $('.compose_body').prop('disabled', true);
+            $('.smtp_server_id').prop('disabled', true);
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
+                {'name': 'imap_msg_uid', 'value': uid.val()},
+                {'name': 'reply_format', 'value': 1},
+                {'name': 'imap_server_id', 'value': detail.server_id},
+                {'name': 'folder', 'value': detail.folder}],
+                display_reply_content,
+                [],
+                false
+            );
+        }
+    }
+};
+
+var display_reply_content = function(res) {
+    $('.compose_to').prop('disabled', false);
+    $('.smtp_send').prop('disabled', false);
+    $('.compose_subject').prop('disabled', false);
+    $('.compose_body').prop('disabled', false);
+    $('.smtp_server_id').prop('disabled', false);
+    $('.compose_body').text(res.reply_body);
+    $('.compose_subject').val(res.reply_subject);
+    $('.compose_to').val(res.reply_to);
+}
+
 /* setup */
 if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
@@ -363,6 +399,9 @@ if (hm_page_name == 'message_list') {
 }
 else if (hm_page_name == 'search') {
     add_imap_sources(imap_search_page_content);
+}
+else if (hm_page_name == 'compose') {
+    setup_compose_page();
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'imap') {
     setup_message_view_page();

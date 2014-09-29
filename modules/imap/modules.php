@@ -4,6 +4,18 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require 'modules/imap/hm-imap.php';
 
+class Hm_Handler_imap_process_reply_fields extends Hm_Handler_Module {
+    public function process($data) {
+        if (array_key_exists('reply_source', $this->request->get) && preg_match("/^imap_(\d+)_(.+)$/", $this->request->get['reply_source'])) {
+            if (array_key_exists('reply_uid', $this->request->get)) {
+                $data['imap_reply_source'] = $this->request->get['reply_source'];
+                $data['imap_reply_uid'] = $this->request->get['reply_uid'];
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
     public function process($data) {
         if (array_key_exists('list_path', $this->request->get)) {
@@ -434,6 +446,9 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
                 $part = $this->request->post['imap_msg_part'];
             }
+            if (array_key_exists('reply_format', $this->request->post) && $this->request->post['reply_format']) {
+                $data['reply_format'] = true;
+            }
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if ($imap) {
@@ -457,7 +472,6 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     }
                     $data['msg_headers'] = $imap->get_message_headers($form['imap_msg_uid']);
                     $data['imap_msg_part'] = $part;
-                    $data['msg_cache_suffix'] = 'imap_'.$form['imap_server_id'].'_'.$form['folder'].'_'.$form['imap_msg_uid'];
                 }
             }
         }
@@ -499,25 +513,25 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             else {
                 $txt .= format_msg_text($input['msg_text'], $this);
             }
+            $txt .= '</div>';
+            $input['msg_text'] = $txt;
         }
-        $txt .= '</div>';
-        $input['msg_text'] = $txt;
         return $input;
     }
 }
 
 class Hm_Output_filter_message_struct extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<table class="msg_parts">';
         if (isset($input['msg_struct'])) {
+            $res = '<table class="msg_parts">';
             $part = 1;
             if (isset($input['imap_msg_part'])) {
                 $part = $input['imap_msg_part'];
             }
             $res .=  format_msg_part_section($input['msg_struct'], $this, $part);
+            $res .= '</table>';
+            $input['msg_parts'] = $res;
         }
-        $res .= '</table>';
-        $input['msg_parts'] = $res;
         return $input;
     }
 }
@@ -657,6 +671,19 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
                 $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
                     '<td class="imap_detail_'.$index.'"></td></tr>';
             }
+        }
+        return $res;
+    }
+}
+
+class Hm_Output_imap_reply_details extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if (isset($input['imap_reply_source'])) {
+            $res .= '<input type="hidden" class="imap_reply_source" value="'.$this->html_safe($input['imap_reply_source']).'" />';
+        }
+        if (isset($input['imap_reply_uid'])) {
+            $res .= '<input type="hidden" class="imap_reply_uid" value="'.$this->html_safe($input['imap_reply_uid']).'" />';
         }
         return $res;
     }
@@ -806,6 +833,48 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         return $input;
     }
 }
+
+class Hm_Output_filter_reply_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $reply_subject = 'Re: [No Subject]';
+        $reply_to = '';
+        $reply_body = '';
+        if (array_key_exists('reply_format', $input) && $input['reply_format']) {
+            if (array_key_exists('msg_headers', $input) && is_array($input['msg_headers'])) {
+                $hdrs = $input['msg_headers'];
+                if (array_key_exists('Subject', $hdrs)) {
+                    $reply_subject = sprintf("Re: %s", $hdrs['Subject']);
+                }
+                if (array_key_exists('From', $hdrs)) {
+                    $reply_to = $hdrs['From'];
+                }
+                elseif (array_key_exists('Sender', $hdrs)) {
+                    $reply_to = $hdrs['Sender'];
+                }
+                elseif (array_key_exists('Return-path', $hdrs)) {
+                    $reply_to = $hdrs['Return-path'];
+                }
+            }
+            if (array_key_exists('msg_text', $input)) {
+                $reply_body = format_reply_text($input['msg_text']);
+            }
+            $input['reply_to'] = $reply_to;
+            $input['reply_body'] = $reply_body;
+            $input['reply_subject'] = $reply_subject;
+            if (array_key_exists('msg_text', $input)) {
+                unset($input['msg_text']);
+            }
+            if (array_key_exists('msg_struct', $input)) {
+                unset($input['msg_struct']);
+            }
+            if (array_key_exists('msg_headers', $input)) {
+                unset($input['msg_headers']);
+            }
+        }
+        return $input;
+    }
+}
+
 
 function format_imap_folder_section($folders, $id, $output_mod) {
     $results = '<ul class="inner_list">';
