@@ -22,9 +22,6 @@ error_reporting(E_ALL | E_STRICT);
 /* set default TZ */
 date_default_timezone_set( 'UTC' );
 
-/* start a simple page performance timer */
-$start_time = microtime(true);
-
 /* get includes */
 require 'lib/framework.php';
 require 'lib/session.php';
