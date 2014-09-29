@@ -343,30 +343,6 @@ var add_imap_sources = function(callback) {
     }
 };
 
-var update_unread_count = function() {
-    var id;
-    var ids = $('.imap_server_ids').val();
-    if (ids && ids.length > 0) {
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_unread_count'},
-            {'name': 'imap_server_ids', 'value': ids}],
-            update_unread_count_display,
-            [],
-            true
-        );
-    }
-};
-
-var update_unread_count_display = function(res) {
-    if (res.unseen_total) {
-        var current = $('.unread_count').text();
-        if (current != res.unseen_total) {
-            $('.unread_count').text(res.unseen_total);
-            save_folder_list();
-        }
-    }
-};
-
 /* setup */
 if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
@@ -397,6 +373,3 @@ else if (hm_page_name == 'servers') {
 else if (hm_page_name == 'home') {
     setTimeout(imap_status_update, 100);
 }
-/*if (hm_page_name != 'message_list' || hm_list_path != 'unread') {
-    Hm_Timer.add_job(update_unread_count, 60, true);
-}*/

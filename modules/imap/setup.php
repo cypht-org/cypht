@@ -179,17 +179,6 @@ add_handler('ajax_imap_combined_inbox', 'save_imap_servers',  true);
 add_handler('ajax_imap_combined_inbox', 'date', true, 'core');
 add_output('ajax_imap_combined_inbox', 'filter_combined_inbox', true);
 
-/* unread message counter update */
-add_handler('ajax_unread_count', 'login', false, 'core');
-add_handler('ajax_unread_count', 'load_user_data', true, 'core');
-add_handler('ajax_unread_count', 'message_list_type', true, 'core');
-add_handler('ajax_unread_count', 'imap_message_list_type', true);
-add_handler('ajax_unread_count', 'load_imap_servers_from_config',  true);
-add_handler('ajax_unread_count', 'imap_unread_total',  true);
-add_handler('ajax_unread_count', 'save_imap_cache',  true);
-add_handler('ajax_unread_count', 'save_imap_servers',  true);
-add_handler('ajax_unread_count', 'date', true, 'core');
-
 /* allowed input */
 return array(
     'allowed_pages' => array(

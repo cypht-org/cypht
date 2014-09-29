@@ -201,28 +201,6 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_imap_unread_total extends Hm_Handler_Module {
-    public function process($data) {
-        $total = 0;
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
-        if ($success) {
-            $ids = explode(',', $form['imap_server_ids']);
-            foreach ($ids as $id) {
-                $cache = Hm_IMAP_List::get_cache($this->session, $id);
-                $imap = Hm_IMAP_List::connect($id, $cache);
-                if ($imap && $imap->get_state() == 'authenticated') {
-                    $status = $imap->get_mailbox_status('INBOX', array('UNSEEN'));
-                    if (isset($status['unseen'])) {
-                        $total += $status['unseen'];
-                    }
-                }
-            }
-        }
-        $data['unseen_total'] = $total;
-        return $data;
-    }
-}
-
 class Hm_Handler_imap_status extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -331,6 +309,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             if ($server['name'] == 'Default-Auth-Server') {
                 $added = true;
             }
+            $data['data_sources'][] = 'imap';
         }
         if (!$added) {
             $auth_server = $this->session->get('imap_auth_server_settings', array());
