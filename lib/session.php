@@ -55,7 +55,6 @@ class Hm_PHP_Session extends Hm_Session {
         $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
         $id .= (array_key_exists('REQUEST_SCHEME', $env)) ? $env['REQUEST_SCHEME'] : '';
         $id .= (array_key_exists('HTTP_ACCEPT_LANGUAGE', $env)) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
-        $id .= (array_key_exists('HTTP_ACCEPT_ENCODING', $env)) ? $env['HTTP_ACCEPT_ENCODING'] : '';
         $id .= (array_key_exists('HTTP_ACCEPT_CHARSET', $env)) ? $env['HTTP_ACCEPT_CHARSET'] : '';
         $id .= (array_key_exists('HTTP_HOST', $env)) ? $env['HTTP_HOST'] : '';
         return hash('sha256', $id);
