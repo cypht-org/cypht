@@ -259,9 +259,9 @@ function format_msg_html($str, $external_resources=false) {
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$external_resources) {
-        $config->set('URI.DisableResources', false);
-        $config->set('URI.DisableExternalResources', false);
-        $config->set('URI.DisableExternal', false);
+        $config->set('URI.DisableResources', true);
+        $config->set('URI.DisableExternalResources', true);
+        $config->set('URI.DisableExternal', true);
     }
     $config->set('HTML.TargetBlank', true);
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
@@ -365,6 +365,10 @@ function search_form($data, $output_mod) {
         ' '.message_since_dropdown($data['search_since'], 'search_since').
         ' <input type="submit" class="search_update" value="Go!" /></form></div>';
     return $res;
+}
+
+function format_reply_text($txt) {
+    return '> '.str_replace("\n", "\n> ", $txt);
 }
 
 ?>

@@ -488,6 +488,8 @@ return array(
         'search_terms' => FILTER_SANITIZE_STRING,
         'search_since' => FILTER_SANITIZE_STRING,
         'search_fld' => FILTER_SANITIZE_STRING,
+        'reply_uid' => FILTER_VALIDATE_INT,
+        'reply_source' => FILTER_SANITIZE_STRING
     ),
 
     'allowed_post' => array(
@@ -516,6 +518,7 @@ return array(
         'message_list_since' => FILTER_SANITIZE_STRING,
         'new_pass1' => FILTER_SANITIZE_STRING,
         'new_pass2' => FILTER_SANITIZE_STRING,
+        'reply_format' => FILTER_VALIDATE_INT
     )
 );
 
