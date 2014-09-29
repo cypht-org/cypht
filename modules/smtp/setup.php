@@ -7,6 +7,7 @@ output_source('smtp');
 
 add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
+add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('compose', 'compose_form', true, 'smtp', 'content_section_start', 'after');
 
 /* servers page */
@@ -42,10 +43,14 @@ return array(
         'smtp_forget' => FILTER_VALIDATE_INT,
         'smtp_save' => FILTER_VALIDATE_INT,
         'smtp_delete' => FILTER_VALIDATE_INT,
+        'smtp_send' => FILTER_VALIDATE_INT,
         'submit_smtp_server' => FILTER_SANITIZE_STRING,
         'smtp_server_id' => FILTER_VALIDATE_INT,
         'smtp_user' => FILTER_SANITIZE_STRING,
         'smtp_pass' => FILTER_SANITIZE_STRING,
+        'compose_to' => FILTER_SANITIZE_STRING,
+        'compose_body' => FILTER_SANITIZE_STRING,
+        'compose_subject' => FILTER_SANITIZE_STRING,
     )
 );
 ?>

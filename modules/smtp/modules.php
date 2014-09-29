@@ -152,27 +152,61 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
+    public function process($data) {
+        if (array_key_exists('smtp_send', $this->request->post)) {
+            list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'smtp_server_id'));
+            if ($success) {
+                $to = $form['compose_to'];
+                $subject = $form['compose_subject'];
+                $body = '';
+                $from = '';
+                if (array_key_exists('compose_body', $this->request->post)) {
+                    $body = $this->request->post['compose_body'];
+                }
+                $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id']);
+                if ($smtp_details) {
+                    $from = $smtp_details['user'];
+                    $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
+                    if ($smtp && $smtp->state == 'authed') {
+                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from);
+                        $recipients = $mime->get_recipient_addresses();
+                        if (empty($recipients)) {
+                            Hm_Msgs::add("ERRNo valid receipts found");
+                        }
+                        else {
+                            $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
+                            if ($err_msg) {
+                                Hm_Msgs::add(sprintf("ERR%s", $err_msg));
+                            }
+                            else {
+                                Hm_Msgs::add("Message Sent");
+                            }
+                        }
+                    }
+                    else {
+                        Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+                    }
+                }
+            }
+            else {
+                Hm_Msgs::add('ERRRequired field missing');
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Output_compose_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="compose_page"><div class="content_title">Compose</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
-            '<input class="compose_to" type="text" placeholder="To" />'.
-            '<input class="compose_subject" type="text" placeholder="Subject" />'.
-            '<textarea class="compose_body"></textarea>'.
+            '<input name="compose_to" class="compose_to" type="text" placeholder="To" />'.
+            '<input name="compose_subject" class="compose_subject" type="text" placeholder="Subject" />'.
+            '<textarea name="compose_body" class="compose_body"></textarea>'.
             smtp_server_dropdown($input, $this).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" /></form></div>';
     }
-}
-
-function smtp_server_dropdown($input, $output_mod) {
-    $res = '<select name="smtp_server_id" class="compose_server">';
-    if (array_key_exists('smtp_servers', $input)) {
-        foreach ($input['smtp_servers'] as $id => $vals) {
-            $res .= '<option value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['name'], $vals['server'])).'</option>';
-        }
-    }
-    $res .= '</select>';
-    return $res;
 }
 
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
@@ -245,6 +279,34 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
         }
         return $res;
     }
+}
+
+function smtp_server_dropdown($input, $output_mod) {
+    $res = '<select name="smtp_server_id" class="compose_server">';
+    if (array_key_exists('smtp_servers', $input)) {
+        foreach ($input['smtp_servers'] as $id => $vals) {
+            $res .= '<option value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['name'], $vals['server'])).'</option>';
+        }
+    }
+    $res .= '</select>';
+    return $res;
+}
+
+function build_mime_msg($to, $subject, $body, $from) {
+    $headers = array(
+        'from' => $from,
+        'to' => $to,
+        'subject' => $subject,
+        'date' => date('r')
+    );
+    $body = array(
+        1 => array(
+            'type' => TYPETEXT,
+            'subtype' => 'plain',
+            'contents.data' => $body
+        )
+    );
+    return imap_mail_compose($headers, $body);
 }
 
 

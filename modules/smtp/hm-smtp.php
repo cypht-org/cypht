@@ -356,6 +356,7 @@ class Hm_SMTP {
         }
         return $result;
     }
+
     /* parse NTLM challenge string */
     function parse_ntlm_type_two($bin_str) {
         $res = array();
@@ -378,6 +379,7 @@ class Hm_SMTP {
         $res['names'] = $names;
         return $res;
     }
+
     /* build initial NTLM message string */
     function build_ntlm_type_one() {
         $pre = 'NTLMSSP'.chr(0);
@@ -385,6 +387,7 @@ class Hm_SMTP {
         $flags = pack('V', 0x00000201);
         return base64_encode($pre.$type.$flags);
     }
+
     /* build NTLM challenge response string */
     function build_ntlm_type_three($msg_data, $username, $password) {
         $username = iconv('UTF-8', 'UTF-16LE', $username);
@@ -409,10 +412,12 @@ class Hm_SMTP {
         $sess_sec = $this->ntlm_security_buffer(0, $offset);
         return base64_encode($pre.$type.$lm_sec.$ntlm_sec.$target_sec.$user_sec.$host_sec.$sess_sec.$flags.$target.$username.$host.$lm_response.$ntlm_response);
     }
+
     /* build an NTLM "security buffer" for the type 3 response string */
     function ntlm_security_buffer($len, $offset) {
         return pack('vvV', $len, $len, $offset);
     }
+
     /* build the NTLM lm hash then ecnrypt the challenge string with it */
     function build_lm_response($msg_data, $username, $password){
         $pass = strtoupper($password);
@@ -429,8 +434,8 @@ class Hm_SMTP {
             $lm_hash .= chr(0);
         }
         return $this->apply_ntlm_hash($msg_data['vals']['challenge'], $lm_hash);
-
     }
+
     /* build the NTLM ntlm hash then ecnrypt the challenge string with it */
     function build_ntlm_response($msg_data, $username, $password){
         $password = iconv('UTF-8', 'UTF-16LE', $password);
@@ -440,6 +445,7 @@ class Hm_SMTP {
         }
         return $this->apply_ntlm_hash($msg_data['vals']['challenge'], $ntlm_hash);
     }
+
     /* encrypt the challenge string with the lm/ntlm hash */
     function apply_ntlm_hash($challenge, $hash) {
         $p1 = substr($hash, 0, 7);
@@ -449,6 +455,7 @@ class Hm_SMTP {
             $this->des_encrypt($p2, $challenge).
             $this->des_encrypt($p3, $challenge);
     }
+
     /* NTLM compatible DES encryption */
     function des_encrypt($string, $challenge='KGS!@#$%') {
         $key = array();
@@ -510,8 +517,7 @@ class Hm_SMTP {
                 $result = 'An error occured during the DATA command';
             }
             else {
-                $command = $message->output_smtp_message();
-                $this->send_command($command);
+                $this->send_command($message);
                 /* TODO: process attachments */
                 $command = $this->crlf.'.';
                 $this->send_command($command);
@@ -547,11 +553,232 @@ class Hm_SMTP {
             fclose($this->handle);
         }
     }
+
     function clean($val) {
         if (!preg_match("/^[^\r\n]+$/", $val)) {
             print_r("INVALID SMTP INPUT DETECTED: <b>$val</b>");
             exit;
         }
+    }
+}
+
+class Hm_MIME_Msg {
+    private $headers = array('MIME-Version' => '1.0');
+    private $body = '';
+    private $allow_unqualified_addresses = false;
+
+    /* build mime message data */
+    function __construct($to, $subject, $body, $from) {
+        $this->headers['To'] = $this->encode_header_fld($to);
+        $this->headers['Subject'] = $this->encode_header_fld($subject);
+        $this->headers['Date'] = date('r');
+        $this->headers['Message-ID'] = '<'.md5(uniqid(rand(),1)).'@'.php_uname('n').'>';
+        $this->body = $this->prep_message_body($body);
+    }
+
+    /* output mime message */
+    function get_mime_msg() {
+        $res = '';
+        foreach ($this->headers as $name => $val) {
+            $res .= sprintf("%s: %s\r\n", $name, $val);
+        }
+        $res .= "\r\n\r\n";
+        $res .= $this->body;
+        return $res;
+    }
+
+    /* try to accurately validate an E-mail. Based on RFC 3696 */
+    function match_email_full($val) {
+        /* defaults */
+        $domain = false;
+        $local = false;
+        /* basic checks to weed out obviously incorrect values */
+        if (!trim($val) || strlen($val) > 320) {
+            return false;
+        }
+        /* determine if this is a local address or if it has a domain part */
+        if (strpos($val, '@') !== false) {
+            $local = substr($val, 0, strrpos($val, '@'));
+            $domain = substr($val, (strrpos($val, '@') + 1));
+        }
+        else {
+            $local = $val;
+        }
+        /* domain is not require but the local part is */
+        if (!$local) {
+            return false;
+        }
+        else {
+            /* if we have a domain validate it. */
+            if ($domain && !$this->validate_domain_full($domain)) {
+                return false;
+            }
+            /* validate the required local part */
+            if (!$this->validate_local_full($local)) {
+                return false;
+            }
+        }
+        /* E-mail is valid */
+        return true;
+    }
+
+    function validate_local_full($val) {
+        /* check length, "." rules, and for characters > ASCII 127 */
+        if (strlen($val) > 64 || $val{0} == '.' || $val{(strlen($val) -1)} == '.' || strstr($val, '..') ||
+            preg_match('/[^\x00-\x7F]/',$val)) {
+            return false;
+        }
+        /* remove escaped characters and quoted strings */
+        $local = preg_replace("/\\\\.{1}/", '', $val);
+        $local = preg_replace("/\"[^\"]+\"/", '', $local);
+
+        /* validate remaining unescaped characters */
+        if (preg_match("/[[:print:]]/", $local) && !preg_match("/[@\\\",\[\]]/", $local)) {
+            return true;
+        }
+        return false;
+    }
+
+    function validate_domain_full($val) {
+        /* check for a dot, max allowed length and standard ASCII characters */
+        if (strpos($val, '.') === false || strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
+            $val{0} == '-' || $val{(strlen($val) - 1)} == '-') {
+            return false;
+        }
+        return true;
+    }
+
+    function encode_header_fld($input, $email=true) {
+        $res = array();
+        $input = trim($input, ',; ');
+        if (strstr($input, ' ')) {
+            $parts = explode(' ', $input);
+        }
+        else {
+            $parts[] = $input;
+        }
+        foreach ($parts as $v) {
+            if (preg_match('/(?:[^\x00-\x7F])/',$v) === 1) {
+                $leading_quote = false;
+                $trailing_quote = false;
+                if (substr($v, 0, 1) == '"') {
+                    $v = substr($v, 1);
+                    $leading_quote = true;
+                }
+                if (substr($v, -1) == '"') {
+                    $trailing_quote = true;
+                    $v = substr($v, 0, -1);
+                }
+                $enc_val = '=?UTF-8?B?'.base64_encode($v).'?=';
+                if ($leading_quote) {
+                    $enc_val = '"'.$enc_val;
+                }
+                if ($trailing_quote) {
+                    $enc_val = $enc_val.'"';
+                }
+                $res[] = $enc_val;
+            }
+            else {
+                if ($email && strpos($v, '@') !== false && $this->match_email_full($v)) {
+                    $res[] = '<'.$v.'>';
+                }
+                else {
+                    $res[] = $v;
+                }
+            }
+        }
+        $string = preg_replace("/\s{2,}/", ' ', trim(implode(' ', $res)));
+        return $string;
+    }
+
+    function get_recipient_addresses() {
+        $res = array();
+        foreach (array('To', 'Cc', 'Bcc') as $fld) {
+            if (!array_key_exists($fld, $this->headers)) {
+                continue;
+            }
+            $v = $this->headers[$fld];
+            $v = trim(preg_replace("/(\r|\n|\t)/m", ' ', $v));
+            $v = preg_replace("/(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", ' ', $v);
+            $v = str_replace(array(',', ';'), array(' , ', ' ; '), $v); 
+            $v = preg_replace("/\s+/", ' ', $v);
+            $bits = explode(' ', $v);
+            foreach ($bits as $val) {
+                $val = trim($val);
+                if (!$val) {
+                    continue;
+                }
+                if (strstr($val, '@')) {
+                    $address = ltrim(rtrim($val ,'>'), '<');
+                    if ($this->match_email_full($address)) {
+                        $res[] = $address;
+                    }
+                }
+            }
+            if ($this->allow_unqualified_addresses) {
+                $bits = preg_split("/(;|,)/", $v);
+                foreach ($bits as $val) {
+                        $val = trim($val);
+                    if (!strstr($val, ' ') && !strstr($val, '@') && strlen($val) > 2) {
+                        $res[] = $val;
+                    }
+                }
+            }
+        }
+        return $res;
+    }
+
+    function prep_message_body($body) {
+        $message = trim($body);
+        $message = str_replace("\r\n", "\n", $message);
+        $lines = explode("\n", wordwrap($message, 79, " \n"));
+        $new_lines = array();
+        foreach($lines as $line) {
+            $line = trim($line, "\r\n")."\r\n";
+            $new_lines[] = preg_replace("/^\.\r\n/", "..\r\n", $line);
+        }
+        $this->headers['Content-Type'] = 'text/plain; charset=UTF-8; format=flowed';
+        $this->headers['Content-Transfer-Encoding'] = 'quoted-printable';
+        $body = implode('', $new_lines);
+        return $this->qp_encode($body);
+    }
+
+    function qp_encode($string) {
+        $string = str_replace("\r\n", "\n", $string);
+        $lines = explode("\n", $string, 78);
+        $res = array();
+        $new_lines = array();
+        foreach ($lines as $v) {
+            $new_line = '';
+            $char_count = 0;
+            while ($v) {
+                $char = substr($v, 0, 1);
+                $ord = ord($char);
+                $v = substr($v, 1);
+                switch (true) {
+                    case ($ord > 32 && $ord < 61) || ($ord > 61 && $ord < 127):
+                        $new_line .= $char;
+                        $char_count++;
+                        break;
+                    case $ord == 9:
+                    case $ord == 32:
+                        $new_line .= $char;
+                        break;
+                    default:
+                        $new_line .= '='.strtoupper(dechex($ord));
+                        $char_count += 3;
+                        break;
+                }
+                if ($char_count > 72) {
+                    $new_lines[] = $new_line.'=';
+                    $char_count = 0;
+                    $new_line = '';
+                }
+            }
+            $new_lines[] = $new_line;
+        }
+        $string = implode("\r\n", $new_lines);
+        return $string;
     }
 }
 
