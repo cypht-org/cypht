@@ -88,7 +88,7 @@ function settings_menu( $input, $output_mod) {
 }
 
 function message_list_meta($input, $output_mod) {
-	if (preg_match('/^imap_/', $input['list_path'])) { //TODO remove imap ref
+    if (!array_key_exists('list_meta', $input) || !$input['list_meta']) {
         return '';
     }
     $limit = 0;
@@ -259,9 +259,9 @@ function format_msg_html($str, $external_resources=false) {
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$external_resources) {
-        $config->set('URI.DisableResources', true);
-        $config->set('URI.DisableExternalResources', true);
-        $config->set('URI.DisableExternal', true);
+        $config->set('URI.DisableResources', false);
+        $config->set('URI.DisableExternalResources', false);
+        $config->set('URI.DisableExternal', false);
     }
     $config->set('HTML.TargetBlank', true);
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
