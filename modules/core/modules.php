@@ -278,6 +278,13 @@ class Hm_Handler_login extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_default_page_data extends Hm_Handler_Module {
+    public function process($data) {
+        $data['data_sources'] = array();
+        return $data;
+    }
+}
+
 class Hm_Handler_create_user extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('username', 'password', 'create_hm_user'));
