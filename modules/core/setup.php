@@ -48,10 +48,6 @@ add_output('settings', 'all_since_setting', true, 'core', 'start_everything_sett
 add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_setting', 'after');
 add_output('settings', 'end_settings_form', true, 'core', 'all_source_max_setting', 'after');
 
-/* search page */
-setup_base_page('search');
-add_output('search', 'search_content', true, 'core', 'content_section_start', 'after');
-
 /* message list page */
 setup_base_page('message_list');
 add_output('message_list', 'message_list_heading', true, 'core', 'content_section_start', 'after');

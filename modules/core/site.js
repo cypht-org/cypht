@@ -577,7 +577,6 @@ var update_folder_list_display = function(res) {
 	sort_list('email_folders', 'menu_email');
 	sort_list('feeds_folders', 'menu_feeds');
     save_to_local_storage('formatted_folder_list', res.formatted_folder_list);
-    $('.search_terms').val(hm_search_terms);
     hl_selected_menu();
 };
 
@@ -729,14 +728,10 @@ $(function() {
             Hm_Message_List.setup_combined_view('formatted_flagged_data');
         }
     }
-    else if (hm_page_name == 'search') {
-        Hm_Message_List.load_sources();
-    }
     else if (hm_page_name == 'settings' || hm_page_name == 'servers') {
         reload_folders();
     }
     Hm_Timer.fire();
-    $('.search_terms').val(hm_search_terms);
 
     if ($('.sys_messages').text().length) {
         $('.sys_messages').show();

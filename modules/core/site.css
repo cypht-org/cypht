@@ -101,6 +101,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .hide_folders img { opacity: .4; }
 .section_caret { opacity: .15; vertical-align: 4px; padding-right: 10px; }
 .server_count { float: right; margin-right: 20px; font-size: 90%; }
+.long_text { margin-left: 30px; margin-top: 20px; max-width: 60%; color: #666; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }

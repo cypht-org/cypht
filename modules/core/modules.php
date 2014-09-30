@@ -6,24 +6,6 @@ require 'modules/core/functions.php';
 
 /* INPUT */
 
-class Hm_Handler_process_search_terms extends Hm_Handler_Module {
-    public function process($data) {
-        if (array_key_exists('search_terms', $this->request->get)) {
-            $this->session->set('search_terms', validate_search_terms($this->request->get['search_terms']));
-        }
-        if (array_key_exists('search_since', $this->request->get)) {
-            $this->session->set('search_since', process_since_argument($this->request->get['search_since'], true));
-        }
-        if (array_key_exists('search_fld', $this->request->get)) {
-            $this->session->set('search_fld', validate_search_fld($this->request->get['search_fld']));
-        }
-        $data['search_since'] = $this->session->get('search_since', DEFAULT_SINCE);
-        $data['search_terms'] = $this->session->get('search_terms', '');
-        $data['search_fld'] = $this->session->get('search_fld', 'TEXT');
-        return $data;
-    }
-}
-
 class Hm_Handler_http_headers extends Hm_Handler_Module {
     public function process($data) {
         if (array_key_exists('language', $data)) {
@@ -588,9 +570,6 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_list_parent = "'.(array_key_exists('list_parent', $input) ? $this->html_safe($input['list_parent']) : '').'";'.
             'var hm_msg_uid = "'.(array_key_exists('uid', $input) ? $this->html_safe($input['uid']) : 0).'";'.
             'var hm_module_list = "'.$this->html_safe($input['router_module_list']).'";'.
-            'var hm_search_terms = "'.(array_key_exists('search_terms', $input) ? $this->html_safe($input['search_terms']) : '').'";'.
-            'var hm_search_fld = "'.(array_key_exists('search_fld', $input) ? $this->html_safe($input['search_fld']) : '').'";'.
-            'var hm_search_since = "'.(array_key_exists('search_since', $input) ? $this->html_safe($input['search_since']) : '').'";'.
             '</script>';
     }
 }
@@ -844,11 +823,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
                 $email = true;
             }
         }
-        $res = '';
-        $res .= '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).'" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
-            '<input type="text" class="search_terms" name="search_terms" placeholder="'.$this->trans('Search').'" size="14" /></form></li>'.
-            '<li class="menu_home"><a class="unread_link" href="?page=home">'.
+        $res = '<li class="menu_home"><a class="unread_link" href="?page=home">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$this->trans('Home').'</a></li>'.
             '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> '.$this->trans('Everything').
@@ -1064,23 +1039,6 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<div class="content_title">Page Not Found!</div>';
         $res .= '<div class="empty_list"><br />Nothingness</div>';
-        return $res;
-    }
-}
-
-class Hm_Output_search_content extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '<div class="search_content"><div class="content_title">Search'.
-            search_form($input, $this).'</div>';
-        $res .= '<table class="message_table">';
-        if (!array_key_exists('no_message_list_headers', $input) || !$input['no_message_list_headers']) {
-            $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
-            '<col class="from_col"><col class="subject_col"><col class="date_col">'.
-            '<col class="icon_col"></colgroup><!--<thead><tr><th colspan="2" class="source">'.
-            'Source</th><th class="from">From</th><th class="subject">Subject</th>'.
-            '<th class="msg_date">Date</th><th></th></tr></thead>-->';
-        }
-        $res .= '<tbody></tbody></table>';
         return $res;
     }
 }
