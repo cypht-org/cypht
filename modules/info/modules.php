@@ -4,19 +4,22 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 class Hm_Output_dev_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="dev_content"><div class="content_title">Make it your own</div></div>';
+        return '<div class="dev_content"><div class="content_title">Developer Documentation</div>'.
+            '<div class="long_text">Everything you ever wanted to know about customizing the software.</div></div>';
     }
 }
 
 class Hm_Output_bug_report_form extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="bug_report"><div class="content_title">Is much broken</div></div>';
+        return '<div class="bug_report"><div class="content_title">Report a bug</div>'.
+            '<div class="long_text">If you found a bug or want a feature we want to hear from you!</div></div>';
     }
 }
 
 class Hm_Output_help_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="help_content"><div class="content_title">Let me explain</div></div>';
+        return '<div class="help_content"><div class="content_title">Help</div>'.
+            '<div class="long_text">How to get the most out of our experience.</div></div>';
     }
 }
 
