@@ -4,9 +4,7 @@ var pop3_test_action = function() {
     var id = form.find('#pop3_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
-        function(res) {
-            Hm_Notices.show(res.router_user_msgs);
-        },
+        function(res) { },
         {'pop3_connect': 1}
     );
 };
@@ -18,7 +16,6 @@ var pop3_save_action = function() {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            Hm_Notices.show(res.router_user_msgs);
             if (res.just_saved_credentials) {
                 form.find('.credentials').attr('disabled', true);
                 form.find('.save_pop3_connection').hide();
@@ -40,7 +37,6 @@ var pop3_forget_action = function() {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            Hm_Notices.show(res.router_user_msgs);
             if (res.just_forgot_credentials) {
                 form.find('.credentials').attr('disabled', false);
                 form.find('.pop3_password').val('');
@@ -62,7 +58,6 @@ var pop3_delete_action = function() {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            Hm_Notices.show(res.router_user_msgs);
             if (res.deleted_server_id > -1 ) {
                 form.parent().remove();
                 reload_folders(true);
@@ -74,12 +69,11 @@ var pop3_delete_action = function() {
 
 var display_pop3_mailbox = function(res) {
     ids = [res.pop3_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
     key = 'pop3_'+res.pop3_server_id;
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage(key, data.html());
-
 };
 
 var load_pop3_list = function(id) {
@@ -145,7 +139,7 @@ var pop3_all_mail_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
         {'name': 'pop3_server_id', 'value': id}],
-        display_pop3_combined_inbox,
+        display_pop3_list,
         [],
         false,
         set_all_mail_state
@@ -157,7 +151,7 @@ var pop3_combined_inbox_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
         {'name': 'pop3_server_id', 'value': id}],
-        display_pop3_combined_inbox,
+        display_pop3_list,
         [],
         false,
         set_combined_inbox_state
@@ -165,9 +159,9 @@ var pop3_combined_inbox_content = function(id) {
     return false;
 };
 
-var display_pop3_combined_inbox = function(res) {
+var display_pop3_list = function(res) {
     var ids = [res.pop3_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
 };
 
 var pop3_status_update = function() {
@@ -211,7 +205,7 @@ var pop3_search_page_content = function(id) {
 
 var update_pop3_search_result = function(res) {
     var ids = [res.pop3_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
 };
 
 var pop3_combined_unread_content = function(id) {
@@ -228,7 +222,7 @@ var pop3_combined_unread_content = function(id) {
 };
 var update_pop3_unread_display = function(res) {
     var ids = [res.pop3_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_mailbox_page, 'pop3');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
 };
 
 

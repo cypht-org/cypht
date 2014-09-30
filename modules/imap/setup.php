@@ -194,6 +194,20 @@ return array(
         'ajax_imap_message_action'
     ),
 
+    'allowed_output' => array(
+        'imap_connect_status' => array(FILTER_SANITIZE_STRING, false),
+        'imap_connect_time' => array(FILTER_SANITIZE_STRING, false),
+        'imap_detail_display' => array(FILTER_UNSAFE_RAW, false),
+        'imap_status_display' => array(FILTER_UNSAFE_RAW, false),
+        'imap_status_server_id' => array(FILTER_VALIDATE_INT, false),
+        'imap_expanded_folder_path' => array(FILTER_SANITIZE_STRING, false),
+        'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
+        'imap_server_ids' => array(FILTER_SANITIZE_STRING, false),
+        'imap_server_id' => array(FILTER_VALIDATE_INT, false),
+        'combined_inbox_server_ids' => array(FILTER_SANITIZE_STRING, false),
+        'page_links' => array(FILTER_UNSAFE_RAW, false),
+    ),
+
     'allowed_get' => array(
         'imap_server_id' => FILTER_VALIDATE_INT,
     ),
@@ -220,9 +234,6 @@ return array(
         'tls' => FILTER_VALIDATE_BOOLEAN,
         'folder' => FILTER_SANITIZE_STRING,
         'force_update' => FILTER_VALIDATE_BOOLEAN,
-        'formatted_unread_data' => FILTER_UNSAFE_RAW,
-        'formatted_combined_inbox' => FILTER_UNSAFE_RAW,
-        'formatted_flagged_data' => FILTER_UNSAFE_RAW,
         'imap_folder_state' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_msg_part' => FILTER_SANITIZE_STRING,

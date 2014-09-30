@@ -469,7 +469,7 @@ class Hm_Output_header_start extends Hm_Output_Module {
         if ($this->lang) {
             $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
         }
-        return '<!DOCTYPE html><html '.$lang.'><head>';
+        return '<!DOCTYPE html><html '.$lang.'><head><meta charset="utf-8" />';
     }
 }
 
@@ -509,7 +509,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
                 $title .= ' '.ucfirst($input['router_page_name']);
             }
         }
-        return '<title>'.$this->html_safe($title).'</title><meta charset="utf-8" />'.
+        return '<title>'.$this->html_safe($title).'</title>'.
             '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
             '<link rel="icon" class="tab_icon" type="image/png" href="'.Hm_Image_Sources::$env_closed.'">'.
             '<base href="'.$this->html_safe($input['router_url_path']).'" />';

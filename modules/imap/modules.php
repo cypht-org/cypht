@@ -177,7 +177,7 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             $date = process_since_argument($since);
             $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
             $data['imap_search_results'] = $msg_list;
-            $data['imap_search_ids'] = $form['imap_server_ids'];
+            $data['imap_server_ids'] = $form['imap_server_ids'];
         }
         return $data;
     }
@@ -207,7 +207,7 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
             $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_SINCE));
             $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
             $data['imap_flagged_data'] = $msg_list;
-            $data['flagged_server_ids'] = $form['imap_server_ids'];
+            $data['imap_server_ids'] = $form['imap_server_ids'];
         }
         return $data;
     }
@@ -249,7 +249,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $msg_list = array();
             $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
             $data['imap_unread_data'] = $msg_list;
-            $data['unread_server_ids'] = $form['imap_server_ids'];
+            $data['imap_server_ids'] = $form['imap_server_ids'];
         }
         return $data;
     }
@@ -748,11 +748,10 @@ class Hm_Output_filter_imap_search extends Hm_Output_Module {
                 $style = 'news';
             }
             $res = format_imap_message_list($input['imap_search_results'], $this, 'search', $style);
-            $input['formatted_search_results'] = $res;
-            unset($input['imap_search_results']);
+            $input['formatted_message_list'] = $res;
         }
-        elseif (!isset($input['formatted_search_results'])) {
-            $input['formatted_search_results'] = array();
+        elseif (!isset($input['formatted_message_list'])) {
+            $input['formatted_message_list'] = array();
         }
         return $input;
     }
@@ -766,11 +765,10 @@ class Hm_Output_filter_flagged_data extends Hm_Output_Module {
                 $style = 'news';
             }
             $res = format_imap_message_list($input['imap_flagged_data'], $this, 'flagged', $style);
-            $input['formatted_flagged_data'] = $res;
-            unset($input['imap_flagged_data']);
+            $input['formatted_message_list'] = $res;
         }
-        elseif (!isset($input['formatted_flagged_data'])) {
-            $input['formatted_flagged_data'] = array();
+        elseif (!isset($input['formatted_message_list'])) {
+            $input['formatted_message_list'] = array();
         }
         return $input;
     }
@@ -784,11 +782,10 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
                 $style = 'news';
             }
             $res = format_imap_message_list($input['imap_unread_data'], $this, 'unread', $style);
-            $input['formatted_unread_data'] = $res;
-            unset($input['imap_unread_data']);
+            $input['formatted_message_list'] = $res;
         }
-        elseif (!isset($input['formatted_unread_data'])) {
-            $input['formatted_unread_data'] = array();
+        elseif (!isset($input['formatted_message_list'])) {
+            $input['formatted_message_list'] = array();
         }
         return $input;
     }
@@ -802,11 +799,10 @@ class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
                 $style = 'news';
             }
             $res = format_imap_message_list($input['imap_combined_inbox_data'], $this, 'combined_inbox', $style);
-            $input['formatted_combined_inbox'] = $res;
-            unset($input['imap_combined_inbox_data']);
+            $input['formatted_message_list'] = $res;
         }
         else {
-            $input['formatted_combined_inbox'] = array();
+            $input['formatted_message_list'] = array();
         }
         return $input;
     }
@@ -821,14 +817,11 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
                 $style = 'news';
             }
             $res = format_imap_message_list($input['imap_mailbox_page'], $this, false, $style);
-            $input['formatted_mailbox_page'] = $res;
-            Hm_Page_Cache::add('formatted_mailbox_page_'.$input['imap_mailbox_page_path'].'_'.$input['list_page'], $res);
+            $input['formatted_message_list'] = $res;
             $input['page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
-            unset($input['imap_mailbox_page']);
-            unset($input['imap_folder_detail']);
         }
-        elseif (!isset($input['formatted_mailbox_page'])) {
-            $input['formatted_mailbox_page'] = array();
+        elseif (!isset($input['formatted_message_list'])) {
+            $input['formatted_message_list'] = array();
         }
         return $input;
     }

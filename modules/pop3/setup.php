@@ -137,6 +137,14 @@ return array(
         'ajax_pop3_unread',
         'ajax_pop3_status'
     ),
+    'allowed_output' => array(
+        'pop3_connect_status' => array(FILTER_SANITIZE_STRING, false),
+        'pop3_connect_time' => array(FILTER_SANITIZE_STRING, false),
+        'pop3_detail_display' => array(FILTER_SANITIZE_STRING, false),
+        'pop3_status_display' => array(FILTER_SANITIZE_STRING, false),
+        'pop3_status_server_id' => array(FILTER_VALIDATE_INT, false),
+        'pop3_server_id' => array(FILTER_VALIDATE_INT, false),
+    ),
     'allowed_post' => array(
         'new_pop3_name' => FILTER_SANITIZE_STRING,
         'new_pop3_address' => FILTER_SANITIZE_STRING,

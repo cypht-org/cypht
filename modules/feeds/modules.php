@@ -545,7 +545,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
             }
             unset($input['feed_list_data']);
         }
-        $input['formatted_feed_data'] = $res;
+        $input['formatted_message_list'] = $res;
         return $input;
     }
 }

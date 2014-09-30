@@ -591,7 +591,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
 
 class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
     protected function output($input, $format) {
-        $input['formatted_mailbox_page'] = array();
+        $input['formatted_message_list'] = array();
         if (isset($input['pop3_mailbox_page'])) {
             $style = isset($input['news_list_style']) ? 'news' : 'email';
             if ($input['is_mobile']) {
@@ -604,9 +604,7 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
                 $login_time = false;
             }
             $res = format_pop3_message_list($input['pop3_mailbox_page'], $this, $style, $login_time, $input['list_path']);
-            $input['formatted_mailbox_page'] = $res;
-            Hm_Page_Cache::add('formatted_mailbox_page_'.$input['pop3_mailbox_page_path'], $res);
-            unset($input['pop3_mailbox_page']);
+            $input['formatted_message_list'] = $res;
         }
         return $input;
     }

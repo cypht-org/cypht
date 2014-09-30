@@ -149,7 +149,7 @@ class Hm_Router {
     public function process_request($config) {
         if (DEBUG_MODE) {
             $filters = array();
-            $filters = array('allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
+            $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
             $modules = explode(',', $config->get('modules', array()));
             foreach ($modules as $name) {
                 if (is_readable(sprintf("modules/%s/setup.php", $name))) {
@@ -193,7 +193,7 @@ class Hm_Router {
         $this->check_for_redirect($request, $session, $result);
 
         /* return processed data */
-        return array($result, $session);
+        return array($result, $session, $request->allowed_output);
     }
 
     private function check_for_tls($config, $request) {
@@ -354,9 +354,9 @@ class Hm_Router {
     }
 
     static public function merge_filters($existing, $new) {
-        foreach (array('allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
+        foreach (array('allowed_output', 'allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
             if (array_key_exists($v, $new)) {
-                if ($v == 'allowed_pages') {
+                if ($v == 'allowed_pages' || $v == 'allowed_output') {
                     $existing[$v] = array_merge($existing[$v], $new[$v]);
                 }
                 else {
@@ -381,6 +381,7 @@ class Hm_Request {
     public $tls = false;
     public $mobile = false;
     public $path = '';
+    public $allowed_output = array();
 
     public function __construct($filters) {
         $this->sapi = php_sapi_name();
@@ -389,6 +390,7 @@ class Hm_Request {
         $this->post = $this->filter_input(INPUT_POST, $filters['allowed_post']);
         $this->get = $this->filter_input(INPUT_GET, $filters['allowed_get']);
         $this->cookie = $this->filter_input(INPUT_COOKIE, $filters['allowed_cookie']);
+        $this->allowed_output = $filters['allowed_output'];
 
         $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
         $this->get_request_type();
@@ -535,15 +537,15 @@ abstract class HM_Format {
 
     protected $modules = false;
 
-    abstract protected function content($input, $lang_str);
+    abstract protected function content($input, $lang_str, $allowed_output);
 
-    public function format_content($input) {
+    public function format_content($input, $allowed_output) {
         $lang_strings = array();
         if (array_key_exists('language', $input)) {
             $lang_strings = $this->get_language($input['language']);
         }
         $this->modules = Hm_Output_Modules::get_for_page($input['router_page_name']);
-        $formatted = $this->content($input, $lang_strings);
+        $formatted = $this->content($input, $lang_strings, $allowed_output);
         return $formatted;
     }
 
@@ -587,20 +589,40 @@ abstract class HM_Format {
 /* JSON output format */
 class Hm_Format_JSON extends HM_Format {
 
-    public function content($input, $lang_str) {
+    public function content($input, $lang_str, $allowed_output) {
         $input['router_user_msgs'] = Hm_Msgs::get();
         $output = $this->run_modules($input, 'JSON', $lang_str);
-        if (array_key_exists('internal_users', $output)) {
-            unset($output['internal_users']);
-        }
+        $output = $this->filter_output($output, $allowed_output);
         return json_encode($output, JSON_FORCE_OBJECT);
+    }
+    private function filter_output($data, $allowed) {
+        foreach ($data as $name => $value) {
+            if (!array_key_exists($name, $allowed)) {
+                unset($data[$name]);
+            }
+            else {
+                if ($allowed[$name][1]) {
+                    $new_value = filter_var($value, $allowed[$name][0], $allowed[$name][1]);
+                }
+                else {
+                    $new_value = filter_var($value, $allowed[$name][0]);
+                }
+                if ($new_value === false && $allowed[$name] != FILTER_VALIDATE_BOOLEAN) {
+                    unset($data[$name]);
+                }
+                else {
+                    $data[$name] = $new_value;
+                }
+            }
+        }
+        return $data;
     }
 }
 
 /* HTML5 output format */
 class Hm_Format_HTML5 extends HM_Format {
 
-    public function content($input, $lang_str) {
+    public function content($input, $lang_str, $allowed_output) {
         $output = $this->run_modules($input, 'HTML5', $lang_str);
         return implode('', $output);
     }
@@ -816,7 +838,9 @@ trait Hm_Modules {
 
     public static function add_to_all_pages($module, $logged_in, $marker, $placement, $source) {
         foreach (self::$module_list as $page => $modules) {
-            self::add($page, $module, $logged_in, $marker, $placement, true, $source);
+            if (!preg_match("/^ajax_/", $page)) {
+                self::add($page, $module, $logged_in, $marker, $placement, true, $source);
+            }
         }
     }
 

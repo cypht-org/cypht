@@ -4,9 +4,7 @@ var feed_test_action = function() {
     var id = form.find('#feed_id');
     Hm_Ajax.request(
         form.serializeArray(),
-        function(res) {
-            Hm_Notices.show(res.router_user_msgs);
-        },
+        function(res) {},
         {'feed_connect': 1}
     );
 };
@@ -18,7 +16,6 @@ var feed_delete_action = function() {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            Hm_Notices.show(res.router_user_msgs);
             if (res.deleted_server_id > -1 ) {
                 reload_folders(true);
                 form.parent().remove();
@@ -45,7 +42,7 @@ var feeds_search_page_content = function(id) {
 
 var display_feeds_search_result = function(res) {
     var ids = [res.feed_server_ids];
-    var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
 };
 
 var feeds_combined_content_unread = function(id) {
@@ -63,7 +60,7 @@ var feeds_combined_content_unread = function(id) {
 
 var display_feeds_combined_unread = function(res) {
     var ids = [res.feed_server_ids];
-    var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
 };
 
 var feeds_combined_content = function(id) {
@@ -90,7 +87,7 @@ var set_combined_feeds_state = function() {
 
 var display_feeds_combined = function(res) {
     var ids = res.feed_server_ids.split(',');
-    var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
 };
 
 var feeds_combined_inbox_content= function(id) {
@@ -108,7 +105,7 @@ var feeds_combined_inbox_content= function(id) {
 
 var display_feeds_combined_inbox = function(res) {
     var ids = res.feed_server_ids.split(',');
-    var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
 };
 
 var add_feed_sources = function(callback) {
@@ -167,7 +164,7 @@ var load_feed_list = function(id) {
 
 var display_feed_list = function(res) {
     ids = [res.feed_server_ids];
-    var count = Hm_Message_List.update(ids, res.formatted_feed_data, 'feeds');
+    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
     key = 'feeds_'+res.feed_server_ids;
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');

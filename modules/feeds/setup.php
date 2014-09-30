@@ -131,7 +131,16 @@ return array(
         'ajax_feed_debug',
         'ajax_feed_status'
     ),
-
+    'allowed_output' => array(
+        'feed_connect_status' => array(FILTER_SANITIZE_STRING, false),
+        'feed_connect_time' => array(FILTER_SANITIZE_STRING, false),
+        'feed_detail_display' => array(FILTER_UNSAFE_RAW, false),
+        'feed_status_display' => array(FILTER_UNSAFE_RAW, false),
+        'feed_status_server_id' => array(FILTER_VALIDATE_INT, false),
+        'feed_server_ids' => array(FILTER_SANITIZE_STRING, false),
+        'feed_msg_headers' => array(FILTER_SANITIZE_STRING, false),
+        'feed_msg_text' => array(FILTER_SANITIZE_STRING, false),
+    ),
     'allowed_post' => array(
         'feed_id' => FILTER_VALIDATE_INT,
         'delete_feed' => FILTER_VALIDATE_INT,

@@ -101,6 +101,24 @@ return array(
         'dev',
         'search'
     ),
+    'allowed_output' => array(
+        'date' => array(FILTER_SANITIZE_STRING, false),
+        'formatted_folder_list' => array(FILTER_UNSAFE_RAW, false),
+        'router_user_msgs' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
+        'router_login_state' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'formatted_message_list' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'just_saved_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'just_forgot_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'deleted_server_id' => array(FILTER_VALIDATE_INT, false),
+        'msg_gravatar' => array(FILTER_UNSAFE_RAW, false),
+        'msg_headers' => array(FILTER_UNSAFE_RAW, false),
+        'msg_text' => array(FILTER_UNSAFE_RAW, false),
+        'msg_parts' => array(FILTER_UNSAFE_RAW, false),
+        'reply_body' => array(FILTER_SANITIZE_STRING, false),
+        'reply_subject' => array(FILTER_SANITIZE_STRING, false),
+        'reply_to' => array(FILTER_SANITIZE_STRING, false),
+
+    ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
         'hm_id' => FILTER_SANITIZE_STRING,

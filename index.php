@@ -32,11 +32,11 @@ $config = new Hm_Site_Config_File('hm3.rc');
 
 /* process request input */
 $router = new Hm_Router();
-list($response_data, $session) = $router->process_request($config);
+list($response_data, $session, $allowed_output) = $router->process_request($config);
 
 /* format response content */
 $formatter = new $response_data['router_format_name']();
-$response_str = $formatter->format_content($response_data);
+$response_str = $formatter->format_content($response_data, $allowed_output);
 
 /* output response */
 $renderer = new Hm_Output_HTTP();
