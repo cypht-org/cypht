@@ -88,7 +88,7 @@ Hm_Ajax_Request = function() { return {
     },
 
     fail: function(res) {
-        Hm_Notices.show({0: 'An error occured communicating with the server'});
+        setTimeout(function() { Hm_Notices.show({0: 'An error occured communicating with the server'}); }, 1000);
     },
 
     always: function(res) {
