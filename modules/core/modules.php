@@ -859,11 +859,19 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         }
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$this->trans('Flagged').
-            '</a> <span class="flagged_count"></span></li>'.
-            '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$this->trans('Compose').'</a></li>';
+            '</a> <span class="flagged_count"></span></li>';
 
-        $res .=  '<li><form class="logout_form" method="POST">'.
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
+class Hm_Output_logout_menu_item extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res =  '<li><form class="logout_form" method="POST">'.
             '<a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
             $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a>'.
             '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.

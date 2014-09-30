@@ -281,6 +281,19 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_compose_page_link extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$this->trans('Compose').'</a></li>';
+
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
 function smtp_server_dropdown($input, $output_mod) {
     $res = '<select name="smtp_server_id" class="compose_server">';
     if (array_key_exists('smtp_servers', $input)) {

@@ -31,6 +31,9 @@ add_handler('ajax_smtp_debug', 'save_smtp_servers', true);
 add_handler('ajax_smtp_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_smtp_debug', 'date', true, 'core');
 
+/* folder list link */
+add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'logout_menu_item', 'before');
+
 return array(
     'allowed_pages' => array(
         'ajax_smtp_debug'
