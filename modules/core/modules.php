@@ -512,7 +512,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
 
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        $title = 'HM3';
+        $title = '';
         if (array_key_exists('mailbox_list_title', $input)) {
             $title .= ' '.implode('-', array_slice($input['mailbox_list_title'], 1));
         }
@@ -813,18 +813,165 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_folder_list_content extends Hm_Output_Module {
+class Hm_Output_folder_list_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = main_menu($input, $this);
-        $res .= folder_source_menu($input, $this);
-        $res .= settings_menu($input, $this);
-        $res .= '<a href="#" onclick="return update_folder_list();" class="update_message_list">[reload]</a>';
+        if ($format == 'HTML5') {
+            return '';
+        }
+        $input['formatted_folder_list'] = '';
+        return $input;
+    }
+}
+
+class Hm_Output_main_menu_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<div class="src_name main_menu" onclick="return toggle_section(\'.main\');">Main'.
+        '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+        '</div><div class="main"><ul class="folders">';
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
+class Hm_Output_main_menu_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $email = false;
+        if (array_key_exists('folder_sources', $input) && is_array($input['folder_sources'])) {
+            if (in_array('email_folders', $input['folder_sources'])) {
+                $email = true;
+            }
+        }
+        $res = '';
+        $res .= '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).'" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
+            '<input type="text" class="search_terms" name="search_terms" placeholder="'.$this->trans('Search').'" size="14" /></form></li>'.
+            '<li class="menu_home"><a class="unread_link" href="?page=home">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$this->trans('Home').'</a></li>'.
+            '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> '.$this->trans('Everything').
+            '</a><span class="combined_inbox_count"></span></li>';
+        if ($email) {
+            $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$this->trans('Unread').'</a></li>';
+        }
+        $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$this->trans('Flagged').
+            '</a> <span class="flagged_count"></span></li>'.
+            '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$this->trans('Compose').'</a></li>';
+
+        $res .=  '<li><form class="logout_form" method="POST">'.
+            '<a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
+            $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a>'.
+            '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
+            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
+            '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
+            '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(); return false;" type="button" value="Cancel" />'.
+            '</div></form></li>';
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
+class Hm_Output_main_menu_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '</ul></div>';
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
+class Hm_Output_email_menu_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if (array_key_exists('folder_sources', $input) && is_array($input['folder_sources'])) {
+            foreach (array_unique($input['folder_sources']) as $src) {
+                $parts = explode('_', $src);
+                $name = ucfirst(strtolower($parts[0]));
+                $res .= '<div class="src_name" onclick="return toggle_section(\'.'.$this->html_safe($src).
+                    '\');">'.$this->html_safe($name).
+                    '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" /></div>';
+
+                $res .= '<div style="display: none;" ';
+                $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
+                if ($name == 'Email') {
+                    $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">'.
+                    '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> '.$this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
+                }
+                $cache = Hm_Page_Cache::get($src);
+                Hm_Page_Cache::del($src);
+                if ($cache) {
+                    $res .= $cache;
+                }
+                $res .= '</ul></div>';
+            }
+        }
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
+class Hm_Output_settings_menu_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<div class="src_name" onclick="return toggle_section(\'.settings\');">Settings'.
+            '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
+            '</div><ul style="display: none;" class="settings folders">';
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
+class Hm_Output_settings_menu_content extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).'" alt="" width="16" height="16" /> '.$this->trans('Servers').'</a></li>'.
+            '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).'" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>';
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
+class Hm_Output_settings_menu_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '</ul>';
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $input['formatted_folder_list'] .= $res;
+        return $input;
+    }
+}
+
+class Hm_Output_folder_list_content_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '<a href="#" onclick="return update_folder_list();" class="update_message_list">[reload]</a>';
         $res .= '<a href="#" onclick="return hide_folder_list();" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.'" alt="Collapse" width="16" height="16" /></a>';
         if ($format == 'HTML5') {
             return $res;
         }
-        $input['formatted_folder_list'] = $res;
+        $input['formatted_folder_list'] .= $res;
         return $input;
+
     }
 }
 
@@ -910,30 +1057,6 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
         $res = '<div class="content_title">Page Not Found!</div>';
         $res .= '<div class="empty_list"><br />Nothingness</div>';
         return $res;
-    }
-}
-
-class Hm_Output_dev_content extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<div class="dev_content"><div class="content_title">Make it your own</div></div>';
-    }
-}
-
-class Hm_Output_bug_report_form extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<div class="bug_report"><div class="content_title">Is much broken</div></div>';
-    }
-}
-
-class Hm_Output_help_content extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<div class="help_content"><div class="content_title">Let me explain</div></div>';
-    }
-}
-
-class Hm_Output_profile_content extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<div class="profile_content"><div class="content_title">Profiles</div></div>';
     }
 }
 

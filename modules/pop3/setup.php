@@ -51,10 +51,6 @@ add_handler('search', 'pop3_message_list_type', true, 'pop3', 'message_list_type
 add_handler('search', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('search', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
-/* profile page */
-add_handler('profiles', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('profiles', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-
 /* not found */
 add_handler('notfound', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('notfound', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
@@ -63,7 +59,7 @@ add_handler('notfound', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop
 add_handler('ajax_hm_folders', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
 add_handler('ajax_hm_folders', 'load_pop3_folders', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('ajax_hm_folders', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('ajax_hm_folders', 'filter_pop3_folders', true, 'pop3', 'folder_list_content', 'before');
+add_output('ajax_hm_folders', 'filter_pop3_folders', true, 'pop3', 'folder_list_content_start', 'before');
 
 /* select pop3 "folder" */
 add_handler('ajax_pop3_folder_display', 'login', false, 'core');

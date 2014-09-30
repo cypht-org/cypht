@@ -326,7 +326,6 @@ function validate_search_fld($fld) {
     return false;
 }
 
-
 function search_field_selection($current) {
     $flds = array(
         'TEXT' => 'Entire message',
@@ -345,7 +344,6 @@ function search_field_selection($current) {
     $res .= '</select>';
     return $res;
 }
-
 
 function search_form($data, $output_mod) {
     $terms = '';

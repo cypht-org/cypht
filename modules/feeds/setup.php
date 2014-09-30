@@ -38,7 +38,7 @@ add_output('settings', 'feed_limit_setting', true, 'feeds', 'feed_since_setting'
 add_handler('ajax_hm_folders', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');
 add_handler('ajax_hm_folders', 'load_feed_folders',  true, 'feeds', 'load_feeds_from_config', 'after');
 add_handler('ajax_hm_folders', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
-add_output('ajax_hm_folders', 'filter_feed_folders',  true, 'feeds', 'folder_list_content', 'before');
+add_output('ajax_hm_folders', 'filter_feed_folders',  true, 'feeds', 'folder_list_content_start', 'before');
 
 /* message action callback */
 add_handler('ajax_message_action', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');

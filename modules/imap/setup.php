@@ -25,11 +25,6 @@ add_handler('settings', 'load_imap_servers_from_config',  true, 'imap', 'load_us
 add_handler('settings', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
-/* profile page data */
-add_handler('profiles', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
-add_handler('profiles', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_output('profiles', 'imap_server_ids', true, 'imap', 'page_js', 'before');
-
 /* compose page data */
 add_handler('compose', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('compose', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
@@ -66,7 +61,7 @@ add_output('notfound', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_handler('ajax_hm_folders', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_hm_folders', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_hm_folders', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
-add_output('ajax_hm_folders', 'filter_imap_folders',  true, 'imap', 'folder_list_content', 'before');
+add_output('ajax_hm_folders', 'filter_imap_folders',  true, 'imap', 'folder_list_content_start', 'before');
 
 /* ajax server setup callback data */
 add_handler('ajax_imap_debug', 'login', false, 'core');
