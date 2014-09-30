@@ -6,6 +6,7 @@ define("DEBUG_MODE", false);
  *  $js_compress = 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type js';
  *  $js_compress = 'uglifyjs -nc --unsafe -c -v';
  */
+
 $js_compress = false;
 
 /* command that takes css from stdin and outputs compressed results
@@ -25,7 +26,7 @@ if (!empty($settings)) {
     $js = file_get_contents("third_party/zepto.min.js");
     $css = '';
     $mod_map = array();
-    $filters = array('allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
+    $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
     if (isset($settings['modules'])) {
         foreach (explode(',', $settings['modules']) as $mod) {
             printf("scanning module %s ...\n", $mod);
