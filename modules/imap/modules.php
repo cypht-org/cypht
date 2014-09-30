@@ -839,6 +839,7 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
         $reply_subject = 'Re: [No Subject]';
         $reply_to = '';
         $reply_body = '';
+        $lead_in = '';
         if (array_key_exists('reply_format', $input) && $input['reply_format']) {
             if (array_key_exists('msg_headers', $input) && is_array($input['msg_headers'])) {
                 $hdrs = $input['msg_headers'];
@@ -854,9 +855,17 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
                 elseif (array_key_exists('Return-path', $hdrs)) {
                     $reply_to = $hdrs['Return-path'];
                 }
+                if (array_key_exists('Date', $hdrs)) {
+                    if ($reply_to) {
+                        $lead_in = sprintf("On %s %s said\n", $hdrs['Date'], $reply_to);
+                    }
+                    else {
+                        $lead_in = sprintf("On %s, somebody said\n", $hdrs['Date']);
+                    }
+                }
             }
             if (array_key_exists('msg_text', $input)) {
-                $reply_body = format_reply_text($input['msg_text']);
+                $reply_body = $lead_in.format_reply_text($input['msg_text']);
             }
             $input['reply_to'] = $reply_to;
             $input['reply_body'] = $reply_body;
@@ -919,6 +928,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $subject = $msg['subject'];
         $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
         $from = str_replace('"', '', $from);
+        if (!trim($from) && $style == 'email') {
+            $from = '[No From]';
+        }
         $timestamp = strtotime($msg['internal_date']);
         $date = human_readable_interval($msg['internal_date']);
         $flags = array();

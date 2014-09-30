@@ -185,12 +185,6 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
                 '</tr>', str_replace(' ', '-', $id));
         }
         else {
-            if ($from == '[No From]') {
-                $from = '';
-            }
-            else {
-                $from .= ' - ';
-            }
             return array(
                 '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
                     '<td class="news_cell checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.

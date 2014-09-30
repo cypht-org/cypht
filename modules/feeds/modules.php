@@ -534,8 +534,11 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     elseif (isset($item['dc:creator'])) {
                         $from = display_value('dc:creator', $item, 'from');
                     }
-                    else {
+                    elseif ($style == 'email') {
                         $from = '[No From]';
+                    }
+                    else {
+                        $from = '';
                     }
                     $res[$id] = message_list_row($item['title'], $date, $timestamp, $from, $item['server_name'], $id, $flags, $style, $url, $this);
                 }

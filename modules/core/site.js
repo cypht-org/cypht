@@ -381,19 +381,19 @@ var Hm_Message_List = {
         var count = 0;
         if (hm_list_path == 'unread') {
             count = $('.message_table tbody tr').length;
-            document.title = 'HM3 '+count+' Unread';
+            document.title = count+' Unread';
         }
         else if (hm_list_path == 'flagged') {
             count = $('.message_table tbody tr').length;
-            document.title = 'HM3 '+count+' Flagged';
+            document.title = count+' Flagged';
         }
         else if (hm_list_path == 'combined_inbox') {
             count = $('.unseen', $('.message_table tbody')).length;
-            document.title = 'HM3 '+count+' New in Everything';
+            document.title = count+' New in Everything';
         }
         else if (hm_list_path == 'feeds') {
             count = $('.unseen', $('.message_table tbody')).length;
-            document.title = 'HM3 '+count+' New in Feeds';
+            document.title = count+' New in Feeds';
         }
     }
 };
@@ -697,7 +697,6 @@ var toggle_long_headers = function() {
     $('.header_toggle').toggle();
     return false;
 };
-
 
 var folder_list = get_from_local_storage('formatted_folder_list');
 

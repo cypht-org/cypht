@@ -687,6 +687,9 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         $id = sprintf("pop3_%s_%s", $msg['server_id'], $msg_id);
         $subject = display_value('subject', $msg);;
         $from = display_value('from', $msg);
+        if ($style == 'email' && !$from) {
+            $from = '[No From]';
+        }
         $date = display_value('date', $msg);
         $timestamp = display_value('date', $msg, 'time');
         $url = '?page=message&uid='.$msg_id.'&list_path='.sprintf('pop3_%d', $msg['server_id']).'&list_parent='.$list_parent;

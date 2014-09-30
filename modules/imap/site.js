@@ -269,7 +269,7 @@ var display_msg_content = function(res) {
     $('.msg_text').append(res.msg_text);
     $('.msg_text').append(res.msg_parts);
     set_message_content();
-    document.title = 'HM3 '+$('.header_subject th').text();
+    document.title = $('.header_subject th').text();
     imap_message_view_finished();
 };
 
@@ -309,7 +309,7 @@ var setup_message_view_page = function() {
     }
     else {
         $('.msg_text').html(msg_content);
-        document.title = 'HM3 '+$('.header_subject th').text();
+        document.title = $('.header_subject th').text();
         imap_message_view_finished();
     }
 };
@@ -377,6 +377,7 @@ var display_reply_content = function(res) {
     $('.compose_body').text(res.reply_body);
     $('.compose_subject').val(res.reply_subject);
     $('.compose_to').val(res.reply_to);
+    document.title = res.reply_subject;
 }
 
 /* setup */
