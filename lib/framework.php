@@ -1222,14 +1222,18 @@ class Hm_Image_Sources {
     public static $info = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAKtJREFUOI2l0k0OAUEQBeAvIsSSC1g5gI3gDiJxMpKJcAMXcCc/i2Frw0KJCYaZ8ZJKv3TVe13dXfzGDEccMC1Q/4YjrhH712StgME1hxfGNE7eYVLFoDSaSJDijDkaZQwSz0d7xLyMQRqiAYbB07zi+oe9dob3Y72U6SCLbXSwqCIehfiCbhWDTRisq4jhFAa9b0XfRvmR62Dsx298wsqf89DC0v0qqZyJvAEWoivRGHfiuQAAAABJRU5ErkJggg==';
     public static $bug = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAPpJREFUOI2Vkr9rwlAQxz/RKHXwDyid3Nu5f4K7QwYFESw4OXUt9M8qlNbVTg4qGCh0c7ODQ6HQahx6Lz4v90I9OMjLfX9dXqBYEfAIfAIb4MHAlNY9kKkenyOwNgTeywiR91wF9obAV4hcARbSiZCfDdyTYLtACkz94dRzWkpcnSAFVt75VadIgLlB1D0DOmrtvEb/EBhYxI8A+Bq4DczeHDkGfg3RnXyP2HKU+UlFIuQcnGisnL81scLf3fcDSSznnvDySinuGErgX3fTJbiUF3cc/7jMcN8CQzG8Aupu0OB4rx3gB3jxiBMRbntrX5TteaMANaAVAh8AR6Jp1Y4VfDEAAAAASUVORK5CYII=';
     public static $code = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAFVJREFUOI3VjjESwCAIBHf8mD5dX6aNRQYhelbJlRzsAn9JATpQbwF1AsqNwXYu7M1gu0Wm2F2oYl/AyTl6LmWgBd9pb+46O4igYWeHkv3IoGRr+FYGqUEz6slPFcwAAAAASUVORK5CYII=';
+    public static $person = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAMBJREFUOI2l0kFqAkEQheFPF1GzCXqMGLyB5BbZeAsXXkYSsoggZBeIeAcZdBWv4QSi7pLFtBDGsW30wdsUr/6upopqdfCK7+AXtE9kj9TEEr8lZ2ikAEYVzQcPUwCrCCBLAewjgF05XE8hxlQFWEfyXymASQTwdm4iilVljv+/wE0KgOJonpFjgzHuYg09zEPDUyQ3UFzmDN1D8SEU/487RR8t3OIR76VMjnv4dHrv5/xRwza8dIl+aoF0sa6+xD/4h0vlxe5JGQAAAABJRU5ErkJggg==';
+    public static $rss = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAASdJREFUOI2V000rRGEYxvHfTJpZUPbY4kPITqyYUqTYoGTHpxBl6SOwkp1PMCt5KzbKLBDlrWy8ZGYzFu7pPKZpGnedOv/rPPd1nus+58nJqoY3VHCEQ5RR12HVW1wVLCPfiUEBfRjDBm4SoxMMdbqTRuUxi9swecdEu4Ya7nCABRRD78ZumNTamTTnf4gdNGo72UnLOAUMYgVnidGObIh7oR3rYLBL+ExMoCdi1rHY3PCNU6zL8o8kJjOhzQVfI5capPkv0R/6cmj3ETMv+zKjqUE3JnEVDy+iIYfz0OZj7WbwVqvsvYnJWmirwfvB48FlmMYrXlCKBVOyPxCGg2+CB4IfRXMj+3Ms6An+Ci4GV5u5y9/T1rj/8HfC1XZcijc/+R3iv+oHjPVkYOSl2fQAAAAASUVORK5CYII=';
 }
 
 function handler_source($source) {
     Hm_Handler_Modules::set_source($source);
 }
+
 function output_source($source) {
     Hm_Output_Modules::set_source($source);
 }
+
 function replace_module($type, $target, $replacement, $page=false) {
     if ($type == 'handler') {
         Hm_Handler_Modules::replace($target, $replacement, $page);
@@ -1238,12 +1242,14 @@ function replace_module($type, $target, $replacement, $page=false) {
         Hm_Output_Modules::replace($target, $replacement, $page);
     }
 }
+
 function add_handler($page, $mod, $logged_in, $source=false, $marker=false, $placement='after', $queue=true) {
     Hm_Handler_Modules::add($page, $mod, $logged_in, $marker, $placement, $queue, $source);
 }
 function add_output($page, $mod, $logged_in, $source=false, $marker=false, $placement='after', $queue=true) {
     Hm_Output_Modules::add($page, $mod, $logged_in, $marker, $placement, $queue, $source);
 }
+
 function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='') {
     if ($request->tls) {
         $secure = true;
@@ -1252,6 +1258,39 @@ function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='
         $secure = false;
     }
     setcookie($name, $value, $lifetime, $path, $domain, $secure);
+}
+
+function setup_base_page($name, $source=false) {
+    add_handler($name, 'create_user', false, $source);
+    add_handler($name, 'login', false, $source);
+    add_handler($name, 'load_user_data', true, $source);
+    add_handler($name, 'default_page_data', true, $source);
+    add_handler($name, 'message_list_type', true);
+    add_handler($name, 'language',  true, $source);
+    add_handler($name, 'process_search_terms', true, $source);
+    add_handler($name, 'title', true, $source);
+    add_handler($name, 'date', true, $source);
+    add_handler($name, 'save_user_data', true, $source);
+    add_handler($name, 'logout', true, $source);
+    add_handler($name, 'http_headers', true, $source);
+    add_output($name, 'header_start', false, $source);
+    add_output($name, 'js_data', true, $source);
+    add_output($name, 'header_css', false, $source);
+    add_output($name, 'header_content', false, $source);
+    add_output($name, 'header_end', false, $source);
+    add_output($name, 'content_start', false, $source);
+    add_output($name, 'login', false, $source);
+    add_output($name, 'two_col_layout_start', true, $source);
+    add_output($name, 'loading_icon', true, $source);
+    add_output($name, 'date', true, $source);
+    add_output($name, 'msgs', false, $source);
+    add_output($name, 'folder_list_start', true, $source);
+    add_output($name, 'folder_list_end', true, $source);
+    add_output($name, 'content_section_start', true, $source);
+    add_output($name, 'content_section_end', true, $source);
+    add_output($name, 'two_col_layout_end', true, $source);
+    add_output($name, 'page_js', true, $source);
+    add_output($name, 'content_end', true, $source);
 }
 
 ?>
