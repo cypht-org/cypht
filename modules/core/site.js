@@ -554,7 +554,7 @@ var reload_folders = function(force) {
 };
 
 var save_to_local_storage = function(key, val) {
-    if (typeof(Storage) !== "undefined") {
+    if (Storage !== void(0)) {
         sessionStorage.setItem(key, val);
     }
     return false;
