@@ -809,9 +809,17 @@ trait Hm_Modules {
     public static function load($mod_list) {
         self::$module_list = $mod_list;
     }
+
     public static function set_source($source) {
         self::$source = $source;
     }
+
+    public static function add_to_all_pages($module, $logged_in, $marker, $placement, $source) {
+        foreach (self::$module_list as $page => $modules) {
+            self::add($page, $module, $logged_in, $marker, $placement, true, $source);
+        }
+    }
+
     public static function add($page, $module, $logged_in, $marker=false, $placement='after', $queue=true, $source=false) {
         $inserted = false;
         if (!array_key_exists($page, self::$module_list)) {
@@ -1224,6 +1232,7 @@ class Hm_Image_Sources {
     public static $code = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAFVJREFUOI3VjjESwCAIBHf8mD5dX6aNRQYhelbJlRzsAn9JATpQbwF1AsqNwXYu7M1gu0Wm2F2oYl/AyTl6LmWgBd9pb+46O4igYWeHkv3IoGRr+FYGqUEz6slPFcwAAAAASUVORK5CYII=';
     public static $person = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAMBJREFUOI2l0kFqAkEQheFPF1GzCXqMGLyB5BbZeAsXXkYSsoggZBeIeAcZdBWv4QSi7pLFtBDGsW30wdsUr/6upopqdfCK7+AXtE9kj9TEEr8lZ2ikAEYVzQcPUwCrCCBLAewjgF05XE8hxlQFWEfyXymASQTwdm4iilVljv+/wE0KgOJonpFjgzHuYg09zEPDUyQ3UFzmDN1D8SEU/487RR8t3OIR76VMjnv4dHrv5/xRwza8dIl+aoF0sa6+xD/4h0vlxe5JGQAAAABJRU5ErkJggg==';
     public static $rss = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAASdJREFUOI2V000rRGEYxvHfTJpZUPbY4kPITqyYUqTYoGTHpxBl6SOwkp1PMCt5KzbKLBDlrWy8ZGYzFu7pPKZpGnedOv/rPPd1nus+58nJqoY3VHCEQ5RR12HVW1wVLCPfiUEBfRjDBm4SoxMMdbqTRuUxi9swecdEu4Ya7nCABRRD78ZumNTamTTnf4gdNGo72UnLOAUMYgVnidGObIh7oR3rYLBL+ExMoCdi1rHY3PCNU6zL8o8kJjOhzQVfI5capPkv0R/6cmj3ETMv+zKjqUE3JnEVDy+iIYfz0OZj7WbwVqvsvYnJWmirwfvB48FlmMYrXlCKBVOyPxCGg2+CB4IfRXMj+3Ms6An+Ci4GV5u5y9/T1rj/8HfC1XZcijc/+R3iv+oHjPVkYOSl2fQAAAAASUVORK5CYII=';
+    public static $rss_alt = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAPxJREFUOI2d0b0uRFEUhuFnpjAo9BKVn4JGxC2IC0AE94PET6iFRE0ltK5AI9QmRkk1MhkxJhnF7JOcrJzDZHaymnd/+81aa1fQRROveMQ97vBpwNMrqDYuMDesIKsfHGJ0WEFWz5gpE4xgEivYxUuJ5B2Lg4xUxQbqJZLp+KCj/wPX2EkdwTguCyRPwk5i4A3rufu9gszBX4KsTlFJmdhJB7P/CXo4yY0Td3KeCWpYwhG+CiRrKbcZeBsTwllAIwQb+outFnSxBS3cpseZJHayne72Az/L76CJ+RQ8DsGrxFcDf4hLvEnB5cDriU8F/hEFrRQcC/w78Vrg3V/3bJgjGmgApwAAAABJRU5ErkJggg==';
 }
 
 function handler_source($source) {
@@ -1249,6 +1258,14 @@ function add_handler($page, $mod, $logged_in, $source=false, $marker=false, $pla
 function add_output($page, $mod, $logged_in, $source=false, $marker=false, $placement='after', $queue=true) {
     Hm_Output_Modules::add($page, $mod, $logged_in, $marker, $placement, $queue, $source);
 }
+function add_module_to_all_pages($type, $mod, $logged_in, $source, $marker, $placement) {
+    if ($type == 'output') {
+        Hm_Output_Modules::add_to_all_pages($mod, $logged_in, $marker, $placement, $source);
+    }
+    elseif ( $type == 'handler') {
+        Hm_Handler_Modules::add_to_all_pages($mod, $logged_in, $marker, $placement, $source);
+    }
+}
 
 function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='') {
     if ($request->tls) {
@@ -1267,7 +1284,6 @@ function setup_base_page($name, $source=false) {
     add_handler($name, 'default_page_data', true, $source);
     add_handler($name, 'message_list_type', true);
     add_handler($name, 'language',  true, $source);
-    add_handler($name, 'process_search_terms', true, $source);
     add_handler($name, 'title', true, $source);
     add_handler($name, 'date', true, $source);
     add_handler($name, 'save_user_data', true, $source);
