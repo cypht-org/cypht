@@ -492,12 +492,12 @@ var prev_next_links = function(cache, class_name) {
     }
     if (prev.length) {
         href = prev.find('.subject').find('a').prop('href');
-        plink = '<a class="plink" href="'+href+'"><img class="prevnext" src="images/open_iconic/arrow-circle-top-2x.png" width="16" height="16" /> '+prev.find('.subject').text()+'</a>';
+        plink = '<a class="plink" href="'+href+'"><div class="prevnext prev_img"></div> '+prev.find('.subject').text()+'</a>';
         $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
     }
     if (next.length) {
         href = next.find('.subject').find('a').prop('href');
-        nlink = '<a class="nlink" href="'+href+'"><img class="prevnext" src="images/open_iconic/arrow-circle-bottom-2x.png" width="16" height="16" /> '+next.find('.subject').text()+'</a>';
+        nlink = '<a class="nlink" href="'+href+'"><div class="prevnext next_img"></div> '+next.find('.subject').text()+'</a>';
         $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
     }
 };
