@@ -105,7 +105,7 @@ function search_form($data, $output_mod) {
         ' <input type="text" class="search_terms" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
         ' '.search_field_selection($data['search_fld']).
         ' '.message_since_dropdown($data['search_since'], 'search_since').
-        ' <input type="submit" class="search_update" value="Go!" /></form></div>';
+        ' <input type="submit" class="search_update" value="Update" /></form></div>';
     return $res;
 }
 

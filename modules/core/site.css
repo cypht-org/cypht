@@ -19,7 +19,7 @@ td { vertical-align: top; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
 .logout:hover { background-color: #eee; }
 .logout { cursor: pointer; background: #fff font-size: 100%; }
-.search_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
+.profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { width: 100%; white-space: nowrap; padding-left: 25px; }
 .user_settings table td { vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 0px; color: #666; }
 .save_settings { float: left !important; }
@@ -94,9 +94,6 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .list_meta { letter-spacing: 0px; display: inline; color: #999 !important; font-size: 70% !important; vertical-align: 1px; font-style: normal; margin-left: 20px; }
 .list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ccc; opacity: 1; padding-top: 100px; text-align: center; }
-.search_form { font-size: 80%; color: #999; display: inline; padding-left: 15px; }
-.search_form input, .search_form select { margin-right: 10px; margin-left: 3px; }
-.search_terms { padding-left: 5px; }
 .hide_folders { float: left; clear: none; margin-top: 10px; margin-left: 23px; }
 .hide_folders img { opacity: .4; }
 .section_caret { opacity: .15; vertical-align: 4px; padding-right: 10px; }
