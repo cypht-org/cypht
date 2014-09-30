@@ -559,7 +559,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
             foreach ($input['feed_folders'] as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
                     '<a href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">'.
-                    '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
+                    '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
