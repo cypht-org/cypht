@@ -112,7 +112,7 @@ var display_pop3_message = function(res) {
     $('.msg_text').append(res.msg_headers);
     $('.msg_text').append(res.msg_text);
     set_message_content();
-    document.title = 'HM3 '+$('.header_subject th').text();
+    document.title = $('.header_subject th').text();
     pop3_message_view_finished();
 };
 
