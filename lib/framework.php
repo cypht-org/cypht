@@ -178,7 +178,7 @@ class Hm_Router {
         $this->get_page($request, $filters['allowed_pages']);
 
         /* load processing modules for this page */
-        $this->load_modules($config, $handler_mods, $output_mods);
+        $this->load_module_sets($config, $handler_mods, $output_mods);
 
         /* run all the handler modules for a page and merge in some standard results */
         $result = $this->merge_response($this->process_page($request, $session, $config), $config, $request, $session);
@@ -242,25 +242,20 @@ class Hm_Router {
         return array_unique(array_values(array_map(function($v) { return $v[0]; }, $mod_list)));
     }
 
-    private function load_modules($config, $handlers=array(), $output=array()) {
-
-        foreach ($handlers as $page => $modlist) {
+    private function load_modules($class, $module_sets) {
+        foreach ($module_sets as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
                 if ($this->page == $page) {
-                    Hm_Handler_Modules::add($page, $name, $vals[1], false, 'after', true, $vals[0]);
+                    $class::add($page, $name, $vals[1], false, 'after', true, $vals[0]);
                 }
             }
         }
-        Hm_Handler_Modules::try_queued_modules();
+        $class::try_queued_modules();
+    }
+    private function load_module_sets($config, $handlers=array(), $output=array()) {
 
-        foreach ($output as $page => $modlist) {
-            foreach ($modlist as $name => $vals) {
-                if ($this->page == $page) {
-                    Hm_Output_Modules::add($page, $name, $vals[1], false, 'after', true, $vals[0]);
-                }
-            }
-        }
-        Hm_Output_Modules::try_queued_modules();
+        $this->load_modules('Hm_Handler_Modules', $handlers);
+        $this->load_modules('Hm_Output_Modules', $output);
         $active_mods = array_unique(array_merge($this->get_active_mods(Hm_Output_Modules::get_for_page($this->page)),
             $this->get_active_mods(Hm_Handler_Modules::get_for_page($this->page))));
 
@@ -656,28 +651,6 @@ class Hm_Output_HTTP extends Hm_Output {
         $this->output_headers($headers);
         ob_end_clean();
         echo $content;
-    }
-}
-
-/* STDOUT output class */
-class Hm_Output_STDOUT extends Hm_Output {
-
-    protected function output_content($content) {
-        $stdout = fopen('php://stdout', 'w');
-        fwrite($stdout, $content);
-        fclose($stdout);
-    }
-}
-
-/* file output class */
-class Hm_Output_File extends Hm_Output {
-
-    public $filename = 'test.out';
-
-    protected function output_content($content) {
-        $fh = fopen($this->filename, 'a');
-        fwrite($fh, $content);
-        fclose($fh);
     }
 }
 
