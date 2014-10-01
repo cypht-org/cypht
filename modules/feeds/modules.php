@@ -465,7 +465,6 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
             $input['feed_message_content'] = str_replace(array('<', '>', '&ldquo;'), array(' <', '> ', ' &ldquo;'), $input['feed_message_content']);
             $txt = '<div class="msg_text_inner">'.format_msg_html($input['feed_message_content']).'</div>';
             $input['feed_msg_text'] = $txt;
-            error_log($txt);
             $input['feed_msg_headers'] = $header_str;
         }
         return $input;
