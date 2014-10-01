@@ -138,8 +138,8 @@ return array(
         'feed_status_display' => array(FILTER_UNSAFE_RAW, false),
         'feed_status_server_id' => array(FILTER_VALIDATE_INT, false),
         'feed_server_ids' => array(FILTER_SANITIZE_STRING, false),
-        'feed_msg_headers' => array(FILTER_SANITIZE_STRING, false),
-        'feed_msg_text' => array(FILTER_SANITIZE_STRING, false),
+        'feed_msg_headers' => array(FILTER_UNSAFE_RAW, false),
+        'feed_msg_text' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_post' => array(
         'feed_id' => FILTER_VALIDATE_INT,
