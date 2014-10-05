@@ -311,6 +311,7 @@ var imap_message_view_finished = function() {
             prev_next_links('formatted_flagged_data', class_name);
         }
     }
+    track_read_messages(class_name);
 };
 
 var add_imap_sources = function(callback) {

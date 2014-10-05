@@ -373,8 +373,23 @@ var Hm_Message_List = {
         var data = get_from_local_storage(cache_name);
         if (data && data.length) {
             $('.message_table tbody').html(data);
+            if (cache_name == 'formatted_unread_data') {
+                Hm_Message_List.clear_read_messages();
+            }
         }
         Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
+    },
+
+    clear_read_messages: function() {
+        var class_name;
+        var list = get_from_local_storage('read_message_list');
+        if (list && list.length) {
+            list = JSON.parse(list);
+            for (class_name in list) {
+                $('.'+class_name).remove();
+            }
+            save_to_local_storage('read_message_list', '');
+        }
     },
 
     update_title: function() {
@@ -685,6 +700,18 @@ var check_empty_list = function() {
     return count == 0;
 };
 
+var track_read_messages = function(class_name) {
+    var read_messages = get_from_local_storage('read_message_list');
+    if (read_messages && read_messages.length) {
+        read_messages = JSON.parse(read_messages);
+    }
+    else {
+        read_messages = {};
+    }
+    read_messages[class_name] = 1;
+    save_to_local_storage('read_message_list', JSON.stringify(read_messages));
+};
+
 var toggle_rows = function() {
     $('input[type=checkbox]').each(function () { this.checked = !this.checked; });
     Hm_Message_List.toggle_msg_controls();
@@ -731,7 +758,6 @@ $(function() {
     else if (hm_page_name == 'settings' || hm_page_name == 'servers') {
         reload_folders();
     }
-    Hm_Timer.fire();
 
     if ($('.sys_messages').text().length) {
         $('.sys_messages').show();
@@ -740,4 +766,6 @@ $(function() {
             $('.sys_messages').html('');
         });
     }
+
+    Hm_Timer.fire();
 });
