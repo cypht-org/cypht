@@ -25,7 +25,6 @@ date_default_timezone_set( 'UTC' );
 /* get includes */
 require 'lib/framework.php';
 require 'lib/session.php';
-require 'third_party/pbkdf2.php';
 
 /* get configuration */
 $config = new Hm_Site_Config_File('hm3.rc');
