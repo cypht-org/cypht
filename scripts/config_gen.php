@@ -2,18 +2,6 @@
 
 define("DEBUG_MODE", false);
 
-/* command that takes js from stdin and outputs compressed results
- *  $js_compress = 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type js';
- *  $js_compress = 'uglifyjs -nc --unsafe -c -v';
- */
-
-$js_compress = false;
-
-/* command that takes css from stdin and outputs compressed results
- *  $css_compress = 'java -jar /usr/local/lib/yuicompressor-2.4.8.jar --type css';
- */
-$css_compress = false;
-
 require 'lib/framework.php';
 
 $options = getopt('', array('ini_file::', 'debug'));
@@ -26,6 +14,14 @@ if (!empty($settings)) {
     $js = file_get_contents("third_party/zepto.min.js");
     $css = '';
     $mod_map = array();
+    $js_compress = false;
+    $css_compress = false;
+    if (isset($settings['js_compress']) && $settings['js_compress']) {
+        $js_compress = $settings['js_compress'];
+    }
+    if (isset($settings['css_compress']) && $settings['css_compress']) {
+        $css_compress = $settings['css_compress'];
+    }
     $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
     if (isset($settings['modules'])) {
         foreach (explode(',', $settings['modules']) as $mod) {
@@ -42,11 +38,11 @@ if (!empty($settings)) {
         }
     }
     if ($css) {
-        file_put_contents('site.css', compress($css, 'css'));
+        file_put_contents('site.css', compress($css, $css_compress));
         printf("site.css file created\n");
     }
     if ($js) {
-        file_put_contents('site.js', compress($js, 'js'));
+        file_put_contents('site.js', compress($js, $js_compress));
         printf("site.js file created\n");
     }
     $settings['handler_modules'] = Hm_Handler_Modules::dump();
@@ -64,17 +60,10 @@ else {
     printf("\ncould not find hm3.ini file\n");
 }
 
-function compress($string, $type) {
+function compress($string, $command) {
 
-    global $js_compress;
-    global $css_compress;
-
-    if ($type == 'js' && $js_compress) {
-        exec("echo ".escapeshellarg($string)." | $js_compress", $output);
-        return join('', $output);
-    }
-    elseif ($type == 'css' && $css_compress) {
-        exec("echo ".escapeshellarg($string)." | $css_compress", $output);
+    if ($command) {
+        exec("echo ".escapeshellarg($string)." | $command", $output);
         return join('', $output);
     }
     else {
