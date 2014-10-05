@@ -4,6 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 abstract class Hm_Auth {
     protected $site_config = false;
+    public $internal_users = false;
 
     public function __construct($config) {
         $this->site_config = $config;
@@ -90,6 +91,8 @@ class Hm_Auth_IMAP extends Hm_Auth {
 }
 
 class Hm_Auth_DB extends Hm_Auth {
+    public $internal_users = true;
+
     public function check_credentials($user, $pass) {
         if ($this->connect()) {
             $sql = $this->dbh->prepare("select hash from hm_user where username = ?");
@@ -165,6 +168,7 @@ abstract class Hm_Session {
     public function __construct($config, $auth_type='Hm_Auth_DB') {
         $this->site_config = $config;
         $this->auth_mech = new $auth_type($config);
+        $this->internal_users = $this->auth_mech->internal_users;
     }
 
     protected function just_started() {
