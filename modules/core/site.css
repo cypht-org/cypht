@@ -56,6 +56,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 
 .src_name { max-height: 25px; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
 .content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 10px; padding-top: 5px; letter-spacing: -1px; font-size: 125%; padding-left: 30px; }
+.server_section { cursor: pointer; max-height: 25px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }

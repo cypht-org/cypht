@@ -437,6 +437,12 @@ class Hm_Output_login extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_server_content_start extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '<div class="content_title">'.$this->trans('Servers').'</div>';
+    }
+}
+
 class Hm_Output_date extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="date">'.$this->html_safe($input['date']).'</div>';

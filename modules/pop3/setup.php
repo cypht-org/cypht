@@ -27,7 +27,7 @@ add_handler('servers', 'load_pop3_servers_from_config', true, 'pop3', 'language'
 add_handler('servers', 'process_add_pop3_server', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('servers', 'add_pop3_servers_to_page_data', true, 'pop3', 'process_add_pop3_server', 'after');
 add_handler('servers', 'save_pop3_servers', true, 'pop3', 'add_pop3_servers_to_page_data', 'after');
-add_output('servers', 'add_pop3_server_dialog', true, 'pop3', 'content_section_start', 'after');
+add_output('servers', 'add_pop3_server_dialog', true, 'pop3', 'server_content_start', 'after');
 add_output('servers', 'display_configured_pop3_servers', true, 'pop3', 'add_pop3_server_dialog', 'after');
 
 /* settings page */

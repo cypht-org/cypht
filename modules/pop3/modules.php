@@ -453,7 +453,7 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
             $count = 0;
         }
         $count = sprintf($this->trans('%d configured'), $count);
-        return '<div class="pop3_server_setup"><div onclick="return toggle_server_section(\'.pop3_section\');" class="content_title">'.
+        return '<div class="pop3_server_setup"><div onclick="return toggle_server_section(\'.pop3_section\');" class="server_section">'.
             '<img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
            ' POP3 Servers <div class="server_count">'.$count.'</div></div><div class="pop3_section"><form class="add_server" method="POST">'.
             '<div class="subtitle">Add a POP3 Server</div><input type="hidden" name="hm_nonce" value="'.$this->build_nonce( 'add_pop3_server' ).'" />'.

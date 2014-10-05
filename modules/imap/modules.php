@@ -646,7 +646,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             $count = 0;
         }
         $count = $this->trans(sprintf('%d configured', $count));
-        return '<div class="imap_server_setup"><div onclick="return toggle_server_section(\'.imap_section\')" class="content_title">'.
+        return '<div class="imap_server_setup"><div onclick="return toggle_server_section(\'.imap_section\')" class="server_section">'.
             '<img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
            ' IMAP Servers <div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_imap_server').'"/>'.

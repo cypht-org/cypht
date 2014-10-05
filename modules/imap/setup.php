@@ -16,7 +16,7 @@ add_handler('servers', 'load_imap_servers_from_config',  true, 'imap', 'load_use
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('servers', 'add_imap_servers_to_page_data', true, 'imap', 'process_add_imap_server', 'after');
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
-add_output('servers', 'add_imap_server_dialog', true, 'imap', 'content_section_start', 'after');
+add_output('servers', 'add_imap_server_dialog', true, 'imap', 'server_content_start', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap_server_dialog', 'after');
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 

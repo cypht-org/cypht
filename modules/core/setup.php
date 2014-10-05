@@ -12,6 +12,7 @@ add_output('home', 'server_status_end', true, 'core', 'server_status_start', 'af
 
 /* servers page */
 setup_base_page('servers');
+add_output('servers', 'server_content_start', true, 'core', 'content_section_start', 'after');
 
 /* compose */
 setup_base_page('compose');
