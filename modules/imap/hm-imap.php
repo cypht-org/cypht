@@ -2,61 +2,6 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-/* IMAP authentication */
-trait Hm_IMAP_Auth {
-
-    private $imap_settings = array();
-
-    public function auth($user, $pass) {
-        if (!class_exists('Hm_IMAP')) {
-            require 'lib/hm-imap.php';
-        }
-        $imap = new Hm_IMAP();
-        list($server, $port, $tls) = $this->get_imap_config();
-        if ($user && $pass && $server && $port) {
-            $this->imap_settings = array(
-                'server' => $server,
-                'port' => $port,
-                'tls' => $tls,
-                'username' => $user,
-                'password' => $pass,
-                'no_caps' => true,
-                'blacklisted_extensions' => array('enable')
-            );
-            $imap->connect($this->imap_settings);
-        }
-        if ($imap->get_state() == 'authenticated') {
-            return true;
-        }
-        else {
-            Hm_Msgs::add("Invalid username or password");
-        }
-        return false;
-    }
-    private function get_imap_config() {
-        $server = $this->site_config->get('imap_auth_server', false);
-        $port = $this->site_config->get('imap_auth_port', false);
-        $tls = $this->site_config->get('imap_auth_tls', false);
-        return array($server, $port, $tls);
-    }
-    protected function just_started() {
-        $this->set('login_time', time());
-        $this->set('imap_auth_server_settings', $this->imap_settings);
-    }
-}
-
-/* persistant storage with vanilla PHP sessions and IMAP based authentication */
-class Hm_PHP_Session_IMAP_Auth extends Hm_PHP_Session_DB_Auth {
-    public $internal_users = false;
-    use Hm_IMAP_Auth;
-}
-
-/* persistant storage with custom DB sessions and IMAP based authentication */
-class Hm_DB_Session_IMAP_Auth extends Hm_DB_Session_DB_Auth {
-    public $internal_users = false;
-    use Hm_IMAP_Auth;
-}
-
 /* imap connection manager */
 class Hm_IMAP_List {
     

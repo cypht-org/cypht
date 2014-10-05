@@ -2,188 +2,95 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-/* persistant storage between pages, abstract interface */
-abstract class Hm_Session {
-
-    public $active = false;
-    public $loaded = false;
-    public $internal_users = false;
-
-    protected $enc_key = '';
-    protected $data = array();
-    protected $cname = false;
+abstract class Hm_Auth {
     protected $site_config = false;
-
-    abstract protected function check($request);
-    abstract protected function start($request);
-    abstract protected function just_started();
-    abstract protected function check_fingerprint($request);
-    abstract protected function set_fingerprint($request);
-    abstract protected function auth($user, $pass);
-    abstract protected function get($name, $default=false);
-    abstract protected function set($name, $value);
-    abstract protected function del($name);
-    abstract protected function is_active();
-    abstract protected function record_unsaved($value);
-    abstract protected function end();
-    abstract protected function destroy($request);
-}
-
-/* session persistant storage with vanilla PHP sessions and no local authentication */
-class Hm_PHP_Session extends Hm_Session {
-
-    protected $cname = 'PHPSESSID';
 
     public function __construct($config) {
         $this->site_config = $config;
     }
-    protected function just_started() {
-        $this->set('login_time', time());
-    }
+    abstract public function check_credentials($user, $pass);
+}
 
-    protected function check_fingerprint($request) {
-        $id = $this->build_fingerprint($request);
-        $fingerprint = $this->get('fingerprint', false);
-        if (!$fingerprint || $fingerprint !== $id) {
-            $this->end();
-        }
-    }
-    private function build_fingerprint($request) {
-        $env = $request->server;
-        $id = '';
-        $id .= (array_key_exists('REMOTE_ADDR', $env)) ? $env['REMOTE_ADDR'] : '';
-        $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
-        $id .= (array_key_exists('REQUEST_SCHEME', $env)) ? $env['REQUEST_SCHEME'] : '';
-        $id .= (array_key_exists('HTTP_ACCEPT_LANGUAGE', $env)) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
-        $id .= (array_key_exists('HTTP_ACCEPT_CHARSET', $env)) ? $env['HTTP_ACCEPT_CHARSET'] : '';
-        $id .= (array_key_exists('HTTP_HOST', $env)) ? $env['HTTP_HOST'] : '';
-        return hash('sha256', $id);
-    }
-
-    protected function set_fingerprint($request) {
-        $id = $this->build_fingerprint($request);
-        $this->set('fingerprint', $id);
-    }
-
-    protected function ciphertext($data) {
-        return Hm_Crypt::ciphertext(serialize($data), $this->enc_key);
-    }
-    protected function plaintext($data) {
-        return @unserialize(Hm_Crypt::plaintext($data, $this->enc_key));
-    }
-    protected function set_key($request) {
-        if (array_key_exists('hm_id', $request->cookie)) {
-            $this->enc_key = $request->cookie['hm_id'];
-        }
-        else {
-            $this->enc_key = base64_encode(openssl_random_pseudo_bytes(128));
-            secure_cookie($request, 'hm_id', $this->enc_key);
-        }
-    }
-
-    public function check($request) {
-        $this->set_key($request);
-        if (array_key_exists($this->cname, $request->cookie)) {
-            $this->start($request);
-            $this->check_fingerprint($request);
-        }
-        else {
-            $this->start($request);
-            $this->set_fingerprint($request);
-        }
-    }
-
-    public function auth($user, $pass) {
+class Hm_Auth_None extends Hm_Auth {
+    public function check_credentials($user, $pass) {
         return true;
-    }
-
-    public function start($request) {
-        session_start();
-        if (array_key_exists('data', $_SESSION)) {
-            $data = $this->plaintext($_SESSION['data']);
-            if (is_array($data)) {
-                $this->data = $data;
-            }
-        }
-        $this->active = true;
-    }
-
-    public function get($name, $default=false, $user=false) {
-        if ($user) {
-            return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data) ? $this->data['user_data'][$name] : $default;
-        }
-        else {
-            return array_key_exists($name, $this->data) ? $this->data[$name] : $default;
-        }
-    }
-
-    public function set($name, $value, $user=false) {
-        if ($user) {
-            $this->data['user_data'][$name] = $value;
-        }
-        else {
-            $this->data[$name] = $value;
-        }
-    }
-
-    public function del($name) {
-        if (array_key_exists($name, $this->data)) {
-            unset($this->data[$name]);
-        }
-    }
-    public function is_active() {
-        return $this->active;
-    }
-    public function record_unsaved($value) {
-        $this->data['changed_settings'][] = $value;
-    }
-
-    public function destroy($request) {
-        session_unset();
-        @session_destroy();
-        $params = session_get_cookie_params();
-        secure_cookie($request, $this->cname, '', 0, $params['path'], $params['domain']);
-        secure_cookie($request, 'hm_id', '', 0);
-        $this->active = false;
-    }
-
-    public function end() {
-        if ($this->active) {
-            $enc_data = $this->ciphertext($this->data);
-            $_SESSION = array('data' => $enc_data);
-            session_write_close();
-            $this->active = false;
-        }
     }
 }
 
-/* persistant storage with vanilla PHP sessions and DB based authentication */
-class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
+class Hm_Auth_POP3 extends Hm_Auth {
+    private $pop3_settings = array();
 
-    public $internal_users = true;
-    protected $dbh = false;
-
-    public function check($request, $user=false, $pass=false) {
-        if ($user && $pass) {
-            if ($this->auth($user, $pass)) {
-                $this->set_key($request);
-                $this->loaded = true;
-                $this->start($request);
-                $this->set_fingerprint($request);
-                $this->just_started();
-            }
-            else {
-                Hm_Msgs::add("ERRInvalid username or password");
+    public function check_credentials($user, $pass) {
+        $pop3 = new Hm_POP3();
+        $authed = false;
+        list($server, $port, $tls) = $this->get_pop3_config();
+        if ($user && $pass && $server && $port) {
+            $this->pop3_settings = array(
+                'server' => $server,
+                'port' => $port,
+                'tls' => $tls,
+                'username' => $user,
+                'password' => $pass,
+                'no_caps' => true
+            );
+            $pop3->server = $server;
+            $pop3->port = $port;
+            $pop3->tls = $tls;
+            if ($pop3->connect()) {
+                $authed = $pop3->auth($user, $pass);
             }
         }
-        elseif (array_key_exists($this->cname, $request->cookie)) {
-            $this->set_key($request);
-            $this->start($request);
-            $this->check_fingerprint($request);
+        if ($authed) {
+            return true;
         }
+        Hm_Msgs::add("Invalid username or password");
+        return false;
+    }
+    private function get_pop3_config() {
+        $server = $this->site_config->get('pop3_auth_server', false);
+        $port = $this->site_config->get('pop3_auth_port', false);
+        $tls = $this->site_config->get('pop3_auth_tls', false);
+        return array($server, $port, $tls);
+    }
+}
+
+class Hm_Auth_IMAP extends Hm_Auth {
+    private $imap_settings = array();
+
+    public function check_credentials($user, $pass) {
+        $imap = new Hm_IMAP();
+        list($server, $port, $tls) = $this->get_imap_config();
+        if ($user && $pass && $server && $port) {
+            $this->imap_settings = array(
+                'server' => $server,
+                'port' => $port,
+                'tls' => $tls,
+                'username' => $user,
+                'password' => $pass,
+                'no_caps' => true,
+                'blacklisted_extensions' => array('enable')
+            );
+            $imap->connect($this->imap_settings);
+        }
+        if ($imap->get_state() == 'authenticated') {
+            return true;
+        }
+        else {
+            Hm_Msgs::add("Invalid username or password");
+        }
+        return false;
     }
 
-    public function auth($user, $pass) {
+    private function get_imap_config() {
+        $server = $this->site_config->get('imap_auth_server', false);
+        $port = $this->site_config->get('imap_auth_port', false);
+        $tls = $this->site_config->get('imap_auth_tls', false);
+        return array($server, $port, $tls);
+    }
+}
+
+class Hm_Auth_DB extends Hm_Auth {
+    public function check_credentials($user, $pass) {
         if ($this->connect()) {
             $sql = $this->dbh->prepare("select hash from hm_user where username = ?");
             if ($sql->execute(array($user))) {
@@ -235,16 +142,196 @@ class Hm_PHP_Session_DB_Auth extends Hm_PHP_Session {
     }
 }
 
-/* persistant storage with DB sessions and DB authentication */
-class Hm_DB_Session_DB_Auth extends Hm_PHP_Session_DB_Auth {
+abstract class Hm_Session {
+    public $loaded = false;
+    public $active = false;
+    public $internal_users = false;
 
+    protected $enc_key = '';
+    protected $data = array();
+    protected $cname = false;
+    protected $site_config = false;
+    protected $auth_mech = false;
+
+    abstract protected function check($request);
+    abstract protected function start($request);
+    abstract protected function auth($user, $pass);
+    abstract protected function get($name, $default=false);
+    abstract protected function set($name, $value);
+    abstract protected function del($name);
+    abstract protected function end();
+    abstract protected function destroy($request);
+
+    public function __construct($config, $auth_type='Hm_Auth_DB') {
+        $this->site_config = $config;
+        $this->auth_mech = new $auth_type($config);
+    }
+
+    protected function just_started() {
+        $this->set('login_time', time());
+    }
+
+    protected function check_fingerprint($request) {
+        $id = $this->build_fingerprint($request);
+        $fingerprint = $this->get('fingerprint', false);
+        if (!$fingerprint || $fingerprint !== $id) {
+            $this->end();
+        }
+    }
+
+    protected function build_fingerprint($request) {
+        $env = $request->server;
+        $id = '';
+        $id .= (array_key_exists('REMOTE_ADDR', $env)) ? $env['REMOTE_ADDR'] : '';
+        $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
+        $id .= (array_key_exists('REQUEST_SCHEME', $env)) ? $env['REQUEST_SCHEME'] : '';
+        $id .= (array_key_exists('HTTP_ACCEPT_LANGUAGE', $env)) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
+        $id .= (array_key_exists('HTTP_ACCEPT_CHARSET', $env)) ? $env['HTTP_ACCEPT_CHARSET'] : '';
+        $id .= (array_key_exists('HTTP_HOST', $env)) ? $env['HTTP_HOST'] : '';
+        return hash('sha256', $id);
+    }
+
+    protected function set_fingerprint($request) {
+        $id = $this->build_fingerprint($request);
+        $this->set('fingerprint', $id);
+    }
+
+    public function record_unsaved($value) {
+        $this->data['changed_settings'][] = $value;
+    }
+
+    public function is_active() {
+        return $this->active;
+    }
+
+    protected function ciphertext($data) {
+        return Hm_Crypt::ciphertext(serialize($data), $this->enc_key);
+    }
+
+    protected function plaintext($data) {
+        return @unserialize(Hm_Crypt::plaintext($data, $this->enc_key));
+    }
+
+    protected function set_key($request) {
+        if (array_key_exists('hm_id', $request->cookie)) {
+            $this->enc_key = $request->cookie['hm_id'];
+        }
+        else {
+            $this->enc_key = base64_encode(openssl_random_pseudo_bytes(128));
+            secure_cookie($request, 'hm_id', $this->enc_key);
+        }
+    }
+}
+
+class Hm_PHP_Session extends Hm_Session {
+    protected $cname = 'PHPSESSID';
+
+    public function check($request, $user=false, $pass=false) {
+        if ($user && $pass) {
+            if ($this->auth($user, $pass)) {
+                $this->set_key($request);
+                $this->loaded = true;
+                $this->start($request);
+                $this->set_fingerprint($request);
+                $this->just_started();
+            }
+            else {
+                Hm_Msgs::add("ERRInvalid username or password");
+            }
+        }
+        elseif (array_key_exists($this->cname, $request->cookie)) {
+            $this->set_key($request);
+            $this->start($request);
+            $this->check_fingerprint($request);
+        }
+    }
+
+    public function auth($user, $pass) {
+        return $this->auth_mech->check_credentials($user, $pass);
+    }
+
+    public function change_pass($user, $pass) {
+        return $this->auth_mech->change_pass($user, $pass);
+    }
+
+    public function create($request, $user, $pass) {
+        return $this->auth_mech->create($user, $pass);
+    }
+
+    public function start($request) {
+        if (array_key_exists($this->cname, $request->cookie)) {
+            session_id($request->cookie[$this->cname]);
+        }
+        session_start();
+        if (array_key_exists('data', $_SESSION)) {
+            $data = $this->plaintext($_SESSION['data']);
+            if (is_array($data)) {
+                $this->data = $data;
+            }
+        }
+        $this->active = true;
+    }
+
+    public function get($name, $default=false, $user=false) {
+        if ($user) {
+            return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data) ? $this->data['user_data'][$name] : $default;
+        }
+        else {
+            return array_key_exists($name, $this->data) ? $this->data[$name] : $default;
+        }
+    }
+
+    public function set($name, $value, $user=false) {
+        if ($user) {
+            $this->data['user_data'][$name] = $value;
+        }
+        else {
+            $this->data[$name] = $value;
+        }
+    }
+
+    public function del($name) {
+        if (array_key_exists($name, $this->data)) {
+            unset($this->data[$name]);
+        }
+    }
+
+    public function destroy($request) {
+        session_unset();
+        @session_destroy();
+        $params = session_get_cookie_params();
+        secure_cookie($request, $this->cname, '', 0, $params['path'], $params['domain']);
+        secure_cookie($request, 'hm_id', '', 0);
+        $this->active = false;
+    }
+
+    public function end() {
+        if ($this->active) {
+            $enc_data = $this->ciphertext($this->data);
+            $_SESSION = array('data' => $enc_data);
+            session_write_close();
+            $this->active = false;
+        }
+    }
+}
+
+class Hm_DB_Session extends Hm_PHP_Session {
     protected $cname = 'hm_session';
     private $session_key = '';
+    protected $dbh = false;
 
     private function insert_session_row() {
         $sql = $this->dbh->prepare("insert into hm_user_session values(?, ?, current_date)");
         $enc_data = $this->ciphertext($this->data);
         if ($sql->execute(array($this->session_key, $enc_data))) {
+            return true;
+        }
+        return false;
+    }
+
+    protected function connect() {
+        $this->dbh = Hm_DB::connect($this->site_config);
+        if ($this->dbh) {
             return true;
         }
         return false;

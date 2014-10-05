@@ -203,39 +203,23 @@ class Hm_Router {
     }
 
     private function setup_session($config) {
+
         $session_type = $config->get('session_type', false);
         $auth_type = $config->get('auth_type', false);
-
-        switch ($session_type.$auth_type) {
-            case 'DBDB':
-                Hm_Debug::add('Using DB auth and DB sessions');
-                $session = new Hm_DB_Session_DB_Auth($config);
-                break;
-            case 'PHPDB':
-                Hm_Debug::add('Using DB auth and PHP sessions');
-                $session = new Hm_PHP_Session_DB_Auth($config);
-                break;
-            case 'PHPIMAP':
-                Hm_Debug::add('Using IMAP auth and PHP sessions');
-                $session = new Hm_PHP_Session_IMAP_Auth($config);
-                break;
-            case 'PHPPOP3':
-                Hm_Debug::add('Using POP3 auth and PHP sessions');
-                $session = new Hm_PHP_Session_POP3_Auth($config);
-                break;
-            case 'DBIMAP':
-                Hm_Debug::add('Using IMAP auth and DB sessions');
-                $session = new Hm_DB_Session_IMAP_Auth($config);
-                break;
-            case 'DBPOP3':
-                Hm_Debug::add('Using POP3 auth and DB sessions');
-                $session = new Hm_DB_Session_POP3_Auth($config);
-                break;
-            default:
-                Hm_Debug::add('Using default PHP sessions with no auth');
-                $session = new Hm_PHP_Session($config);
-                break;
+        if ($auth_type) {
+            $auth_class = sprintf('Hm_Auth_%s', $auth_type);
         }
+        else {
+            $auth_class = 'Hm_Auth_None';
+        }
+        if ($session_type == 'DB') {
+            $session_class = 'Hm_DB_Session';
+        }
+        else {
+            $session_class = 'Hm_PHP_Session';
+        }
+        Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
+        $session = new $session_class($config, $auth_class);
         return $session;
     }
     private function get_active_mods($mod_list) {
@@ -336,7 +320,7 @@ class Hm_Router {
             'router_request_type' => $request->type,
             'router_sapi_name'    => $request->sapi,
             'router_format_name'  => $request->format,
-            'router_login_state'  => $session->active,
+            'router_login_state'  => $session->is_active(),
             'router_url_path'     => $request->path,
             'router_module_list'  => $config->get('modules', '')
         ));
@@ -512,7 +496,7 @@ class Hm_Request_Handler {
             $input = false;
             $name = "Hm_Handler_$name";
             if (class_exists($name)) {
-                if (!$args[1] || ($args[1] && $this->session->active)) {
+                if (!$args[1] || ($args[1] && $this->session->is_active())) {
                     $mod = new $name( $this, $args[1]);
                     $input = $mod->process($this->response);
                 }
