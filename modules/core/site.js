@@ -504,7 +504,7 @@ var prev_next_links = function(cache, class_name) {
 
 var open_folder_list = function() {
     $('.folder_list').show();
-    $('.folder_toggle').toggle(100);
+    $('.folder_toggle').toggle();
     save_to_local_storage('hide_folder_list', '');
     return false;
 };
