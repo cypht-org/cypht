@@ -24,6 +24,10 @@ class Hm_POP3_List {
     }
 }
 
+class Hm_POP3_Seen_Cache {
+    use Hm_Uid_Cache;
+}
+
 class Hm_POP3 {
     var $server;
     var $starttls;

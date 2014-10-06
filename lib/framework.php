@@ -26,7 +26,7 @@ abstract class Hm_Config {
     }
 }
 
-/* file based user configuration */
+/* file based user settings */
 class Hm_User_Config_File extends Hm_Config {
 
     private $site_config = false;
@@ -65,7 +65,7 @@ class Hm_User_Config_File extends Hm_Config {
     }
 }
 
-/* db based user configuration */
+/* db based user settings */
 class Hm_User_Config_DB extends Hm_Config {
 
     private $site_config = false;
@@ -147,23 +147,9 @@ class Hm_Router {
     private $page = 'home';
 
     public function process_request($config) {
-        if (DEBUG_MODE) {
-            $filters = array();
-            $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
-            $modules = explode(',', $config->get('modules', array()));
-            foreach ($modules as $name) {
-                if (is_readable(sprintf("modules/%s/setup.php", $name))) {
-                    $filters = Hm_Router::merge_filters($filters, require sprintf("modules/%s/setup.php", $name));
-                }
-            }
-            $handler_mods = array();
-            $output_mods = array();
-        }
-        else {
-            $filters = $config->get('input_filters', array());
-            $handler_mods = $config->get('handler_modules', array());
-            $output_mods = $config->get('output_modules', array());
-        }
+
+        /* get module assignments and input whitelists */
+        list($filters, $handler_mods, $output_mods) = $this->process_module_setup($config);
 
         /* process inbound data */
         $request = new Hm_Request($filters);
@@ -196,6 +182,27 @@ class Hm_Router {
         return array($result, $session, $request->allowed_output);
     }
 
+    private function process_module_setup($config) {
+        if (DEBUG_MODE) {
+            $filters = array();
+            $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
+            $modules = explode(',', $config->get('modules', array()));
+            foreach ($modules as $name) {
+                if (is_readable(sprintf("modules/%s/setup.php", $name))) {
+                    $filters = Hm_Router::merge_filters($filters, require sprintf("modules/%s/setup.php", $name));
+                }
+            }
+            $handler_mods = array();
+            $output_mods = array();
+        }
+        else {
+            $filters = $config->get('input_filters', array());
+            $handler_mods = $config->get('handler_modules', array());
+            $output_mods = $config->get('output_modules', array());
+        }
+        return array($filters, $handler_mods, $output_mods);
+    }
+
     private function check_for_tls($config, $request) {
         if (!$request->tls && !$config->get('disable_tls', false)) {
             $this->redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
@@ -225,6 +232,7 @@ class Hm_Router {
         $session = new $session_class($config, $auth_class);
         return $session;
     }
+
     private function get_active_mods($mod_list) {
         return array_unique(array_values(array_map(function($v) { return $v[0]; }, $mod_list)));
     }
@@ -239,6 +247,7 @@ class Hm_Router {
         }
         $class::try_queued_modules();
     }
+
     private function load_module_sets($config, $handlers=array(), $output=array()) {
 
         $this->load_modules('Hm_Handler_Modules', $handlers);
@@ -366,19 +375,28 @@ class Hm_Request {
     public $allowed_output = array();
 
     public function __construct($filters) {
-        $this->sapi = php_sapi_name();
+        $this->filter_request_input($filters);
+        $this->get_other_request_details($filters);
+        $this->remove_super_globals();
+    }
 
+    private function filter_request_input($filters) {
         $this->server = $this->filter_input(INPUT_SERVER, $filters['allowed_server']);
         $this->post = $this->filter_input(INPUT_POST, $filters['allowed_post']);
         $this->get = $this->filter_input(INPUT_GET, $filters['allowed_get']);
         $this->cookie = $this->filter_input(INPUT_COOKIE, $filters['allowed_cookie']);
-        $this->allowed_output = $filters['allowed_output'];
+    }
 
+    private function get_other_request_details($filters) {
+        $this->sapi = php_sapi_name();
+        $this->allowed_output = $filters['allowed_output'];
         $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
         $this->get_request_type();
         $this->is_tls();
         $this->is_mobile();
+    }
 
+    private function remove_super_globals() {
         unset($_POST);
         unset($_SERVER);
         unset($_GET);
@@ -411,10 +429,7 @@ class Hm_Request {
     }
 
     private function get_request_type() {
-        if ($this->is_cli()) {
-            die("CLI support not implemented\n");
-        }
-        elseif ($this->is_ajax()) {
+        if ($this->is_ajax()) {
             $this->type = 'AJAX';
             $this->format = 'Hm_Format_JSON';
         }
@@ -422,10 +437,6 @@ class Hm_Request {
             $this->type = 'HTTP';
             $this->format = 'Hm_Format_HTML5';
         }
-    }
-
-    private function is_cli() {
-        return strtolower(php_sapi_name()) == 'cli';
     }
 
     private function is_ajax() {
@@ -538,6 +549,7 @@ abstract class HM_Format {
         }
         return $strings;
     }
+
     protected function run_modules($input, $format, $lang_str) {
         $mod_output = array();
 
@@ -577,6 +589,7 @@ class Hm_Format_JSON extends HM_Format {
         $output = $this->filter_output($output, $allowed_output);
         return json_encode($output, JSON_FORCE_OBJECT);
     }
+
     private function filter_output($data, $allowed) {
         foreach ($data as $name => $value) {
             if (!array_key_exists($name, $allowed)) {
@@ -674,8 +687,12 @@ trait Hm_List {
         }
     }
 }
+
 class Hm_Msgs { use Hm_List; }
-class Hm_Debug { use Hm_List;
+
+class Hm_Debug {
+    
+    use Hm_List;
 
     public static function load_page_stats() {
         self::add(sprintf("PHP version %s", phpversion()));
@@ -740,6 +757,7 @@ class Hm_DB {
             }
         }
     }
+
     static private function db_key() {
         return md5(self::$config['db_driver'].
             self::$config['db_host'].
@@ -888,6 +906,7 @@ class Hm_Page_Cache {
     public static function add($key, $page, $save=false) {
         self::$pages[$key] = array($page, $save);
     }
+
     public static function concat($key, $page, $save = false, $delim=false) {
         if (array_key_exists($key, self::$pages)) {
             if ($delim) {
@@ -901,6 +920,7 @@ class Hm_Page_Cache {
             self::$pages[$key] = array($page, $save);
         }
     }
+
     public static function del($key) {
         if (array_key_exists($key, self::$pages)) {
             unset(self::$pages[$key]);
@@ -908,6 +928,7 @@ class Hm_Page_Cache {
         }
         return false;
     }
+
     public static function get($key) {
         if (array_key_exists($key, self::$pages)) {
             Hm_Debug::add(sprintf("PAGE CACHE: %s", $key));
@@ -915,18 +936,22 @@ class Hm_Page_Cache {
         }
         return false;
     }
+
     public static function dump() {
         return self::$pages;
     }
+
     public static function flush($session) {
         self::$pages = array();
         $session->set('page_cache', array());
         $session->set('saved_pages', array());
     }
+
     public static function load($session) {
         self::$pages = $session->get('page_cache', array());
         self::$pages = array_merge(self::$pages, $session->get('saved_pages', array()));
     }
+
     public static function save($session) {
         $pages = self::$pages;
         $saved_pages = array();
@@ -953,15 +978,19 @@ trait Hm_Uid_Cache {
             self::$uids = array();
         }
     }
+
     public static function is_present($uid) {
         return array_key_exists($uid, self::$uids);
     }
+
     public static function dump() {
         return array_keys(self::$uids);
     }
+
     public static function add($uid) {
         self::$uids[$uid] = 0;
     }
+
     public static function remove($uid) {
         if (array_key_exists($uid, self::$uids)) {
             unset(self::$uids[$uid]);
@@ -969,13 +998,6 @@ trait Hm_Uid_Cache {
         }
         return false;
     }
-}
-
-class Hm_POP3_Seen_Cache {
-    use Hm_Uid_Cache;
-}
-class Hm_Feed_Seen_Cache {
-    use Hm_Uid_Cache;
 }
 
 class Hm_Image_Sources {

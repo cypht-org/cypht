@@ -15,6 +15,10 @@ class Hm_Feed_List {
     }
 }
 
+class Hm_Feed_Seen_Cache {
+    use Hm_Uid_Cache;
+}
+
 class Hm_Feed {
     var $url;
     var $id;
