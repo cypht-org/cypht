@@ -3,6 +3,7 @@
 define("DEBUG_MODE", false);
 
 require 'lib/framework.php';
+require 'lib/modules.php';
 
 $options = getopt('', array('ini_file::', 'debug'));
 $settings = '';
