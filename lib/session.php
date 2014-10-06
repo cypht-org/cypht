@@ -222,9 +222,20 @@ abstract class Hm_Session {
         }
         else {
             $this->enc_key = base64_encode(openssl_random_pseudo_bytes(128));
-            secure_cookie($request, 'hm_id', $this->enc_key);
+            $this->secure_cookie($request, 'hm_id', $this->enc_key);
         }
     }
+
+    public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='') {
+        if ($request->tls) {
+            $secure = true;
+        }
+        else {
+            $secure = false;
+        }
+        setcookie($name, $value, $lifetime, $path, $domain, $secure);
+    }
+
 }
 
 class Hm_PHP_Session extends Hm_Session {
@@ -304,8 +315,8 @@ class Hm_PHP_Session extends Hm_Session {
         session_unset();
         @session_destroy();
         $params = session_get_cookie_params();
-        secure_cookie($request, $this->cname, '', 0, $params['path'], $params['domain']);
-        secure_cookie($request, 'hm_id', '', 0);
+        $this->secure_cookie($request, $this->cname, '', 0, $params['path'], $params['domain']);
+        $this->secure_cookie($request, 'hm_id', '', 0);
         $this->active = false;
     }
 
@@ -345,7 +356,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
         if ($this->connect()) {
             if ($this->loaded) {
                 $this->session_key = base64_encode(openssl_random_pseudo_bytes(128));
-                secure_cookie($request, $this->cname, $this->session_key, 0);
+                $this->secure_cookie($request, $this->cname, $this->session_key, 0);
                 if ($this->insert_session_row()) {
                     $this->active = true;
                 }
@@ -386,8 +397,8 @@ class Hm_DB_Session extends Hm_PHP_Session {
             $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
             $sql->execute(array($this->session_key));
         }
-        secure_cookie($request, $this->cname, '', 0);
-        secure_cookie($request, 'hm_id', '', 0);
+        $this->secure_cookie($request, $this->cname, '', 0);
+        $this->secure_cookie($request, 'hm_id', '', 0);
         $this->active = false;
     }
 }
