@@ -24,6 +24,7 @@ date_default_timezone_set( 'UTC' );
 
 /* get includes */
 require 'lib/framework.php';
+require 'lib/modules.php';
 require 'lib/session.php';
 
 /* get configuration */
