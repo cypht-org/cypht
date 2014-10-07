@@ -5,9 +5,8 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * Data request details
  *
- * The object is a wrapper around all input data. Modules can only access
- * user and server input through this class, and each module set must white
- * list and define the type for any input variables it wants access to.
+ * This is an interface to HTTP request details. All request data 
+ * must be white-listed and sanitized by module set filters.
  */
 class Hm_Request {
 
