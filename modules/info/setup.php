@@ -9,6 +9,8 @@ output_source('info');
 /* help page */
 setup_base_page('help', 'core');
 add_output('help', 'help_content', true, 'info', 'content_section_start', 'after');
+
+/* folder list */
 add_output('ajax_hm_folders', 'help_page_link', true, 'info', 'settings_menu_end', 'before');
 add_output('ajax_hm_folders', 'bug_report_link', true, 'info', 'settings_menu_end', 'before');
 add_output('ajax_hm_folders', 'developer_doc_link', true, 'info', 'settings_menu_end', 'before');

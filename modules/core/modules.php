@@ -443,7 +443,13 @@ class Hm_Output_login extends Hm_Output_Module {
 
 class Hm_Output_server_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="content_title">'.$this->trans('Servers').'</div>';
+        return '<div class="content_title">'.$this->trans('Servers').'</div><div class="server_content">';
+    }
+}
+
+class Hm_Output_server_content_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</div>';
     }
 }
 

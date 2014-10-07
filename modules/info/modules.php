@@ -19,7 +19,7 @@ class Hm_Output_bug_report_form extends Hm_Output_Module {
 class Hm_Output_help_content extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="help_content"><div class="content_title">Help</div>'.
-            '<div class="long_text">How to get the most out of our experience.</div></div>';
+            '<div class="long_text"></div></div>';
     }
 }
 

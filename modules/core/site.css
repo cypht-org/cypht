@@ -19,7 +19,7 @@ td { vertical-align: top; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
 .logout:hover { background-color: #eee; }
 .logout { cursor: pointer; background: #fff font-size: 100%; }
-.profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
+.server_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 500px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { width: 100%; white-space: nowrap; padding-left: 25px; }
 .user_settings table td { vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 0px; color: #666; }
 .save_settings { float: left !important; }
@@ -121,6 +121,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .list_controls { padding-right: 10px; }
     .msg_text { font-size: 125%; }
     .msg_text_inner { font-size: 140%; }
+    .list_meta { display: none; }
 }
 @media screen and (max-device-width:1080px) and (orientation : landscape) {
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
