@@ -220,11 +220,18 @@ var pop3_combined_unread_content = function(id) {
     );
     return false;
 };
+
 var update_pop3_unread_display = function(res) {
     var ids = [res.pop3_server_id];
     var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
 };
 
+var expand_pop3_settings = function() {
+    var dsp = get_from_local_storage('.pop3_setting');
+    if (dsp == 'table-row' || dsp == 'none') {
+        $('.pop3_setting').css('display', dsp);
+    }
+};
 
 if (hm_page_name == 'servers') {
     $('.test_pop3_connect').on('click', pop3_test_action);
@@ -266,4 +273,7 @@ else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'pop3') {
 }
 else if (hm_page_name == 'home') {
     setTimeout(pop3_status_update, 100);
+}
+else if (hm_page_name == 'settings') {
+    expand_pop3_settings();
 }

@@ -549,11 +549,12 @@ var toggle_section = function(class_name, force_on) {
     return false;
 };
 
-var toggle_server_section = function(class_name) {
+var toggle_page_section = function(class_name) {
     if ($(class_name).length) {
         $(class_name).toggle();
         save_to_local_storage(class_name, $(class_name).css('display'));
     }
+    return false;
 };
 
 var get_from_local_storage = function(key) {
@@ -724,6 +725,17 @@ var toggle_long_headers = function() {
     return false;
 };
 
+var expand_core_settings = function() {
+    var dsp;
+    var sections = ['.general_setting', '.unread_setting', '.flagged_setting', '.all_setting'];
+    for (i=0;i<sections.length;i++) {
+        dsp = get_from_local_storage(sections[i]);
+        if (dsp == 'table-row' || dsp == 'none') {
+            $(sections[i]).css('display', dsp);
+        }
+    }
+};
+
 var folder_list = get_from_local_storage('formatted_folder_list');
 
 $(function() {
@@ -756,6 +768,9 @@ $(function() {
         }
     }
     else if (hm_page_name == 'settings' || hm_page_name == 'servers') {
+        if (hm_page_name == 'settings') {
+            expand_core_settings();
+        }
         reload_folders();
     }
 

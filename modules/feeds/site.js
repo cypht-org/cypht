@@ -195,6 +195,13 @@ var update_feed_status_display = function(res) {
     $('.feeds_status_'+id).html(res.feed_status_display);
 };
 
+var expand_feed_settings = function() {
+    var dsp = get_from_local_storage('.feed_setting');
+    if (dsp == 'table-row' || dsp == 'none') {
+        $('.feed_setting').css('display', dsp);
+    }
+};
+
 if (hm_page_name == 'message_list') {
     if (hm_list_path == 'combined_inbox') {
         add_feed_sources(feeds_combined_inbox_content);
@@ -231,4 +238,7 @@ else if (hm_page_name == 'servers') {
 }
 else if (hm_page_name == 'home') {
     setTimeout(feed_status_update, 100);
+}
+else if (hm_page_name == 'settings') {
+    expand_feed_settings();
 }

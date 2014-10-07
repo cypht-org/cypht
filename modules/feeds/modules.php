@@ -399,8 +399,8 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
                 $count = 0;
             }
             $count = sprintf($this->trans('%d configured'), $count);
-            return '<div class="feed_server_setup"><div onclick="return toggle_server_section(\'.feed_section\');" class="server_section">'.
-                '<img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+            return '<div class="feed_server_setup"><div onclick="return toggle_page_section(\'.feed_section\');" class="server_section">'.
+                '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.
                ' Feeds <div class="server_count">'.$count.'</div></div><div class="feed_section"><form class="add_server" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_feed').'"/>'.
                 '<div class="subtitle">Add an RSS/ATOM Feed</div><table>'.
@@ -587,7 +587,7 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
         else {
             $checked = '';
         }
-        return '<tr><td>Exclude unread feed items</td><td><input type="checkbox" '.$checked.' value="1" name="unread_exclude_feeds" /></td></tr>';
+        return '<tr class="unread_setting"><td>Exclude unread feed items</td><td><input type="checkbox" '.$checked.' value="1" name="unread_exclude_feeds" /></td></tr>';
     }
 }
 
@@ -608,7 +608,7 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
 
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" class="settings_subtitle"><br /><img alt="" src="'.Hm_Image_Sources::$rss.'" />Feed Settings</td></tr>';
+        return '<tr><td colspan="2" onclick="return toggle_page_section(\'.feed_setting\')" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$rss.'" />Feed Settings</td></tr>';
     }
 }
 
@@ -618,7 +618,7 @@ class Hm_Output_feed_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('feed_since', $input['user_settings'])) {
             $since = $input['user_settings']['feed_since'];
         }
-        return '<tr><td>Show feed items received since</td><td>'.message_since_dropdown($since, 'feed_since').'</td></tr>';
+        return '<tr class="feed_setting"><td>Show feed items received since</td><td>'.message_since_dropdown($since, 'feed_since').'</td></tr>';
     }
 }
 
@@ -628,7 +628,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('feed_limit', $input['user_settings'])) {
             $limit = $input['user_settings']['feed_limit'];
         }
-        return '<tr><td>Max feed items to display</td><td><input type="text" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
+        return '<tr class="feed_setting"><td>Max feed items to display</td><td><input type="text" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
 

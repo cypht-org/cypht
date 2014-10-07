@@ -57,7 +57,7 @@ var imap_forget_action = function() {
     );
 };
 
-var setup_server_page = function() {
+var imap_setup_server_page = function() {
     $('.imap_delete').on('click', imap_delete_action);
     $('.save_imap_connection').on('click', imap_save_action);
     $('.forget_imap_connection').on('click', imap_forget_action);
@@ -285,7 +285,7 @@ var get_message_content = function(msg_part) {
     return false;
 };
 
-var setup_message_view_page = function() {
+var imap_setup_message_view_page = function() {
     var msg_content = get_local_message_content();
     if (!msg_content || !msg_content.length) {
         get_message_content();
@@ -327,7 +327,7 @@ var add_imap_sources = function(callback) {
     }
 };
 
-var setup_compose_page = function() {
+var imap_setup_compose_page = function() {
     var source = $('.imap_reply_source');
     var uid = $('.imap_reply_uid');
     if (source.length && uid.length) {
@@ -386,13 +386,13 @@ else if (hm_page_name == 'search') {
     add_imap_sources(imap_search_page_content);
 }
 else if (hm_page_name == 'compose') {
-    setup_compose_page();
+    imap_setup_compose_page();
 }
 else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'imap') {
-    setup_message_view_page();
+    imap_setup_message_view_page();
 }
 else if (hm_page_name == 'servers') {
-    setup_server_page();
+    imap_setup_server_page();
 }
 else if (hm_page_name == 'home') {
     setTimeout(imap_status_update, 100);

@@ -453,8 +453,8 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
             $count = 0;
         }
         $count = sprintf($this->trans('%d configured'), $count);
-        return '<div class="pop3_server_setup"><div onclick="return toggle_server_section(\'.pop3_section\');" class="server_section">'.
-            '<img alt="" class="section_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+        return '<div class="pop3_server_setup"><div onclick="return toggle_page_section(\'.pop3_section\');" class="server_section">'.
+            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
            ' POP3 Servers <div class="server_count">'.$count.'</div></div><div class="pop3_section"><form class="add_server" method="POST">'.
             '<div class="subtitle">Add a POP3 Server</div><input type="hidden" name="hm_nonce" value="'.$this->build_nonce( 'add_pop3_server' ).'" />'.
             '<table><tr><td colspan="2"><input type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
@@ -636,7 +636,7 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
 
 class Hm_Output_start_pop3_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" class="settings_subtitle"><br /><img alt="" src="'.Hm_Image_Sources::$env_closed.'" />POP3 Settings</td></tr>';
+        return '<tr><td onclick="return toggle_page_section(\'.pop3_setting\');" colspan="2" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$env_closed.'" />POP3 Settings</td></tr>';
     }
 }
 
@@ -646,7 +646,7 @@ class Hm_Output_pop3_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('pop3_since', $input['user_settings'])) {
             $since = $input['user_settings']['pop3_since'];
         }
-        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown($since, 'pop3_since').'</td></tr>';
+        return '<tr class="pop3_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'pop3_since').'</td></tr>';
     }
 }
 
@@ -656,7 +656,7 @@ class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('pop3_limit', $input['user_settings'])) {
             $limit = $input['user_settings']['pop3_limit'];
         }
-        return '<tr><td>Max messages to display</td><td><input type="text" name="pop3_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
+        return '<tr class="pop3_setting"><td>Max messages to display</td><td><input type="text" name="pop3_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
 

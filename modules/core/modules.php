@@ -593,7 +593,7 @@ class Hm_Output_loading_icon extends Hm_Output_Module {
 
 class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="user_settings"><div class="content_title">Site Settings</div><br />'.
+        return '<div class="user_settings"><div class="content_title">Site Settings</div>'.
             '<form method="POST"><table class="settings_table"><colgroup>'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
     }
@@ -609,7 +609,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
         else {
             $list_style = false;
         }
-        $res = '<tr><td>Message list style</td><td><select name="list_style">';
+        $res = '<tr class="general_setting"><td>Message list style</td><td><select name="list_style">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($list_style == $val) {
@@ -626,7 +626,7 @@ class Hm_Output_change_password extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if (array_key_exists('internal_users', $input) && $input['internal_users']) {
-            $res .= '<tr><td>Change password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
+            $res .= '<tr class="general_setting"><td>Change password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
                 ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
         }
         return $res;
@@ -635,31 +635,31 @@ class Hm_Output_change_password extends Hm_Output_Module {
 
 class Hm_Output_start_flagged_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" class="settings_subtitle">'.
-            '<br /><img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />'.
-            $this->trans('Flagged Page').'</td></tr>';
+        return '<tr><td onclick="return toggle_page_section(\'.flagged_setting\')" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />'.
+            $this->trans('Flagged').'</td></tr>';
     }
 }
 
 class Hm_Output_start_everything_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" class="settings_subtitle">'.
-            '<br /><img alt="" src="'.Hm_Image_Sources::$box.'" width="16" height="16" />'.
-            $this->trans('Everything Page').'</td></tr>';
+        return '<tr><td onclick="return toggle_page_section(\'.all_setting\')" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$box.'" width="16" height="16" />'.
+            $this->trans('Everything').'</td></tr>';
     }
 }
 
 class Hm_Output_start_unread_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" class="settings_subtitle">'.
-            '<br /><img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
-            $this->trans('Unread Page').'</td></tr>';
+        return '<tr><td onclick="return toggle_page_section(\'.unread_setting\')" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+            $this->trans('Unread').'</td></tr>';
     }
 }
 
 class Hm_Output_start_general_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" class="settings_subtitle">'.
+        return '<tr><td onclick="return toggle_page_section(\'.general_setting\')" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$cog.'" width="16" height="16" />'.
             $this->trans('General').'</td></tr>';
     }
@@ -671,7 +671,7 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('unread_per_source', $input['user_settings'])) {
             $sources = $input['user_settings']['unread_per_source'];
         }
-        return '<tr><td>Max messages per source</td><td><input type="text" size="2" name="unread_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+        return '<tr class="unread_setting"><td>Max messages per source</td><td><input type="text" size="2" name="unread_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
 
@@ -681,7 +681,7 @@ class Hm_Output_unread_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('unread_since', $input['user_settings'])) {
             $since = $input['user_settings']['unread_since'];
         }
-        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown($since, 'unread_since').'</td></tr>';
+        return '<tr class="unread_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'unread_since').'</td></tr>';
     }
 }
 
@@ -691,7 +691,7 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('flagged_per_source', $input['user_settings'])) {
             $sources = $input['user_settings']['flagged_per_source'];
         }
-        return '<tr><td>Max messages per source</td><td><input type="text" size="2" name="flagged_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+        return '<tr class="flagged_setting"><td>Max messages per source</td><td><input type="text" size="2" name="flagged_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
 
@@ -701,7 +701,7 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('flagged_since', $input['user_settings'])) {
             $since = $input['user_settings']['flagged_since'];
         }
-        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown($since, 'flagged_since').'</td></tr>';
+        return '<tr class="flagged_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'flagged_since').'</td></tr>';
     }
 }
 
@@ -711,7 +711,7 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('all_per_source', $input['user_settings'])) {
             $sources = $input['user_settings']['all_per_source'];
         }
-        return '<tr><td>Max messages per source</td><td><input type="text" size="2" name="all_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+        return '<tr class="all_setting"><td>Max messages per source</td><td><input type="text" size="2" name="all_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
 
@@ -721,7 +721,7 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('all_since', $input['user_settings'])) {
             $since = $input['user_settings']['all_since'];
         }
-        return '<tr><td>Show messages received since</td><td>'.message_since_dropdown($since, 'all_since').'</td></tr>';
+        return '<tr class="all_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'all_since').'</td></tr>';
     }
 }
 
@@ -737,7 +737,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         else {
             $mylang = false;
         }
-        $res = '<tr><td>Interface language</td><td><select name="language_setting">';
+        $res = '<tr class="general_setting"><td>Interface language</td><td><select name="language_setting">';
         foreach ($langs as $id => $lang) {
             $res .= '<option ';
             if ($id == $mylang) {
@@ -759,7 +759,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
         else {
             $myzone = false;
         }
-        $res = '<tr><td>Timezone</td><td><select name="timezone_setting">';
+        $res = '<tr class="general_setting"><td>Timezone</td><td><select name="timezone_setting">';
         foreach ($zones as $zone) {
             $res .= '<option ';
             if ($zone == $myzone) {

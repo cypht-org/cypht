@@ -56,13 +56,12 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 
 .src_name { max-height: 25px; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
 .content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 10px; padding-top: 5px; letter-spacing: -1px; font-size: 125%; padding-left: 30px; }
-.server_section { cursor: pointer; max-height: 25px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
 .settings_col { width: 80%; }
 .label_col { width: 20%; }
-.submit_cell { padding-top: 30px !important; }
+.submit_cell { padding-left: 0px !important; padding-top: 30px !important; }
 .password_notice { float: left; margin-left: 10px; font-size: .9em; color: #666; padding-top: 5px; }
 .confirm_logout { display: none; background-color: #eee; padding: 20px; position: absolute; left: 0px; top: 0px; border: solid 1px #ccc; z-index: 100; }
 .confirm_text {  padding-left: 10px; padding-bottom: 10px; }
@@ -92,8 +91,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .plink, .nlink { color: #666; }
 .plink:hover, .nlink:hover { color: teal !important; }
 .limit { width: 50px; margin-left: 20px; }
-.settings_subtitle { font-size: 120%; color: #555 !important; letter-spacing: -1px; padding-bottom: 15px !important; padding-left: 5px !important; }
-.settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; }
+.settings_subtitle { font-size: 115%; color: #777 !important; letter-spacing: -1px; padding-bottom: 6px !important; padding-left: 0px !important; max-height: 25px; padding-top: 15px !important; }
+.server_section img, .settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; }
+.settings_subtitle, .server_section { cursor: pointer; max-height: 25px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; }
 .list_meta { letter-spacing: 0px; display: inline; color: #999 !important; font-size: 70% !important; vertical-align: 1px; font-style: normal; margin-left: 20px; }
 .list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ccc; opacity: 1; padding-top: 100px; text-align: center; }
@@ -102,6 +102,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .section_caret { opacity: .15; vertical-align: 4px; padding-right: 10px; }
 .server_count { float: right; margin-right: 120px; font-size: 90%; }
 .long_text { margin-left: 30px; margin-top: 20px; max-width: 60%; color: #666; }
+.all_setting, .unread_setting, .flagged_setting, .general_setting { display: none; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }
