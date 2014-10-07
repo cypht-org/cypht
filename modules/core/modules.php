@@ -514,7 +514,8 @@ class Hm_Output_header_content extends Hm_Output_Module {
         if (array_key_exists('mailbox_list_title', $input)) {
             $title .= ' '.implode('-', array_slice($input['mailbox_list_title'], 1));
         }
-        elseif (array_key_exists('router_page_name', $input)) {
+        if (!trim($title) && array_key_exists('router_page_name', $input)) {
+            $title = '';
             if (array_key_exists('list_path', $input) && $input['router_page_name'] == 'message_list') {
                 $title .= ' '.ucwords(str_replace('_', ' ', $input['list_path']));
             }
