@@ -2,9 +2,10 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-/* Page request router. This class ties together everything needed to process
+/**
+ * Page request router. This class ties together everything needed to process
  * a request, initiate a session, run handler modules assigned to the request,
- * and possibly do a HTTP redirect
+ * and possibly do an HTTP redirect
  */
 class Hm_Router {
 
