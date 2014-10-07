@@ -56,6 +56,8 @@ if (!empty($settings)) {
         file_put_contents('site.js', compress($js, $js_compress));
         printf("site.js file created\n");
     }
+    Hm_Handler_Modules::process_all_page_queue();
+    Hm_Output_Modules::process_all_page_queue();
     $settings['handler_modules'] = Hm_Handler_Modules::dump();
     $settings['output_modules'] = Hm_Output_Modules::dump();
     $settings['input_filters'] = $filters;
