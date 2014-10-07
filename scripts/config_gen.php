@@ -2,8 +2,18 @@
 
 define("DEBUG_MODE", false);
 
-require 'lib/framework.php';
 require 'lib/modules.php';
+require 'lib/config.php';
+require 'lib/auth.php';
+require 'lib/session.php';
+require 'lib/format.php';
+require 'lib/router.php';
+require 'lib/request.php';
+require 'lib/cache.php';
+require 'lib/output.php';
+require 'lib/crypt.php';
+require 'lib/db.php';
+require 'lib/servers.php';
 
 $options = getopt('', array('ini_file::', 'debug'));
 $settings = '';

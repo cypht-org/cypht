@@ -2,160 +2,40 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-abstract class Hm_Auth {
-    protected $site_config = false;
-    public $internal_users = false;
-
-    public function __construct($config) {
-        $this->site_config = $config;
-    }
-    abstract public function check_credentials($user, $pass);
-}
-
-class Hm_Auth_None extends Hm_Auth {
-    public function check_credentials($user, $pass) {
-        return true;
-    }
-}
-
-class Hm_Auth_POP3 extends Hm_Auth {
-    private $pop3_settings = array();
-
-    public function check_credentials($user, $pass) {
-        $pop3 = new Hm_POP3();
-        $authed = false;
-        list($server, $port, $tls) = $this->get_pop3_config();
-        if ($user && $pass && $server && $port) {
-            $this->pop3_settings = array(
-                'server' => $server,
-                'port' => $port,
-                'tls' => $tls,
-                'username' => $user,
-                'password' => $pass,
-                'no_caps' => true
-            );
-            $pop3->server = $server;
-            $pop3->port = $port;
-            $pop3->tls = $tls;
-            if ($pop3->connect()) {
-                $authed = $pop3->auth($user, $pass);
-            }
-        }
-        if ($authed) {
-            return true;
-        }
-        Hm_Msgs::add("Invalid username or password");
-        return false;
-    }
-    private function get_pop3_config() {
-        $server = $this->site_config->get('pop3_auth_server', false);
-        $port = $this->site_config->get('pop3_auth_port', false);
-        $tls = $this->site_config->get('pop3_auth_tls', false);
-        return array($server, $port, $tls);
-    }
-}
-
-class Hm_Auth_IMAP extends Hm_Auth {
-    private $imap_settings = array();
-
-    public function check_credentials($user, $pass) {
-        $imap = new Hm_IMAP();
-        list($server, $port, $tls) = $this->get_imap_config();
-        if ($user && $pass && $server && $port) {
-            $this->imap_settings = array(
-                'server' => $server,
-                'port' => $port,
-                'tls' => $tls,
-                'username' => $user,
-                'password' => $pass,
-                'no_caps' => true,
-                'blacklisted_extensions' => array('enable')
-            );
-            $imap->connect($this->imap_settings);
-        }
-        if ($imap->get_state() == 'authenticated') {
-            return true;
-        }
-        else {
-            Hm_Msgs::add("Invalid username or password");
-        }
-        return false;
-    }
-
-    private function get_imap_config() {
-        $server = $this->site_config->get('imap_auth_server', false);
-        $port = $this->site_config->get('imap_auth_port', false);
-        $tls = $this->site_config->get('imap_auth_tls', false);
-        return array($server, $port, $tls);
-    }
-}
-
-class Hm_Auth_DB extends Hm_Auth {
-    public $internal_users = true;
-
-    public function check_credentials($user, $pass) {
-        if ($this->connect()) {
-            $sql = $this->dbh->prepare("select hash from hm_user where username = ?");
-            if ($sql->execute(array($user))) {
-                $row = $sql->fetch();
-                if ($row['hash'] && pbkdf2_validate_password($pass, $row['hash'])) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    protected function connect() {
-        $this->dbh = Hm_DB::connect($this->site_config);
-        if ($this->dbh) {
-            return true;
-        }
-        return false;
-    }
-
-    public function change_pass($user, $pass) {
-        $this->connect();
-        $hash = pbkdf2_create_hash($pass);
-        $sql = $this->dbh->prepare("update hm_user set hash=? where username=?");
-        if ($sql->execute(array($hash, $user))) {
-            Hm_Msgs::add("Password changed");
-            return true;
-        }
-        return false;
-    }
-
-    public function create($request, $user, $pass) {
-        $this->connect();
-        $sql = $this->dbh->prepare("select username from hm_user where username = ?");
-        if ($sql->execute(array($user))) {
-            $res = $sql->fetch();
-            if (!empty($res)) {
-                Hm_Msgs::add("ERRThat username is already in use");
-            }
-            else {
-                $sql = $this->dbh->prepare("insert into hm_user values(?,?)");
-                $hash = pbkdf2_create_hash($pass);
-                if ($sql->execute(array($user, $hash))) {
-                    $this->check($request, $user, $pass);
-                    Hm_Msgs::add("Account created");
-                }
-            }
-        }
-    }
-}
-
+/**
+ * Base class for session management. All session interaction happens through
+ * classes that extend this.
+ */
 abstract class Hm_Session {
+
+    /* set to true if the session was just loaded on this request */
     public $loaded = false;
+
+    /* set to true if the session is active */
     public $active = false;
+
+    /* set to true if the user authentication is local (DB) */
     public $internal_users = false;
 
+    /* key used to encrypt session data */
     protected $enc_key = '';
+
+    /* session data */
     protected $data = array();
+
+    /* session cookie name */
     protected $cname = false;
+
+    /* site config object */
     protected $site_config = false;
+
+    /* authentication object */
     protected $auth_mech = false;
 
+    /**
+     * Methods extended classes need to override
+     * TODO: document
+     */
     abstract protected function check($request);
     abstract protected function start($request);
     abstract protected function auth($user, $pass);
@@ -165,16 +45,36 @@ abstract class Hm_Session {
     abstract protected function end();
     abstract protected function destroy($request);
 
+    /**
+     * Setup initial data
+     *
+     * @param $config object site config
+     * @param $auth_type string authentication class
+     *
+     * @return void
+     */
     public function __construct($config, $auth_type='Hm_Auth_DB') {
         $this->site_config = $config;
         $this->auth_mech = new $auth_type($config);
         $this->internal_users = $this->auth_mech->internal_users;
     }
 
+    /**
+     * Method called on a new login
+     *
+     * @return void
+     */
     protected function just_started() {
         $this->set('login_time', time());
     }
 
+    /**
+     * Check HTTP header "fingerprint" against the session value
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
     protected function check_fingerprint($request) {
         $id = $this->build_fingerprint($request);
         $fingerprint = $this->get('fingerprint', false);
@@ -183,6 +83,13 @@ abstract class Hm_Session {
         }
     }
 
+    /**
+     * Build HTTP header "fingerprint"
+     *
+     * @param $request object request details
+     *
+     * @return string fingerprint value
+     */
     protected function build_fingerprint($request) {
         $env = $request->server;
         $id = '';
@@ -195,27 +102,67 @@ abstract class Hm_Session {
         return hash('sha256', $id);
     }
 
+    /**
+     * Save a fingerprint in the session
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
     protected function set_fingerprint($request) {
         $id = $this->build_fingerprint($request);
         $this->set('fingerprint', $id);
     }
 
+    /**
+     * Record session level changes not yet saved in persistant storage
+     *
+     * @param $vaue string short description of the unsaved value
+     *
+     * @return void
+     */
     public function record_unsaved($value) {
         $this->data['changed_settings'][] = $value;
     }
 
+    /**
+     * Returns bool true if the session is active
+     *
+     * @return bool
+     */
     public function is_active() {
         return $this->active;
     }
 
+    /**
+     * Encrypt session data
+     *
+     * @param $data array session data to encrypt
+     *
+     * @return string encrypted session data
+     */
     protected function ciphertext($data) {
         return Hm_Crypt::ciphertext(serialize($data), $this->enc_key);
     }
 
+    /**
+     * Decrypt session data
+     *
+     * @param $data encrypted session data
+     *
+     * @return array decrpted session data
+     */
     protected function plaintext($data) {
         return @unserialize(Hm_Crypt::plaintext($data, $this->enc_key));
     }
 
+    /**
+     * Set or re-use session level encryption key
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
     protected function set_key($request) {
         if (array_key_exists('hm_id', $request->cookie)) {
             $this->enc_key = $request->cookie['hm_id'];
@@ -226,6 +173,18 @@ abstract class Hm_Session {
         }
     }
 
+    /**
+     * Set a cookie, secure if possible
+     *
+     * @param $request object request details
+     * @param $name string cookie name
+     * @param $value string cookie value
+     * @param $lifetime string cookie lifetime
+     * @param $path string cookie path
+     * @param $domain string cookie domain
+     *
+     * @return void
+     */
     public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='') {
         if ($request->tls) {
             $secure = true;
@@ -238,9 +197,23 @@ abstract class Hm_Session {
 
 }
 
+/**
+ * PHP Sessions that extend the base session class
+ */
 class Hm_PHP_Session extends Hm_Session {
+
+    /* cookie name for sessions */
     protected $cname = 'PHPSESSID';
 
+    /**
+     * Check for an existing session or a new user/pass login request
+     *
+     * @param $request object request details
+     * @param $user string username
+     * @param $pass string password
+     *
+     * @return void
+     */
     public function check($request, $user=false, $pass=false) {
         if ($user && $pass) {
             if ($this->auth($user, $pass)) {
@@ -261,18 +234,50 @@ class Hm_PHP_Session extends Hm_Session {
         }
     }
 
+    /**
+     * Call the configured authentication method to check user credentials
+     *
+     * @param $user string username
+     * @param $pass string password
+     *
+     * @return bool true if the authentication was successful
+     */
     public function auth($user, $pass) {
         return $this->auth_mech->check_credentials($user, $pass);
     }
 
+    /**
+     * Call the configuration authentication method to change the user password
+     *
+     * @param $user string username
+     * @param $pass string password
+     *
+     * @return bool true if the password was changed
+     */
     public function change_pass($user, $pass) {
         return $this->auth_mech->change_pass($user, $pass);
     }
 
+    /**
+     * Call the configuration authentication method to create an account
+     *
+     * @param $request object request details
+     * @param $user string username
+     * @param $pass string password
+     *
+     * @return bool true if the account was created
+     */
     public function create($request, $user, $pass) {
         return $this->auth_mech->create($user, $pass);
     }
 
+    /**
+     * Start the session. This could be an existing session or a new login
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
     public function start($request) {
         if (array_key_exists($this->cname, $request->cookie)) {
             session_id($request->cookie[$this->cname]);
@@ -287,6 +292,15 @@ class Hm_PHP_Session extends Hm_Session {
         $this->active = true;
     }
 
+    /**
+     * Return a session value, or a user settings value stored in the session
+     *
+     * @param $name string session value name to return
+     * @param $default mixed value to return if $name is not found
+     * @param $user bool if true, only search the user_data section of the session
+     *
+     * @return mixed the value if found, otherwise $default
+     */
     public function get($name, $default=false, $user=false) {
         if ($user) {
             return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data) ? $this->data['user_data'][$name] : $default;
@@ -296,6 +310,15 @@ class Hm_PHP_Session extends Hm_Session {
         }
     }
 
+    /**
+     * Save a value in the session
+     *
+     * @param $name string the name to save
+     * @param $value string the value to save
+     * @param $user bool if true, save in the user_data section of the session
+     *
+     * @return void
+     */
     public function set($name, $value, $user=false) {
         if ($user) {
             $this->data['user_data'][$name] = $value;
@@ -305,21 +328,25 @@ class Hm_PHP_Session extends Hm_Session {
         }
     }
 
+    /**
+     * Delete a value from the session
+     *
+     * @param $name string name of value to delete
+     *
+     * @return void
+     */
     public function del($name) {
         if (array_key_exists($name, $this->data)) {
             unset($this->data[$name]);
         }
     }
 
-    public function destroy($request) {
-        session_unset();
-        @session_destroy();
-        $params = session_get_cookie_params();
-        $this->secure_cookie($request, $this->cname, '', 0, $params['path'], $params['domain']);
-        $this->secure_cookie($request, 'hm_id', '', 0);
-        $this->active = false;
-    }
-
+    /**
+     * End a session after a page request is complete. This only closes the session and
+     * does not destroy it
+     *
+     * @return void
+     */
     public function end() {
         if ($this->active) {
             $enc_data = $this->ciphertext($this->data);
@@ -328,13 +355,44 @@ class Hm_PHP_Session extends Hm_Session {
             $this->active = false;
         }
     }
+
+    /**
+     * Destroy a session for good
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
+    public function destroy($request) {
+        session_unset();
+        @session_destroy();
+        $params = session_get_cookie_params();
+        $this->secure_cookie($request, $this->cname, '', 0, $params['path'], $params['domain']);
+        $this->secure_cookie($request, 'hm_id', '', 0);
+        $this->active = false;
+    }
 }
 
+/**
+ * This session class uses a PDO compatible DB to manage session data. It does not
+ * use PHP session handlers at all and is a completely indenpendant session system.
+ */
 class Hm_DB_Session extends Hm_PHP_Session {
+
+    /* session cookie name */
     protected $cname = 'hm_session';
+
+    /* session key */
     private $session_key = '';
+
+    /* DB handle */
     protected $dbh = false;
 
+    /**
+     * Create a new session
+     *
+     * @return bool true on success
+     */
     private function insert_session_row() {
         $sql = $this->dbh->prepare("insert into hm_user_session values(?, ?, current_date)");
         $enc_data = $this->ciphertext($this->data);
@@ -344,6 +402,11 @@ class Hm_DB_Session extends Hm_PHP_Session {
         return false;
     }
 
+    /**
+     * Connect to the configured DB
+     *
+     * @return bool true on success
+     */
     protected function connect() {
         $this->dbh = Hm_DB::connect($this->site_config);
         if ($this->dbh) {
@@ -352,6 +415,13 @@ class Hm_DB_Session extends Hm_PHP_Session {
         return false;
     }
 
+    /**
+     * Start the session. This could be an existing session or a new login
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
     public function start($request) {
         if ($this->connect()) {
             if ($this->loaded) {
@@ -383,6 +453,12 @@ class Hm_DB_Session extends Hm_PHP_Session {
         }
     }
 
+    /**
+     * End a session after a page request is complete. This only closes the session and
+     * does not destroy it
+     *
+     * @return void
+     */
     public function end() {
         if ($this->dbh) {
             $sql = $this->dbh->prepare("update hm_user_session set data=? where hm_id=?");
@@ -392,6 +468,13 @@ class Hm_DB_Session extends Hm_PHP_Session {
         $this->active = false;
     }
 
+    /**
+     * Destroy a session for good
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
     public function destroy($request) {
         if ($this->dbh) {
             $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
