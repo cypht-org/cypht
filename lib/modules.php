@@ -49,7 +49,6 @@ abstract class Hm_Handler_Module {
         $this->request = $parent->request;
         $this->config = $parent->config;
         $this->user_config = $parent->user_config;
-        $this->page = $parent->page;
     }
 
     /**
