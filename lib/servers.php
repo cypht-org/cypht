@@ -3,7 +3,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * Struct that makes it easy for a module set to manage a set of server connections
+ * Struct that makes it easy for a module set to manage a list of server connections
  */
 trait Hm_Server_List {
 
