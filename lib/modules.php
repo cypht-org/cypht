@@ -218,8 +218,8 @@ abstract class Hm_Output_Module {
  * Input processing module "runner"
  *
  * This is a wrapper around input or "handler" module execution.
- * It is called by the Hm_Router object to execut all input processing
- * modules
+ * It is called by the Hm_Router object to run all the handler modules
+ * for the current page
  */
 class Hm_Request_Handler {
 
@@ -321,7 +321,8 @@ class Hm_Request_Handler {
     }
 }
 
-/* Trait used as the basic logic for module management
+/**
+ * Trait used as the basic logic for module management
  *
  * Two classes use this trait, Hm_Handler_Modules and Hm_Output_Modules.
  * These are the interfaces module sets use (indirectly) to interact with a request
