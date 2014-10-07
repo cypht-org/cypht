@@ -196,6 +196,7 @@ class Hm_Router {
             }
         }
         $class::try_queued_modules();
+        $class::process_all_page_queue();
     }
 
     /**

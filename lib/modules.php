@@ -339,6 +339,35 @@ trait Hm_Modules {
     /* a retry queue for modules that fail to insert immediately */
     private static $module_queue = array();
 
+    /* queue for delayed module insertion for all pages */
+    private static $all_page_queue = array();
+
+    /**
+     * Queue a module to be added to all defined pages
+     *
+     * @param $module string the module to add
+     * @param $logged_in bool true if the module requires the user to be logged in
+     * @param $marker string the module to insert before or after
+     * @param $placement string "before" or "after" the $marker module
+     * @param $source string the module set containing this module
+     *
+     * return void
+     */
+    public static function queue_module_for_all_pages($module, $logged_in, $marker, $placement, $source) {
+        self::$all_page_queue[] = array($module, $logged_in, $marker, $placement, $source);
+    }
+
+    /**
+     * Process queued modules and add them to all pages
+     *
+     * @return void
+     */
+    public static function process_all_page_queue() {
+        foreach (self::$all_page_queue as $mod) {
+            self::add_to_all_pages($mod[0], $mod[1], $mod[2], $mod[3], $mod[4]);
+        }
+    }
+
     /**
      * Load a complete formatted module list
      *
@@ -636,10 +665,10 @@ function add_output($page, $mod, $logged_in, $source=false, $marker=false, $plac
  */
 function add_module_to_all_pages($type, $mod, $logged_in, $source, $marker, $placement) {
     if ($type == 'output') {
-        Hm_Output_Modules::add_to_all_pages($mod, $logged_in, $marker, $placement, $source);
+        Hm_Output_Modules::queue_module_for_all_pages($mod, $logged_in, $marker, $placement, $source);
     }
     elseif ( $type == 'handler') {
-        Hm_Handler_Modules::add_to_all_pages($mod, $logged_in, $marker, $placement, $source);
+        Hm_Handler_Modules::queue_module_for_all_pages($mod, $logged_in, $marker, $placement, $source);
     }
 }
 
