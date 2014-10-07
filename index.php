@@ -1,10 +1,10 @@
 <?php
 
-/* constants */
+/* config file location */
+define('CONFIG_FILE', 'hm3.rc');
+
+/* debug mode switch */
 define('DEBUG_MODE', false);
-define('MAX_PER_SOURCE', 100);
-define('DEFAULT_PER_SOURCE', 20);
-define('DEFAULT_SINCE', 'today');
 
 /* compress output if possible */
 ini_set("zlib.output_compression", "On");
@@ -35,26 +35,13 @@ require 'lib/db.php';
 require 'lib/servers.php';
 
 /* get configuration */
-$config = new Hm_Site_Config_File('hm3.rc');
+$config = new Hm_Site_Config_File(CONFIG_FILE);
 
-/* process request input */
+/* process request and send output to the browser */
 $router = new Hm_Router();
-list($response_data, $session, $allowed_output) = $router->process_request($config);
+$router->process_request($config);
 
-/* format response content */
-$formatter = new $response_data['router_format_name']();
-$response_str = $formatter->format_content($response_data, $allowed_output);
-
-/* output response */
-$renderer = new Hm_Output_HTTP();
-$renderer->send_response($response_str, $response_data);
-
-/* save any cached stuff */
-Hm_Page_Cache::save($session);
-
-/* close down the session */
-$session->end();
-
+/* log some debug stats about the page */
 if (DEBUG_MODE) {
     Hm_Debug::load_page_stats();
     Hm_Debug::show('log');

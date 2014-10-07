@@ -13,7 +13,8 @@ class Hm_Router {
     private $page = 'home';
 
     /**
-     * Main entry point to the router. 
+     * Main entry point to the router. All the work of processing input and sending output to and from
+     * the browser happens here.
      *
      * @param $config object site configuration object
      *
@@ -41,16 +42,32 @@ class Hm_Router {
         $this->load_module_sets($config, $handler_mods, $output_mods);
 
         /* run all the handler modules for a page and merge in some standard results */
-        $result = $this->merge_response($this->process_page($request, $session, $config), $config, $request, $session);
+        $response_data = $this->merge_response($this->process_page($request, $session, $config), $config, $request, $session);
 
         /* check for POST redirect messages */
         $this->check_for_redirected_msgs($session, $request);
 
         /* see if we should redirect this request */
-        $this->check_for_redirect($request, $session, $result);
+        $this->check_for_redirect($request, $session, $response_data);
 
-        /* return processed data */
-        return array($result, $session, $request->allowed_output);
+        /* format and output the response data */
+        $this->render_output($this->format_response_content($response_data, $request->allowed_output), $response_data);
+
+        /* save any cached stuff */
+        Hm_Page_Cache::save($session);
+
+        /* close down the session */
+        $session->end();
+    }
+
+    private function format_response_content($response_data, $allowed_output) {
+        $formatter = new $response_data['router_format_name']();
+        return $formatter->format_content($response_data, $allowed_output);
+    }
+
+    private function render_output($output, $response_data) {
+        $renderer = new Hm_Output_HTTP();
+        $renderer->send_response($output, $response_data);
     }
 
     /**
