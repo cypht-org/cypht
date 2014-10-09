@@ -13,10 +13,10 @@ if (!defined('DEBUG_MODE')) { die(); }
  * $config       The site config object
  * $user_config  The user settings object for the current user
  *
- * Modules that extend this class need to override the process function. It takes a
- * take a single array argument. Modules can pass information to the output modules
+ * Modules that extend this class need to override the process function, which takes a
+ * a single array argument. Modules can pass information to the output modules
  * by adding to the array and returning it. All handler modules should return
- * the the input array even if it's unmodified, otherwise other modules could be lost.
+ * the input array even if it's unmodified, otherwise other modules could be lost.
  *
  */
 abstract class Hm_Handler_Module {
