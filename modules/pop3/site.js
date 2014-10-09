@@ -102,7 +102,6 @@ var pop3_message_view = function() {
 
 var display_pop3_message = function(res) {
     $('.msg_text').html('');
-    $('.msg_text').append(res.msg_gravatar);
     $('.msg_text').append(res.msg_headers);
     $('.msg_text').append(res.msg_text);
     set_message_content();

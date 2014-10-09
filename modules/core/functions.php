@@ -190,13 +190,6 @@ function format_msg_text($str, $output_mod, $links=true) {
     return $str;
 }
 
-function build_msg_gravatar($from) {
-    if (preg_match("/[\S]+\@[\S]+/", $from, $matches)) {
-        $hash = md5(strtolower(trim($matches[0], " \"><'\t\n\r\0\x0B")));
-        return '<img alt="" class="gravatar" src="http://www.gravatar.com/avatar/'.$hash.'?d=mm" />';
-    }
-}
-
 function display_value($name, $haystack, $type=false, $default='') {
     if (!array_key_exists($name, $haystack)) {
         return $default;

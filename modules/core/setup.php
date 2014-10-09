@@ -112,7 +112,6 @@ return array(
         'just_saved_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
         'just_forgot_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
         'deleted_server_id' => array(FILTER_VALIDATE_INT, false),
-        'msg_gravatar' => array(FILTER_UNSAFE_RAW, false),
         'msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),

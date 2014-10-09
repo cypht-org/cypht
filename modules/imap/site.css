@@ -61,7 +61,6 @@
 .header_links{ font-variant: small-caps; }
 .selected_part { background-color: #f5f5f5; }
 .imap_server_setup { table-layout: fixed; width: 100%; display: table; background-color: #fff; }
-.gravatar { width: 80px; height: 80px; position: absolute; top: 70px; right: 20px; }
 .unseen { font-weight: 700; }
 .checkbox_row { padding-right: 10px !important; }
 .checkbox_header img { padding-left: 3px; padding-right: 0px; }

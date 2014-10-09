@@ -577,7 +577,6 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                 '</th></tr></table>';
 
             $input['msg_headers'] = $txt;
-            $input['msg_gravatar'] = build_msg_gravatar($from);
         }
         $txt = '<div class="msg_text_inner">';
         if (isset($input['pop3_message_body'])) {
