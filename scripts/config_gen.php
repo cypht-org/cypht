@@ -22,7 +22,7 @@ if (isset($options['ini_file'])) {
     $settings = parse_ini_file($options['ini_file']);
 }
 if (!empty($settings)) {
-    $js = file_get_contents("third_party/zepto.min.js");
+    $js = '';
     $css = '';
     $mod_map = array();
     $js_compress = false;
@@ -53,7 +53,8 @@ if (!empty($settings)) {
         printf("site.css file created\n");
     }
     if ($js) {
-        file_put_contents('site.js', compress($js, $js_compress));
+        $js_lib = file_get_contents("third_party/zepto.min.js");
+        file_put_contents('site.js', $js_lib.compress($js, $js_compress));
         printf("site.js file created\n");
     }
     Hm_Handler_Modules::process_all_page_queue();
