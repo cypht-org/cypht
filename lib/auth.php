@@ -233,7 +233,7 @@ class Hm_Auth_DB extends Hm_Auth {
      * @param $user string username
      * @param $pass string password
      */
-    public function create($request, $user, $pass) {
+    public function create($user, $pass) {
         $this->connect();
         $sql = $this->dbh->prepare("select username from hm_user where username = ?");
         if ($sql->execute(array($user))) {
@@ -245,7 +245,6 @@ class Hm_Auth_DB extends Hm_Auth {
                 $sql = $this->dbh->prepare("insert into hm_user values(?,?)");
                 $hash = pbkdf2_create_hash($pass);
                 if ($sql->execute(array($user, $hash))) {
-                    $this->check($request, $user, $pass);
                     Hm_Msgs::add("Account created");
                 }
             }
