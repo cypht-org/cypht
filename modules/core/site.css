@@ -117,7 +117,6 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .folder_list { min-width: 150px; }
     .src_name, .content_title { font-size: 140%; padding-bottom: 15px; padding-top: 15px; max-height: 50px; }
     body { font-size: 150%; }
-    .gravatar { display: none; }
     .list_controls { padding-right: 10px; }
     .msg_text { font-size: 125%; }
     .msg_text_inner { font-size: 140%; }
@@ -134,7 +133,6 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .checkbox_cell { padding-left: 15px !important; }
     .folder_list { min-width: 150px; }
     .src_name, .content_title { font-size: 125%; max-height: 50px; }
-    .gravatar { display: none; }
     .list_controls { padding-right: 10px; }
     .msg_text_inner { font-size: 140%; }
 }

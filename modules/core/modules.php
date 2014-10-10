@@ -18,6 +18,9 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
         if ($this->request->tls) {
             $data['http_headers'][] = 'Strict-Transport-Security: max-age=31536000';
         }
+        $data['http_headers'][] = 'X-XSS-Protection: 1; mode=block';
+        $data['http_headers'][] = 'X-Content-Type-Options: nosniff';
+        $data['http_headers'][] = "Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';";
         return $data;
     }
 }

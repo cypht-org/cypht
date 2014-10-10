@@ -247,7 +247,6 @@ var expand_imap_mailbox = function(res) {
 /* message content */
 var display_msg_content = function(res) {
     $('.msg_text').html('');
-    $('.msg_text').append(res.msg_gravatar);
     $('.msg_text').append(res.msg_headers);
     $('.msg_text').append(res.msg_text);
     $('.msg_text').append(res.msg_parts);

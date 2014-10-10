@@ -404,11 +404,15 @@ var Hm_Message_List = {
         }
         else if (hm_list_path == 'combined_inbox') {
             count = $('.unseen', $('.message_table tbody')).length;
-            document.title = count+' New in Everything';
+            document.title = count+' Unread in Everything';
+        }
+        else if (hm_list_path == 'email') {
+            count = $('.unseen', $('.message_table tbody')).length;
+            document.title = count+' Unread in Email';
         }
         else if (hm_list_path == 'feeds') {
             count = $('.unseen', $('.message_table tbody')).length;
-            document.title = count+' New in Feeds';
+            document.title = count+' Unread in Feeds';
         }
     }
 };

@@ -582,7 +582,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 '</th></tr></table>';
 
             $input['msg_headers'] = $txt;
-            $input['msg_gravatar'] = build_msg_gravatar($from);
         }
         return $input;
     }
