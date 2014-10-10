@@ -32,6 +32,9 @@ abstract class Hm_Session {
     /* authentication object */
     protected $auth_mech = false;
 
+    /* close early flag */
+    protected $session_closed = false;
+
     /**
      * Methods extended classes need to override
      * TODO: document
@@ -168,7 +171,7 @@ abstract class Hm_Session {
             $this->enc_key = $request->cookie['hm_id'];
         }
         else {
-            $this->enc_key = base64_encode(openssl_random_pseudo_bytes(128));
+            $this->enc_key = Hm_Crypt::unique_id();
             $this->secure_cookie($request, 'hm_id', $this->enc_key);
         }
     }
@@ -350,11 +353,32 @@ class Hm_PHP_Session extends Hm_Session {
      */
     public function end() {
         if ($this->active) {
-            $enc_data = $this->ciphertext($this->data);
-            $_SESSION = array('data' => $enc_data);
-            session_write_close();
+            if (!$this->session_closed) {
+                $this->save_data();
+            }
             $this->active = false;
         }
+    }
+
+    /**
+     * write session data to avoid locking, keep session active, but don't allow writing
+     *
+     * @return void
+     */
+    public function close_early() {
+        $this->session_closed = true;
+        $this->save_data();
+    }
+
+    /** save session data
+     *
+     * @return void
+     */
+    public function save_data() {
+        $enc_data = $this->ciphertext($this->data);
+        $_SESSION = array('data' => $enc_data);
+        session_write_close();
+        $_SESSION = array();
     }
 
     /**
@@ -426,7 +450,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
     public function start($request) {
         if ($this->connect()) {
             if ($this->loaded) {
-                $this->session_key = base64_encode(openssl_random_pseudo_bytes(128));
+                $this->session_key = Hm_Crypt::unique_id(); 
                 $this->secure_cookie($request, $this->cname, $this->session_key, 0);
                 if ($this->insert_session_row()) {
                     $this->active = true;
@@ -461,12 +485,23 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return void
      */
     public function end() {
+        if (!$this->session_closed) {
+            $this->save_data();
+        }
+        $this->active = false;
+    }
+
+    public function save_data() {
         if ($this->dbh) {
             $sql = $this->dbh->prepare("update hm_user_session set data=? where hm_id=?");
             $enc_data = $this->ciphertext($this->data);
             $sql->execute(array($enc_data, $this->session_key));
         }
-        $this->active = false;
+    }
+
+    public function close_early() {
+        $this->session_closed = true;
+        $this->save_data();
     }
 
     /**
