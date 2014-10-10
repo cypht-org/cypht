@@ -82,7 +82,7 @@ abstract class Hm_Session {
         $id = $this->build_fingerprint($request);
         $fingerprint = $this->get('fingerprint', false);
         if (!$fingerprint || $fingerprint !== $id) {
-            $this->end();
+            $this->destroy($request);
         }
     }
 
@@ -160,21 +160,29 @@ abstract class Hm_Session {
     }
 
     /**
-     * Set or re-use session level encryption key
+     * Set the session level encryption key
      *
      * @param $request object request details
      *
      * @return void
      */
     protected function set_key($request) {
+        $this->enc_key = Hm_Crypt::unique_id();
+        $this->secure_cookie($request, 'hm_id', $this->enc_key);
+    }
+    /**
+     * Fetch the current encryption key
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
+    function get_key($request) {
         if (array_key_exists('hm_id', $request->cookie)) {
             $this->enc_key = $request->cookie['hm_id'];
         }
-        else {
-            $this->enc_key = Hm_Crypt::unique_id();
-            $this->secure_cookie($request, 'hm_id', $this->enc_key);
-        }
     }
+
 
     /**
      * Set a cookie, secure if possible
@@ -195,9 +203,14 @@ abstract class Hm_Session {
         else {
             $secure = false;
         }
-        setcookie($name, $value, $lifetime, $path, $domain, $secure);
+        if (!$path && isset($request->path)) {
+            $path = $request->path;
+        }
+        if (!$domain && array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
+            $domain = $request->server['SERVER_NAME'];
+        }
+        setcookie($name, $value, $lifetime, $path, $domain, $secure, true);
     }
-
 }
 
 /**
@@ -231,7 +244,7 @@ class Hm_PHP_Session extends Hm_Session {
             }
         }
         elseif (array_key_exists($this->cname, $request->cookie)) {
-            $this->set_key($request);
+            $this->get_key($request);
             $this->start($request);
             $this->check_fingerprint($request);
         }
@@ -286,6 +299,8 @@ class Hm_PHP_Session extends Hm_Session {
         if (array_key_exists($this->cname, $request->cookie)) {
             session_id($request->cookie[$this->cname]);
         }
+        list($secure, $path, $domain) = $this->set_session_params($request);
+        session_set_cookie_params(0, $path, $domain, $secure);
         session_start();
         if (array_key_exists('data', $_SESSION)) {
             $data = $this->plaintext($_SESSION['data']);
@@ -294,6 +309,29 @@ class Hm_PHP_Session extends Hm_Session {
             }
         }
         $this->active = true;
+    }
+
+    /**
+     * Setup the cookie params for a session cookie
+     *
+     * @param $request object request details
+     *
+     * @return array list of cookie fields
+     */
+    public function set_session_params($request) {
+        if ($request->tls) {
+            $secure = true;
+        }
+        else {
+            $secure = false;
+        }
+        if (isset($request->path)) {
+            $path = $request->path;
+        }
+        if (array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
+            $domain = $request->server['SERVER_NAME'];
+        }
+        return array($secure, $path, $domain);
     }
 
     /**
@@ -392,8 +430,8 @@ class Hm_PHP_Session extends Hm_Session {
         session_unset();
         @session_destroy();
         $params = session_get_cookie_params();
-        $this->secure_cookie($request, $this->cname, '', 0, $params['path'], $params['domain']);
-        $this->secure_cookie($request, 'hm_id', '', 0);
+        $this->secure_cookie($request, $this->cname, '', time()-3600, $params['path'], $params['domain']);
+        $this->secure_cookie($request, 'hm_id', '', time()-3600);
         $this->active = false;
     }
 }
@@ -465,7 +503,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
                     $sql = $this->dbh->prepare('select data from hm_user_session where hm_id=?');
                     if ($sql->execute(array($this->session_key))) {
                         $results = $sql->fetch();
-                        if (array_key_exists('data', $results)) {
+                        if (is_array($results) && array_key_exists('data', $results)) {
                             $data = $this->plaintext($results['data']);
                             if (is_array($data)) {
                                 $this->active = true;
@@ -516,8 +554,8 @@ class Hm_DB_Session extends Hm_PHP_Session {
             $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
             $sql->execute(array($this->session_key));
         }
-        $this->secure_cookie($request, $this->cname, '', 0);
-        $this->secure_cookie($request, 'hm_id', '', 0);
+        $this->secure_cookie($request, $this->cname, '', time()-3600);
+        $this->secure_cookie($request, 'hm_id', '', time()-3600);
         $this->active = false;
     }
 }
