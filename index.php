@@ -6,9 +6,6 @@ define('CONFIG_FILE', 'hm3.rc');
 /* debug mode switch */
 define('DEBUG_MODE', false);
 
-/* compress output if possible */
-ini_set("zlib.output_compression", "On");
-
 /* don't let anything output content until we are ready */
 ob_start();
 
@@ -36,6 +33,9 @@ require 'lib/servers.php';
 
 /* get configuration */
 $config = new Hm_Site_Config_File(CONFIG_FILE);
+
+/* setup ini settings */
+require 'lib/ini_set.php';
 
 /* process request and send output to the browser */
 $router = new Hm_Router();
