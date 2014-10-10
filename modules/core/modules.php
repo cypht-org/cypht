@@ -27,7 +27,7 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
         }
         $data['http_headers'][] = 'X-XSS-Protection: 1; mode=block';
         $data['http_headers'][] = 'X-Content-Type-Options: nosniff';
-        $data['http_headers'][] = 'Expires: '.gmdate('D, d M Y H:i:s \G\M\T', strtotime('-1 minute'));
+        $data['http_headers'][] = 'Expires: '.gmdate('D, d M Y H:i:s \G\M\T', strtotime('-1 year'));
         $data['http_headers'][] = "Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';";
         return $data;
     }
