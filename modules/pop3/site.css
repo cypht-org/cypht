@@ -1,6 +1,6 @@
 .pop3_summary_data table th, .unread_messages table th { cursor: pointer; text-align: left; color: #666; font-weight: normal; border-bottom: solid 1px #eee; }
 .pop3_summary_data table td { padding: 5px; }
-.pop3_summary_data { margin-top: 20px; margin-right: 20px; padding: 10px; border: solid 1px #aaa; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.pop3_summary_data { margin-top: 20px; margin-right: 20px; padding: 10px; border: solid 1px #aaa; border-radius: 5px; }
 .pop3_summary_row { padding: 10px; padding-top: 0px; }
 .pop3_summary_row td { text-align: left; padding-left: 10px;}
 .pop3_server_setup { background-color: #fff; }
