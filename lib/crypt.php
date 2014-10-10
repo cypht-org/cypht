@@ -74,6 +74,15 @@ class Hm_Crypt {
     public static function iv_size() {
         return mcrypt_get_iv_size(self::$cipher, self::$mode);
     }
+
+    /**
+     * Return a unique-enough-key for session cookie ids
+     *
+     * @return string
+     */
+    public static function unique_id() {
+        return bin2hex(openssl_random_pseudo_bytes(128));
+    }
 }
 
 ?>
