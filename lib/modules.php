@@ -55,7 +55,7 @@ abstract class Hm_Handler_Module {
      * Process an HTTP POST form
      *
      * @param $form array list of required field names in the form
-     * @param $nonce bool if true require a matching nonce value in a form field called hm_nonce
+     * @param $nonce bool if a string require a matching nonce value in a form field called hm_nonce
      *
      * @return array tuple with a bool indicating success, and an array of valid form values
      */
@@ -72,7 +72,7 @@ abstract class Hm_Handler_Module {
             $success = true;
         }
         if ($nonce && $success) {
-            $success = $this->process_nonce($post);
+            $success = $this->process_nonce($post, $nonce);
         }
         return array($success, $new_form);
     }
@@ -81,10 +81,11 @@ abstract class Hm_Handler_Module {
      * Validate an HTTP POST form id
      *
      * @param $post array sanitized post data
+     * @param $nonce string nonce to check
      *
      * @return bool true on success
      */
-    private function process_nonce($post) {
+    private function process_nonce($post, $nonce) {
         if (!array_key_exists('hm_nonce', $post)) {
             return false;
         }
