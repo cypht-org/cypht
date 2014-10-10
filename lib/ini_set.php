@@ -33,4 +33,22 @@ ini_set('session.cache_limiter', 'nocache');
 /* session hash mechanism */
 ini_set('session.hash_function', 'sha256');
 
+/* disable remote includes */
+ini_set('allow_url_include', 0);
+
+/* don't show errors in production */
+if (!DEBUG_MODE) {
+    ini_set('display_errors', 0);
+    ini_set('display_start_up_errors', 0);
+}
+
+/* show everthing in debug mode */
+else {
+    ini_set('display_errors', 1);
+    ini_set('display_start_up_errors', 1);
+}
+
+/* open base dir */
+ini_set('open_basedir', dirname(dirname(__FILE__)));
+
 ?>

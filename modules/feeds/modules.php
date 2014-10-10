@@ -402,7 +402,6 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
             return '<div class="feed_server_setup"><div onclick="return toggle_page_section(\'.feed_section\');" class="server_section">'.
                 '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.
                ' Feeds <div class="server_count">'.$count.'</div></div><div class="feed_section"><form class="add_server" method="POST">'.
-                '<input type="hidden" name="hm_nonce" value="'.$this->build_nonce('add_feed').'"/>'.
                 '<div class="subtitle">Add an RSS/ATOM Feed</div><table>'.
                 '<tr><td><input type="text" name="new_feed_name" class="txt_fld" value="" placeholder="Feed name" /></td></tr>'.
                 '<tr><td><input type="text" name="new_feed_address" class="txt_fld" placeholder="Site address or feed URL" value=""/></td></tr>'.

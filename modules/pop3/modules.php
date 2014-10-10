@@ -456,7 +456,7 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
         return '<div class="pop3_server_setup"><div onclick="return toggle_page_section(\'.pop3_section\');" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
            ' POP3 Servers <div class="server_count">'.$count.'</div></div><div class="pop3_section"><form class="add_server" method="POST">'.
-            '<div class="subtitle">Add a POP3 Server</div><input type="hidden" name="hm_nonce" value="'.$this->build_nonce( 'add_pop3_server' ).'" />'.
+            '<div class="subtitle">Add a POP3 Server</div>'.
             '<table><tr><td colspan="2"><input type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
             '<tr><td colspan="2"><input type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
             '<tr><td colspan="2"><input type="text" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.

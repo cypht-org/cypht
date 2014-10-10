@@ -306,26 +306,6 @@ class Hm_Router {
     }
 
     /**
-     * Build a value that can be used to seed a page specific nonce id
-     *
-     * @param $session object session interface
-     * @param $config object site config
-     * @param $request object request details
-     *
-     * @return string nonce base
-     */
-    private function build_nonce_base($session, $config, $request) {
-        $result = $session->get('username', false);
-        if (array_key_exists('hm_id', $request->cookie)) {
-            $result .= $request->cookie['hm_id']; 
-        }
-        elseif ($config->get('enc_key', false)) {
-            $result .= $config->get('enc_key', false);
-        }
-        return $result;
-    }
-
-    /**
      * Merge the combined response from the handler modules with some default values
      *
      * @param $response array combined result of the handler modules
@@ -338,7 +318,6 @@ class Hm_Router {
     private function merge_response($response, $config, $request, $session) {
         return array_merge($response, array(
             'router_page_name'    => $this->page,
-            'router_nonce_base'   => $this->build_nonce_base($session, $config, $request),
             'router_request_type' => $request->type,
             'router_sapi_name'    => $request->sapi,
             'router_format_name'  => $request->format,

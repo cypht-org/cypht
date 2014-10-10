@@ -55,11 +55,10 @@ abstract class Hm_Handler_Module {
      * Process an HTTP POST form
      *
      * @param $form array list of required field names in the form
-     * @param $nonce bool if a string require a matching nonce value in a form field called hm_nonce
      *
      * @return array tuple with a bool indicating success, and an array of valid form values
      */
-    protected function process_form($form, $nonce=false) {
+    protected function process_form($form) {
         $post = $this->request->post;
         $success = false;
         $new_form = array();
@@ -71,35 +70,7 @@ abstract class Hm_Handler_Module {
         if (count($form) == count($new_form)) {
             $success = true;
         }
-        if ($nonce && $success) {
-            $success = $this->process_nonce($post, $nonce);
-        }
         return array($success, $new_form);
-    }
-
-    /**
-     * Validate an HTTP POST form id
-     *
-     * @param $post array sanitized post data
-     * @param $nonce string nonce to check
-     *
-     * @return bool true on success
-     */
-    private function process_nonce($post, $nonce) {
-        if (!array_key_exists('hm_nonce', $post)) {
-            return false;
-        }
-        $key = $this->session->get('username', false);
-        if (array_key_exists('hm_id', $this->request->cookie)) {
-            $key .= $this->request->cookie['hm_id'];
-        }
-        elseif ($this->config->get('enc_key', false)) {
-            $key .= $this->config->get('enc_key', false);
-        }
-        if (hash_hmac('sha256', $nonce, $key) == $post['hm_nonce']) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -116,7 +87,7 @@ abstract class Hm_Handler_Module {
  * Base class for output modules
  *
  * All modules that output data to a request must extend this class and define
- * an output() method. It provides a nonce generator for forms, html sanitizing,
+ * an output() method. It provides form validation, html sanitizing,
  * and string translation services to modules
  */
 abstract class Hm_Output_Module {
@@ -127,29 +98,12 @@ abstract class Hm_Output_Module {
     /* langauge name */
     protected $lang = false;
 
-    /* nonce based passed up from the router */
-    protected $nonce_base = false;
-
     /**
-     * Assign nonce base
-     *
-     * @param $input array list from the input modules and page router
+     * Constructor. Might want to do something with $input eventually
      *
      * @return void
      */
     function __construct($input) {
-        $this->nonce_base = $input['router_nonce_base'];
-    }
-
-    /**
-     * Build a nonce value for the form
-     *
-     * @param $name string form id
-     *
-     * @return string nonce
-     */
-    protected function build_nonce($name) {
-        return hash_hmac('sha256', $name, $this->nonce_base);
     }
 
     /**
