@@ -140,8 +140,15 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             if ($this->tls) {
                 $this->server = 'tls://'.$this->server;
             } 
+            else {
+                $this->server = 'tcp://'.$this->server;
+            }
             $this->debug[] = 'Connecting to '.$this->server.' on port '.$this->port;
-            $this->handle = @fsockopen($this->server, $this->port, $errorno, $errorstr, 10);
+            $ctx = stream_context_create();
+            /* TODO: make this optional */
+            stream_context_set_option($ctx, 'ssl', 'verify_peer_name', false);
+            $timeout = 10;
+            $this->handle = stream_socket_client($this->server.':'.$this->port, $errorno, $errorstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
             if (is_resource($this->handle)) {
                 $this->debug[] = 'Successfully opened port to the IMAP server';
                 $this->state = 'connected';
