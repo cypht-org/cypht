@@ -270,8 +270,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
                 $data['internal_users'] = $this->session->internal_users;
                 Hm_Page_Cache::load($this->session);
                 Hm_Nonce::load($this->session);
-                // TODO: fix login/logout
-                //$this->process_nonce();
+                $this->process_nonce();
             }
         }
         return $data;
