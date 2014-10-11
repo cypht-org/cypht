@@ -49,6 +49,10 @@ else {
 }
 
 /* open base dir */
-ini_set('open_basedir', dirname(dirname(__FILE__)));
+$base = dirname(dirname(__FILE__));
+if ($config->get('user_settings_dir', false) && is_readable($config->get('user_settings_dir', false))) {
+    $base .= PATH_SEPARATOR.$config->get('user_settings_dir', false);
+}
+ini_set('open_basedir', $base);
 
 ?>
