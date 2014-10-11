@@ -614,6 +614,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $vals['tls'] ? 'TLS' : '' );
             $res .= 
                 '<form class="imap_connect" method="POST">'.
+                '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
                 '<span> <input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
@@ -647,7 +648,8 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
         $count = $this->trans(sprintf('%d configured', $count));
         return '<div class="imap_server_setup"><div onclick="return toggle_page_section(\'.imap_section\')" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
-           ' IMAP Servers <div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
+            ' IMAP Servers <div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<div class="subtitle">Add an IMAP Server</div><table>'.
             '<tr><td colspan="2"><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
             '<tr><td colspan="2"><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.

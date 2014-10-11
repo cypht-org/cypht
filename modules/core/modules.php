@@ -266,9 +266,11 @@ class Hm_Handler_login extends Hm_Handler_Module {
             else {
                 $this->session->check($this->request);
             }
-            $data['internal_users'] = $this->session->internal_users;
             if ($this->session->is_active()) {
+                $data['internal_users'] = $this->session->internal_users;
                 Hm_Page_Cache::load($this->session);
+                Hm_Nonce::load($this->session);
+                $this->process_nonce();
             }
         }
         return $data;
@@ -513,7 +515,8 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
         }
         else {
-            $res .= ' style=""><noscript class="noscript">You Need to have Javascript enabled to use HM3. Sorry about that!</noscript>';
+            $res .= ' ><noscript class="noscript">You Need to have Javascript enabled to use HM3. Sorry about that!</noscript>'.
+                '<input type="hidden" id="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
         }
         return $res;
     }
@@ -613,6 +616,7 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="user_settings"><div class="content_title">Site Settings</div>'.
             '<form method="POST"><table class="settings_table"><colgroup>'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
     }
 }
@@ -875,6 +879,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
     protected function output($input, $format) {
         $res =  '<li><form class="logout_form" method="POST">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
             $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a>'.
             '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.

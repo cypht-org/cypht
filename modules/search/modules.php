@@ -23,6 +23,7 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
 class Hm_Output_search_from_folder_list extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).'" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
             '<input type="text" class="search_terms" name="search_terms" placeholder="'.$this->trans('Search').'" size="14" /></form></li>';
         if ($format == 'HTML5') {
@@ -102,6 +103,7 @@ function search_form($data, $output_mod) {
     }
     $res = '<div class="search_form">'.
         '<form method="get"><input type="hidden" name="page" value="search" />'.
+        '<input type="hidden" name="hm_nonce" value="'.$output_mod->html_safe(Hm_Nonce::generate()).'" />'.
         ' <input type="text" class="search_terms" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
         ' '.search_field_selection($data['search_fld']).
         ' '.message_since_dropdown($data['search_since'], 'search_since').

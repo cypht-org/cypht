@@ -280,9 +280,9 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
 class Hm_Handler_process_add_feed extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['submit_feed'])) {
+            $found = false;
             list($success, $form) = $this->process_form(array('new_feed_name', 'new_feed_address'));
             if ($success) {
-                $found = false;
                 $connection_test = address_from_url($form['new_feed_address']);
                 if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
                     $feed = is_feed($form['new_feed_address']);
@@ -401,7 +401,8 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
             $count = sprintf($this->trans('%d configured'), $count);
             return '<div class="feed_server_setup"><div onclick="return toggle_page_section(\'.feed_section\');" class="server_section">'.
                 '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.
-               ' Feeds <div class="server_count">'.$count.'</div></div><div class="feed_section"><form class="add_server" method="POST">'.
+                ' Feeds <div class="server_count">'.$count.'</div></div><div class="feed_section"><form class="add_server" method="POST">'.
+                '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<div class="subtitle">Add an RSS/ATOM Feed</div><table>'.
                 '<tr><td><input type="text" name="new_feed_name" class="txt_fld" value="" placeholder="Feed name" /></td></tr>'.
                 '<tr><td><input type="text" name="new_feed_address" class="txt_fld" placeholder="Site address or feed URL" value=""/></td></tr>'.

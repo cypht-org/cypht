@@ -201,6 +201,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="compose_page"><div class="content_title">Compose</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<input name="compose_to" class="compose_to" type="text" placeholder="To" />'.
             '<input name="compose_subject" class="compose_subject" type="text" placeholder="Subject" />'.
             '<textarea name="compose_body" class="compose_body"></textarea>'.
@@ -221,6 +222,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
         return '<div class="smtp_server_setup"><div onclick="return toggle_page_section(\'.smtp_section\')" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" />'.
             ' SMTP Servers <div class="server_count">'.$count.'</div></div><div class="smtp_section"><form class="add_server" method="POST">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<div class="subtitle">Add an SMTP Server</div>'.
             '<table><tr><td colspan="2"><input type="text" name="new_smtp_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
             '<tr><td colspan="2"><input type="text" name="new_smtp_address" class="txt_fld" placeholder="smtp server address" value=""/></td></tr>'.
@@ -258,6 +260,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                     $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
                 $res .= 
                     '<form class="smtp_connect" method="POST">'.
+                    '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                     '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
                     '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="smtp_user" value="'.$user_pc.'"></span>'.
                     '<span> <input '.$disabled.' class="credentials smtp_password" placeholder="'.$pass_pc.'" type="password" name="smtp_pass"></span>';

@@ -45,6 +45,7 @@ Hm_Ajax_Request = function() { return {
                 args.push({'name': name, 'value': extra[name]});
             }
         }
+        args.push({'name': 'hm_nonce', 'value': $('#hm_nonce').val()});
 
         var dt = new Date();
         this.start_time = dt.getTime();
@@ -715,6 +716,25 @@ var track_read_messages = function(class_name) {
     }
     read_messages[class_name] = 1;
     save_to_local_storage('read_message_list', JSON.stringify(read_messages));
+};
+
+var url_nonce = function() {
+    var href;
+    var nonce = $('#hm_nonce').val();
+    if (!nonce) {
+        /* TODO: something bad */
+    }
+    $('a').each(function() {
+        href = $(this).prop('href');
+        /* TODO: handle # */
+        if (href.indexOf('?') != -1) {
+            href += '&hm_nonce='+nonce;
+        }
+        else {
+            href += '?hm_nonce='+nonce;
+        }
+        $(this).prop('href', href);
+    });
 };
 
 var toggle_rows = function() {
