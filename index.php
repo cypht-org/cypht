@@ -4,7 +4,7 @@
 define('CONFIG_FILE', 'hm3.rc');
 
 /* debug mode switch */
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', false);
 
 /* don't let anything output content until we are ready */
 ob_start();
