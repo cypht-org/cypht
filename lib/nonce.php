@@ -9,6 +9,9 @@ class Hm_Nonce {
     /* valid nonce list */
     public static $nonce_list = array();
 
+    /* nonce for the current page */
+    private static $current_nonce = false;
+
     /* max number to allow as valid */
     private static $max = 5;
 
@@ -29,10 +32,12 @@ class Hm_Nonce {
      * @return string new random string
      */
     public static function generate() {
-        $nonce = Hm_Crypt::unique_id();
-        self::$nonce_list[] = $nonce;
+        if (!self::$current_nonce) {
+            self::$current_nonce = Hm_Crypt::unique_id();
+        }
+        self::$nonce_list[] = self::$current_nonce;
         self::trim_list(); 
-        return $nonce;
+        return self::$current_nonce;
     }
 
     /**
