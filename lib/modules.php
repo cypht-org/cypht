@@ -52,6 +52,32 @@ abstract class Hm_Handler_Module {
     }
 
     /**
+     * Validate a form nonce. If this is a non-empty POST form from a normal
+     * HTTP request or from an AJAX update, it will take the user to the page
+     * "not found page" if the hm_nonce value is not present and valid
+     *
+     * @return void
+     */
+    public function process_nonce() {
+        if (empty($this->request->post)) {
+            return;
+        }
+        $nonce = array_key_exists('hm_nonce', $this->request->post) ? $this->request->post['hm_nonce'] : false;
+        error_log($nonce);
+        error_log(print_r(Hm_Nonce::$nonce_list,true));
+        if (!Hm_Nonce::validate($nonce)) {
+            if ($this->request->type == 'AJAX') {
+                die(json_encode(array('status' => 'not callable')));;
+            }
+            else {
+                page_redirect('?page=notfound');
+            }
+        }
+    }
+
+
+
+    /**
      * Process an HTTP POST form
      *
      * @param $form array list of required field names in the form
@@ -648,6 +674,7 @@ function setup_base_page($name, $source=false) {
     add_handler($name, 'save_user_data', true, $source);
     add_handler($name, 'logout', true, $source);
     add_handler($name, 'http_headers', true, $source);
+
     add_output($name, 'header_start', false, $source);
     add_output($name, 'js_data', true, $source);
     add_output($name, 'header_css', false, $source);
