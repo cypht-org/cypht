@@ -69,15 +69,12 @@ abstract class Hm_Handler_Module {
             $trace = debug_backtrace();
             $caller = isset($trace[0]['object']) ? get_class($trace[0]['object']) : false;
             if ($caller && in_array($caller, array('Hm_Handler_login', 'Hm_Handler_logout'))) {
-                error_log('freebee');
                 return;
             }
             if ($this->request->type == 'AJAX') {
-                error_log('oops');
                 die(json_encode(array('status' => 'not callable')));;
             }
             else {
-                error_log('oops');
                 page_redirect('?page=notfound');
             }
         }
