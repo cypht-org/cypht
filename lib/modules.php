@@ -65,20 +65,13 @@ abstract class Hm_Handler_Module {
         $nonce = array_key_exists('hm_nonce', $this->request->post) ? $this->request->post['hm_nonce'] : false;
         if (!Hm_Nonce::validate($nonce)) {
             if ($this->request->type == 'AJAX') {
-                //die(json_encode(array('status' => 'not callable')));;
-                error_log('AJAX nonce failure');
+                die(json_encode(array('status' => 'not callable')));;
             }
             else {
-                //page_redirect('?page=notfound');
-                error_log('HTTP nonce failure');
+                page_redirect('?page=notfound');
             }
         }
-        else {
-            Hm_Debug::add("Nonce worked");
-        }
     }
-
-
 
     /**
      * Process an HTTP POST form
