@@ -63,15 +63,18 @@ abstract class Hm_Handler_Module {
             return;
         }
         $nonce = array_key_exists('hm_nonce', $this->request->post) ? $this->request->post['hm_nonce'] : false;
-        error_log($nonce);
-        error_log(print_r(Hm_Nonce::$nonce_list,true));
         if (!Hm_Nonce::validate($nonce)) {
             if ($this->request->type == 'AJAX') {
-                die(json_encode(array('status' => 'not callable')));;
+                //die(json_encode(array('status' => 'not callable')));;
+                error_log('AJAX nonce failure');
             }
             else {
-                page_redirect('?page=notfound');
+                //page_redirect('?page=notfound');
+                error_log('HTTP nonce failure');
             }
+        }
+        else {
+            Hm_Debug::add("Nonce worked");
         }
     }
 
