@@ -56,6 +56,9 @@ class Hm_Router {
         /* save any cached stuff */
         Hm_Page_Cache::save($session);
 
+        /* save nonce set */
+        hm_nonce::save($session);
+
         /* close down the session */
         $session->end();
     }
@@ -132,7 +135,7 @@ class Hm_Router {
      */
     private function check_for_tls($config, $request) {
         if (!$request->tls && !$config->get('disable_tls', false)) {
-            $this->redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
+            page_redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
         }
     }
 
@@ -259,7 +262,7 @@ class Hm_Router {
                 $session->secure_cookie($request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
             }
             $session->end();
-            $this->redirect($request->server['REQUEST_URI']);
+            page_redirect($request->server['REQUEST_URI']);
         }
     }
 
@@ -328,19 +331,6 @@ class Hm_Router {
     }
 
     /**
-     * Perform an HTTP redirect
-     *
-     * @param $url string url to redirect to
-     *
-     * @return void
-     */
-    public function redirect($url) {
-        header('HTTP/1.1 303 Found');
-        header('Location: '.$url);
-        exit;
-    }
-
-    /**
      * Merge input filters from module sets
      *
      * @param $existing array already collected filters
@@ -361,6 +351,19 @@ class Hm_Router {
         }
         return $existing;
     }
+}
+
+/**
+ * Perform an HTTP redirect
+ *
+ * @param $url string url to redirect to
+ *
+ * @return void
+ */
+function page_redirect($url) {
+    header('HTTP/1.1 303 Found');
+    header('Location: '.$url);
+    exit;
 }
 
 ?>
