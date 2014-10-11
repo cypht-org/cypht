@@ -4,7 +4,7 @@
 define('CONFIG_FILE', 'hm3.rc');
 
 /* debug mode switch */
-define('DEBUG_MODE', false);
+define('DEBUG_MODE', true);
 
 /* don't let anything output content until we are ready */
 ob_start();
@@ -30,6 +30,7 @@ require 'lib/output.php';
 require 'lib/crypt.php';
 require 'lib/db.php';
 require 'lib/servers.php';
+require 'lib/nonce.php';
 
 /* get configuration */
 $config = new Hm_Site_Config_File(CONFIG_FILE);
