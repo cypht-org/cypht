@@ -60,7 +60,6 @@ abstract class Hm_Handler_Module {
      */
     public function process_nonce() {
 
-        /* TODO: nonce check on get */
         if (empty($this->request->post)) {
             return;
         }
@@ -74,9 +73,11 @@ abstract class Hm_Handler_Module {
                 return;
             }
             if ($this->request->type == 'AJAX') {
+                error_log('oops');
                 die(json_encode(array('status' => 'not callable')));;
             }
             else {
+                error_log('oops');
                 page_redirect('?page=notfound');
             }
         }

@@ -85,7 +85,6 @@ Hm_Ajax_Request = function() { return {
             if (this.callback) {
                 this.callback(res);
             }
-            url_nonce();
         }
     },
 
@@ -719,27 +718,6 @@ var track_read_messages = function(class_name) {
     save_to_local_storage('read_message_list', JSON.stringify(read_messages));
 };
 
-var url_nonce = function() {
-    var href;
-    var nonce = $('#hm_nonce').val();
-    if (!nonce) {
-        window.location.href = "?page=notfound";
-    }
-    $('a').each(function() {
-        href = $(this).prop('href');
-        if (href.indexOf('#') != -1) {
-            return true;
-        }
-        if (href.indexOf('?') != -1) {
-            href += '&hm_nonce='+nonce;
-        }
-        else {
-            href += '?hm_nonce='+nonce;
-        }
-        $(this).prop('href', href);
-    });
-};
-
 var toggle_rows = function() {
     $('input[type=checkbox]').each(function () { this.checked = !this.checked; });
     Hm_Message_List.toggle_msg_controls();
@@ -809,6 +787,5 @@ $(function() {
         });
     }
 
-    url_nonce();
     Hm_Timer.fire();
 });
