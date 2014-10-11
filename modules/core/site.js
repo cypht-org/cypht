@@ -85,6 +85,7 @@ Hm_Ajax_Request = function() { return {
             if (this.callback) {
                 this.callback(res);
             }
+            url_nonce();
         }
     },
 
@@ -722,11 +723,13 @@ var url_nonce = function() {
     var href;
     var nonce = $('#hm_nonce').val();
     if (!nonce) {
-        /* TODO: something bad */
+        window.location.href = "?page=notfound";
     }
     $('a').each(function() {
         href = $(this).prop('href');
-        /* TODO: handle # */
+        if (href.indexOf('#') != -1) {
+            return true;
+        }
         if (href.indexOf('?') != -1) {
             href += '&hm_nonce='+nonce;
         }
@@ -806,5 +809,6 @@ $(function() {
         });
     }
 
+    url_nonce();
     Hm_Timer.fire();
 });
