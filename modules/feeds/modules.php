@@ -404,9 +404,9 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
                 ' Feeds <div class="server_count">'.$count.'</div></div><div class="feed_section"><form class="add_server" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<div class="subtitle">Add an RSS/ATOM Feed</div><table>'.
-                '<tr><td><input type="text" name="new_feed_name" class="txt_fld" value="" placeholder="Feed name" /></td></tr>'.
-                '<tr><td><input type="text" name="new_feed_address" class="txt_fld" placeholder="Site address or feed URL" value=""/></td></tr>'.
-                '<tr><td><input type="submit" value="Add" name="submit_feed" /></td></tr>'.
+                '<tr><td><input required type="text" name="new_feed_name" class="txt_fld" value="" placeholder="Feed name" /></td></tr>'.
+                '<tr><td><input required type="text" name="new_feed_address" class="txt_fld" placeholder="Site address or feed URL" value=""/></td></tr>'.
+                '<tr><td><input required type="submit" value="Add" name="submit_feed" /></td></tr>'.
                 '</table></form>';
         }
     }

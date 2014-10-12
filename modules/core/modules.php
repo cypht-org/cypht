@@ -257,7 +257,7 @@ class Hm_Handler_date extends Hm_Handler_Module {
 
 class Hm_Handler_login extends Hm_Handler_Module {
     public function process($data) {
-        if (!array_key_exists('create_hm_user', $this->request->post)) {
+        if (!array_key_exists('create_username', $this->request->post)) {
             list($success, $form) = $this->process_form(array('username', 'password'));
             if ($success) {
                 $this->session->check($this->request, $form['username'], $form['password']);
@@ -429,8 +429,8 @@ class Hm_Output_login extends Hm_Output_Module {
         if (!$input['router_login_state']) {
             $res = '<form class="login_form" method="POST">'.
                 '<h1 class="title">HM3</h1>'.
-                ' <input type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
-                ' <input type="password" placeholder="'.$this->trans('Password').'" name="password">'.
+                ' <input required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
+                ' <input required type="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" />';
             $res .= '</form>';
             return $res;
@@ -462,7 +462,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
         $res = '';
         $msgs = Hm_Msgs::get();
         $logged_out_class = '';
-        if (!$input['router_login_state']) {
+        if (!$input['router_login_state'] && !empty($msgs)) {
             $logged_out_class = ' logged_out';
         }
         $res .= '<div class="sys_messages'.$logged_out_class.'">';
@@ -786,7 +786,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
 class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<tr><td class="submit_cell" colspan="2">'.
-            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<input required name="password" class="save_settings_password" type="password" placeholder="Password" />'.
             '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
             '<div class="password_notice">* You must enter your password to save your settings on the server</div>'.
             '</td></tr></table></form></div>';

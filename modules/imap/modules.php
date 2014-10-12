@@ -651,9 +651,9 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             ' IMAP Servers <div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<div class="subtitle">Add an IMAP Server</div><table>'.
-            '<tr><td colspan="2"><input type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-            '<tr><td colspan="2"><input type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
-            '<tr><td colspan="2"><input type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+            '<tr><td colspan="2"><input required type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+            '<tr><td colspan="2"><input required type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
+            '<tr><td colspan="2"><input required type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
             '<td><input type="submit" value="Add" name="submit_imap_server" /></td></tr>'.
             '</table></form>';
