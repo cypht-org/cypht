@@ -51,28 +51,6 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_process_change_password extends Hm_Handler_Module {
-    public function process($data) {
-        list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2'));
-        if ($success) {
-            if ($this->session->internal_users) {
-                if ($form['new_pass1'] && $form['new_pass2']) {
-                    if ($form['new_pass1'] != $form['new_pass2']) {
-                        Hm_Msgs::add("ERRNew passwords don't match");
-                    }
-                    else {
-                        $user = $this->session->get('username', false);
-                        if ($this->session->change_pass($user, $form['new_pass1'])) {
-                            $data['new_password'] = $form['new_pass1'];
-                        }
-                    }
-                }
-            }
-        }
-        return $data;
-    }
-}
-
 class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'unread_per_source'));
@@ -267,7 +245,6 @@ class Hm_Handler_login extends Hm_Handler_Module {
                 $this->session->check($this->request);
             }
             if ($this->session->is_active()) {
-                $data['internal_users'] = $this->session->internal_users;
                 Hm_Page_Cache::load($this->session);
                 Hm_Nonce::load($this->session);
                 $this->process_nonce();
@@ -633,17 +610,6 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_change_password extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '';
-        if (array_key_exists('internal_users', $input) && $input['internal_users']) {
-            $res .= '<tr class="general_setting"><td>Change password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
-                ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
-        }
-        return $res;
-    }
-}
-
 class Hm_Output_start_flagged_settings extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<tr><td onclick="return toggle_page_section(\'.flagged_setting\')" colspan="2" class="settings_subtitle">'.
@@ -985,6 +951,7 @@ class Hm_Output_folder_list_end extends Hm_Output_Module {
         return '</div></div>';
     }
 }
+
 class Hm_Output_content_section_start extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="content_cell">';

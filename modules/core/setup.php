@@ -20,7 +20,6 @@ setup_base_page('compose');
 
 /* settings */
 setup_base_page('settings');
-add_handler('settings', 'process_change_password', true, 'core', 'date', 'after');
 add_handler('settings', 'process_language_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_list_style_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_timezone_setting', true, 'core', 'date', 'after');
@@ -38,8 +37,7 @@ add_output('settings', 'start_general_settings', true, 'core', 'start_settings_f
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'list_style_setting', true, 'core', 'timezone_setting', 'after');
-add_output('settings', 'change_password', true, 'core', 'list_style_setting', 'after');
-add_output('settings', 'start_unread_settings', true, 'core', 'change_password', 'after');
+add_output('settings', 'start_unread_settings', true, 'core', 'list_style_setting', 'after');
 add_output('settings', 'unread_since_setting', true, 'core', 'start_unread_settings', 'after');
 add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_setting', 'after');
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');

@@ -2,6 +2,28 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+class Hm_Handler_process_change_password extends Hm_Handler_Module {
+    public function process($data) {
+        list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2'));
+        if ($success) {
+            if ($this->session->internal_users) {
+                if ($form['new_pass1'] && $form['new_pass2']) {
+                    if ($form['new_pass1'] != $form['new_pass2']) {
+                        Hm_Msgs::add("ERRNew passwords don't match");
+                    }
+                    else {
+                        $user = $this->session->get('username', false);
+                        if ($this->session->change_pass($user, $form['new_pass1'])) {
+                            $data['new_password'] = $form['new_pass1'];
+                        }
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+}
+
 class Hm_Handler_process_create_account extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('create_username', 'create_password', 'create_password_again'));
@@ -19,9 +41,16 @@ class Hm_Handler_process_create_account extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_check_internal_users extends Hm_Handler_Module {
+    public function process($data) {
+        $data['internal_users'] = $this->session->internal_users;
+        return $data;
+    }
+}
+
 class Hm_Output_create_account_link extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (!$input['router_login_state']) {
+        if (!$input['router_login_state'] && array_key_exists('internal_users', $input) && $input['internal_users']) {
             return '<a class="create_account_link" href="?page=create_account">Create</a>';
         }
     }
@@ -39,7 +68,7 @@ class Hm_Output_create_form extends Hm_Output_Module {
             page_redirect('?page=home');
         }
 
-        if (true || array_key_exists('internal_users', $input) && $input['internal_users']) {
+        if (array_key_exists('internal_users', $input) && $input['internal_users']) {
             return '<div class="create_user">'.
                 '<h1 class="title">Create Account</h1>'.
                 '<form method="POST" autocomplete="off" >'.
@@ -55,5 +84,17 @@ class Hm_Output_create_form extends Hm_Output_Module {
         }
     }
 }
+
+class Hm_Output_change_password extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $res = '';
+        if (array_key_exists('internal_users', $input) && $input['internal_users']) {
+            $res .= '<tr class="general_setting"><td>Change password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
+                ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
+        }
+        return $res;
+    }
+}
+
 
 ?>
