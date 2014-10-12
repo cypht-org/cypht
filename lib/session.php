@@ -193,10 +193,11 @@ abstract class Hm_Session {
      * @param $lifetime string cookie lifetime
      * @param $path string cookie path
      * @param $domain string cookie domain
+     * @param $html_only string set html only cookie flag
      *
      * @return void
      */
-    public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='') {
+    public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='', $html_only=true) {
         if ($request->tls) {
             $secure = true;
         }
@@ -209,7 +210,7 @@ abstract class Hm_Session {
         if (!$domain && array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
             $domain = $request->server['SERVER_NAME'];
         }
-        setcookie($name, $value, $lifetime, $path, $domain, $secure, true);
+        setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
     }
 }
 
