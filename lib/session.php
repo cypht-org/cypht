@@ -285,8 +285,9 @@ class Hm_PHP_Session extends Hm_Session {
      * @return bool true if the account was created
      */
     public function create($request, $user, $pass) {
-        $this->auth_mech->create($user, $pass);
-        return $this->check($request, $user, $pass);
+        if ($this->auth_mech->create($user, $pass)) {
+            return $this->check($request, $user, $pass);
+        }
     }
 
     /**
