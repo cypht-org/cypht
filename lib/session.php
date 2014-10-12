@@ -321,6 +321,8 @@ class Hm_PHP_Session extends Hm_Session {
      * @return array list of cookie fields
      */
     public function set_session_params($request) {
+        $domain = false;
+        $path = false;
         if ($request->tls) {
             $secure = true;
         }
