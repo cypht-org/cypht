@@ -361,6 +361,11 @@ class Hm_Router {
  * @return void
  */
 function page_redirect($url) {
+    if (DEBUG_MODE) {
+        Hm_Debug::add(sprintf('Redirecting to %s', $url));
+        Hm_Debug::load_page_stats();
+        Hm_Debug::show('log');
+    }
     header('HTTP/1.1 303 Found');
     header('Location: '.$url);
     exit;

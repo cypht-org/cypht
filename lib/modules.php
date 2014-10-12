@@ -666,7 +666,6 @@ function add_module_to_all_pages($type, $mod, $logged_in, $source, $marker, $pla
  * @return void
  */
 function setup_base_page($name, $source=false) {
-    add_handler($name, 'create_user', false, $source);
     add_handler($name, 'login', false, $source);
     add_handler($name, 'load_user_data', true, $source);
     add_handler($name, 'default_page_data', true, $source);

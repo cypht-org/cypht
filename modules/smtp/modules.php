@@ -202,9 +202,9 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         return '<div class="compose_page"><div class="content_title">Compose</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<input name="compose_to" class="compose_to" type="text" placeholder="To" />'.
-            '<input name="compose_subject" class="compose_subject" type="text" placeholder="Subject" />'.
-            '<textarea name="compose_body" class="compose_body"></textarea>'.
+            '<input required name="compose_to" class="compose_to" type="text" placeholder="To" />'.
+            '<input required name="compose_subject" class="compose_subject" type="text" placeholder="Subject" />'.
+            '<textarea required name="compose_body" class="compose_body"></textarea>'.
             smtp_server_dropdown($input, $this).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" /></form></div>';
     }
@@ -224,9 +224,9 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
             ' SMTP Servers <div class="server_count">'.$count.'</div></div><div class="smtp_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<div class="subtitle">Add an SMTP Server</div>'.
-            '<table><tr><td colspan="2"><input type="text" name="new_smtp_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-            '<tr><td colspan="2"><input type="text" name="new_smtp_address" class="txt_fld" placeholder="smtp server address" value=""/></td></tr>'.
-            '<tr><td colspan="2"><input type="text" name="new_smtp_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+            '<table><tr><td colspan="2"><input required type="text" name="new_smtp_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+            '<tr><td colspan="2"><input required type="text" name="new_smtp_address" class="txt_fld" placeholder="smtp server address" value=""/></td></tr>'.
+            '<tr><td colspan="2"><input required type="text" name="new_smtp_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
             '<td><input type="submit" value="Add" name="submit_smtp_server" /></td></tr>'.
             '</table></form>';

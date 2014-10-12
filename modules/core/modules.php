@@ -51,28 +51,6 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_process_change_password extends Hm_Handler_Module {
-    public function process($data) {
-        list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2'));
-        if ($success) {
-            if ($this->session->internal_users) {
-                if ($form['new_pass1'] && $form['new_pass2']) {
-                    if ($form['new_pass1'] != $form['new_pass2']) {
-                        Hm_Msgs::add("ERRNew passwords don't match");
-                    }
-                    else {
-                        $user = $this->session->get('username', false);
-                        if ($this->session->change_pass($user, $form['new_pass1'])) {
-                            $data['new_password'] = $form['new_pass1'];
-                        }
-                    }
-                }
-            }
-        }
-        return $data;
-    }
-}
-
 class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('save_settings', 'unread_per_source'));
@@ -257,7 +235,7 @@ class Hm_Handler_date extends Hm_Handler_Module {
 
 class Hm_Handler_login extends Hm_Handler_Module {
     public function process($data) {
-        if (!array_key_exists('create_hm_user', $this->request->post)) {
+        if (!array_key_exists('create_username', $this->request->post)) {
             list($success, $form) = $this->process_form(array('username', 'password'));
             if ($success) {
                 $this->session->check($this->request, $form['username'], $form['password']);
@@ -267,7 +245,6 @@ class Hm_Handler_login extends Hm_Handler_Module {
                 $this->session->check($this->request);
             }
             if ($this->session->is_active()) {
-                $data['internal_users'] = $this->session->internal_users;
                 Hm_Page_Cache::load($this->session);
                 Hm_Nonce::load($this->session);
                 $this->process_nonce();
@@ -280,18 +257,6 @@ class Hm_Handler_login extends Hm_Handler_Module {
 class Hm_Handler_default_page_data extends Hm_Handler_Module {
     public function process($data) {
         $data['data_sources'] = array();
-        return $data;
-    }
-}
-
-class Hm_Handler_create_user extends Hm_Handler_Module {
-    public function process($data) {
-        list($success, $form) = $this->process_form(array('username', 'password', 'create_hm_user'));
-        if ($success) {
-            if ($this->session->internal_users) {
-                $this->session->create($this->request, $form['username'], $form['password']);
-            }
-        }
         return $data;
     }
 }
@@ -441,12 +406,9 @@ class Hm_Output_login extends Hm_Output_Module {
         if (!$input['router_login_state']) {
             $res = '<form class="login_form" method="POST">'.
                 '<h1 class="title">HM3</h1>'.
-                ' <input type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
-                ' <input type="password" placeholder="'.$this->trans('Password').'" name="password">'.
+                ' <input required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
+                ' <input required type="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" />';
-            if (array_key_exists('internal_users', $input) && $input['internal_users'] && $input['router_page_name'] == 'home') {
-                $res .= ' <input type="submit" name="create_hm_user" value="Create" />';
-            }
             $res .= '</form>';
             return $res;
         }
@@ -476,7 +438,11 @@ class Hm_Output_msgs extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         $msgs = Hm_Msgs::get();
-        $res .= '<div class="sys_messages">';
+        $logged_out_class = '';
+        if (!$input['router_login_state'] && !empty($msgs)) {
+            $logged_out_class = ' logged_out';
+        }
+        $res .= '<div class="sys_messages'.$logged_out_class.'">';
         if (!empty($msgs)) {
             $res .= implode(',', array_map(function($v) {
                 if (preg_match("/ERR/", $v)) {
@@ -644,17 +610,6 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_change_password extends Hm_Output_Module {
-    protected function output($input, $format) {
-        $res = '';
-        if (array_key_exists('internal_users', $input) && $input['internal_users']) {
-            $res .= '<tr class="general_setting"><td>Change password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
-                ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
-        }
-        return $res;
-    }
-}
-
 class Hm_Output_start_flagged_settings extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<tr><td onclick="return toggle_page_section(\'.flagged_setting\')" colspan="2" class="settings_subtitle">'.
@@ -797,7 +752,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
 class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<tr><td class="submit_cell" colspan="2">'.
-            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<input required name="password" class="save_settings_password" type="password" placeholder="Password" />'.
             '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
             '<div class="password_notice">* You must enter your password to save your settings on the server</div>'.
             '</td></tr></table></form></div>';
@@ -996,6 +951,7 @@ class Hm_Output_folder_list_end extends Hm_Output_Module {
         return '</div></div>';
     }
 }
+
 class Hm_Output_content_section_start extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="content_cell">';
