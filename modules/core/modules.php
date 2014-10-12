@@ -284,18 +284,6 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_create_user extends Hm_Handler_Module {
-    public function process($data) {
-        list($success, $form) = $this->process_form(array('username', 'password', 'create_hm_user'));
-        if ($success) {
-            if ($this->session->internal_users) {
-                $this->session->create($this->request, $form['username'], $form['password']);
-            }
-        }
-        return $data;
-    }
-}
-
 class Hm_Handler_load_user_data extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('username', 'password'));
@@ -444,9 +432,6 @@ class Hm_Output_login extends Hm_Output_Module {
                 ' <input type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
                 ' <input type="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" />';
-            if (array_key_exists('internal_users', $input) && $input['internal_users'] && $input['router_page_name'] == 'home') {
-                $res .= ' <input type="submit" name="create_hm_user" value="Create" />';
-            }
             $res .= '</form>';
             return $res;
         }
@@ -476,7 +461,11 @@ class Hm_Output_msgs extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         $msgs = Hm_Msgs::get();
-        $res .= '<div class="sys_messages">';
+        $logged_out_class = '';
+        if (!$input['router_login_state']) {
+            $logged_out_class = ' logged_out';
+        }
+        $res .= '<div class="sys_messages'.$logged_out_class.'">';
         if (!empty($msgs)) {
             $res .= implode(',', array_map(function($v) {
                 if (preg_match("/ERR/", $v)) {
