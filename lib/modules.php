@@ -69,15 +69,12 @@ abstract class Hm_Handler_Module {
             $trace = debug_backtrace();
             $caller = isset($trace[0]['object']) ? get_class($trace[0]['object']) : false;
             if ($caller && in_array($caller, array('Hm_Handler_login', 'Hm_Handler_logout'))) {
-                error_log('freebee');
                 return;
             }
             if ($this->request->type == 'AJAX') {
-                error_log('oops');
                 die(json_encode(array('status' => 'not callable')));;
             }
             else {
-                error_log('oops');
                 page_redirect('?page=notfound');
             }
         }
@@ -669,7 +666,6 @@ function add_module_to_all_pages($type, $mod, $logged_in, $source, $marker, $pla
  * @return void
  */
 function setup_base_page($name, $source=false) {
-    add_handler($name, 'create_user', false, $source);
     add_handler($name, 'login', false, $source);
     add_handler($name, 'load_user_data', true, $source);
     add_handler($name, 'default_page_data', true, $source);
