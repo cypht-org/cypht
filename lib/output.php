@@ -140,7 +140,7 @@ trait Hm_List {
      */
     public static function show($type='print') {
         if ($type == 'log') {
-            error_log(str_replace(array("\n", "\t", "  "), array(' '), print_r(self::$msgs, true)));
+            error_log(print_r(self::$msgs, true));
         }
         elseif ($type == 'return') {
             return print_r(self::$msgs, true);
