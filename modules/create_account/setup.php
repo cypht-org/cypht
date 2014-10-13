@@ -29,7 +29,7 @@ return array(
     'allowed_post' => array(
         'create_username' => FILTER_SANITIZE_STRING,
         'create_password' => FILTER_SANITIZE_STRING,
-        'create_password_again' => FILTER_SANITIZE_STRING
+        'create_password_again' => FILTER_SANITIZE_STRING,
         'new_pass1' => FILTER_SANITIZE_STRING,
         'new_pass2' => FILTER_SANITIZE_STRING,
     )
