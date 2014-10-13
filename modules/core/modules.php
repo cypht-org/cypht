@@ -581,8 +581,8 @@ class Hm_Output_loading_icon extends Hm_Output_Module {
 class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="user_settings"><div class="content_title">Site Settings</div>'.
-            '<form method="POST"><table class="settings_table"><colgroup>'.
-            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<form method="POST"><input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<table class="settings_table"><colgroup>'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
     }
 }

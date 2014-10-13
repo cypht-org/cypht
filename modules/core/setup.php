@@ -163,7 +163,6 @@ return array(
         'save_and_logout' => FILTER_VALIDATE_BOOLEAN,
         'limit' => FILTER_VALIDATE_INT,
         'username' => FILTER_SANITIZE_STRING,
-        'create_hm_user' => FILTER_SANITIZE_STRING,
         'password' => FILTER_SANITIZE_STRING,
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'save_settings' => FILTER_SANITIZE_STRING,
@@ -181,8 +180,6 @@ return array(
         'message_ids' => FILTER_SANITIZE_STRING,
         'action_type' => FILTER_SANITIZE_STRING,
         'message_list_since' => FILTER_SANITIZE_STRING,
-        'new_pass1' => FILTER_SANITIZE_STRING,
-        'new_pass2' => FILTER_SANITIZE_STRING,
         'reply_format' => FILTER_VALIDATE_INT
     )
 );

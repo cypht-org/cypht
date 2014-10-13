@@ -21,7 +21,7 @@ td { vertical-align: top; }
 .logout:hover { background-color: #eee; }
 .logout { cursor: pointer; background: #fff; font-size: 100%; }
 .server_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 500px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
-.user_settings table { width: 100%; white-space: nowrap; padding-left: 25px; }
+.user_settings table { table-layout: fixed; width: 100%; white-space: nowrap; padding-left: 25px; }
 .user_settings table td { vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 0px; color: #666; }
 .save_settings { float: left !important; }
 .save_settings_password { float: left; margin-left: 0px; padding: 4px; }
@@ -60,7 +60,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
-.settings_col { width: 80%; }
+.setting_col { width: 80%; }
 .label_col { width: 20%; }
 .submit_cell { padding-left: 0px !important; padding-top: 30px !important; }
 .password_notice { float: left; margin-left: 10px; font-size: .9em; color: #666; padding-top: 5px; }
