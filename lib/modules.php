@@ -457,8 +457,10 @@ trait Hm_Modules {
      * @return void
      */
     public static function replace($target, $replacement, $page=false) {
-        if ($page && array_key_exists($page, self::$module_list) && array_key_exists($target, self::$module_list[$page])) {
-            self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
+        if ($page) {
+            if (array_key_exists($page, self::$module_list) && array_key_exists($target, self::$module_list[$page])) {
+                self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
+            }
         }
         else {
             foreach (self::$module_list as $page => $modules) {
