@@ -7,7 +7,7 @@ output_source('account');
 
 /* create account page */
 setup_base_page('create_account', 'core');
-replace_module('output', 'login', 'no_login', 'account');
+replace_module('output', 'login', 'no_login', 'create_account');
 add_handler('create_account', 'process_create_account', false, 'account', 'login', 'before');
 add_handler('create_account', 'check_internal_users', false, 'account', 'login', 'before');
 add_output('create_account', 'create_form', false, 'account', 'content_section_start', 'after');
