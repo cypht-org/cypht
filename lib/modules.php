@@ -66,11 +66,6 @@ abstract class Hm_Handler_Module {
 
         $nonce = array_key_exists('hm_nonce', $this->request->post) ? $this->request->post['hm_nonce'] : false;
         if (!Hm_Nonce::validate($nonce)) {
-            $trace = debug_backtrace();
-            $caller = isset($trace[0]['object']) ? get_class($trace[0]['object']) : false;
-            if ($caller && in_array($caller, array('Hm_Handler_login', 'Hm_Handler_logout'))) {
-                return;
-            }
             if ($this->request->type == 'AJAX') {
                 die(json_encode(array('status' => 'not callable')));;
             }
