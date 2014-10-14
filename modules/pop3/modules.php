@@ -501,7 +501,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 if (!$no_edit) {
                     $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
                     if (!isset($vals['user']) || !$vals['user']) {
-                        $res .= '<input type="submit" value="Delete" class="pop3_delete" />';
+                        $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
                         $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
                     }
                     else {
