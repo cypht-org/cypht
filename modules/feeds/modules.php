@@ -101,6 +101,7 @@ class Hm_Handler_feed_connect extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_delete_feed extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['delete_feed'])) {
@@ -121,6 +122,7 @@ class Hm_Handler_delete_feed extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_feed_status extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
