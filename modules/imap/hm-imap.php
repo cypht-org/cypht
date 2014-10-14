@@ -94,6 +94,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     public $app_vendor = 'Hastymail Development Group';
     public $app_support_url = 'http://hastymail.org/contact_us/';
 
+    /* connect error info */
+    public $con_error_msg = '';
+    public $con_error_num = 0;
+
     /* holds information about the currently selected mailbox */
     public $selected_mailbox = false;
 
@@ -157,6 +161,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             else {
                 $this->debug[] = 'Could not connect to the IMAP server';
                 $this->debug[] = 'fsockopen errors #'.$errorno.'. '.$errorstr;
+                $this->con_error_msg = $errorstr;
+                $this->con_error_num = $errorno;
                 return false;
             }
         }
