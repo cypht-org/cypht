@@ -78,6 +78,9 @@ abstract class Hm_Handler_Module {
                 die(json_encode(array('status' => 'not callable')));;
             }
             else {
+                if ($this->session->loaded) {
+                    $this->session->destroy($this->request);
+                }
                 page_redirect('?page=notfound');
             }
         }
