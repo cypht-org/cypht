@@ -490,7 +490,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
         }
         else {
-            $res .= ' style="display: none;"><noscript class="noscript">You Need to have Javascript enabled to use '.$this->html_safe($input['router_app_name']).' Sorry about that!</noscript>'.
+            $res .= '><noscript class="noscript">You Need to have Javascript enabled to use '.$this->html_safe($input['router_app_name']).' Sorry about that!</noscript>'.
                 '<input type="hidden" id="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
         }
         return $res;
