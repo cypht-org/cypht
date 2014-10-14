@@ -118,7 +118,6 @@ var pop3_message_view_finished = function() {
         }
         else if (hm_list_parent == 'unread') {
             prev_next_links('formatted_unread_data', class_name);
-            update_unread_cache(class_name);
         }
     }
 };
