@@ -8,7 +8,7 @@ body { background: linear-gradient(180deg, #f5f5f5, #f5f5f5, #f5f5f5, #f5f5f5, #
 table { width: 100%; }
 td { vertical-align: top; }
 .subtitle { color: teal; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
-.title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; letter-spacing: -1px; color: #999; }
+.title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
 .date { display: none; position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
 .sys_messages { cursor: pointer; display: none; position: absolute; opacity: .9; background-color: #fff; color: teal; left: 33%; right: 33%; width: 33%; margin-top: 0px; text-align: center; background-color: #efefef; padding: 8px; white-space: nowrap; border: solid 1px #ddd; }
 .logged_out { display: block !important; }

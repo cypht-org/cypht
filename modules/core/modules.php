@@ -500,7 +500,10 @@ class Hm_Output_content_start extends Hm_Output_Module {
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($input, $format) {
         $title = '';
-        if (array_key_exists('mailbox_list_title', $input)) {
+        if (!$input['router_login_state']) {
+            $title = $input['router_app_name'];
+        }
+        elseif (array_key_exists('mailbox_list_title', $input)) {
             $title .= ' '.implode('-', array_slice($input['mailbox_list_title'], 1));
         }
         if (!trim($title) && array_key_exists('router_page_name', $input)) {
