@@ -191,6 +191,7 @@ class Hm_Auth_DB extends Hm_Auth {
                 }
             }
         }
+        sleep(2);
         return false;
     }
 
