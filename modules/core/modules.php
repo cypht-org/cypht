@@ -246,10 +246,9 @@ class Hm_Handler_login extends Hm_Handler_Module {
             }
             if ($this->session->is_active()) {
                 Hm_Page_Cache::load($this->session);
-                Hm_Nonce::load($this->session);
-                $this->process_nonce();
             }
         }
+        $this->process_nonce();
         return $data;
     }
 }
@@ -406,13 +405,23 @@ class Hm_Output_login extends Hm_Output_Module {
         if (!$input['router_login_state']) {
             $res = '<form class="login_form" method="POST">'.
                 '<h1 class="title">HM3</h1>'.
+                ' <input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
                 ' <input required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
                 ' <input required type="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" />';
             $res .= '</form>';
             return $res;
         }
-        return '';
+        else {
+            return '<form class="logout_form" method="POST">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
+            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
+            '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
+            '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(); return false;" type="button" value="Cancel" />'.
+            '</div></form>';
+        }
     }
 }
 
@@ -833,16 +842,9 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
 
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res =  '<li><form class="logout_form" method="POST">'.
-            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
-            $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a>'.
-            '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
-            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
-            '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
-            '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
-            '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(); return false;" type="button" value="Cancel" />'.
-            '</div></form></li>';
+        $res =  '<li><a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
+            $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a></li>';
+
         if ($format == 'HTML5') {
             return $res;
         }
