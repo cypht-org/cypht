@@ -746,6 +746,7 @@ var folder_list = get_from_local_storage('formatted_folder_list');
 $(function() {
     if (folder_list) {
         $('.folder_list').html(folder_list);
+        $('body').show();
         if (get_from_local_storage('hide_folder_list') == '1') {
             $('.folder_list').hide();
             $('.folder_toggle').show();
