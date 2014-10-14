@@ -60,12 +60,20 @@ abstract class Hm_Handler_Module {
      */
     public function process_nonce() {
 
+        Hm_Nonce::load($this->session, $this->config, $this->request);
+
         if (empty($this->request->post)) {
             return;
         }
 
         $nonce = array_key_exists('hm_nonce', $this->request->post) ? $this->request->post['hm_nonce'] : false;
-        if (!Hm_Nonce::validate($nonce)) {
+        if (!$this->session->is_active() || $this->session->loaded) {
+            $valid = Hm_Nonce::validate_site_key($nonce);
+        }
+        else {
+            $valid = Hm_Nonce::validate($nonce);
+        }
+        if (!$valid) {
             if ($this->request->type == 'AJAX') {
                 die(json_encode(array('status' => 'not callable')));;
             }

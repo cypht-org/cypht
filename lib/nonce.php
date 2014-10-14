@@ -9,6 +9,9 @@ class Hm_Nonce {
     /* valid nonce list */
     public static $nonce_list = array();
 
+    /* site key */
+    private static $site_hash = false;
+
     /* nonce for the current page */
     private static $current_nonce = false;
 
@@ -22,8 +25,29 @@ class Hm_Nonce {
      * 
      * @return void
      */
-    public static function load($session) {
+    public static function load($session, $config, $request) {
         self::$nonce_list = $session->get('nonce_list', array());
+        self::$site_hash = $session->build_fingerprint($request, $config->get('site_key', ''));
+    }
+
+    /**
+     * Return the site key, used for logged out page nonce
+     *
+     * @return string site key
+     */
+    public static function site_key() {
+        return self::$site_hash;
+    }
+
+    /**
+     * Validate the site key
+     *
+     * @param $key string key to validate
+     *
+     * @return bool
+     */
+    public static function validate_site_key($key) {
+        return $key == self::$site_hash;
     }
 
     /**
