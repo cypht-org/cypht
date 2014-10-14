@@ -404,7 +404,7 @@ class Hm_Output_login extends Hm_Output_Module {
     protected function output($input, $format) {
         if (!$input['router_login_state']) {
             $res = '<form class="login_form" method="POST">'.
-                '<h1 class="title">HM3</h1>'.
+                '<h1 class="title">'.$this->html_safe($input['router_app_name']).'</h1>'.
                 ' <input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
                 ' <input required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
                 ' <input required type="password" placeholder="'.$this->trans('Password').'" name="password">'.
@@ -490,7 +490,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
         }
         else {
-            $res .= ' ><noscript class="noscript">You Need to have Javascript enabled to use HM3. Sorry about that!</noscript>'.
+            $res .= ' ><noscript class="noscript">You Need to have Javascript enabled to use '.$this->html_safe($input['router_app_name']).' Sorry about that!</noscript>'.
                 '<input type="hidden" id="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
         }
         return $res;
