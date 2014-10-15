@@ -105,7 +105,7 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
                     '<div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
                         '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
                     '</div></div>'.
-                    '<div class="from">'.$output_mod->html_safe($from).' '.$output_mod->html_safe($source).'</div>'.
+                    '<div class="from">'.$output_mod->html_safe($source).' '.(trim($from) ? '- ' : '').$output_mod->html_safe($from).'</div>'.
                     '<div class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></div>'.
                 '</td></tr>', $id);
         }

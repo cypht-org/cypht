@@ -75,6 +75,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .news_cell { border: none !important; padding-bottom: 10px !important; padding-top: 10px !important; }
 .news_cell .subject { padding-bottom: 5px !important; }
 .news_cell .icon { float: right; }
+.news_cell .from {font-size: 100% !important; color: #111; letter-spacing: 0px; }
 .wait { cursor: progress; }
 .msg_controls { display: none; padding-left: 0px; margin-right: 20px; }
 .msg_controls_visible { display: inline; }
