@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('DEBUG_MODE')) { die(); }
+
 /* compress output if possible */
 ini_set('zlib.output_compression', 'On');
 
