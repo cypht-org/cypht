@@ -8,13 +8,16 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
         /* new session or one not passed the second auth */
         if ($this->session->loaded || $this->session->get('2fa_required', false)) {
 
+            /* ini file location */
+            $ini_file = rtrim($this->config->get('app_data_dir', ''), '/').'/swipeidentity.ini';
+
             /* data for the swipe api */
             $swipe_username = $this->session->get('username', false);
             $swipe_address = $this->request->server['REMOTE_ADDR'];
             $required = true;
 
             /* get api config and object */
-            list($api, $api_config) = setup_swipe_api();
+            list($api, $api_config) = setup_swipe_api($ini_file);
             $started = start_api($api, $api_config);
             if (!$started) {
                 $data['2fa_fatal'] = true;
@@ -166,7 +169,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
  *
  * @return array list containing the api object and api config
  */
-function setup_swipe_api() {
+function setup_swipe_api($ini_file) {
     require "third_party/swipe_2fa_api/ApiBase.php";
     require "third_party/swipe_2fa_api/Error.php";
     require "third_party/swipe_2fa_api/SpiBaseObject.php";
@@ -178,7 +181,7 @@ function setup_swipe_api() {
     require "third_party/swipe_2fa_api/SwipeIdentityExpressApi.php";
 
     /* TODO: move the ini out of the doc root */
-    $api_config = parse_ini_file('modules/swipe_2fa/swipeidentity.ini');
+    $api_config = parse_ini_file($ini_file);
     return array(new swipeIdentityExpressApi($api_config["com.swipeidentity.api.server.url"]), $api_config);
 }
 
