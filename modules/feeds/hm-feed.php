@@ -74,7 +74,6 @@ class Hm_Feed {
                 curl_setopt($curl_handle,CURLOPT_URL, $url);
                 curl_setopt($curl_handle,CURLOPT_CONNECTTIMEOUT,15);
                 curl_setopt($curl_handle,CURLOPT_RETURNTRANSFER,1);
-                curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, 1);
                 curl_setopt($curl_handle, CURLOPT_COOKIEJAR, '/tmp/'.$rand.'.txt');
                 curl_setopt($curl_handle, CURLOPT_COOKIEFILE, '/tmp/'.$rand.'.txt');
                 $buffer = curl_exec($curl_handle);
