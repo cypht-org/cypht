@@ -51,7 +51,7 @@ else {
 }
 
 /* open base dir */
-$base = dirname(dirname(__FILE__));
+$base = dirname(dirname(__FILE__)).PATH_SEPARATOR.'/tmp';
 if ($config->get('user_settings_dir', false) && is_readable($config->get('user_settings_dir', false))) {
     $base .= PATH_SEPARATOR.$config->get('user_settings_dir', false);
 }
