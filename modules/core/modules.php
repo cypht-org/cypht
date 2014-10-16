@@ -406,7 +406,7 @@ class Hm_Output_login extends Hm_Output_Module {
             $res = '<form class="login_form" method="POST">'.
                 '<h1 class="title">'.$this->html_safe($input['router_app_name']).'</h1>'.
                 ' <input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
-                ' <input required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
+                ' <input autofocus required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
                 ' <input required type="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" />';
             $res .= '</form>';
