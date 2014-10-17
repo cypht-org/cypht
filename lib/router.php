@@ -220,7 +220,7 @@ class Hm_Router {
 
         $mods = explode(',', $config->get('modules', '')); 
         foreach ($mods as $name) {
-            if (in_array($name, $active_mods) && is_readable(sprintf('modules/%s/modules.php', $name))) {
+            if (in_array($name, $active_mods, true) && is_readable(sprintf('modules/%s/modules.php', $name))) {
                 require sprintf('modules/%s/modules.php', $name);
             }
         }
@@ -275,13 +275,13 @@ class Hm_Router {
      * @return void
      */
     private function get_page($request, $pages) {
-        if ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post) && in_array($request->post['hm_ajax_hook'], $pages)) {
+        if ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post) && in_array($request->post['hm_ajax_hook'], $pages, true)) {
             $this->page = $request->post['hm_ajax_hook'];
         }
-        elseif ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post) && !in_array($request->post['hm_ajax_hook'], $pages)) {
+        elseif ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post) && !in_array($request->post['hm_ajax_hook'], $pages, true)) {
             die(json_encode(array('status' => 'not callable')));;
         }
-        elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $pages)) {
+        elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $pages, true)) {
             $this->page = $request->get['page'];
         }
         elseif (!array_key_exists('page', $request->get)) {
