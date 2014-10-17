@@ -93,9 +93,9 @@ abstract class Hm_Session {
      *
      * @return string fingerprint value
      */
-    protected function build_fingerprint($request) {
+    public function build_fingerprint($request, $input='') {
         $env = $request->server;
-        $id = '';
+        $id = $input;
         $id .= (array_key_exists('REMOTE_ADDR', $env)) ? $env['REMOTE_ADDR'] : '';
         $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
         $id .= (array_key_exists('REQUEST_SCHEME', $env)) ? $env['REQUEST_SCHEME'] : '';

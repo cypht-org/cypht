@@ -326,7 +326,8 @@ class Hm_Router {
             'router_format_name'  => $request->format,
             'router_login_state'  => $session->is_active(),
             'router_url_path'     => $request->path,
-            'router_module_list'  => $config->get('modules', '')
+            'router_module_list'  => $config->get('modules', ''),
+            'router_app_name'     => $config->get('app_name', 'HM3')
         ));
     }
 

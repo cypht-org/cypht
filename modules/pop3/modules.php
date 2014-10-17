@@ -66,7 +66,7 @@ class Hm_Handler_pop3_status extends Hm_Handler_Module {
             foreach ($ids as $id) {
                 $start_time = microtime(true);
                 $pop3 = Hm_POP3_List::connect($id, false);
-                if ($pop3->state = 'authed') {
+                if ($pop3->state == 'authed') {
                     $data['pop3_connect_time'] = microtime(true) - $start_time;
                     $data['pop3_connect_status'] = 'Authenticated';
                     $data['pop3_status_server_id'] = $id;
@@ -142,7 +142,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
-            if ($pop3->state = 'authed') {
+            if ($pop3->state == 'authed') {
                 $data['pop3_mailbox_page_path'] = $path;
                 $list = array_slice(array_reverse(array_unique(array_keys($pop3->mlist()))), 0, $limit);
                 foreach ($list as $id) {
@@ -202,7 +202,7 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
             $id = (int) substr($form['pop3_list_path'], 4);
             $pop3 = Hm_POP3_List::connect($id, false);
             $details = Hm_POP3_List::dump($id);
-            if ($pop3->state = 'authed') {
+            if ($pop3->state == 'authed') {
                 $msg_lines = $pop3->retr_full($form['pop3_uid']);
                 $header_list = array();
                 $body = array();

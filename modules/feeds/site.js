@@ -147,7 +147,6 @@ var display_feed_item_content = function(res) {
     }
     else if (hm_list_parent == 'unread') {
         prev_next_links('formatted_unread_data', hm_list_path+'_'+hm_msg_uid);
-        var count = update_unread_cache(hm_list_path+'_'+hm_msg_uid);
     }
 };
 

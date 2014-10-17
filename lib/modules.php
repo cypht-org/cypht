@@ -60,21 +60,28 @@ abstract class Hm_Handler_Module {
      */
     public function process_nonce() {
 
+        Hm_Nonce::load($this->session, $this->config, $this->request);
+
         if (empty($this->request->post)) {
             return;
         }
 
         $nonce = array_key_exists('hm_nonce', $this->request->post) ? $this->request->post['hm_nonce'] : false;
-        if (!Hm_Nonce::validate($nonce)) {
-            $trace = debug_backtrace();
-            $caller = isset($trace[0]['object']) ? get_class($trace[0]['object']) : false;
-            if ($caller && in_array($caller, array('Hm_Handler_login', 'Hm_Handler_logout'))) {
-                return;
-            }
+        if (!$this->session->is_active() || $this->session->loaded) {
+            $valid = Hm_Nonce::validate_site_key($nonce);
+        }
+        else {
+            $valid = Hm_Nonce::validate($nonce);
+        }
+        if (!$valid) {
             if ($this->request->type == 'AJAX') {
                 die(json_encode(array('status' => 'not callable')));;
             }
             else {
+                if ($this->session->loaded) {
+                    $this->session->destroy($this->request);
+                }
+                Hm_Debug::add("nonce check failed");
                 page_redirect('?page=notfound');
             }
         }
@@ -457,8 +464,10 @@ trait Hm_Modules {
      * @return void
      */
     public static function replace($target, $replacement, $page=false) {
-        if ($page && array_key_exists($page, self::$module_list) && array_key_exists($target, self::$module_list[$page])) {
-            self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
+        if ($page) {
+            if (array_key_exists($page, self::$module_list) && array_key_exists($target, self::$module_list[$page])) {
+                self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
+            }
         }
         else {
             foreach (self::$module_list as $page => $modules) {

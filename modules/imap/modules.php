@@ -187,8 +187,14 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+            if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'email') {
+                $limit = DEFAULT_PER_SOURCE;
+                $date = process_since_argument(DEFAULT_SINCE);
+            }
+            else {
+                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+            }
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
             $data['imap_combined_inbox_data'] = $msg_list;

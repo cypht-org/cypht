@@ -101,6 +101,7 @@ class Hm_Handler_feed_connect extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_delete_feed extends Hm_Handler_Module {
     public function process($data) {
         if (isset($this->request->post['delete_feed'])) {
@@ -121,6 +122,7 @@ class Hm_Handler_delete_feed extends Hm_Handler_Module {
         return $data;
     }
 }
+
 class Hm_Handler_feed_status extends Hm_Handler_Module {
     public function process($data) {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
@@ -256,13 +258,25 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                 $feed = is_feed($feed_data['server']);
                 if ($feed && $feed->parsed_data) {
                     foreach ($feed->parsed_data as $item) {
+                        if (isset($item['id']) && !isset($item['guid'])) {
+                            $item['guid'] = $item['id'];
+                            unset($item['id']);
+                        }
                         if (isset($item['guid']) && md5($item['guid']) == $form['feed_uid']) {
                             if (isset($item['description'])) {
                                 $content = $item['description'];
                                 unset($item['description']);
-                                $headers = $item;
-                                $headers['source'] = $feed_data['name'];
                             }
+                            elseif (isset($item['summary'])) {
+                                $content = $item['summary'];
+                                unset($item['summary']);
+                            }
+                            $title = $item['title'];
+                            $headers = $item;
+                            unset($headers['title']);
+                            $headers = array_merge(array('title' => $title), $headers);
+                            $headers['source'] = $feed_data['name'];
+                            break;
                         }
                     }
                 }
@@ -480,6 +494,10 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
         }
         if (isset($input['feed_list_data'])) {
             foreach ($input['feed_list_data'] as $item) {
+                if (isset($item['id']) && !isset($item['guid'])) {
+                    $item['guid'] = $item['id'];
+                    unset($item['id']);
+                }
                 if (isset($item['guid'])) {
 
                     $id = sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid']));
@@ -529,6 +547,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     if (isset($item['author'])) {
                         $from = display_value('author', $item, 'from');
                     }
+                    elseif (isset($item['name'])) {
+                        $from = display_value('name', $item, 'from');
+                    }
                     elseif (isset($item['dc:creator'])) {
                         $from = display_value('dc:creator', $item, 'from');
                     }
@@ -538,7 +559,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     else {
                         $from = '';
                     }
-                    $res[$id] = message_list_row($item['title'], $date, $timestamp, $from, $item['server_name'], $id, $flags, $style, $url, $this);
+                    $res[$id] = message_list_row(strip_tags($item['title']), $date, $timestamp, $from, $item['server_name'], $id, $flags, $style, $url, $this);
                 }
             }
             unset($input['feed_list_data']);

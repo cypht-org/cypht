@@ -74,7 +74,6 @@ class Hm_Feed {
                 curl_setopt($curl_handle,CURLOPT_URL, $url);
                 curl_setopt($curl_handle,CURLOPT_CONNECTTIMEOUT,15);
                 curl_setopt($curl_handle,CURLOPT_RETURNTRANSFER,1);
-                curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, 1);
                 curl_setopt($curl_handle, CURLOPT_COOKIEJAR, '/tmp/'.$rand.'.txt');
                 curl_setopt($curl_handle, CURLOPT_COOKIEFILE, '/tmp/'.$rand.'.txt');
                 $buffer = curl_exec($curl_handle);
@@ -133,6 +132,9 @@ class Hm_Feed {
         if (!empty($this->parsed_data)) {
             return true;
         }
+        if (preg_match('/<feed .+atom/i', $this->xml_data)) {
+            $this->feed_type = 'atom';
+        }
         $xml_parser = xml_parser_create();
         xml_set_object($xml_parser, $this);
         if ($this->feed_type == 'atom' || $this->feed_type == 'rss') {
@@ -171,6 +173,8 @@ class Hm_Feed {
                 case 'GUID':
                 case 'UPDATED':
                 case 'MODIFIED':
+                case 'ID':
+                case 'NAME':
                     $this->collect = strtolower($tagname);
                     break;
                 case 'LINK':
@@ -230,7 +234,7 @@ class Hm_Feed {
     }
     /* RSS FEED FUNCTIONS */
     function rss_start_element($parser, $tagname, $attrs) {
-        if ($tagname == 'CHANNEL') {
+        if ($tagname == 'FEED') {
             $this->heading_block = true;
         }
         if ($tagname == 'ITEM') {

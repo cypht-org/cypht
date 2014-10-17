@@ -72,6 +72,7 @@ class Hm_Output_create_form extends Hm_Output_Module {
             return '<div class="create_user">'.
                 '<h1 class="title">Create Account</h1>'.
                 '<form method="POST" autocomplete="off" >'.
+                '<input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
                 '<!-- fake fields are a workaround for chrome autofill getting the wrong fields -->'.
                 '<input style="display:none" type="text" name="fake_username" />'.
                 '<input style="display:none" type="password" name="fake_password" />'.

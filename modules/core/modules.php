@@ -246,10 +246,9 @@ class Hm_Handler_login extends Hm_Handler_Module {
             }
             if ($this->session->is_active()) {
                 Hm_Page_Cache::load($this->session);
-                Hm_Nonce::load($this->session);
-                $this->process_nonce();
             }
         }
+        $this->process_nonce();
         return $data;
     }
 }
@@ -405,14 +404,24 @@ class Hm_Output_login extends Hm_Output_Module {
     protected function output($input, $format) {
         if (!$input['router_login_state']) {
             $res = '<form class="login_form" method="POST">'.
-                '<h1 class="title">HM3</h1>'.
-                ' <input required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
+                '<h1 class="title">'.$this->html_safe($input['router_app_name']).'</h1>'.
+                ' <input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
+                ' <input autofocus required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
                 ' <input required type="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" />';
             $res .= '</form>';
             return $res;
         }
-        return '';
+        else {
+            return '<form class="logout_form" method="POST">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
+            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
+            '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
+            '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(); return false;" type="button" value="Cancel" />'.
+            '</div></form>';
+        }
     }
 }
 
@@ -481,7 +490,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
         }
         else {
-            $res .= ' ><noscript class="noscript">You Need to have Javascript enabled to use HM3. Sorry about that!</noscript>'.
+            $res .= '><noscript class="noscript">You Need to have Javascript enabled to use '.$this->html_safe($input['router_app_name']).' Sorry about that!</noscript>'.
                 '<input type="hidden" id="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
         }
         return $res;
@@ -491,7 +500,10 @@ class Hm_Output_content_start extends Hm_Output_Module {
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($input, $format) {
         $title = '';
-        if (array_key_exists('mailbox_list_title', $input)) {
+        if (!$input['router_login_state']) {
+            $title = $input['router_app_name'];
+        }
+        elseif (array_key_exists('mailbox_list_title', $input)) {
             $title .= ' '.implode('-', array_slice($input['mailbox_list_title'], 1));
         }
         if (!trim($title) && array_key_exists('router_page_name', $input)) {
@@ -533,13 +545,22 @@ class Hm_Output_header_css extends Hm_Output_Module {
 class Hm_Output_page_js extends Hm_Output_Module {
     protected function output($input, $format) {
         if (DEBUG_MODE) {
-            $res = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
+            $res = '';
+            $zepto = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
+            $core = false;
             foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+                if ($name == 'modules/core/') {
+                    $core = $name;
+                    continue;
+                }
                 if (is_readable(sprintf("%ssite.js", $name))) {
                     $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $name).'"></script>';
                 }
             }
-            return $res;
+            if ($core) {
+                $res = '<script type="text/javascript" src="'.sprintf("%ssite.js", $core).'"></script>'.$res;
+            }
+            return $zepto.$res;
         }
         else {
             return '<script type="text/javascript" src="site.js"></script>';
@@ -581,8 +602,8 @@ class Hm_Output_loading_icon extends Hm_Output_Module {
 class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<div class="user_settings"><div class="content_title">Site Settings</div>'.
-            '<form method="POST"><table class="settings_table"><colgroup>'.
-            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<form method="POST"><input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<table class="settings_table"><colgroup>'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
     }
 }
@@ -833,16 +854,9 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
 
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res =  '<li><form class="logout_form" method="POST">'.
-            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
-            $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a>'.
-            '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
-            '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
-            '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
-            '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
-            '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(); return false;" type="button" value="Cancel" />'.
-            '</div></form></li>';
+        $res =  '<li><a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
+            $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a></li>';
+
         if ($format == 'HTML5') {
             return $res;
         }
