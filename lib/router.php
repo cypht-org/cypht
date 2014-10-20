@@ -63,11 +63,27 @@ class Hm_Router {
         $session->end();
     }
 
+    /**
+     * Format result of output modules
+     *
+     * @param $response_data mixed data from output modules
+     * @param $allowed_output array filters applied to JSON formatted output
+     *
+     * @return mixed formatted content
+     */
     private function format_response_content($response_data, $allowed_output) {
         $formatter = new $response_data['router_format_name']();
         return $formatter->format_content($response_data, $allowed_output);
     }
 
+    /**
+     * Send the formatted content to the user
+     *
+     * @param $output mixed data to send to the user
+     * @param $response_data mixed router details
+     *
+     * @return void
+     */
     private function render_output($output, $response_data) {
         $renderer = new Hm_Output_HTTP();
         $renderer->send_response($output, $response_data);

@@ -141,7 +141,7 @@ trait Hm_Uid_Cache {
     /* UID list */
     private static $uids;
 
-    /* Load UIDS from an outside source
+    /* Load UIDs from an outside source
      *
      * @param $uid_array list of uids
      *

@@ -13,11 +13,11 @@ if (!defined('DEBUG_MODE')) { die(); }
  * $config       The site config object
  * $user_config  The user settings object for the current user
  *
- * Modules that extend this class need to override the process function, which takes a
+ * Modules that extend this class need to override the process function, which takes
  * a single array argument. Modules can pass information to the output modules
  * by adding to the array and returning it. All handler modules should return
- * the input array even if it's unmodified, otherwise other modules could be lost.
- *
+ * the input array even if it's unmodified, otherwise other module processing could
+ * be lost.
  */
 abstract class Hm_Handler_Module {
 
@@ -567,8 +567,7 @@ class Hm_Output_Modules { use Hm_Modules; }
  *
  * This is the functional interface used by module sets to
  * setup data handlers and output modules in their setup.php files.
- * They are easier to use and more succinct than dealing directly
- * with the class instances
+ * They are easier to use than dealing directly with the class instances
  */ 
 
 /**

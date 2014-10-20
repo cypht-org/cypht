@@ -170,6 +170,7 @@ abstract class Hm_Session {
         $this->enc_key = Hm_Crypt::unique_id();
         $this->secure_cookie($request, 'hm_id', $this->enc_key);
     }
+
     /**
      * Fetch the current encryption key
      *
@@ -403,7 +404,7 @@ class Hm_PHP_Session extends Hm_Session {
     }
 
     /**
-     * write session data to avoid locking, keep session active, but don't allow writing
+     * Write session data to avoid locking, keep session active, but don't allow writing
      *
      * @return void
      */
@@ -412,7 +413,8 @@ class Hm_PHP_Session extends Hm_Session {
         $this->save_data();
     }
 
-    /** save session data
+    /**
+     * Save session data
      *
      * @return void
      */
@@ -533,6 +535,11 @@ class Hm_DB_Session extends Hm_PHP_Session {
         $this->active = false;
     }
 
+    /**
+     * Write session data to the db
+     *
+     * @return void
+     */
     public function save_data() {
         if ($this->dbh) {
             $sql = $this->dbh->prepare("update hm_user_session set data=? where hm_id=?");
@@ -541,6 +548,11 @@ class Hm_DB_Session extends Hm_PHP_Session {
         }
     }
 
+    /**
+     * Close a session early, but don't destroy it
+     *
+     * @return void
+     */
     public function close_early() {
         $this->session_closed = true;
         $this->save_data();

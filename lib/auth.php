@@ -13,7 +13,7 @@ abstract class Hm_Auth {
     /* site configuration object */
     protected $site_config = false;
 
-    /* bool flag defining if we are responsible for user auth */
+    /* bool flag defining if users are internal */
     public $internal_users = false;
 
     /**
@@ -28,7 +28,7 @@ abstract class Hm_Auth {
     }
 
     /**
-     * Method new auth mechs need to override.
+     * This is the method new auth mechs need to override.
      *
      * @param $user string username
      * @param $pass string password

@@ -13,6 +13,13 @@ trait Hm_Server_List {
     /**
      * Server lists must override this method to connect
      *
+     * @param $id int server id
+     * @param $server string server hostname or ip
+     * @param $user string username for authentication
+     * @param $pass string password for authentication
+     * @param $cache mixed cached connection data
+     *
+     * @return bool true on success
      */
     abstract public function service_connect($id, $server, $user, $pass, $cache);
 
