@@ -11,6 +11,12 @@ trait Hm_Server_List {
     private static $server_list = array();
 
     /**
+     * Server lists must override this method to connect
+     *
+     */
+    abstract public function service_connect($id, $server, $user, $pass, $cache);
+
+    /**
      * Connect to a server
      *
      * @param $id int server id
