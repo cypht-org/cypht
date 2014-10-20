@@ -106,7 +106,7 @@ function search_form($data, $output_mod) {
         '<input type="hidden" name="hm_nonce" value="'.$output_mod->html_safe(Hm_Nonce::generate()).'" />'.
         ' <input type="text" class="search_terms" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
         ' '.search_field_selection($data['search_fld']).
-        ' '.message_since_dropdown($data['search_since'], 'search_since').
+        ' '.message_since_dropdown($data['search_since'], 'search_since', $output_mod).
         ' <input type="submit" class="search_update" value="Update" /></form></div>';
     return $res;
 }

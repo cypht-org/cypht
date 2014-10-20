@@ -639,7 +639,7 @@ class Hm_Output_feed_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('feed_since', $input['user_settings'])) {
             $since = $input['user_settings']['feed_since'];
         }
-        return '<tr class="feed_setting"><td>Show feed items received since</td><td>'.message_since_dropdown($since, 'feed_since').'</td></tr>';
+        return '<tr class="feed_setting"><td>Show feed items received since</td><td>'.message_since_dropdown($since, 'feed_since', $this).'</td></tr>';
     }
 }
 

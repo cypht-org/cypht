@@ -647,7 +647,7 @@ class Hm_Output_pop3_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('pop3_since', $input['user_settings'])) {
             $since = $input['user_settings']['pop3_since'];
         }
-        return '<tr class="pop3_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'pop3_since').'</td></tr>';
+        return '<tr class="pop3_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'pop3_since', $this).'</td></tr>';
     }
 }
 
