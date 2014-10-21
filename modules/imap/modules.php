@@ -231,12 +231,10 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
                 $data['imap_connect_time'] = microtime(true) - $start_time;
                 if ($imap) {
                     $data['imap_connect_status'] = $imap->get_state();
-                    $data['imap_status_inbox'] = $imap->select_mailbox('INBOX');
                     $data['imap_status_server_id'] = $id;
                 }
                 else {
                     $data['imap_connect_status'] = 'disconnected';
-                    $data['imap_status_inbox'] = false;
                     $data['imap_status_server_id'] = $id;
                 }
             }
