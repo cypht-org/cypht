@@ -737,11 +737,21 @@ var toggle_long_headers = function() {
 
 var expand_core_settings = function() {
     var dsp;
+    var hash = window.location.hash;
     var sections = ['.general_setting', '.unread_setting', '.flagged_setting', '.all_setting'];
     for (i=0;i<sections.length;i++) {
         dsp = get_from_local_storage(sections[i]);
+        if (hash) {
+            if (hash.replace('#', '.') != sections[i]) {
+                dsp = 'none';
+            }
+            else {
+                dsp = 'table-row';
+            }
+        }
         if (dsp == 'table-row' || dsp == 'none') {
             $(sections[i]).css('display', dsp);
+            save_to_local_storage(sections[i], dsp);
         }
     }
 };

@@ -1067,12 +1067,25 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($input, $format) {
+        if (array_key_exists('list_path', $input) && in_array($input['list_path'], array('unread', 'flagged', 'pop3', 'combined_inbox'), true)) {
+            if ($input['list_path'] == 'combined_inbox') {
+                $path = 'all';
+            }
+            else {
+                $path = $input['list_path'];
+            }
+            $config_link = '<a href="?page=settings#'.$path.'_setting"><img alt="Configure" class="refresh_list" src="'.Hm_Image_Sources::$cog.'" width="20" height="20" /></a>';
+        }
+        else {
+            $config_link = '';
+        }
         $res = '';
         $res .= '<div class="message_list"><div class="content_title">';
         $res .= message_controls().
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
         $res .= '<div class="list_controls">';
         $res .= '<a onclick="return Hm_Message_List.load_sources()" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+        $res .= $config_link;
         $res .= '</div>';
 	    $res .= message_list_meta($input, $this);
         $res .= '</div>';
