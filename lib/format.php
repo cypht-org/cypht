@@ -25,7 +25,7 @@ abstract class HM_Format {
     abstract protected function content($input, $lang_str, $allowed_output);
 
     /**
-     * Set up and run the abstract content() function
+     * Setup and run the abstract content() function
      *
      * @param $input array data from the handler modules
      * @param $allowed_output array allowed fields for JSON responses

@@ -679,7 +679,7 @@ class Hm_Output_unread_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('unread_since', $input['user_settings'])) {
             $since = $input['user_settings']['unread_since'];
         }
-        return '<tr class="unread_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'unread_since').'</td></tr>';
+        return '<tr class="unread_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'unread_since', $this).'</td></tr>';
     }
 }
 
@@ -699,7 +699,7 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('flagged_since', $input['user_settings'])) {
             $since = $input['user_settings']['flagged_since'];
         }
-        return '<tr class="flagged_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'flagged_since').'</td></tr>';
+        return '<tr class="flagged_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'flagged_since', $this).'</td></tr>';
     }
 }
 
@@ -719,7 +719,7 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
         if (array_key_exists('user_settings', $input) && array_key_exists('all_since', $input['user_settings'])) {
             $since = $input['user_settings']['all_since'];
         }
-        return '<tr class="all_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'all_since').'</td></tr>';
+        return '<tr class="all_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'all_since', $this).'</td></tr>';
     }
 }
 

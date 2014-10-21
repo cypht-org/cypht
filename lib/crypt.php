@@ -11,7 +11,7 @@ define('BLOCK_MODE', MCRYPT_MODE_CBC);
 /* cipher */
 define('CIPHER', MCRYPT_RIJNDAEL_128);
 
-/* Rand source */
+/* rand source */
 define('RAND_SOURCE', MCRYPT_RAND);
 
 /**

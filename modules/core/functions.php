@@ -121,7 +121,7 @@ function message_controls() {
         '<a href="#" onclick="return message_action(\'delete\');">Delete</a></div>';
 }
 
-function message_since_dropdown($since, $name) {
+function message_since_dropdown($since, $name, $output_mod) {
     $times = array(
         'today' => 'Today',
         '-1 week' => 'Last 7 days',
@@ -137,7 +137,7 @@ function message_since_dropdown($since, $name) {
         if ($val == $since) {
             $res .= ' selected="selected"';
         }
-        $res .= ' value="'.$val.'">'.$label.'</option>';
+        $res .= ' value="'.$val.'">'.$output_mod->trans($label).'</option>';
     }
     $res .= '</select>';
     return $res;
