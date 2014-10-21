@@ -117,7 +117,9 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
             $state = $input['2fa_state'];
 
             echo '<!DOCTYPE html><html lang=en-us><head><meta charset="utf-8" />'.
-                '<link href="site.css" media="all" rel="stylesheet" type="text/css" /></head><body>';
+                '<link href="site.css" media="all" rel="stylesheet" type="text/css" />'.
+                '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
+                '</head><body>';
 
             if (array_key_exists('2fa_error', $input)) {
                 $error = '<div class="swipe_error">'.$this->html_safe($input['2fa_error']).'</div>';
