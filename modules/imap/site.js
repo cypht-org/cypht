@@ -8,6 +8,7 @@ var imap_delete_action = function() {
         function(res) {
             if (res.deleted_server_id > -1 ) {
                 form.parent().remove();
+                set_unsaved_changes(1);
                 reload_folders(true);
             }
         },
@@ -29,6 +30,7 @@ var imap_save_action = function() {
                 form.find('.imap_password').attr('placeholder', '[saved]');
                 form.append('<input type="submit" value="Forget" class="forget_imap_connection" />');
                 $('.forget_imap_connection').on('click', imap_forget_action);
+                set_unsaved_changes(1);
                 reload_folders(true);
             }
         },
@@ -44,12 +46,13 @@ var imap_forget_action = function() {
         form.serializeArray(),
         function(res) {
             if (res.just_forgot_credentials) {
-                form.find('.credentials').attr('disabled', false);
+                form.find('.credentials').prop('disabled', false);
                 form.find('.imap_password').val('');
-                form.find('.imap_password').attr('placeholder', 'Password');
+                form.find('.imap_password').prop('placeholder', 'Password');
                 form.append('<input type="submit" value="Save" class="save_imap_connection" />');
                 $('.save_imap_connection').on('click', imap_save_action);
                 $('.forget_imap_connection', form).hide();
+                set_unsaved_changes(1);
                 reload_folders(true);
             }
         },

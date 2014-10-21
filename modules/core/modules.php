@@ -246,6 +246,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
             }
             if ($this->session->is_active()) {
                 Hm_Page_Cache::load($this->session);
+                $data['changed_settings'] = $this->session->get('changed_settings', array());
             }
         }
         $this->process_nonce();
@@ -414,11 +415,14 @@ class Hm_Output_login extends Hm_Output_Module {
         }
         else {
             return '<form class="logout_form" method="POST">'.
+            '<input type="hidden" id="unsaved_changes" value="'.
+            (array_key_exists('changed_settings', $input) && !empty($input['changed_settings']) ? '1' : '0').'" />'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<div class="confirm_logout"><div class="confirm_text">You must enter your password to save your settings on logout</div>'.
+            '<div class="confirm_logout"><div class="confirm_text">'.
+            $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').'</div>'.
             '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
             '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
-            '<input class="save_settings" type="submit" name="logout" value="Just Logout" />'.
+            '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />'.
             '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(); return false;" type="button" value="Cancel" />'.
             '</div></form>';
         }

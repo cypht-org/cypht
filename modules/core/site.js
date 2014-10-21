@@ -448,7 +448,12 @@ var reload_after_message_action = function() {
 };
 
 var confirm_logout = function() {
-    $('.confirm_logout').show();
+    if ($('#unsaved_changes').val() == 0) {
+        $('#logout_without_saving').click();
+    }
+    else {
+        $('.confirm_logout').show();
+    }
     return false;
 };
 
@@ -739,6 +744,10 @@ var expand_core_settings = function() {
             $(sections[i]).css('display', dsp);
         }
     }
+};
+
+var set_unsaved_changes = function(state) {
+    $('#unsaved_changes').val(state);
 };
 
 var folder_list = get_from_local_storage('formatted_folder_list');

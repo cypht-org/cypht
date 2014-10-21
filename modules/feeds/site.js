@@ -17,6 +17,7 @@ var feed_delete_action = function() {
         form.serializeArray(),
         function(res) {
             if (res.deleted_server_id > -1 ) {
+                set_unsaved_changes(1);
                 reload_folders(true);
                 form.parent().remove();
             }

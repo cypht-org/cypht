@@ -23,6 +23,7 @@ var pop3_save_action = function() {
                 form.find('.pop3_password').attr('placeholder', '[saved]');
                 form.append('<input type="submit" value="Forget" class="forget_pop3_connection" />');
                 $('.forget_pop3_connection').on('click', pop3_forget_action);
+                set_unsaved_changes(1);
                 reload_folders(true);
             }
         },
@@ -44,6 +45,7 @@ var pop3_forget_action = function() {
                 form.append('<input type="submit" value="Save" class="save_pop3_connection" />');
                 $('.save_pop3_connection').on('click', pop3_save_action);
                 $('.forget_pop3_connection', form).remove();
+                set_unsaved_changes(1);
                 reload_folders(true);
             }
         },
@@ -60,6 +62,7 @@ var pop3_delete_action = function() {
         function(res) {
             if (res.deleted_server_id > -1 ) {
                 form.parent().remove();
+                set_unsaved_changes(1);
                 reload_folders(true);
             }
         },
