@@ -985,7 +985,7 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
 class Hm_Output_server_status_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<div class="server_status"><div class="content_title">Home</div>';
-        $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Status</th><th>Details</th></tr>'.
+        $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Status</th></tr>'.
                 '</thead><tbody>';
         return $res;
     }
