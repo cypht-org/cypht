@@ -262,6 +262,9 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                             $item['guid'] = $item['id'];
                             unset($item['id']);
                         }
+                        elseif (isset($item['title']) && !isset($item['guid'])) {
+                            $item['guid'] = md5($item['title']);
+                        }
                         if (isset($item['guid']) && md5($item['guid']) == $form['feed_uid']) {
                             if (isset($item['description'])) {
                                 $content = $item['description'];
@@ -497,6 +500,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 if (isset($item['id']) && !isset($item['guid'])) {
                     $item['guid'] = $item['id'];
                     unset($item['id']);
+                }
+                elseif (isset($item['title']) && !isset($item['guid'])) {
+                    $item['guid'] = md5($item['title']);
                 }
                 if (isset($item['guid'])) {
 

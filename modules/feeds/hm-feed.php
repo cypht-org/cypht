@@ -57,7 +57,7 @@ class Hm_Feed {
     }
     function get_feed_data($url) {
         $buffer = '';
-        if (!preg_match("?^http://?", ltrim($url))) {
+        if (!preg_match("?^http(|s)://?", ltrim($url))) {
             $url = 'http://'.ltrim($url);
         }
         if (function_exists('curl_setopt')) {
@@ -70,10 +70,10 @@ class Hm_Feed {
             case 'curl':
                 $rand =  md5(uniqid(rand(), 1));
                 $curl_handle=curl_init();
-                curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1");
-                curl_setopt($curl_handle,CURLOPT_URL, $url);
-                curl_setopt($curl_handle,CURLOPT_CONNECTTIMEOUT,15);
-                curl_setopt($curl_handle,CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36");
+                curl_setopt($curl_handle, CURLOPT_URL, $url);
+                curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT,15);
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER,1);
                 curl_setopt($curl_handle, CURLOPT_COOKIEJAR, '/tmp/'.$rand.'.txt');
                 curl_setopt($curl_handle, CURLOPT_COOKIEFILE, '/tmp/'.$rand.'.txt');
                 $buffer = curl_exec($curl_handle);
