@@ -60,6 +60,7 @@ add_handler('ajax_feed_combined_inbox', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_combined_inbox', 'close_session_early',  true, 'core');
 add_handler('ajax_feed_combined_inbox', 'feed_list_content',  true);
 add_handler('ajax_feed_combined_inbox', 'date', true, 'core');
+add_handler('ajax_feed_combined_inbox', 'http_headers', true, 'core');
 add_output('ajax_feed_combined_inbox', 'filter_feed_list_data', true);
 
 /* combined feeds */
@@ -71,6 +72,7 @@ add_handler('ajax_feed_combined', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_combined', 'close_session_early',  true, 'core');
 add_handler('ajax_feed_combined', 'feed_list_content',  true);
 add_handler('ajax_feed_combined', 'date', true, 'core');
+add_handler('ajax_feed_combined', 'http_headers', true, 'core');
 add_output('ajax_feed_combined', 'filter_feed_list_data', true);
 
 /* unread */
@@ -82,6 +84,7 @@ add_handler('ajax_feed_unread', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_unread', 'close_session_early',  true, 'core');
 add_handler('ajax_feed_unread', 'feed_list_content',  true);
 add_handler('ajax_feed_unread', 'date', true, 'core');
+add_handler('ajax_feed_unread', 'http_headers', true, 'core');
 add_output('ajax_feed_unread', 'filter_feed_list_data', true);
 
 
@@ -94,6 +97,7 @@ add_handler('ajax_feed_list_display', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_list_display', 'close_session_early',  true, 'core');
 add_handler('ajax_feed_list_display', 'feed_list_content',  true);
 add_handler('ajax_feed_list_display', 'date', true, 'core');
+add_handler('ajax_feed_list_display', 'http_headers', true, 'core');
 add_output('ajax_feed_list_display', 'filter_feed_list_data', true);
 
 add_handler('message', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
@@ -107,6 +111,7 @@ add_handler('ajax_feed_item_content', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_item_content', 'feed_item_content',  true);
 add_handler('ajax_feed_item_content', 'save_feeds',  true);
 add_handler('ajax_feed_item_content', 'date', true, 'core');
+add_handler('ajax_feed_item_content', 'http_headers', true, 'core');
 add_output('ajax_feed_item_content', 'filter_feed_item_content', true);
 
 add_handler('ajax_feed_debug', 'login', false, 'core');
@@ -117,6 +122,7 @@ add_handler('ajax_feed_debug', 'feed_connect', true);
 add_handler('ajax_feed_debug', 'save_feeds',  true);
 add_handler('ajax_feed_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_feed_debug', 'date', true, 'core');
+add_handler('ajax_feed_debug', 'http_headers', true, 'core');
 
 add_handler('ajax_feed_status', 'login', false, 'core');
 add_handler('ajax_feed_status', 'load_user_data', true, 'core');
@@ -124,6 +130,7 @@ add_handler('ajax_feed_status', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_status', 'close_session_early',  true, 'core');
 add_handler('ajax_feed_status', 'feed_status',  true);
 add_handler('ajax_feed_status', 'date', true, 'core');
+add_handler('ajax_feed_status', 'http_headers', true, 'core');
 add_output('ajax_feed_status', 'filter_feed_status_data', true);
 
 return array(

@@ -72,7 +72,6 @@ Hm_Ajax_Request = function() { return {
             return;
         }
         else {
-            res = $.parseJSON(res);
             if (!res.router_login_state) {
                 window.location.href = "?page=notfound";
             }

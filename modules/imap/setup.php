@@ -75,6 +75,7 @@ add_handler('ajax_imap_debug', 'save_imap_cache',  true);
 add_handler('ajax_imap_debug', 'save_imap_servers',  true);
 add_handler('ajax_imap_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_imap_debug', 'date', true, 'core');
+add_handler('ajax_imap_debug', 'http_headers', true, 'core');
 
 /* ajax message content */
 add_handler('ajax_imap_message_content', 'login', false, 'core');
@@ -84,6 +85,7 @@ add_handler('ajax_imap_message_content', 'imap_message_content',  true);
 add_handler('ajax_imap_message_content', 'save_imap_cache',  true);
 add_handler('ajax_imap_message_content', 'save_imap_servers',  true);
 add_handler('ajax_imap_message_content', 'date', true, 'core');
+add_handler('ajax_imap_message_content', 'http_headers', true, 'core');
 add_output('ajax_imap_message_content', 'filter_reply_content', true);
 add_output('ajax_imap_message_content', 'filter_message_headers', true);
 add_output('ajax_imap_message_content', 'filter_message_body', true);
@@ -98,6 +100,7 @@ add_handler('ajax_imap_unread', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_unread', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_unread', 'imap_unread',  true);
 add_handler('ajax_imap_unread', 'date', true, 'core');
+add_handler('ajax_imap_unread', 'http_headers', true, 'core');
 add_output('ajax_imap_unread', 'filter_unread_data', true);
 
 /* ajax status callback data */
@@ -107,6 +110,7 @@ add_handler('ajax_imap_status', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_status', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_status', 'imap_status',  true);
 add_handler('ajax_imap_status', 'date', true, 'core');
+add_handler('ajax_imap_status', 'http_headers', true, 'core');
 add_output('ajax_imap_status', 'filter_imap_status_data', true);
 
 /* ajax flagged callback data */
@@ -118,6 +122,7 @@ add_handler('ajax_imap_flagged', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_flagged', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_flagged', 'imap_flagged',  true);
 add_handler('ajax_imap_flagged', 'date', true, 'core');
+add_handler('ajax_imap_flagged', 'http_headers', true, 'core');
 add_output('ajax_imap_flagged', 'filter_flagged_data', true);
 
 /* ajax message action callback */
@@ -132,6 +137,7 @@ add_handler('ajax_imap_folder_expand', 'load_user_data', true, 'core');
 add_handler('ajax_imap_folder_expand', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_folder_expand', 'imap_folder_expand',  true);
 add_handler('ajax_imap_folder_expand', 'date', true, 'core');
+add_handler('ajax_imap_folder_expand', 'http_headers', true, 'core');
 add_output('ajax_imap_folder_expand', 'filter_expanded_folder_data', true);
 
 /* select folder */
@@ -142,6 +148,7 @@ add_handler('ajax_imap_folder_display', 'imap_message_list_type', true);
 add_handler('ajax_imap_folder_display', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_folder_display', 'imap_folder_page',  true);
 add_handler('ajax_imap_folder_display', 'date', true, 'core');
+add_handler('ajax_imap_folder_display', 'http_headers', true, 'core');
 add_output('ajax_imap_folder_display', 'filter_folder_page', true);
 
 /* search results */
@@ -153,6 +160,7 @@ add_handler('ajax_imap_search', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_search', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_search', 'imap_search',  true);
 add_handler('ajax_imap_search', 'date', true, 'core');
+add_handler('ajax_imap_search', 'http_headers', true, 'core');
 add_output('ajax_imap_search', 'filter_imap_search', true);
 
 /* combined inbox */
@@ -164,6 +172,7 @@ add_handler('ajax_imap_combined_inbox', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_combined_inbox', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_combined_inbox', 'imap_combined_inbox',  true);
 add_handler('ajax_imap_combined_inbox', 'date', true, 'core');
+add_handler('ajax_imap_combined_inbox', 'http_headers', true, 'core');
 add_output('ajax_imap_combined_inbox', 'filter_combined_inbox', true);
 
 /* allowed input */

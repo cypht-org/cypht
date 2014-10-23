@@ -67,11 +67,13 @@ add_output('notfound', 'notfound_content', true, 'core', 'content_section_start'
 add_handler('ajax_message_action', 'login', false);
 add_handler('ajax_message_action', 'load_user_data', true);
 add_handler('ajax_message_action', 'date', true);
+add_handler('ajax_message_action', 'http_headers', true);
 
 /* folder list update ajax request */
 add_handler('ajax_hm_folders', 'login', false);
 add_handler('ajax_hm_folders', 'load_user_data', true);
 add_handler('ajax_hm_folders', 'date', true);
+add_handler('ajax_hm_folders', 'http_headers', true);
 add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
 add_output('ajax_hm_folders', 'main_menu_content', true);
