@@ -54,6 +54,12 @@ class Hm_Request {
         $this->filter_request_input($filters);
         $this->get_other_request_details($filters);
         $this->remove_super_globals();
+
+        Hm_Debug::add('Using sapi: '.$this->sapi);
+        Hm_Debug::add('Request type: '.$this->type);
+        Hm_Debug::add('Request path: '.$this->path);
+        Hm_Debug::add('TLS request: '.intval($this->tls));
+        Hm_Debug::add('Mobile request: '.intval($this->mobile));
     }
 
     /**
@@ -96,6 +102,10 @@ class Hm_Request {
         unset($_SERVER);
         unset($_GET);
         unset($_COOKIE);
+        unset($GLOBALS);
+        unset($_FILES);
+        unset($_REQUEST);
+        unset($_ENV);
     }
 
     /**
