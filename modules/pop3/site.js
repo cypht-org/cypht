@@ -1,10 +1,9 @@
 var pop3_test_action = function() {
     event.preventDefault();
     var form = $(this).parent();
-    var id = form.find('#pop3_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
-        function(res) { },
+        function() { },
         {'pop3_connect': 1}
     );
 };
@@ -12,7 +11,6 @@ var pop3_test_action = function() {
 var pop3_save_action = function() {
     event.preventDefault();
     var form = $(this).parent();
-    var id = form.find('#pop3_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -34,7 +32,6 @@ var pop3_save_action = function() {
 var pop3_forget_action = function() {
     event.preventDefault();
     var form = $(this).parent();
-    var id = form.find('#pop3_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -56,7 +53,6 @@ var pop3_forget_action = function() {
 var pop3_delete_action = function() {
     event.preventDefault();
     var form = $(this).parent();
-    var id = form.find('#pop3_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -71,9 +67,9 @@ var pop3_delete_action = function() {
 };
 
 var display_pop3_mailbox = function(res) {
-    ids = [res.pop3_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
-    key = 'pop3_'+res.pop3_server_id;
+    var ids = [res.pop3_server_id];
+    Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
+    var key = 'pop3_'+res.pop3_server_id;
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     save_to_local_storage(key, data.html());
@@ -82,7 +78,7 @@ var display_pop3_mailbox = function(res) {
 var load_pop3_list = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
-        {'name': 'pop3_server_id', 'value': detail.server_id}],
+        {'name': 'pop3_server_id', 'value': id}],
         display_pop3_mailbox,
         [],
         false
@@ -113,9 +109,9 @@ var display_pop3_message = function(res) {
 };
 
 var pop3_message_view_finished = function() {
-    detail = parse_folder_path(hm_list_path, 'pop3');
+    var detail = parse_folder_path(hm_list_path, 'pop3');
     if (detail) {
-        class_name = 'pop3_'+detail.server_id+'_'+hm_msg_uid;
+        var class_name = 'pop3_'+detail.server_id+'_'+hm_msg_uid;
         if (hm_list_parent == 'combined_inbox') {
             prev_next_links('formatted_combined_inbox', class_name);
         }
@@ -126,6 +122,8 @@ var pop3_message_view_finished = function() {
 };
 
 var add_pop3_sources = function(callback) {
+    var i;
+    var id;
     if ($('.pop3_server_ids').length) {
         var ids = $('.pop3_server_ids').val().split(',');
         if (ids && ids != '') {
@@ -162,10 +160,12 @@ var pop3_combined_inbox_content = function(id) {
 
 var display_pop3_list = function(res) {
     var ids = [res.pop3_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
+    Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
 };
 
 var pop3_status_update = function() {
+    var i;
+    var id;
     if ($('.pop3_server_ids').length) {
         var ids = $('.pop3_server_ids').val().split(',');
         if ( ids && ids != '') {
@@ -206,7 +206,7 @@ var pop3_search_page_content = function(id) {
 
 var update_pop3_search_result = function(res) {
     var ids = [res.pop3_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
+    Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
 };
 
 var pop3_combined_unread_content = function(id) {
@@ -224,7 +224,7 @@ var pop3_combined_unread_content = function(id) {
 
 var update_pop3_unread_display = function(res) {
     var ids = [res.pop3_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
+    Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
 };
 
 var expand_pop3_settings = function() {

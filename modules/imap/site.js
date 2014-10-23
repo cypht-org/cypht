@@ -2,7 +2,6 @@
 var imap_delete_action = function() {
     event.preventDefault();
     var form = $(this).parent();
-    var id = form.find('#imap_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -19,7 +18,6 @@ var imap_delete_action = function() {
 var imap_save_action = function() {
     event.preventDefault();
     var form = $(this).parent();
-    var id = form.find('#imap_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -41,7 +39,6 @@ var imap_save_action = function() {
 var imap_forget_action = function() {
     event.preventDefault();
     var form = $(this).parent();
-    var id = form.find('#imap_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -75,7 +72,6 @@ var imap_test_action = function() {
     $('.imap_folder_data').empty();
     event.preventDefault();
     var form = $(this).parent();
-    var id = form.find('#imap_server_id');
     Hm_Ajax.request(
         form.serializeArray(),
         false,
@@ -111,6 +107,8 @@ var imap_combined_flagged_content = function(id) {
 
 /* home page */
 var imap_status_update = function() {
+    var id;
+    var i;
     if ($('.imap_server_ids').length) {
         var ids = $('.imap_server_ids').val().split(',');
         if ( ids && ids != '') {
@@ -150,7 +148,7 @@ var imap_search_page_content = function(id) {
 
 var display_imap_message_list = function(res) {
     var ids = res.imap_server_ids.split(',');
-    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+    Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
 }
 
 /* all mail page */
@@ -207,7 +205,7 @@ var select_imap_folder = function(path, force) {
 
 var display_imap_mailbox = function(res) {
     var ids = [res.imap_server_id];
-    var count = Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+    Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
     if (res.page_links) {
         $('.page_links').html(res.page_links);
     }
@@ -300,9 +298,9 @@ var imap_setup_message_view_page = function() {
 };
 
 var imap_message_view_finished = function() {
-    detail = parse_folder_path(hm_list_path, 'imap');
+    var detail = parse_folder_path(hm_list_path, 'imap');
     if (detail) {
-        class_name = 'imap_'+detail.server_id+'_'+hm_msg_uid+'_'+detail.folder;
+        var class_name = 'imap_'+detail.server_id+'_'+hm_msg_uid+'_'+detail.folder;
         if (hm_list_parent == 'combined_inbox') {
             prev_next_links('formatted_combined_inbox', class_name);
         }
@@ -319,6 +317,7 @@ var imap_message_view_finished = function() {
 var add_imap_sources = function(callback) {
     if ($('.imap_server_ids').length) {
         var id;
+        var i;
         var ids = $('.imap_server_ids').val().split(',');
         if (ids && ids != '') {
             for (i=0;i<ids.length;i++) {
@@ -333,7 +332,7 @@ var imap_setup_compose_page = function() {
     var source = $('.imap_reply_source');
     var uid = $('.imap_reply_uid');
     if (source.length && uid.length) {
-        detail = parse_folder_path(source.val(), 'imap');
+        var detail = parse_folder_path(source.val(), 'imap');
         if (detail) {
             $('.compose_to').prop('disabled', true);
             $('.smtp_send').prop('disabled', true);

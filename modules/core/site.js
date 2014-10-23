@@ -1,5 +1,5 @@
 /* Ajax multiplexer */
-Hm_Ajax = {
+var Hm_Ajax = {
     request_count: 0,
     batch_callback: false,
 
@@ -19,6 +19,7 @@ Hm_Ajax = {
 
 var hm_loading_id = 0;
 var hm_loading_pos = 0;
+
 var show_loading_icon = function() {
     $('.loading_icon').show();
     hm_loading_pos = hm_loading_pos + 5;
@@ -32,13 +33,14 @@ var stop_loading_icon = function() {
 }
 
 /* Ajax request wrapper */
-Hm_Ajax_Request = function() { return { 
+var Hm_Ajax_Request = function() { return { 
 
     callback: false,
     index: 0,
     start_time: 0,
 
     make_request: function(args, callback, extra) {
+        var name;
         this.callback = callback;
         if (extra) {
             for (name in extra) {
@@ -87,7 +89,7 @@ Hm_Ajax_Request = function() { return {
         }
     },
 
-    fail: function(res) {
+    fail: function() {
         setTimeout(function() { Hm_Notices.show({0: 'An error occured communicating with the server'}); }, 1000);
     },
 
@@ -108,7 +110,7 @@ Hm_Ajax_Request = function() { return {
     }
 }; };
 
-Hm_Debug = {
+var Hm_Debug = {
     max: 5,
     count: 0,
     add: function(msg) {
@@ -130,7 +132,7 @@ Hm_Debug = {
 };
 
 /* user notification manager */
-Hm_Notices = {
+var Hm_Notices = {
 
     hide_id: false,
 
@@ -170,7 +172,7 @@ Hm_Notices = {
 };
 
 /* job scheduler */
-Hm_Timer = {
+var Hm_Timer = {
 
     jobs: [],
     interval: 1000,
@@ -185,6 +187,7 @@ Hm_Timer = {
     },
 
     cancel: function(job) {
+        var index;
         for (index in Hm_Timer.jobs) {
             if (Hm_Timer.jobs[index][0] == job) {
                 Hm_Timer.jobs.splice(index, 1);
@@ -196,6 +199,7 @@ Hm_Timer = {
 
     fire: function() {
         var job;
+        var index;
         for (index in Hm_Timer.jobs) {
             job = Hm_Timer.jobs[index];
             job[2]--;
@@ -226,6 +230,7 @@ var Hm_Message_List = {
 
     remove_rows: function(ids, msg_ids, type) {
         var count = $('.message_table tbody tr').length;
+        var i;
         for (i=0;i<ids.length;i++) {
             $('.message_table tbody tr[class^='+type+'_'+ids[i]+'_]').filter(function() {
                 var id = this.className;
@@ -240,6 +245,12 @@ var Hm_Message_List = {
 
     add_rows: function(msgs) {
         var msg_ids = [];
+        var row;
+        var id;
+        var index;
+        var timestr;
+        var subject;
+        var timeint;
         for (index in msgs) {
             row = msgs[index][0];
             id = msgs[index][1];
@@ -263,6 +274,7 @@ var Hm_Message_List = {
     insert_into_message_list: function(row) {
         var timestr = $('.msg_timestamp', $(row)).val();
         var element = false;
+        var timestr2;
         $('.message_table tbody tr').each(function() {
             timestr2 = $('.msg_timestamp', $(this)).val();
             if ((timestr*1) >= (timestr2*1)) {
@@ -338,8 +350,8 @@ var Hm_Message_List = {
     },
 
     update_after_action: function(action_type, selected) {
+        var index;
         var remove = false;
-        var row = false;
         var class_name = false;
         var count = $(".message_list tbody tr").length;
         if (action_type == 'read' && hm_list_path == 'unread') {
@@ -359,6 +371,8 @@ var Hm_Message_List = {
     },
 
     load_sources: function() {
+        var index;
+        var source;
         $('.empty_list').remove();
         $('.src_count').text(Hm_Message_List.sources.length);
         $('.total').text($('.message_table tbody tr').length);
@@ -461,6 +475,7 @@ var parse_folder_path = function(path, path_type) {
     var server_id = false;
     var uid = false;
     var folder = '';
+    var parts;
 
     if (path_type == 'imap') {
         parts = path.split('_', 4);
@@ -501,6 +516,7 @@ var parse_folder_path = function(path, path_type) {
 
 var prev_next_links = function(cache, class_name) {
     var href;
+    var target;
     var plink = false;
     var nlink = false;
     var list = get_from_local_storage(cache);
@@ -594,7 +610,7 @@ var sort_list = function(class_name, exclude_name) {
 		}
 	   return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
 	});
-	$.each(listitems, function(idx, itm) { folder.append(itm); });
+	$.each(listitems, function(_, itm) { folder.append(itm); });
 };
 
 var update_folder_list_display = function(res) {
@@ -736,6 +752,7 @@ var toggle_long_headers = function() {
 
 var expand_core_settings = function() {
     var dsp;
+    var i;
     var hash = window.location.hash;
     var sections = ['.general_setting', '.unread_setting', '.flagged_setting', '.all_setting'];
     for (i=0;i<sections.length;i++) {
