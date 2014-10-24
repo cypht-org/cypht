@@ -126,7 +126,7 @@ var add_pop3_sources = function(callback) {
     var id;
     if ($('.pop3_server_ids').length) {
         var ids = $('.pop3_server_ids').val().split(',');
-        if (ids && ids != '') {
+        if (ids && ids !== '') {
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
                 Hm_Message_List.sources.push({type: 'pop3', id: id, callback: callback});
@@ -168,7 +168,7 @@ var pop3_status_update = function() {
     var id;
     if ($('.pop3_server_ids').length) {
         var ids = $('.pop3_server_ids').val().split(',');
-        if ( ids && ids != '') {
+        if ( ids && ids !== '') {
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
                 Hm_Ajax.request(
@@ -255,7 +255,7 @@ else if (hm_page_name == 'message_list') {
         add_pop3_sources(pop3_combined_unread_content);
     }
     else if (hm_list_path.substring(0, 4) == 'pop3') {
-        if ($('.message_table tbody tr').length == 0) {
+        if ($('.message_table tbody tr').length === 0) {
             var detail = parse_folder_path(hm_list_path, 'pop3');
             if (detail) {
                 Hm_Message_List.sources.push({type: 'pop3', id: detail.server_id, callback: load_pop3_list});

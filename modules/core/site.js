@@ -5,7 +5,7 @@ var Hm_Ajax = {
 
     request: function(args, callback, extra, no_icon, batch_callback) {
         var ajax = new Hm_Ajax_Request();
-        if (Hm_Ajax.request_count == 0) {
+        if (Hm_Ajax.request_count === 0) {
             if (!no_icon) {
                 show_loading_icon();
                 $('body').addClass('wait');
@@ -30,7 +30,7 @@ var show_loading_icon = function() {
 var stop_loading_icon = function() {
     $('.loading_icon').hide();
     clearTimeout(hm_loading_id);
-}
+};
 
 /* Ajax request wrapper */
 var Hm_Ajax_Request = function() { return { 
@@ -65,7 +65,7 @@ var Hm_Ajax_Request = function() { return {
     },
 
     done: function(res) {
-        if (typeof res == 'string' && (res == 'null' || res.indexOf('<') == 0 || res == '{}')) {
+        if (typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
             this.fail(res);
             return;
         }
@@ -99,7 +99,7 @@ var Hm_Ajax_Request = function() { return {
         var msg = 'AJAX request finished in ' + elapsed + ' millis';
         Hm_Debug.add(msg);
         Hm_Ajax.request_count--;
-        if (Hm_Ajax.request_count == 0) {
+        if (Hm_Ajax.request_count === 0) {
             if (Hm_Ajax.batch_callback) {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
@@ -203,7 +203,7 @@ var Hm_Timer = {
         for (index in Hm_Timer.jobs) {
             job = Hm_Timer.jobs[index];
             job[2]--;
-            if (job[2] == 0) {
+            if (job[2] === 0) {
                 job[2] = job[1];
                 Hm_Timer.jobs[index] = job;
                 try { job[0](); } catch(e) { console.log(e); }
@@ -231,14 +231,15 @@ var Hm_Message_List = {
     remove_rows: function(ids, msg_ids, type) {
         var count = $('.message_table tbody tr').length;
         var i;
+        var filter_function = function() {
+            var id = this.className;
+            if ($.inArray(id, msg_ids) == -1) {
+                count--;
+                $(this).remove();
+            }
+        };
         for (i=0;i<ids.length;i++) {
-            $('.message_table tbody tr[class^='+type+'_'+ids[i]+'_]').filter(function() {
-                var id = this.className;
-                if ($.inArray(id, msg_ids) == -1) {
-                    count--;
-                    $(this).remove();
-                }
-            });
+            $('.message_table tbody tr[class^='+type+'_'+ids[i]+'_]').filter(filter_function);
         }
         return count;
     },
@@ -326,7 +327,7 @@ var Hm_Message_List = {
         var end;
         if (event_object && event_object.shiftKey) {
             if (event_object.target.checked) {
-                if (Hm_Message_List.range_start != '') {
+                if (Hm_Message_List.range_start !== '') {
                     start = Hm_Message_List.range_start;
                     end = event_object.target.value;
                     Hm_Message_List.select_range(start, end);
@@ -461,7 +462,7 @@ var reload_after_message_action = function() {
 };
 
 var confirm_logout = function() {
-    if ($('#unsaved_changes').val() == 0) {
+    if ($('#unsaved_changes').val() === 0) {
         $('#logout_without_saving').click();
     }
     else {
@@ -495,7 +496,7 @@ var parse_folder_path = function(path, path_type) {
             folder = parts[3];
         }
         if (type && server_id) {
-            return {'type': type, 'server_id' : server_id, 'folder' : folder, 'uid': uid}
+            return {'type': type, 'server_id' : server_id, 'folder' : folder, 'uid': uid};
         }
     }
     else if (path_type == 'pop3' || path_type == 'feeds') {
@@ -508,7 +509,7 @@ var parse_folder_path = function(path, path_type) {
             uid = parts[2];
         }
         if (type && server_id) {
-            return {'type': type, 'server_id' : server_id, 'uid': uid}
+            return {'type': type, 'server_id' : server_id, 'uid': uid};
         }
     }
     return false;
@@ -723,7 +724,7 @@ var check_empty_list = function() {
             $('.message_list').append('<div class="empty_list">So alone</div>');
         }
     }
-    return count == 0;
+    return count === 0;
 };
 
 var track_read_messages = function(class_name) {

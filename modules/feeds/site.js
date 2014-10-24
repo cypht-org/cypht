@@ -111,7 +111,7 @@ var add_feed_sources = function(callback) {
     var i;
     if ($('.feed_server_ids').length) {
         var ids = $('.feed_server_ids').val().split(',');
-        if (ids && ids != '') {
+        if (ids && ids !== '') {
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
                 Hm_Message_List.sources.push({type: 'feed', id: id, callback: callback});
@@ -175,7 +175,7 @@ var feed_status_update = function() {
     var i;
     if ($('.feed_server_ids').length) {
         var ids = $('.feed_server_ids').val().split(',');
-        if ( ids && ids != '') {
+        if ( ids && ids !== '') {
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
                 Hm_Ajax.request(
@@ -214,7 +214,7 @@ if (hm_page_name == 'message_list') {
         add_feed_sources(feeds_combined_content_unread);
     }
     else if (hm_list_path.substring(0, 4) == 'feed') {
-        if ($('.message_table tbody tr').length == 0) {
+        if ($('.message_table tbody tr').length === 0) {
             var detail = parse_folder_path(hm_list_path, 'feeds');
             if (detail) {
                 Hm_Message_List.sources.push({type: 'feed', id: detail.server_id, callback: load_feed_list});
