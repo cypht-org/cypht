@@ -794,6 +794,10 @@ else {
 if (hm_page_name == 'settings' || hm_page_name == 'servers') {
     if (hm_page_name == 'settings') {
         expand_core_settings();
+        $('.settings_subtitle').click(function() { return toggle_page_section($(this).data('target')); });
+    }
+    else {
+        $('.server_section').click(function() { return toggle_page_section($(this).data('target')); });
     }
     reload_folders();
 }
@@ -825,11 +829,7 @@ $(function() {
         else if (hm_list_path == 'flagged') {
             Hm_Message_List.setup_combined_view('formatted_flagged_data');
         }
-    }
-    else if (hm_page_name == 'servers') {
-        $('.server_section').click(function() { return toggle_page_section($(this).data('target')); });
-    }
-    else if (hm_page_name == 'settings') {
-        $('.settings_subtitle').click(function() { return toggle_page_section($(this).data('target')); });
+        $('.msg_controls > a').click(function() { return message_action($(this).data('action')); });
+        $('.toggle_link').click(function() { return toggle_rows(); });
     }
 });
