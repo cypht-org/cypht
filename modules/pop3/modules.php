@@ -637,7 +637,7 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
 
 class Hm_Output_start_pop3_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td onclick="return toggle_page_section(\'.pop3_setting\');" colspan="2" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$env_closed.'" />POP3 Settings</td></tr>';
+        return '<tr><td data-target=".pop3_setting" colspan="2" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$env_closed.'" />POP3 Settings</td></tr>';
     }
 }
 

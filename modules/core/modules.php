@@ -640,7 +640,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
 
 class Hm_Output_start_flagged_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td onclick="return toggle_page_section(\'.flagged_setting\')" colspan="2" class="settings_subtitle">'.
+        return '<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />'.
             $this->trans('Flagged').'</td></tr>';
     }
@@ -648,7 +648,7 @@ class Hm_Output_start_flagged_settings extends Hm_Output_Module {
 
 class Hm_Output_start_everything_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td onclick="return toggle_page_section(\'.all_setting\')" colspan="2" class="settings_subtitle">'.
+        return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$box.'" width="16" height="16" />'.
             $this->trans('Everything').'</td></tr>';
     }
@@ -656,7 +656,7 @@ class Hm_Output_start_everything_settings extends Hm_Output_Module {
 
 class Hm_Output_start_unread_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td onclick="return toggle_page_section(\'.unread_setting\')" colspan="2" class="settings_subtitle">'.
+        return '<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
             $this->trans('Unread').'</td></tr>';
     }
@@ -664,7 +664,7 @@ class Hm_Output_start_unread_settings extends Hm_Output_Module {
 
 class Hm_Output_start_general_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td onclick="return toggle_page_section(\'.general_setting\')" colspan="2" class="settings_subtitle">'.
+        return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$cog.'" width="16" height="16" />'.
             $this->trans('General').'</td></tr>';
     }

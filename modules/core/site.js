@@ -827,6 +827,9 @@ $(function() {
         }
     }
     else if (hm_page_name == 'servers') {
-        $('.server_section').click(function() { toggle_page_section($(this).data('target')); });
+        $('.server_section').click(function() { return toggle_page_section($(this).data('target')); });
+    }
+    else if (hm_page_name == 'settings') {
+        $('.settings_subtitle').click(function() { return toggle_page_section($(this).data('target')); });
     }
 });

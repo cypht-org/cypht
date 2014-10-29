@@ -635,7 +635,7 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
 
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" onclick="return toggle_page_section(\'.feed_setting\')" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$rss.'" />Feed Settings</td></tr>';
+        return '<tr><td colspan="2" data-target=".feed_setting" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$rss.'" />Feed Settings</td></tr>';
     }
 }
 
