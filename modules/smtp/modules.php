@@ -219,7 +219,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
             $count = 0;
         }
         $count = sprintf($this->trans('%d configured'), $count);
-        return '<div class="smtp_server_setup"><div onclick="return toggle_page_section(\'.smtp_section\')" class="server_section">'.
+        return '<div class="smtp_server_setup"><div data-target=".smtp_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" />'.
             ' SMTP Servers <div class="server_count">'.$count.'</div></div><div class="smtp_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.

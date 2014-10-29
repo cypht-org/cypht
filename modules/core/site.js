@@ -826,4 +826,7 @@ $(function() {
             Hm_Message_List.setup_combined_view('formatted_flagged_data');
         }
     }
+    else if (hm_page_name == 'servers') {
+        $('.server_section').click(function() { toggle_page_section($(this).data('target')); });
+    }
 });
