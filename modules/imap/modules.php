@@ -575,8 +575,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
-                '<a href="#" class="header_toggle" onclick="return toggle_long_headers();">all</a>'.
-                '<a class="header_toggle" style="display: none;" href="#" onclick="return toggle_long_headers();">small</a>'.
+                '<a href="#" class="header_toggle">all</a>'.
+                '<a class="header_toggle" style="display: none;" href="#">small</a>'.
                 ' | <a href="?page=compose&amp;reply_uid='.$this->html_safe($input['msg_text_uid']).
                 '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $input['msg_server_id'], $input['msg_folder'])).'">reply</a>'.
                 ' | <a href="?page=compose">forward</a>'.

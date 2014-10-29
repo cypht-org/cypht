@@ -746,6 +746,7 @@ var toggle_rows = function() {
 };
 
 var toggle_long_headers = function() {
+    console.log("HERE");
     $('.long_header').toggle();
     $('.header_toggle').toggle();
     return false;

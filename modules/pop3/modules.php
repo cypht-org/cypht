@@ -569,8 +569,8 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                 }
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
-                '<a href="#" class="header_toggle" onclick="return toggle_long_headers();">all</a>'.
-                '<a class="header_toggle" style="display: none;" href="#" onclick="return toggle_long_headers();">small</a>'.
+                '<a href="#" class="header_toggle">all</a>'.
+                '<a class="header_toggle" style="display: none;" href="#">small</a>'.
                 ' | <a href="?page=compose">reply</a>'.
                 ' | <a href="?page=compose">forward</a>'.
                 ' | <a href="?page=compose">attach</a>'.

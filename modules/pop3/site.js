@@ -119,6 +119,7 @@ var pop3_message_view_finished = function() {
             prev_next_links('formatted_unread_data', class_name);
         }
     }
+    $('.header_toggle').click(function() { return toggle_long_headers(); });
 };
 
 var add_pop3_sources = function(callback) {

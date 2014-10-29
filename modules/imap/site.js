@@ -315,6 +315,7 @@ var imap_message_view_finished = function() {
     if (class_name) {
         track_read_messages(class_name);
     }
+    $('.header_toggle').click(function() { return toggle_long_headers(); });
 };
 
 var add_imap_sources = function(callback) {
