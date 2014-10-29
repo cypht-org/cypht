@@ -621,6 +621,9 @@ var update_folder_list_display = function(res) {
     save_to_local_storage('formatted_folder_list', res.formatted_folder_list);
     hl_selected_menu();
     $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
+    $('.src_name').click(function() { return toggle_section($(this).data('source')); });
+    $('.update_message_list').click(function() { return update_folder_list(); });
+    $('.hide_folders').click(function() { return hide_folder_list(); });
 };
 
 var update_folder_list = function() {
@@ -789,6 +792,9 @@ if (folder_list) {
     }
     hl_selected_menu();
     $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
+    $('.src_name').click(function() { return toggle_section($(this).data('source')); });
+    $('.update_message_list').click(function() { return update_folder_list(); });
+    $('.hide_folders').click(function() { return hide_folder_list(); });
 }
 else {
     update_folder_list();
@@ -813,8 +819,11 @@ if ($('.sys_messages').text().length) {
     });
 }
 
-Hm_Timer.fire();
+$('.cancel_logout').click(function() { $('.confirm_logout').hide(); return false; });
+$('.logout_link').click(function() { return confirm_logout(); });
+$('.folder_toggle').click(function() { return open_folder_list(); });
 
+Hm_Timer.fire();
 $(function() {
     if (hm_page_name == 'message_list') {
         if (hm_list_path == 'feeds') {
@@ -834,5 +843,6 @@ $(function() {
         }
         $('.msg_controls > a').click(function() { return message_action($(this).data('action')); });
         $('.toggle_link').click(function() { return toggle_rows(); });
+        $('.refresh_list').click(function() { return Hm_Message_List.load_sources(); });
     }
 });

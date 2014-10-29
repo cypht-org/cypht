@@ -426,7 +426,7 @@ class Hm_Output_login extends Hm_Output_Module {
             '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
             '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
             '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />'.
-            '<input class="save_settings" onclick="$(\'.confirm_logout\').hide(); return false;" type="button" value="Cancel" />'.
+            '<input class="cancel_logout save_settings" type="button" value="Cancel" />'.
             '</div></form>';
         }
     }
@@ -801,7 +801,7 @@ class Hm_Output_two_col_layout_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<a class="folder_toggle" href="#" onclick="return open_folder_list();"><img alt="" src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
+        $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
             '<div class="folder_cell"><div class="folder_list">';
         return $res;
     }
@@ -819,7 +819,7 @@ class Hm_Output_folder_list_content_start extends Hm_Output_Module {
 
 class Hm_Output_main_menu_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="src_name main_menu" onclick="return toggle_section(\'.main\');">Main'.
+        $res = '<div class="src_name main_menu" data-source=".main">Main'.
         '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div class="main"><ul class="folders">';
         if ($format == 'HTML5') {
@@ -861,7 +861,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
 
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res =  '<li><a class="unread_link" href="#" onclick="return confirm_logout()"><img class="account_icon" src="'.
+        $res =  '<li><a class="unread_link logout_link" href="#"><img class="account_icon" src="'.
             $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a></li>';
 
         if ($format == 'HTML5') {
@@ -890,8 +890,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             foreach (array_unique($input['folder_sources']) as $src) {
                 $parts = explode('_', $src);
                 $name = ucfirst(strtolower($parts[0]));
-                $res .= '<div class="src_name" onclick="return toggle_section(\'.'.$this->html_safe($src).
-                    '\');">'.$this->html_safe($name).
+                $res .= '<div class="src_name" data-source=".'.$this->html_safe($src).'">'.$this->html_safe($name).
                     '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" /></div>';
 
                 $res .= '<div style="display: none;" ';
@@ -918,7 +917,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
 
 class Hm_Output_settings_menu_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="src_name" onclick="return toggle_section(\'.settings\');">Settings'.
+        $res = '<div class="src_name" data-source=".settings">Settings'.
             '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
             '</div><ul style="display: none;" class="settings folders">';
         if ($format == 'HTML5') {
@@ -956,8 +955,8 @@ class Hm_Output_settings_menu_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_content_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<a href="#" onclick="return update_folder_list();" class="update_message_list">[reload]</a>';
-        $res .= '<a href="#" onclick="return hide_folder_list();" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.'" alt="Collapse" width="16" height="16" /></a>';
+        $res = '<a href="#" class="update_message_list">[reload]</a>';
+        $res .= '<a href="#" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.'" alt="Collapse" width="16" height="16" /></a>';
         if ($format == 'HTML5') {
             return $res;
         }
@@ -1087,7 +1086,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= message_controls().
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $input['mailbox_list_title']);
         $res .= '<div class="list_controls">';
-        $res .= '<a onclick="return Hm_Message_List.load_sources()" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+        $res .= '<a class="refresh_link" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
         $res .= $config_link;
         $res .= '</div>';
 	    $res .= message_list_meta($input, $this);
