@@ -135,7 +135,7 @@ class Hm_Feed {
         if (preg_match('/<feed .+atom/i', $this->xml_data)) {
             $this->feed_type = 'atom';
         }
-        $xml_parser = xml_parser_create();
+        $xml_parser = xml_parser_create( 'UTF-8');
         xml_set_object($xml_parser, $this);
         if ($this->feed_type == 'atom' || $this->feed_type == 'rss') {
             xml_set_element_handler($xml_parser, $this->feed_type.'_start_element', $this->feed_type.'_end_element');
@@ -148,6 +148,7 @@ class Hm_Feed {
                 return true;
             }
             else {
+                Hm_Debug::add(sprintf('XML Parse error: %s', xml_error_string(xml_get_error_code($xml_parser))));
                 return false; 
             }
         }
