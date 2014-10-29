@@ -620,6 +620,7 @@ var update_folder_list_display = function(res) {
 	sort_list('feeds_folders', 'menu_feeds');
     save_to_local_storage('formatted_folder_list', res.formatted_folder_list);
     hl_selected_menu();
+    $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
 };
 
 var update_folder_list = function() {
@@ -787,6 +788,7 @@ if (folder_list) {
         $('.folder_toggle').show();
     }
     hl_selected_menu();
+    $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
 }
 else {
     update_folder_list();

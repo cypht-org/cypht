@@ -735,7 +735,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if (isset($input['imap_folders'])) {
             foreach ($input['imap_folders'] as $id => $folder) {
-                $res .= '<li class="imap_'.intval($id).'_"><a href="#" onclick="return expand_imap_folders(\'imap_'.intval($id).'_\')"><img alt="" class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
+                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_"><img alt="" class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
@@ -887,7 +887,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
     foreach ($folders as $folder_name => $folder) {
         $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe(str_replace(' ', '-', $folder_name)).'">';
         if ($folder['children']) {
-            $results .= '<a href="#" class="expand_link" onclick="return expand_imap_folders(\'imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'\')">+</a>';
+            $results .= '<a href="#" class="imap_folder_link expand_link" data-target="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'">+</a>';
         }
         else {
             $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
