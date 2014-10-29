@@ -581,7 +581,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $input['msg_server_id'], $input['msg_folder'])).'">reply</a>'.
                 ' | <a href="?page=compose">forward</a>'.
                 ' | <a href="?page=compose">attach</a>'.
-                ' | <a onclick="return get_message_content(0);" href="#">raw</a>'.
+                ' | <a class="msg_part_link" data-message-part="0" href="#">raw</a>'.
                 ' | <a href="#">flag</a>'.
                 '</th></tr></table>';
 
@@ -1062,7 +1062,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     }
     $res .= '><td><div class="'.$class.'">';
     if (in_array($vals['type'].$vals['subtype'], $allowed)) {
-        $res .= '<a href="#" onclick="return get_message_content(\''.$output_mod->html_safe($id).'\');">'.$output_mod->html_safe($vals['type']).
+        $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe($vals['type']).
             ' / '.$output_mod->html_safe($vals['subtype']).'</a>';
     }
     else {

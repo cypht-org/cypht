@@ -316,6 +316,7 @@ var imap_message_view_finished = function() {
         track_read_messages(class_name);
     }
     $('.header_toggle').click(function() { return toggle_long_headers(); });
+    $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart')); });
 };
 
 var add_imap_sources = function(callback) {
