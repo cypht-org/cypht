@@ -574,7 +574,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                 ' | <a href="?page=compose">reply</a>'.
                 ' | <a href="?page=compose">forward</a>'.
                 ' | <a href="?page=compose">attach</a>'.
-                ' | <a onclick="return get_message_content(0);" href="#">raw</a>'.
+                ' | <a data-message-part="0" href="#">raw</a>'.
                 ' | <a href="#">flag</a>'.
                 '</th></tr></table>';
 
