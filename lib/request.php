@@ -86,7 +86,9 @@ class Hm_Request {
     private function get_other_request_details($filters) {
         $this->sapi = php_sapi_name();
         $this->allowed_output = $filters['allowed_output'];
-        $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
+        if (array_key_exists('REQUEST_URI', $this->server)) {
+            $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
+        }
         $this->get_request_type();
         $this->is_tls();
         $this->is_mobile();
