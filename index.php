@@ -1,13 +1,13 @@
 <?php
 
-/* config file location */
-define('CONFIG_FILE', 'hm3.rc');
-
-/* debug mode switch */
-define('DEBUG_MODE', false);
-
 /* application dir */
 define('APP_PATH', '');
+
+/* config file location */
+define('CONFIG_FILE', APP_PATH.'hm3.rc');
+
+/* debug mode switch */
+define('DEBUG_MODE', true);
 
 /* don't let anything output content until we are ready */
 ob_start();
@@ -21,19 +21,7 @@ if (DEBUG_MODE) {
 date_default_timezone_set( 'UTC' );
 
 /* get includes */
-require APP_PATH.'lib/modules.php';
-require APP_PATH.'lib/config.php';
-require APP_PATH.'lib/auth.php';
-require APP_PATH.'lib/session.php';
-require APP_PATH.'lib/format.php';
-require APP_PATH.'lib/router.php';
-require APP_PATH.'lib/request.php';
-require APP_PATH.'lib/cache.php';
-require APP_PATH.'lib/output.php';
-require APP_PATH.'lib/crypt.php';
-require APP_PATH.'lib/db.php';
-require APP_PATH.'lib/servers.php';
-require APP_PATH.'lib/nonce.php';
+require APP_PATH.'lib/framework.php';
 
 /* get configuration */
 $config = new Hm_Site_Config_File(CONFIG_FILE);
@@ -50,4 +38,5 @@ if (DEBUG_MODE) {
     Hm_Debug::load_page_stats();
     Hm_Debug::show('log');
 }
+
 ?>

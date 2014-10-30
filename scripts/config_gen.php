@@ -1,26 +1,14 @@
 <?php
 
-define("DEBUG_MODE", false);
+define('DEBUG_MODE', false);
+define('APP_PATH', dirname(dirname(__FILE__)).'/');
 
-require 'lib/modules.php';
-require 'lib/config.php';
-require 'lib/auth.php';
-require 'lib/session.php';
-require 'lib/format.php';
-require 'lib/router.php';
-require 'lib/request.php';
-require 'lib/cache.php';
-require 'lib/output.php';
-require 'lib/crypt.php';
-require 'lib/db.php';
-require 'lib/servers.php';
-
-$options = getopt('', array('ini_file::', 'debug'));
+require APP_PATH.'lib/framework.php';
 $settings = '';
+$error = '';
 
-if (isset($options['ini_file'])) {
-    $settings = parse_ini_file($options['ini_file']);
-}
+$settings = parse_ini_file(APP_PATH.'hm3.ini');
+
 if (!empty($settings)) {
     $js = '';
     $css = '';
@@ -57,21 +45,28 @@ if (!empty($settings)) {
         file_put_contents('site.js', $js_lib.compress($js, $js_compress));
         printf("site.js file created\n");
     }
+
     Hm_Handler_Modules::process_all_page_queue();
     Hm_Output_Modules::process_all_page_queue();
     $settings['handler_modules'] = Hm_Handler_Modules::dump();
     $settings['output_modules'] = Hm_Output_Modules::dump();
     $settings['input_filters'] = $filters;
-
     file_put_contents('hm3.rc', serialize($settings));
     printf("hm3.rc file written\n");
-    if (isset($options['debug'])) {
-        printf("Debug output:\n");
-        Hm_Debug::show();
+
+    if (!is_readable('site/')) {
+        mkdir('site');
     }
+    printf("creating production site\n");
+    copy('site.css', 'site/site.css');
+    copy('site.js', 'site/site.js');
+    $index_file = file_get_contents('index.php');
+    $index_file = preg_replace("/APP_PATH', ''/", "APP_PATH', '".APP_PATH."'", $index_file);
+    $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
+    file_put_contents('site/index.php', $index_file);
 }
 else {
-    printf("\ncould not find hm3.ini file\n");
+    printf("\nNo settings found in ini file\n");
 }
 
 function compress($string, $command) {
