@@ -6,6 +6,9 @@ define('CONFIG_FILE', 'hm3.rc');
 /* debug mode switch */
 define('DEBUG_MODE', false);
 
+/* application dir */
+define('APP_PATH', '');
+
 /* don't let anything output content until we are ready */
 ob_start();
 
@@ -18,25 +21,25 @@ if (DEBUG_MODE) {
 date_default_timezone_set( 'UTC' );
 
 /* get includes */
-require 'lib/modules.php';
-require 'lib/config.php';
-require 'lib/auth.php';
-require 'lib/session.php';
-require 'lib/format.php';
-require 'lib/router.php';
-require 'lib/request.php';
-require 'lib/cache.php';
-require 'lib/output.php';
-require 'lib/crypt.php';
-require 'lib/db.php';
-require 'lib/servers.php';
-require 'lib/nonce.php';
+require APP_PATH.'lib/modules.php';
+require APP_PATH.'lib/config.php';
+require APP_PATH.'lib/auth.php';
+require APP_PATH.'lib/session.php';
+require APP_PATH.'lib/format.php';
+require APP_PATH.'lib/router.php';
+require APP_PATH.'lib/request.php';
+require APP_PATH.'lib/cache.php';
+require APP_PATH.'lib/output.php';
+require APP_PATH.'lib/crypt.php';
+require APP_PATH.'lib/db.php';
+require APP_PATH.'lib/servers.php';
+require APP_PATH.'lib/nonce.php';
 
 /* get configuration */
 $config = new Hm_Site_Config_File(CONFIG_FILE);
 
 /* setup ini settings */
-require 'lib/ini_set.php';
+require APP_PATH.'lib/ini_set.php';
 
 /* process request and send output to the browser */
 $router = new Hm_Router();
