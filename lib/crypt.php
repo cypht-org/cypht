@@ -80,8 +80,8 @@ class Hm_Crypt {
      *
      * @return string
      */
-    public static function unique_id() {
-        return base64_encode(openssl_random_pseudo_bytes(128));
+    public static function unique_id($size=128) {
+        return base64_encode(openssl_random_pseudo_bytes($size));
     }
 }
 
