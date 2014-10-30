@@ -172,17 +172,16 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
  * @return array list containing the api object and api config
  */
 function setup_swipe_api($ini_file) {
-    require "third_party/swipe_2fa_api/ApiBase.php";
-    require "third_party/swipe_2fa_api/Error.php";
-    require "third_party/swipe_2fa_api/SpiBaseObject.php";
-    require "third_party/swipe_2fa_api/SpiExpressSecondFactor.php";
-    require "third_party/swipe_2fa_api/SpiExpressUser.php";
-    require "third_party/swipe_2fa_api/SwipeApiList.php";
-    require "third_party/swipe_2fa_api/SwipeApiNull.php";
-    require "third_party/swipe_2fa_api/SwipeApiStringObject.php";
-    require "third_party/swipe_2fa_api/SwipeIdentityExpressApi.php";
+    require APP_PATH."third_party/swipe_2fa_api/ApiBase.php";
+    require APP_PATH."third_party/swipe_2fa_api/Error.php";
+    require APP_PATH."third_party/swipe_2fa_api/SpiBaseObject.php";
+    require APP_PATH."third_party/swipe_2fa_api/SpiExpressSecondFactor.php";
+    require APP_PATH."third_party/swipe_2fa_api/SpiExpressUser.php";
+    require APP_PATH."third_party/swipe_2fa_api/SwipeApiList.php";
+    require APP_PATH."third_party/swipe_2fa_api/SwipeApiNull.php";
+    require APP_PATH."third_party/swipe_2fa_api/SwipeApiStringObject.php";
+    require APP_PATH."third_party/swipe_2fa_api/SwipeIdentityExpressApi.php";
 
-    /* TODO: move the ini out of the doc root */
     $api_config = parse_ini_file($ini_file);
     return array(new swipeIdentityExpressApi($api_config["com.swipeidentity.api.server.url"]), $api_config);
 }
