@@ -543,7 +543,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
             }
         }
         else {
-            $res .= '<link href="site.css" media="all" rel="stylesheet" type="text/css" />';
+            $res .= '<link href="site.css?v='.CACHE_ID.'" media="all" rel="stylesheet" type="text/css" />';
         }
         return $res;
     }
@@ -570,7 +570,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
             return $zepto.$res;
         }
         else {
-            return '<script type="text/javascript" src="site.js"></script>';
+            return '<script type="text/javascript" src="site.js?v='.CACHE_ID.'"></script>';
         }
     }
 }
