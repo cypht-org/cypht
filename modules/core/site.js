@@ -750,7 +750,6 @@ var toggle_rows = function() {
 };
 
 var toggle_long_headers = function() {
-    console.log("HERE");
     $('.long_header').toggle();
     $('.header_toggle').toggle();
     return false;
@@ -795,6 +794,7 @@ if (folder_list) {
     $('.src_name').click(function() { return toggle_section($(this).data('source')); });
     $('.update_message_list').click(function() { return update_folder_list(); });
     $('.hide_folders').click(function() { return hide_folder_list(); });
+    delete folder_list;
 }
 else {
     update_folder_list();
