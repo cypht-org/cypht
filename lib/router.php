@@ -118,8 +118,8 @@ class Hm_Router {
             'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
         $modules = explode(',', $config->get('modules', array()));
         foreach ($modules as $name) {
-            if (is_readable(sprintf("modules/%s/setup.php", $name))) {
-                $filters = Hm_Router::merge_filters($filters, require sprintf("modules/%s/setup.php", $name));
+            if (is_readable(sprintf(APP_PATH."modules/%s/setup.php", $name))) {
+                $filters = Hm_Router::merge_filters($filters, require sprintf(APP_PATH."modules/%s/setup.php", $name));
             }
         }
         $handler_mods = array();
@@ -151,7 +151,9 @@ class Hm_Router {
      */
     private function check_for_tls($config, $request) {
         if (!$request->tls && !$config->get('disable_tls', false)) {
-            page_redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
+            if (array_key_exists('SERVER_NAME', $request->server) && array_key_exists('REQUEST_URI', $request->server)) {
+                page_redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
+            }
         }
     }
 
@@ -169,7 +171,7 @@ class Hm_Router {
         $auth_type = $config->get('auth_type', false);
         if ($auth_type) {
             if ($auth_type == 'DB') {
-                require 'third_party/pbkdf2.php';
+                require APP_PATH.'third_party/pbkdf2.php';
             }
             $auth_class = sprintf('Hm_Auth_%s', $auth_type);
         }
@@ -236,8 +238,8 @@ class Hm_Router {
 
         $mods = explode(',', $config->get('modules', '')); 
         foreach ($mods as $name) {
-            if (in_array($name, $active_mods, true) && is_readable(sprintf('modules/%s/modules.php', $name))) {
-                require sprintf('modules/%s/modules.php', $name);
+            if (in_array($name, $active_mods, true) && is_readable(sprintf(APP_PATH.'modules/%s/modules.php', $name))) {
+                require sprintf(APP_PATH.'modules/%s/modules.php', $name);
             }
         }
     }
