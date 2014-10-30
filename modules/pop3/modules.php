@@ -2,7 +2,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require 'modules/pop3/hm-pop3.php';
+require APP_PATH.'modules/pop3/hm-pop3.php';
 
 class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
     public function process($data) {

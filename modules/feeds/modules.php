@@ -2,7 +2,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require 'modules/feeds/hm-feed.php';
+require APP_PATH.'modules/feeds/hm-feed.php';
 
 class Hm_Handler_feed_list_type extends Hm_Handler_Module {
     public function process($data) {

@@ -2,7 +2,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require 'modules/imap/hm-imap.php';
+require APP_PATH.'modules/imap/hm-imap.php';
 
 class Hm_Handler_imap_process_reply_fields extends Hm_Handler_Module {
     public function process($data) {

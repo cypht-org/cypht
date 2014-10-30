@@ -162,7 +162,7 @@ function process_since_argument($val, $validate=false) {
 }
 
 function format_msg_html($str, $external_resources=false) {
-    require 'third_party/HTMLPurifier.standalone.php';
+    require APP_PATH.'third_party/HTMLPurifier.standalone.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$external_resources) {

@@ -2,7 +2,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require 'modules/smtp/hm-smtp.php';
+require APP_PATH.'modules/smtp/hm-smtp.php';
 
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process($data) {
