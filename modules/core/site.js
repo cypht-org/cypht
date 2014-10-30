@@ -462,7 +462,7 @@ var reload_after_message_action = function() {
 };
 
 var confirm_logout = function() {
-    if ($('#unsaved_changes').val() === 0) {
+    if ($('#unsaved_changes').val() === "0") {
         $('#logout_without_saving').click();
     }
     else {
@@ -624,6 +624,7 @@ var update_folder_list_display = function(res) {
     $('.src_name').click(function() { return toggle_section($(this).data('source')); });
     $('.update_message_list').click(function() { return update_folder_list(); });
     $('.hide_folders').click(function() { return hide_folder_list(); });
+    $('.logout_link').click(function() { return confirm_logout(); });
 };
 
 var update_folder_list = function() {
@@ -794,7 +795,8 @@ if (folder_list) {
     $('.src_name').click(function() { return toggle_section($(this).data('source')); });
     $('.update_message_list').click(function() { return update_folder_list(); });
     $('.hide_folders').click(function() { return hide_folder_list(); });
-    delete folder_list;
+    $('.logout_link').click(function() { return confirm_logout(); });
+    folder_list = null;
 }
 else {
     update_folder_list();
@@ -820,7 +822,6 @@ if ($('.sys_messages').text().length) {
 }
 
 $('.cancel_logout').click(function() { $('.confirm_logout').hide(); return false; });
-$('.logout_link').click(function() { return confirm_logout(); });
 $('.folder_toggle').click(function() { return open_folder_list(); });
 
 Hm_Timer.fire();
