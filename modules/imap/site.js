@@ -243,6 +243,7 @@ var expand_imap_folders = function(path) {
 
 var expand_imap_mailbox = function(res) {
     $('.'+clean_selector(res.imap_expanded_folder_path)).append(res.imap_expanded_folder_formatted);
+    $('.imap_folder_link').unbind('click');
     $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
 };
 
