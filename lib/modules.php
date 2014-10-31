@@ -81,8 +81,8 @@ abstract class Hm_Handler_Module {
                 if ($this->session->loaded) {
                     $this->session->destroy($this->request);
                 }
-                Hm_Debug::add("nonce check failed");
-                page_redirect('?page=notfound');
+                Hm_Debug::add('nonce check failed');
+                page_redirect('?page=home');
             }
         }
     }
