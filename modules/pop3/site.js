@@ -90,7 +90,7 @@ var pop3_message_view = function() {
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_message_display'},
-        {'name': 'pop3_list_path', 'value': hm_list_path},
+        {'name': 'pop3_list_path', 'value': hm_list_path()},
         {'name': 'pop3_uid', 'value': hm_msg_uid}],
         display_pop3_message,
         [],
@@ -109,13 +109,13 @@ var display_pop3_message = function(res) {
 };
 
 var pop3_message_view_finished = function() {
-    var detail = parse_folder_path(hm_list_path, 'pop3');
+    var detail = parse_folder_path(hm_list_path(), 'pop3');
     if (detail) {
         var class_name = 'pop3_'+detail.server_id+'_'+hm_msg_uid;
-        if (hm_list_parent == 'combined_inbox') {
+        if (hm_list_parent() == 'combined_inbox') {
             prev_next_links('formatted_combined_inbox', class_name);
         }
-        else if (hm_list_parent == 'unread') {
+        else if (hm_list_parent() == 'unread') {
             prev_next_links('formatted_unread_data', class_name);
         }
     }
@@ -236,7 +236,7 @@ var expand_pop3_settings = function() {
     }
 };
 
-if (hm_page_name == 'servers') {
+if (hm_page_name() == 'servers') {
     $('.test_pop3_connect').on('click', pop3_test_action);
     $('.save_pop3_connection').on('click', pop3_save_action);
     $('.forget_pop3_connection').on('click', pop3_forget_action);
@@ -246,37 +246,37 @@ if (hm_page_name == 'servers') {
         $('.pop3_section').css('display', dsp);
     }
 }
-else if (hm_page_name == 'message_list') {
-    if (hm_list_path == 'combined_inbox') {
+else if (hm_page_name() == 'message_list') {
+    if (hm_list_path() == 'combined_inbox') {
         add_pop3_sources(pop3_combined_inbox_content);
     }
-    else if (hm_list_path == 'email') {
+    else if (hm_list_path() == 'email') {
         add_pop3_sources(pop3_all_mail_content);
     }
-    else if (hm_list_path == 'unread') {
+    else if (hm_list_path() == 'unread') {
         add_pop3_sources(pop3_combined_unread_content);
     }
-    else if (hm_list_path.substring(0, 4) == 'pop3') {
+    else if (hm_list_path().substring(0, 4) == 'pop3') {
         if ($('.message_table tbody tr').length === 0) {
-            var detail = parse_folder_path(hm_list_path, 'pop3');
+            var detail = parse_folder_path(hm_list_path(), 'pop3');
             if (detail) {
                 Hm_Message_List.sources.push({type: 'pop3', id: detail.server_id, callback: load_pop3_list});
             }
-            Hm_Message_List.setup_combined_view(hm_list_path);
+            Hm_Message_List.setup_combined_view(hm_list_path());
             
         }
         $('.message_table tr').show();
     }
 }
-else if (hm_page_name == 'search') {
+else if (hm_page_name() == 'search') {
     add_pop3_sources(pop3_search_page_content);
 }
-else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'pop3') {
+else if (hm_page_name() == 'message' && hm_list_path().substr(0, 4) == 'pop3') {
     pop3_message_view();
 }
-else if (hm_page_name == 'home') {
+else if (hm_page_name() == 'home') {
     setTimeout(pop3_status_update, 100);
 }
-else if (hm_page_name == 'settings') {
+else if (hm_page_name() == 'settings') {
     expand_pop3_settings();
 }

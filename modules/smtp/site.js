@@ -71,7 +71,7 @@ var smtp_delete_action = function() {
     );
 };
 
-if (hm_page_name == 'servers') {
+if (hm_page_name() == 'servers') {
     $('.test_smtp_connect').on('click', smtp_test_action);
     $('.save_smtp_connection').on('click', smtp_save_action);
     $('.forget_smtp_connection').on('click', smtp_forget_action);

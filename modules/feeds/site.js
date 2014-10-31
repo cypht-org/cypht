@@ -124,8 +124,8 @@ var feed_item_view = function() {
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_item_content'},
-        {'name': 'feed_list_path', 'value': hm_list_path},
-        {'name': 'feed_uid', 'value': hm_msg_uid}],
+        {'name': 'feed_list_path', 'value': hm_list_path()},
+        {'name': 'feed_uid', 'value': hm_msg_uid()}],
         display_feed_item_content,
         [],
         false
@@ -134,19 +134,21 @@ var feed_item_view = function() {
 };
 
 var display_feed_item_content = function(res) {
+    var msg_uid = hm_msg_uid();
     $('.msg_text').html('');
     $('.msg_text').append(res.feed_msg_headers);
     $('.msg_text').append(res.feed_msg_text);
     set_message_content();
     document.title = $('.header_subject th').text();
-    if (hm_list_parent == 'feeds') {
-        prev_next_links('formatted_feed_data', hm_list_path+'_'+hm_msg_uid);
+    var path = hm_list_path();
+    if (hm_list_parent() == 'feeds') {
+        prev_next_links('formatted_feed_data', path+'_'+msg_uid);
     }
-    else if (hm_list_parent == 'combined_inbox') {
-        prev_next_links('formatted_combined_inbox', hm_list_path+'_'+hm_msg_uid);
+    else if (hm_list_parent() == 'combined_inbox') {
+        prev_next_links('formatted_combined_inbox', path+'_'+msg_uid);
     }
-    else if (hm_list_parent == 'unread') {
-        prev_next_links('formatted_unread_data', hm_list_path+'_'+hm_msg_uid);
+    else if (hm_list_parent() == 'unread') {
+        prev_next_links('formatted_unread_data', path+'_'+msg_uid);
     }
 };
 
@@ -203,33 +205,33 @@ var expand_feed_settings = function() {
     }
 };
 
-if (hm_page_name == 'message_list') {
-    if (hm_list_path == 'combined_inbox') {
+if (hm_page_name() == 'message_list') {
+    if (hm_list_path() == 'combined_inbox') {
         add_feed_sources(feeds_combined_inbox_content);
     }
-    else if (hm_list_path == 'feeds') {
+    else if (hm_list_path() == 'feeds') {
         add_feed_sources(feeds_combined_content);
     }
-    else if (hm_list_path == 'unread') {
+    else if (hm_list_path() == 'unread') {
         add_feed_sources(feeds_combined_content_unread);
     }
-    else if (hm_list_path.substring(0, 4) == 'feed') {
+    else if (hm_list_path().substring(0, 4) == 'feed') {
         if ($('.message_table tbody tr').length === 0) {
-            var detail = parse_folder_path(hm_list_path, 'feeds');
+            var detail = parse_folder_path(hm_list_path(), 'feeds');
             if (detail) {
                 Hm_Message_List.sources.push({type: 'feed', id: detail.server_id, callback: load_feed_list});
             }
-            Hm_Message_List.setup_combined_view(hm_list_path);
+            Hm_Message_List.setup_combined_view(hm_list_path());
         }
     }
 }
-else if (hm_page_name == 'search') {
+else if (hm_page_name() == 'search') {
     add_feed_sources(feeds_search_page_content);
 }
-else if (hm_page_name == 'message' && hm_list_path.substr(0, 4) == 'feed') {
+else if (hm_page_name() == 'message' && hm_list_path().substr(0, 4) == 'feed') {
     feed_item_view();
 }
-else if (hm_page_name == 'servers') {
+else if (hm_page_name() == 'servers') {
     $('.feed_delete').on('click', feed_delete_action);
     $('.test_feed_connect').on('click', feed_test_action);
     var dsp = get_from_local_storage('.feed_section');
@@ -237,9 +239,9 @@ else if (hm_page_name == 'servers') {
         $('.feed_section').css('display', dsp);
     }
 }
-else if (hm_page_name == 'home') {
+else if (hm_page_name() == 'home') {
     setTimeout(feed_status_update, 100);
 }
-else if (hm_page_name == 'settings') {
+else if (hm_page_name() == 'settings') {
     expand_feed_settings();
 }

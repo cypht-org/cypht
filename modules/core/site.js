@@ -2,6 +2,7 @@
 var Hm_Ajax = {
     request_count: 0,
     batch_callback: false,
+    icon_loading_id: 0,
 
     request: function(args, callback, extra, no_icon, batch_callback) {
         var ajax = new Hm_Ajax_Request();
@@ -17,19 +18,20 @@ var Hm_Ajax = {
     }
 };
 
-var hm_loading_id = 0;
-var hm_loading_pos = 0;
-
 var show_loading_icon = function() {
+    var hm_loading_pos = 0;
     $('.loading_icon').show();
-    hm_loading_pos = hm_loading_pos + 5;
-    $('.loading_icon').css('background-position', hm_loading_pos+'px 0');
-    hm_loading_id = setTimeout(show_loading_icon, 100);
+    function move_background_image() {
+        hm_loading_pos = hm_loading_pos + 5;
+        $('.loading_icon').css('background-position', hm_loading_pos+'px 0');
+        Hm_Ajax.icon_loading_id = setTimeout(move_background_image, 100);
+    }
+    move_background_image();
 };
 
-var stop_loading_icon = function() {
+var stop_loading_icon = function(loading_id) {
+    clearTimeout(loading_id);
     $('.loading_icon').hide();
-    clearTimeout(hm_loading_id);
 };
 
 /* Ajax request wrapper */
@@ -104,7 +106,7 @@ var Hm_Ajax_Request = function() { return {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
             }
-            stop_loading_icon();
+            stop_loading_icon(Hm_Ajax.icon_loading_id);
             $('body').removeClass('wait');
         }
     }
@@ -355,7 +357,7 @@ var Hm_Message_List = {
         var remove = false;
         var class_name = false;
         var count = $(".message_list tbody tr").length;
-        if (action_type == 'read' && hm_list_path == 'unread') {
+        if (action_type == 'read' && hm_list_path() == 'unread') {
             remove = true;
         }
         else if (action_type == 'delete') {
@@ -409,23 +411,23 @@ var Hm_Message_List = {
 
     update_title: function() {
         var count = 0;
-        if (hm_list_path == 'unread') {
+        if (hm_list_path() == 'unread') {
             count = $('.message_table tbody tr').length;
             document.title = count+' Unread';
         }
-        else if (hm_list_path == 'flagged') {
+        else if (hm_list_path() == 'flagged') {
             count = $('.message_table tbody tr').length;
             document.title = count+' Flagged';
         }
-        else if (hm_list_path == 'combined_inbox') {
+        else if (hm_list_path() == 'combined_inbox') {
             count = $('.unseen', $('.message_table tbody')).length;
             document.title = count+' Unread in Everything';
         }
-        else if (hm_list_path == 'email') {
+        else if (hm_list_path() == 'email') {
             count = $('.unseen', $('.message_table tbody')).length;
             document.title = count+' Unread in Email';
         }
-        else if (hm_list_path == 'feeds') {
+        else if (hm_list_path() == 'feeds') {
             count = $('.unseen', $('.message_table tbody')).length;
             document.title = count+' Unread in Feeds';
         }
@@ -642,23 +644,25 @@ var clean_selector = function(str) {
 };
 
 var hl_selected_menu = function() {
+    var page = hm_page_name();
+    var path = hm_list_path();
     $('.folder_list').find('*').removeClass('selected_menu');
-    if (hm_list_path.length) {
-        var path = hm_list_path.replace(/ /, '-');
-        if (hm_page_name == 'message_list') {
+    if (path.length) {
+        path = path.replace(/ /, '-');
+        if (page == 'message_list') {
             $('a', $('.'+clean_selector(path))).addClass('selected_menu');
             $('.menu_'+clean_selector(path)).addClass('selected_menu');
         }
-        else if (hm_list_parent) {
-            $('a', $('.'+clean_selector(hm_list_parent))).addClass('selected_menu');
-            $('.menu_'+clean_selector(hm_list_parent)).addClass('selected_menu');
+        else if (hm_list_parent()) {
+            $('a', $('.'+clean_selector(hm_list_parent()))).addClass('selected_menu');
+            $('.menu_'+clean_selector(hm_list_parent())).addClass('selected_menu');
         }
         else {
-            $('.menu_'+hm_page_name).addClass('selected_menu');
+            $('.menu_'+page).addClass('selected_menu');
         }
     }
     else {
-        $('.menu_'+hm_page_name).addClass('selected_menu');
+        $('.menu_'+page).addClass('selected_menu');
     }
 };
 
@@ -802,8 +806,8 @@ else {
     update_folder_list();
 }
 
-if (hm_page_name == 'settings' || hm_page_name == 'servers') {
-    if (hm_page_name == 'settings') {
+if (hm_page_name() == 'settings' || hm_page_name() == 'servers') {
+    if (hm_page_name() == 'settings') {
         expand_core_settings();
         $('.settings_subtitle').click(function() { return toggle_page_section($(this).data('target')); });
     }
@@ -826,20 +830,20 @@ $('.folder_toggle').click(function() { return open_folder_list(); });
 
 Hm_Timer.fire();
 $(function() {
-    if (hm_page_name == 'message_list') {
-        if (hm_list_path == 'feeds') {
+    if (hm_page_name() == 'message_list') {
+        if (hm_list_path() == 'feeds') {
             Hm_Message_List.setup_combined_view('formatted_feed_data');
         }
-        else if (hm_list_path == 'combined_inbox') {
+        else if (hm_list_path() == 'combined_inbox') {
             Hm_Message_List.setup_combined_view('formatted_combined_inbox');
         }
-        else if (hm_list_path == 'email') {
+        else if (hm_list_path() == 'email') {
             Hm_Message_List.setup_combined_view('formatted_all_mail');
         }
-        else if (hm_list_path == 'unread') {
+        else if (hm_list_path() == 'unread') {
             Hm_Message_List.setup_combined_view('formatted_unread_data');
         }
-        else if (hm_list_path == 'flagged') {
+        else if (hm_list_path() == 'flagged') {
             Hm_Message_List.setup_combined_view('formatted_flagged_data');
         }
         $('.msg_controls > a').click(function() { return message_action($(this).data('action')); });
