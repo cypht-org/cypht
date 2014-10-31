@@ -43,6 +43,12 @@ class Hm_Request {
     /* allowed AJAX output field names defined by module sets */
     public $allowed_output = array();
 
+    /* bool indicating unknown input data */
+    public $invalid_input_detected = false;
+
+    /* invalid input fields */
+    public $invalid_input_fields = array();
+
     /**
      * Process request details
      *
@@ -122,6 +128,18 @@ class Hm_Request {
         $data = filter_input_array($type, $filters, false);
         if (!$data) {
             return array();
+        }
+        if ($type == INPUT_GET) {
+            $this->invalid_input_detected = count($_GET) > count($data);
+            if ($this->invalid_input_detected) {
+                $this->invalid_input_fields = array_keys(array_diff_assoc($_GET, $data));
+            }
+        }
+        if ($type == INPUT_POST) {
+            $this->invalid_input_detected = count($_POST) > count($data);
+            if ($this->invalid_input_detected) {
+                $this->invalid_input_fields = array_keys(array_diff_assoc($_POST, $data));
+            }
         }
         return $data;
     }
