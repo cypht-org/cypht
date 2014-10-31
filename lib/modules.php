@@ -664,45 +664,4 @@ function add_module_to_all_pages($type, $mod, $logged_in, $source, $marker, $pla
     }
 }
 
-/**
- * Setup commonly used modules for a page
- * TODO: This should be moved to the core module set
- *
- * @param $name string the page id
- * @param $source string the module set name
- *
- * @return void
- */
-function setup_base_page($name, $source=false) {
-    add_handler($name, 'login', false, $source);
-    add_handler($name, 'load_user_data', true, $source);
-    add_handler($name, 'default_page_data', true, $source);
-    add_handler($name, 'message_list_type', true);
-    add_handler($name, 'language',  true, $source);
-    add_handler($name, 'title', true, $source);
-    add_handler($name, 'date', true, $source);
-    add_handler($name, 'save_user_data', true, $source);
-    add_handler($name, 'logout', true, $source);
-    add_handler($name, 'http_headers', true, $source);
-
-    add_output($name, 'header_start', false, $source);
-    add_output($name, 'js_data', true, $source);
-    add_output($name, 'header_css', false, $source);
-    add_output($name, 'header_content', false, $source);
-    add_output($name, 'header_end', false, $source);
-    add_output($name, 'content_start', false, $source);
-    add_output($name, 'login', false, $source);
-    add_output($name, 'two_col_layout_start', true, $source);
-    add_output($name, 'loading_icon', true, $source);
-    add_output($name, 'date', true, $source);
-    add_output($name, 'msgs', false, $source);
-    add_output($name, 'folder_list_start', true, $source);
-    add_output($name, 'folder_list_end', true, $source);
-    add_output($name, 'content_section_start', true, $source);
-    add_output($name, 'content_section_end', true, $source);
-    add_output($name, 'two_col_layout_end', true, $source);
-    add_output($name, 'page_js', true, $source);
-    add_output($name, 'content_end', true, $source);
-}
-
 ?>
