@@ -126,7 +126,7 @@ var pop3_message_view_finished = function() {
 var add_pop3_sources = function(callback) {
     var i;
     var id;
-    if ($('.pop3_server_ids').length) {
+    if ($('.pop3_server_ids').length && $('.pop3_server_ids').val().length) {
         var ids = $('.pop3_server_ids').val().split(',');
         if (ids && ids !== '') {
             for (i=0;i<ids.length;i++) {

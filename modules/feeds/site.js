@@ -109,7 +109,7 @@ var display_feeds_combined_inbox = function(res) {
 var add_feed_sources = function(callback) {
     var id;
     var i;
-    if ($('.feed_server_ids').length) {
+    if ($('.feed_server_ids').length && $('.feed_server_ids').val().length) {
         var ids = $('.feed_server_ids').val().split(',');
         if (ids && ids !== '') {
             for (i=0;i<ids.length;i++) {

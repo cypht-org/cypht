@@ -321,7 +321,7 @@ var imap_message_view_finished = function() {
 };
 
 var add_imap_sources = function(callback) {
-    if ($('.imap_server_ids').length) {
+    if ($('.imap_server_ids').length && $('.imap_server_ids').val().length) {
         var id;
         var i;
         var ids = $('.imap_server_ids').val().split(',');
