@@ -98,6 +98,8 @@ abstract class Hm_Session {
         $fingerprint = $this->get('fingerprint', false);
         if (!$fingerprint || $fingerprint !== $id) {
             $this->destroy($request);
+            Hm_Debug::add('HTTP header fingerprint check failed');
+            page_redirect('?page=home');
         }
     }
 
@@ -265,6 +267,11 @@ class Hm_PHP_Session extends Hm_Session {
             $this->start($request);
             $this->check_fingerprint($request);
         }
+        if ($this->is_active() && $request->invalid_input_detected) {
+            Hm_Debug::add(sprintf('Invalid input fields: %s', implode(',', $request->invalid_input_fields)));
+            $this->destroy($request);
+            page_redirect('?page=home');
+        }
     }
 
     /**
@@ -327,6 +334,11 @@ class Hm_PHP_Session extends Hm_Session {
             $data = $this->plaintext($_SESSION['data']);
             if (is_array($data)) {
                 $this->data = $data;
+            }
+            elseif (!$this->loaded) {
+                $this->destroy($request);
+                Hm_Debug::add('Mismatched session level encryption key');
+                page_redirect('?page=home');
             }
         }
         $this->active = true;
