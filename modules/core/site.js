@@ -622,11 +622,7 @@ var update_folder_list_display = function(res) {
 	sort_list('feeds_folders', 'menu_feeds');
     save_to_local_storage('formatted_folder_list', res.formatted_folder_list);
     hl_selected_menu();
-    $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
-    $('.src_name').click(function() { return toggle_section($(this).data('source')); });
-    $('.update_message_list').click(function() { return update_folder_list(); });
-    $('.hide_folders').click(function() { return hide_folder_list(); });
-    $('.logout_link').click(function() { return confirm_logout(); });
+    folder_list_events();
 };
 
 var update_folder_list = function() {
@@ -786,6 +782,14 @@ var set_unsaved_changes = function(state) {
     $('#unsaved_changes').val(state);
 };
 
+var folder_list_events = function() {
+    $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
+    $('.src_name').click(function() { return toggle_section($(this).data('source')); });
+    $('.update_message_list').click(function() { return update_folder_list(); });
+    $('.hide_folders').click(function() { return hide_folder_list(); });
+    $('.logout_link').click(function() { return confirm_logout(); });
+};
+
 var folder_list = get_from_local_storage('formatted_folder_list');
 
 if (folder_list) {
@@ -795,11 +799,7 @@ if (folder_list) {
         $('.folder_toggle').show();
     }
     hl_selected_menu();
-    $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
-    $('.src_name').click(function() { return toggle_section($(this).data('source')); });
-    $('.update_message_list').click(function() { return update_folder_list(); });
-    $('.hide_folders').click(function() { return hide_folder_list(); });
-    $('.logout_link').click(function() { return confirm_logout(); });
+    folder_list_events();
     folder_list = null;
 }
 else {
