@@ -149,7 +149,6 @@ trait Hm_Server_List {
 
     /**
      * Try to disconnect cleanly
-     * TODO: this looks suspect. Better look into it
      *
      * @param $id int server id
      *
@@ -165,6 +164,9 @@ trait Hm_Server_List {
                     self::$server_list[$index]['object']->disconnect();
                 }
                 self::$server_list[$index]['connected'] = false;
+                if ($id !== false) {
+                    break;
+                }
             }
         }
     }
