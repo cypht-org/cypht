@@ -18,7 +18,6 @@ abstract class Hm_Output {
 
     /**
      * Wrapper around extended class output_content() calls
-     * TODO: this is confusing, clean this up
      *
      * @param $response mixed data to output
      * @param $input array raw module data
