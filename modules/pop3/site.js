@@ -91,7 +91,7 @@ var pop3_message_view = function() {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_message_display'},
         {'name': 'pop3_list_path', 'value': hm_list_path()},
-        {'name': 'pop3_uid', 'value': hm_msg_uid}],
+        {'name': 'pop3_uid', 'value': hm_msg_uid()}],
         display_pop3_message,
         [],
         false
@@ -111,7 +111,7 @@ var display_pop3_message = function(res) {
 var pop3_message_view_finished = function() {
     var detail = parse_folder_path(hm_list_path(), 'pop3');
     if (detail) {
-        var class_name = 'pop3_'+detail.server_id+'_'+hm_msg_uid;
+        var class_name = 'pop3_'+detail.server_id+'_'+hm_msg_uid();
         if (hm_list_parent() == 'combined_inbox') {
             prev_next_links('formatted_combined_inbox', class_name);
         }
