@@ -29,6 +29,9 @@ abstract class Hm_Session {
     /* site config object */
     protected $site_config = false;
 
+    /* authentication class name */
+    protected $auth_class = false;
+
     /* authentication object */
     protected $auth_mech = false;
 
@@ -36,8 +39,8 @@ abstract class Hm_Session {
     protected $session_closed = false;
 
     /**
-     * Methods extended classes need to override
-     * TODO: document
+     * Methods extended classes need to override. See the Hm_PHP_Session extended class
+     * for comments
      */
     abstract protected function check($request);
     abstract protected function start($request);
@@ -58,8 +61,20 @@ abstract class Hm_Session {
      */
     public function __construct($config, $auth_type='Hm_Auth_DB') {
         $this->site_config = $config;
-        $this->auth_mech = new $auth_type($config);
-        $this->internal_users = $this->auth_mech->internal_users;
+        $this->auth_class = $auth_type;
+    }
+
+    /**
+     * Lazy loader for the auth mech so modules can define their own
+     * overrides
+     *
+     * @return void
+     */
+    protected function load_auth_mech() {
+        if (!is_object($this->auth_mech)) {
+            $this->auth_mech = new $this->auth_class($this->site_config);
+            $this->internal_users = $this->auth_mech->internal_users;
+        }
     }
 
     /**
@@ -261,6 +276,7 @@ class Hm_PHP_Session extends Hm_Session {
      * @return bool true if the authentication was successful
      */
     public function auth($user, $pass) {
+        $this->load_auth_mech();
         return $this->auth_mech->check_credentials($user, $pass);
     }
 
@@ -273,6 +289,7 @@ class Hm_PHP_Session extends Hm_Session {
      * @return bool true if the password was changed
      */
     public function change_pass($user, $pass) {
+        $this->load_auth_mech();
         return $this->auth_mech->change_pass($user, $pass);
     }
 
@@ -286,6 +303,7 @@ class Hm_PHP_Session extends Hm_Session {
      * @return bool true if the account was created
      */
     public function create($request, $user, $pass) {
+        $this->load_auth_mech();
         if ($this->auth_mech->create($user, $pass)) {
             return $this->check($request, $user, $pass);
         }
