@@ -61,7 +61,7 @@ function compress($string, $command) {
         return join('', $output);
     }
     else {
-        return $string;
+        return preg_replace("/\s+/", ' ', $string);
     }
 }
 
@@ -134,6 +134,7 @@ function combine_includes($js, $js_compress, $css, $css_compress) {
     }
     if ($js) {
         $js_lib = file_get_contents("third_party/zepto.min.js");
+        $js = str_replace('\\', '\\\\', $js);
         file_put_contents('site.js', $js_lib.compress($js, $js_compress));
         printf("site.js file created\n");
     }
