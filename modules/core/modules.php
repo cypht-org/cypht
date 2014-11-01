@@ -13,7 +13,6 @@ require APP_PATH.'modules/core/functions.php';
 class Hm_Handler_close_session_early extends Hm_Handler_Module {
     public function process() {
         $this->session->close_early();
-        return $data;
     }
 }
 
