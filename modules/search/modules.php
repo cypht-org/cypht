@@ -3,7 +3,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 class Hm_Handler_process_search_terms extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (array_key_exists('search_terms', $this->request->get)) {
             $this->session->set('search_terms', validate_search_terms($this->request->get['search_terms']));
         }
@@ -13,17 +13,15 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
         if (array_key_exists('search_fld', $this->request->get)) {
             $this->session->set('search_fld', validate_search_fld($this->request->get['search_fld']));
         }
-        $data['search_since'] = $this->session->get('search_since', DEFAULT_SINCE);
-        $data['search_terms'] = $this->session->get('search_terms', '');
-        $data['search_fld'] = $this->session->get('search_fld', 'TEXT');
-        return $data;
+        $this->out('search_since', $this->session->get('search_since', DEFAULT_SINCE));
+        $this->out('search_terms', $this->session->get('search_terms', ''));
+        $this->out('search_fld', $this->session->get('search_fld', 'TEXT'));
     }
 }
 
 class Hm_Output_search_from_folder_list extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
-            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).'" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
             '<input type="text" class="search_terms" name="search_terms" placeholder="'.$this->trans('Search').'" /></form></li>';
         if ($format == 'HTML5') {

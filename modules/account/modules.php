@@ -3,7 +3,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 class Hm_Handler_process_change_password extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2'));
         if ($success) {
             if ($this->session->internal_users) {
@@ -14,18 +14,17 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
                     else {
                         $user = $this->session->get('username', false);
                         if ($this->session->change_pass($user, $form['new_pass1'])) {
-                            $data['new_password'] = $form['new_pass1'];
+                            $this->out('new_password', $form['new_pass1']);
                         }
                     }
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_process_create_account extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('create_username', 'create_password', 'create_password_again'));
         if ($success) {
             if ($form['create_password'] == $form['create_password_again']) {
@@ -37,14 +36,12 @@ class Hm_Handler_process_create_account extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRPasswords did not match');
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_check_internal_users extends Hm_Handler_Module {
-    public function process($data) {
-        $data['internal_users'] = $this->session->internal_users;
-        return $data;
+    public function process() {
+        $this->out('internal_users', $this->session->internal_users);
     }
 }
 

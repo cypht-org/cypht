@@ -5,21 +5,20 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/smtp/hm-smtp.php';
 
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = $this->user_config->get('smtp_servers', array());
         foreach ($servers as $index => $server) {
             Hm_SMTP_List::add( $server, $index );
         }
-        return $data;
     }
 }
 
 class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['submit_smtp_server'])) {
             list($success, $form) = $this->process_form(array('new_smtp_name', 'new_smtp_address', 'new_smtp_port'));
             if (!$success) {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
                 Hm_Msgs::add('ERRYou must supply a name, a server and a port');
             }
             else {
@@ -41,32 +40,26 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
-    public function process($data) {
-        $data['smtp_servers'] = array();
+    public function process() {
         $servers = Hm_SMTP_List::dump();
-        if (!empty($servers)) {
-            $data['smtp_servers'] = $servers;
-        }
-        return $data;
+        $this->out('smtp_servers', $servers);
     }
 }
 
 class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = Hm_SMTP_List::dump(false, true);
         $this->user_config->set('smtp_servers', $servers);
-        return $data;
     }
 }
 
 class Hm_Handler_smtp_save extends Hm_Handler_Module {
-    public function process($data) {
-        $data['just_saved_credentials'] = false;
+    public function process() {
+        $just_saved_credentials = false;
         if (isset($this->request->post['smtp_save'])) {
             list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
             if (!$success) {
@@ -75,7 +68,7 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
             else {
                 $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
                 if ($smtp->state == 'authed') {
-                    $data['just_saved_credentials'] = true;
+                    $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");
                     $this->session->record_unsaved('SMTP server saved');
                 }
@@ -84,51 +77,50 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
+        $this->out('just_saved_credentials', $just_saved_credentials);
     }
 }
 
 class Hm_Handler_smtp_forget extends Hm_Handler_Module {
-    public function process($data) {
-        $data['just_forgot_credentials'] = false;
+    public function process() {
+        $just_forgot_credentials = false;
         if (isset($this->request->post['smtp_forget'])) {
             list($success, $form) = $this->process_form(array('smtp_server_id'));
             if ($success) {
                 Hm_SMTP_List::forget_credentials($form['smtp_server_id']);
-                $data['just_forgot_credentials'] = true;
+                $just_forgot_credentials = true;
                 Hm_Msgs::add('Server credentials forgotten');
                 $this->session->record_unsaved('SMTP server credentials forgotten');
             }
             else {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
             }
         }
-        return $data;
+        $this->out('just_forgot_credentials', $just_forgot_credentials);
     }
 }
 
 class Hm_Handler_smtp_delete extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['smtp_delete'])) {
             list($success, $form) = $this->process_form(array('smtp_server_id'));
             if ($success) {
                 $res = Hm_SMTP_List::del($form['smtp_server_id']);
                 if ($res) {
-                    $data['deleted_server_id'] = $form['smtp_server_id'];
+                    $this->out(deleted_server_id, $form['smtp_server_id']);
                     Hm_Msgs::add('Server deleted');
                     $this->session->record_unsaved('SMTP server deleted');
                 }
             }
             else {
-                $data['old_form'] = $form;
+                $this->out(old_form, $form);
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_smtp_connect extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $smtp = false;
         if (isset($this->request->post['smtp_connect'])) {
             list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
@@ -148,12 +140,11 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                 Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (array_key_exists('smtp_send', $this->request->post)) {
             list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'smtp_server_id'));
             if ($success) {
@@ -193,7 +184,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRRequired field missing');
             }
         }
-        return $data;
     }
 }
 

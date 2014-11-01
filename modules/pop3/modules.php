@@ -5,30 +5,32 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/pop3/hm-pop3.php';
 
 class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if (preg_match("/^pop3_\d+$/", $path)) {
-                $data['list_path'] = $path;
+                $this->out('list_path', $path);
                 $parts = explode('_', $path, 2);
                 $details = Hm_POP3_List::dump(intval($parts[1]));
                 if (!empty($details)) {
                     if ($details['name'] == 'Default-Auth-Server') {
                         $details['name'] = 'Default';
                     }
-                    $data['mailbox_list_title'] = array('POP3', $details['name'], 'INBOX');
-                    $data['message_list_since'] = $this->user_config->get('pop3_since', DEFAULT_SINCE);
-                    $data['per_source_limit'] = $this->user_config->get('pop3_limit', DEFAULT_SINCE);
+                    $this->out('mailbox_list_title', array('POP3', $details['name'], 'INBOX'));
+                    $this->out('message_list_since', $this->user_config->get('pop3_since', DEFAULT_SINCE));
+                    $this->out('per_source_limit', $this->user_config->get('pop3_limit', DEFAULT_SINCE));
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'pop3_limit'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
             if ($form['pop3_limit'] > MAX_PER_SOURCE || $form['pop3_limit'] < 0) {
                 $limit = DEFAULT_PER_SOURCE;
@@ -36,30 +38,35 @@ class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
             else {
                 $limit = $form['pop3_limit'];
             }
-            $data['new_user_settings']['pop3_limit'] = $limit;
+            $new_settings['pop3_limit'] = $limit;
         }
         else {
-            $data['user_settings']['pop3_limit'] = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
+            $settings['pop3_limit'] = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_pop3_since_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'pop3_since'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
-            $data['new_user_settings']['pop3_since'] = process_since_argument($form['pop3_since'], true);
+            $new_settings['pop3_since'] = process_since_argument($form['pop3_since'], true);
         }
         else {
-            $data['user_settings']['pop3_since'] = $this->user_config->get('pop3_since', false);
+            $settings['pop3_since'] = $this->user_config->get('pop3_since', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_pop3_status extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('pop3_server_ids'));
         if ($success) {
             $ids = explode(',', $form['pop3_server_ids']);
@@ -67,18 +74,17 @@ class Hm_Handler_pop3_status extends Hm_Handler_Module {
                 $start_time = microtime(true);
                 $pop3 = Hm_POP3_List::connect($id, false);
                 if ($pop3->state == 'authed') {
-                    $data['pop3_connect_time'] = microtime(true) - $start_time;
-                    $data['pop3_connect_status'] = 'Authenticated';
-                    $data['pop3_status_server_id'] = $id;
+                    $this->out('pop3_connect_time', microtime(true) - $start_time);
+                    $this->out('pop3_connect_status', 'Authenticated');
+                    $this->out('pop3_status_server_id', $id);
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
 
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
@@ -96,12 +102,11 @@ class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
 
         $msgs = array();
         list($success, $form) = $this->process_form(array('pop3_server_id'));
@@ -109,7 +114,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             $unread_only = false;
             $login_time = $this->session->get('login_time', false);
             if ($login_time) {
-                $data['login_time'] = $login_time;
+                $this->out('login_time', $login_time);
             }
             $terms = false;
             if (array_key_exists('pop3_search', $this->request->post)) {
@@ -120,7 +125,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $date = process_since_argument($since);
                 $cutoff_timestamp = strtotime($date);
             }
-            elseif (array_key_exists('list_path', $data) && $data['list_path'] == 'unread') {
+            elseif ($this->get('list_path') == 'unread') {
                 $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
                 $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
                 $unread_only = true;
@@ -129,7 +134,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                     $cutoff_timestamp = $login_time;
                 }
             }
-            elseif (array_key_exists('list_path', $data) && $data['list_path'] == 'combined_inbox') {
+            elseif ($this->get('list_path') == 'combined_inbox') {
                 $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
                 $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
                 $cutoff_timestamp = strtotime($date);
@@ -143,7 +148,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
             if ($pop3->state == 'authed') {
-                $data['pop3_mailbox_page_path'] = $path;
+                $this->out('pop3_mailbox_page_path', $path);
                 $list = array_slice(array_reverse(array_unique(array_keys($pop3->mlist()))), 0, $limit);
                 foreach ($list as $id) {
                     $path = sprintf("pop3_%d", $form['pop3_server_id']);
@@ -168,34 +173,15 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                         $msgs[$id] = $msg_headers;
                     }
                 }
-                $data['pop3_mailbox_page'] = $msgs;
-                $data['pop3_server_id'] = $form['pop3_server_id'];
+                $this->out('pop3_mailbox_page', $msgs);
+                $this->out('pop3_server_id', $form['pop3_server_id']);
             }
-        }
-        return $data;
-    }
-}
-
-function search_pop3_msg($body, $headers, $terms, $fld) {
-    if ($fld == 'TEXT') {
-        if (stristr($body, $terms)) {
-            return true;
-        }
-    }
-    if ($fld == 'SUBJECT') {
-        if (array_key_exists('subject', $headers) && stristr($headers['subject'], $terms)) {
-            return true;
-        }
-    }
-    if ($fld == 'FROM') {
-        if (array_key_exists('from', $headers) && stristr($headers['from'], $terms)) {
-            return true;
         }
     }
 }
 
 class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
 
         list($success, $form) = $this->process_form(array('pop3_uid', 'pop3_list_path'));
         if ($success) {
@@ -228,20 +214,20 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                         $headers = false;
                     }
                 }
-                $data['pop3_message_headers'] = $header_list;
-                $data['pop3_message_body'] = $body;
+                $this->out('pop3_message_headers', $header_list);
+                $this->out('pop3_message_body', $body);
+                $this->out('pop3_mailbox_page_path', $form['pop3_list_path']);
+                $this->out('pop3_server_id', $id);
+
                 Hm_POP3_Seen_Cache::add(sprintf("pop3_%s_%s", $id, $form['pop3_uid']));
-                $data['pop3_mailbox_page_path'] = $form['pop3_list_path'];
-                $data['pop3_server_id'] = $id;
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_pop3_save extends Hm_Handler_Module {
-    public function process($data) {
-        $data['just_saved_credentials'] = false;
+    public function process() {
+        $just_saved_credentials = false;
         if (isset($this->request->post['pop3_save'])) {
             list($success, $form) = $this->process_form(array('pop3_user', 'pop3_pass', 'pop3_server_id'));
             if (!$success) {
@@ -250,7 +236,7 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
             else {
                 $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false, $form['pop3_user'], $form['pop3_pass'], true);
                 if ($pop3->state == 'authed') {
-                    $data['just_saved_credentials'] = true;
+                    $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");
                     $this->session->record_unsaved('POP3 server saved');
                 }
@@ -259,51 +245,50 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
+        $this->out('just_saved_credentials', $just_saved_credentials);
     }
 }
 
 class Hm_Handler_pop3_forget extends Hm_Handler_Module {
-    public function process($data) {
-        $data['just_forgot_credentials'] = false;
+    public function process() {
+        $just_forgot_credentials = false;
         if (isset($this->request->post['pop3_forget'])) {
             list($success, $form) = $this->process_form(array('pop3_server_id'));
             if ($success) {
                 Hm_POP3_List::forget_credentials($form['pop3_server_id']);
-                $data['just_forgot_credentials'] = true;
+                $just_forgot_credentials = true;
                 Hm_Msgs::add('Server credentials forgotten');
                 $this->session->record_unsaved('POP3 server credentials forgotten');
             }
             else {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
             }
         }
-        return $data;
+        $this->out('just_forgot_credentials', $just_forgot_credentials);
     }
 }
 
 class Hm_Handler_pop3_delete extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['pop3_delete'])) {
             list($success, $form) = $this->process_form(array('pop3_server_id'));
             if ($success) {
                 $res = Hm_POP3_List::del($form['pop3_server_id']);
                 if ($res) {
-                    $data['deleted_server_id'] = $form['pop3_server_id'];
+                    $this->out('deleted_server_id', $form['pop3_server_id']);
                     Hm_Msgs::add('Server deleted');
                     $this->session->record_unsaved('POP3 server deleted');
                 }
             }
             else {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_pop3_connect extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $pop3 = false;
         if (isset($this->request->post['pop3_connect'])) {
             list($success, $form) = $this->process_form(array('pop3_user', 'pop3_pass', 'pop3_server_id'));
@@ -320,30 +305,27 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
                 Hm_Msgs::add("ERRFailed to authenticate to the POP3 server");
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_load_pop3_cache extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = Hm_POP3_List::dump();
         $cache = $this->session->get('pop3_cache', array()); 
         foreach ($servers as $index => $server) {
             if (isset($cache[$index])) {
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_save_pop3_cache extends Hm_Handler_Module {
-    public function process($data) {
-        return $data;
+    public function process() {
     }
 }
 
 class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = $this->user_config->get('pop3_servers', array());
         $added = false;
         foreach ($servers as $index => $server) {
@@ -367,16 +349,15 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
             }
         }
         Hm_POP3_Seen_Cache::load($this->session->get('pop3_read_uids', array()));
-        return $data;
     }
 }
 
 class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['submit_pop3_server'])) {
             list($success, $form) = $this->process_form(array('new_pop3_name', 'new_pop3_address', 'new_pop3_port'));
             if (!$success) {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
                 Hm_Msgs::add('ERRYou must supply a name, a server and a port');
             }
             else {
@@ -398,27 +379,21 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
-    public function process($data) {
-        $data['pop3_servers'] = array();
+    public function process() {
         $servers = Hm_POP3_List::dump();
+        $this->out('pop3_servers', $servers);
         if (!empty($servers)) {
-            $data['pop3_servers'] = $servers;
-            $data['folder_sources'][] = 'email_folders';
-            if (array_key_exists('source_total', $data)) {
-                $data['source_total'] += count($servers);
-            }
+            $this->append('email_folders', 'folder_sources');
         }
-        return $data;
     }
 }
 
 class Hm_Handler_load_pop3_folders extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = Hm_POP3_List::dump();
         $folders = array();
         if (!empty($servers)) {
@@ -429,18 +404,16 @@ class Hm_Handler_load_pop3_folders extends Hm_Handler_Module {
                 $folders[$id] = $server['name'];
             }
         }
-        $data['pop3_folders'] = $folders;
-        return $data;
+        $this->out('pop3_folders', $folders);
     }
 }
 
 class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = Hm_POP3_List::dump(false, true);
         $this->user_config->set('pop3_servers', $servers);
         $this->session->set('pop3_read_uids', Hm_POP3_Seen_Cache::dump());
         Hm_POP3_List::clean_up();
-        return $data;
     }
 }
 
@@ -704,6 +677,24 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         $res[$id] = message_list_row($subject, $date, $timestamp, $from, $msg['server_name'], $id, $flags, $style, $url, $output_module);
     }
     return $res;
+}
+
+function search_pop3_msg($body, $headers, $terms, $fld) {
+    if ($fld == 'TEXT') {
+        if (stristr($body, $terms)) {
+            return true;
+        }
+    }
+    if ($fld == 'SUBJECT') {
+        if (array_key_exists('subject', $headers) && stristr($headers['subject'], $terms)) {
+            return true;
+        }
+    }
+    if ($fld == 'FROM') {
+        if (array_key_exists('from', $headers) && stristr($headers['from'], $terms)) {
+            return true;
+        }
+    }
 }
 
 ?>

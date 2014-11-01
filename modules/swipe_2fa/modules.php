@@ -3,7 +3,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
 
         /* new session or one not passed the second auth */
         if ($this->session->loaded || $this->session->get('2fa_required', false)) {
@@ -20,7 +20,7 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
             list($api, $api_config) = setup_swipe_api($ini_file);
             $started = start_api($api, $api_config);
             if (!$started) {
-                $data['2fa_fatal'] = true;
+                $this->out('2fa_fatal', true);
             }
 
             /* get current 2fa state */
@@ -32,8 +32,8 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
             }
 
             /* pass a nonce and no redirect flag to the output modules */
-            $data['no_redirect'] = true;
-            $data['2fa_nonce'] = Hm_Nonce::generate();
+            $this->out('no_redirect', true);
+            $this->out('2fa_nonce', Hm_Nonce::generate());
 
             $sms_number = false;
             $sms_response = false;
@@ -52,11 +52,11 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
 
                     /* number rejected by swipe */
                     if ($state == NEED_REGISTER_SMS) {
-                        $data['2fa_error'] = 'Invalid phone number';
+                        $this->out('2fa_error', 'Invalid phone number');
                     }
                 }
                 else {
-                    $data['2fa_error'] = 'Invalid phone number format';
+                    $this->out('2fa_error', 'Invalid phone number format');
                 }
 
             }
@@ -76,11 +76,11 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
                     }
                     else {
                         $state = get_secondfactor_state($api, $api_config, $swipe_username, $swipe_address);
-                        $data['2fa_error'] = 'Response did not match! A new sms code has been sent';
+                        $this->out('2fa_error', 'Response did not match! A new sms code has been sent');
                     }
                 }
                 else {
-                    $data['2fa_error'] = 'Incorrectly formatted response, please re-enter the sms code';
+                    $this->out('2fa_error', 'Incorrectly formatted response, please re-enter the sms code');
                 }
             }
 
@@ -89,8 +89,8 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
 
                 /* pass required flag to modules */
                 $this->session->set('2fa_required', true);
-                $data['2fa_required'] = true;
-                $data['2fa_state'] = $state;
+                $this->out('2fa_required', true);
+                $this->out('2fa_state', $state);
 
                 /* close the session early */
                 Hm_Nonce::save($this->session);
@@ -100,10 +100,9 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
 
                 /* unset any previously set required flags */
                 $this->session->set('2fa_required', false);
-                $data['2fa_required'] = false;
+                $this->out('2fa_required', false);
             }
         }
-        return $data;
     }
 }
 

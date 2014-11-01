@@ -5,38 +5,36 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/imap/hm-imap.php';
 
 class Hm_Handler_imap_process_reply_fields extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (array_key_exists('reply_source', $this->request->get) && preg_match("/^imap_(\d+)_(.+)$/", $this->request->get['reply_source'])) {
             if (array_key_exists('reply_uid', $this->request->get)) {
-                $data['imap_reply_source'] = $this->request->get['reply_source'];
-                $data['imap_reply_uid'] = $this->request->get['reply_uid'];
+                $this->out('imap_reply_source', $this->request->get['reply_source']);
+                $this->out('imap_reply_uid', $this->request->get['reply_uid']);
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if (preg_match("/^imap_\d+_.+$/", $path)) {
-                $data['list_meta'] = false;
-                $data['list_path'] = $path;
+                $this->out('list_meta', false, false);
+                $this->out('list_path', $path);
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
                 if (!empty($details)) {
-                    $data['mailbox_list_title'] = array('IMAP', $details['name'], $parts[2]);
+                    $this->out('mailbox_list_title', array('IMAP', $details['name'], $parts[2]));
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
-    public function process($data) {
-        $data['imap_expanded_folder_data'] = array();
+    public function process() {
+
         list($success, $form) = $this->process_form(array('imap_server_id'));
         if ($success) {
             $folder = '';
@@ -46,9 +44,9 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $path = sprintf("imap_%d_%s", $form['imap_server_id'], $folder);
             $page_cache =  Hm_Page_Cache::get('imap_folders_'.$path);
             if ($page_cache) {
-                $data['imap_expanded_folder_path'] = $path;
-                $data['imap_expanded_folder_formatted'] = $page_cache;
-                return $data;
+                $this->out('imap_expanded_folder_path', $path);
+                $this->out('imap_expanded_folder_formatted', $page_cache);
+                return;
             }
             $details = Hm_IMAP_List::dump($form['imap_server_id']);
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
@@ -58,17 +56,16 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
-                $data['imap_expanded_folder_data'] = $msgs;
-                $data['imap_expanded_folder_id'] = $form['imap_server_id'];
-                $data['imap_expanded_folder_path'] = $path;
+                $this->out('imap_expanded_folder_data', $msgs);
+                $this->out('imap_expanded_folder_id', $form['imap_server_id']);
+                $this->out('imap_expanded_folder_path', $path);
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
 
         $sort = 'ARRIVAL';
         $rev = true;
@@ -94,27 +91,24 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                $data['imap_mailbox_page_path'] = $path;
+                $this->out('imap_mailbox_page_path', $path);
                 foreach ($imap->get_mailbox_page($form['folder'], $sort, $rev, $filter, $offset, $limit) as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
                     $msg['folder'] = $form['folder'];
                     $msgs[] = $msg;
                 }
-                $data['imap_folder_detail'] = $imap->selected_mailbox;
-                $data['imap_folder_detail']['offset'] = $offset;
-                $data['imap_folder_detail']['limit'] = $limit;
+                $this->out('imap_folder_detail', array_merge($imap->selected_mailbox, array('offset' => $offset, 'limit' => $limit)));
             }
-            $data['imap_mailbox_page'] = $msgs;
-            $data['list_page'] = $list_page;
-            $data['imap_server_id'] = $form['imap_server_id'];
+            $this->out('imap_mailbox_page', $msgs);
+            $this->out('list_page', $list_page);
+            $this->out('imap_server_id', $form['imap_server_id']);
         }
-        return $data;
     }
 }
 
 class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = Hm_IMAP_List::dump();
         $folders = array();
         if (!empty($servers)) {
@@ -125,13 +119,12 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
                 $folders[$id] = $server['name'];
             }
         }
-        $data['imap_folders'] = $folders;
-        return $data;
+        $this->out('imap_folders', $folders);
     }
 }
 
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
             if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag'))) {
@@ -162,12 +155,11 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_search extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $terms = $this->session->get('search_terms', false);
@@ -176,15 +168,14 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             $ids = explode(',', $form['imap_server_ids']);
             $date = process_since_argument($since);
             $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
-            $data['imap_search_results'] = $msg_list;
-            $data['imap_server_ids'] = $form['imap_server_ids'];
+            $this->out('imap_search_results', $msg_list);
+            $this->out(['imap_server_ids'], $form['imap_server_ids']);
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'email') {
@@ -197,30 +188,28 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             }
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
-            $data['imap_combined_inbox_data'] = $msg_list;
-            $data['imap_server_ids'] = $form['imap_server_ids'];
+            $this->out('imap_combined_inbox_data', $msg_list);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_flagged extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
             $ids = explode(',', $form['imap_server_ids']);
             $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_SINCE));
             $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
-            $data['imap_flagged_data'] = $msg_list;
-            $data['imap_server_ids'] = $form['imap_server_ids'];
+            $this->out('imap_flagged_data', $msg_list);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_status extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
@@ -228,23 +217,22 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
                 $cache = Hm_IMAP_List::get_cache($this->session, $id);
                 $start_time = microtime(true);
                 $imap = Hm_IMAP_List::connect($id, $cache);
-                $data['imap_connect_time'] = microtime(true) - $start_time;
+                $this->out('imap_connect_time', microtime(true) - $start_time);
                 if ($imap) {
-                    $data['imap_connect_status'] = $imap->get_state();
-                    $data['imap_status_server_id'] = $id;
+                    $this->out('imap_connect_status', $imap->get_state());
+                    $this->out('imap_status_server_id', $id);
                 }
                 else {
-                    $data['imap_connect_status'] = 'disconnected';
-                    $data['imap_status_server_id'] = $id;
+                    $this->out('imap_connect_status', 'disconnected');
+                    $this->out('imap_status_server_id', $id);
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
@@ -252,19 +240,18 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
             $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
-            $data['imap_unread_data'] = $msg_list;
-            $data['imap_server_ids'] = $form['imap_server_ids'];
+            $this->out('imap_unread_data', $msg_list);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
         }
-        return $data;
     }
 }
 
 class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['submit_imap_server'])) {
             list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_address', 'new_imap_port'));
             if (!$success) {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
                 Hm_Msgs::add('ERRYou must supply a name, a server and a port');
             }
             else {
@@ -286,12 +273,11 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = Hm_IMAP_List::dump(false, true);
         $cache = $this->session->get('imap_cache', array());
         foreach ($servers as $index => $server) {
@@ -303,29 +289,28 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
             $this->session->set('imap_cache', $cache);
             Hm_Debug::add(sprintf('Cached data for %d IMAP connections', count($cache)));
         }
-        return $data;
     }
 }
 
 class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = Hm_IMAP_List::dump(false, true);
         $this->user_config->set('imap_servers', $servers);
         Hm_IMAP_List::clean_up();
-        return $data;
     }
 }
 
 class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $servers = $this->user_config->get('imap_servers', array());
         $added = false;
+        $data_sources = $this->get('data_sources', array());
         foreach ($servers as $index => $server) {
             Hm_IMAP_List::add($server, $index);
             if ($server['name'] == 'Default-Auth-Server') {
                 $added = true;
             }
-            $data['data_sources'][] = 'imap';
+            $data_sources[] = 'imap';
         }
         if (!$added) {
             $auth_server = $this->session->get('imap_auth_server_settings', array());
@@ -341,31 +326,28 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 $this->session->del('imap_auth_server_settings');
             }
         }
-        return $data;
+        $this->out('data_sources', $data_sources);
     }
 }
 
 class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
-    public function process($data) {
-        $data['imap_servers'] = array();
+    public function process() {
         $servers = Hm_IMAP_List::dump();
         if (!empty($servers)) {
-            $data['imap_servers'] = $servers;
-            $data['folder_sources'][] = 'email_folders';
+            $this->out('imap_servers', $servers);
+            $this->append('folder_sources', 'email_folders');
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $this->session->set('imap_cache', array());
-        return $data;
     }
 }
 
 class Hm_Handler_imap_connect extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
             $imap = false;
@@ -386,36 +368,35 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             }
             else {
                 Hm_Msgs::add('ERRUsername and password are required');
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_forget extends Hm_Handler_Module {
-    public function process($data) {
-        $data['just_forgot_credentials'] = false;
+    public function process() {
+        $just_forgot_credentials = false;
         if (isset($this->request->post['imap_forget'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             if ($success) {
                 Hm_IMAP_List::forget_credentials($form['imap_server_id']);
-                $data['just_forgot_credentials'] = true;
+                $just_forgot_credentials = true;
                 Hm_Msgs::add('Server credentials forgotten');
                 $this->session->record_unsaved('IMAP server credentials forgotten');
                 Hm_Page_Cache::flush($this->session);
             }
             else {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
             }
         }
-        return $data;
+        $this->out('just_forgot_credentials', $just_forgot_credentials);
     }
 }
 
 class Hm_Handler_imap_save extends Hm_Handler_Module {
-    public function process($data) {
-        $data['just_saved_credentials'] = false;
+    public function process() {
+        $just_saved_credentials = false;
         if (isset($this->request->post['imap_save'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
             if (!$success) {
@@ -425,7 +406,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                 $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
                 $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], true);
                 if ($imap->get_state() == 'authenticated') {
-                    $data['just_saved_credentials'] = true;
+                    $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");
                     $this->session->record_unsaved('IMAP server saved');
                     Hm_Page_Cache::flush($this->session);
@@ -435,29 +416,30 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
+        $this->out('just_saved_credentials', $just_saved_credentials);
     }
 }
 
 class Hm_Handler_imap_message_content extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
         if ($success) {
-            $data['msg_text_uid'] = $form['imap_msg_uid'];
-            $data['msg_server_id'] = $form['imap_server_id'];
-            $data['msg_folder'] = $form['folder'];
+            $this->out('msg_text_uid', $form['imap_msg_uid']);
+            $this->out('msg_server_id', $form['imap_server_id']);
+            $this->out('msg_folder', $form['folder']);
             $part = false;
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
                 $part = $this->request->post['imap_msg_part'];
             }
             if (array_key_exists('reply_format', $this->request->post) && $this->request->post['reply_format']) {
-                $data['reply_format'] = true;
+                $this->out('reply_format', true);
             }
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if ($imap) {
                 if ($imap->select_mailbox($form['folder'])) {
-                    $data['msg_struct'] = $imap->get_message_structure($form['imap_msg_uid']);
+                    $msg_struct = $imap->get_message_structure($form['imap_msg_uid']);
+                    $this->out('msg_struct', $msg_struct);
                     if ($part !== false) {
                         if ($part == 0) {
                             $max = 50000;
@@ -465,42 +447,42 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         else {
                             $max = false;
                         }
-                        $struct = $imap->search_bodystructure( $data['msg_struct'], array('imap_part_number' => $part));
-                        $data['msg_struct_current'] = array_shift($struct);
-                        $data['msg_text'] = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $data['msg_struct_current']);
+                        $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
+                        $msg_struct_current = array_shift($struct);
+                        $msg_text = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $msg_struct_current);
                     }
                     else {
-                        list($part, $data['msg_text']) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $data['msg_struct']);
-                        $struct = $imap->search_bodystructure( $data['msg_struct'], array('imap_part_number' => $part));
-                        $data['msg_struct_current'] = array_shift($struct);
+                        list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
+                        $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
+                        $msg_struct_current = array_shift($struct);
                     }
-                    $data['msg_headers'] = $imap->get_message_headers($form['imap_msg_uid']);
-                    $data['imap_msg_part'] = $part;
+                    $this->out('msg_headers', $imap->get_message_headers($form['imap_msg_uid']));
+                    $this->out('imap_msg_part', $part);
+                    $this->out('msg_struct_current', $msg_struct_current);
+                    $this->out('msg_text', $msg_text);
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['imap_delete'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             if ($success) {
                 $res = Hm_IMAP_List::del($form['imap_server_id']);
                 if ($res) {
-                    $data['deleted_server_id'] = $form['imap_server_id'];
+                    $this->out('deleted_server_id', $form['imap_server_id']);
                     Hm_Msgs::add('Server deleted');
                     $this->session->record_unsaved('IMAP server deleted');
                     Hm_Page_Cache::flush($this->session);
                 }
             }
             else {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
             }
         }
-        return $data;
     }
 }
 

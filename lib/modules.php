@@ -13,11 +13,9 @@ if (!defined('DEBUG_MODE')) { die(); }
  * $config       The site config object
  * $user_config  The user settings object for the current user
  *
- * Modules that extend this class need to override the process function, which takes
- * a single array argument. Modules can pass information to the output modules
- * by adding to the array and returning it. All handler modules should return
- * the input array even if it's unmodified, otherwise other module processing could
- * be lost.
+ * Modules that extend this class need to override the process function
+ * Modules can pass information to the output modules using the out() and append() methods,
+ * and see data from other modules with the get() method
  */
 abstract class Hm_Handler_Module {
 
@@ -36,19 +34,120 @@ abstract class Hm_Handler_Module {
     /* user settings */
     protected $user_config = false;
 
+    /* module output */
+    protected $output = array();
+
+    /* protected output keys */
+    protected $protected = array();
+
+    /* list of appendable keys */
+    protected $appendable = array();
+
     /**
      * Assign input and state sources
      *
      * @param $parent object instance of the Hm_Request_Handler class
      * @param $logged_in bool true if currently logged in
+     * @param $output array data from handler modules
+     * @param $protected array list of protected output names
      *
      * @return void
      */
-    public function __construct($parent, $logged_in) {
+    public function __construct($parent, $logged_in, $output=array(), $protected=array() ) {
         $this->session = $parent->session;
         $this->request = $parent->request;
         $this->config = $parent->config;
         $this->user_config = $parent->user_config;
+        $this->output = $output;
+        $this->protected = $protected;
+    }
+
+    /**
+     * Add a name value pair to the output array
+     *
+     * @param $name string name of value to store
+     * @param $value mixed value
+     * @param $protected bool true disallows overwriting
+     *
+     * @return bool true on success
+     */
+    protected function out($name, $value, $protected=true) {
+        if (in_array($name, $this->protected)) {
+            Hm_Debug::add(sprintf('HANDLERS: Cannot overwrite protected %s with %s', $name, $value));
+            return false;
+        }
+        if (in_array($name, $this->appendable)) {
+            Hm_Debug::add(sprintf('HANDLERS: Cannot overwrite appendable %s with %s', $name, $value));
+            return false;
+        }
+        if ($protected) {
+            $this->protected[] = $name;
+        }
+        $this->output[$name] = $value;
+        return true;
+    }
+
+    /**
+     * append a value to an array, create it if does not exist
+     *
+     * @param $name string array name
+     * @param $value value to add
+     *
+     * @return bool true on success
+     */
+    protected function append($name, $value) {
+        if (in_array($name, $this->protected)) {
+            Hm_Debug::add(sprintf('Cannot overwrite %s in handler module', $name));
+            return false;
+        }
+        if (array_key_exists($name, $this->output)) {
+            if (is_array($this->output[$name])) {
+                $this->output[$name][] = $value;
+                return true;
+            }
+            else {
+                Hm_Debug::add(sprintf('Tried to append %s to scaler %s', $value, $name));
+                return false;
+            }
+        }
+        else {
+            $this->output[$name] = array($value);
+            $this->appendable[] = $name;
+            return true;
+        }
+    }
+
+    /**
+     * Return module output from process()
+     *
+     * @return array
+     */
+    public function output() {
+        return $this->output;
+    }
+
+    /**
+     * Return protected output field list
+     *
+     * @return array
+     */
+    public function output_protected() {
+        return $this->protected;
+    }
+
+    /**
+     * Fetch an output value
+     *
+     * @param $name string key to fetch the value for
+     * @param $default mixed default return value if not found
+     *
+     * @return mixed value if found or default
+     */
+    public function get($name, $default=false) {
+        if (array_key_exists($name, $this->output)) {
+            return $this->output[$name];
+        }
+        return $default;
     }
 
     /**
@@ -111,12 +210,8 @@ abstract class Hm_Handler_Module {
 
     /**
      * Handler modules need to override this method to do work
-     *
-     * @param $data array list of data to send to the output modules
-     *
-     * @return should return the $data array, modified or otherwise
      */
-    abstract public function process($data);
+    abstract public function process();
 }
 
 /**
@@ -293,21 +388,24 @@ class Hm_Request_Handler {
      * @return void
      */
     protected function run_modules() {
+        $input = array();
+        $protected = array();
         foreach ($this->modules as $name => $args) {
-            $input = false;
             $name = "Hm_Handler_$name";
             if (class_exists($name)) {
                 if (!$args[1] || ($args[1] && $this->session->is_active())) {
-                    $mod = new $name( $this, $args[1]);
-                    $input = $mod->process($this->response);
+                    $mod = new $name( $this, $args[1], $input, $protected);
+                    $mod->process($input);
+                    $input = $mod->output();
+                    $protected = $mod->output_protected();
                 }
             }
             else {
                 Hm_Debug::add(sprintf('Handler module %s activated but not found', $name));
             }
-            if ($input) {
-                $this->response = $input;
-            }
+        }
+        if ($input) {
+            $this->response = $input;
         }
     }
 }

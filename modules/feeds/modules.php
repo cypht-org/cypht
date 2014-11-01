@@ -5,33 +5,35 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/feeds/hm-feed.php';
 
 class Hm_Handler_feed_list_type extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if ($path == 'feeds') {
-                $data['list_path'] = 'feeds';
-                $data['mailbox_list_title'] = array('All Feeds');
-                $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
-                $data['per_source_limit'] = $this->user_config->get('feed_limit', DEFAULT_SINCE);
+                $this->out('list_path', 'feeds');
+                $this->out('mailbox_list_title', array('All Feeds'));
+                $this->out('message_list_since', $this->user_config->get('feed_since', DEFAULT_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('feed_limit', DEFAULT_SINCE));
             }
             elseif (preg_match("/^feeds_\d+$/", $path)) {
-                $data['message_list_since'] = $this->user_config->get('feed_since', DEFAULT_SINCE);
-                $data['per_source_limit'] = $this->user_config->get('feed_limit', DEFAULT_SINCE);
-                $data['list_path'] = $path;
+                $this->out('message_list_since', $this->user_config->get('feed_since', DEFAULT_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('feed_limit', DEFAULT_SINCE));
+                $this->out('list_path', $path);
                 $parts = explode('_', $path, 2);
                 $details = Hm_Feed_List::dump(intval($parts[1]));
                 if (!empty($details)) {
-                    $data['mailbox_list_title'] = array('Feeds', $details['name']);
+                    $this->out('mailbox_list_title', array('Feeds', $details['name']));
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'feed_limit'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
             if ($form['feed_limit'] > MAX_PER_SOURCE || $form['feed_limit'] < 0) {
                 $limit = DEFAULT_PER_SOURCE;
@@ -39,48 +41,57 @@ class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
             else {
                 $limit = $form['feed_limit'];
             }
-            $data['new_user_settings']['feed_limit'] = $limit;
+            $new_settings['feed_limit'] = $limit;
         }
         else {
-            $data['user_settings']['feed_limit'] = $this->user_config->get('feed_limit', DEFAULT_PER_SOURCE);
+            $settings['feed_limit'] = $this->user_config->get('feed_limit', DEFAULT_PER_SOURCE);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_feed_since_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'feed_since'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
-            $data['new_user_settings']['feed_since'] = process_since_argument($form['feed_since'], true);
+            $new_settings['feed_since'] = process_since_argument($form['feed_since'], true);
         }
         else {
-            $data['user_settings']['feed_since'] = $this->user_config->get('feed_since', false);
+            $settings['feed_since'] = $this->user_config->get('feed_since', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_unread_feeds_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
             if (array_key_exists('unread_exclude_feeds', $this->request->post)) {
-                $data['new_user_settings']['unread_exclude_feeds'] = true;
+                $new_settings['unread_exclude_feeds'] = true;
             }
             else {
-                $data['new_user_settings']['unread_exclude_feeds'] = false;
+                $new_settings['unread_exclude_feeds'] = false;
             }
         }
         else {
-            $data['user_settings']['unread_exclude_feeds'] = $this->user_config->get('unread_exclude_feeds', false);
+            $settings['unread_exclude_feeds'] = $this->user_config->get('unread_exclude_feeds', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_feed_connect extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $failed = true; 
         if (isset($this->request->post['feed_connect'])) {
             list($success, $form) = $this->process_form(array('feed_id'));
@@ -98,33 +109,31 @@ class Hm_Handler_feed_connect extends Hm_Handler_Module {
                 Hm_Msgs::add("ERRFailed to connect to the feed");
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_delete_feed extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['delete_feed'])) {
             list($success, $form) = $this->process_form(array('feed_id'));
             if ($success) {
                 $res = Hm_Feed_List::del($form['feed_id']);
                 if ($res) {
-                    $data['deleted_server_id'] = $form['feed_id'];
-                    $data['reload_folders'] = true;
+                    $this->out('deleted_server_id', $form['feed_id']);
+                    $this->out('reload_folders', true);
                     Hm_Msgs::add('Feed deleted');
                     $this->session->record_unsaved('Feed deleted');
                 }
             }
             else {
-                $data['old_form'] = $form;
+                $this->out('old_form', $form);
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_feed_status extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
         if ($success) {
             $ids = explode(',', $form['feed_server_ids']);
@@ -134,19 +143,18 @@ class Hm_Handler_feed_status extends Hm_Handler_Module {
                 if ($feed_data) {
                     $feed = is_feed($feed_data['server']);
                     if ($feed && $feed->parsed_data) {
-                        $data['feed_connect_time'] = microtime(true) - $start_time;
-                        $data['feed_connect_status'] = 'Connected';
-                        $data['feed_status_server_id'] = $id;
+                        $this->out('feed_connect_time', microtime(true) - $start_time);
+                        $this->out('feed_connect_status', 'Connected');
+                        $this->out('feed_status_server_id', $id);
                     }
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_feed_message_action extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
 
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
@@ -166,12 +174,11 @@ class Hm_Handler_feed_message_action extends Hm_Handler_Module {
                 }
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_feed_list_content extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
         if ($success) {
             if (array_key_exists('feed_search', $this->request->post)) {
@@ -187,9 +194,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
             $unread_only = false;
             $login_time = $this->session->get('login_time', false);
             if ($login_time) {
-                $data['login_time'] = $login_time;
+                $this->out('login_time', $login_time);
             }
-            if (array_key_exists('list_path', $data) && $data['list_path'] == 'unread') {
+            if ($this->get('list_path') == 'unread') {
                 $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
                 $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
                 $unread_only = true;
@@ -198,7 +205,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                     $cutoff_timestamp = $login_time;
                 }
             }
-            elseif (array_key_exists('list_path', $data) && $data['list_path'] == 'combined_inbox') {
+            elseif ($this->get('list_path') == 'combined_inbox') {
                 $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
                 $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
                 $cutoff_timestamp = strtotime($date);
@@ -235,18 +242,17 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                     }
                 }
             }
-            $data['feed_list_data'] = $res;
+            $this->out('feed_list_data', $res);
             if (isset($this->request->get['list_path'])) {
-                $data['feed_list_parent'] = $this->request->get['list_path'];
+                $this->out('feed_list_parent', $this->request->get['list_path']);
             }
-            $data['feed_server_ids'] = $form['feed_server_ids'];
+            $this->out('feed_server_ids', $form['feed_server_ids']);
         }
-        return $data;
     }
 }
 
 class Hm_Handler_feed_item_content extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $content = '';
         $headers = array();
         list($success, $form) = $this->process_form(array('feed_uid', 'feed_list_path'));
@@ -286,16 +292,15 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
             }
             if ($content) {
                 Hm_Feed_Seen_Cache::add($form['feed_uid']);
-                $data['feed_message_content'] = $content;
-                $data['feed_message_headers'] = $headers;
+                $this->out('feed_message_content', $content);
+                $this->out('feed_message_headers', $headers);
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_process_add_feed extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (isset($this->request->post['submit_feed'])) {
             $found = false;
             list($success, $form) = $this->process_form(array('new_feed_name', 'new_feed_address'));
@@ -340,7 +345,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRFeed Name and Address are required');
             }
             if ($found) {
-                $data['reload_folders'] = true;
+                $this->out('reload_folders', true);
                 Hm_Feed_List::add(array(
                     'name' => $form['new_feed_name'],
                     'server' => $href,
@@ -350,50 +355,46 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                 $this->session->record_unsaved('Feed added');
             }
         }
-        return $data;
     }
 }
 
 class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $feeds = $this->user_config->get('feeds', array());
         foreach ($feeds as $index => $feed) {
             Hm_Feed_List::add($feed, $index);
         }
         Hm_Feed_Seen_Cache::load($this->session->get('feed_read_uids', array()));
-        return $data;
     }
 }
 
 class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $excluded = false;
-        if (isset($data['list_path']) && $data['list_path'] == 'unread') {
+        if ($this->get('list_path') == 'unread') {
             $excluded = $this->user_config->get('unread_exclude_feeds', false);
         }
         if ($excluded) {
-            return $data;
+            return; 
         }
         $feeds = Hm_Feed_List::dump();
         if (!empty($feeds)) {
-            $data['feeds'] = $feeds;
-            $data['folder_sources'][] = 'feeds_folders';
+            $this->out('feeds', $feeds);
+            $this->append('folder_sources', 'feeds_folders');
         }
-        return $data;
     }
 }
 
 class Hm_Handler_save_feeds extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $feeds = Hm_Feed_List::dump();
         $this->user_config->set('feeds', $feeds);
         $this->session->set('feed_read_uids', Hm_Feed_Seen_Cache::dump());
-        return $data;
     }
 }
 
 class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $feeds = Hm_Feed_List::dump();
         $folders = array();
         if (!empty($feeds)) {
@@ -401,8 +402,7 @@ class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
                 $folders[$id] = $feed['name'];
             }
         }
-        $data['feed_folders'] = $folders;
-        return $data;
+        $this->out('feed_folders', $folders);
     }
 }
 

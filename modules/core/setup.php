@@ -125,6 +125,12 @@ add_output('ajax_hm_folders', 'settings_menu_content', true);
 add_output('ajax_hm_folders', 'settings_menu_end', true);
 add_output('ajax_hm_folders', 'folder_list_content_end', true);
 
+/* no-op */
+add_handler('ajax_no_op', 'login', false);
+add_handler('ajax_no_op', 'load_user_data', true);
+add_handler('ajax_no_op', 'date', true);
+add_handler('ajax_no_op', 'http_headers', true);
+
 
 /* allowed input */
 return array(
@@ -136,6 +142,7 @@ return array(
         'settings',
         'servers',
         'ajax_hm_folders',
+        'ajax_no_op',
         'ajax_message_action',
         'notfound',
         'help',

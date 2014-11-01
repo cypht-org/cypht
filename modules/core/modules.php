@@ -11,52 +11,60 @@ require APP_PATH.'modules/core/functions.php';
 /* INPUT */
 
 class Hm_Handler_close_session_early extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $this->session->close_early();
         return $data;
     }
 }
 
 class Hm_Handler_http_headers extends Hm_Handler_Module {
-    public function process($data) {
-        if (array_key_exists('language', $data)) {
-            $data['http_headers'][] = 'Content-Language: '.substr($data['language'], 0, 2);
+    public function process() {
+        $headers = array();
+        if ($this->get('language')) {
+            $headers[] = 'Content-Language: '.substr($this->get('language'), 0, 2);
         }
         if ($this->request->tls) {
-            $data['http_headers'][] = 'Strict-Transport-Security: max-age=31536000';
+            $headers[] = 'Strict-Transport-Security: max-age=31536000';
         }
-        $data['http_headers'][] = 'X-XSS-Protection: 1; mode=block';
-        $data['http_headers'][] = 'X-Content-Type-Options: nosniff';
-        $data['http_headers'][] = 'Expires: '.gmdate('D, d M Y H:i:s \G\M\T', strtotime('-1 year'));
-        $data['http_headers'][] = "Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';";
+        $headers[] = 'X-XSS-Protection: 1; mode=block';
+        $headers[] = 'X-Content-Type-Options: nosniff';
+        $headers[] = 'Expires: '.gmdate('D, d M Y H:i:s \G\M\T', strtotime('-1 year'));
+        $headers[] = "Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';";
         if ($this->request->type == 'AJAX') {
-            $data['http_headers'][] = 'Content-Type: application/json';
+            $headers[] = 'Content-Type: application/json';
         }
-        return $data;
+        $this->out('http_headers', $headers);
     }
 }
 
 class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'list_style'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
             if (in_array($form['list_style'], array('email_style', 'news_style'))) {
-                $data['new_user_settings']['list_style'] = $form['list_style'];
+                $new_settings['list_style'] = $form['list_style'];
             }
             else {
-                $data['user_settings']['list_style'] = $this->user_config->get('list_style', false);
+                $settings['list_style'] = $this->user_config->get('list_style', false);
             }
         }
         else {
-            $data['user_settings']['list_style'] = $this->user_config->get('list_style', false);
+            $settings['list_style'] = $this->user_config->get('list_style', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'unread_per_source'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
             if ($form['unread_per_source'] > MAX_PER_SOURCE || $form['unread_per_source'] < 0) {
                 $sources = DEFAULT_PER_SOURCE;
@@ -64,18 +72,22 @@ class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
             else {
                 $sources = $form['unread_per_source'];
             }
-            $data['new_user_settings']['unread_per_source_setting'] = $sources;
+            $new_settings['unread_per_source_setting'] = $sources;
         }
         else {
-            $data['user_settings']['unread_per_source'] = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
+            $settings['unread_per_source'] = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_per_source'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
             if ($form['all_per_source'] > MAX_PER_SOURCE || $form['all_per_source'] < 0) {
                 $sources = DEFAULT_PER_SOURCE;
@@ -83,18 +95,22 @@ class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
             else {
                 $sources = $form['all_per_source'];
             }
-            $data['new_user_settings']['all_per_source_setting'] = $sources;
+            $new_settings['all_per_source_setting'] = $sources;
         }
         else {
-            $data['user_settings']['all_per_source'] = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
+            $settings['all_per_source'] = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'flagged_per_source'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
             if ($form['flagged_per_source'] > MAX_PER_SOURCE || $form['flagged_per_source'] < 0) {
                 $sources = DEFAULT_PER_SOURCE;
@@ -102,93 +118,114 @@ class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
             else {
                 $sources = $form['flagged_per_source'];
             }
-            $data['new_user_settings']['flagged_per_source_setting'] = $sources;
+            $new_settings['flagged_per_source_setting'] = $sources;
         }
         else {
-            $data['user_settings']['flagged_per_source'] = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
+            $settings['flagged_per_source'] = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
         }
-        return $data;
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
     }
 }
 
 class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'flagged_since'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
-            $data['new_user_settings']['flagged_since_setting'] = process_since_argument($form['flagged_since'], true);
+            $new_settings['flagged_since_setting'] = process_since_argument($form['flagged_since'], true);
         }
         else {
-            $data['user_settings']['flagged_since'] = $this->user_config->get('flagged_since_setting', false);
+            $settings['flagged_since'] = $this->user_config->get('flagged_since_setting', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_since'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
-            $data['new_user_settings']['all_since_setting'] = process_since_argument($form['all_since'], true);
+            $new_settings['all_since_setting'] = process_since_argument($form['all_since'], true);
         }
         else {
-            $data['user_settings']['all_since'] = $this->user_config->get('all_since_setting', false);
+            $settings['all_since'] = $this->user_config->get('all_since_setting', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'unread_since'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
-            $data['new_user_settings']['unread_since_setting'] = process_since_argument($form['unread_since'], true);
+            $new_settings['unread_since_setting'] = process_since_argument($form['unread_since'], true);
         }
         else {
-            $data['user_settings']['unread_since'] = $this->user_config->get('unread_since_setting', false);
+            $settings['unread_since'] = $this->user_config->get('unread_since_setting', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
-            $data['new_user_settings']['language_setting'] = $form['language_setting'];
+            $new_settings['language_setting'] = $form['language_setting'];
         }
         else {
-            $data['user_settings']['language'] = $this->user_config->get('language_setting', false);
+            $settings['language'] = $this->user_config->get('language_setting', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'timezone_setting'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
         if ($success) {
-            $data['new_user_settings']['timezone_setting'] = $form['timezone_setting'];
+            $new_settings['timezone_setting'] = $form['timezone_setting'];
         }
         else {
-            $data['user_settings']['timezone'] = $this->user_config->get('timezone_setting', false);
+            $settings['timezone'] = $this->user_config->get('timezone_setting', false);
         }
-        return $data;
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
     }
 }
 
 class Hm_Handler_save_user_settings extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'password'));
         if ($success) {
-            if (array_key_exists('new_user_settings', $data)) {
-                foreach ($data['new_user_settings'] as $name => $value) {
+            if ($new_settings = $this->get('new_user_settings', false)) {
+                foreach ($new_settings as $name => $value) {
                     $this->user_config->set($name, $value);
                 }
                 $user = $this->session->get('username', false);
                 $path = $this->config->get('user_settings_dir', false);
 
-                if (array_key_exists('new_password', $data)) {
-                    $pass = $data['new_password'];
+                if ($this->get('new_password', false)) {
+                    $pass = $this->get('new_password');
                 }
                 elseif ($this->session->auth($user, $form['password'])) {
                     $pass = $form['password'];
@@ -201,7 +238,7 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                 if ($user && $path && $pass) {
                     $this->user_config->save($user, $pass);
                     Hm_Msgs::add('Settings saved');
-                    $data['reload_folders'] = true;
+                    $this->out('reload_folders', true, false);
                 }
                 Hm_Page_Cache::flush($this->session);
             }
@@ -210,35 +247,30 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
             /* TODO: save current settings in session */
             Hm_Msgs::add('ERRYour password is required to save your settings to the server');
         }
-        return $data;
     }
 }
 
 class Hm_Handler_title extends Hm_Handler_Module {
-    public function process($data) {
-        $data['title'] = ucfirst($this->page);
-        return $data;
+    public function process() {
+        $this->out('title', ucfirst($this->page));
     }
 }
 
 class Hm_Handler_language extends Hm_Handler_Module {
-    public function process($data) {
-        $data['language'] = $this->user_config->get('language_setting', 'en_US');
-        //$data['language'] = $this->session->get('language', 'en_US');
-        return $data;
+    public function process() {
+        $this->out('language', $this->user_config->get('language_setting', 'en_US'));
     }
 }
 
 class Hm_Handler_date extends Hm_Handler_Module {
-    public function process($data) {
-        $data['date'] = date('G:i:s');
-        return $data;
+    public function process() {
+        $this->out('date', date('G:i:s'));
     }
 }
 
 class Hm_Handler_login extends Hm_Handler_Module {
-    public function process($data) {
-        if (!array_key_exists('create_username', $this->request->post)) {
+    public function process() {
+        if (!$this->get('create_username', false)) {
             list($success, $form) = $this->process_form(array('username', 'password'));
             if ($success) {
                 $this->session->check($this->request, $form['username'], $form['password']);
@@ -249,23 +281,22 @@ class Hm_Handler_login extends Hm_Handler_Module {
             }
             if ($this->session->is_active()) {
                 Hm_Page_Cache::load($this->session);
-                $data['changed_settings'] = $this->session->get('changed_settings', array());
+                $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
             }
         }
         $this->process_nonce();
-        return $data;
     }
 }
 
+/* TODO: populate this from modules (imap is the only one so far) */
 class Hm_Handler_default_page_data extends Hm_Handler_Module {
-    public function process($data) {
-        $data['data_sources'] = array();
-        return $data;
+    public function process() {
+        $this->out('data_sources', array());
     }
 }
 
 class Hm_Handler_load_user_data extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         list($success, $form) = $this->process_form(array('username', 'password'));
         if ($this->session->is_active()) {
             if ($success) {
@@ -282,23 +313,21 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
                 }
             }
         }
-        $data['is_mobile'] = $this->request->mobile;
-        return $data;
+        $this->out('is_mobile', $this->request->mobile);
     }
 }
 
 class Hm_Handler_save_user_data extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         $user_data = $this->user_config->dump();
         if (!empty($user_data)) {
             $this->session->set('user_data', $user_data);
         }
-        return $data;
     }
 }
 
 class Hm_Handler_logout extends Hm_Handler_Module {
-    public function process($data) {
+    public function process() {
         if (array_key_exists('logout', $this->request->post) && !$this->session->loaded) {
             $this->session->destroy($this->request);
             Hm_Msgs::add('Session destroyed on logout');
@@ -330,72 +359,87 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRYour password is required to save your settings to the server');
             }
         }
-        return $data;
     }
 }
-
+/* TODO: clean this up somehow */
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
-    public function process($data) {
-        $data['list_path'] = false;
-        $data['list_meta'] = true;
+    public function process() {
+        $uid = false;
+        $list_path = false;
+        $list_meta = true;
+        $list_parent = false;
+        $list_page = false;
+        $mailbox_list_title = array();
+        $message_list_since = false;
+        $per_source_limit = false;
+        $no_message_list_headers = false;
+
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if ($path == 'unread') {
-                $data['list_path'] = 'unread';
-                $data['mailbox_list_title'] = array('Unread');
-                $data['message_list_since'] = $this->user_config->get('unread_since_setting', DEFAULT_SINCE);
-                $data['per_source_limit'] = $this->user_config->get('unread_per_source_setting', DEFAULT_SINCE);
+                $list_path = 'unread';
+                $mailbox_list_title = array('Unread');
+                $message_list_since = $this->user_config->get('unread_since_setting', DEFAULT_SINCE);
+                $per_source_limit = $this->user_config->get('unread_per_source_setting', DEFAULT_SINCE);
             }
             elseif ($path == 'email') {
-                $data['list_path'] = 'email';
-                $data['mailbox_list_title'] = array('All Email');
+                $list_path = 'email';
+                $mailbox_list_title = array('All Email');
             }
             elseif ($path == 'flagged') {
-                $data['list_path'] = 'flagged';
-                $data['message_list_since'] = $this->user_config->get('flagged_since_setting', DEFAULT_SINCE);
-                $data['per_source_limit'] = $this->user_config->get('flagged_per_source_setting', DEFAULT_SINCE);
-                $data['mailbox_list_title'] = array('Flagged');
+                $list_path = 'flagged';
+                $message_list_since = $this->user_config->get('flagged_since_setting', DEFAULT_SINCE);
+                $per_source_limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_SINCE);
+                $mailbox_list_title = array('Flagged');
             }
             elseif ($path == 'combined_inbox') {
-                $data['list_path'] = 'combined_inbox';
-                $data['message_list_since'] = $this->user_config->get('all_since_setting', DEFAULT_SINCE);
-                $data['per_source_limit'] = $this->user_config->get('all_per_source_setting', DEFAULT_SINCE);
-                $data['mailbox_list_title'] = array('Everything');
+                $list_path = 'combined_inbox';
+                $message_list_since = $this->user_config->get('all_since_setting', DEFAULT_SINCE);
+                $per_source_limit = $this->user_config->get('all_per_source_setting', DEFAULT_SINCE);
+                $mailbox_list_title = array('Everything');
             }
         }
         if (array_key_exists('list_parent', $this->request->get)) {
-            $data['list_parent'] = $this->request->get['list_parent'];
+            $list_parent = $this->request->get['list_parent'];
         }
         else {
-            $data['list_parent'] = false;
+            $list_parent = false;
         }
         if (array_key_exists('list_page', $this->request->get)) {
-            $data['list_page'] = (int) $this->request->get['list_page'];
-            if ($data['list_page'] < 1) {
-                $data['list_page'] = 1;
+            $list_page = (int) $this->request->get['list_page'];
+            if ($list_page < 1) {
+                $list_page = 1;
             }
         }
         else {
-            $data['list_page'] = 1;
+            $list_page = 1;
         }
         if (array_key_exists('uid', $this->request->get) && preg_match("/\d+/", $this->request->get['uid'])) {
-            $data['uid'] = $this->request->get['uid'];
+            $uid = $this->request->get['uid'];
         }
         $list_style = $this->user_config->get('list_style', false);
-        if ($data['is_mobile']) {
+        if ($this->get('is_mobile', false)) {
             $list_style = 'news_style';
         }
         if ($list_style == 'news_style') {
-            $data['no_message_list_headers'] = true;
-            $data['news_list_style'] = true;
+            $no_message_list_headers = true;
+            $this->out('news_list_style', true);
         }
-        return $data;
+        $this->out('uid', $uid);
+        $this->out('list_path', $list_path, false);
+        $this->out('list_meta', $list_meta, false);
+        $this->out('list_parent', $list_parent);
+        $this->out('list_page', $list_page);
+        $this->out('mailbox_list_title', $mailbox_list_title, false);
+        $this->out('message_list_since', $message_list_since, false);
+        $this->out('per_source_limit', $per_source_limit, false);
+        $this->out('no_message_list_headers', $no_message_list_headers);
     }
 }
 
 class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
-    public function process($data) {
-        if (array_key_exists('reload_folders', $data)) {
+    public function process() {
+        if ($this->get('reload_folders', false)) {
             secure_cookie($this->request, 'hm_reload_folders', '1');
         }
     }
