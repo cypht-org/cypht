@@ -2,37 +2,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-/**
- * Base class for data input processing modules, called "handler modules"
- *
- * All modules that deal with processing input data extend from this class.
- * It provides access to input and state through the following member variables:
- *
- * $session      The session interface object
- * $request      The HTTP request details object
- * $config       The site config object
- * $user_config  The user settings object for the current user
- *
- * Modules that extend this class need to override the process function
- * Modules can pass information to the output modules using the out() and append() methods,
- * and see data from other modules with the get() method
- */
-abstract class Hm_Handler_Module {
-
-    /* session object */
-    protected $session = false;
-
-    /* request object */
-    protected $request = false;
-
-    /* site configuration object */
-    protected $config = false;
-
-    /* current request id */
-    protected $page = false;
-
-    /* user settings */
-    protected $user_config = false;
+trait Hm_Module_Output {
 
     /* module output */
     protected $output = array();
@@ -42,25 +12,6 @@ abstract class Hm_Handler_Module {
 
     /* list of appendable keys */
     protected $appendable = array();
-
-    /**
-     * Assign input and state sources
-     *
-     * @param $parent object instance of the Hm_Request_Handler class
-     * @param $logged_in bool true if currently logged in
-     * @param $output array data from handler modules
-     * @param $protected array list of protected output names
-     *
-     * @return void
-     */
-    public function __construct($parent, $logged_in, $output=array(), $protected=array() ) {
-        $this->session = $parent->session;
-        $this->request = $parent->request;
-        $this->config = $parent->config;
-        $this->user_config = $parent->user_config;
-        $this->output = $output;
-        $this->protected = $protected;
-    }
 
     /**
      * Add a name value pair to the output array
@@ -73,11 +24,11 @@ abstract class Hm_Handler_Module {
      */
     protected function out($name, $value, $protected=true) {
         if (in_array($name, $this->protected)) {
-            Hm_Debug::add(sprintf('HANDLERS: Cannot overwrite protected %s with %s', $name, $value));
+            Hm_Debug::add(sprintf('HANDLERS: Cannot overwrite protected %s with %s', $name, print_r($value,true)));
             return false;
         }
         if (in_array($name, $this->appendable)) {
-            Hm_Debug::add(sprintf('HANDLERS: Cannot overwrite appendable %s with %s', $name, $value));
+            Hm_Debug::add(sprintf('HANDLERS: Cannot overwrite appendable %s with %s', $name, print_r($value,true)));
             return false;
         }
         if ($protected) {
@@ -85,6 +36,19 @@ abstract class Hm_Handler_Module {
         }
         $this->output[$name] = $value;
         return true;
+    }
+
+    /**
+     * method for adding ajax output that uses the handler logic
+     *
+     * @param $name string name of value to store
+     * @param $value mixed value
+     * @param $protected bool true disallows overwriting
+     *
+     * @return bool true on success
+     */
+    protected function ajax_out($name, $value, $protected=true) {
+        return $this->out($name, $value, $protected);
     }
 
     /**
@@ -148,6 +112,61 @@ abstract class Hm_Handler_Module {
             return $this->output[$name];
         }
         return $default;
+    }
+
+
+}
+/**
+ * Base class for data input processing modules, called "handler modules"
+ *
+ * All modules that deal with processing input data extend from this class.
+ * It provides access to input and state through the following member variables:
+ *
+ * $session      The session interface object
+ * $request      The HTTP request details object
+ * $config       The site config object
+ * $user_config  The user settings object for the current user
+ *
+ * Modules that extend this class need to override the process function
+ * Modules can pass information to the output modules using the out() and append() methods,
+ * and see data from other modules with the get() method
+ */
+abstract class Hm_Handler_Module {
+
+    use Hm_Module_Output;
+
+    /* session object */
+    protected $session = false;
+
+    /* request object */
+    protected $request = false;
+
+    /* site configuration object */
+    protected $config = false;
+
+    /* current request id */
+    protected $page = false;
+
+    /* user settings */
+    protected $user_config = false;
+
+    /**
+     * Assign input and state sources
+     *
+     * @param $parent object instance of the Hm_Request_Handler class
+     * @param $logged_in bool true if currently logged in
+     * @param $output array data from handler modules
+     * @param $protected array list of protected output names
+     *
+     * @return void
+     */
+    public function __construct($parent, $logged_in, $output=array(), $protected=array() ) {
+        $this->session = $parent->session;
+        $this->request = $parent->request;
+        $this->config = $parent->config;
+        $this->user_config = $parent->user_config;
+        $this->output = $output;
+        $this->protected = $protected;
     }
 
     /**
@@ -222,6 +241,8 @@ abstract class Hm_Handler_Module {
  * and string translation services to modules
  */
 abstract class Hm_Output_Module {
+
+    use Hm_Module_Output;
 
     /* translated language strings */
     protected $lstr = array();
@@ -659,6 +680,35 @@ class Hm_Handler_Modules { use Hm_Modules; }
  */
 class Hm_Output_Modules { use Hm_Modules; }
 
+/**
+ * Input data for output modules (the output of handler modules)
+ */
+class Hm_Handler_Output_Data {
+
+    private $data;
+
+    public function __construct($input) {
+        $this->data = $input;
+    }
+
+    public function exists($name) {
+        return array_key_exists($name, $this->data);
+    }
+
+    public function get($name, $default=false) {
+        if (array_key_exists($name, $this->data)) {
+            return $this->data[$name];
+        }
+        return $default;
+    }
+
+    public function in($name, $values) {
+        if (array_key_exists($name, $this->data) && in_array($name, $values)) {
+            return true;
+        }
+        return false;
+    }
+}
 
 /**
  * MODULE SET FUNCTIONS
