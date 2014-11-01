@@ -304,13 +304,12 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('imap_servers', array());
         $added = false;
-        $data_sources = $this->get('data_sources', array());
         foreach ($servers as $index => $server) {
             Hm_IMAP_List::add($server, $index);
             if ($server['name'] == 'Default-Auth-Server') {
                 $added = true;
             }
-            $data_sources[] = 'imap';
+            $this->append('data_sources', 'imap');
         }
         if (!$added) {
             $auth_server = $this->session->get('imap_auth_server_settings', array());
@@ -326,7 +325,6 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 $this->session->del('imap_auth_server_settings');
             }
         }
-        $this->out('data_sources', $data_sources);
     }
 }
 
