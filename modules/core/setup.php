@@ -125,11 +125,6 @@ add_output('ajax_hm_folders', 'settings_menu_content', true);
 add_output('ajax_hm_folders', 'settings_menu_end', true);
 add_output('ajax_hm_folders', 'folder_list_content_end', true);
 
-/* no-op */
-add_handler('ajax_no_op', 'login', false);
-add_handler('ajax_no_op', 'date', true);
-add_handler('ajax_no_op', 'http_headers', true);
-
 
 /* allowed input */
 return array(
@@ -228,7 +223,7 @@ return array(
         'message_ids' => FILTER_SANITIZE_STRING,
         'action_type' => FILTER_SANITIZE_STRING,
         'message_list_since' => FILTER_SANITIZE_STRING,
-        'reply_format' => FILTER_VALIDATE_INT
+        'reply_format' => FILTER_VALIDATE_INT,
     )
 );
 

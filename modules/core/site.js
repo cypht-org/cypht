@@ -77,7 +77,7 @@ var Hm_Ajax_Request = function() { return {
         }
         else {
             if (!res.router_login_state) {
-                window.location.href = "?page=notfound";
+                window.location.href = "?page=home";
             }
             if (res.date) {
                 $('.date').html(res.date);
@@ -790,16 +790,6 @@ var folder_list_events = function() {
     $('.logout_link').click(function() { return confirm_logout(); });
 };
 
-var hm_no_op = function() {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_no_op'}],
-        function() { },
-        [],
-        false
-    );
-    return false;
-};
-
 var folder_list = get_from_local_storage('formatted_folder_list');
 
 if (folder_list) {
@@ -860,8 +850,5 @@ $(function() {
         $('.msg_controls > a').click(function() { return message_action($(this).data('action')); });
         $('.toggle_link').click(function() { return toggle_rows(); });
         $('.refresh_link').click(function() { return Hm_Message_List.load_sources(); });
-    }
-    else {
-        Hm_Timer.add_job(hm_no_op, 300, true);
     }
 });
