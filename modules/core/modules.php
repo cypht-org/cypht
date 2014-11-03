@@ -653,7 +653,6 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
     }
 }
 
-/* HERE */
 class Hm_Output_list_style_setting extends Hm_Output_Module {
     protected function output($input, $format) {
         $options = array('email_style' => 'Email', 'news_style' => 'News');
