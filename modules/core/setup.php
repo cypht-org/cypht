@@ -127,7 +127,6 @@ add_output('ajax_hm_folders', 'folder_list_content_end', true);
 
 /* no-op */
 add_handler('ajax_no_op', 'login', false);
-add_handler('ajax_no_op', 'load_user_data', true);
 add_handler('ajax_no_op', 'date', true);
 add_handler('ajax_no_op', 'http_headers', true);
 
