@@ -68,20 +68,19 @@ abstract class HM_Format {
      */
     protected function run_modules($input, $format, $lang_str) {
         $mod_output = array();
-
+        $protected = array();
         foreach ($this->modules as $name => $args) {
             $name = "Hm_Output_$name";
             if (class_exists($name)) {
                 if (!$args[1] || ($args[1] && $input['router_login_state'])) {
-                    $mod = new $name($input);
+                    $mod = new $name($input, $protected);
                     if ($format == 'JSON') {
-                        $mod_output = $mod->output_content($input, $format, $lang_str);
-                        if ($mod_output) {
-                            $input = $mod_output;
-                        }
+                        $mod->output_content($input, $format, $lang_str, $protected);
+                        $input = $mod->module_output();
+                        $protected = $mod->output_protected();
                     }
                     else {
-                        $mod_output[] = $mod->output_content($input, $format, $lang_str);
+                        $mod_output[] = $mod->output_content($input, $format, $lang_str, array());
                     }
                 }
             }

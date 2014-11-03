@@ -111,17 +111,17 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
 
         /* intercept normal page output for 2fa dialogs. This is fired just
          * after the http_headers core module */
-        if (isset($input['2fa_required']) && $input['2fa_required']) {
+        if ($this->get('2fa_required')) {
 
-            $state = $input['2fa_state'];
+            $state = $this->get('2fa_state');
 
             echo '<!DOCTYPE html><html lang=en-us><head><meta charset="utf-8" />'.
                 '<link href="site.css" media="all" rel="stylesheet" type="text/css" />'.
                 '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
                 '</head><body>';
 
-            if (array_key_exists('2fa_error', $input)) {
-                $error = '<div class="swipe_error">'.$this->html_safe($input['2fa_error']).'</div>';
+            if ($this->get('2fa_error')) {
+                $error = '<div class="swipe_error">'.$this->html_safe($this->get('2fa_error')).'</div>';
             }
             else {
                 $error = '';
@@ -130,11 +130,11 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
             /* add a phone number form */
             if ($state == NEED_REGISTER_SMS) {
                 echo '<form class="login_form" method="POST">'.
-                    '<h1 class="title">'.$this->html_safe($input['router_app_name']).'</h1>'.
+                    '<h1 class="title">'.$this->html_safe($this->get('router_app_name')).'</h1>'.
                     $error.
                     '<div class="swipe_txt">Register your number for Swipeidentity two factor authentication. '.
                     'The number must include a country code. Only enter numbers and no spaces or delimiters</div>'.
-                    '<input type="hidden" name="hm_nonce" value="'.$input['2fa_nonce'].'" />'.
+                    '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
                     '<input autofocus required type="text" name="sms_number" value="" placeholder="Phone number to SMS to" />'.
                     '<input type="submit" name="submit_swipe_number" value="Submit" />'.
                     '</form>';
@@ -142,10 +142,10 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
             /* sms response form */
             elseif ($state == RC_SMS_DELIVERED) {
                 echo '<form class="login_form" method="POST">'.
-                    '<h1 class="title">'.$this->html_safe($input['router_app_name']).'</h1>'.
+                    '<h1 class="title">'.$this->html_safe($this->get('router_app_name')).'</h1>'.
                     $error.
                     '<div class="swipe_txt">Enter the 5 digit SMS code you just received</div>'.
-                    '<input type="hidden" name="hm_nonce" value="'.$input['2fa_nonce'].'" />'.
+                    '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
                     '<input autofocus required type="text" name="2fa_sms_response" value="" placeholder="Login code" />'.
                     '<input type="submit" name="submit_2fa_response" value="Submit" />'.
                     '</form>';
@@ -154,7 +154,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
             /* fatal error */
             elseif ($state == 0) {
                 echo '<div class="login_form">'.
-                    '<h1 class="title">'.$this->html_safe($input['router_app_name']).'</h1>'.
+                    '<h1 class="title">'.$this->html_safe($this->get('router_app_name')).'</h1>'.
                     '<div class="swipe_error">A fatal error occurred with the swipeidentity 2fa system</div>'.
                     '</div>';
 

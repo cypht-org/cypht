@@ -195,19 +195,14 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '<input required name="compose_to" class="compose_to" type="text" placeholder="To" />'.
             '<input required name="compose_subject" class="compose_subject" type="text" placeholder="Subject" />'.
             '<textarea required name="compose_body" class="compose_body"></textarea>'.
-            smtp_server_dropdown($input, $this).
+            smtp_server_dropdown($this->module_output(), $this).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" /></form></div>';
     }
 }
 
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (array_key_exists('smtp_servers', $input)) {
-            $count = count($input['smtp_servers']);
-        }
-        else {
-            $count = 0;
-        }
+        $count = $this->get('smtp_servers', array());
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="smtp_server_setup"><div data-target=".smtp_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" />'.
@@ -226,50 +221,48 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
 class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['smtp_servers'])) {
-            foreach ($input['smtp_servers'] as $index => $vals) {
+        foreach ($this->get('smtp_servers', array()) as $index => $vals) {
 
-                $no_edit = false;
+            $no_edit = false;
 
-                if (isset($vals['user'])) {
-                    $disabled = 'disabled="disabled"';
-                    $user_pc = $vals['user'];
-                    $pass_pc = '[saved]';
+            if (isset($vals['user'])) {
+                $disabled = 'disabled="disabled"';
+                $user_pc = $vals['user'];
+                $pass_pc = '[saved]';
+            }
+            else {
+                $user_pc = '';
+                $pass_pc = 'Password';
+                $disabled = '';
+            }
+            if ($vals['name'] == 'Default-Auth-Server') {
+                $vals['name'] = 'Default';
+                $no_edit = true;
+            }
+            $res .= '<div class="configured_server">';
+            $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
+            $res .= 
+                '<form class="smtp_connect" method="POST">'.
+                '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+                '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
+                '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="smtp_user" value="'.$user_pc.'"></span>'.
+                '<span> <input '.$disabled.' class="credentials smtp_password" placeholder="'.$pass_pc.'" type="password" name="smtp_pass"></span>';
+            if (!$no_edit) {
+                $res .= '<input type="submit" value="Test" class="test_smtp_connect" />';
+                if (!isset($vals['user']) || !$vals['user']) {
+                    $res .= '<input type="submit" value="Delete" class="smtp_delete" />';
+                    $res .= '<input type="submit" value="Save" class="save_smtp_connection" />';
                 }
                 else {
-                    $user_pc = '';
-                    $pass_pc = 'Password';
-                    $disabled = '';
+                    $res .= '<input type="submit" value="Delete" class="delete_smtp_connection" />';
+                    $res .= '<input type="submit" value="Forget" class="forget_smtp_connection" />';
                 }
-                if ($vals['name'] == 'Default-Auth-Server') {
-                    $vals['name'] = 'Default';
-                    $no_edit = true;
-                }
-                $res .= '<div class="configured_server">';
-                $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
-                    $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
-                $res .= 
-                    '<form class="smtp_connect" method="POST">'.
-                    '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-                    '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                    '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="smtp_user" value="'.$user_pc.'"></span>'.
-                    '<span> <input '.$disabled.' class="credentials smtp_password" placeholder="'.$pass_pc.'" type="password" name="smtp_pass"></span>';
-                if (!$no_edit) {
-                    $res .= '<input type="submit" value="Test" class="test_smtp_connect" />';
-                    if (!isset($vals['user']) || !$vals['user']) {
-                        $res .= '<input type="submit" value="Delete" class="smtp_delete" />';
-                        $res .= '<input type="submit" value="Save" class="save_smtp_connection" />';
-                    }
-                    else {
-                        $res .= '<input type="submit" value="Delete" class="delete_smtp_connection" />';
-                        $res .= '<input type="submit" value="Forget" class="forget_smtp_connection" />';
-                    }
-                    $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
-                }
-                $res .= '</form></div>';
+                $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }
-            $res .= '<br class="clear_float" /></div></div>';
+            $res .= '</form></div>';
         }
+        $res .= '<br class="clear_float" /></div></div>';
         return $res;
     }
 }
@@ -282,8 +275,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return $res;
         }
-        $input['formatted_folder_list'] .= $res;
-        return $input;
+        $this->concat('formatted_folder_list', $res);
     }
 }
 

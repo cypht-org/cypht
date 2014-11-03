@@ -47,7 +47,7 @@ class Hm_Handler_check_internal_users extends Hm_Handler_Module {
 
 class Hm_Output_create_account_link extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (!$input['router_login_state'] && array_key_exists('internal_users', $input) && $input['internal_users']) {
+        if (!$this->get('router_login_state') && $this->get('internal_users')) {
             return '<a class="create_account_link" href="?page=create_account">Create</a>';
         }
     }
@@ -61,11 +61,10 @@ class Hm_Output_no_login extends Hm_Output_Module {
 
 class Hm_Output_create_form extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($input['router_login_state']) {
+        if ($this->get('router_login_state')) {
             page_redirect('?page=home');
         }
-
-        if (array_key_exists('internal_users', $input) && $input['internal_users']) {
+        if ($this->get('internal_users')) {
             return '<div class="create_user">'.
                 '<h1 class="title">Create Account</h1>'.
                 '<form method="POST" autocomplete="off" >'.
@@ -86,7 +85,7 @@ class Hm_Output_create_form extends Hm_Output_Module {
 class Hm_Output_change_password extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (array_key_exists('internal_users', $input) && $input['internal_users']) {
+        if ($this->get('internal_users')) {
             $res .= '<tr class="general_setting"><td>Change password</td><td><input type="password" name="new_pass1" placeholder="New password" />'.
                 ' <input type="password" name="new_pass2" placeholder="New password again" /></td></tr>';
         }

@@ -9,8 +9,7 @@ class Hm_Output_contacts_page_link extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return $res;
         }
-        $input['formatted_folder_list'] .= $res;
-        return $input;
+        $this->concat('formatted_folder_list', $res);
     }
 }
 

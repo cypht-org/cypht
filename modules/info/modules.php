@@ -30,8 +30,7 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return $res;
         }
-        $input['formatted_folder_list'] .= $res;
-        return $input;
+        $this->concat('formatted_folder_list', $res);
     }
 }
 
@@ -42,8 +41,7 @@ class Hm_Output_bug_report_link extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return $res;
         }
-        $input['formatted_folder_list'] .= $res;
-        return $input;
+        $this->concat('formatted_folder_list', $res);
     }
 }
 
@@ -54,8 +52,7 @@ class Hm_Output_help_page_link extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return $res;
         }
-        $input['formatted_folder_list'] .= $res;
-        return $input;
+        $this->concat('formatted_folder_list', $res);
     }
 }
 

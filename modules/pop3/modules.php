@@ -419,12 +419,7 @@ class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
 
 class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (array_key_exists('pop3_servers', $input)) {
-            $count = count($input['pop3_servers']);
-        }
-        else {
-            $count = 0;
-        }
+        $count = count($this->get('pop3_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="pop3_server_setup"><div data-target=".pop3_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
@@ -443,50 +438,48 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
 class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['pop3_servers'])) {
-            foreach ($input['pop3_servers'] as $index => $vals) {
+        foreach ($this->get('pop3_servers', array()) as $index => $vals) {
 
-                $no_edit = false;
+            $no_edit = false;
 
-                if (isset($vals['user'])) {
-                    $disabled = 'disabled="disabled"';
-                    $user_pc = $vals['user'];
-                    $pass_pc = '[saved]';
+            if (isset($vals['user'])) {
+                $disabled = 'disabled="disabled"';
+                $user_pc = $vals['user'];
+                $pass_pc = '[saved]';
+            }
+            else {
+                $user_pc = '';
+                $pass_pc = 'Password';
+                $disabled = '';
+            }
+            if ($vals['name'] == 'Default-Auth-Server') {
+                $vals['name'] = 'Default';
+                $no_edit = true;
+            }
+            $res .= '<div class="configured_server">';
+            $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
+            $res .= 
+                '<form class="pop3_connect" method="POST">'.
+                '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+                '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
+                '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
+                '<span> <input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
+            if (!$no_edit) {
+                $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
+                if (!isset($vals['user']) || !$vals['user']) {
+                    $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
+                    $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
                 }
                 else {
-                    $user_pc = '';
-                    $pass_pc = 'Password';
-                    $disabled = '';
+                    $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
+                    $res .= '<input type="submit" value="Forget" class="forget_pop3_connection" />';
                 }
-                if ($vals['name'] == 'Default-Auth-Server') {
-                    $vals['name'] = 'Default';
-                    $no_edit = true;
-                }
-                $res .= '<div class="configured_server">';
-                $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
-                    $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
-                $res .= 
-                    '<form class="pop3_connect" method="POST">'.
-                    '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-                    '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                    '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
-                    '<span> <input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
-                if (!$no_edit) {
-                    $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
-                    if (!isset($vals['user']) || !$vals['user']) {
-                        $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
-                        $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
-                    }
-                    else {
-                        $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
-                        $res .= '<input type="submit" value="Forget" class="forget_pop3_connection" />';
-                    }
-                    $res .= '<input type="hidden" value="ajax_pop3_debug" name="hm_ajax_hook" />';
-                }
-                $res .= '</form></div>';
+                $res .= '<input type="hidden" value="ajax_pop3_debug" name="hm_ajax_hook" />';
             }
-            $res .= '<br class="clear_float" /></div></div>';
+            $res .= '</form></div>';
         }
+        $res .= '<br class="clear_float" /></div></div>';
         return $res;
     }
 }
@@ -494,13 +487,11 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
 class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['pop3_folders'])) {
-            foreach ($input['pop3_folders'] as $id => $folder) {
-                $res .= '<li class="pop3_'.$this->html_safe($id).'">'.
-                    '<a href="?page=message_list&list_path=pop3_'.$this->html_safe($id).'">'.
-                    '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
-                    $this->html_safe($folder).'</a></li>';
-            }
+        foreach ($this->get('pop3_folders', array()) as $id => $folder) {
+            $res .= '<li class="pop3_'.$this->html_safe($id).'">'.
+                '<a href="?page=message_list&list_path=pop3_'.$this->html_safe($id).'">'.
+                '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
+                $this->html_safe($folder).'</a></li>';
         }
         Hm_Page_Cache::concat('email_folders', $res);
         return '';
@@ -509,11 +500,11 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
 
 class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['pop3_message_headers'])) {
+        if ($this->get('pop3_message_headers')) {
             $txt = '';
             $from = '';
             $small_headers = array('subject', 'date', 'from');
-            $headers = $input['pop3_message_headers'];
+            $headers = $this->get('pop3_message_headers');
             $txt .= '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
@@ -551,58 +542,52 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                 ' | <a href="#">flag</a>'.
                 '</th></tr></table>';
 
-            $input['msg_headers'] = $txt;
+            $this->out('msg_headers', $txt);
         }
         $txt = '<div class="msg_text_inner">';
-        if (isset($input['pop3_message_body'])) {
-            $txt .= format_msg_text(implode('', $input['pop3_message_body']), $this);
+        if ($this->get('pop3_message_body')) {
+            $txt .= format_msg_text(implode('', $this->get('pop3_message_body')), $this);
         }
         $txt .= '</div>';
-        $input['msg_text'] = $txt;
-        return $input;
+        $this->out('msg_text', $txt);
     }
 }
 
 class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
     protected function output($input, $format) {
-        $input['formatted_message_list'] = array();
-        if (isset($input['pop3_mailbox_page'])) {
-            $style = isset($input['news_list_style']) ? 'news' : 'email';
-            if ($input['is_mobile']) {
+        $formatted_message_list = array();
+        if ($this->get('pop3_mailbox_page')) {
+            $style = $this->get('news_list_style') ? 'news' : 'email';
+            if ($this->get('is_mobile')) {
                 $style = 'news';
             }
-            if (isset($input['login_time'])) {
-                $login_time = $input['login_time'];
+            if ($this->get('login_time')) {
+                $login_time = $this->get('login_time');
             }
             else {
                 $login_time = false;
             }
-            $res = format_pop3_message_list($input['pop3_mailbox_page'], $this, $style, $login_time, $input['list_path']);
-            $input['formatted_message_list'] = $res;
+            $res = format_pop3_message_list($this->get('pop3_mailbox_page'), $this, $style, $login_time, $this->get('list_path'));
+            $this->out('formatted_message_list', $res);
         }
-        return $input;
     }
 }
 
 class Hm_Output_pop3_server_ids extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['pop3_servers'])) {
-            return '<input type="hidden" class="pop3_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['pop3_servers']))).'" />';
-        }
+        return '<input type="hidden" class="pop3_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('pop3_servers', array())))).'" />';
     }
 }
 
 class Hm_Output_display_pop3_status extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['pop3_servers']) && !empty($input['pop3_servers'])) {
-            foreach ($input['pop3_servers'] as $index => $vals) {
-                if ($vals['name'] == 'Default-Auth-Server') {
-                    $vals['name'] = 'Default';
-                }
-                $res .= '<tr><td>POP3</td><td>'.$vals['name'].'</td><td class="pop3_status_'.$index.'"></td>'.
-                    '<td class="pop3_detail_'.$index.'"></td></tr>';
+        foreach ($this->get('pop3_servers', array()) as $index => $vals) {
+            if ($vals['name'] == 'Default-Auth-Server') {
+                $vals['name'] = 'Default';
             }
+            $res .= '<tr><td>POP3</td><td>'.$vals['name'].'</td><td class="pop3_status_'.$index.'"></td>'.
+                '<td class="pop3_detail_'.$index.'"></td></tr>';
         }
         return $res;
     }
@@ -617,8 +602,9 @@ class Hm_Output_start_pop3_settings extends Hm_Output_Module {
 class Hm_Output_pop3_since_setting extends Hm_Output_Module {
     protected function output($input, $format) {
         $since = false;
-        if (array_key_exists('user_settings', $input) && array_key_exists('pop3_since', $input['user_settings'])) {
-            $since = $input['user_settings']['pop3_since'];
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('pop3_since', $settings)) {
+            $since = $settings['pop3_since'];
         }
         return '<tr class="pop3_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'pop3_since', $this).'</td></tr>';
     }
@@ -627,8 +613,9 @@ class Hm_Output_pop3_since_setting extends Hm_Output_Module {
 class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
     protected function output($input, $format) {
         $limit = DEFAULT_PER_SOURCE;
-        if (array_key_exists('user_settings', $input) && array_key_exists('pop3_limit', $input['user_settings'])) {
-            $limit = $input['user_settings']['pop3_limit'];
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('pop3_limit', $settings)) {
+            $limit = $settings['pop3_limit'];
         }
         return '<tr class="pop3_setting"><td>Max messages to display</td><td><input type="text" name="pop3_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
@@ -636,16 +623,13 @@ class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
 
 class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['pop3_connect_status']) && $input['pop3_connect_status'] == 'Authenticated') {
-            $input['pop3_status_display'] = '<span class="online">'.
-                $this->html_safe(ucwords($input['pop3_connect_status'])).'</span> in '.round($input['pop3_connect_time'],3);
-            $input['pop3_detail_display'] = '';
+        if ($this->get('pop3_connect_status') == 'Authenticated') {
+            $this->out('pop3_status_display', '<span class="online">'.
+                $this->html_safe(ucwords($this->get('pop3_connect_status'))).'</span> in '.round($this->get('pop3_connect_time'), 3));
         }
         else {
-            $input['pop3_status_display'] = '<span class="down">Down</span>';
-            $input['pop3_detail_display'] = '';
+            $this->out('pop3_status_display', '<span class="down">Down</span>');
         }
-        return $input;
     }
 }
 

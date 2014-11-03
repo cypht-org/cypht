@@ -169,7 +169,7 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             $date = process_since_argument($since);
             $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
             $this->out('imap_search_results', $msg_list);
-            $this->out(['imap_server_ids'], $form['imap_server_ids']);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
         }
     }
 }
@@ -487,48 +487,43 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
 class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output($input, $format) {
         $txt = '<div class="msg_text_inner">';
-        if (isset($input['msg_text'])) {
-            if (isset($input['msg_struct_current']) && isset($input['msg_struct_current']['subtype']) && $input['msg_struct_current']['subtype'] == 'html') {
-                $txt .= format_msg_html($input['msg_text']);
+        if ($this->get('msg_text')) {
+            $struct = $this->get('msg_struct_current', array());
+            if (isset($struct['subtype']) && $struct['subtype'] == 'html') {
+                $txt .= format_msg_html($this->get('msg_text'));
             }
-            elseif (isset($input['msg_struct_current']['type']) && $input['msg_struct_current']['type'] == 'image') {
-                $txt .= format_msg_image($input['msg_text'], $input['msg_struct_current']['subtype']);
+            elseif (isset($struct['type']) && $struct['type'] == 'image') {
+                $txt .= format_msg_image($this->get('msg_text'), $struct['subtype']);
             }
             else {
-                $txt .= format_msg_text($input['msg_text'], $this);
+                $txt .= format_msg_text($this->get('msg_text'), $this);
             }
             $txt .= '</div>';
-            $input['msg_text'] = $txt;
+            $this->out('msg_text', $txt);
         }
-        return $input;
     }
 }
 
 class Hm_Output_filter_message_struct extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['msg_struct'])) {
+        if ($this->get('msg_struct')) {
             $res = '<table class="msg_parts">';
-            $part = 1;
-            if (isset($input['imap_msg_part'])) {
-                $part = $input['imap_msg_part'];
-            }
-            $res .=  format_msg_part_section($input['msg_struct'], $this, $part);
+            $part = $this->get('imap_msg_part', 1);
+            $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part);
             $res .= '</table>';
-            $input['msg_parts'] = $res;
+            $this->out('msg_parts', $res);
         }
-        return $input;
     }
 }
 
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['msg_headers'])) {
+        if ($this->get('msg_headers')) {
             $txt = '';
             $from = '';
             $small_headers = array('subject', 'date', 'from');
-            $headers = $input['msg_headers'];
-            $txt .= '<table class="msg_headers">'.
-                '<col class="header_name_col"><col class="header_val_col"></colgroup>';
+            $headers = $this->get('msg_headers', array());
+            $txt .= '<table class="msg_headers"><col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
                     if ($fld == strtolower($name)) {
@@ -557,24 +552,23 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="header_toggle">all</a>'.
                 '<a class="header_toggle" style="display: none;" href="#">small</a>'.
-                ' | <a href="?page=compose&amp;reply_uid='.$this->html_safe($input['msg_text_uid']).
-                '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $input['msg_server_id'], $input['msg_folder'])).'">reply</a>'.
+                ' | <a href="?page=compose&amp;reply_uid='.$this->html_safe($this->get('msg_text_uid', 0)).
+                '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $this->get('msg_server_id'), $this->get('msg_folder'))).'">reply</a>'.
                 ' | <a href="?page=compose">forward</a>'.
                 ' | <a href="?page=compose">attach</a>'.
                 ' | <a class="msg_part_link" data-message-part="0" href="#">raw</a>'.
                 ' | <a href="#">flag</a>'.
                 '</th></tr></table>';
 
-            $input['msg_headers'] = $txt;
+            $this->out('msg_headers', $txt);
         }
-        return $input;
     }
 }
 
 class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        foreach ($input['imap_servers'] as $index => $vals) {
+        foreach ($this->get('imap_servers', array()) as $index => $vals) {
 
             $no_edit = false;
 
@@ -623,12 +617,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (array_key_exists('imap_servers', $input)) {
-            $count = count($input['imap_servers']);
-        }
-        else {
-            $count = 0;
-        }
+        $count = count($this->get('imap_servers', array()));
         $count = $this->trans(sprintf('%d configured', $count));
         return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
@@ -647,14 +636,12 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
 class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['imap_servers']) && !empty($input['imap_servers'])) {
-            foreach ($input['imap_servers'] as $index => $vals) {
-                if ($vals['name'] == 'Default-Auth-Server') {
-                    $vals['name'] = 'Default';
-                }
-                $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
-                    '<td class="imap_detail_'.$index.'"></td></tr>';
+        foreach ($this->get('imap_servers', array()) as $index => $vals) {
+            if ($vals['name'] == 'Default-Auth-Server') {
+                $vals['name'] = 'Default';
             }
+            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
+                '<td class="imap_detail_'.$index.'"></td></tr>';
         }
         return $res;
     }
@@ -663,11 +650,11 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
 class Hm_Output_imap_reply_details extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['imap_reply_source'])) {
-            $res .= '<input type="hidden" class="imap_reply_source" value="'.$this->html_safe($input['imap_reply_source']).'" />';
+        if ($this->get('imap_reply_source')) {
+            $res .= '<input type="hidden" class="imap_reply_source" value="'.$this->html_safe($this->get('imap_reply_source')).'" />';
         }
-        if (isset($input['imap_reply_uid'])) {
-            $res .= '<input type="hidden" class="imap_reply_uid" value="'.$this->html_safe($input['imap_reply_uid']).'" />';
+        if ($this->get('imap_reply_uid')) {
+            $res .= '<input type="hidden" class="imap_reply_uid" value="'.$this->html_safe($this->get('imap_reply_uid')).'" />';
         }
         return $res;
     }
@@ -675,46 +662,42 @@ class Hm_Output_imap_reply_details extends Hm_Output_Module {
 
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['imap_servers'])) {
-            return '<input type="hidden" class="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($input['imap_servers']))).'" />';
-        }
+        return '<input type="hidden" class="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('imap_servers', array ())))).'" />';
     }
 }
 
 class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['imap_expanded_folder_data']) && !empty($input['imap_expanded_folder_data'])) {
-            ksort($input['imap_expanded_folder_data']);
-            $res .= format_imap_folder_section($input['imap_expanded_folder_data'], $input['imap_expanded_folder_id'], $this);
-            $input['imap_expanded_folder_formatted'] = $res;
-            unset($input['imap_expanded_folder_data']);
-            Hm_Page_Cache::add('imap_folders_'.$input['imap_expanded_folder_path'], $res);
+        $folder_data = $this->get('imap_expanded_folder_data', array());
+        if (!empty($folder_data)) {
+            ksort($folder_data);
+            $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this);
+            $this->out('imap_expanded_folder_formatted', $res);
+            Hm_Page_Cache::add('imap_folders_'.$this->get('imap_expanded_folder_path'), $res);
         }
-        return $input;
     }
 }
 
 class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['imap_connect_status']) && $input['imap_connect_status'] != 'disconnected') {
-            $input['imap_status_display'] = '<span class="online">'.
-                $this->html_safe(ucwords($input['imap_connect_status'])).'</span> in '.round($input['imap_connect_time'],3);
-            $input['imap_detail_display'] = '';
+        $res = '';
+        if ($this->get('imap_connect_status') != 'disconnected') {
+            $res .= '<span class="online">'.$this->html_safe(ucwords($this->get('imap_connect_status'))).
+                '</span> in '.round($this->get('imap_connect_time', 0), 3);
         }
         else {
-            $input['imap_status_display'] = '<span class="down">Down</span>';
-            $input['imap_detail_display'] = '';
+            $res .= '<span class="down">Down</span>';
         }
-        return $input;
+        $this->out('imap_status_display', $res);
     }
 }
 
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
-        if (isset($input['imap_folders'])) {
-            foreach ($input['imap_folders'] as $id => $folder) {
+        if ($this->get('imap_folders')) {
+            foreach ($this->get('imap_folders', array()) as $id => $folder) {
                 $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_"><img alt="" class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
@@ -726,88 +709,58 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
 
 class Hm_Output_filter_imap_search extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['imap_search_results'])) {
-            $style = isset($input['news_list_style']) ? 'news' : 'email';
-            if ($input['is_mobile']) {
-                $style = 'news';
-            }
-            $res = format_imap_message_list($input['imap_search_results'], $this, 'search', $style);
-            $input['formatted_message_list'] = $res;
+        if ($this->get('imap_search_results')) {
+            prepare_imap_message_list($this->get('imap_search_results'), $this, 'search');
         }
-        elseif (!isset($input['formatted_message_list'])) {
-            $input['formatted_message_list'] = array();
+        elseif (!$this->get('formatted_message_list')) {
+            $this->out('formatted_message_list', array());
         }
-        return $input;
     }
 }
 
 class Hm_Output_filter_flagged_data extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['imap_flagged_data'])) {
-            $style = isset($input['news_list_style']) ? 'news' : 'email';
-            if ($input['is_mobile']) {
-                $style = 'news';
-            }
-            $res = format_imap_message_list($input['imap_flagged_data'], $this, 'flagged', $style);
-            $input['formatted_message_list'] = $res;
+        if ($this->get('imap_flagged_data')) {
+            prepare_imap_message_list($this->get('imap_flagged_data'), $this, 'flagged');
         }
-        elseif (!isset($input['formatted_message_list'])) {
-            $input['formatted_message_list'] = array();
+        elseif (!$this->get('formatted_message_list')) {
+            $this->out('formatted_message_list', array());
         }
-        return $input;
     }
 }
 
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['imap_unread_data'])) {
-            $style = isset($input['news_list_style']) ? 'news' : 'email';
-            if ($input['is_mobile']) {
-                $style = 'news';
-            }
-            $res = format_imap_message_list($input['imap_unread_data'], $this, 'unread', $style);
-            $input['formatted_message_list'] = $res;
+        if ($this->get('imap_unread_data')) {
+            prepare_imap_message_list($this->get('imap_unread_data'), $this, 'unread');
         }
-        elseif (!isset($input['formatted_message_list'])) {
-            $input['formatted_message_list'] = array();
+        elseif (!$this->get('formatted_message_list')) {
+            $this->out('formatted_message_list', array());
         }
-        return $input;
     }
 }
 
 class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     protected function output($input, $format) {
-        if (isset($input['imap_combined_inbox_data']) && !empty($input['imap_combined_inbox_data'])) {
-            $style = isset($input['news_list_style']) ? 'news' : 'email';
-            if ($input['is_mobile']) {
-                $style = 'news';
-            }
-            $res = format_imap_message_list($input['imap_combined_inbox_data'], $this, 'combined_inbox', $style);
-            $input['formatted_message_list'] = $res;
+        if ($this->get('imap_combined_inbox_data')) {
+            prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox');
         }
         else {
-            $input['formatted_message_list'] = array();
+            $this->out('formatted_message_list', array());
         }
-        return $input;
     }
 }
 
 class Hm_Output_filter_folder_page extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = array();
-        if (isset($input['imap_mailbox_page']) && !empty($input['imap_mailbox_page'])) {
-            $style = isset($input['news_list_style']) ? 'news' : 'email';
-            if ($input['is_mobile']) {
-                $style = 'news';
-            }
-            $res = format_imap_message_list($input['imap_mailbox_page'], $this, false, $style);
-            $input['formatted_message_list'] = $res;
-            $input['page_links'] = build_page_links($input['imap_folder_detail'], $input['imap_mailbox_page_path']);
+        if ($this->get('imap_mailbox_page')) {
+            prepare_imap_message_list($this->get('imap_mailbox_page'), $this, false);
+            $this->out('page_links', build_page_links($this->get('imap_folder_detail'), $this->get('imap_mailbox_page_path')));
         }
-        elseif (!isset($input['formatted_message_list'])) {
-            $input['formatted_message_list'] = array();
+        elseif (!$this->get('formatted_message_list')) {
+            $this->out('formatted_message_list', array());
         }
-        return $input;
     }
 }
 
@@ -817,9 +770,9 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
         $reply_to = '';
         $reply_body = '';
         $lead_in = '';
-        if (array_key_exists('reply_format', $input) && $input['reply_format']) {
-            if (array_key_exists('msg_headers', $input) && is_array($input['msg_headers'])) {
-                $hdrs = $input['msg_headers'];
+        if ($this->get('reply_format')) {
+            if (is_array($this->get('msg_headers'))) {
+                $hdrs = $this->get('msg_headers');
                 if (array_key_exists('Subject', $hdrs)) {
                     $reply_subject = sprintf("Re: %s", $hdrs['Subject']);
                 }
@@ -841,26 +794,24 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
                     }
                 }
             }
-            if (array_key_exists('msg_text', $input)) {
-                $reply_body = $lead_in.format_reply_text($input['msg_text']);
+            if ($this->get('msg_text')) {
+                $reply_body = $lead_in.format_reply_text($this->get('msg_text'));
             }
-            $input['reply_to'] = $reply_to;
-            $input['reply_body'] = $reply_body;
-            $input['reply_subject'] = $reply_subject;
-            if (array_key_exists('msg_text', $input)) {
-                unset($input['msg_text']);
-            }
-            if (array_key_exists('msg_struct', $input)) {
-                unset($input['msg_struct']);
-            }
-            if (array_key_exists('msg_headers', $input)) {
-                unset($input['msg_headers']);
-            }
+            $this->out('reply_to', $reply_to);
+            $this->out('reply_body', $reply_body);
+            $this->out('reply_subject', $reply_subject);
         }
-        return $input;
     }
 }
 
+function prepare_imap_message_list($msgs, $mod, $type) {
+    $style = $mod->get('news_list_style') ? 'news' : 'email';
+    if ($mod->get('is_mobile')) {
+        $style = 'news';
+    }
+    $res = format_imap_message_list($msgs, $mod, $type, $style);
+    $mod->out('formatted_message_list', $res);
+}
 
 function format_imap_folder_section($folders, $id, $output_mod) {
     $results = '<ul class="inner_list">';

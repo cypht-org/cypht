@@ -2,6 +2,12 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * Module data management. These functions provide an interface for modules (both handler and output)
+ * to fetch data set by other modules and to return their own output. Handler modules must use these
+ * methods to set a response, output modules must if the format is AJAX, otherwise they should return
+ * an HTML5 string
+ */ 
 trait Hm_Module_Output {
 
     /* module output */
@@ -22,13 +28,13 @@ trait Hm_Module_Output {
      *
      * @return bool true on success
      */
-    protected function out($name, $value, $protected=true) {
-        if (in_array($name, $this->protected)) {
-            Hm_Debug::add(sprintf('HANDLERS: Cannot overwrite protected %s with %s', $name, print_r($value,true)));
+    public function out($name, $value, $protected=true) {
+        if (in_array($name, $this->protected, true)) {
+            Hm_Debug::add(sprintf('MODULES: Cannot overwrite protected %s with %s', $name, print_r($value,true)));
             return false;
         }
-        if (in_array($name, $this->appendable)) {
-            Hm_Debug::add(sprintf('HANDLERS: Cannot overwrite appendable %s with %s', $name, print_r($value,true)));
+        if (in_array($name, $this->appendable, true)) {
+            Hm_Debug::add(sprintf('MODULES: Cannot overwrite appendable %s with %s', $name, print_r($value,true)));
             return false;
         }
         if ($protected) {
@@ -36,19 +42,6 @@ trait Hm_Module_Output {
         }
         $this->output[$name] = $value;
         return true;
-    }
-
-    /**
-     * method for adding ajax output that uses the handler logic
-     *
-     * @param $name string name of value to store
-     * @param $value mixed value
-     * @param $protected bool true disallows overwriting
-     *
-     * @return bool true on success
-     */
-    protected function ajax_out($name, $value, $protected=true) {
-        return $this->out($name, $value, $protected);
     }
 
     /**
@@ -60,8 +53,8 @@ trait Hm_Module_Output {
      * @return bool true on success
      */
     protected function append($name, $value) {
-        if (in_array($name, $this->protected)) {
-            Hm_Debug::add(sprintf('Cannot overwrite %s in handler module', $name));
+        if (in_array($name, $this->protected, true)) {
+            Hm_Debug::add(sprintf('MODULES: Cannot overwrite %s with %s', $name, print_r($value,true)));
             return false;
         }
         if (array_key_exists($name, $this->output)) {
@@ -82,11 +75,36 @@ trait Hm_Module_Output {
     }
 
     /**
+     * Concatenate a value
+     *
+     * @param $name string name to add to
+     * @param $value string value to add
+     *
+     * @return bool true on success
+     */
+    protected function concat($name, $value) {
+        if (array_key_exists($name, $this->output)) {
+            if (is_string($this->output[$name])) {
+                $this->output[$name] .= $value;
+                return true;
+            }
+            else {
+                Hm_Debug::add('Count not append %s to %s', print_r($value,true), $name);
+                return false;
+            }
+        }
+        else {
+            $this->output[$name] = $value;
+            return true;
+        }
+    }
+
+    /**
      * Return module output from process()
      *
      * @return array
      */
-    public function output() {
+    public function module_output() {
         return $this->output;
     }
 
@@ -114,8 +132,34 @@ trait Hm_Module_Output {
         return $default;
     }
 
+    /**
+     * Check for a key
+     *
+     * @param $name string key name
+     *
+     * @return bool true if found
+     */
+    public function exists($name) {
+        return array_key_exists($name, $this->output);
+    }
+
+    /**
+     * Check to see if a value matches a list
+     *
+     * @param $name string name to check
+     * @param $values array list to check against
+     *
+     * @return bool true if found
+     */
+    public function in($name, $values) {
+        if (array_key_exists($name, $this->output) && in_array($this->output[$name], $values, true)) {
+            return true;
+        }
+        return false;
+    }
 
 }
+
 /**
  * Base class for data input processing modules, called "handler modules"
  *
@@ -251,11 +295,16 @@ abstract class Hm_Output_Module {
     protected $lang = false;
 
     /**
-     * Constructor. Might want to do something with $input eventually
+     * Constructor
+     *
+     * @param $input data from handler modules
+     * @param $protected array list of protected keys
      *
      * @return void
      */
-    function __construct($input) {
+    function __construct($input, $protected) {
+        $this->output = $input;
+        $this->protected = $protected;
     }
 
     /**
@@ -290,7 +339,7 @@ abstract class Hm_Output_Module {
      * @return mixed module output, a string for HTML5 format,
      * and an array for AJAX
      */
-    public function output_content($input, $format, $lang_str) {
+    public function output_content($input, $format, $lang_str, $protected) {
         $this->lstr = $lang_str;
         if (array_key_exists('interface_lang', $lang_str)) {
             $this->lang = $lang_str['interface_lang'];
@@ -417,7 +466,7 @@ class Hm_Request_Handler {
                 if (!$args[1] || ($args[1] && $this->session->is_active())) {
                     $mod = new $name( $this, $args[1], $input, $protected);
                     $mod->process($input);
-                    $input = $mod->output();
+                    $input = $mod->module_output();
                     $protected = $mod->output_protected();
                 }
             }
@@ -679,36 +728,6 @@ class Hm_Handler_Modules { use Hm_Modules; }
  * Class to manage all the output modules
  */
 class Hm_Output_Modules { use Hm_Modules; }
-
-/**
- * Input data for output modules (the output of handler modules)
- */
-class Hm_Handler_Output_Data {
-
-    private $data;
-
-    public function __construct($input) {
-        $this->data = $input;
-    }
-
-    public function exists($name) {
-        return array_key_exists($name, $this->data);
-    }
-
-    public function get($name, $default=false) {
-        if (array_key_exists($name, $this->data)) {
-            return $this->data[$name];
-        }
-        return $default;
-    }
-
-    public function in($name, $values) {
-        if (array_key_exists($name, $this->data) && in_array($name, $values)) {
-            return true;
-        }
-        return false;
-    }
-}
 
 /**
  * MODULE SET FUNCTIONS

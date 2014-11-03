@@ -27,8 +27,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
         if ($format == 'HTML5') {
             return $res;
         }
-        $input['formatted_folder_list'] .= $res;
-        return $input;
+        $this->concat('formatted_folder_list', $res);
 
     }
 }
@@ -36,9 +35,9 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
 class Hm_Output_search_content extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<div class="search_content"><div class="content_title">Search'.
-            search_form($input, $this).'</div>';
+            search_form($this->module_output(), $this).'</div>';
         $res .= '<table class="message_table">';
-        if (!array_key_exists('no_message_list_headers', $input) || !$input['no_message_list_headers']) {
+        if (!$this->get('no_message_list_headers')) {
             $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
             '<col class="from_col"><col class="subject_col"><col class="date_col">'.
             '<col class="icon_col"></colgroup><!--<thead><tr><th colspan="2" class="source">'.
@@ -53,9 +52,9 @@ class Hm_Output_search_content extends Hm_Output_Module {
 class Hm_Output_js_search_data extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<script type="text/javascript">'.
-            'var hm_search_terms = "'.(array_key_exists('search_terms', $input) ? $this->html_safe($input['search_terms']) : '').'";'.
-            'var hm_search_fld = "'.(array_key_exists('search_fld', $input) ? $this->html_safe($input['search_fld']) : '').'";'.
-            'var hm_search_since = "'.(array_key_exists('search_since', $input) ? $this->html_safe($input['search_since']) : '').'";'.
+            'var hm_search_terms = "'.$this->get('search_terms', '').'";'.
+            'var hm_search_fld = "'.$this->get('search_fld', '').'";'.
+            'var hm_search_since = "'.$this->get('search_since', '').'";'.
             '</script>';
     }
 }
