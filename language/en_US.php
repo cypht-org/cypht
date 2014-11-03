@@ -15,6 +15,8 @@ return array(
     'Servers' => false,
     'Settings' => false,
     'Logout' => false,
+    '%d configured' => false,
+    'Today' => false,
 ); 
 
 ?>
