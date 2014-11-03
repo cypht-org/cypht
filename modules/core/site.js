@@ -859,7 +859,7 @@ $(function() {
         }
         $('.msg_controls > a').click(function() { return message_action($(this).data('action')); });
         $('.toggle_link').click(function() { return toggle_rows(); });
-        $('.refresh_list').click(function() { return Hm_Message_List.load_sources(); });
+        $('.refresh_link').click(function() { return Hm_Message_List.load_sources(); });
     }
     else {
         Hm_Timer.add_job(hm_no_op, 300, true);
