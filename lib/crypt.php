@@ -88,7 +88,6 @@ class Hm_Crypt {
 /**
  * Manage nonces easily for modules
  */
-
 class Hm_Nonce {
 
     /* valid nonce list */
