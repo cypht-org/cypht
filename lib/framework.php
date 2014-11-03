@@ -14,6 +14,5 @@ require APP_PATH.'lib/output.php';
 require APP_PATH.'lib/crypt.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
-require APP_PATH.'lib/nonce.php';
 
 ?>
