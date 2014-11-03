@@ -51,8 +51,8 @@ abstract class HM_Format {
      */
     private function get_language($lang) {
         $strings = array();
-        if (file_exists('language/'.$lang.'.php')) {
-            $strings = require 'language/'.$lang.'.php';
+        if (file_exists(APP_PATH.'language/'.$lang.'.php')) {
+            $strings = require APP_PATH.'language/'.$lang.'.php';
         }
         return $strings;
     }
