@@ -379,11 +379,15 @@ class Hm_Router {
  *
  * @return void
  */
-function page_redirect($url) {
+function page_redirect($url, $status=false) {
     if (DEBUG_MODE) {
         Hm_Debug::add(sprintf('Redirecting to %s', $url));
         Hm_Debug::load_page_stats();
         Hm_Debug::show('log');
+    }
+    if ($status == 303) {
+        Hm_Debug::add('Redirect loop found');
+        die('Redirect loop discovered');
     }
     header('HTTP/1.1 303 Found');
     header('Location: '.$url);

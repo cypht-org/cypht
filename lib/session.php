@@ -331,7 +331,7 @@ class Hm_PHP_Session extends Hm_Session {
         session_set_cookie_params(0, $path, $domain, $secure);
         session_start();
 
-        if ($request->type == 'HTTP') {
+        if ($request->type == 'HTTP' && ! array_key_exists( 'logout', $request->post)) {
             session_regenerate_id(true);
             $this->cname = session_id();
         }
