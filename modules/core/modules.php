@@ -533,13 +533,12 @@ class Hm_Output_header_end extends Hm_Output_Module {
 
 class Hm_Output_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<body';
+        $res = '<body><noscript class="noscript">You Need to have Javascript enabled to use '.$this->html_safe($this->get('router_app_name')).' Sorry about that!</noscript>';
         if (!$this->get('router_login_state')) {
-            $res .= '><script type="text/javascript">sessionStorage.clear();</script>';
+            $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
         }
         else {
-            $res .= '><noscript class="noscript">You Need to have Javascript enabled to use '.$this->html_safe($this->get('router_app_name')).' Sorry about that!</noscript>'.
-                '<input type="hidden" id="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
+            $res .= '<input type="hidden" id="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
         }
         return $res;
     }
@@ -1103,7 +1102,8 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($input, $format) {
-        if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox'))) {
+        /* TODO: remove module specific stuff */
+        if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds'))) {
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';
             }
