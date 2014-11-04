@@ -199,9 +199,9 @@ var update_feed_status_display = function(res) {
 };
 
 var expand_feed_settings = function() {
-    var dsp = get_from_local_storage('.feed_setting');
+    var dsp = get_from_local_storage('.feeds_setting');
     if (dsp == 'table-row' || dsp == 'none') {
-        $('.feed_setting').css('display', dsp);
+        $('.feeds_setting').css('display', dsp);
     }
 };
 
