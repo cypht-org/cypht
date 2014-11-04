@@ -182,7 +182,7 @@ function format_msg_image($str, $mime_type) {
 }
 
 function format_msg_text($str, $output_mod, $links=true) {
-    $str = nl2br(str_replace(' ', '&#160;&#8203;', ($output_mod->html_safe($str))));
+    $str = nl2br(str_replace(' ', '&#160;<wbr>', ($output_mod->html_safe($str))));
     if ($links) {
         $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,\[\]%[:alnum:]])+)/m";
         $str = preg_replace($link_regex, "<a target=\"_blank\" href=\"$1\">$1</a>", $str);
