@@ -244,7 +244,7 @@ abstract class Hm_Handler_Module {
                     $this->session->destroy($this->request);
                 }
                 Hm_Debug::add('nonce check failed');
-                page_redirect('?page=home');
+                Hm_Router::page_redirect('?page=home');
             }
         }
     }

@@ -152,7 +152,7 @@ class Hm_Router {
     private function check_for_tls($config, $request) {
         if (!$request->tls && !$config->get('disable_tls', false)) {
             if (array_key_exists('SERVER_NAME', $request->server) && array_key_exists('REQUEST_URI', $request->server)) {
-                page_redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
+                Hm_Router::page_redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
             }
         }
     }
@@ -280,7 +280,7 @@ class Hm_Router {
                 $session->secure_cookie($request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
             }
             $session->end();
-            page_redirect($request->server['REQUEST_URI']);
+            Hm_Router::page_redirect($request->server['REQUEST_URI']);
         }
     }
 
@@ -370,28 +370,28 @@ class Hm_Router {
         }
         return $existing;
     }
-}
 
-/**
- * Perform an HTTP redirect
- *
- * @param $url string url to redirect to
- *
- * @return void
- */
-function page_redirect($url, $status=false) {
-    if (DEBUG_MODE) {
-        Hm_Debug::add(sprintf('Redirecting to %s', $url));
-        Hm_Debug::load_page_stats();
-        Hm_Debug::show('log');
+    /**
+     * Perform an HTTP redirect
+     *
+     * @param $url string url to redirect to
+     *
+     * @return void
+     */
+    static public function page_redirect($url, $status=false) {
+        if (DEBUG_MODE) {
+            Hm_Debug::add(sprintf('Redirecting to %s', $url));
+            Hm_Debug::load_page_stats();
+            Hm_Debug::show('log');
+        }
+        if ($status == 303) {
+            Hm_Debug::add('Redirect loop found');
+            die('Redirect loop discovered');
+        }
+        header('HTTP/1.1 303 Found');
+        header('Location: '.$url);
+        exit;
     }
-    if ($status == 303) {
-        Hm_Debug::add('Redirect loop found');
-        die('Redirect loop discovered');
-    }
-    header('HTTP/1.1 303 Found');
-    header('Location: '.$url);
-    exit;
 }
 
 ?>

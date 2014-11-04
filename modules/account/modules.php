@@ -62,7 +62,7 @@ class Hm_Output_no_login extends Hm_Output_Module {
 class Hm_Output_create_form extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($this->get('router_login_state')) {
-            page_redirect('?page=home');
+            Hm_Router::page_redirect('?page=home');
         }
         if ($this->get('internal_users')) {
             return '<div class="create_user">'.
