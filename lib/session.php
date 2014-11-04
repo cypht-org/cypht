@@ -195,7 +195,7 @@ abstract class Hm_Session {
      *
      * @return void
      */
-    function get_key($request) {
+    protected function get_key($request) {
         if (array_key_exists('hm_id', $request->cookie)) {
             $this->enc_key = $request->cookie['hm_id'];
         }
