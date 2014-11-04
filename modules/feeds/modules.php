@@ -617,7 +617,7 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
 
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" data-target=".feed_setting" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$rss.'" />Feed Settings</td></tr>';
+        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$rss.'" />Feed Settings</td></tr>';
     }
 }
 
@@ -628,7 +628,7 @@ class Hm_Output_feed_since_setting extends Hm_Output_Module {
         if (array_key_exists('feed_since', $settings)) {
             $since = $settings['feed_since'];
         }
-        return '<tr class="feed_setting"><td>Show feed items received since</td><td>'.message_since_dropdown($since, 'feed_since', $this).'</td></tr>';
+        return '<tr class="feeds_setting"><td>Show feed items received since</td><td>'.message_since_dropdown($since, 'feed_since', $this).'</td></tr>';
     }
 }
 
@@ -639,7 +639,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
         if (array_key_exists('feed_limit', $settings)) {
             $limit = $settings['feed_limit'];
         }
-        return '<tr class="feed_setting"><td>Max feed items to display</td><td><input type="text" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
+        return '<tr class="feeds_setting"><td>Max feed items to display</td><td><input type="text" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
 
