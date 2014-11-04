@@ -31,16 +31,16 @@ function build_config() {
         list($js_compress, $css_compress) = compress_methods($settings);
 
         /* get module detail */
-        list($js, $css, $filters) = get_module_assignments($settings);
+        list($js, $css, $filters, $assets) = get_module_assignments($settings);
 
-        /* combined and compress page assets */
+        /* combined and compress page content */
         combine_includes($js, $js_compress, $css, $css_compress);
 
         /* write out the hm3.rc file */
         write_config_file($settings, $filters);
 
         /* create the production version */
-        create_production_site();
+        create_production_site($assets);
     }
     else {
         printf("\nNo settings found in ini file\n");
@@ -92,11 +92,12 @@ function compress_methods($settings) {
  *
  * @param $settings array site settings list
  *
- * @return array js and css blobs, and the combined filers array
+ * @return array js and css blobs, combined filers array, and module assets
  */
 function get_module_assignments($settings) {
     $js = '';
     $css = '';
+    $assets = array();
     $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
         'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
 
@@ -112,9 +113,12 @@ function get_module_assignments($settings) {
             if (is_readable(sprintf("modules/%s/setup.php", $mod))) {
                 $filters = Hm_Router::merge_filters($filters, require sprintf("modules/%s/setup.php", $mod));
             }
+            if (is_readable(sprintf("modules/%s/assets/", $mod))) {
+                $assets[] = sprintf("modules/%s/assets/", $mod);
+            }
         }
     }
-    return array($js, $css, $filters);
+    return array($js, $css, $filters, $assets);
 }
 
 /**
@@ -164,9 +168,9 @@ function write_config_file($settings, $filters) {
  *
  * @return void
  */
-function create_production_site() {
+function create_production_site($assets) {
     if (!is_readable('site/')) {
-        mkdir('site');
+        mkdir('site', 0755);
     }
     printf("creating production site\n");
     copy('site.css', 'site/site.css');
@@ -176,6 +180,17 @@ function create_production_site() {
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
     $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
     file_put_contents('site/index.php', $index_file);
+    foreach ($assets as $path) {
+        if (!is_readable('site/'.$path)) {
+            mkdir('site/'.$path, 0755, true);
+        }
+        foreach (scandir($path) as $file) {
+            if (in_array($file, array('.', '..'), true)) {
+                continue;
+            }
+            copy($path.$file, 'site/'.$path.$file);
+        }
+    }
 }
 
 ?>
