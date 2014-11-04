@@ -4,7 +4,6 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Authenticate against an IMAP server
- * TODO: move to the IMAP module set
  */
 class Hm_Auth_IMAP extends Hm_Auth {
 
@@ -740,7 +739,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         if ($this->is_supported( 'X-GM-EXT-1' )) {
             $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
         }
-        $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE)])\r\n";
+        $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)])\r\n";
         $cache_command = $command.(string)$raw;
         $cache = $this->check_cache($cache_command);
         if ($cache !== false) {
@@ -750,8 +749,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         $res = $this->get_response(false, true);
         $status = $this->check_response($res, true);
         $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-        $junk = array('LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-        $flds = array('list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority');
+        $junk = array('MESSAGE-ID', 'REFERENCES', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
+        $flds = array('message-id' => 'message_id', 'references' => 'references', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority');
         $headers = array();
         foreach ($res as $n => $vals) {
             if (isset($vals[0]) && $vals[0] == '*') {
@@ -760,7 +759,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $subject = '';
                 $list_archive = '';
                 $from = '';
+                $references = '';
                 $date = '';
+                $message_id = '';
                 $x_priority = 0;
                 $content_type = '';
                 $to = '';
@@ -816,7 +817,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                     $headers[(string) $uid] = array('uid' => $uid, 'flags' => $flags, 'internal_date' => $internal_date, 'size' => $size,
                                      'date' => $date, 'from' => $from, 'to' => $to, 'subject' => $subject, 'content-type' => $content_type,
                                      'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
-                                     'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive);
+                                     'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
+                                     'references' => $references, 'message_id' => $message_id);
 
                     if ($raw) {
                         $headers[$uid] = array_map('trim', $headers[$uid]);
