@@ -136,7 +136,6 @@ return array(
         'settings',
         'servers',
         'ajax_hm_folders',
-        'ajax_no_op',
         'ajax_message_action',
         'notfound',
         'help',
