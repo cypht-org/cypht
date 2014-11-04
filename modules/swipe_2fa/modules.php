@@ -61,7 +61,7 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
 
             }
             /* the sms was sent, look for a sms code in POST */
-            if ($state == RC_SMS_DELIVERED && array_key_exists('2fa_sms_response', $this->request->post)) {
+            elseif ($state == RC_SMS_DELIVERED && array_key_exists('2fa_sms_response', $this->request->post)) {
 
                 if (preg_match("/^\d{5}$/", $this->request->post['2fa_sms_response'])) {
 
@@ -147,7 +147,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
                     '<div class="swipe_txt">Enter the 5 digit SMS code you just received</div>'.
                     '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
                     '<input autofocus required type="text" name="2fa_sms_response" value="" placeholder="Login code" />'.
-                    '<input type="submit" name="submit_2fa_response" value="Submit" />'.
+                    '<input type="submit" value="Submit" />'.
                     '</form>';
             }
 
