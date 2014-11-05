@@ -285,10 +285,10 @@ class Hm_Feed {
                 $this->collect = 'dc:date';
             }
             if (isset($this->parsed_data[$this->item_count][$this->collect])) {
-                $this->parsed_data[$this->item_count][$this->collect] .= trim($data);
+                $this->parsed_data[$this->item_count][$this->collect] .= $data;
             }
             else {
-                $this->parsed_data[$this->item_count][$this->collect] = trim($data);
+                $this->parsed_data[$this->item_count][$this->collect] = $data;
             }
 
         }
