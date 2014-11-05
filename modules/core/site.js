@@ -396,7 +396,7 @@ var Hm_Message_List = {
         else if (hm_list_path() == 'flagged') {
             Hm_Message_List.setup_combined_view('formatted_flagged_data');
         }
-        $('.msg_controls > a').click(function() { return message_action($(this).data('action')); });
+        $('.msg_controls > a').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
         $('.toggle_link').click(function() { return Hm_Message_List.toggle_rows(); });
         $('.refresh_link').click(function() { return Hm_Message_List.load_sources(); });
     },
