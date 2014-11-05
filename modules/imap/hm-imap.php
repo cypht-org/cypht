@@ -1680,7 +1680,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                     $fld = mb_convert_encoding(base64_decode($fld), 'UTF-8', $charset);
                 }
                 elseif (strtoupper($encoding) == 'Q') {
-                    $fld = mb_convert_encoding(quoted_printable_decode($fld), 'UTF-8', $charset);
+                    $fld = mb_convert_encoding(quoted_printable_decode(str_replace('_', ' ', $fld)), 'UTF-8', $charset);
                 }
                 $string = str_replace($v, $fld, $string);
             }
