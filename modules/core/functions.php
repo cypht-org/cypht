@@ -28,14 +28,14 @@ function message_list_meta($input, $output_mod) {
         $since = DEFAULT_SINCE;
     }
     $dt = sprintf('%s', strtolower($times[$since]));
-    $max = sprintf('sources@%d each', $limit);
+    $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
     return '<div class="list_meta">'.
         $output_mod->html_safe($dt).
         '<b>-</b>'.
-        '<span class="src_count"></span> '.$output_mod->html_safe($max).
+        '<span class="src_count"></span> '.$max.
         '<b>-</b>'.
-        '<span class="total"></span> total</div>';
+        '<span class="total"></span> '.$output_mod->trans('total').'</div>';
 }
 
 function human_readable_interval($date_str) {
@@ -111,14 +111,14 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
         }
 }
 
-function message_controls() {
+function message_controls($output_mod) {
     return '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
         '<div class="msg_controls">'.
-        '<a href="#" data-action="read">Read</a>'.
-        '<a href="#" data-action="unread">Unread</a>'.
-        '<a href="#" data-action="flag">Flag</a>'.
-        '<a href="#" data-action="unflag">Unflag</a>'.
-        '<a href="#" data-action="delete">Delete</a></div>';
+        '<a href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
+        '<a href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
+        '<a href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
+        '<a href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
+        '<a href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></div>';
 }
 
 function message_since_dropdown($since, $name, $output_mod) {

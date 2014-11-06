@@ -453,9 +453,11 @@ class Hm_Output_login extends Hm_Output_Module {
             return '<form class="login_form" method="POST">'.
                 '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
                 ' <input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
-                ' <label for="username">Username</label><input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
-                ' <label for="password">Password</label><input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
-                ' <input type="submit" value="Login" /></form>';
+                ' <label for="username">'.$this->trans('Username').'</label>'.
+                '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
+                ' <label for="password">'.$this->trans('Password').'</label>'.
+                '<input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
+                ' <input type="submit" value="'.$this->trans('Login').'" /></form>';
         }
         else {
             return '<form class="logout_form" method="POST">'.
@@ -464,10 +466,11 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').'</div>'.
-                '<label for="logout_password">Password</label><input id="logout_password" name="password" class="save_settings_password" type="password" placeholder="Password" />'.
-                '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
-                '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />'.
-                '<input class="cancel_logout save_settings" type="button" value="Cancel" />'.
+                '<label for="logout_password">'.$this->trans('Password').'</label>'.
+                '<input id="logout_password" name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
+                '<input class="save_settings" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />'.
+                '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
+                '<input class="cancel_logout save_settings" type="button" value="'.$this->trans('Cancel').'" />'.
                 '</div></form>';
         }
     }
@@ -503,10 +506,10 @@ class Hm_Output_msgs extends Hm_Output_Module {
         if (!empty($msgs)) {
             $res .= implode(',', array_map(function($v) {
                 if (preg_match("/ERR/", $v)) {
-                    return sprintf('<span class="err">%s</span>', substr($this->html_safe($v), 3));
+                    return sprintf('<span class="err">%s</span>', $this->trans(substr($v, 3)));
                 }
                 else {
-                    return $this->html_safe($v);
+                    return $this->trans($v);
                 }
             }, $msgs));
         }
@@ -533,7 +536,9 @@ class Hm_Output_header_end extends Hm_Output_Module {
 
 class Hm_Output_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<body><noscript class="noscript">You Need to have Javascript enabled to use '.$this->html_safe($this->get('router_app_name')).' Sorry about that!</noscript>';
+        $res = '<body><noscript class="noscript">'.
+            $this->trans(sprintf('You Need to have Javascript enabled to use %s, sorry about that!',
+            $this->html_safe($this->get('router_app_name')))).'</noscript>';
         if (!$this->get('router_login_state')) {
             $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
         }
@@ -565,7 +570,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
                 $title .= ' '.ucfirst($this->get('router_page_name'));
             }
         }
-        return '<title>'.$this->html_safe($title).'</title>'.
+        return '<title>'.$this->trans($title).'</title>'.
             '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
             '<link rel="icon" class="tab_icon" type="image/png" href="'.Hm_Image_Sources::$env_closed.'">'.
             '<base href="'.$this->html_safe($this->get('router_url_path')).'" />';
@@ -663,14 +668,15 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
         else {
             $list_style = false;
         }
-        $res = '<tr class="general_setting"><td><label for="list_style">Message list style</label></td>'.
+        $res = '<tr class="general_setting"><td><label for="list_style">'.
+            $this->trans('Message list style').'</label></td>'.
             '<td><select id="list_style" name="list_style">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($list_style == $val) {
                 $res .= 'selected="selected" ';
             }
-            $res .= 'value="'.$val.'">'.$label.'</option>';
+            $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
         }
         $res .= '</select></td></tr>';
         return $res;
@@ -716,7 +722,8 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('unread_per_source', $settings)) {
             $sources = $settings['unread_per_source'];
         }
-        return '<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td>'.
+        return '<tr class="unread_setting"><td><label for="unread_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
             '<td><input type="text" size="2" id="unread_per_source" name="unread_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
@@ -728,7 +735,8 @@ class Hm_Output_unread_since_setting extends Hm_Output_Module {
         if (array_key_exists('unread_since', $settings)) {
             $since = $settings['unread_since'];
         }
-        return '<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td>'.
+        return '<tr class="unread_setting"><td><label for="unread_since">'.
+            $this->trans('Show messages received since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'unread_since', $this).'</td></tr>';
     }
 }
@@ -740,7 +748,8 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('flagged_per_source', $settings)) {
             $sources = $settings['flagged_per_source'];
         }
-        return '<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td>'.
+        return '<tr class="flagged_setting"><td><label for="flagged_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
             '<td><input type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
@@ -752,7 +761,8 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
         if (array_key_exists('flagged_since', $settings)) {
             $since = $settings['flagged_since'];
         }
-        return '<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td>'.
+        return '<tr class="flagged_setting"><td><label for="flagged_since">'.
+            $this->trans('Show messages received since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'flagged_since', $this).'</td></tr>';
     }
 }
@@ -764,7 +774,8 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('all_per_source', $settings)) {
             $sources = $settings['all_per_source'];
         }
-        return '<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td>'.
+        return '<tr class="all_setting"><td><label for="all_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
             '<td><input type="text" size="2" id="all_per_source" name="all_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
@@ -776,7 +787,8 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
         if (array_key_exists('all_since', $settings)) {
             $since = $settings['all_since'];
         }
-        return '<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td>'.
+        return '<tr class="all_setting"><td><label for="all_since">'.
+            $this->trans('Show messages received since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'all_since', $this).'</td></tr>';
     }
 }
@@ -794,7 +806,8 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         else {
             $mylang = false;
         }
-        $res = '<tr class="general_setting"><td><label for="language_setting">Interface language</label></td>'.
+        $res = '<tr class="general_setting"><td><label for="language_setting">'.
+            $this->trans('Interface language').'</label></td>'.
             '<td><select id="language_setting" name="language_setting">';
         foreach ($langs as $id => $lang) {
             $res .= '<option ';
@@ -818,8 +831,8 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
         else {
             $myzone = false;
         }
-        $res = '<tr class="general_setting"><td><label for="timezone_setting">Timezone</label></td>'.
-            '<td><select id="timezone_setting" name="timezone_setting">';
+        $res = '<tr class="general_setting"><td><label for="timezone_setting">'.
+            $this->trans('Timezone').'</label></td><td><select id="timezone_setting" name="timezone_setting">';
         foreach ($zones as $zone) {
             $res .= '<option ';
             if ($zone == $myzone) {
@@ -835,10 +848,11 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
 class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<tr><td class="submit_cell" colspan="2">'.
-            '<label class="screen_reader" for="password">Password</label><input required id="password" name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<label class="screen_reader" for="password">Password</label><input required id="password" '.
+            'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
             '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
-            '<div class="password_notice">* You must enter your password to save your settings on the server</div>'.
-            '</td></tr></table></form></div>';
+            '<div class="password_notice">* '.$this->trans('You must enter your password to save your settings on the server').
+            '</div></td></tr></table></form></div>';
     }
 }
 
@@ -933,7 +947,8 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
             if ($name == 'Email') {
                 $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> '.$this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
+                    '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).
+                    '" alt="" width="16" height="16" /> '.$this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
             }
             $cache = Hm_Page_Cache::get($src);
             Hm_Page_Cache::del($src);
@@ -964,9 +979,11 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
 class Hm_Output_settings_menu_content extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).'" alt="" width="16" height="16" /> '.$this->trans('Servers').'</a></li>'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).
+            '" alt="" width="16" height="16" /> '.$this->trans('Servers').'</a></li>'.
             '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).'" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>';
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).
+            '" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>';
         if ($format == 'HTML5') {
             return $res;
         }
@@ -987,7 +1004,8 @@ class Hm_Output_settings_menu_end extends Hm_Output_Module {
 class Hm_Output_folder_list_content_end extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<a href="#" class="update_message_list">[reload]</a>';
-        $res .= '<a href="#" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.'" alt="Collapse" width="16" height="16" /></a>';
+        $res .= '<a href="#" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.
+            '" alt="'.$this->trans('Collapse').'" width="16" height="16" /></a>';
         if ($format == 'HTML5') {
             return $res;
         }
@@ -1015,9 +1033,9 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
 
 class Hm_Output_server_status_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="server_status"><div class="content_title">Home</div>';
-        $res .= '<table><thead><tr><th>Type</th><th>Name</th><th>Status</th></tr>'.
-                '</thead><tbody>';
+        $res = '<div class="server_status"><div class="content_title">'.$this->trans('Home').'</div>';
+        $res .= '<table><thead><tr><th>'.$this->trans('Type').'</th><th>'.$this->trans('Name').'</th><th>'.
+                $this->trans('Status').'</th></tr></thead><tbody>';
         return $res;
     }
 }
@@ -1032,10 +1050,10 @@ class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($this->in('list_parent', array('search', 'flagged', 'combined_inbox', 'unread', 'feeds'))) {
             if ($this->get('list_parent') == 'combined_inbox') {
-                $list_name = 'Everything';
+                $list_name = $this->trans('Everything');
             }
             else {
-                $list_name = ucwords(str_replace('_', ' ', $this->get('list_parent', '')));
+                $list_name = $this->trans(ucwords(str_replace('_', ' ', $this->get('list_parent', ''))));
             }
             if ($this->get('list_parent') == 'search') {
                 $page = 'search';
@@ -1044,7 +1062,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
                 $page = 'message_list';
             }
             $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).
-                '">'.$this->html_safe($list_name).'</a>';
+                '">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 1) {
                 $mb_title = $this->get('mailbox_list_title', array());
                 $title .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
@@ -1076,8 +1094,8 @@ class Hm_Output_message_end extends Hm_Output_Module {
 
 class Hm_Output_notfound_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="content_title">Page Not Found!</div>';
-        $res .= '<div class="empty_list"><br />Nothingness</div>';
+        $res = '<div class="content_title">'.$this->trans('Page Not Found!').'</div>';
+        $res .= '<div class="empty_list"><br />'.$this->trans('Nothingness').'</div>';
         return $res;
     }
 }
@@ -1089,8 +1107,9 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
             $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
             '<col class="from_col"><col class="subject_col"><col class="date_col">'.
             '<col class="icon_col"></colgroup><thead><tr><th></th><th class="source">'.
-            'Source</th><th class="from">From</th><th class="subject">Subject</th>'.
-            '<th class="msg_date">Date</th><th></th></tr></thead>';
+            $this->trans('Source').'</th><th class="from">'.$this->trans('From').
+            '</th><th class="subject">'.$this->trans('Subject').'</th><th class="msg_date">'.
+            $this->trans('Date').'</th><th></th></tr></thead>';
         }
         $res .= '<tbody>';
         return $res;
@@ -1114,7 +1133,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         }
         $res = '';
         $res .= '<div class="message_list"><div class="content_title">';
-        $res .= message_controls().
+        $res .= message_controls($this).
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $this->get('mailbox_list_title', array()));
         $res .= '<div class="list_controls">';
         $res .= '<a class="refresh_link" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
