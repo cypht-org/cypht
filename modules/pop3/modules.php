@@ -606,7 +606,8 @@ class Hm_Output_pop3_since_setting extends Hm_Output_Module {
         if (array_key_exists('pop3_since', $settings)) {
             $since = $settings['pop3_since'];
         }
-        return '<tr class="pop3_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'pop3_since', $this).'</td></tr>';
+        return '<tr class="pop3_setting"><td><label for="pop3_since">Show messages received since</label></td>'.
+            '<td>'.message_since_dropdown($since, 'pop3_since', $this).'</td></tr>';
     }
 }
 
@@ -617,7 +618,8 @@ class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
         if (array_key_exists('pop3_limit', $settings)) {
             $limit = $settings['pop3_limit'];
         }
-        return '<tr class="pop3_setting"><td>Max messages to display</td><td><input type="text" name="pop3_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
+        return '<tr class="pop3_setting"><td><label for="pop3_limit">Max messages to display</label></td>'.
+            '<td><input type="text" id="pop3_limit" name="pop3_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
 

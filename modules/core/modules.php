@@ -453,8 +453,8 @@ class Hm_Output_login extends Hm_Output_Module {
             return '<form class="login_form" method="POST">'.
                 '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
                 ' <input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
-                ' <input autofocus required type="text" placeholder="'.$this->trans('Username').'" name="username" value="">'.
-                ' <input required type="password" placeholder="'.$this->trans('Password').'" name="password">'.
+                ' <label for="username">Username</label><input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
+                ' <label for="password">Password</label><input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="Login" /></form>';
         }
         else {
@@ -464,7 +464,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').'</div>'.
-                '<input name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+                '<label for="logout_password">Password</label><input id="logout_password" name="password" class="save_settings_password" type="password" placeholder="Password" />'.
                 '<input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" />'.
                 '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />'.
                 '<input class="cancel_logout save_settings" type="button" value="Cancel" />'.
@@ -663,7 +663,8 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
         else {
             $list_style = false;
         }
-        $res = '<tr class="general_setting"><td>Message list style</td><td><select name="list_style">';
+        $res = '<tr class="general_setting"><td><label for="list_style">Message list style</label></td>'.
+            '<td><select id="list_style" name="list_style">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($list_style == $val) {
@@ -715,7 +716,8 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('unread_per_source', $settings)) {
             $sources = $settings['unread_per_source'];
         }
-        return '<tr class="unread_setting"><td>Max messages per source</td><td><input type="text" size="2" name="unread_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+        return '<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td>'.
+            '<td><input type="text" size="2" id="unread_per_source" name="unread_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
 
@@ -726,7 +728,8 @@ class Hm_Output_unread_since_setting extends Hm_Output_Module {
         if (array_key_exists('unread_since', $settings)) {
             $since = $settings['unread_since'];
         }
-        return '<tr class="unread_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'unread_since', $this).'</td></tr>';
+        return '<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td>'.
+            '<td>'.message_since_dropdown($since, 'unread_since', $this).'</td></tr>';
     }
 }
 
@@ -737,7 +740,8 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('flagged_per_source', $settings)) {
             $sources = $settings['flagged_per_source'];
         }
-        return '<tr class="flagged_setting"><td>Max messages per source</td><td><input type="text" size="2" name="flagged_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+        return '<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td>'.
+            '<td><input type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
 
@@ -748,7 +752,8 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
         if (array_key_exists('flagged_since', $settings)) {
             $since = $settings['flagged_since'];
         }
-        return '<tr class="flagged_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'flagged_since', $this).'</td></tr>';
+        return '<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td>'.
+            '<td>'.message_since_dropdown($since, 'flagged_since', $this).'</td></tr>';
     }
 }
 
@@ -759,7 +764,8 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
         if (array_key_exists('all_per_source', $settings)) {
             $sources = $settings['all_per_source'];
         }
-        return '<tr class="all_setting"><td>Max messages per source</td><td><input type="text" size="2" name="all_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+        return '<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td>'.
+            '<td><input type="text" size="2" id="all_per_source" name="all_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
 
@@ -770,7 +776,8 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
         if (array_key_exists('all_since', $settings)) {
             $since = $settings['all_since'];
         }
-        return '<tr class="all_setting"><td>Show messages received since</td><td>'.message_since_dropdown($since, 'all_since', $this).'</td></tr>';
+        return '<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td>'.
+            '<td>'.message_since_dropdown($since, 'all_since', $this).'</td></tr>';
     }
 }
 
@@ -787,7 +794,8 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         else {
             $mylang = false;
         }
-        $res = '<tr class="general_setting"><td>Interface language</td><td><select name="language_setting">';
+        $res = '<tr class="general_setting"><td><label for="language_setting">Interface language</label></td>'.
+            '<td><select id="language_setting" name="language_setting">';
         foreach ($langs as $id => $lang) {
             $res .= '<option ';
             if ($id == $mylang) {
@@ -810,7 +818,8 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
         else {
             $myzone = false;
         }
-        $res = '<tr class="general_setting"><td>Timezone</td><td><select name="timezone_setting">';
+        $res = '<tr class="general_setting"><td><label for="timezone_setting">Timezone</label></td>'.
+            '<td><select id="timezone_setting" name="timezone_setting">';
         foreach ($zones as $zone) {
             $res .= '<option ';
             if ($zone == $myzone) {
@@ -826,7 +835,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
 class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<tr><td class="submit_cell" colspan="2">'.
-            '<input required name="password" class="save_settings_password" type="password" placeholder="Password" />'.
+            '<label class="screen_reader" for="password">Password</label><input required id="password" name="password" class="save_settings_password" type="password" placeholder="Password" />'.
             '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
             '<div class="password_notice">* You must enter your password to save your settings on the server</div>'.
             '</td></tr></table></form></div>';
@@ -848,7 +857,7 @@ class Hm_Output_two_col_layout_end extends Hm_Output_Module {
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
-            '<div class="folder_cell"><div class="folder_list">';
+            '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
 }
@@ -1000,7 +1009,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '</div></div>';
+        return '</div></nav>';
     }
 }
 

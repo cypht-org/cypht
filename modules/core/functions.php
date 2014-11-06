@@ -131,7 +131,7 @@ function message_since_dropdown($since, $name, $output_mod) {
         '-6 months' => 'Last 6 months',
         '-1 year' => 'Last year'
     );
-    $res = '<select name="'.$name.'" class="message_list_since">';
+    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since">';
     foreach ($times as $val => $label) {
         $res .= '<option';
         if ($val == $since) {

@@ -29,6 +29,7 @@ input:disabled { background-color: #f5f5f5; }
 input, option, select { font-size: 100%; padding: 3px; }
 textarea, select, input { border: solid 1px #ddd; background-color: #fff; color: #333; -border-radius: 3px; }
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 300px; border-radius: 0px 0px 10px 0px; margin: 0px; background-color: #f5f5f5; width: 300px; padding-left: 20px; }
+.screen_reader, .logout_form label, .login_form label { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }
 .debug { color: teal; font-size: 75%; float: right; clear: both; margin: 20px; }
