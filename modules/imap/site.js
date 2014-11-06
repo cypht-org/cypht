@@ -78,34 +78,6 @@ var imap_test_action = function() {
         {'imap_connect': 1}
     );
 };
-
-/* unread page */
-var imap_combined_unread_content = function(id) {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-        {'name': 'imap_server_ids', 'value': id}],
-        display_imap_message_list,
-        [],
-        false,
-        Hm_Message_List.set_unread_state
-    );
-    return false;
-};
-
-/* flagged page */
-var imap_combined_flagged_content = function(id) {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_flagged'},
-        {'name': 'imap_server_ids', 'value': id}],
-        display_imap_message_list,
-        [],
-        false,
-        Hm_Message_List.set_flagged_state
-    );
-    return false;
-};
-
-/* home page */
 var imap_status_update = function() {
     var id;
     var i;
@@ -117,7 +89,10 @@ var imap_status_update = function() {
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
                     {'name': 'imap_server_ids', 'value': id}],
-                    update_imap_status_display,
+                    function(res) {
+                        var id = res.imap_status_server_id;
+                        $('.imap_status_'+id).html(res.imap_status_display);
+                    },
                     [],
                     false
                 );
@@ -126,74 +101,53 @@ var imap_status_update = function() {
     }
     return false;
 };
-
-var update_imap_status_display = function(res) {
-    var id = res.imap_status_server_id;
-    $('.imap_status_'+id).html(res.imap_status_display);
+var imap_message_list_content = function(id, hook, batch_callback) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': hook},
+        {'name': 'imap_server_ids', 'value': id}],
+        function(res) {
+            var ids = res.imap_server_ids.split(',');
+            Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+        },
+        [],
+        false,
+        batch_callback
+    );
+    return false;
 };
-
+var imap_all_mail_content = function(id) {
+    return imap_message_list_content(id, 'ajax_imap_combined_inbox', Hm_Message_List.set_all_mail_state);
+};
 var imap_search_page_content = function(id) {
     if (hm_search_terms && hm_search_terms.length) {
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_search'},
-            {'name': 'imap_server_ids', 'value': id}],
-            display_imap_message_list,
-            [],
-            false,
-            false
-        );
+        return imap_message_list_content(id, 'ajax_imap_search', false);
     }
     return false;
 };
-
-var display_imap_message_list = function(res) {
-    var ids = res.imap_server_ids.split(',');
-    Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+var imap_combined_unread_content = function(id) {
+    return imap_message_list_content(id, 'ajax_imap_unread', Hm_Message_List.set_unread_state);
 };
-
-/* all mail page */
-var imap_all_mail_content = function(id) {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_combined_inbox'},
-        {'name': 'imap_server_ids', 'value': id}],
-        display_imap_message_list,
-        [],
-        false,
-        Hm_Message_List.set_all_mail_state
-    );
-    return false;
+var imap_combined_flagged_content = function(id) {
+    return imap_message_list_content(id, 'ajax_imap_flagged', Hm_Message_List.set_flagged_state);
 };
-
-/* combined inbox page */
 var imap_combined_inbox_content = function(id) {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_combined_inbox'},
-        {'name': 'imap_server_ids', 'value': id}],
-        display_imap_message_list,
-        [],
-        false,
-        Hm_Message_List.set_combined_inbox_state
-    );
-    return false;
+    return imap_message_list_content(id, 'ajax_imap_combined_inbox', Hm_Message_List.set_combined_inbox_state);
 };
 
 /* imap mailbox list */
 var setup_imap_folder_page = function() {
     if ($('.message_table tbody tr').length === 0) {
-        select_imap_folder(hm_list_path(), true);
+        select_imap_folder(hm_list_path());
     }
     $('.message_table tr').show();
 };
 
-var select_imap_folder = function(path, force) {
+var select_imap_folder = function(path) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     if (detail) {
-        if (force) {
-        }
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_display'},
             {'name': 'imap_server_id', 'value': detail.server_id},
-            {'name': 'force_update', 'value': force},
             {'name': 'folder', 'value': detail.folder}],
             display_imap_mailbox,
             [],
