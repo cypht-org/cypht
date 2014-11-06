@@ -317,16 +317,16 @@ abstract class Hm_Output_Module {
     public function trans($string) {
         if (array_key_exists($string, $this->lstr)) {
             if ($this->lstr[$string] === false) {
-                return $string;
+                return $this->html_safe($string);
             }
             else {
-                return $this->lstr[$string];
+                return $this->html_safe($this->lstr[$string]);
             }
         }
         else {
             Hm_Debug::add(sprintf('No translation found: %s', $string));
         }
-        return $string;
+        return $this->html_safe($string);
     }
 
     /**
