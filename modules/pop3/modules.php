@@ -426,9 +426,12 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
             ' POP3 Servers <div class="server_count">'.$count.'</div></div><div class="pop3_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<div class="subtitle">Add a POP3 Server</div>'.
-            '<table><tr><td colspan="2"><input required type="text" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-            '<tr><td colspan="2"><input required type="text" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
-            '<tr><td colspan="2"><input required type="text" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+            '<table><tr><td colspan="2"><label class="screen_reader" for="new_pop3_name">POP3 account name</label>'.
+            '<input required type="text" id="new_pop3_name" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_pop3_address">POP3 server address</label>'.
+            '<input required type="text" id="new_pop3_address" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
+            '<tr><td colspan="2"><label for="new_pop3_port" class="screen_reader">POP3 port</label>'.
+            '<input required type="number" id="new_pop3_port" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
             '<td><input type="submit" value="Add" name="submit_pop3_server" /></td></tr>'.
             '</table></form>';
@@ -463,8 +466,10 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 '<form class="pop3_connect" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
-                '<span> <input '.$disabled.' class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
+                '<label class="screen_reader" for="pop3_user_'.$index.'">POP3 username</label>'.
+                '<input '.$disabled.' id="pop3_user_'.$index.'" class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
+                '<span> <label class="screen_reader" for="pop3_password_'.$index.'">POP3 password</label>'.
+                '<input '.$disabled.' id="pop3_password_'.$index.'" class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
             if (!$no_edit) {
                 $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {

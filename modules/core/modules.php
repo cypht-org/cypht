@@ -842,18 +842,6 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_two_col_layout_start extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '<div class="framework">';
-    }
-}
-
-class Hm_Output_two_col_layout_end extends Hm_Output_Module {
-    protected function output($input, $format) {
-        return '</div><br class="end_float" />';
-    }
-}
-
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
@@ -1015,13 +1003,13 @@ class Hm_Output_folder_list_end extends Hm_Output_Module {
 
 class Hm_Output_content_section_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="content_cell">';
+        return '<main class="content_cell">';
     }
 }
 
 class Hm_Output_content_section_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '</div>';
+        return '</main>';
     }
 }
 

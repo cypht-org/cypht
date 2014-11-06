@@ -135,7 +135,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
                     '<div class="swipe_txt">Register your number for Swipeidentity two factor authentication. '.
                     'The number must include a country code. Only enter numbers and no spaces or delimiters</div>'.
                     '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
-                    '<input autofocus required type="text" name="sms_number" value="" placeholder="Phone number to SMS to" />'.
+                    '<input autofocus required type="tel" name="sms_number" value="" placeholder="Phone number to SMS to" />'.
                     '<input type="submit" name="submit_swipe_number" value="Submit" />'.
                     '</form>';
             }
@@ -146,7 +146,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
                     $error.
                     '<div class="swipe_txt">Enter the 5 digit SMS code you just received</div>'.
                     '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
-                    '<input autofocus required type="text" name="2fa_sms_response" value="" placeholder="Login code" />'.
+                    '<input autofocus required type="number" name="2fa_sms_response" value="" placeholder="Login code" />'.
                     '<input type="submit" value="Submit" />'.
                     '</form>';
             }

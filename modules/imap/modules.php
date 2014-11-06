@@ -594,8 +594,10 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 '<form class="imap_connect" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<input '.$disabled.' class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
-                '<span> <input '.$disabled.' class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
+                '<label class="screen_reader" for="imap_user_'.$index.'">IMAP username</label>'.
+                '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
+                '<span><label class="screen_reader" for="imap_pass_'.$index.'">IMAP password</label>'.
+                '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
             if (!$no_edit) {
                 $res .= '<input type="submit" value="Test" class="test_imap_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
@@ -624,9 +626,12 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             ' IMAP Servers <div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<div class="subtitle">Add an IMAP Server</div><table>'.
-            '<tr><td colspan="2"><input required type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-            '<tr><td colspan="2"><input required type="text" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
-            '<tr><td colspan="2"><input required type="text" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_name">Account name</label>'.
+            '<input id="new_imap_name" required type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_address">Server address</label>'.
+            '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">IMAP Port</label>'.
+            '<input required type="number" id="new_imap_port" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
             '<td><input type="submit" value="Add" name="submit_imap_server" /></td></tr>'.
             '</table></form>';

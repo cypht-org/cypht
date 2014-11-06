@@ -29,7 +29,6 @@ function setup_base_page($name, $source=false) {
     add_output($name, 'header_end', false, $source);
     add_output($name, 'content_start', false, $source);
     add_output($name, 'login', false, $source);
-    add_output($name, 'two_col_layout_start', true, $source);
     add_output($name, 'loading_icon', true, $source);
     add_output($name, 'date', true, $source);
     add_output($name, 'msgs', false, $source);
@@ -37,7 +36,6 @@ function setup_base_page($name, $source=false) {
     add_output($name, 'folder_list_end', true, $source);
     add_output($name, 'content_section_start', true, $source);
     add_output($name, 'content_section_end', true, $source);
-    add_output($name, 'two_col_layout_end', true, $source);
     add_output($name, 'page_js', true, $source);
     add_output($name, 'content_end', true, $source);
 }
