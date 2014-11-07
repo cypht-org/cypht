@@ -567,7 +567,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
                 $title .= ' Nope';
             }
             else {
-                $title .= ' '.ucfirst($this->get('router_page_name'));
+                $title .= ' '.ucfirst(str_replace('_', ' ', $this->get('router_page_name')));
             }
         }
         return '<title>'.$this->trans($title).'</title>'.
@@ -940,7 +940,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
         foreach ($folder_sources as $src) {
             $parts = explode('_', $src);
             $name = ucfirst(strtolower($parts[0]));
-            $res .= '<div class="src_name" data-source=".'.$this->html_safe($src).'">'.$this->html_safe($name).
+            $res .= '<div class="src_name" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
                 '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" /></div>';
 
             $res .= '<div style="display: none;" ';
