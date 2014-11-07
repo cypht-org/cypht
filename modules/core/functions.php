@@ -273,10 +273,20 @@ function interface_langs() {
 
     );
 }
+
 function rtl_langs() {
     return array(
         'ar', 'iw', 'yi'
     );
+}
+
+function translate_time_str($str, $output_mod) {
+    if (preg_match("/(\d+).+(\d+)/U", $str, $matches)) {
+        $str = $output_mod->trans(preg_replace("/(\d+)/", '%d', $str));
+        error_log( sprintf($str, $matches[1], $matches[2]));
+        return sprintf($str, $matches[1], $matches[2]);
+    }
+    return $str;
 }
 
 ?>
