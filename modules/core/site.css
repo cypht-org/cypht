@@ -121,6 +121,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .rtl_page .save_settings_password { float: right; margin-left: 0px; padding: 4px; }
 .rtl_page .loading_icon { left: 80px !important; right: auto !important; }
 .rtl_page .debug { float: left !important; }
+.rtl_page .list_meta { padding-right: 10px; }
+.rtl_page .toggle_link { margin-right: 5px !important; margin-left: 15px !important; }
+.rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }

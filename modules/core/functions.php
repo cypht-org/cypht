@@ -27,7 +27,7 @@ function message_list_meta($input, $output_mod) {
     if (!$since) {
         $since = DEFAULT_SINCE;
     }
-    $dt = sprintf('%s', strtolower($times[$since]));
+    $dt = sprintf('%s', strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
     return '<div class="list_meta">'.

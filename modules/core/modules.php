@@ -1063,17 +1063,17 @@ class Hm_Output_message_start extends Hm_Output_Module {
             else {
                 $page = 'message_list';
             }
-            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).
-                '">'.$list_name.'</a>';
+            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 1) {
                 $mb_title = $this->get('mailbox_list_title', array());
                 $title .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
-                    '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.$this->html_safe($mb_title[1]).'</a>';
+                    '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.$this->trans($mb_title[1]).'</a>';
             }
         }
         elseif ($this->get('mailbox_list_title')) {
             $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
-                implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', $this->get('mailbox_list_title', array())).'</a>';
+                implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />', array_map( function($v) { return $this->trans($v); },
+                    $this->get('mailbox_list_title', array()))).'</a>';
         }
         else {
             $title = '';
@@ -1136,7 +1136,8 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res = '';
         $res .= '<div class="message_list"><div class="content_title">';
         $res .= message_controls($this).
-            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', $this->get('mailbox_list_title', array()));
+            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
+                $this->get('mailbox_list_title', array())));
         $res .= '<div class="list_controls">';
         $res .= '<a class="refresh_link" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
         $res .= $config_link;
