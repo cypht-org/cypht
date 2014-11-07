@@ -521,10 +521,15 @@ class Hm_Output_msgs extends Hm_Output_Module {
 class Hm_Output_header_start extends Hm_Output_Module {
     protected function output($input, $format) {
         $lang = '';
+        $dir = 'ltr';
         if ($this->lang) {
             $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
         }
-        return '<!DOCTYPE html><html '.$lang.'><head><meta charset="utf-8" />';
+        if ($this->dir) {
+            $dir = $this->dir;
+        }
+        $class = $dir."_page";
+        return '<!DOCTYPE html><html dir="'.$dir.'" class="'.$class.'" dir="rtl" '.$lang.'><head><meta charset="utf-8" />';
     }
 }
 
