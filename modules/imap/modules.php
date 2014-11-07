@@ -980,14 +980,17 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     else {
         $class = 'row_indent_'.$level;
     }
-    if (isset($vals['description']) && trim($vals['description'])) {
+    if (isset($vals['description']) && trim($vals['description']) && trim(strtolower($vals['description'])) != 'nil') {
         $desc = $vals['description'];
     }
-    elseif (isset($vals['name']) && trim($vals['name'])) {
+    elseif (isset($vals['name']) && trim($vals['name']) && trim(strtolower($vals['name'])) != 'nil') {
         $desc = $vals['name'];
     }
-    elseif (isset($vals['filename']) && trim($vals['filename'])) {
+    elseif (isset($vals['filename']) && trim($vals['filename']) && trim(strtolower($vals['filename'])) != 'nil') {
         $desc = $vals['filename'];
+    }
+    elseif (isset($vals['subject']) && trim($vals['subject']) && trim(strtolower($vals['subject'])) != 'nil') {
+        $desc = $vals['subject'];
     }
     else {
         $desc = '';
