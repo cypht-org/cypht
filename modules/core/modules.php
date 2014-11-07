@@ -453,9 +453,9 @@ class Hm_Output_login extends Hm_Output_Module {
             return '<form class="login_form" method="POST">'.
                 '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
                 ' <input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
-                ' <label for="username">'.$this->trans('Username').'</label>'.
+                ' <label class="screen_reader" for="username">'.$this->trans('Username').'</label>'.
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
-                ' <label for="password">'.$this->trans('Password').'</label>'.
+                ' <label class="screen_reader" for="password">'.$this->trans('Password').'</label>'.
                 '<input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
                 ' <input type="submit" value="'.$this->trans('Login').'" /></form>';
         }
@@ -466,7 +466,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').'</div>'.
-                '<label for="logout_password">'.$this->trans('Password').'</label>'.
+                '<label class="screen_reader" for="logout_password">'.$this->trans('Password').'</label>'.
                 '<input id="logout_password" name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
                 '<input class="save_settings" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />'.
                 '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
