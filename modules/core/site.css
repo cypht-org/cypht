@@ -110,6 +110,17 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .configured_server { float: left; margin-left: 25px; width: 230px; height: 220px; }
 .add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; height: 220px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
+.rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
+.rtl_page .list_controls { padding-left: 20px; float: left !important; }
+.rtl_page .account_icon { padding-right: 0px !important; padding-left: 6px !important; }
+.rtl_page .content_title { padding-right: 30px; margin-right: 0px !important; }
+.rtl_page .server_count { float: left; }
+.rtl_page .add_server, .rtl_page .configured_server { float: right !important; }
+.rtl_page .server_section img, .rtl_page .settings_subtitle img { padding-left: 10px; padding-right: 0px !important; }
+.rtl_page .save_settings, .rtl_page .password_notice { float: right !important; }
+.rtl_page .save_settings_password { float: right; margin-left: 0px; padding: 4px; }
+.rtl_page .loading_icon { left: 80px !important; right: auto !important; }
+.rtl_page .debug { float: left !important; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }
