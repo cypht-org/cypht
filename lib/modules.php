@@ -327,7 +327,7 @@ abstract class Hm_Output_Module {
             }
         }
         else {
-            Hm_Debug::add(sprintf('No translation found: %s', $string));
+            Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string));
         }
         return $this->html_safe($string);
     }

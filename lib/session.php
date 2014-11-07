@@ -62,6 +62,7 @@ abstract class Hm_Session {
     public function __construct($config, $auth_type='Hm_Auth_DB') {
         $this->site_config = $config;
         $this->auth_class = $auth_type;
+        $this->internal_users = $auth_type::$internal_users;
     }
 
     /**
@@ -73,7 +74,6 @@ abstract class Hm_Session {
     protected function load_auth_mech() {
         if (!is_object($this->auth_mech)) {
             $this->auth_mech = new $this->auth_class($this->site_config);
-            $this->internal_users = $this->auth_mech->internal_users;
         }
     }
 
@@ -215,6 +215,9 @@ abstract class Hm_Session {
      * @return void
      */
     public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='', $html_only=true) {
+        if ($name == 'hm_reload_folders') {
+            setcookie($name, $value);
+        }
         if ($request->tls) {
             $secure = true;
         }
@@ -470,6 +473,7 @@ class Hm_PHP_Session extends Hm_Session {
         $params = session_get_cookie_params();
         $this->secure_cookie($request, $this->cname, '', time()-3600, $params['path'], $params['domain']);
         $this->secure_cookie($request, 'hm_id', '', time()-3600);
+        $this->secure_cookie($request, 'hm_reload_folders', 0, time()-3600);
         $this->active = false;
     }
 }
