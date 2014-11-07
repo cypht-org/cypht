@@ -294,6 +294,9 @@ abstract class Hm_Output_Module {
     /* langauge name */
     protected $lang = false;
 
+    /* UI layout direction */
+    protected $dir = 'ltr';
+
     /**
      * Constructor
      *
@@ -343,6 +346,9 @@ abstract class Hm_Output_Module {
         $this->lstr = $lang_str;
         if (array_key_exists('interface_lang', $lang_str)) {
             $this->lang = $lang_str['interface_lang'];
+        }
+        if (array_key_exists('interface_direction', $lang_str)) {
+            $this->dir = $lang_str['interface_direction'];
         }
         return $this->output($input, $format);
     }
