@@ -166,6 +166,7 @@ add_output('ajax_imap_search', 'filter_imap_search', true);
 /* combined inbox */
 add_handler('ajax_imap_combined_inbox', 'login', false, 'core');
 add_handler('ajax_imap_combined_inbox', 'load_user_data', true, 'core');
+add_handler('ajax_imap_combined_inbox', 'language', true, 'core');
 add_handler('ajax_imap_combined_inbox', 'message_list_type', true, 'core');
 add_handler('ajax_imap_combined_inbox', 'imap_message_list_type', true);
 add_handler('ajax_imap_combined_inbox', 'load_imap_servers_from_config',  true);

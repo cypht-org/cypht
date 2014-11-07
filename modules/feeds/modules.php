@@ -511,6 +511,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $date = '';
                     $timestamp = 0;
                 }
+                if ($date) {
+                    $date = translate_time_str($date, $this);
+                }
                 $url = '?page=message&uid='.urlencode(md5($item['guid'])).'&list_path=feeds_'.$item['server_id'];
                 if ($this->get('feed_list_parent') == 'combined_inbox') {
                     $url .= '&list_parent=combined_inbox';
