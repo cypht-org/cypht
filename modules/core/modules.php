@@ -529,7 +529,7 @@ class Hm_Output_header_start extends Hm_Output_Module {
             $dir = $this->dir;
         }
         $class = $dir."_page";
-        return '<!DOCTYPE html><html dir="'.$dir.'" class="'.$class.'" dir="rtl" '.$lang.'><head><meta charset="utf-8" />';
+        return '<!DOCTYPE html><html dir="'.$dir.'" class="'.$class.'" '.$lang.'><head><meta charset="utf-8" />';
     }
 }
 
