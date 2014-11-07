@@ -257,7 +257,7 @@ class Hm_Handler_title extends Hm_Handler_Module {
 
 class Hm_Handler_language extends Hm_Handler_Module {
     public function process() {
-        $this->out('language', $this->user_config->get('language_setting', 'en_US'));
+        $this->out('language', $this->user_config->get('language_setting', 'en'));
     }
 }
 
@@ -439,7 +439,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
 class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
     public function process() {
         if ($this->get('reload_folders', false)) {
-            secure_cookie($this->request, 'hm_reload_folders', '1');
+            $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
         }
     }
 }
@@ -520,16 +520,17 @@ class Hm_Output_msgs extends Hm_Output_Module {
 
 class Hm_Output_header_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $lang = '';
+        $lang = 'en';
         $dir = 'ltr';
         if ($this->lang) {
-            $lang = 'lang='.strtolower(str_replace('_', '-', $this->lang));
+            $lang = strtolower(str_replace('_', '-', $this->lang));
         }
         if ($this->dir) {
             $dir = $this->dir;
         }
         $class = $dir."_page";
-        return '<!DOCTYPE html><html dir="'.$dir.'" class="'.$class.'" '.$lang.'><head><meta charset="utf-8" />';
+        return '<!DOCTYPE html><html dir="'.$this->html_safe($dir).'" class="'.
+            $this->html_safe($class).'" lang='.$this->html_safe($lang).'><head><meta charset="utf-8" />';
     }
 }
 
@@ -575,7 +576,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
                 $title .= ' '.ucfirst(str_replace('_', ' ', $this->get('router_page_name')));
             }
         }
-        return '<title>'.$this->trans($title).'</title>'.
+        return '<title>'.$this->trans(trim($title)).'</title>'.
             '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
             '<link rel="icon" class="tab_icon" type="image/png" href="'.Hm_Image_Sources::$env_closed.'">'.
             '<base href="'.$this->html_safe($this->get('router_url_path')).'" />';
@@ -655,7 +656,7 @@ class Hm_Output_loading_icon extends Hm_Output_Module {
 
 class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="user_settings"><div class="content_title">Site Settings</div>'.
+        return '<div class="user_settings"><div class="content_title">'.$this->trans('Site Settings').'</div>'.
             '<form method="POST"><input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<table class="settings_table"><colgroup>'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
@@ -800,21 +801,17 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
 
 class Hm_Output_language_setting extends Hm_Output_Module {
     protected function output($input, $format) {
-        $langs = array(
-            'en_US' => 'English',
-            'es_ES' => 'Spanish'
-        );
-        $settings = $this->get('user_settings', array());
-        if (array_key_exists('language', $settings)) {
-            $mylang = $settings['language'];
+        $langs = interface_langs();
+        $translated = array();
+        foreach ($langs as $code => $name) {
+            $translated[$code] = $this->trans($name);
         }
-        else {
-            $mylang = false;
-        }
+        asort($translated);
+        $mylang = $this->get('language', false);
         $res = '<tr class="general_setting"><td><label for="language_setting">'.
             $this->trans('Interface language').'</label></td>'.
             '<td><select id="language_setting" name="language_setting">';
-        foreach ($langs as $id => $lang) {
+        foreach ($translated as $id => $lang) {
             $res .= '<option ';
             if ($id == $mylang) {
                 $res .= 'selected="selected" ';
@@ -880,7 +877,7 @@ class Hm_Output_folder_list_content_start extends Hm_Output_Module {
 
 class Hm_Output_main_menu_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="src_name main_menu" data-source=".main">Main'.
+        $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main').
         '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div class="main"><ul class="folders">';
         if ($format == 'HTML5') {
@@ -971,7 +968,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
 
 class Hm_Output_settings_menu_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="src_name" data-source=".settings">Settings'.
+        $res = '<div class="src_name" data-source=".settings">'.$this->trans('Settings').
             '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
             '</div><ul style="display: none;" class="settings folders">';
         if ($format == 'HTML5') {
@@ -1008,7 +1005,7 @@ class Hm_Output_settings_menu_end extends Hm_Output_Module {
 
 class Hm_Output_folder_list_content_end extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<a href="#" class="update_message_list">[reload]</a>';
+        $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
         $res .= '<a href="#" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.
             '" alt="'.$this->trans('Collapse').'" width="16" height="16" /></a>';
         if ($format == 'HTML5') {

@@ -15,7 +15,7 @@ class Hm_Output_contacts_page_link extends Hm_Output_Module {
 
 class Hm_Output_contacts_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="contacts_content"><div class="content_title">Contacts</div></div>';
+        return '<div class="contacts_content"><div class="content_title">'.$this->trans('Contacts').'</div></div>';
     }
 }
 

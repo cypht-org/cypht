@@ -538,7 +538,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
                         else {
-                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                         }
                         break;
                     }
@@ -546,7 +546,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             foreach ($headers as $name => $value) {
                 if (!in_array(strtolower($name), $small_headers)) {
-                    $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
@@ -575,15 +575,15 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             if (isset($vals['user'])) {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
-                $pass_pc = '[saved]';
+                $pass_pc = $this->trans('[saved]');
             }
             else {
                 $user_pc = '';
-                $pass_pc = 'Password';
+                $pass_pc = $this->trans('Password');
                 $disabled = '';
             }
             if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = 'Default';
+                $vals['name'] = $this->trans('Default');
                 $no_edit = true;
             }
             $res .= '<div class="configured_server">';
@@ -594,19 +594,19 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 '<form class="imap_connect" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<label class="screen_reader" for="imap_user_'.$index.'">IMAP username</label>'.
-                '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="Username" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
-                '<span><label class="screen_reader" for="imap_pass_'.$index.'">IMAP password</label>'.
+                '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label>'.
+                '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').'" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
+                '<span><label class="screen_reader" for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label>'.
                 '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
             if (!$no_edit) {
-                $res .= '<input type="submit" value="Test" class="test_imap_connect" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
-                    $res .= '<input type="submit" value="Delete" class="imap_delete" />';
-                    $res .= '<input type="submit" value="Save" class="save_imap_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection" />';
                 }
                 else {
-                    $res .= '<input type="submit" value="Delete" class="imap_delete" />';
-                    $res .= '<input type="submit" value="Forget" class="forget_imap_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection" />';
                 }
                 $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
             }
@@ -623,17 +623,17 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
-            ' IMAP Servers <div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
+            ' '.$this->trans('IMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<div class="subtitle">Add an IMAP Server</div><table>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_name">Account name</label>'.
-            '<input id="new_imap_name" required type="text" name="new_imap_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_address">Server address</label>'.
-            '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld" placeholder="IMAP server address" value=""/></td></tr>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">IMAP Port</label>'.
-            '<input required type="number" id="new_imap_port" name="new_imap_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
-            '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
-            '<td><input type="submit" value="Add" name="submit_imap_server" /></td></tr>'.
+            '<div class="subtitle">'.$this->trans('Add an IMAP Server').'</div><table>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_name">'.$this->trans('Account name').'</label>'.
+            '<input id="new_imap_name" required type="text" name="new_imap_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_address">'.$this->trans('Server address').'</label>'.
+            '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld" placeholder="'.$this->trans('IMAP server address').'" value=""/></td></tr>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('IMAP port').'</label>'.
+            '<input required type="number" id="new_imap_port" name="new_imap_port" class="port_fld" value="" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<tr><td><input type="checkbox" name="tls" value="1" id="imap_tls" checked="checked" /> <label for="imap_tls">'.$this->trans('Use TLS').'</label></td>'.
+            '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" /></td></tr>'.
             '</table></form>';
     }
 }
@@ -643,7 +643,7 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
             if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = 'Default';
+                $vals['name'] = $this->trans('Default');
             }
             $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
                 '<td class="imap_detail_'.$index.'"></td></tr>';
@@ -688,11 +688,11 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         if ($this->get('imap_connect_status') != 'disconnected') {
-            $res .= '<span class="online">'.$this->html_safe(ucwords($this->get('imap_connect_status'))).
+            $res .= '<span class="online">'.$this->trans(ucwords($this->get('imap_connect_status'))).
                 '</span> in '.round($this->get('imap_connect_time', 0), 3);
         }
         else {
-            $res .= '<span class="down">Down</span>';
+            $res .= '<span class="down">'.$this->trans('Down').'</span>';
         }
         $this->out('imap_status_display', $res);
     }
@@ -703,7 +703,8 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_"><img alt="" class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
+                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_">'.
+                    '<img class="account_icon" alt="'.$this->trans('Toggle folder').'" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
@@ -792,10 +793,10 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
                 }
                 if (array_key_exists('Date', $hdrs)) {
                     if ($reply_to) {
-                        $lead_in = sprintf("On %s %s said\n", $hdrs['Date'], $reply_to);
+                        $lead_in = sprintf($this->trans('On %s %s said')."\n", $hdrs['Date'], $reply_to);
                     }
                     else {
-                        $lead_in = sprintf("On %s, somebody said\n", $hdrs['Date']);
+                        $lead_in = sprintf($this->trans('On %s, somebody said')."\n", $hdrs['Date']);
                     }
                 }
             }

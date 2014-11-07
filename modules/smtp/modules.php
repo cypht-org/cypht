@@ -189,11 +189,11 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
 class Hm_Output_compose_form extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="compose_page"><div class="content_title">Compose</div>'.
+        return '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<input required name="compose_to" class="compose_to" type="text" placeholder="To" />'.
-            '<input required name="compose_subject" class="compose_subject" type="text" placeholder="Subject" />'.
+            '<input required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<input required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
             '<textarea required name="compose_body" class="compose_body"></textarea>'.
             smtp_server_dropdown($this->module_output(), $this).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" /></form></div>';
@@ -206,17 +206,17 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="smtp_server_setup"><div data-target=".smtp_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" />'.
-            ' SMTP Servers <div class="server_count">'.$count.'</div></div><div class="smtp_section"><form class="add_server" method="POST">'.
+            ' '.$this->trans('SMTP Servers').' <div class="server_count">'.$count.'</div></div><div class="smtp_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<div class="subtitle">Add an SMTP Server</div>'.
-            '<table><tr><td colspan="2"><label for="new_smtp_name" class="screen_reader">SMTP account name</label>'.
-            '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-            '<tr><td colspan="2"><label for="new_smtp_address" class="screen_reader">SMTP server address</label>'.
-            '<input required type="text" id="new_smtp_address" name="new_smtp_address" class="txt_fld" placeholder="smtp server address" value=""/></td></tr>'.
-            '<tr><td colspan="2"><label for="new_smtp_port" class="screen_reader">SMTP Port</label>'.
-            '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
-            '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
-            '<td><input type="submit" value="Add" name="submit_smtp_server" /></td></tr>'.
+            '<div class="subtitle">'.$this->trans('Add an SMTP Server').'</div>'.
+            '<table><tr><td colspan="2"><label for="new_smtp_name" class="screen_reader">'.$this->trans('SMTP account name').'</label>'.
+            '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
+            '<tr><td colspan="2"><label for="new_smtp_address" class="screen_reader">'.$this->trans('SMTP server address').'</label>'.
+            '<input required type="text" id="new_smtp_address" name="new_smtp_address" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" value=""/></td></tr>'.
+            '<tr><td colspan="2"><label for="new_smtp_port" class="screen_reader">'.$this->trans('SMTP port').'</label>'.
+            '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<tr><td><input type="checkbox" name="tls" value="1" id="smtp_tls" checked="checked" /> <label for="smtp_tls">'.$this->trans('Use TLS').'</label></td>'.
+            '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" /></td></tr>'.
             '</table></form>';
     }
 }
@@ -231,15 +231,15 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             if (isset($vals['user'])) {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
-                $pass_pc = '[saved]';
+                $pass_pc = $this->trans('[saved]');
             }
             else {
                 $user_pc = '';
-                $pass_pc = 'Password';
+                $pass_pc = $this->trans('Password');
                 $disabled = '';
             }
             if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = 'Default';
+                $vals['name'] = $this->trans('Default');
                 $no_edit = true;
             }
             $res .= '<div class="configured_server">';
@@ -249,19 +249,19 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 '<form class="smtp_connect" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<label class="screen_reader" for="smtp_user_'.$index.'">SMTP username</label>'.
-                '<input '.$disabled.' class="credentials" id="smtp_user_'.$index.'" placeholder="Username" type="text" name="smtp_user" value="'.$user_pc.'"></span>'.
-                '<span> <label class="screen_reader" for="smtp_pass_'.$index.'">SMTP password</label>'.
+                '<label class="screen_reader" for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label>'.
+                '<input '.$disabled.' class="credentials" id="smtp_user_'.$index.'" placeholder="'.$this->trans('Username').'" type="text" name="smtp_user" value="'.$user_pc.'"></span>'.
+                '<span> <label class="screen_reader" for="smtp_pass_'.$index.'">'.$this->trans('SMTP password').'</label>'.
                 '<input '.$disabled.' class="credentials smtp_password" placeholder="'.$pass_pc.'" type="password" id="smtp_pass_'.$index.'" name="smtp_pass"></span>';
             if (!$no_edit) {
-                $res .= '<input type="submit" value="Test" class="test_smtp_connect" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
-                    $res .= '<input type="submit" value="Delete" class="smtp_delete" />';
-                    $res .= '<input type="submit" value="Save" class="save_smtp_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="smtp_delete" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_smtp_connection" />';
                 }
                 else {
-                    $res .= '<input type="submit" value="Delete" class="delete_smtp_connection" />';
-                    $res .= '<input type="submit" value="Forget" class="forget_smtp_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_smtp_connection" />';
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }

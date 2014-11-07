@@ -68,7 +68,7 @@ add_handler('settings', 'process_unread_source_max_setting', true, 'core', 'date
 add_handler('settings', 'process_all_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
-add_handler('settings', 'reload_folder_cookie', true, 'core', 'date', 'after');
+add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 
 add_output('settings', 'start_settings_form', true, 'core', 'content_section_start', 'after');
 add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
@@ -110,6 +110,7 @@ add_handler('ajax_message_action', 'http_headers', true);
 /* folder list update ajax request */
 add_handler('ajax_hm_folders', 'login', false);
 add_handler('ajax_hm_folders', 'load_user_data', true);
+add_handler('ajax_hm_folders', 'language',  true);
 add_handler('ajax_hm_folders', 'date', true);
 add_handler('ajax_hm_folders', 'http_headers', true);
 add_output('ajax_hm_folders', 'folder_list_content_start', true);

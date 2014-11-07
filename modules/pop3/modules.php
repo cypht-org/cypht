@@ -423,17 +423,17 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="pop3_server_setup"><div data-target=".pop3_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
-            ' POP3 Servers <div class="server_count">'.$count.'</div></div><div class="pop3_section"><form class="add_server" method="POST">'.
+            ' '.$this->trans('POP3 Servers').' <div class="server_count">'.$count.'</div></div><div class="pop3_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<div class="subtitle">Add a POP3 Server</div>'.
-            '<table><tr><td colspan="2"><label class="screen_reader" for="new_pop3_name">POP3 account name</label>'.
-            '<input required type="text" id="new_pop3_name" name="new_pop3_name" class="txt_fld" value="" placeholder="Account name" /></td></tr>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_pop3_address">POP3 server address</label>'.
-            '<input required type="text" id="new_pop3_address" name="new_pop3_address" class="txt_fld" placeholder="pop3 server address" value=""/></td></tr>'.
-            '<tr><td colspan="2"><label for="new_pop3_port" class="screen_reader">POP3 port</label>'.
-            '<input required type="number" id="new_pop3_port" name="new_pop3_port" class="port_fld" value="" placeholder="Port"></td></tr>'.
-            '<tr><td><input type="checkbox" name="tls" value="1" checked="checked" /> Use TLS</td>'.
-            '<td><input type="submit" value="Add" name="submit_pop3_server" /></td></tr>'.
+            '<div class="subtitle">'.$this->trans('Add a POP3 Server').'</div>'.
+            '<table><tr><td colspan="2"><label class="screen_reader" for="new_pop3_name">'.$this->trans('POP3 account name').'</label>'.
+            '<input required type="text" id="new_pop3_name" name="new_pop3_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_pop3_address">'.$this->trans('POP3 server address').'</label>'.
+            '<input required type="text" id="new_pop3_address" name="new_pop3_address" class="txt_fld" placeholder="'.$this->trans('POP3 server address').'" value=""/></td></tr>'.
+            '<tr><td colspan="2"><label for="new_pop3_port" class="screen_reader">'.$this->trans('POP3 port').'</label>'.
+            '<input required type="number" id="new_pop3_port" name="new_pop3_port" class="port_fld" value="" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<tr><td><input type="checkbox" name="tls" value="1" id="pop3_tls" checked="checked" /> <lable for="pop3_tls">'.$this->trans('Use TLS').'</label></td>'.
+            '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_pop3_server" /></td></tr>'.
             '</table></form>';
     }
 }
@@ -448,15 +448,15 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
             if (isset($vals['user'])) {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
-                $pass_pc = '[saved]';
+                $pass_pc = $this->trans('[saved]');
             }
             else {
                 $user_pc = '';
-                $pass_pc = 'Password';
+                $pass_pc = $this->trans('Password');
                 $disabled = '';
             }
             if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = 'Default';
+                $vals['name'] = $this->trans('Default');
                 $no_edit = true;
             }
             $res .= '<div class="configured_server">';
@@ -466,19 +466,19 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 '<form class="pop3_connect" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<label class="screen_reader" for="pop3_user_'.$index.'">POP3 username</label>'.
-                '<input '.$disabled.' id="pop3_user_'.$index.'" class="credentials" placeholder="Username" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
-                '<span> <label class="screen_reader" for="pop3_password_'.$index.'">POP3 password</label>'.
+                '<label class="screen_reader" for="pop3_user_'.$index.'">'.$this->trans('POP3 username').'</label>'.
+                '<input '.$disabled.' id="pop3_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').'" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
+                '<span> <label class="screen_reader" for="pop3_password_'.$index.'">'.$this->trans('POP3 password').'</label>'.
                 '<input '.$disabled.' id="pop3_password_'.$index.'" class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
             if (!$no_edit) {
                 $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
-                    $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
-                    $res .= '<input type="submit" value="Save" class="save_pop3_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_pop3_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_pop3_connection" />';
                 }
                 else {
-                    $res .= '<input type="submit" value="Delete" class="delete_pop3_connection" />';
-                    $res .= '<input type="submit" value="Forget" class="forget_pop3_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_pop3_connection" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_pop3_connection" />';
                 }
                 $res .= '<input type="hidden" value="ajax_pop3_debug" name="hm_ajax_hook" />';
             }
@@ -526,7 +526,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
                         else {
-                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                         }
                         break;
                     }
@@ -534,17 +534,17 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
             }
             foreach ($headers as $name => $value) {
                 if (!in_array(strtolower($name), $small_headers)) {
-                    $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="header_toggle">all</a>'.
                 '<a class="header_toggle" style="display: none;" href="#">small</a>'.
-                ' | <a href="?page=compose">reply</a>'.
-                ' | <a href="?page=compose">forward</a>'.
-                ' | <a href="?page=compose">attach</a>'.
-                ' | <a data-message-part="0" href="#">raw</a>'.
-                ' | <a href="#">flag</a>'.
+                ' | <a href="?page=compose">'.$this->trans('Reply').'</a>'.
+                ' | <a href="?page=compose">'.$this->trans('Forward').'</a>'.
+                ' | <a href="?page=compose">'.$this->trans('Attach').'</a>'.
+                ' | <a data-message-part="0" href="#">'.$this->trans('Raw').'</a>'.
+                ' | <a href="#">'.$this->trans('Flag').'</a>'.
                 '</th></tr></table>';
 
             $this->out('msg_headers', $txt);
@@ -589,7 +589,7 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
         $res = '';
         foreach ($this->get('pop3_servers', array()) as $index => $vals) {
             if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = 'Default';
+                $vals['name'] = $this->trans('Default');
             }
             $res .= '<tr><td>POP3</td><td>'.$vals['name'].'</td><td class="pop3_status_'.$index.'"></td>'.
                 '<td class="pop3_detail_'.$index.'"></td></tr>';
@@ -600,7 +600,8 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
 
 class Hm_Output_start_pop3_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td data-target=".pop3_setting" colspan="2" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$env_closed.'" />POP3 Settings</td></tr>';
+        return '<tr><td data-target=".pop3_setting" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" />'.$this->trans('POP3 Settings').'</td></tr>';
     }
 }
 
@@ -611,7 +612,7 @@ class Hm_Output_pop3_since_setting extends Hm_Output_Module {
         if (array_key_exists('pop3_since', $settings)) {
             $since = $settings['pop3_since'];
         }
-        return '<tr class="pop3_setting"><td><label for="pop3_since">Show messages received since</label></td>'.
+        return '<tr class="pop3_setting"><td><label for="pop3_since">'.$this->trans('Show messages received since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'pop3_since', $this).'</td></tr>';
     }
 }
@@ -623,7 +624,7 @@ class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
         if (array_key_exists('pop3_limit', $settings)) {
             $limit = $settings['pop3_limit'];
         }
-        return '<tr class="pop3_setting"><td><label for="pop3_limit">Max messages to display</label></td>'.
+        return '<tr class="pop3_setting"><td><label for="pop3_limit">'.$this->trans('Max messages to display').'</label></td>'.
             '<td><input type="text" id="pop3_limit" name="pop3_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
@@ -632,10 +633,10 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($this->get('pop3_connect_status') == 'Authenticated') {
             $this->out('pop3_status_display', '<span class="online">'.
-                $this->html_safe(ucwords($this->get('pop3_connect_status'))).'</span> in '.round($this->get('pop3_connect_time'), 3));
+                $this->trans(ucwords($this->get('pop3_connect_status'))).'</span> in '.round($this->get('pop3_connect_time'), 3));
         }
         else {
-            $this->out('pop3_status_display', '<span class="down">Down</span>');
+            $this->out('pop3_status_display', '<span class="down">'.$this->trans('Down').'</span>');
         }
     }
 }

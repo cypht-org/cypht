@@ -22,8 +22,10 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
 class Hm_Output_search_from_folder_list extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).'" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
-            '<input type="search" class="search_terms" name="search_terms" placeholder="'.$this->trans('Search').'" /></form></li>';
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).
+            '" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
+            '<input type="search" class="search_terms" name="search_terms" placeholder="'.
+            $this->trans('Search').'" /></form></li>';
         if ($format == 'HTML5') {
             return $res;
         }
@@ -41,8 +43,9 @@ class Hm_Output_search_content extends Hm_Output_Module {
             $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
             '<col class="from_col"><col class="subject_col"><col class="date_col">'.
             '<col class="icon_col"></colgroup><!--<thead><tr><th colspan="2" class="source">'.
-            'Source</th><th class="from">From</th><th class="subject">Subject</th>'.
-            '<th class="msg_date">Date</th><th></th></tr></thead>-->';
+            $this->trans('Source').'</th><th class="from">'.$this->trans('From').
+            '</th><th class="subject">'.$this->trans('Subject').'</th>'.
+            '<th class="msg_date">'.$this->trans('Date').'</th><th></th></tr></thead>-->';
         }
         $res .= '<tbody></tbody></table>';
         return $res;
@@ -74,7 +77,7 @@ function validate_search_fld($fld) {
     return false;
 }
 
-function search_field_selection($current) {
+function search_field_selection($current, $output_mod) {
     $flds = array(
         'TEXT' => 'Entire message',
         'BODY' => 'Message body',
@@ -87,7 +90,7 @@ function search_field_selection($current) {
         if ($current == $val) {
             $res .= 'selected="selected" ';
         }
-        $res .= 'value="'.$val.'">'.$name.'</option>';
+        $res .= 'value="'.$val.'">'.$output_mod->trans($name).'</option>';
     }
     $res .= '</select>';
     return $res;
@@ -101,7 +104,7 @@ function search_form($data, $output_mod) {
     $res = '<div class="search_form">'.
         '<form method="get"><input type="hidden" name="page" value="search" />'.
         ' <input type="text" class="search_terms" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
-        ' '.search_field_selection($data['search_fld']).
+        ' '.search_field_selection($data['search_fld'], $output_mod).
         ' '.message_since_dropdown($data['search_since'], 'search_since', $output_mod).
         ' <input type="submit" class="search_update" value="Update" /></form></div>';
     return $res;

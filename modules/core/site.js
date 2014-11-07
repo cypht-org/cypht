@@ -575,7 +575,7 @@ var Hm_Folders = {
         if (document.cookie.indexOf('hm_reload_folders=1') > -1 || force) {
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
-            document.cookie = 'hm_reload_folders=; expires=' + new Date(0).toUTCString();
+            document.cookie = 'hm_reload_folders=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         }
     },
     sort_list: function(class_name, exclude_name) {

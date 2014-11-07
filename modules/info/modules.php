@@ -4,21 +4,21 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 class Hm_Output_dev_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="dev_content"><div class="content_title">Developer Documentation</div>'.
-            '<div class="long_text">Everything you ever wanted to know about customizing the software.</div></div>';
+        return '<div class="dev_content"><div class="content_title">'.$this->trans('Developer Documentation').'</div>'.
+            '<div class="long_text"></div></div>';
     }
 }
 
 class Hm_Output_bug_report_form extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="bug_report"><div class="content_title">Report a bug</div>'.
-            '<div class="long_text">If you found a bug or want a feature we want to hear from you!</div></div>';
+        return '<div class="bug_report"><div class="content_title">'.$this->trans('Report a bug').'</div>'.
+            '<div class="long_text">'.$this->trans('If you found a bug or want a feature we want to hear from you!').'</div></div>';
     }
 }
 
 class Hm_Output_help_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="help_content"><div class="content_title">Help</div>'.
+        return '<div class="help_content"><div class="content_title">'.$this->trans('Help').'</div>'.
             '<div class="long_text"></div></div>';
     }
 }
@@ -26,7 +26,7 @@ class Hm_Output_help_content extends Hm_Output_Module {
 class Hm_Output_developer_doc_link extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> '.$this->trans('Dev').'</a></li>';
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> '.$this->trans('Development').'</a></li>';
         if ($format == 'HTML5') {
             return $res;
         }
@@ -37,7 +37,7 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
 class Hm_Output_bug_report_link extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '<li class="menu_bug_report"><a class="unread_link" href="?page=bug_report">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> '.$this->trans('FAIL').'</a></li>';
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> '.$this->trans('Bugs').'</a></li>';
         if ($format == 'HTML5') {
             return $res;
         }

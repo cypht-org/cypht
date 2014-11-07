@@ -221,4 +221,62 @@ function format_reply_text($txt) {
     return '> '.str_replace("\n", "\n> ", $txt);
 }
 
+function interface_langs() {
+    return array(
+        'en' => 'English',
+        'es' => 'Spanish',
+        'zh' => 'Chinese (Simplified)',
+        'zh_TW' => 'Chinese (Traditional)',
+        'ar' => 'Arabic',
+        'fr' => 'French',
+        'nl' => 'Dutch',
+        'de' => 'German',
+        'hi' => 'Hindi',
+        'it' => 'Italian',
+        'ja' => 'Japanese',
+        'ko' => 'Korean',
+        'pl' => 'Polish',
+        'pt' => 'Portuguese',
+        'ru' => 'Russian',
+        'ro' => 'Romanian',
+        'sv' => 'Sweedish',
+        'th' => 'Thai',
+        'vi' => 'Vietnamese',
+        'cs' => 'Czech',
+        'da' => 'Danish',
+        'et' => 'Estonian',
+        'fi' => 'Finish',
+        'tl' => 'Filipino',
+        'ka' => 'Georgian',
+        'el' => 'Greek',
+        'iw' => 'Hebrew',
+        'hu' => 'Hungarian',
+        'id' => 'Indonesian',
+        'kn' => 'Kannada',
+        'lo' => 'Lao',
+        'lv' => 'Latvian',
+        'lt' => 'Lithuanian',
+        'mt' => 'Maltese',
+        'mn' => 'Mongolian',
+        'ne' => 'Nepalia',
+        'no' => 'Norwegian',
+        'fa' => 'Persian',
+        'pa' => 'Punjabi',
+        'sr' => 'Serbian',
+        'so' => 'Somali',
+        'sw' => 'Swahili',
+        'uk' => 'Ukranian',
+        'yi' => 'Yiddish',
+
+
+
+
+    );
+}
+function rtl_langs() {
+    return array(
+        'ar', 'iw', 'yi'
+    );
+}
+
 ?>

@@ -413,14 +413,14 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
             $count = sprintf($this->trans('%d configured'), $count);
             return '<div class="feed_server_setup"><div data-target=".feed_section" class="server_section">'.
                 '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.
-                ' Feeds <div class="server_count">'.$count.'</div></div><div class="feed_section"><form class="add_server" method="POST">'.
+                ' '.$this->trans('Feeds').' <div class="server_count">'.$count.'</div></div><div class="feed_section"><form class="add_server" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-                '<div class="subtitle">Add an RSS/ATOM Feed</div><table>'.
-                '<tr><td><label class="screen_reader" for="new_feed_name">Feed name</label>'.
-                '<input required type="text" id="new_feed_name" name="new_feed_name" class="txt_fld" value="" placeholder="Feed name" /></td></tr>'.
-                '<tr><td><label for="new_feed_address" class="screen_reader">Feed address</label>'.
-                '<input required type="url" id="new_feed_address" name="new_feed_address" class="txt_fld" placeholder="Site address or feed URL" value=""/></td></tr>'.
-                '<tr><td><input type="submit" value="Add" name="submit_feed" /></td></tr>'.
+                '<div class="subtitle">'.$this->trans('Add an RSS/ATOM Feed').'</div><table>'.
+                '<tr><td><label class="screen_reader" for="new_feed_name">'.$this->trans('Feed name').'</label>'.
+                '<input required type="text" id="new_feed_name" name="new_feed_name" class="txt_fld" value="" placeholder="'.$this->trans('Feed name').'" /></td></tr>'.
+                '<tr><td><label for="new_feed_address" class="screen_reader">'.$this->trans('Site address or feed URL').'</label>'.
+                '<input required type="url" id="new_feed_address" name="new_feed_address" class="txt_fld" placeholder="'.$this->trans('Site address or feed URL').'" value=""/></td></tr>'.
+                '<tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_feed" /></td></tr>'.
                 '</table></form>';
         }
     }
@@ -432,11 +432,12 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
         if ($format == 'HTML5') {
             foreach ($this->get('feeds', array()) as $index => $vals) {
                 $res .= '<div class="configured_server">';
-                $res .= sprintf('<div class="server_title">%s</div><div title="%s" class="server_subtitle">%s</div>', $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['server']));
+                $res .= sprintf('<div class="server_title">%s</div><div title="%s" class="server_subtitle">%s</div>',
+                    $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['server']));
                 $res .= '<form class="feed_connect" method="POST">';
                 $res .= '<input type="hidden" name="feed_id" value="'.$this->html_safe($index).'" />';
-                $res .= '<input type="submit" value="Test" class="test_feed_connect" />';
-                $res .= '<input type="submit" value="Delete" class="feed_delete" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_feed_connect" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="feed_delete" />';
                 $res .= '<input type="hidden" value="ajax_feed_debug" name="hm_ajax_hook" />';
                 $res .= '</form></div>';
             }
@@ -465,10 +466,10 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                     $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
                 }
                 elseif ($name == 'link') {
-                    $header_str .= '<tr class="header_'.$name.'"><th>'.$this->html_safe($name).'</th><td><a target="_blank" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
+                    $header_str .= '<tr class="header_'.$name.'"><th>'.$this->trans($name).'</th><td><a target="_blank" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
                 }
                 else {
-                    $header_str .= '<tr><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    $header_str .= '<tr><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
             }
             $header_str .= '<tr><td colspan="2"></td></tr></table>';
@@ -551,7 +552,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $from = display_value('dc:creator', $item, 'from');
                 }
                 elseif ($style == 'email') {
-                    $from = '[No From]';
+                    $from = $this->trans('[No From]');
                 }
                 else {
                     $from = '';
@@ -572,7 +573,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
             foreach ($this->get('feed_folders') as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
                     '<a href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">'.
-                    '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" /> '.
+                    '<img class="account_icon" alt="'.$this->trans('Load Feed').'" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }
         }
@@ -585,7 +586,7 @@ class Hm_Output_display_feeds_status extends Hm_Output_Module {
     protected function output($input, $format) {
         $res = '';
         foreach ($this->get('feeds', array()) as $index => $vals) {
-            $res .= '<tr><td>FEED</td><td>'.$vals['name'].'</td><td class="feeds_status_'.$index.'"></td>'.
+            $res .= '<tr><td>'.$this->trans('FEED').'</td><td>'.$vals['name'].'</td><td class="feeds_status_'.$index.'"></td>'.
                 '<td class="feeds_detail_'.$index.'"></td></tr>';
         }
         return $res;
@@ -601,7 +602,7 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
         else {
             $checked = '';
         }
-        return '<tr class="unread_setting"><td><label for="unread_exclude_feeds">Exclude unread feed items</label></td>'.
+        return '<tr class="unread_setting"><td><label for="unread_exclude_feeds">'.$this->trans('Exclude unread feed items').'</label></td>'.
             '<td><input type="checkbox" '.$checked.' value="1" id="unread_exclude_feeds" name="unread_exclude_feeds" /></td></tr>';
     }
 }
@@ -610,17 +611,18 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
     protected function output($input, $format) {
         if ($this->get('feed_connect_status') == 'Connected') {
             $this->out('feed_status_display', '<span class="online">'.
-                $this->html_safe(ucwords($this->get('feed_connect_status'))).'</span> in '.round($this->get('feed_connect_time'), 3));
+                $this->trans(ucwords($this->get('feed_connect_status'))).'</span> in '.round($this->get('feed_connect_time'), 3));
         }
         else {
-            $this->out('feed_status_display', '<span class="down">Down</span>');
+            $this->out('feed_status_display', '<span class="down">'.$this->trans('Down').'</span>');
         }
     }
 }
 
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$rss.'" />Feed Settings</td></tr>';
+        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$rss.'" />'.$this->trans('Feed Settings').'</td></tr>';
     }
 }
 
@@ -631,7 +633,7 @@ class Hm_Output_feed_since_setting extends Hm_Output_Module {
         if (array_key_exists('feed_since', $settings)) {
             $since = $settings['feed_since'];
         }
-        return '<tr class="feeds_setting"><td><label for="feed_since">Show feed items received since</label></td>'.
+        return '<tr class="feeds_setting"><td><label for="feed_since">'.$this->trans('Show feed items received since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'feed_since', $this).'</td></tr>';
     }
 }
@@ -643,7 +645,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
         if (array_key_exists('feed_limit', $settings)) {
             $limit = $settings['feed_limit'];
         }
-        return '<tr class="feeds_setting"><td><label for="feed_limit">Max feed items to display</label></td>'.
+        return '<tr class="feeds_setting"><td><label for="feed_limit">'.$this->trans('Max feed items to display').'</label></td>'.
             '<td><input type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }

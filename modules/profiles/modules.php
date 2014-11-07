@@ -15,7 +15,7 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
 
 class Hm_Output_profile_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        return '<div class="profile_content"><div class="content_title">Profiles</div></div>';
+        return '<div class="profile_content"><div class="content_title">'.$this->trans('Profiles').'</div></div>';
     }
 }
 

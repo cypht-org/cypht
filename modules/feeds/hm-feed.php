@@ -68,7 +68,6 @@ class Hm_Feed {
         }
         switch ($type) {
             case 'curl':
-                $rand =  md5(uniqid(rand(), 1));
                 $curl_handle=curl_init();
                 curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36");
                 curl_setopt($curl_handle, CURLOPT_URL, $url);
