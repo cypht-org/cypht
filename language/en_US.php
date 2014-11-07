@@ -4,6 +4,8 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'en_US',
+    'interface_direction' => 'ltr',
+
     'Username' => false,
     'Password' => false,
     'Notices' => false,
