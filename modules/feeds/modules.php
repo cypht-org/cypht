@@ -419,7 +419,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
                 '<tr><td><label class="screen_reader" for="new_feed_name">'.$this->trans('Feed name').'</label>'.
                 '<input required type="text" id="new_feed_name" name="new_feed_name" class="txt_fld" value="" placeholder="'.$this->trans('Feed name').'" /></td></tr>'.
                 '<tr><td><label for="new_feed_address" class="screen_reader">'.$this->trans('Site address or feed URL').'</label>'.
-                '<input required type="url" id="new_feed_address" name="new_feed_address" class="txt_fld" placeholder="'.$this->trans('Site address or feed URL').'" value=""/></td></tr>'.
+                '<input required type="url" id="new_feed_address" name="new_feed_address" class="txt_fld" placeholder="'.$this->trans('Site address or feed URL').'" value="http://"/></td></tr>'.
                 '<tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_feed" /></td></tr>'.
                 '</table></form>';
         }
