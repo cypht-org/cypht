@@ -852,7 +852,7 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
         return '<tr><td class="submit_cell" colspan="2">'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
             'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
-            '<input class="save_settings" type="submit" name="save_settings" value="Save" />'.
+            '<input class="save_settings" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
             '<div class="password_notice">* '.$this->trans('You must enter your password to save your settings on the server').
             '</div></td></tr></table></form></div>';
     }

@@ -36,7 +36,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
 
 class Hm_Output_search_content extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="search_content"><div class="content_title">Search'.
+        $res = '<div class="search_content"><div class="content_title">'.$this->trans('Search').
             search_form($this->module_output(), $this).'</div>';
         $res .= '<table class="message_table">';
         if (!$this->get('no_message_list_headers')) {
@@ -106,7 +106,7 @@ function search_form($data, $output_mod) {
         ' <input type="text" class="search_terms" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
         ' '.search_field_selection($data['search_fld'], $output_mod).
         ' '.message_since_dropdown($data['search_since'], 'search_since', $output_mod).
-        ' <input type="submit" class="search_update" value="Update" /></form></div>';
+        ' <input type="submit" class="search_update" value="'.$output_mod->trans('Update').'" /></form></div>';
     return $res;
 }
 

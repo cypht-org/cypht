@@ -54,6 +54,7 @@ add_output('message_list', 'feed_ids', true, 'feeds', 'page_js', 'before');
 /* combined inbox */
 add_handler('ajax_feed_combined_inbox', 'login', false, 'core');
 add_handler('ajax_feed_combined_inbox', 'load_user_data', true, 'core');
+add_handler('ajax_feed_combined_inbox', 'language', true, 'core');
 add_handler('ajax_feed_combined_inbox', 'message_list_type', true, 'core');
 add_handler('ajax_feed_combined_inbox', 'feed_list_type', true);
 add_handler('ajax_feed_combined_inbox', 'load_feeds_from_config',  true);
@@ -66,6 +67,7 @@ add_output('ajax_feed_combined_inbox', 'filter_feed_list_data', true);
 /* combined feeds */
 add_handler('ajax_feed_combined', 'login', false, 'core');
 add_handler('ajax_feed_combined', 'load_user_data', true, 'core');
+add_handler('ajax_feed_combined', 'language', true, 'core');
 add_handler('ajax_feed_combined', 'message_list_type', true, 'core');
 add_handler('ajax_feed_combined', 'feed_list_type', true);
 add_handler('ajax_feed_combined', 'load_feeds_from_config',  true);
@@ -78,6 +80,7 @@ add_output('ajax_feed_combined', 'filter_feed_list_data', true);
 /* unread */
 add_handler('ajax_feed_unread', 'login', false, 'core');
 add_handler('ajax_feed_unread', 'load_user_data', true, 'core');
+add_handler('ajax_feed_unread', 'language', true, 'core');
 add_handler('ajax_feed_unread', 'message_list_type', true, 'core');
 add_handler('ajax_feed_unread', 'feed_list_type', true);
 add_handler('ajax_feed_unread', 'load_feeds_from_config',  true);
@@ -91,6 +94,7 @@ add_output('ajax_feed_unread', 'filter_feed_list_data', true);
 /* feed list */
 add_handler('ajax_feed_list_display', 'login', false, 'core');
 add_handler('ajax_feed_list_display', 'load_user_data', true, 'core');
+add_handler('ajax_feed_list_display', 'language', true, 'core');
 add_handler('ajax_feed_list_display', 'message_list_type', false, 'core');
 add_handler('ajax_feed_list_display', 'feed_list_type', false);
 add_handler('ajax_feed_list_display', 'load_feeds_from_config',  true);
@@ -107,6 +111,7 @@ add_handler('message', 'add_feeds_to_page_data',  true, 'feeds', 'load_feeds_fro
 /* message view */
 add_handler('ajax_feed_item_content', 'login', false, 'core');
 add_handler('ajax_feed_item_content', 'load_user_data', true, 'core');
+add_handler('ajax_feed_list_content', 'language', true, 'core');
 add_handler('ajax_feed_item_content', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_item_content', 'feed_item_content',  true);
 add_handler('ajax_feed_item_content', 'save_feeds',  true);
@@ -116,6 +121,7 @@ add_output('ajax_feed_item_content', 'filter_feed_item_content', true);
 
 add_handler('ajax_feed_debug', 'login', false, 'core');
 add_handler('ajax_feed_debug', 'load_user_data', true, 'core');
+add_handler('ajax_feed_debug', 'language', true, 'core');
 add_handler('ajax_feed_debug', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_debug', 'delete_feed', true);
 add_handler('ajax_feed_debug', 'feed_connect', true);
@@ -126,6 +132,7 @@ add_handler('ajax_feed_debug', 'http_headers', true, 'core');
 
 add_handler('ajax_feed_status', 'login', false, 'core');
 add_handler('ajax_feed_status', 'load_user_data', true, 'core');
+add_handler('ajax_feed_status', 'language', true, 'core');
 add_handler('ajax_feed_status', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_status', 'close_session_early',  true, 'core');
 add_handler('ajax_feed_status', 'feed_status',  true);

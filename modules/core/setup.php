@@ -104,6 +104,7 @@ add_output('notfound', 'notfound_content', true, 'core', 'content_section_start'
 /* message action ajax request */
 add_handler('ajax_message_action', 'login', false);
 add_handler('ajax_message_action', 'load_user_data', true);
+add_handler('ajax_message_action', 'language',  true);
 add_handler('ajax_message_action', 'date', true);
 add_handler('ajax_message_action', 'http_headers', true);
 

@@ -267,24 +267,20 @@ function interface_langs() {
         'sw' => 'Swahili',
         'uk' => 'Ukranian',
         'yi' => 'Yiddish',
-
-
-
-
-    );
-}
-
-function rtl_langs() {
-    return array(
-        'ar', 'iw', 'yi'
     );
 }
 
 function translate_time_str($str, $output_mod) {
-    if (preg_match("/(\d+).+(\d+)/U", $str, $matches)) {
-        $str = $output_mod->trans(preg_replace("/(\d+)/", '%d', $str));
-        error_log( sprintf($str, $matches[1], $matches[2]));
-        return sprintf($str, $matches[1], $matches[2]);
+    $parts = explode(',', $str);
+    $res = array();
+    foreach ($parts as $part) {
+        $part = trim($part);
+        if (preg_match("/(\d+)/U", $part, $matches)) {
+            $res[] = sprintf($output_mod->trans(preg_replace("/(\d+)/", '%d', $part)), $matches[1]);
+        }
+    }
+    if (!empty($res)) {
+        return implode(',', $res);
     }
     return $str;
 }
