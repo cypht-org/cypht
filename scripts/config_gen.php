@@ -33,7 +33,7 @@ function build_config() {
         /* get module detail */
         list($js, $css, $filters, $assets) = get_module_assignments($settings);
 
-        /* combined and compress page content */
+        /* combine and compress page content */
         combine_includes($js, $js_compress, $css, $css_compress);
 
         /* write out the hm3.rc file */
