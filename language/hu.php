@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'hu',
-    'interface_direction' => '',
+    'interface_direction' => 'ltr',
 
     'Main' => 'Legfontosabb',
     'Username' => 'Felhasználónév',

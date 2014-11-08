@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'sv',
-    'interface_direction' => '',
+    'interface_direction' => 'ltr',
 
     'Main' => 'Huvud',
     'Username' => 'Användarnamn',

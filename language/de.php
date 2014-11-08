@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'de',
-    'interface_direction' => '',
+    'interface_direction' => 'ltr',
 
     'Main' => 'Main',
     'Username' => 'Benutzername',

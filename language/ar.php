@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'ar',
-    'interface_direction' => '',
+    'interface_direction' => 'rtl',
 
     'Main' => 'رئيسي',
     'Username' => 'اسم المستخدم',

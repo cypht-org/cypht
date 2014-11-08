@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'lo',
-    'interface_direction' => '',
+    'interface_direction' => 'ltr',
 
     'Main' => 'ຫຼັກ',
     'Username' => 'ຊື່​ຜູ້​ໃຊ້',

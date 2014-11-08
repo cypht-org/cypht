@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'cs',
-    'interface_direction' => '',
+    'interface_direction' => 'ltr',
 
     'Main' => 'Hlavní',
     'Username' => 'Uživatelské jméno',

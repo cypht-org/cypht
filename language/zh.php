@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'zh',
-    'interface_direction' => '',
+    'interface_direction' => 'ltr',
 
     'Main' => '主',
     'Username' => '用户名',

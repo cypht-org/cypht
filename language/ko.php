@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'ko',
-    'interface_direction' => '',
+    'interface_direction' => 'ltr',
 
     'Main' => '홈페이지',
     'Username' => '사용자 이름',

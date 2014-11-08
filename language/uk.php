@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'uk',
-    'interface_direction' => '',
+    'interface_direction' => 'ltr',
 
     'Main' => 'Головний',
     'Username' => 'Ім\'я користувача',

@@ -4,7 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
     'interface_lang' => 'yi',
-    'interface_direction' => '',
+    'interface_direction' => 'rtl',
 
     'Main' => 'הויפּט',
     'Username' => 'נאמען',
