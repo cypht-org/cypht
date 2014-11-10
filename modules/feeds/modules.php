@@ -575,7 +575,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$rss_alt).'" alt="" width="16" height="16" /> '.$this->trans('All').'</a> <span class="unread_feed_count"></span></li>';
             foreach ($this->get('feed_folders') as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
-                    '<a href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">'.
+                    '<a data-id="feeds_'.$this->html_safe($id).'" href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">'.
                     '<img class="account_icon" alt="'.$this->trans('Load Feed').'" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" /> '.
                     $this->html_safe($folder).'</a></li>';
             }

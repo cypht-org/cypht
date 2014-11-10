@@ -830,9 +830,10 @@ function format_imap_folder_section($folders, $id, $output_mod) {
             $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
         }
         if (!$folder['noselect']) {
-            $results .= '<a href="?page=message_list&amp;list_path='.
-            urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
-            '">'.$output_mod->html_safe($folder['basename']).'</a>';
+            $results .= '<a data-id="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).
+                '" href="?page=message_list&amp;list_path='.
+                urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
+                '">'.$output_mod->html_safe($folder['basename']).'</a>';
         }
         else {
             $results .= $output_mod->html_safe($folder['basename']);
