@@ -48,9 +48,9 @@ class Hm_Output_search_content_end extends Hm_Output_Module {
 
 class Hm_Output_search_form extends Hm_Output_Module {
     protected function output($input, $format) {
+        $terms = $this->get('search_terms', '');
         $source_link = '<a href="#" title="Sources" class="source_link"><img class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
         $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
-        $terms = $this->get('search_terms', '');
         $res = '<div class="search_form">'.
             '<form method="get"><input type="hidden" name="page" value="search" />'.
             ' <input type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
