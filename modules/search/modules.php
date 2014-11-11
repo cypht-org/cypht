@@ -5,6 +5,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_process_search_terms extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('search_terms', $this->request->get)) {
+            $this->out('run_search', true);
             $this->session->set('search_terms', validate_search_terms($this->request->get['search_terms']));
         }
         if (array_key_exists('search_since', $this->request->get)) {
@@ -30,34 +31,49 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
-
     }
 }
 
-class Hm_Output_search_content extends Hm_Output_Module {
+class Hm_Output_search_content_start extends Hm_Output_Module {
     protected function output($input, $format) {
-        $res = '<div class="search_content"><div class="content_title">'.$this->trans('Search').
-            search_form($this->module_output(), $this).'</div>';
-        $res .= '<table class="message_table">';
-        if (!$this->get('no_message_list_headers')) {
-            $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
-            '<col class="from_col"><col class="subject_col"><col class="date_col">'.
-            '<col class="icon_col"></colgroup><!--<thead><tr><th colspan="2" class="source">'.
-            $this->trans('Source').'</th><th class="from">'.$this->trans('From').
-            '</th><th class="subject">'.$this->trans('Subject').'</th>'.
-            '<th class="msg_date">'.$this->trans('Date').'</th><th></th></tr></thead>-->';
-        }
-        $res .= '<tbody></tbody></table>';
+        return '<div class="search_content"><div class="content_title">'.$this->trans('Search');
+    }
+}
+
+class Hm_Output_search_content_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</div>';
+    }
+}
+
+class Hm_Output_search_form extends Hm_Output_Module {
+    protected function output($input, $format) {
+        $terms = $this->get('search_terms', '');
+        $res = '<div class="search_form">'.
+            '<form method="get"><input type="hidden" name="page" value="search" />'.
+            ' <input type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
+            ' '.search_field_selection($this->get('search_fld', ''), $this).
+            ' '.message_since_dropdown($this->get('search_since', ''), 'search_since', $this).
+            ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" /></form></div>'.
+            list_controls(false).
+            '</div>';
         return $res;
+    }
+}
+
+class Hm_Output_search_results_table_end extends Hm_Output_Module {
+    protected function output($input, $format) {
+        return '</tbody></table>';
     }
 }
 
 class Hm_Output_js_search_data extends Hm_Output_Module {
     protected function output($input, $format) {
         return '<script type="text/javascript">'.
-            'var hm_search_terms = "'.$this->get('search_terms', '').'";'.
-            'var hm_search_fld = "'.$this->get('search_fld', '').'";'.
-            'var hm_search_since = "'.$this->get('search_since', '').'";'.
+            'var hm_search_terms = "'.$this->html_safe($this->get('search_terms', '')).'";'.
+            'var hm_search_fld = "'.$this->html_safe($this->get('search_fld', '')).'";'.
+            'var hm_search_since = "'.$this->html_safe($this->get('search_since', '')).'";'.
+            'var hm_run_search = "'.$this->html_safe($this->get('run_search', 0)).'";'.
             '</script>';
     }
 }
@@ -95,21 +111,5 @@ function search_field_selection($current, $output_mod) {
     $res .= '</select>';
     return $res;
 }
-
-function search_form($data, $output_mod) {
-    $terms = '';
-    if (array_key_exists('search_terms', $data)) {
-        $terms = $data['search_terms'];
-    }
-    $res = '<div class="search_form">'.
-        '<form method="get"><input type="hidden" name="page" value="search" />'.
-        ' <input type="text" class="search_terms" name="search_terms" value="'.$output_mod->html_safe($terms).'" />'.
-        ' '.search_field_selection($data['search_fld'], $output_mod).
-        ' '.message_since_dropdown($data['search_since'], 'search_since', $output_mod).
-        ' <input type="submit" class="search_update" value="'.$output_mod->trans('Update').'" /></form></div>';
-    return $res;
-}
-
-
 
 ?>

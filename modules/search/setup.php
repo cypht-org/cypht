@@ -8,7 +8,12 @@ output_source('search');
 
 /* search page */
 setup_base_page('search', 'core');
-add_output('search', 'search_content', true, 'search', 'content_section_start', 'after');
+add_output('search', 'search_content_start', true, 'search', 'content_section_start', 'after');
+add_output('search', 'search_form', true, 'search', 'search_content_start', 'after');
+add_output('search', 'message_list_start', true, 'core', 'search_form', 'after');
+add_output('search', 'search_results_table_end', true, 'search', 'message_list_start', 'after');
+add_output('search', 'search_content_end', true, 'search', 'search_results_table_end', 'after');
+
 add_output('ajax_hm_folders', 'search_from_folder_list', true, 'search', 'main_menu_start', 'after');
 
 /* add search term processing to all pages */
