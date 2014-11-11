@@ -333,6 +333,7 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
             if ($server['name'] == 'Default-Auth-Server') {
                 $added = true;
             }
+            $this->append('data_sources', array('type' => 'pop3', 'name' => $server['name'], 'id' => $index));
         }
         if (!$added) {
             $auth_server = $this->session->get('pop3_auth_server_settings', array());
