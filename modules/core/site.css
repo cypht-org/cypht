@@ -119,7 +119,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .rtl_page .server_count { float: left; }
 .rtl_page .add_server, .rtl_page .configured_server { float: right !important; }
 .rtl_page .server_section img, .rtl_page .settings_subtitle img { padding-left: 10px; padding-right: 0px !important; }
- _settings, .rtl_page .password_notice { float: right !important; }
+.rtl_page .save_settings, .rtl_page .password_notice { float: right !important; }
 .rtl_page .save_settings_password { float: right; margin-left: 0px; padding: 4px; }
 .rtl_page .loading_icon { left: 80px !important; right: auto !important; }
 .rtl_page .debug { float: left !important; }
