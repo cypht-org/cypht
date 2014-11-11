@@ -15,7 +15,7 @@ td { vertical-align: top; }
 .logout_form a {}
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .placeholder { width: 100px !important; }
-.loading_icon { background-position: 0px 0px; background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==') repeat-x top left; opacity: .25; text-align: center; display: none; position: absolute; right: 110px; top: 25px; width: 50px; height: 10px; }
+.loading_icon { background-position: 0px 0px; background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==') repeat-x top left; opacity: .25; text-align: center; display: none; position: absolute; right: 115px; top: 25px; width: 50px; height: 10px; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
 .logout:hover { background-color: #eee; }
 .logout { cursor: pointer; background: #fff; font-size: 100%; }
@@ -83,6 +83,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 0px; vertical-align: -10px; }
 .list_settings_dialog { display: none; padding: 10px; position: absolute; top: 0px; right: 0px; width: 600px; background-color: #efefef; border: solid 1px #ccc; }
 .list_controls { margin-top: -20px; padding: 10px; padding-right: 20px; float: right; }
+.list_controls a { padding-right: 5px; }
 .list_settings_dialog table { width: 1%; white-space: nowrap; }
 .list_settings_dialog table th { font-size: 90%; font-weight: normal; text-align: left; }
 .folder_toggle { position: absolute; top: 20px; left: 7px; display: none; }
