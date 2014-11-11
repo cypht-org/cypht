@@ -141,6 +141,9 @@ return array(
     'Invalid username or password' => false,
     'Update' => false,
     'Save' => false,
+    'Sources' => false,
+    'Configure' => false,
+    'Refresh' => false,
 
     '%d second' => false,
     '%d seconds' => false,
