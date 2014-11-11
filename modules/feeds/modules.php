@@ -381,7 +381,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
         if (!empty($feeds)) {
             $this->out('feeds', $feeds);
             $this->append('folder_sources', 'feeds_folders');
-            foreach ($feeds as $feed) {
+            foreach ($feeds as $index => $feed) {
                 $this->append('data_sources', array('type' => 'feed', 'name' => $feed['name'], 'id' => $index));
             }
         }
