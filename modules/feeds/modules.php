@@ -363,6 +363,7 @@ class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
         $feeds = $this->user_config->get('feeds', array());
         foreach ($feeds as $index => $feed) {
             Hm_Feed_List::add($feed, $index);
+            $this->append('data_sources', array('type' => 'feed', 'name' => $feed['name'], 'id' => $index));
         }
         Hm_Feed_Seen_Cache::load($this->session->get('feed_read_uids', array()));
     }
@@ -473,7 +474,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                 }
             }
             $header_str .= '<tr><td colspan="2"></td></tr></table>';
-            $this->out('feed_message_content', str_replace(array('<', '>', '&ldquo;'), array(' <', '> ', ' &ldquo;'), $input['feed_message_content']));
+            $this->out('feed_message_content', str_replace(array('<', '>', '&ldquo;'), array(' <', '> ', ' &ldquo;'), $this->get('feed_message_content')));
             $txt = '<div class="msg_text_inner">'.format_msg_html($this->get('feed_message_content')).'</div>';
             $this->out('feed_msg_text', $txt);
             $this->out('feed_msg_headers', $header_str);
