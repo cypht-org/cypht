@@ -363,14 +363,14 @@ class Hm_Handler_logout extends Hm_Handler_Module {
 /* TODO: clean this up somehow */
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
     public function process() {
-        $uid = false;
-        $list_path = false;
+        $uid = '';
+        $list_path = '';
+        $list_parent = '';
+        $list_page = 1;
         $list_meta = true;
-        $list_parent = false;
-        $list_page = false;
         $mailbox_list_title = array();
-        $message_list_since = false;
-        $per_source_limit = false;
+        $message_list_since = DEFAULT_SINCE;
+        $per_source_limit = DEFAULT_PER_SOURCE;
         $no_message_list_headers = false;
 
         if (array_key_exists('list_path', $this->request->get)) {
@@ -379,7 +379,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $list_path = 'unread';
                 $mailbox_list_title = array('Unread');
                 $message_list_since = $this->user_config->get('unread_since_setting', DEFAULT_SINCE);
-                $per_source_limit = $this->user_config->get('unread_per_source_setting', DEFAULT_SINCE);
+                $per_source_limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
             }
             elseif ($path == 'email') {
                 $list_path = 'email';
@@ -388,21 +388,18 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             elseif ($path == 'flagged') {
                 $list_path = 'flagged';
                 $message_list_since = $this->user_config->get('flagged_since_setting', DEFAULT_SINCE);
-                $per_source_limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_SINCE);
+                $per_source_limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
                 $mailbox_list_title = array('Flagged');
             }
             elseif ($path == 'combined_inbox') {
                 $list_path = 'combined_inbox';
                 $message_list_since = $this->user_config->get('all_since_setting', DEFAULT_SINCE);
-                $per_source_limit = $this->user_config->get('all_per_source_setting', DEFAULT_SINCE);
+                $per_source_limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
                 $mailbox_list_title = array('Everything');
             }
         }
         if (array_key_exists('list_parent', $this->request->get)) {
             $list_parent = $this->request->get['list_parent'];
-        }
-        else {
-            $list_parent = false;
         }
         if (array_key_exists('list_page', $this->request->get)) {
             $list_page = (int) $this->request->get['list_page'];
@@ -462,7 +459,7 @@ class Hm_Output_login extends Hm_Output_Module {
         else {
             return '<form class="logout_form" method="POST">'.
                 '<input type="hidden" id="unsaved_changes" value="'.
-                ($this->get('changed_settings', false) ? '1' : '0').'" />'.
+                (!empty($this->get('changed_settings', array())) ? '1' : '0').'" />'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').'</div>'.
@@ -562,7 +559,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
             $title = $this->get('router_app_name');
         }
         elseif ($this->exists('mailbox_list_title')) {
-            $title .= ' '.implode('-', array_slice($this->get('mailbox_list_title', ''), 1));
+            $title .= ' '.implode('-', array_slice($this->get('mailbox_list_title', array()), 1));
         }
         if (!trim($title) && $this->exists('router_page_name')) {
             $title = '';

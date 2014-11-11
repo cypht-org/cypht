@@ -122,12 +122,20 @@ trait Hm_Module_Output {
      *
      * @param $name string key to fetch the value for
      * @param $default mixed default return value if not found
+     * @param $typed if a default value is given, typecast the result to it's type
      *
      * @return mixed value if found or default
      */
-    public function get($name, $default=false) {
+    public function get($name, $default=NULL, $typed=true) {
         if (array_key_exists($name, $this->output)) {
-            return $this->output[$name];
+            $val = $this->output[$name];
+            if (!is_null($default) && $typed) {
+                if (gettype($default) != gettype($val)) {
+                    Hm_Debug::add(sprintf('TYPE CONVERSION: %s to %s for %s', gettype($val), gettype($default), $name));
+                    settype($val, gettype($default));
+                }
+            }
+            return $val;
         }
         return $default;
     }

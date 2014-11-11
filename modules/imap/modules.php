@@ -689,7 +689,7 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_connect_status') != 'disconnected') {
             $res .= '<span class="online">'.$this->trans(ucwords($this->get('imap_connect_status'))).
-                '</span> in '.round($this->get('imap_connect_time', 0), 3);
+                '</span> in '.round($this->get('imap_connect_time', 0.0), 3);
         }
         else {
             $res .= '<span class="down">'.$this->trans('Down').'</span>';
