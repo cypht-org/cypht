@@ -788,7 +788,7 @@ if (!Hm_Folders.load_from_local_storage()) {
     Hm_Folders.update_folder_list();
 }
 
-/* setup settins and server pages */
+/* setup settings and server pages */
 if (hm_page_name() == 'settings') {
     Hm_Utils.expand_core_settings();
     $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });

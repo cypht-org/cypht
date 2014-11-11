@@ -1122,23 +1122,28 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($input, $format) {
         /* TODO: remove module specific stuff */
         if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds'))) {
+            $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';
             }
             else {
                 $path = $this->get('list_path');
             }
-            $config_link = '<a href="?page=settings#'.$path.'_setting"><img alt="Configure" class="refresh_list" src="'.Hm_Image_Sources::$cog.'" width="20" height="20" /></a>';
+            $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><img alt="Configure" class="refresh_list" src="'.Hm_Image_Sources::$cog.'" width="20" height="20" /></a>';
+            $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+
         }
         else {
             $config_link = '';
+            $source_link = '';
+            $refresh_link = '';
         }
         $res = '';
         $res .= '<div class="message_list"><div class="content_title">';
         $res .= message_controls($this).
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array())));
-        $res .= list_controls($config_link);
+        $res .= list_controls($refresh_link, $config_link, $source_link);
 	    $res .= message_list_meta($this->module_output(), $this);
         $res .= '</div>';
         return $res;

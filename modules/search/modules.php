@@ -48,6 +48,8 @@ class Hm_Output_search_content_end extends Hm_Output_Module {
 
 class Hm_Output_search_form extends Hm_Output_Module {
     protected function output($input, $format) {
+        $source_link = '<a href="#" title="Sources" class="source_link"><img class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
         $terms = $this->get('search_terms', '');
         $res = '<div class="search_form">'.
             '<form method="get"><input type="hidden" name="page" value="search" />'.
@@ -55,7 +57,7 @@ class Hm_Output_search_form extends Hm_Output_Module {
             ' '.search_field_selection($this->get('search_fld', ''), $this).
             ' '.message_since_dropdown($this->get('search_since', ''), 'search_since', $this).
             ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" /></form></div>'.
-            list_controls(false).
+            list_controls($refresh_link, false, $source_link).
             '</div>';
         return $res;
     }

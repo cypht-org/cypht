@@ -285,10 +285,9 @@ function translate_time_str($str, $output_mod) {
     return $str;
 }
 
-function list_controls($config_link) {
-    return '<div class="list_controls"><a class="refresh_link" href="#">'.
-        '<img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.
-        '" width="20" height="20" /></a>'.$config_link.'</div>';
+function list_controls($refresh_link, $config_link, $source_link=false) {
+    return '<div class="list_controls">'.
+        $refresh_link.$config_link.$source_link.'</div>';
 }
 
 ?>
