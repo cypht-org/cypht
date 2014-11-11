@@ -813,5 +813,6 @@ Hm_Timer.fire();
 $(function() {
     if (hm_page_name() == 'message_list') {
         Hm_Message_List.select_combined_view();
+        $('.source_link').click(function() { $('.list_sources').toggle(); return false; });
     }
 });

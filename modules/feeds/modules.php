@@ -363,7 +363,6 @@ class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
         $feeds = $this->user_config->get('feeds', array());
         foreach ($feeds as $index => $feed) {
             Hm_Feed_List::add($feed, $index);
-            $this->append('data_sources', array('type' => 'feed', 'name' => $feed['name'], 'id' => $index));
         }
         Hm_Feed_Seen_Cache::load($this->session->get('feed_read_uids', array()));
     }
@@ -382,6 +381,9 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
         if (!empty($feeds)) {
             $this->out('feeds', $feeds);
             $this->append('folder_sources', 'feeds_folders');
+            foreach ($feeds as $feed) {
+                $this->append('data_sources', array('type' => 'feed', 'name' => $feed['name'], 'id' => $index));
+            }
         }
     }
 }

@@ -1141,6 +1141,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
                 $this->get('mailbox_list_title', array())));
         $res .= list_controls($refresh_link, $config_link, $source_link);
 	    $res .= message_list_meta($this->module_output(), $this);
+        $res .= list_sources($this->get('data_sources', array()), $this);
         $res .= '</div>';
         return $res;
     }

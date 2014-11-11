@@ -290,4 +290,18 @@ function list_controls($refresh_link, $config_link, $source_link=false) {
         $refresh_link.$source_link.$config_link.'</div>';
 }
 
+function list_sources($sources, $output_mod) {
+    $res = '<div class="list_sources">';
+    foreach ($sources as $src) {
+        $res .= '<div class="list_src">'.$output_mod->html_safe($src['type']).
+            ' '.$output_mod->html_safe($src['name']);
+        if ($src['type'] == 'imap' && !array_key_exists('folder', $src)) {
+            $res .= ' INBOX';
+        }
+        $res .= '</div>';
+    }
+    $res .= '</div>';
+    return $res;
+}
+
 ?>
