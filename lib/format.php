@@ -75,12 +75,12 @@ abstract class HM_Format {
                 if (!$args[1] || ($args[1] && $input['router_login_state'])) {
                     $mod = new $name($input, $protected);
                     if ($format == 'JSON') {
-                        $mod->output_content($input, $format, $lang_str, $protected);
+                        $mod->output_content($format, $lang_str, $protected);
                         $input = $mod->module_output();
                         $protected = $mod->output_protected();
                     }
                     else {
-                        $mod_output[] = $mod->output_content($input, $format, $lang_str, array());
+                        $mod_output[] = $mod->output_content($format, $lang_str, array());
                     }
                 }
             }

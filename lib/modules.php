@@ -343,14 +343,13 @@ abstract class Hm_Output_Module {
     /**
      * Build output by calling module specific output functions
      *
-     * @param $input array list of input from the handler modules
      * @param $formt string output type, either HTML5 or AJAX
      * @param $lang_str array list of language translation strings
      *
      * @return mixed module output, a string for HTML5 format,
-     * and an array for AJAX
+     *               and an array for AJAX
      */
-    public function output_content($input, $format, $lang_str, $protected) {
+    public function output_content($format, $lang_str, $protected) {
         $this->lstr = $lang_str;
         if (array_key_exists('interface_lang', $lang_str)) {
             $this->lang = $lang_str['interface_lang'];
@@ -358,7 +357,7 @@ abstract class Hm_Output_Module {
         if (array_key_exists('interface_direction', $lang_str)) {
             $this->dir = $lang_str['interface_direction'];
         }
-        return $this->output($input, $format);
+        return $this->output($format);
     }
 
     /**
@@ -375,13 +374,12 @@ abstract class Hm_Output_Module {
     /**
      * Output modules need to override this method to add to a page or AJAX response
      *
-     * @param $input array data from the input processing modules
      * @param $format string either AJAX or HTML5
      *
-     * @return mixed should return an array if $format == AJAX, or
-     * an HTML5 formatted string if set to HTML5
+     * @return mixed should return an array if $format == AJAX, or an HTML5 formatted
+     *               string if set to HTML5
      */
-    abstract protected function output($input, $format);
+    abstract protected function output($format);
 }
 
 /**
