@@ -309,7 +309,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             if ($server['name'] == 'Default-Auth-Server') {
                 $added = true;
             }
-            $this->append('data_sources', 'imap');
+            $this->append('data_sources', array('type' => 'imap', 'name' => $server['name'], 'id' => $index));
         }
         if (!$added) {
             $auth_server = $this->session->get('imap_auth_server_settings', array());
