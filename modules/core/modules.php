@@ -1138,10 +1138,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= message_controls($this).
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array())));
-        $res .= '<div class="list_controls">';
-        $res .= '<a class="refresh_link" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
-        $res .= $config_link;
-        $res .= '</div>';
+        $res .= list_controls($config_link);
 	    $res .= message_list_meta($this->module_output(), $this);
         $res .= '</div>';
         return $res;
