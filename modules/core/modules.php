@@ -444,7 +444,7 @@ class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
 /* OUTPUT */
 
 class Hm_Output_login extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if (!$this->get('router_login_state')) {
             return '<form class="login_form" method="POST">'.
                 '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
@@ -473,25 +473,25 @@ class Hm_Output_login extends Hm_Output_Module {
 }
 
 class Hm_Output_server_content_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<div class="content_title">'.$this->trans('Servers').'</div><div class="server_content">';
     }
 }
 
 class Hm_Output_server_content_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '</div>';
     }
 }
 
 class Hm_Output_date extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<div class="date">'.$this->html_safe($this->get('date')).'</div>';
     }
 }
 
 class Hm_Output_msgs extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '';
         $msgs = Hm_Msgs::get();
         $logged_out_class = '';
@@ -515,7 +515,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
 }
 
 class Hm_Output_header_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $lang = 'en';
         $dir = 'ltr';
         if ($this->lang) {
@@ -531,13 +531,13 @@ class Hm_Output_header_start extends Hm_Output_Module {
 }
 
 class Hm_Output_header_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '</head>';
     }
 }
 
 class Hm_Output_content_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<body><noscript class="noscript">'.
             $this->trans(sprintf('You Need to have Javascript enabled to use %s, sorry about that!',
             $this->html_safe($this->get('router_app_name')))).'</noscript>';
@@ -552,7 +552,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
 }
 
 class Hm_Output_header_content extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $title = '';
         if (!$this->get('router_login_state')) {
             $title = $this->get('router_app_name');
@@ -580,7 +580,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
 }
 
 class Hm_Output_header_css extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '';
         if (DEBUG_MODE) {
             foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
@@ -597,7 +597,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
 }
 
 class Hm_Output_page_js extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if (DEBUG_MODE) {
             $res = '';
             $zepto = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
@@ -623,7 +623,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
 }
 
 class Hm_Output_content_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if (defined('DEBUG_MODE') && DEBUG_MODE) {
             return '<div class="debug"></div></body></html>';
         }
@@ -634,7 +634,7 @@ class Hm_Output_content_end extends Hm_Output_Module {
 }
 
 class Hm_Output_js_data extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<script type="text/javascript">'.
             'var hm_page_name = function() { return "'.$this->html_safe($this->get('router_page_name')).'"; };'.
             'var hm_list_path = function() { return "'.$this->html_safe($this->get('list_path', '')).'"; };'.
@@ -645,13 +645,13 @@ class Hm_Output_js_data extends Hm_Output_Module {
 }
 
 class Hm_Output_loading_icon extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<div class="loading_icon"></div>';
     }
 }
 
 class Hm_Output_start_settings_form extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<div class="user_settings"><div class="content_title">'.$this->trans('Site Settings').'</div>'.
             '<form method="POST"><input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
             '<table class="settings_table"><colgroup>'.
@@ -660,7 +660,7 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
 }
 
 class Hm_Output_list_style_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $options = array('email_style' => 'Email', 'news_style' => 'News');
         $settings = $this->get('user_settings', array());
 
@@ -686,7 +686,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_start_flagged_settings extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />'.
             $this->trans('Flagged').'</td></tr>';
@@ -694,7 +694,7 @@ class Hm_Output_start_flagged_settings extends Hm_Output_Module {
 }
 
 class Hm_Output_start_everything_settings extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$box.'" width="16" height="16" />'.
             $this->trans('Everything').'</td></tr>';
@@ -702,7 +702,7 @@ class Hm_Output_start_everything_settings extends Hm_Output_Module {
 }
 
 class Hm_Output_start_unread_settings extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
             $this->trans('Unread').'</td></tr>';
@@ -710,7 +710,7 @@ class Hm_Output_start_unread_settings extends Hm_Output_Module {
 }
 
 class Hm_Output_start_general_settings extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$cog.'" width="16" height="16" />'.
             $this->trans('General').'</td></tr>';
@@ -718,7 +718,7 @@ class Hm_Output_start_general_settings extends Hm_Output_Module {
 }
 
 class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('unread_per_source', $settings)) {
@@ -731,7 +731,7 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_unread_since_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $since = false;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('unread_since', $settings)) {
@@ -744,7 +744,7 @@ class Hm_Output_unread_since_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('flagged_per_source', $settings)) {
@@ -757,7 +757,7 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_flagged_since_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $since = false;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('flagged_since', $settings)) {
@@ -770,7 +770,7 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_all_source_max_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('all_per_source', $settings)) {
@@ -783,7 +783,7 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_all_since_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $since = false;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('all_since', $settings)) {
@@ -796,7 +796,7 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_language_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $langs = interface_langs();
         $translated = array();
         foreach ($langs as $code => $name) {
@@ -820,7 +820,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_timezone_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $zones = timezone_identifiers_list();
         $settings = $this->get('user_settings', array());
         if (array_key_exists('timezone', $settings)) {
@@ -844,7 +844,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_end_settings_form extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<tr><td class="submit_cell" colspan="2">'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
             'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
@@ -855,7 +855,7 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
 }
 
 class Hm_Output_folder_list_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
             '<nav class="folder_cell"><div class="folder_list">';
         return $res;
@@ -863,7 +863,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
 }
 
 class Hm_Output_folder_list_content_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if ($format == 'HTML5') {
             return '';
         }
@@ -872,7 +872,7 @@ class Hm_Output_folder_list_content_start extends Hm_Output_Module {
 }
 
 class Hm_Output_main_menu_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main').
         '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div class="main"><ul class="folders">';
@@ -884,7 +884,7 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
 }
 
 class Hm_Output_main_menu_content extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $email = false;
         if (in_array('email_folders', $this->get('folder_sources', array()))) {
             $email = true;
@@ -910,7 +910,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
 }
 
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res =  '<li><a class="unread_link logout_link" href="#"><img class="account_icon" src="'.
             $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a></li>';
 
@@ -922,7 +922,7 @@ class Hm_Output_logout_menu_item extends Hm_Output_Module {
 }
 
 class Hm_Output_main_menu_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '</ul></div>';
         if ($format == 'HTML5') {
             return $res;
@@ -932,7 +932,7 @@ class Hm_Output_main_menu_end extends Hm_Output_Module {
 }
 
 class Hm_Output_email_menu_content extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '';
         $folder_sources = array_unique($this->get('folder_sources', array()));
         foreach ($folder_sources as $src) {
@@ -963,7 +963,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
 }
 
 class Hm_Output_settings_menu_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<div class="src_name" data-source=".settings">'.$this->trans('Settings').
             '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
             '</div><ul style="display: none;" class="settings folders">';
@@ -975,7 +975,7 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
 }
 
 class Hm_Output_settings_menu_content extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).
             '" alt="" width="16" height="16" /> '.$this->trans('Servers').'</a></li>'.
@@ -990,7 +990,7 @@ class Hm_Output_settings_menu_content extends Hm_Output_Module {
 }
 
 class Hm_Output_settings_menu_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '</ul>';
         if ($format == 'HTML5') {
             return $res;
@@ -1000,7 +1000,7 @@ class Hm_Output_settings_menu_end extends Hm_Output_Module {
 }
 
 class Hm_Output_folder_list_content_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
         $res .= '<a href="#" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.
             '" alt="'.$this->trans('Collapse').'" width="16" height="16" /></a>';
@@ -1012,25 +1012,25 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
 }
 
 class Hm_Output_folder_list_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '</div></nav>';
     }
 }
 
 class Hm_Output_content_section_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<main class="content_cell">';
     }
 }
 
 class Hm_Output_content_section_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '</main>';
     }
 }
 
 class Hm_Output_server_status_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<div class="server_status"><div class="content_title">'.$this->trans('Home').'</div>';
         $res .= '<table><thead><tr><th>'.$this->trans('Type').'</th><th>'.$this->trans('Name').'</th><th>'.
                 $this->trans('Status').'</th></tr></thead><tbody>';
@@ -1039,13 +1039,13 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
 }
 
 class Hm_Output_server_status_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '</tbody></table></div>';
     }
 }
 
 class Hm_Output_message_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if ($this->in('list_parent', array('search', 'flagged', 'combined_inbox', 'unread', 'feeds'))) {
             if ($this->get('list_parent') == 'combined_inbox') {
                 $list_name = $this->trans('Everything');
@@ -1085,13 +1085,13 @@ class Hm_Output_message_start extends Hm_Output_Module {
 }
 
 class Hm_Output_message_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '</div>';
     }
 }
 
 class Hm_Output_notfound_content extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<div class="content_title">'.$this->trans('Page Not Found!').'</div>';
         $res .= '<div class="empty_list"><br />'.$this->trans('Nothingness').'</div>';
         return $res;
@@ -1099,7 +1099,7 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
 }
 
 class Hm_Output_message_list_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<table class="message_table">';
         if (!$this->get('no_message_list_headers')) {
             $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
@@ -1115,7 +1115,7 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 }
 
 class Hm_Output_message_list_heading extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         /* TODO: remove module specific stuff */
         if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds'))) {
             $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
@@ -1147,7 +1147,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
 }
 
 class Hm_Output_message_list_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '</tbody></table><div class="page_links"></div></div>';
         return $res;
     }

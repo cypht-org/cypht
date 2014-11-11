@@ -21,7 +21,7 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
 }
 
 class Hm_Output_search_from_folder_list extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).
             '" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
@@ -35,19 +35,19 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
 }
 
 class Hm_Output_search_content_start extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<div class="search_content"><div class="content_title">'.$this->trans('Search');
     }
 }
 
 class Hm_Output_search_content_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '</div>';
     }
 }
 
 class Hm_Output_search_form extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $terms = $this->get('search_terms', '');
         $source_link = '<a href="#" title="Sources" class="source_link"><img class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
         $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
@@ -64,13 +64,13 @@ class Hm_Output_search_form extends Hm_Output_Module {
 }
 
 class Hm_Output_search_results_table_end extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '</tbody></table>';
     }
 }
 
 class Hm_Output_js_search_data extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<script type="text/javascript">'.
             'var hm_search_terms = "'.$this->html_safe($this->get('search_terms', '')).'";'.
             'var hm_search_fld = "'.$this->html_safe($this->get('search_fld', '')).'";'.

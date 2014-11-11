@@ -408,7 +408,7 @@ class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
 }
 
 class Hm_Output_add_feed_dialog extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if ($format == 'HTML5') {
             $count = count($this->get('feeds', array()));
             $count = sprintf($this->trans('%d configured'), $count);
@@ -428,7 +428,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
 }
 
 class Hm_Output_display_configured_feeds extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '';
         if ($format == 'HTML5') {
             foreach ($this->get('feeds', array()) as $index => $vals) {
@@ -449,13 +449,13 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
 }
 
 class Hm_Output_feed_ids extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<input type="hidden" class="feed_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('feeds', array())))).'" />';
     }
 }
 
 class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if ($this->get('feed_message_content')) {
             $header_str = '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
@@ -483,7 +483,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
 }
 
 class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = array();
         $login_time = false;
         if ($this->get('login_time')) {
@@ -569,7 +569,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
 }
 
 class Hm_Output_filter_feed_folders extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '';
         if (is_array($this->get('feed_folders'))) {
             $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">'.
@@ -587,7 +587,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
 }
 
 class Hm_Output_display_feeds_status extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '';
         foreach ($this->get('feeds', array()) as $index => $vals) {
             $res .= '<tr><td>'.$this->trans('FEED').'</td><td>'.$vals['name'].'</td><td class="feeds_status_'.$index.'"></td>'.
@@ -598,7 +598,7 @@ class Hm_Output_display_feeds_status extends Hm_Output_Module {
 }
 
 class Hm_Output_unread_feeds_included extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $settings = $this->get('user_settings');
         if (array_key_exists('unread_exclude_feeds', $settings) && $settings['unread_exclude_feeds']) {
             $checked = ' checked="checked"';
@@ -612,7 +612,7 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
 }
 
 class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if ($this->get('feed_connect_status') == 'Connected') {
             $this->out('feed_status_display', '<span class="online">'.
                 $this->trans(ucwords($this->get('feed_connect_status'))).'</span> in '.round($this->get('feed_connect_time'), 3));
@@ -624,14 +624,14 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
 }
 
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$rss.'" />'.$this->trans('Feed Settings').'</td></tr>';
     }
 }
 
 class Hm_Output_feed_since_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $since = false;
         $settings = $this->get('user_settings');
         if (array_key_exists('feed_since', $settings)) {
@@ -643,7 +643,7 @@ class Hm_Output_feed_since_setting extends Hm_Output_Module {
 }
 
 class Hm_Output_feed_limit_setting extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $limit = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings');
         if (array_key_exists('feed_limit', $settings)) {

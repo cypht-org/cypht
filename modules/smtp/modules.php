@@ -188,7 +188,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 }
 
 class Hm_Output_compose_form extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
@@ -201,7 +201,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
 }
 
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $count = $this->get('smtp_servers', array());
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="smtp_server_setup"><div data-target=".smtp_section" class="server_section">'.
@@ -222,7 +222,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
 }
 
 class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '';
         foreach ($this->get('smtp_servers', array()) as $index => $vals) {
 
@@ -273,7 +273,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
 }
 
 class Hm_Output_compose_page_link extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$this->trans('Compose').'</a></li>';
 
@@ -284,10 +284,10 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
     }
 }
 
-function smtp_server_dropdown($input, $output_mod) {
+function smtp_server_dropdown($data, $output_mod) {
     $res = '<select name="smtp_server_id" class="compose_server">';
-    if (array_key_exists('smtp_servers', $input)) {
-        foreach ($input['smtp_servers'] as $id => $vals) {
+    if (array_key_exists('smtp_servers', $data)) {
+        foreach ($data['smtp_servers'] as $id => $vals) {
             $res .= '<option value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['name'], $vals['server'])).'</option>';
         }
     }

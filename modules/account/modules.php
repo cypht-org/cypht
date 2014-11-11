@@ -46,7 +46,7 @@ class Hm_Handler_check_internal_users extends Hm_Handler_Module {
 }
 
 class Hm_Output_create_account_link extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if (!$this->get('router_login_state') && $this->get('internal_users')) {
             return '<a class="create_account_link" href="?page=create_account">'.$this->trans('Create').'</a>';
         }
@@ -54,13 +54,13 @@ class Hm_Output_create_account_link extends Hm_Output_Module {
 }
 
 class Hm_Output_no_login extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         return '';
     }
 }
 
 class Hm_Output_create_form extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         if ($this->get('router_login_state')) {
             Hm_Router::page_redirect('?page=home');
         }
@@ -82,7 +82,7 @@ class Hm_Output_create_form extends Hm_Output_Module {
 }
 
 class Hm_Output_change_password extends Hm_Output_Module {
-    protected function output($input, $format) {
+    protected function output($format) {
         $res = '';
         if ($this->get('internal_users')) {
             $res .= '<tr class="general_setting"><td><label for="new_pass1">'.$this->trans('Change password').
