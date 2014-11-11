@@ -12,8 +12,8 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 function setup_base_page($name, $source=false) {
     add_handler($name, 'login', false, $source);
-    add_handler($name, 'load_user_data', true, $source);
     add_handler($name, 'default_page_data', true, $source);
+    add_handler($name, 'load_user_data', true, $source);
     add_handler($name, 'message_list_type', true);
     add_handler($name, 'language',  true, $source);
     add_handler($name, 'title', true, $source);

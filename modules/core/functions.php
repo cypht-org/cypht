@@ -287,7 +287,7 @@ function translate_time_str($str, $output_mod) {
 
 function list_controls($refresh_link, $config_link, $source_link=false) {
     return '<div class="list_controls">'.
-        $refresh_link.$config_link.$source_link.'</div>';
+        $refresh_link.$source_link.$config_link.'</div>';
 }
 
 ?>

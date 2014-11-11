@@ -287,10 +287,9 @@ class Hm_Handler_login extends Hm_Handler_Module {
     }
 }
 
-/* TODO: populate this from modules (imap is the only one so far) */
 class Hm_Handler_default_page_data extends Hm_Handler_Module {
     public function process() {
-        $this->out('data_sources', array());
+        $this->out('data_sources', array(), false);
     }
 }
 
