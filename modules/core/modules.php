@@ -216,7 +216,7 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'password'));
         if ($success) {
-            if ($new_settings = $this->get('new_user_settings', false)) {
+            if ($new_settings = $this->get('new_user_settings', array())) {
                 foreach ($new_settings as $name => $value) {
                     $this->user_config->set($name, $value);
                 }
