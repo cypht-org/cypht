@@ -272,16 +272,17 @@ function interface_langs() {
 }
 
 function translate_time_str($str, $output_mod) {
+    error_log($str);
     $parts = explode(',', $str);
     $res = array();
     foreach ($parts as $part) {
         $part = trim($part);
-        if (preg_match("/(\d+)/U", $part, $matches)) {
+        if (preg_match("/(\d+)/", $part, $matches)) {
             $res[] = sprintf($output_mod->trans(preg_replace("/(\d+)/", '%d', $part)), $matches[1]);
         }
     }
     if (!empty($res)) {
-        return implode(',', $res);
+        return implode(', ', $res);
     }
     return $str;
 }
