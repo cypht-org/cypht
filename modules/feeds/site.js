@@ -150,6 +150,7 @@ var display_feed_item_content = function(res) {
     else if (hm_list_parent() == 'unread') {
         Hm_Message_List.prev_next_links('formatted_unread_data', path+'_'+msg_uid);
     }
+    Hm_Message_List.track_read_messages(path+'_'+msg_uid);
 };
 
 var load_feed_list = function(id) {
