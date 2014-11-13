@@ -84,15 +84,16 @@ var imap_status_update = function() {
     if ($('.imap_server_ids').length) {
         var ids = $('.imap_server_ids').val().split(',');
         if ( ids && ids !== '') {
+            var process_result = function(res) {
+                var id = res.imap_status_server_id;
+                $('.imap_status_'+id).html(res.imap_status_display);
+            };
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
                     {'name': 'imap_server_ids', 'value': id}],
-                    function(res) {
-                        var id = res.imap_status_server_id;
-                        $('.imap_status_'+id).html(res.imap_status_display);
-                    },
+                    process_result,
                     [],
                     false
                 );

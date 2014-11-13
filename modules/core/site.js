@@ -187,8 +187,7 @@ var Hm_Timer = {
     },
 
     cancel: function(job) {
-        var index;
-        for (index in Hm_Timer.jobs) {
+        for (var index in Hm_Timer.jobs) {
             if (Hm_Timer.jobs[index][0] == job) {
                 Hm_Timer.jobs.splice(index, 1);
                 return true;
@@ -241,7 +240,7 @@ var Hm_Message_List = {
     remove_source: function(type, id) {
         var new_sources = [];
         var src;
-        for (index in Hm_Message_List.sources) {
+        for (var index in Hm_Message_List.sources) {
             src = Hm_Message_List.sources[index];
             if (src.type == type && src.id == id) {
                 continue;
