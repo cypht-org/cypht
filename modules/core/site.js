@@ -224,6 +224,33 @@ var Hm_Message_List = {
         return count;
     },
 
+    remove_page_source: function(link) {
+        var details = Hm_Utils.parse_folder_path($(link).data('id'));
+        if (details) {
+            if (details.type == 'feeds') {
+                details.type = 'feed';
+            }
+            Hm_Message_List.remove_source(details.type, details.server_id);
+            $(".message_list tbody tr").remove();
+            Hm_Message_List.load_sources();
+            $(link).parent().remove();
+        }
+        return false;
+    },
+
+    remove_source: function(type, id) {
+        var new_sources = [];
+        var src;
+        for (index in Hm_Message_List.sources) {
+            src = Hm_Message_List.sources[index];
+            if (src.type == type && src.id == id) {
+                continue;
+            }
+            new_sources.push(src);
+        }
+        Hm_Message_List.sources = new_sources;
+    },
+
     remove_rows: function(ids, msg_ids, type) {
         var count = $('.message_table tbody tr').length;
         var i;
@@ -665,7 +692,17 @@ var Hm_Utils = {
         }
         return false;
     },
+    get_path_type: function(path) {
+        if (path.indexOf('_') != -1) {
+            var path_parts = path.split('_');
+            return path_parts[0];
+        }
+        return false;
+    },
     parse_folder_path: function(path, path_type) {
+        if (!path_type) {
+            path_type = Hm_Utils.get_path_type(path);
+        }
         var type = false;
         var server_id = false;
         var uid = false;
@@ -814,5 +851,7 @@ $(function() {
     if (hm_page_name() == 'message_list') {
         Hm_Message_List.select_combined_view();
         $('.source_link').click(function() { $('.list_sources').toggle(); return false; });
+        $('.del_src_link').click(function() { return Hm_Message_List.remove_page_source(this); });
+        $('.add_src_link').click(function() { console.log('add here'); return false; });
     }
 });
