@@ -272,7 +272,6 @@ function interface_langs() {
 }
 
 function translate_time_str($str, $output_mod) {
-    error_log($str);
     $parts = explode(',', $str);
     $res = array();
     foreach ($parts as $part) {
