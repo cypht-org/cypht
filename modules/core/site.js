@@ -256,7 +256,7 @@ var Hm_Message_List = {
 
     is_source_active: function(type, id) {
         for (var index in Hm_Message_List.sources) {
-            src = Hm_Message_List.sources[index];
+            var src = Hm_Message_List.sources[index];
             if (src.type == type && src.id == id) {
                 return true;
             }
