@@ -803,7 +803,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
             $translated[$code] = $this->trans($name);
         }
         asort($translated);
-        $mylang = $this->get('language', false);
+        $mylang = $this->get('language', '');
         $res = '<tr class="general_setting"><td><label for="language_setting">'.
             $this->trans('Interface language').'</label></td>'.
             '<td><select id="language_setting" name="language_setting">';
@@ -1118,7 +1118,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($format) {
         /* TODO: remove module specific stuff */
         if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds'))) {
-            $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+            $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';
             }
@@ -1137,7 +1137,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res = '';
         $res .= '<div class="message_list"><div class="content_title">';
         $res .= message_controls($this).
-            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
+            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->html_safe($v); },
                 $this->get('mailbox_list_title', array())));
         $res .= list_controls($refresh_link, $config_link, $source_link);
 	    $res .= message_list_meta($this->module_output(), $this);
