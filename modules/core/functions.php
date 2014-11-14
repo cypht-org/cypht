@@ -296,15 +296,18 @@ function list_sources($sources, $output_mod) {
     $res .= '<div class="src_title">'.$output_mod->html_safe('Sources').'</div>';
     foreach ($sources as $src) {
         if ($src['type'] == 'imap' && !array_key_exists('folder', $src)) {
-            $src['folder'] = 'INBOX';
+            $folder = '_INBOX';
         }
         elseif (!array_key_exists('folder', $src)) {
-            $src['folder'] = '';
+            $folder = '';
+        }
+        else {
+            $folder = '_'.$src['folder'];
         }
         $res .= '<div class="list_src">'.
-            '<a class="del_src_link" href="#" data-id="'.$output_mod->html_safe(sprintf('%s_%s_%s', $src['type'], $src['id'], $src['folder'])).'">X</a>'.
+            '<a class="del_src_link" href="#" data-id="'.$output_mod->html_safe(sprintf('%s_%s%s', $src['type'], $src['id'], $folder)).'">X</a>'.
             $output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']);
-        $res .= ' '.$output_mod->html_safe($src['folder']);
+        $res .= ' '.$output_mod->html_safe($folder);
         $res .= '</div>';
     }
     $res .= '<a href="#" class="add_src_link">Add</a>';
