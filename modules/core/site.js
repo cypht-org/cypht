@@ -223,6 +223,23 @@ var Hm_Message_List = {
         return count;
     },
 
+    add_page_source: function() {
+        var details;
+        $('.folders a').each(function() {
+            if ($(this).data('id')) {
+                details = Hm_Utils.parse_folder_path($(this).data('id'));
+                if (details.type == 'feeds') {
+                    details.type = 'feed';
+                }
+                if (!Hm_Message_List.is_source_active(details.type, details.server_id)) {
+                    $(this).css('color', 'red');
+                    console.log(details);
+                }
+            }
+        });
+        return false;
+    },
+
     remove_page_source: function(link) {
         var details = Hm_Utils.parse_folder_path($(link).data('id'));
         if (details) {
@@ -233,6 +250,16 @@ var Hm_Message_List = {
             $(".message_list tbody tr").remove();
             Hm_Message_List.load_sources();
             $(link).parent().remove();
+        }
+        return false;
+    },
+
+    is_source_active: function(type, id) {
+        for (var index in Hm_Message_List.sources) {
+            src = Hm_Message_List.sources[index];
+            if (src.type == type && src.id == id) {
+                return true;
+            }
         }
         return false;
     },
@@ -851,6 +878,6 @@ $(function() {
         Hm_Message_List.select_combined_view();
         $('.source_link').click(function() { $('.list_sources').toggle(); return false; });
         $('.del_src_link').click(function() { return Hm_Message_List.remove_page_source(this); });
-        $('.add_src_link').click(function() { console.log('add here'); return false; });
+        $('.add_src_link').click(function() { return Hm_Message_List.add_page_source(); });
     }
 });
