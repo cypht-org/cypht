@@ -96,15 +96,17 @@ class Hm_POP3 {
     var $connected;
     var $banner;
     var $state;
+    var $no_apop;
     var $handle;
    
     /* set defaults */ 
-    function pop3() {
+    function __construct() {
         $this->debug = array();
         $this->server = 'localhost';
         $this->port = 110; // ssl @ 995
         $this->ssl = false;
         $this->starttls = false;
+        $this->no_apop = true;
         $this->command_count = 0;
         $this->commands = array();
         $this->responses = array();
@@ -112,6 +114,7 @@ class Hm_POP3 {
         $this->state = 'started';
         $this->handle = false;
     }
+
     /* get server response */
     function get_response($multi_line=false) {
         if ($multi_line) {
@@ -122,6 +125,7 @@ class Hm_POP3 {
         }
         return $res;
     }
+
     /* read in a multi-line response */
     function get_multi_line_response($line_length=8192) {
         $n = -1;
@@ -149,6 +153,7 @@ class Hm_POP3 {
         } while ($result[$n] != ".\r\n");
         return $result;
     }
+
     /* read in a single line response */
     function get_single_line_response($line_length=512) {
         if (!is_resource($this->handle)) {
@@ -160,6 +165,7 @@ class Hm_POP3 {
         $this->responses[trim($res)] = microtime(true);
         return $res;
     }
+
     /* send a command string to the server */
     function send_command($command) {
         if (is_resource($this->handle)) {
@@ -172,6 +178,7 @@ class Hm_POP3 {
             $this->commands[trim($command)] = microtime(true);
         }
     }
+
     /* establish a connection to the server. */
     function connect() {
         if ($this->ssl) {
@@ -195,10 +202,12 @@ class Hm_POP3 {
         }
         return $this->connected;
     }
+
     /* output debug */
     function puke() {
         return print_r(array_merge($this->debug, $this->commands), true);
     }
+
     /* check the POP3 response code for errors */
     function is_error($response) {
         $index = count($response);
@@ -219,11 +228,13 @@ class Hm_POP3 {
         }
         return $error;
     }
+
     /* quit an active pop3 session */
     function quit() {
         $this->send_command('QUIT');
         return $this->is_error($this->get_response());
     }
+
     /* stat a mailbox */
     function mstat() {
         $cnt = 0;
@@ -238,6 +249,8 @@ class Hm_POP3 {
         }
         return array('count' => $cnt, 'size' => $size);
     }
+
+    /* list message ids in a pop3 account */
     function mlist($id=false) {
         $command = 'LIST';
         $multi = true;
@@ -259,10 +272,14 @@ class Hm_POP3 {
         }
         return $mlist;
     }
+
+    /* send the top command for the given message id */
     function top($id) {
-        $this->send_command('TOP '.$id);
+        $this->send_command('TOP '.$id.' 0');
         return $this->get_response(true);
     }
+
+    /* parse message headers */
     function msg_headers($id) {
         $lines = $this->top($id);
         $msg_headers = array();
@@ -284,16 +301,22 @@ class Hm_POP3 {
         }
         return $msg_headers;
     }
+
+    /* fetch an entire retr command response */
     function retr_full($id) {
         $this->send_command('RETR '.$id);
         $res = $this->get_response(true);
         return $res;
     }
+
+    /* start a retr command */
     function retr_start($id) {
         $this->send_command('RETR '.$id);
         $res = $this->get_response();
         return $this->is_error($res) == false;
     }
+
+    /* feed results from a retr command */
     function retr_feed() {
         $result = '';
         $line_length = 8192;
@@ -314,10 +337,14 @@ class Hm_POP3 {
         }
         return array($result, $continue);
     }
+
+    /* delete a message */
     function dele($id) {
         $this->send_command('DELE '.$id);
         return $this->is_error($this->get_response()) == false;
     }
+
+    /* send the uidl command */
     function uidl($id=false) {
         $command = 'UIDL';
         $multi = true;
@@ -339,22 +366,32 @@ class Hm_POP3 {
         }
         return $uidlist;
     }
+
+    /* send a noop command */
     function noop() {
         $this->send_command('NOOP');
         return $this->is_error($this->get_response()) == false;
     }
+
+    /* send the rset command */
     function rset() {
         $this->send_command('RSET');
         return $this->is_error($this->get_response()) == false;
     }
+
+    /* send the user command */
     function user($user) {
         $this->send_command('USER '.$user);
         return $this->is_error($this->get_response()) == false;
     }
+
+    /* send the password command */
     function pass($pass) {
         $this->send_command('PASS '.$pass);
         return $this->is_error($this->get_response()) == false;
     }
+
+    /* authenticate to the pop3 server */
     function auth($user, $pass) {
         $res = false;
         if ($this->starttls) {
@@ -363,7 +400,7 @@ class Hm_POP3 {
                 stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
             }
         }
-        if (preg_match('/<[0-9.]+@[^>]+>/', $this->banner, $matches)) {
+        if (!$this->no_apop && preg_match('/<[0-9.]+@[^>]+>/', $this->banner, $matches)) {
             $res = $this->apop($user, $pass, $matches[0]);
         }
         else {
@@ -376,6 +413,8 @@ class Hm_POP3 {
         }
         return $res;
     }
+
+    /* send apop command to avoid sending clear text passwords */
     function apop($user, $pass, $challenge) {
         $this->send_command('APOP '.$user.' '.md5($challenge.$pass));
         return $this->is_error($this->get_response()) == false;
