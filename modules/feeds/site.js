@@ -33,7 +33,7 @@ var feeds_search_page_content = function(id) {
             display_feeds_search_result,
             [],
             false,
-            false
+            Hm_Message_List.set_search_state
         );
     }
     return false;

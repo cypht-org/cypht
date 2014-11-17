@@ -187,7 +187,7 @@ var pop3_search_page_content = function(id) {
             update_pop3_search_result,
             [],
             false,
-            false
+            Hm_Message_List.set_search_state
         );
     }
     return false;

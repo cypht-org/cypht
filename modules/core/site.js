@@ -445,8 +445,8 @@ var Hm_Message_List = {
             Hm_Message_List.setup_combined_view(Hm_Message_List.page_caches[hm_list_path()]);
         }
         else {
-            if (hm_page_name() == 'search' && hm_run_search == "1") {
-                Hm_Message_List.setup_combined_view(false);
+            if (hm_page_name() == 'search') {
+                Hm_Message_List.setup_combined_view('formatted_search_data');
             }
         }
         $('.msg_controls > a').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
@@ -467,7 +467,12 @@ var Hm_Message_List = {
                 Hm_Message_List.clear_read_messages();
             }
         }
-        Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
+        if (hm_page_name() == 'search' && hm_run_search == "0") {
+            Hm_Timer.add_job(Hm_Message_List.load_sources, 60, true);
+        }
+        else {
+            Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
+        }
     },
 
     clear_read_messages: function() {
@@ -602,7 +607,8 @@ var Hm_Message_List = {
     set_all_mail_state: function() { Hm_Message_List.set_message_list_state('formatted_all_mail'); },
     set_combined_inbox_state: function() { Hm_Message_List.set_message_list_state('formatted_combined_inbox'); },
     set_flagged_state: function() { Hm_Message_List.set_message_list_state('formatted_flagged_data'); },
-    set_unread_state: function() { Hm_Message_List.set_message_list_state('formatted_unread_data'); }
+    set_unread_state: function() { Hm_Message_List.set_message_list_state('formatted_unread_data'); },
+    set_search_state: function() { Hm_Message_List.set_message_list_state('formatted_search_data'); }
 };
 
 /* folder list */
