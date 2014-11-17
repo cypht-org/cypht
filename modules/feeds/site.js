@@ -106,20 +106,6 @@ var display_feeds_combined_inbox = function(res) {
     Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
 };
 
-var add_feed_sources = function(callback) {
-    var id;
-    var i;
-    if ($('.feed_server_ids').length && $('.feed_server_ids').val().length) {
-        var ids = $('.feed_server_ids').val().split(',');
-        if (ids && ids !== '') {
-            for (i=0;i<ids.length;i++) {
-                id=ids[i];
-                Hm_Message_List.sources.push({type: 'feed', id: id, callback: callback});
-            }
-        }
-    }
-};
-
 var feed_item_view = function() {
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
@@ -206,28 +192,14 @@ var expand_feed_settings = function() {
     }
 };
 
-if (hm_page_name() == 'message_list') {
-    if (hm_list_path() == 'combined_inbox') {
-        add_feed_sources(feeds_combined_inbox_content);
-    }
-    else if (hm_list_path() == 'feeds') {
-        add_feed_sources(feeds_combined_content);
-    }
-    else if (hm_list_path() == 'unread') {
-        add_feed_sources(feeds_combined_content_unread);
-    }
-    else if (hm_list_path().substring(0, 4) == 'feed') {
-        if ($('.message_table tbody tr').length === 0) {
-            var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'feeds');
-            if (detail) {
-                Hm_Message_List.sources.push({type: 'feed', id: detail.server_id, callback: load_feed_list});
-            }
-            Hm_Message_List.setup_combined_view(hm_list_path());
+if (hm_page_name() == 'message_list' && hm_list_path().substring(0, 4) == 'feed') {
+    if ($('.message_table tbody tr').length === 0) {
+        var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'feeds');
+        if (detail) {
+            Hm_Message_List.sources.push({type: 'feed', id: detail.server_id, callback: load_feed_list});
         }
+        Hm_Message_List.setup_combined_view(hm_list_path());
     }
-}
-else if (hm_page_name() == 'search') {
-    add_feed_sources(feeds_search_page_content);
 }
 else if (hm_page_name() == 'message' && hm_list_path().substr(0, 4) == 'feed') {
     feed_item_view();

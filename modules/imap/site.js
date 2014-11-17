@@ -285,20 +285,6 @@ var imap_message_view_finished = function() {
     $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart')); });
 };
 
-var add_imap_sources = function(callback) {
-    if ($('.imap_server_ids').length && $('.imap_server_ids').val().length) {
-        var id;
-        var i;
-        var ids = $('.imap_server_ids').val().split(',');
-        if (ids && ids !== '') {
-            for (i=0;i<ids.length;i++) {
-                id=ids[i];
-                Hm_Message_List.sources.push({type: 'imap', id: id, callback: callback});
-            }
-        }
-    }
-};
-
 var imap_setup_compose_page = function() {
     var source = $('.imap_reply_source');
     var uid = $('.imap_reply_uid');
@@ -336,25 +322,8 @@ var display_reply_content = function(res) {
     document.title = res.reply_subject;
 };
 
-if (hm_page_name() == 'message_list') {
-    if (hm_list_path() == 'combined_inbox') {
-        add_imap_sources(imap_combined_inbox_content);
-    }
-    else if (hm_list_path() == 'unread') {
-        add_imap_sources(imap_combined_unread_content);
-    }
-    else if (hm_list_path() == 'flagged') {
-        add_imap_sources(imap_combined_flagged_content);
-    }
-    else if (hm_list_path() == 'email') {
-        add_imap_sources(imap_all_mail_content);
-    }
-    else if (hm_list_path().substring(0, 4) == 'imap') {
-        setup_imap_folder_page();
-    }
-}
-else if (hm_page_name() == 'search') {
-    add_imap_sources(imap_search_page_content);
+if (hm_page_name() == 'message_list' && hm_list_path().substring(0, 4) == 'imap') {
+    setup_imap_folder_page();
 }
 else if (hm_page_name() == 'compose') {
     imap_setup_compose_page();

@@ -151,7 +151,6 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $this->out('pop3_mailbox_page_path', $path);
                 $list = array_slice(array_reverse(array_unique(array_keys($pop3->mlist()))), 0, $limit);
                 foreach ($list as $id) {
-                    $path = sprintf("pop3_%d", $form['pop3_server_id']);
                     $msg_headers = $pop3->msg_headers($id);
                     if (!empty($msg_headers)) {
                         if (isset($msg_headers['date'])) {
@@ -324,6 +323,44 @@ class Hm_Handler_save_pop3_cache extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_load_pop3_servers_for_search extends Hm_Handler_Module {
+    public function process() {
+        foreach (Hm_POP3_List::dump() as $index => $vals) {
+            $this->append('data_sources', array('callback' => 'pop3_search_page_content', 'type' => 'pop3', 'name' => $vals['name'], 'id' => $index));
+        }
+    }
+}
+
+class Hm_Handler_load_pop3_servers_for_message_list extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+        }
+        else {
+            $path = '';
+        }
+        switch ($path) {
+            case 'unread':
+                $callback = 'pop3_combined_unread_content';
+                break;
+            case 'combined_inbox':
+                $callback = 'pop3_combined_inbox_content';
+                break;
+            case 'email':
+                $callback = 'pop3_all_mail_content';
+                break;
+            default:
+                $callback = false;
+                break;
+        }
+        if ($callback) {
+            foreach (Hm_POP3_List::dump() as $index => $vals) {
+                $this->append('data_sources', array('callback' => $callback, 'type' => 'pop3', 'name' => $vals['name'], 'id' => $index));
+            }
+        }
+    }
+}
+
 class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('pop3_servers', array());
@@ -333,7 +370,6 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
             if ($server['name'] == 'Default-Auth-Server') {
                 $added = true;
             }
-            $this->append('data_sources', array('type' => 'pop3', 'name' => $server['name'], 'id' => $index));
         }
         if (!$added) {
             $auth_server = $this->session->get('pop3_auth_server_settings', array());

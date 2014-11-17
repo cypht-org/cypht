@@ -34,13 +34,13 @@ add_output('compose', 'imap_reply_details', true, 'imap', 'page_js', 'before');
 
 /* search page data */
 add_handler('search', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('search', 'load_imap_servers_for_search',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('search', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
-add_handler('search', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_output('search', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* message list pages */
 add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('message_list', 'imap_bust_cache',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('message_list', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('message_list', 'imap_bust_cache',  true, 'imap', 'load_imap_servers_for_message_list', 'after');
 add_handler('message_list', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_handler('message_list', 'add_imap_servers_to_page_data',  true, 'imap', 'imap_bust_cache', 'after');
 add_output('message_list', 'imap_server_ids', true, 'imap', 'page_js', 'before');

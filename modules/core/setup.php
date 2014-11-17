@@ -16,6 +16,7 @@ function setup_base_page($name, $source=false) {
     add_handler($name, 'load_user_data', true, $source);
     add_handler($name, 'message_list_type', true);
     add_handler($name, 'language',  true, $source);
+    add_handler($name, 'process_search_terms', true, $source);
     add_handler($name, 'title', true, $source);
     add_handler($name, 'date', true, $source);
     add_handler($name, 'save_user_data', true, $source);
@@ -24,6 +25,7 @@ function setup_base_page($name, $source=false) {
 
     add_output($name, 'header_start', false, $source);
     add_output($name, 'js_data', true, $source);
+    add_output($name, 'js_search_data', true, $source);
     add_output($name, 'header_css', false, $source);
     add_output($name, 'header_content', false, $source);
     add_output($name, 'header_end', false, $source);
@@ -92,6 +94,15 @@ add_output('message_list', 'message_list_heading', true, 'core', 'content_sectio
 add_output('message_list', 'message_list_start', true, 'core', 'message_list_heading', 'after');
 add_output('message_list', 'message_list_end', true, 'core', 'message_list_start', 'after');
 
+/* search page */
+setup_base_page('search');
+add_output('search', 'search_content_start', true, 'core', 'content_section_start', 'after');
+add_output('search', 'search_form', true, 'core', 'search_content_start', 'after');
+add_output('search', 'message_list_start', true, 'core', 'search_form', 'after');
+add_output('search', 'search_results_table_end', true, 'core', 'message_list_start', 'after');
+add_output('search', 'search_content_end', true, 'core', 'search_results_table_end', 'after');
+
+
 /* message view page */
 setup_base_page('message');
 add_output('message', 'message_start', true, 'core', 'content_section_start', 'after');
@@ -116,6 +127,7 @@ add_handler('ajax_hm_folders', 'date', true);
 add_handler('ajax_hm_folders', 'http_headers', true);
 add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
+add_output('ajax_hm_folders', 'search_from_folder_list', true);
 add_output('ajax_hm_folders', 'main_menu_content', true);
 add_output('ajax_hm_folders', 'logout_menu_item', true);
 add_output('ajax_hm_folders', 'main_menu_end', true);

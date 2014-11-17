@@ -1,7 +1,0 @@
-.search_form { font-size: 80%; color: #999; display: inline; padding-left: 15px; }
-.search_form input, .search_form select { margin-right: 10px; margin-left: 3px; }
-.search_terms { padding-left: 5px; }
-.folder_list .search_terms { width: 80%; }
-.search_content { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
-.rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
-

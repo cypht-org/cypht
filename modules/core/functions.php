@@ -315,4 +315,55 @@ function list_sources($sources, $output_mod) {
     return $res;
 }
 
+function format_data_sources($array, $output_mod) {
+    $objects = array();
+    foreach ($array as $values) {
+        $items = array();
+        foreach ($values as $name => $value) {
+            if ($name == 'callback') {
+                $items[] = $output_mod->html_safe($name).':'.$output_mod->html_safe($value);
+            }
+            else {
+                $items[] = $output_mod->html_safe($name).':"'.$output_mod->html_safe($value).'"';
+            }
+        }
+        $objects[] = '{'.implode(',', $items).'}';
+    }
+    return '['.implode(',', $objects).']';
+}
+
+function validate_search_terms($terms) {
+    $terms = trim(strip_tags($terms));
+    if (!$terms) {
+        $terms = false;
+    }
+    return $terms;
+}
+
+function validate_search_fld($fld) {
+    if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'))) {
+        return $fld;
+    }
+    return false;
+}
+
+function search_field_selection($current, $output_mod) {
+    $flds = array(
+        'TEXT' => 'Entire message',
+        'BODY' => 'Message body',
+        'SUBJECT' => 'Subject',
+        'FROM' => 'From',
+    );
+    $res = '<select name="search_fld">';
+    foreach ($flds as $val => $name) {
+        $res .= '<option ';
+        if ($current == $val) {
+            $res .= 'selected="selected" ';
+        }
+        $res .= 'value="'.$val.'">'.$output_mod->trans($name).'</option>';
+    }
+    $res .= '</select>';
+    return $res;
+}
+
 ?>

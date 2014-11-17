@@ -216,6 +216,13 @@ var Hm_Timer = {
 var Hm_Message_List = {
     range_start: '',
     sources: [],
+    page_caches: {
+        'feeds': 'formatted_feed_data',
+        'combined_inbox': 'formatted_combined_inbox',
+        'email': 'formatted_all_mail',
+        'unread': 'formatted_unread_data',
+        'flagged': 'formatted_flagged_data'
+    },
 
     update: function(ids, msgs, type) {
         var msg_ids = Hm_Message_List.add_rows(msgs);
@@ -434,27 +441,25 @@ var Hm_Message_List = {
     },
 
     select_combined_view: function() {
-        if (hm_list_path() == 'feeds') {
-            Hm_Message_List.setup_combined_view('formatted_feed_data');
+        if (Hm_Message_List.page_caches.hasOwnProperty(hm_list_path())) {
+            Hm_Message_List.setup_combined_view(Hm_Message_List.page_caches[hm_list_path()]);
         }
-        else if (hm_list_path() == 'combined_inbox') {
-            Hm_Message_List.setup_combined_view('formatted_combined_inbox');
-        }
-        else if (hm_list_path() == 'email') {
-            Hm_Message_List.setup_combined_view('formatted_all_mail');
-        }
-        else if (hm_list_path() == 'unread') {
-            Hm_Message_List.setup_combined_view('formatted_unread_data');
-        }
-        else if (hm_list_path() == 'flagged') {
-            Hm_Message_List.setup_combined_view('formatted_flagged_data');
+        else {
+            if (hm_page_name() == 'search' && hm_run_search == "1") {
+                Hm_Message_List.setup_combined_view(false);
+            }
         }
         $('.msg_controls > a').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
         $('.toggle_link').click(function() { return Hm_Message_List.toggle_rows(); });
         $('.refresh_link').click(function() { return Hm_Message_List.load_sources(); });
     },
 
+    add_sources: function() {
+        Hm_Message_List.sources = hm_data_sources();
+    },
+
     setup_combined_view: function(cache_name) {
+        Hm_Message_List.add_sources();
         var data = Hm_Utils.get_from_local_storage(cache_name);
         if (data && data.length) {
             $('.message_table tbody').html(data);
@@ -665,6 +670,9 @@ var Hm_Folders = {
         $('.update_message_list').click(function() { return Hm_Folders.update_folder_list(); });
         $('.hide_folders').click(function() { return Hm_Folders.hide_folder_list(); });
         $('.logout_link').click(function() { return Hm_Utils.confirm_logout(); });
+        if (hm_search_terms) {
+            $('.search_terms').val(hm_search_terms);
+        }
     },
     hl_selected_menu: function() {
         var page = hm_page_name();
@@ -843,8 +851,7 @@ var Hm_Utils = {
     }
 };
 
-/* executes before onload, but after the DOM (just before the closing body tag)
- * Only has access to definitions above and Zepto */
+/* executes before onload, but after the DOM (just before the closing body tag) */
 
 /* load folder list */
 if (!Hm_Folders.load_from_local_storage()) {
@@ -874,7 +881,7 @@ Hm_Timer.fire();
 
 /* executes on real onload, has access to other module code */
 $(function() {
-    if (hm_page_name() == 'message_list') {
+    if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         Hm_Message_List.select_combined_view();
         $('.source_link').click(function() { $('.list_sources').toggle(); return false; });
         $('.del_src_link').click(function() { return Hm_Message_List.remove_page_source(this); });

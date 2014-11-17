@@ -13,6 +13,7 @@ add_output('home', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
 /* message list page */
 add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
+add_handler('message_list', 'load_pop3_servers_for_message_list', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('message_list', 'pop3_message_list_type', true, 'pop3', 'message_list_type', 'after');
 add_handler('message_list', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('message_list', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
@@ -40,16 +41,14 @@ add_output('settings', 'pop3_since_setting', true, 'pop3', 'start_pop3_settings'
 add_output('settings', 'pop3_limit_setting', true, 'pop3', 'pop3_since_setting', 'after');
 
 
-
 /* compose page */
 add_handler('compose', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('compose', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 
 /* search page */
 add_handler('search', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
+add_handler('search', 'load_pop3_servers_for_search', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('search', 'pop3_message_list_type', true, 'pop3', 'message_list_type', 'after');
-add_handler('search', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('search', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
 /* not found */
 add_handler('notfound', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
@@ -158,7 +157,7 @@ return array(
         'pop3_connect_status' => array(FILTER_SANITIZE_STRING, false),
         'pop3_connect_time' => array(FILTER_SANITIZE_STRING, false),
         'pop3_detail_display' => array(FILTER_SANITIZE_STRING, false),
-        'pop3_status_display' => array(FILTER_SANITIZE_STRING, false),
+        'pop3_status_display' => array(FILTER_UNSAFE_RAW, false),
         'pop3_status_server_id' => array(FILTER_VALIDATE_INT, false),
         'pop3_server_id' => array(FILTER_VALIDATE_INT, false),
     ),

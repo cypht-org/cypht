@@ -8,8 +8,6 @@ define('DEFAULT_SINCE', 'today');
 
 require APP_PATH.'modules/core/functions.php';
 
-/* INPUT */
-
 class Hm_Handler_close_session_early extends Hm_Handler_Module {
     public function process() {
         $this->session->close_early();
@@ -359,6 +357,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         }
     }
 }
+
 /* TODO: clean this up somehow */
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
     public function process() {
@@ -440,8 +439,83 @@ class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_process_search_terms extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('search_terms', $this->request->get)) {
+            $this->out('run_search', 1);
+            $this->session->set('search_terms', validate_search_terms($this->request->get['search_terms']));
+        }
+        if (array_key_exists('search_since', $this->request->get)) {
+            $this->session->set('search_since', process_since_argument($this->request->get['search_since'], true));
+        }
+        if (array_key_exists('search_fld', $this->request->get)) {
+            $this->session->set('search_fld', validate_search_fld($this->request->get['search_fld']));
+        }
+        $this->out('search_since', $this->session->get('search_since', DEFAULT_SINCE));
+        $this->out('search_terms', $this->session->get('search_terms', ''));
+        $this->out('search_fld', $this->session->get('search_fld', 'TEXT'));
+    }
+}
 
-/* OUTPUT */
+class Hm_Output_search_from_folder_list extends Hm_Output_Module {
+    protected function output($format) {
+        $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).
+            '" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
+            '<input type="search" class="search_terms" name="search_terms" placeholder="'.
+            $this->trans('Search').'" /></form></li>';
+        if ($format == 'HTML5') {
+            return $res;
+        }
+        $this->concat('formatted_folder_list', $res);
+    }
+}
+
+class Hm_Output_search_content_start extends Hm_Output_Module {
+    protected function output($format) {
+        return '<div class="search_content"><div class="content_title">'.$this->trans('Search');
+    }
+}
+
+class Hm_Output_search_content_end extends Hm_Output_Module {
+    protected function output($format) {
+        return '</div>';
+    }
+}
+
+class Hm_Output_search_form extends Hm_Output_Module {
+    protected function output($format) {
+        $terms = $this->get('search_terms', '');
+        $source_link = '<a href="#" title="Sources" class="source_link"><img class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+        $res = '<div class="search_form">'.
+            '<form method="get"><input type="hidden" name="page" value="search" />'.
+            ' <input type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
+            ' '.search_field_selection($this->get('search_fld', ''), $this).
+            ' '.message_since_dropdown($this->get('search_since', ''), 'search_since', $this).
+            ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" /></form></div>'.
+            list_controls($refresh_link, false, $source_link).
+            '</div>';
+        return $res;
+    }
+}
+
+class Hm_Output_search_results_table_end extends Hm_Output_Module {
+    protected function output($format) {
+        return '</tbody></table>';
+    }
+}
+
+class Hm_Output_js_search_data extends Hm_Output_Module {
+    protected function output($format) {
+        return '<script type="text/javascript">'.
+            'var hm_search_terms = "'.$this->html_safe($this->get('search_terms', '')).'";'.
+            'var hm_search_fld = "'.$this->html_safe($this->get('search_fld', '')).'";'.
+            'var hm_search_since = "'.$this->html_safe($this->get('search_since', '')).'";'.
+            'var hm_run_search = "'.$this->html_safe($this->get('run_search', 0)).'";'.
+            '</script>';
+    }
+}
 
 class Hm_Output_login extends Hm_Output_Module {
     protected function output($format) {
@@ -640,6 +714,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_list_path = function() { return "'.$this->html_safe($this->get('list_path', '')).'"; };'.
             'var hm_list_parent = function() { return "'.$this->html_safe($this->get('list_parent', '')).'"; };'.
             'var hm_msg_uid = function() { return "'.$this->html_safe($this->get('uid', '')).'"; };'.
+            'var hm_data_sources = function() { return '.format_data_sources($this->get('data_sources', array()), $this).'; };'.
             '</script>';
     }
 }

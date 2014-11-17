@@ -381,8 +381,44 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
         if (!empty($feeds)) {
             $this->out('feeds', $feeds);
             $this->append('folder_sources', 'feeds_folders');
-            foreach ($feeds as $index => $feed) {
-                $this->append('data_sources', array('type' => 'feeds', 'name' => $feed['name'], 'id' => $index));
+        }
+    }
+}
+
+class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
+    public function process() {
+        foreach (Hm_Feed_List::dump() as $index => $vals) {
+            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+        }
+        
+    }
+}
+
+class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+        }
+        else {
+            $path = '';
+        }
+        switch ($path) {
+            case 'unread':
+                $callback = 'feeds_combined_content_unread';
+                break;
+            case 'combined_inbox':
+                $callback = 'feeds_combined_inbox_content';
+                break;
+            case 'feeds':
+                $callback = 'feeds_combined_content';
+                break;
+            default:
+                $callback = false;
+                break;
+        }
+        if ($callback) {
+            foreach (Hm_Feed_List::dump() as $index => $vals) {
+                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
             }
         }
     }

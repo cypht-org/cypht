@@ -123,19 +123,6 @@ var pop3_message_view_finished = function() {
     $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart')); });
 };
 
-var add_pop3_sources = function(callback) {
-    var i;
-    var id;
-    if ($('.pop3_server_ids').length && $('.pop3_server_ids').val().length) {
-        var ids = $('.pop3_server_ids').val().split(',');
-        if (ids && ids !== '') {
-            for (i=0;i<ids.length;i++) {
-                id=ids[i];
-                Hm_Message_List.sources.push({type: 'pop3', id: id, callback: callback});
-            }
-        }
-    }
-};
 var pop3_all_mail_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
@@ -246,30 +233,15 @@ if (hm_page_name() == 'servers') {
         $('.pop3_section').css('display', dsp);
     }
 }
-else if (hm_page_name() == 'message_list') {
-    if (hm_list_path() == 'combined_inbox') {
-        add_pop3_sources(pop3_combined_inbox_content);
-    }
-    else if (hm_list_path() == 'email') {
-        add_pop3_sources(pop3_all_mail_content);
-    }
-    else if (hm_list_path() == 'unread') {
-        add_pop3_sources(pop3_combined_unread_content);
-    }
-    else if (hm_list_path().substring(0, 4) == 'pop3') {
-        if ($('.message_table tbody tr').length === 0) {
-            var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'pop3');
-            if (detail) {
-                Hm_Message_List.sources.push({type: 'pop3', id: detail.server_id, callback: load_pop3_list});
-            }
-            Hm_Message_List.setup_combined_view(hm_list_path());
-            
+else if (hm_page_name() == 'message_list' && hm_list_path().substring(0, 4) == 'pop3') {
+    if ($('.message_table tbody tr').length === 0) {
+        var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'pop3');
+        if (detail) {
+            Hm_Message_List.sources.push({type: 'pop3', id: detail.server_id, callback: load_pop3_list});
         }
-        $('.message_table tr').show();
+        Hm_Message_List.setup_combined_view(hm_list_path());
     }
-}
-else if (hm_page_name() == 'search') {
-    add_pop3_sources(pop3_search_page_content);
+    $('.message_table tr').show();
 }
 else if (hm_page_name() == 'message' && hm_list_path().substr(0, 4) == 'pop3') {
     pop3_message_view();

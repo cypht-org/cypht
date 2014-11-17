@@ -300,6 +300,47 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
+    public function process() {
+        foreach (Hm_IMAP_List::dump() as $index => $vals) {
+            $this->append('data_sources', array('callback' => 'imap_search_page_content', 'type' => 'imap', 'name' => $vals['name'], 'id' => $index));
+        }
+    }
+}
+
+class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+        }
+        else {
+            $path = '';
+        }
+        switch ($path) {
+            case 'unread':
+                $callback = 'imap_combined_unread_content';
+                break;
+            case 'flagged':
+                $callback = 'imap_combined_flagged_content';
+                break;
+            case 'combined_inbox':
+                $callback = 'imap_combined_inbox_content';
+                break;
+            case 'email':
+                $callback = 'imap_all_mail_content';
+                break;
+            default:
+                $callback = false;
+                break;
+        }
+        if ($callback) {
+            foreach (Hm_IMAP_List::dump() as $index => $vals) {
+                $this->append('data_sources', array('callback' => $callback, 'type' => 'imap', 'name' => $vals['name'], 'id' => $index));
+            }
+        }
+    }
+}
+
 class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('imap_servers', array());
@@ -309,7 +350,6 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             if ($server['name'] == 'Default-Auth-Server') {
                 $added = true;
             }
-            $this->append('data_sources', array('type' => 'imap', 'name' => $server['name'], 'id' => $index));
         }
         if (!$added) {
             $auth_server = $this->session->get('imap_auth_server_settings', array());

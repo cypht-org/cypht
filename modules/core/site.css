@@ -76,7 +76,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .news_cell .subject { padding-bottom: 5px !important; }
 .news_cell .icon { float: right; }
 .news_cell .from {font-size: 100% !important; color: #111; letter-spacing: 0px; }
-.wait { cursor: progress; }
+.wait { }
 .msg_controls { display: none; padding-left: 0px; margin-right: 20px; }
 .msg_controls_visible { display: inline; }
 .msg_controls a, .toggle_link { font-size: .6em; letter-spacing: 0px; color: #666; margin-right: 5px; background-color: #fff; border: solid 1px #ccc; padding: 3px; width: 30px; border-radius: 3px; vertical-align: 3px; }
@@ -115,7 +115,13 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .list_src { margin-bottom: 10px; }
 .src_title { font-size: 110%; padding: 5px; margin-bottom: 10px; }
 .del_src_link { padding: 3px; color: #666; margin-right: 5px; }
+.search_form { font-size: 80%; color: #999; display: inline; padding-left: 15px; }
+.search_form input, .search_form select { margin-right: 10px; margin-left: 3px; }
+.search_terms { padding-left: 5px; }
+.folder_list .search_terms { width: 80%; }
+.search_content { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 
+.rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .list_controls { padding-left: 20px; float: left !important; }
 .rtl_page .account_icon { padding-right: 0px !important; padding-left: 6px !important; }
