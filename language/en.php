@@ -177,6 +177,12 @@ return array(
     'Content-Type' => false,
     'Content-Transfer-Encoding' => false,
     'Flags' => false,
+    'List-Id' => false,
+    'List-Post' => false,
+    'Mailing-List' => false,
+    'Saved user data on logout' => false,
+    'Session destroyed on logout' => false,
+    'Cound not add server: Connection refused' => false,
 
     '%d second' => false,
     '%d seconds' => false,
