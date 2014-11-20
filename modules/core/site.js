@@ -240,7 +240,6 @@ var Hm_Message_List = {
                 }
                 if (!Hm_Message_List.is_source_active(details.type, details.server_id)) {
                     $(this).css('color', 'red');
-                    console.log(details);
                 }
             }
         });
@@ -447,6 +446,9 @@ var Hm_Message_List = {
         else {
             if (hm_page_name() == 'search') {
                 Hm_Message_List.setup_combined_view('formatted_search_data');
+            }
+            else {
+                Hm_Message_List.setup_combined_view(false);
             }
         }
         $('.msg_controls > a').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
