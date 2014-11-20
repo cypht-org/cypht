@@ -396,6 +396,8 @@ class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
 
 class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
     public function process() {
+        $callback = false;
+        $server_id = false;
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
         }
@@ -413,11 +415,17 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 $callback = 'feeds_combined_content';
                 break;
             default:
-                $callback = false;
+                if (preg_match("/^feeds_(\d+)$/", $path, $matches)) {
+                    $server_id = $matches[1];
+                    $callback = 'load_feed_list';
+                }
                 break;
         }
         if ($callback) {
             foreach (Hm_Feed_List::dump() as $index => $vals) {
+                if ($server_id !== false && $index != $server_id) {
+                    continue;
+                }
                 $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
             }
         }

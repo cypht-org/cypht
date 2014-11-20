@@ -233,16 +233,6 @@ if (hm_page_name() == 'servers') {
         $('.pop3_section').css('display', dsp);
     }
 }
-else if (hm_page_name() == 'message_list' && hm_list_path().substring(0, 4) == 'pop3') {
-    if ($('.message_table tbody tr').length === 0) {
-        var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'pop3');
-        if (detail) {
-            Hm_Message_List.sources.push({type: 'pop3', id: detail.server_id, callback: load_pop3_list});
-        }
-        Hm_Message_List.setup_combined_view(hm_list_path());
-    }
-    $('.message_table tr').show();
-}
 else if (hm_page_name() == 'message' && hm_list_path().substr(0, 4) == 'pop3') {
     pop3_message_view();
 }
