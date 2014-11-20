@@ -246,6 +246,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
             if (isset($this->request->get['list_path'])) {
                 $this->out('feed_list_parent', $this->request->get['list_path']);
             }
+            elseif (isset($this->request->get['page']) && $this->request->get['page'] == 'search') {
+                $this->out('feed_list_parent', 'search');
+            }
             $this->out('feed_server_ids', $form['feed_server_ids']);
         }
     }
@@ -562,14 +565,8 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $date = translate_time_str($date, $this);
                 }
                 $url = '?page=message&uid='.urlencode(md5($item['guid'])).'&list_path=feeds_'.$item['server_id'];
-                if ($this->get('feed_list_parent') == 'combined_inbox') {
-                    $url .= '&list_parent=combined_inbox';
-                }
-                elseif ($this->get('feed_list_parent') == 'unread') {
-                    $url .= '&list_parent=unread';
-                }
-                elseif ($this->get('feed_list_parent') == 'feeds') {
-                    $url .= '&list_parent=feeds';
+                if ($this->in('feed_list_parent', array('combined_inbox', 'unread', 'feeds', 'search'))) {
+                    $url .= '&list_parent='.$this->html_safe($this->get('feed_list_parent', ''));
                 }
                 else {
                     $url .= '&list_parent=feeds_'.$item['server_id'];
