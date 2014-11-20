@@ -8,10 +8,9 @@ class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
-            if (preg_match("/^pop3_\d+$/", $path)) {
+            if (preg_match("/^pop3_(\d+)$/", $path, $matches)) {
                 $this->out('list_path', $path);
-                $parts = explode('_', $path, 2);
-                $details = Hm_POP3_List::dump(intval($parts[1]));
+                $details = Hm_POP3_List::dump($matches[1]);
                 if (!empty($details)) {
                     if ($details['name'] == 'Default-Auth-Server') {
                         $details['name'] = 'Default';
@@ -21,6 +20,9 @@ class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
                     $this->out('per_source_limit', $this->user_config->get('pop3_limit', DEFAULT_SINCE));
                 }
             }
+        }
+        if (array_key_exists('page', $this->request->get) && $this->request->get['page'] == 'search') {
+            $this->out('list_path', 'search');
         }
     }
 }
