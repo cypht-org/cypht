@@ -486,13 +486,16 @@ class Hm_Output_search_content_end extends Hm_Output_Module {
 class Hm_Output_search_form extends Hm_Output_Module {
     protected function output($format) {
         $terms = $this->get('search_terms', '');
-        $source_link = '<a href="#" title="Sources" class="source_link"><img class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
-        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+        $source_link = '<a href="#" title="Sources" class="source_link"><img alt="'.$this->trans('Sources').'" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.$this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
         $res = '<div class="search_form">'.
             '<form method="get"><input type="hidden" name="page" value="search" />'.
-            ' <input type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
-            ' '.search_field_selection($this->get('search_fld', ''), $this).
-            ' '.message_since_dropdown($this->get('search_since', ''), 'search_since', $this).
+            ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
+            '<input id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
+            ' <label class="screen_reader" for="search_fld">'.$this->trans('Search Field').'</label>'.
+            search_field_selection($this->get('search_fld', ''), $this).
+            ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
+            message_since_dropdown($this->get('search_since', ''), 'search_since', $this).
             ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" /></form></div>'.
             list_controls($refresh_link, false, $source_link).
             '</div>';
@@ -509,10 +512,8 @@ class Hm_Output_search_results_table_end extends Hm_Output_Module {
 class Hm_Output_js_search_data extends Hm_Output_Module {
     protected function output($format) {
         return '<script type="text/javascript">'.
-            'var hm_search_terms = "'.$this->html_safe($this->get('search_terms', '')).'";'.
-            'var hm_search_fld = "'.$this->html_safe($this->get('search_fld', '')).'";'.
-            'var hm_search_since = "'.$this->html_safe($this->get('search_since', '')).'";'.
-            'var hm_run_search = "'.$this->html_safe($this->get('run_search', 0)).'";'.
+            'var hm_search_terms = function() { return "'.$this->html_safe($this->get('search_terms', '')).'"; };'.
+            'var hm_run_search = function() { return "'.$this->html_safe($this->get('run_search', 0)).'"; };'.
             '</script>';
     }
 }

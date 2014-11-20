@@ -354,7 +354,7 @@ function search_field_selection($current, $output_mod) {
         'SUBJECT' => 'Subject',
         'FROM' => 'From',
     );
-    $res = '<select name="search_fld">';
+    $res = '<select id="search_fld" name="search_fld">';
     foreach ($flds as $val => $name) {
         $res .= '<option ';
         if ($current == $val) {

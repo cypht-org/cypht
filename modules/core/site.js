@@ -469,7 +469,7 @@ var Hm_Message_List = {
                 Hm_Message_List.clear_read_messages();
             }
         }
-        if (hm_page_name() == 'search' && hm_run_search == "0") {
+        if (hm_page_name() == 'search' && hm_run_search() == "0") {
             Hm_Timer.add_job(Hm_Message_List.load_sources, 60, true);
         }
         else {
@@ -678,8 +678,8 @@ var Hm_Folders = {
         $('.update_message_list').click(function() { return Hm_Folders.update_folder_list(); });
         $('.hide_folders').click(function() { return Hm_Folders.hide_folder_list(); });
         $('.logout_link').click(function() { return Hm_Utils.confirm_logout(); });
-        if (hm_search_terms) {
-            $('.search_terms').val(hm_search_terms);
+        if (hm_search_terms()) {
+            $('.search_terms').val(hm_search_terms());
         }
     },
     hl_selected_menu: function() {
