@@ -187,7 +187,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .update_message_list { margin-right: 20px; }
     .msg_text { max-width: 360px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
     .msg_text_inner { font-size: 100%; }
-    .msg_controls { position: absolute; background-color: #fff !important; }
+    .msg_controls { position: absolute; background-color: #fff !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; }
     .header_subject th { max-width: 360px; white-space: normal !important; word-break: break-all; word-wrap: break-word; overflow: visible !important; }
     .msg_headers th { padding-left: 10px !important; }
     .msg_text_inner { padding-left: 10px !important; font-size: 120%; }
