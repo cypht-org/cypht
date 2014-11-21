@@ -144,6 +144,10 @@ return array(
     'Sources' => false,
     'Configure' => false,
     'Refresh' => false,
+    'Search Terms' => false,
+    'Search Field' => false,
+    'Search Since' => false,
+
 
     'link' => false,
     'pubdate' => false,
