@@ -235,11 +235,8 @@ var Hm_Message_List = {
         $('.folders a').each(function() {
             if ($(this).data('id')) {
                 details = Hm_Utils.parse_folder_path($(this).data('id'));
-                if (details.type == 'feeds') {
-                    details.type = 'feed';
-                }
                 if (!Hm_Message_List.is_source_active(details.type, details.server_id)) {
-                    $(this).css('color', 'red');
+                    /* TODO */
                 }
             }
         });
@@ -261,8 +258,9 @@ var Hm_Message_List = {
     },
 
     is_source_active: function(type, id) {
+        var src;
         for (var index in Hm_Message_List.sources) {
-            var src = Hm_Message_List.sources[index];
+            src = Hm_Message_List.sources[index];
             if (src.type == type && src.id == id) {
                 return true;
             }
@@ -275,10 +273,9 @@ var Hm_Message_List = {
         var src;
         for (var index in Hm_Message_List.sources) {
             src = Hm_Message_List.sources[index];
-            if (src.type == type && src.id == id) {
-                continue;
+            if (src.type != type && src.id != id) {
+                new_sources.push(src);
             }
-            new_sources.push(src);
         }
         Hm_Message_List.sources = new_sources;
     },
