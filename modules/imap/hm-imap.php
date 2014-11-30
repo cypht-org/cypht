@@ -93,6 +93,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     /* maximum characters to read in from a request */
     public $max_read = false;
 
+    /* SSL connection knobs */
+    public $verify_peer_name = false;
+    public $verify_peer = false;
+
     /* IMAP server IP address or hostname */
     public $server = '127.0.0.1';
 
@@ -202,8 +206,11 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
             $this->debug[] = 'Connecting to '.$this->server.' on port '.$this->port;
             $ctx = stream_context_create();
+
             /* TODO: make this optional */
-            stream_context_set_option($ctx, 'ssl', 'verify_peer_name', false);
+            stream_context_set_option($ctx, 'ssl', 'verify_peer_name', $this->verify_peer_name);
+            stream_context_set_option($ctx, 'ssl', 'verify_peer', $this->verify_peer);
+
             $timeout = 10;
             $this->handle = stream_socket_client($this->server.':'.$this->port, $errorno, $errorstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
             if (is_resource($this->handle)) {
