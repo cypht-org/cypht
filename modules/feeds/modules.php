@@ -409,7 +409,9 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
         }
         switch ($path) {
             case 'unread':
-                $callback = 'feeds_combined_content_unread';
+                if (!$this->user_config->get('unread_exclude_feeds', false)) {
+                    $callback = 'feeds_combined_content_unread';
+                }
                 break;
             case 'combined_inbox':
                 $callback = 'feeds_combined_inbox_content';
