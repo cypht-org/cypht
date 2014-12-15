@@ -785,6 +785,14 @@ class Hm_Output_start_unread_settings extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_start_all_email_settings extends Hm_Output_Module {
+    protected function output($format) {
+        return '<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+            $this->trans('All Email').'</td></tr>';
+    }
+}
+
 class Hm_Output_start_general_settings extends Hm_Output_Module {
     protected function output($format) {
         return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle">'.
@@ -1192,8 +1200,8 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($format) {
-        /* TODO: remove module specific stuff */
-        if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds'))) {
+        /* TODO: remove module specific stuff, use data sources? */
+        if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds', 'email'))) {
             $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';

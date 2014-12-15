@@ -86,7 +86,8 @@ add_output('settings', 'flagged_source_max_setting', true, 'core', 'flagged_sinc
 add_output('settings', 'start_everything_settings', true, 'core', 'flagged_source_max_setting', 'after');
 add_output('settings', 'all_since_setting', true, 'core', 'start_everything_settings', 'after');
 add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_setting', 'after');
-add_output('settings', 'end_settings_form', true, 'core', 'all_source_max_setting', 'after');
+add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max_setting', 'after');
+add_output('settings', 'end_settings_form', true, 'core', 'start_all_email_settings', 'after');
 
 /* message list page */
 setup_base_page('message_list');
