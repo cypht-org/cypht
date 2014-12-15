@@ -76,6 +76,17 @@ add_handler('ajax_imap_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_imap_debug', 'date', true, 'core');
 add_handler('ajax_imap_debug', 'http_headers', true, 'core');
 
+/* flag a message from the message view page */
+add_handler('ajax_imap_flag_message', 'login', false, 'core');
+add_handler('ajax_imap_flag_message', 'load_user_data', true, 'core');
+add_handler('ajax_imap_flag_message', 'language', true, 'core');
+add_handler('ajax_imap_flag_message', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_flag_message', 'flag_imap_message', true);
+add_handler('ajax_imap_flag_message', 'save_imap_cache',  true);
+add_handler('ajax_imap_flag_message', 'save_imap_servers',  true);
+add_handler('ajax_imap_flag_message', 'date', true, 'core');
+add_handler('ajax_imap_flag_message', 'http_headers', true, 'core');
+
 /* ajax message content */
 add_handler('ajax_imap_message_content', 'login', false, 'core');
 add_handler('ajax_imap_message_content', 'load_user_data', true, 'core');
@@ -196,7 +207,8 @@ return array(
         'ajax_unread_count',
         'ajax_imap_message_content',
         'ajax_imap_save_folder_state',
-        'ajax_imap_message_action'
+        'ajax_imap_message_action',
+        'ajax_imap_flag_message',
     ),
 
     'allowed_output' => array(
@@ -242,6 +254,7 @@ return array(
         'imap_folder_state' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_msg_part' => FILTER_SANITIZE_STRING,
+        'imap_flag_state' => FILTER_SANITIZE_STRING,
     )
 );
 

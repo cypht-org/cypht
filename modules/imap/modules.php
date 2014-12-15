@@ -123,6 +123,33 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_flag_state', 'imap_msg_uid', 'imap_server_id', 'folder'));
+        if ($success) {
+            $flag_result = false;
+            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            if (is_object($imap) && $imap->get_state() == 'authenticated') {
+                if ($imap->select_mailbox($form['folder'])) {
+                    if ($form['imap_flag_state'] == 'flagged') {
+                        $cmd = 'UNFLAG';
+                    }
+                    else {
+                        $cmd = 'FLAG';
+                    }
+                    if ($imap->message_action($cmd, array($form['imap_msg_uid']))) {
+                        $flag_result = true;
+                    }
+                }
+            }
+            if (!$flag_result) {
+                Hm_Msgs::add('ERRAn error occured trying to flag this message');
+            }
+        }
+    }
+}
+
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
@@ -590,15 +617,22 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
-                '<a href="#" class="header_toggle">all</a>'.
-                '<a class="header_toggle" style="display: none;" href="#">small</a>'.
+                '<a href="#" class="header_toggle">'.$this->trans('all').'</a>'.
+                '<a class="header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
                 ' | <a href="?page=compose&amp;reply_uid='.$this->html_safe($this->get('msg_text_uid', 0)).
                 '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $this->get('msg_server_id'), $this->get('msg_folder'))).'">reply</a>'.
-                ' | <a href="?page=compose">forward</a>'.
-                ' | <a href="?page=compose">attach</a>'.
-                ' | <a class="msg_part_link" data-message-part="0" href="#">raw</a>'.
-                ' | <a href="#">flag</a>'.
-                '</th></tr></table>';
+                ' | <a href="?page=compose">'.$this->trans('forward').'</a>'.
+                ' | <a href="?page=compose">'.$this->trans('attach').'</a>'.
+                ' | <a class="msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
+            if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
+                $txt .= ' | <a style="display: none;" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
+                $txt .= '<a id="unflag_msg" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
+            }
+            else {
+                $txt .= ' | <a id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
+                $txt .= '<a style="display: none;" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
+            }
+            $txt .= '</th></tr></table>';
 
             $this->out('msg_headers', $txt);
         }
