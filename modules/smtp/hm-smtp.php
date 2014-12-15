@@ -582,9 +582,7 @@ class Hm_MIME_Msg {
         foreach ($this->headers as $name => $val) {
             $res .= sprintf("%s: %s\r\n", $name, $val);
         }
-        $res .= "\r\n\r\n";
-        $res .= $this->body;
-        return $res;
+        return $res."\r\n".$this->body;
     }
 
     /* try to accurately validate an E-mail. Based on RFC 3696 */
@@ -729,9 +727,11 @@ class Hm_MIME_Msg {
     }
 
     function prep_message_body($body) {
+        $message = mb_convert_encoding(trim($body), "HTML-ENTITIES", "UTF-8");
+        $message = mb_convert_encoding($message, "UTF-8", "HTML-ENTITIES");
         $message = trim($body);
         $message = str_replace("\r\n", "\n", $message);
-        $lines = explode("\n", wordwrap($message, 79, " \n"));
+        $lines = explode("\n", $message);
         $new_lines = array();
         foreach($lines as $line) {
             $line = trim($line, "\r\n")."\r\n";
@@ -745,8 +745,7 @@ class Hm_MIME_Msg {
 
     function qp_encode($string) {
         $string = str_replace("\r\n", "\n", $string);
-        $lines = explode("\n", $string, 78);
-        $res = array();
+        $lines = explode("\n", $string);
         $new_lines = array();
         foreach ($lines as $v) {
             $new_line = '';
@@ -777,8 +776,7 @@ class Hm_MIME_Msg {
             }
             $new_lines[] = $new_line;
         }
-        $string = implode("\r\n", $new_lines);
-        return $string;
+        return implode("\r\n", $new_lines);
     }
 }
 
