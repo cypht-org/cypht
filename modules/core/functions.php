@@ -307,7 +307,7 @@ function list_sources($sources, $output_mod) {
         $res .= '<div class="list_src">'.
             '<a class="del_src_link" href="#" data-id="'.$output_mod->html_safe(sprintf('%s_%s%s', $src['type'], $src['id'], $folder)).'">X</a>'.
             $output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']);
-        $res .= ' '.$output_mod->html_safe($folder);
+        $res .= ' '.$output_mod->html_safe(str_replace('_', '', $folder));
         $res .= '</div>';
     }
     $res .= '<a href="#" class="add_src_link">Add</a>';
