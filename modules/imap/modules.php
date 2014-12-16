@@ -206,9 +206,8 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'email') {
-                /* TODO: add settings for these */
-                $limit = DEFAULT_PER_SOURCE;
-                $date = process_since_argument(DEFAULT_SINCE);
+                $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_SINCE));
             }
             else {
                 $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);

@@ -69,6 +69,8 @@ add_handler('settings', 'process_flagged_source_max_setting', true, 'core', 'dat
 add_handler('settings', 'process_unread_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 
@@ -87,7 +89,9 @@ add_output('settings', 'start_everything_settings', true, 'core', 'flagged_sourc
 add_output('settings', 'all_since_setting', true, 'core', 'start_everything_settings', 'after');
 add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_setting', 'after');
 add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max_setting', 'after');
-add_output('settings', 'end_settings_form', true, 'core', 'start_all_email_settings', 'after');
+add_output('settings', 'all_email_since_setting', true, 'core', 'start_all_email_settings', 'after');
+add_output('settings', 'all_email_source_max_setting', true, 'core', 'all_email_since_setting', 'after');
+add_output('settings', 'end_settings_form', true, 'core', 'content_section_end', 'before');
 
 /* message list page */
 setup_base_page('message_list');
@@ -226,6 +230,8 @@ return array(
         'flagged_since' => FILTER_SANITIZE_STRING,
         'unread_per_source' => FILTER_VALIDATE_INT,
         'unread_since' => FILTER_SANITIZE_STRING,
+        'all_email_per_source' => FILTER_VALIDATE_INT,
+        'all_email_since' => FILTER_SANITIZE_STRING,
         'all_per_source' => FILTER_VALIDATE_INT,
         'all_since' => FILTER_SANITIZE_STRING,
         'list_style' => FILTER_SANITIZE_STRING,

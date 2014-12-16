@@ -79,6 +79,29 @@ class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('save_settings', 'all_email_per_source'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
+        if ($success) {
+            if ($form['all_email_per_source'] > MAX_PER_SOURCE || $form['all_email_per_source'] < 0) {
+                $sources = DEFAULT_PER_SOURCE;
+            }
+            else {
+                $sources = $form['all_email_per_source'];
+            }
+            $new_settings['all_email_per_source_setting'] = $sources;
+        }
+        else {
+            $settings['all_email_per_source'] = $this->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
+        }
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
+    }
+}
+
 class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_per_source'));
@@ -153,6 +176,23 @@ class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
         }
         else {
             $settings['all_since'] = $this->user_config->get('all_since_setting', false);
+        }
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
+    }
+}
+
+class Hm_Handler_process_all_email_since_setting extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('save_settings', 'all_email_since'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
+        if ($success) {
+            $new_settings['all_email_since_setting'] = process_since_argument($form['all_email_since'], true);
+        }
+        else {
+            $settings['all_email_since'] = $this->user_config->get('all_email_since_setting', false);
         }
         $this->out('new_user_settings', $new_settings, false);
         $this->out('user_settings', $settings, false);
@@ -380,6 +420,8 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
                 $per_source_limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
             }
             elseif ($path == 'email') {
+                $message_list_since = $this->user_config->get('all_email_since_setting', DEFAULT_SINCE);
+                $per_source_limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
                 $list_path = 'email';
                 $mailbox_list_title = array('All Email');
             }
@@ -853,6 +895,19 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
+    protected function output($format) {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('all_email_per_source', $settings)) {
+            $sources = $settings['all_email_per_source'];
+        }
+        return '<tr class="all_email_setting"><td><label for="all_email_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td><input type="text" size="2" id="all_email_per_source" name="all_email_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+    }
+}
+
 class Hm_Output_all_source_max_setting extends Hm_Output_Module {
     protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
@@ -863,6 +918,19 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
         return '<tr class="all_setting"><td><label for="all_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
             '<td><input type="text" size="2" id="all_per_source" name="all_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+    }
+}
+
+class Hm_Output_all_email_since_setting extends Hm_Output_Module {
+    protected function output($format) {
+        $since = false;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('all_email_since', $settings)) {
+            $since = $settings['all_email_since'];
+        }
+        return '<tr class="email_setting"><td><label for="all_email_since">'.
+            $this->trans('Show messages received since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'all_email_since', $this).'</td></tr>';
     }
 }
 
@@ -1133,6 +1201,9 @@ class Hm_Output_message_start extends Hm_Output_Module {
         if ($this->in('list_parent', array('search', 'flagged', 'combined_inbox', 'unread', 'feeds', 'email'))) {
             if ($this->get('list_parent') == 'combined_inbox') {
                 $list_name = $this->trans('Everything');
+            }
+            elseif ($this->get('list_parent') == 'email') {
+                $list_name = $this->trans('All Email');
             }
             else {
                 $list_name = $this->trans(ucwords(str_replace('_', ' ', $this->get('list_parent', ''))));
