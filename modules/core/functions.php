@@ -366,15 +366,4 @@ function search_field_selection($current, $output_mod) {
     return $res;
 }
 
-function elog($mixed) {
-    $type = gettype($mixed);
-    if (in_array($type, array('array', 'object'), true)) {
-        $str = print_r($mixed, true);
-    }
-    else {
-        $str = sprintf("%s: %s", $type, $mixed);
-    }
-    error_log($str);
-}
-
 ?>
