@@ -206,6 +206,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'email') {
+                /* TODO: add settings for these */
                 $limit = DEFAULT_PER_SOURCE;
                 $date = process_since_argument(DEFAULT_SINCE);
             }
@@ -815,6 +816,17 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
             prepare_imap_message_list($this->get('imap_unread_data'), $this, 'unread');
         }
         elseif (!$this->get('formatted_message_list')) {
+            $this->out('formatted_message_list', array());
+        }
+    }
+}
+
+class Hm_Output_filter_all_email extends Hm_Output_Module {
+    protected function output($format) {
+        if ($this->get('imap_combined_inbox_data')) {
+            prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'email');
+        }
+        else {
             $this->out('formatted_message_list', array());
         }
     }

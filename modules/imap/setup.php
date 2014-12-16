@@ -191,7 +191,20 @@ add_handler('ajax_imap_combined_inbox', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_combined_inbox', 'imap_combined_inbox',  true);
 add_handler('ajax_imap_combined_inbox', 'date', true, 'core');
 add_handler('ajax_imap_combined_inbox', 'http_headers', true, 'core');
-add_output('ajax_imap_combined_inbox', 'filter_combined_inbox', true);
+add_output('ajax_imap_combined_inbox', 'filter_all_email', true);
+
+/* all email section */
+add_handler('ajax_imap_all_email', 'login', false, 'core');
+add_handler('ajax_imap_all_email', 'load_user_data', true, 'core');
+add_handler('ajax_imap_all_email', 'language', true, 'core');
+add_handler('ajax_imap_all_email', 'message_list_type', true, 'core');
+add_handler('ajax_imap_all_email', 'imap_message_list_type', true);
+add_handler('ajax_imap_all_email', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_all_email', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_all_email', 'imap_combined_inbox',  true);
+add_handler('ajax_imap_all_email', 'date', true, 'core');
+add_handler('ajax_imap_all_email', 'http_headers', true, 'core');
+add_output('ajax_imap_all_email', 'filter_all_email', true);
 
 /* allowed input */
 return array(
