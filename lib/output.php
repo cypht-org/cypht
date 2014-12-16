@@ -118,7 +118,7 @@ trait Hm_List {
      * @return void
      */
     public static function add($string) {
-        self::$msgs[] = $string;
+        self::$msgs[] = self::str($string, false);
     }
 
     /**
@@ -128,6 +128,27 @@ trait Hm_List {
      */
     public static function get() {
         return self::$msgs;
+    }
+
+    /**
+     * Stringify a value
+     *
+     * @param $mixed mixed value to stringify
+     *
+     * @return string
+     */
+    public static function str($mixed, $return_type=true) {
+        $type = gettype($mixed);
+        if (in_array($type, array('array', 'object'), true)) {
+            $str = print_r($mixed, true);
+        }
+        elseif ($return_type) {
+            $str = sprintf("%s: %s", $type, $mixed);
+        }
+        else {
+            $str = (string) $mixed;
+        }
+        return $str;
     }
 
     /**
@@ -174,6 +195,22 @@ class Hm_Debug {
         self::add(sprintf("PID: %d", getmypid()));
         self::add(sprintf("Included files: %d", count(get_included_files())));
     }
+}
+
+/**
+ * Easy to use error logging
+ *
+ * @param $mixed value to send to the log
+ * 
+ * @return void
+ */
+function elog($mixed) {
+    if (DEBUG_MODE) {
+        $bt = debug_backtrace();
+        $caller = array_shift($bt);
+        Hm_Debug::add(sprintf('ELOG called in %s at line %d', $caller['file'], $caller['line']));
+    }
+    error_log(Hm_Debug::str($mixed));
 }
 
 ?>
