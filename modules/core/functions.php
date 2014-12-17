@@ -366,4 +366,11 @@ function search_field_selection($current, $output_mod) {
     return $res;
 }
 
+function email_is_active($mod_list) {
+    if (stristr($mod_list, 'imap') && stristr($mod_list, 'pop3')) {
+        return true;
+    }
+    return false;
+}
+
 ?>

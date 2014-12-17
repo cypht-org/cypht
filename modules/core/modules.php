@@ -829,6 +829,9 @@ class Hm_Output_start_unread_settings extends Hm_Output_Module {
 
 class Hm_Output_start_all_email_settings extends Hm_Output_Module {
     protected function output($format) {
+        if (!email_is_active($this->get('router_module_list'))) {
+            return '';
+        }
         return '<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
             $this->trans('All Email').'</td></tr>';
@@ -897,12 +900,15 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
 
 class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
     protected function output($format) {
+        if (!email_is_active($this->get('router_module_list'))) {
+            return '';
+        }
         $sources = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('all_email_per_source', $settings)) {
             $sources = $settings['all_email_per_source'];
         }
-        return '<tr class="all_email_setting"><td><label for="all_email_per_source">'.
+        return '<tr class="email_setting"><td><label for="all_email_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
             '<td><input type="text" size="2" id="all_email_per_source" name="all_email_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
@@ -923,6 +929,9 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
 
 class Hm_Output_all_email_since_setting extends Hm_Output_Module {
     protected function output($format) {
+        if (!email_is_active($this->get('router_module_list'))) {
+            return '';
+        }
         $since = false;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('all_email_since', $settings)) {
