@@ -54,7 +54,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .not_found { font-size: 150%; color: #999; padding: 50px; height: 100%; border-left: solid 1px #ddd; background-color: #fff; }
 .no_servers { text-align: center; padding: 50px; margin: auto; padding-bottom: 100px; }
 .selected_menu, .selected_menu a { color: Teal !important; line-height: 1.25em;}
-
+.folder_list .update_message_list{ font-size: 80%; padding-top: 10px; float: right; }
 .src_name { max-height: 25px; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 5px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
 .content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 10px; padding-top: 5px; letter-spacing: -1px; font-size: 125%; padding-left: 30px; }
 .header_subject .content_title { color: #555; }
