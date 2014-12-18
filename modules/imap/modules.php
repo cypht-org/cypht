@@ -507,7 +507,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('msg_struct', $msg_struct);
                     if ($part !== false) {
                         if ($part == 0) {
-                            $max = 50000;
+                            $max = 500000;
                         }
                         else {
                             $max = false;
@@ -522,7 +522,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $msg_struct_current = array_shift($struct);
                     }
                     $this->out('msg_headers', $imap->get_message_headers($form['imap_msg_uid']));
-                    $this->out('imap_msg_part', $part);
+                    $this->out('imap_msg_part', "$part");
                     $this->out('msg_struct_current', $msg_struct_current);
                     $this->out('msg_text', $msg_text);
                 }
@@ -575,7 +575,7 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('msg_struct')) {
             $res = '<table class="msg_parts">';
-            $part = $this->get('imap_msg_part', 1);
+            $part = $this->get('imap_msg_part', '1');
             $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part);
             $res .= '</table>';
             $this->out('msg_parts', $res);

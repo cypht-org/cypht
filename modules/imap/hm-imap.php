@@ -887,7 +887,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
             $response = $this->split_toplevel_result($response);
             if (count($response) > 1) {
-                $struct = $this->parse_multi_part($response, 1, 1);
+                $struct = $this->parse_multi_part($response, 1);
             }
             else {
                 $struct[1] = $this->parse_single_part($response);
