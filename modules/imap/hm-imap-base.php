@@ -39,6 +39,7 @@ class Hm_IMAP_Base {
     protected $enabled_extensions = array();   // IMAP extensions validated by the ENABLE response
     protected $capability = false;             // IMAP CAPABILITY response
     protected $server_id = array();            // server ID response values
+    protected $literal_overflow = false;
 
 
     /* attributes that can be set for the IMAP connaction */
@@ -142,6 +143,7 @@ class Hm_IMAP_Base {
     protected function parse_line($line, $current_size, $max, $line_length) {
         /* make it a bit easier to find "atoms" */
         $line = str_replace(')(', ') (', $line);
+        $this->literal_overflow = false;
 
         /* will hold the line parts */
         $parts = array();
@@ -192,6 +194,9 @@ class Hm_IMAP_Base {
                 $chunk = $lit_result[0];
                 if (!isset($lit_result[1]) || $lit_result[1] != "\r\n") {
                     $line_cont = true;
+                }
+                if (isset($lit_result[1]) && $lit_result[1] != "\r\n" && strlen($lit_result[1]) > 0) {
+                    $this->literal_overflow = $lit_result[1];
                 }
                 $i = $len;
             }
@@ -326,6 +331,12 @@ class Hm_IMAP_Base {
             /* properly parse the line */
             else {
                 list($line_cont, $chunks) = $this->parse_line($result[$n], $current_size, $max, $line_length);
+                if ($this->literal_overflow) {
+                    $current_size += strlen($this->literal_overflow);
+                    list($line_cont, $new_chunks) = $this->parse_line($this->literal_overflow, $current_size, $max, $line_length);
+                    $chunks = array_merge($chunks, $new_chunks);
+                    $this->literal_overflow = false;
+                }
             }
 
             /* merge lines that should have been recieved as one and add to results */
