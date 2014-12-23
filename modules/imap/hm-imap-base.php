@@ -23,7 +23,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 */
 
 
-/* base functions for IMAP communication */
+/* Base functions for IMAP communication */
 class Hm_IMAP_Base {
 
     public $cached_response = false;           // flag to indicate we are using a cached response
@@ -40,6 +40,7 @@ class Hm_IMAP_Base {
     protected $capability = false;             // IMAP CAPABILITY response
     protected $server_id = array();            // server ID response values
     protected $literal_overflow = false;
+    protected $struct_object = false;          
 
 
     /* attributes that can be set for the IMAP connaction */
@@ -106,26 +107,6 @@ class Hm_IMAP_Base {
             $literal_data = substr($literal_data, 0, $size);
         }
         return array($literal_data, $left_over);
-    }
-
-    /**
-     * IMAP message part numbers are like one half integer and one half string :) This
-     * routine "increments" them correctly
-     *
-     * @param $part string IMAP part number
-     *
-     * @return string part number incremented by one
-     */
-    protected function update_part_num($part) {
-        if (!strstr($part, '.')) {
-            $part++;
-        }
-        else {
-            $parts = explode('.', $part);
-            $parts[(count($parts) - 1)]++;
-            $part = implode('.', $parts);
-        }
-        return $part;
     }
 
     /**
@@ -575,6 +556,28 @@ class Hm_IMAP_Base {
 /* IMAP specific parsing routines */
 class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
+/* TODO: remove */
+
+    /**
+     * IMAP message part numbers are like one half integer and one half string :) This
+     * routine "increments" them correctly
+     *
+     * @param $part string IMAP part number
+     *
+     * @return string part number incremented by one
+     */
+    protected function update_part_num($part) {
+        if (!strstr($part, '.')) {
+            $part++;
+        }
+        else {
+            $parts = explode('.', $part);
+            $parts[(count($parts) - 1)]++;
+            $part = implode('.', $parts);
+        }
+        return $part;
+    }
+
     /**
      * A single message part structure. This is a MIME type in the message that does NOT contain
      * any other attachments or additonal MIME types
@@ -949,6 +952,9 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
         return $res;
     }
 
+/* end remove */
+
+
     /**
      * helper method to grab values from the SELECT response
      *
@@ -1301,7 +1307,6 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
         }
         return $attributes;
     }
-
 }
 
 /* cache related methods */
@@ -1632,5 +1637,447 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
         }
     }
 
+}
+
+/**
+ * Represent a message structure by parsing the results from the IMAP
+ * BODYSTRUCTURE command
+ */
+class Hm_IMAP_Struct {
+
+    /* Holds the completed structure */
+    private $struct = array();
+
+    /* Holds the current part number */
+    private $part_number = '-1';
+
+    /* Valid top level MIME types */
+    private $mime_types = array('application', 'audio', 'image', 'message', 'multipart', 'text', 'video');
+
+    /* These are "readable" MESSAGE subtypes that should be treated as text */
+    private $readable_message_types = array('delivery-status', 'external-body', 'disposition-notification', 'rfc822-headers');
+
+    /* Field order of a single non-text message part */
+    private $single_format = array( 'type' => 0, 'subtype' => 1, 'attributes' => 2, 'id' => 3, 'description' => 4,
+        'encoding' => 5, 'size' => 6, 'md5' => 7, 'attributes' => 8, 'langauge' => 10, 'location' => 11,);
+
+    /* Field order of a single text message part */
+    private $text_format = array( 'type' => 0, 'subtype' => 1, 'attributes' => 2, 'id' => 3, 'description' => 4,
+        'encoding' => 5, 'size' => 6, 'lines' => 7, 'md5' => 8, 'disposition' => 9, 'file_attributes' => 10,
+        'langauge' => 11, 'location' => 12,);
+
+    /* Field order of an RFC822 container part */
+    private $rfc822_format = array( 'type' => 0, 'subtype' => 1, 'attributes' => 2, 'id' => 3, 'description' => 4,
+        'encoding' => 5, 'size' => 6, 'envelope' => 7);
+
+    /* Fields in a multipart container part */
+    private $multipart_format = array( 'subtype', 'attributes', 'disposition', 'language', 'location');
+
+    /* Address fields in an RFC822 ENVELOPE */
+    private $envelope_addresses = array( 'from', 'sender', 'reply-to', 'to', 'cc', 'bcc', 'in-reply-to');
+
+    /* Fields order of an ENVELOPE address */
+    private $address_format = array( 'name' => 0, 'route' => 1, 'mailbox' => 2, 'domain' => 3,);
+
+    /* Fields order of an ENVELOPE */
+    private $envelope_format = array( 'date' => 0, 'subject' => 1, 'from' => 2, 'sender' => 3, 'reply-to' => 4,
+        'to' => 5, 'cc' => 6, 'bcc' => 7, 'in-reply-to' => 8, 'message_id' => 9);
+
+    /**
+     * Constructor. Takes the BODYSTRUCTURE response and builds a data representation
+     *
+     * @param $struct_response array low-level parsed IMAP response
+     *
+     * @return void
+     */
+    public function __construct($struct_response)  {
+        list($struct, $_) = $this->build($struct_response);
+        $this->struct = $this->id_parts($struct);
+    }
+
+    /**
+     * Builds a nested array based on parens in the input
+     *
+     * @param $array array low-level parsed IMAP response
+     * @param $index int position in the list
+     *
+     * @return array tuple of the parsed result and index
+     */
+    private function build($array, $index=0) {
+        $res = array();
+        $len = count($array);
+        for ($i = $index; $i < $len; $i++ ) {
+            $val = $array[$i];
+            if ($val == '(') {
+                list($result, $new_index) = $this->build($array, ($i+1));
+                $res[] = $result;
+                $i = $new_index;
+            }
+            elseif ($val == ')') {
+                return array($res, $i);
+            }
+            else {
+                $res[] = $val;
+            }
+        }
+        return array($res, $i);
+    }
+    /**
+     * Create a name => value attribute set
+     *
+     * @param $vals array set of attributes
+     * 
+     * @return array
+     */
+    private function attribute_set($vals) {
+        $res = array();
+        $len = count($vals);
+        for ($i = 0; $i < $len; $i++) {
+            if (isset($vals[$i + 1])) {
+                $res[strtolower($vals[$i])] = $this->set_value($vals[$i + 1]);
+                $i++;
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * Parse an ENVELOPE address
+     *
+     * @param $vals array parts of an address
+     *
+     * @return string
+     */
+    private function envelope_address($vals) {
+        $res = array();
+        foreach ($vals as $addy) {
+            $parts = array();
+            $result = '';
+            foreach ($this->address_format as $name => $pos) {
+                if (isset($addy[$pos])) {
+                    $parts[$name] = $this->set_value($addy[$pos]);
+                }
+                else {
+                    $parts[$name] = false;
+                }
+            }
+            if ($parts['name']) {
+                $result = '"'.$parts['name'].'" ';
+            }
+            if ($parts['mailbox'] && $parts['domain']) {
+                $result .= $parts['mailbox'].'@'.$parts['domain'];
+            }
+            $res[] = $result;
+        }
+        return implode(',', $res);
+    }
+
+    /**
+     * Prepare a value to be added to the structure
+     *
+     * @param $val mixed value to add
+     * @param $type string optional value type
+     *
+     * @return prepared value
+     */
+    private function set_value($val, $type=false) {
+        if ($type == 'envelope') {
+            return $this->envelope($val);
+        }
+        elseif (is_array($val) && in_array($type, array('attributes', 'file_attributes'), true)) {
+            return $this->attribute_set($val);
+        }
+        elseif (is_array($val) && in_array($type, $this->envelope_addresses, true)) {
+            return $this->envelope_address($val);
+        }
+        if ($val === 'NIL') {
+            return false;
+        }
+        return $val;
+    }
+
+    /**
+     * Parse an RFC822 ENVELOPE section
+     *
+     * @param $vals array low-level IMAP response
+     *
+     * @return array
+     */
+    private function envelope($vals) {
+        $res = array();
+        foreach ($this->envelope_format as $name => $pos) {
+            if (isset($vals[$pos])) {
+                $res[$name] = $this->set_value($vals[$pos], $name);
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * Determine if this is a multipart, rfc822 message, or single part type
+     *
+     * @param $vals array low-level IMAP response
+     *
+     * @return string
+     */
+    private function get_part_type($vals) {
+        if (count($vals) > 1 && is_string($vals[0]) && is_string($vals[1])) {
+            $type = strtolower($vals[0]);
+            $subtype = strtolower($vals[1]);
+            if ($type == 'message' && !in_array($subtype, $this->readable_message_types, true)) {
+                return 'message';
+            }
+            elseif (in_array($type, $this->mime_types, true) || preg_match("/^x-.+$/", $type)) {
+                return 'single';
+            }
+        }
+        elseif (is_array($vals[0]) && is_array($vals[1])) {
+            return 'multi';
+        }
+        return false;
+    }
+
+    /**
+     * Parse an RFC822 message part
+     *
+     * @param $vals array low-level IMAP response
+     *
+     * @return array
+     */
+    private function id_rfc822_part($vals) {
+        $res = array();
+        foreach($this->rfc822_format as $name => $pos) {
+            if (isset($vals[$pos])) {
+                $res[$name] = $this->set_value($vals[$pos], $name);
+            }
+            else {
+                $res[$name] = false;
+            }
+        }
+        $part_number = $this->part_number;
+        $len = count($vals);
+        $this->part_number .= '.0';
+        $subs = array();
+        for ($i = 8; $i < $len; $i++) {
+            if (is_array($vals[$i])) {
+                if (!is_array($vals[$i][0])) {
+                    $subs = array_merge($subs, $this->id_parts(array($vals[$i])));
+                }
+                else {
+                    $subs = array_merge($subs, $this->id_parts($vals[$i]));
+                }
+            }
+        }
+        if (!empty($subs)) {
+            $res['subs'] = $subs;
+        }
+        $this->part_number = $part_number;
+        return $res;
+    }
+
+    /**
+     * Parse multipart message part
+     *
+     * @param $vals array low-level IMAP response
+     *
+     * @return array
+     */
+    private function id_multi_part($vals) {
+        $res = array('type' => 'message');
+        $part_number = $this->part_number;
+        $this->part_number .= '.0';
+        list($index, $subs) = $this->parse_multi_part_subs($vals);
+        $res = $this->parse_multi_part_flds($index, $vals);
+        $res['subs'] = $subs;
+        $this->part_number = $part_number;
+        return $res;
+    }
+
+    /**
+     * Parse multipart message parts
+     *
+     * @param $vals array low-level IMAP response
+     *
+     * @return array last index and subs array
+     */
+    private function parse_multi_part_subs($vals) {
+        $index = 0;
+        $subs = array();
+        foreach($vals as $index => $val) {
+            if (!is_array($val)) {
+                break;
+            }
+            else {
+                if (!is_array($val[0])) {
+                    $subs = array_merge($subs, $this->id_parts(array($val)));
+                }
+                else {
+                    $subs = array_merge($subs, $this->id_parts($val));
+                }
+            }
+        }
+        return array($index, $subs);
+    }
+
+    /**
+     * Parse multipart message fields
+     *
+     * @param $index int position in the array
+     * @param $vals array low-level parsed IMAP response
+     *
+     * @return array
+     */
+    private function parse_multi_part_flds($index, $vals) {
+        $res = array();
+        if ($index) {
+            foreach ($this->multipart_format as $fld) {
+                if (isset($vals[$index])) {
+                    $res[$fld] = $this->set_value($vals[$index], $fld);
+                }
+                else {
+                    $res[$fld] = false;
+                }
+                $index++;
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * Parse single message part
+     *
+     * @param $vals array low-level IMAP response
+     *
+     * @return array
+     */
+    private function id_single_part($vals) {
+        $res = array();
+        if (isset($vals[0]) && strtolower($vals[0]) == 'text') {
+            $flds = $this->text_format;
+        }
+        else {
+            $flds = $this->single_format;
+        }
+        foreach($flds as $name => $pos) {
+            if (isset($vals[$pos])) {
+                $res[$name] = $this->set_value($vals[$pos], $name);
+            }
+            else {
+                $res[$name] = false;
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * parse the message parts at the current "level"
+     *
+     * @param $struct array low-level IMAP response
+     *
+     * @return array
+     */
+    private function id_parts($struct) {
+        $res = array();
+        foreach ($struct as $val) {
+            if (is_array($val)) {
+                $part_type = $this->get_part_type($val);
+                if ($part_type == 'message') {
+                    $res[$this->increment_part_number()] = $this->id_rfc822_part($val);
+                }
+                elseif ( $part_type == 'single' ) {
+                    if ($this->part_number == '-1') {
+                        $this->part_number = '0';
+                    }
+                    $res[$this->increment_part_number()] = $this->id_single_part($val);
+                }
+                elseif ( $part_type == 'multi' ) {
+                    $res[$this->increment_part_number()] = $this->id_multi_part($val);
+                }
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * Increment the message part number in the weird way IMAP does.
+     *
+     * @return string
+     */
+    private function increment_part_number() {
+        $part = $this->part_number;
+        if (!strstr($part, '.')) {
+            $part++;
+        }
+        else {
+            $parts = explode('.', $part);
+            $parts[(count($parts) - 1)]++;
+            $part = implode('.', $parts);
+        }
+        $part = (string) $part;
+        $this->part_number = $part;
+        return $part;
+    }
+
+    /**
+     * Search a parsed BODYSTRUCTURE response
+     *
+     * @param $struct array the response to search
+     * @param $flds array key => value list of fields and values to search for
+     * @param $all bool true to return all matching parts
+     * @param $res array holds results during recursive iterations
+     *
+     * @return array list of matching parts
+     */
+    private function recursive_search($struct, $flds, $all, $res) {
+        foreach ($struct as $msg_id => $vals) {
+            $matches = 0;
+            if (isset($flds['imap_part_number'])) {
+                if ($msg_id == $flds['imap_part_number'] || preg_replace("/^0\.{1}/", '', $msg_id) == $flds['imap_part_number']) {
+                    $matches++;
+                }
+            }
+            foreach ($flds as $name => $fld_val) {
+                if (isset($vals[$name]) && stristr($fld_val, $vals[$name])) {
+                    $matches++;
+                }
+            }
+            if ($matches === count($flds)) {
+                $part = $vals;
+                if (isset($part['subs'])) {
+                    $part['subs'] = count($part['subs']);
+                }
+                $res[preg_replace("/^0\.{1}/", '', $msg_id)] = $part;
+                if (!$all) {
+                    return $res;
+                }
+                
+            }
+            if (isset($vals['subs'])) {
+                $res = $this->recursive_search($vals['subs'], $flds, $all, $res);
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * Return structure
+     *
+     * @return array
+     */
+    public function data () {
+        return $this->struct;
+    } 
+
+    /**
+     * Public search function, returns a list of matching parts
+     *
+     * @param $flds array key => value pairs of fields and values to search on
+     * @param $all bool true to return all matches
+     *
+     * @return array
+     */
+    public function search($flds, $all=true) {
+        return $this->recursive_search($this->struct, $flds, $all, $res=array());
+    }
 }
 ?>

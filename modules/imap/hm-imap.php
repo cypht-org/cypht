@@ -862,7 +862,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         $command = "UID FETCH $uid BODYSTRUCTURE\r\n";
         $cache = $this->check_cache($command);
         if ($cache !== false) {
-            return $cache;
+            //return $cache;
         }
         $this->send_command($command);
         $result = $this->get_response(false, true);
@@ -870,31 +870,65 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             array_shift($result);
         }
         $status = $this->check_response($result, true);
-        $response = array();
         if (!isset($result[0][4])) {
             $status = false;
         }
-        /* TODO: rework, this is pretty fragile */
-        if ($status) {
-            if (strtoupper($result[0][6]) == 'MODSEQ')  {
-                $response = array_slice($result[0], 11, -1);
-            }
-            elseif (strtoupper($result[0][4]) == 'UID')  {
-                $response = array_slice($result[0], 7, -1);
-            }
-            else {
-                $response = array_slice($result[0], 5, -1);
-            }
-            $response = $this->split_toplevel_result($response);
-            if (count($response) > 1) {
-                $struct = $this->parse_multi_part($response, 1);
-            }
-            else {
-                $struct[1] = $this->parse_single_part($response);
-            }
-        } 
+        $struct = $this->parse_bodystructure_response($result);
         if ($status) {
             return $this->cache_return_val($struct, $command);
+        }
+        return $struct;
+    }
+
+    /**
+     * New BODYSTRUCTURE parsing routine
+     *
+     * @param $result array low-level IMAP response
+     *
+     * @return array
+     */
+    private function parse_bodystructure_response_new($result) {
+        $response = array();
+        if (strtoupper($result[0][6]) == 'MODSEQ')  {
+            $response = array_slice($result[0], 11, -1);
+        }
+        elseif (strtoupper($result[0][4]) == 'UID')  {
+            $response = array_slice($result[0], 7, -1);
+        }
+        else {
+            $response = array_slice($result[0], 5, -1);
+        }
+
+        $this->struct_object = new Hm_IMAP_Struct($response);
+        $struct = $this->struct_object->data();
+
+        return $struct;
+    }
+
+    /**
+     * Parse the BODYSTRUCTURE response
+     *
+     * @param $result array low-level IMAP response
+     *
+     * @return array
+     */
+    private function parse_bodystructure_response($result) {
+        $response = array();
+        if (strtoupper($result[0][6]) == 'MODSEQ')  {
+            $response = array_slice($result[0], 11, -1);
+        }
+        elseif (strtoupper($result[0][4]) == 'UID')  {
+            $response = array_slice($result[0], 7, -1);
+        }
+        else {
+            $response = array_slice($result[0], 5, -1);
+        }
+        $response = $this->split_toplevel_result($response);
+        if (count($response) > 1) {
+            $struct = $this->parse_multi_part($response, 1);
+        }
+        else {
+            $struct[1] = $this->parse_single_part($response);
         }
         return $struct;
     }
