@@ -1260,7 +1260,7 @@ class Hm_IMAP_Struct {
 
     /* Field order of a single non-text message part */
     private $single_format = array( 'type' => 0, 'subtype' => 1, 'attributes' => 2, 'id' => 3, 'description' => 4,
-        'encoding' => 5, 'size' => 6, 'md5' => 7, 'attributes' => 8, 'langauge' => 10, 'location' => 11,);
+        'encoding' => 5, 'size' => 6, 'md5' => 7, 'file_attributes' => 8, 'langauge' => 9, 'location' => 10,);
 
     /* Field order of a single text message part */
     private $text_format = array( 'type' => 0, 'subtype' => 1, 'attributes' => 2, 'id' => 3, 'description' => 4,
@@ -1294,6 +1294,7 @@ class Hm_IMAP_Struct {
     public function __construct($struct_response)  {
         list($struct, $_) = $this->build($struct_response);
         $this->struct = $this->id_parts($struct);
+        //elog($this->struct);
     }
 
     /**

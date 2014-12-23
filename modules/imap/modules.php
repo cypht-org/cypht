@@ -1087,7 +1087,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
         $res .= ' class="selected_part"';
     }
     $res .= '><td><div class="'.$class.'">';
-    if (in_array(strtolower($vals['type']).strtolower($vals['subtype']), $allowed)) {
+    if (in_array(strtolower($vals['type']).strtolower($vals['subtype']), $allowed, true)) {
         $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(strtolower($vals['type'])).
             ' / '.$output_mod->html_safe(strtolower($vals['subtype'])).'</a>';
     }
