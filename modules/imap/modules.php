@@ -867,7 +867,10 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
                 if (array_key_exists('Subject', $hdrs)) {
                     $reply_subject = sprintf("Re: %s", $hdrs['Subject']);
                 }
-                if (array_key_exists('From', $hdrs)) {
+                if (array_key_exists('Reply-to', $hdrs)) {
+                    $reply_to = $hdrs['Reply-to'];
+                }
+                elseif (array_key_exists('From', $hdrs)) {
                     $reply_to = $hdrs['From'];
                 }
                 elseif (array_key_exists('Sender', $hdrs)) {
@@ -1094,7 +1097,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     else {
         $res .= $output_mod->html_safe(strtolower($vals['type'])).' / '.$output_mod->html_safe(strtolower($vals['subtype']));
     }
-    $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe($vals['encoding']) : '').
+    $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
         '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe($vals['attributes']['charset']) : '-').
         '</td><td>'.$output_mod->html_safe($desc).'</td></tr>';
     return $res;

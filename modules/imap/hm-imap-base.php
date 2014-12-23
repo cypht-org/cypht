@@ -1269,7 +1269,8 @@ class Hm_IMAP_Struct {
 
     /* Field order of an RFC822 container part */
     private $rfc822_format = array( 'type' => 0, 'subtype' => 1, 'attributes' => 2, 'id' => 3, 'description' => 4,
-        'encoding' => 5, 'size' => 6, 'envelope' => 7);
+        'encoding' => 5, 'size' => 6, 'envelope' => 7, 'body_lines' => 9, 'body_attributes' => 10, 'disposition' => 11,
+        'language' => 12, 'location' => 13);
 
     /* Fields in a multipart container part */
     private $multipart_format = array( 'subtype', 'attributes', 'disposition', 'language', 'location');
@@ -1294,7 +1295,6 @@ class Hm_IMAP_Struct {
     public function __construct($struct_response)  {
         list($struct, $_) = $this->build($struct_response);
         $this->struct = $this->id_parts($struct);
-        //elog($this->struct);
     }
 
     /**
@@ -1386,7 +1386,7 @@ class Hm_IMAP_Struct {
         if ($type == 'envelope') {
             return $this->envelope($val);
         }
-        elseif (is_array($val) && in_array($type, array('attributes', 'file_attributes'), true)) {
+        elseif (is_array($val) && in_array($type, array('attributes', 'body_attributes', 'disposition', 'file_attributes'), true)) {
             return $this->attribute_set($val);
         }
         elseif (is_array($val) && in_array($type, $this->envelope_addresses, true)) {
@@ -1460,14 +1460,12 @@ class Hm_IMAP_Struct {
         $len = count($vals);
         $this->part_number .= '.0';
         $subs = array();
-        for ($i = 8; $i < $len; $i++) {
-            if (is_array($vals[$i])) {
-                if (!is_array($vals[$i][0])) {
-                    $subs = array_merge($subs, $this->id_parts(array($vals[$i])));
-                }
-                else {
-                    $subs = array_merge($subs, $this->id_parts($vals[$i]));
-                }
+        if (isset($vals[8]) && is_array($vals[8])) {
+            if (!is_array($vals[8][0])) {
+                $subs = array_merge($subs, $this->id_parts(array($vals[8])));
+            }
+            else {
+                $subs = array_merge($subs, $this->id_parts($vals[8]));
             }
         }
         if (!empty($subs)) {
@@ -1509,12 +1507,7 @@ class Hm_IMAP_Struct {
                 break;
             }
             else {
-                if (!is_array($val[0])) {
-                    $subs = array_merge($subs, $this->id_parts(array($val)));
-                }
-                else {
-                    $subs = array_merge($subs, $this->id_parts($val));
-                }
+                $subs = array_merge($subs, $this->id_parts(array($val)));
             }
         }
         return array($index, $subs);
