@@ -887,7 +887,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      *
      * @return array
      */
-    private function parse_bodystructure_response_new($result) {
+    private function parse_bodystructure_response($result) {
         $response = array();
         if (strtoupper($result[0][6]) == 'MODSEQ')  {
             $response = array_slice($result[0], 11, -1);
@@ -901,35 +901,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
         $this->struct_object = new Hm_IMAP_Struct($response);
         $struct = $this->struct_object->data();
-
-        return $struct;
-    }
-
-    /**
-     * Parse the BODYSTRUCTURE response
-     *
-     * @param $result array low-level IMAP response
-     *
-     * @return array
-     */
-    private function parse_bodystructure_response($result) {
-        $response = array();
-        if (strtoupper($result[0][6]) == 'MODSEQ')  {
-            $response = array_slice($result[0], 11, -1);
-        }
-        elseif (strtoupper($result[0][4]) == 'UID')  {
-            $response = array_slice($result[0], 7, -1);
-        }
-        else {
-            $response = array_slice($result[0], 5, -1);
-        }
-        $response = $this->split_toplevel_result($response);
-        if (count($response) > 1) {
-            $struct = $this->parse_multi_part($response, 1);
-        }
-        else {
-            $struct[1] = $this->parse_single_part($response);
-        }
         return $struct;
     }
 
@@ -946,6 +917,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @return string message content
      */
     public function get_message_content($uid, $message_part, $max=false, $struct=true) {
+        $message_part = preg_replace("/^0\.{1}/", '', $message_part);
         if (!$this->is_clean($uid, 'uid')) {
             return '';
         }
@@ -1773,26 +1745,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     }
 
     /**
-     * return a flat list of message parts and IMAP part numbers
-     * from a nested BODYSTRUCTURE response
-     *
-     * @param $struct array nested BODYSTRUCTURE response
-     * 
-     * @return array list of message part details
-     */
-    public function flatten_bodystructure($struct, $res=array()) {
-        foreach($struct as $id => $vals) {
-            if(isset($vals['subtype']) && isset($vals['type'])) {
-                $res[$id] = $vals['type'].'/'.$vals['subtype'];
-            }
-            if(isset($vals['subs'])) {
-                $res = $this->flatten_bodystructure($vals['subs'], $res);
-            }
-        }
-        return $res;
-    }
-
-    /**
      * search a nested BODYSTRUCTURE response for a specific part
      *
      * @param $struct array the structure to search
@@ -1802,35 +1754,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @return array array of all matching parts from the message
      */
     public function search_bodystructure($struct, $search_flds, $all=true, $res=array()) {
-        foreach ($struct as $id => $vals) {
-            if (!is_array($vals)) {
-                continue;
-            }
-            $match_count = count($search_flds);
-            $matches = 0;
-            if (isset($search_flds['imap_part_number']) && $id == $search_flds['imap_part_number']) {
-                $matches++;
-            }
-            foreach ($vals as $name => $val) {
-                if ($name == 'subs') {
-                    $res = $this->search_bodystructure($val, $search_flds, $all, $res);
-                }
-                elseif (isset($search_flds[$name]) && stristr($val, $search_flds[$name])) {
-                    $matches++;
-                }
-            }
-            if ($matches == $match_count) {
-                $part = $vals;
-                if (isset($part['subs'])) {
-                    $part['subs'] = count($part['subs']);
-                }
-                $res[$id] = $part;
-                if (!$all) {
-                    return $res;
-                }
-            }
-        }
-        return $res;
+        return $this->struct_object->recursive_search($struct, $search_flds, $all, $res);
     }
 
     /* ------------------ EXTENSIONS --------------------------------------- */

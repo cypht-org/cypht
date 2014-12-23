@@ -1067,17 +1067,17 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     else {
         $class = 'row_indent_'.$level;
     }
-    if (isset($vals['description']) && trim($vals['description']) && trim(strtolower($vals['description'])) != 'nil') {
+    if (isset($vals['description']) && trim($vals['description'])) {
         $desc = $vals['description'];
     }
-    elseif (isset($vals['name']) && trim($vals['name']) && trim(strtolower($vals['name'])) != 'nil') {
+    elseif (isset($vals['name']) && trim($vals['name'])) {
         $desc = $vals['name'];
     }
-    elseif (isset($vals['filename']) && trim($vals['filename']) && trim(strtolower($vals['filename'])) != 'nil') {
+    elseif (isset($vals['filename']) && trim($vals['filename'])) {
         $desc = $vals['filename'];
     }
-    elseif (isset($vals['subject']) && trim($vals['subject']) && trim(strtolower($vals['subject'])) != 'nil') {
-        $desc = $vals['subject'];
+    elseif (isset($vals['envelope']['subject']) && trim($vals['envelope']['subject'])) {
+        $desc = $vals['envelope']['subject'];
     }
     else {
         $desc = '';
@@ -1087,15 +1087,15 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
         $res .= ' class="selected_part"';
     }
     $res .= '><td><div class="'.$class.'">';
-    if (in_array($vals['type'].$vals['subtype'], $allowed)) {
-        $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe($vals['type']).
-            ' / '.$output_mod->html_safe($vals['subtype']).'</a>';
+    if (in_array(strtolower($vals['type']).strtolower($vals['subtype']), $allowed)) {
+        $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(strtolower($vals['type'])).
+            ' / '.$output_mod->html_safe(strtolower($vals['subtype'])).'</a>';
     }
     else {
-        $res .= $output_mod->html_safe($vals['type']).' / '.$output_mod->html_safe($vals['subtype']);
+        $res .= $output_mod->html_safe(strtolower($vals['type'])).' / '.$output_mod->html_safe(strtolower($vals['subtype']));
     }
-    $res .= '</td><td>'.$output_mod->html_safe($vals['encoding']).
-        '</td><td>'.(isset($vals['charset']) && trim($vals['charset']) ? $output_mod->html_safe($vals['charset']) : '-').
+    $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe($vals['encoding']) : '').
+        '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe($vals['attributes']['charset']) : '-').
         '</td><td>'.$output_mod->html_safe($desc).'</td></tr>';
     return $res;
 }
