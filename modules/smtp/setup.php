@@ -52,7 +52,7 @@ return array(
         'smtp_server_id' => FILTER_VALIDATE_INT,
         'smtp_user' => FILTER_SANITIZE_STRING,
         'smtp_pass' => FILTER_SANITIZE_STRING,
-        'compose_to' => FILTER_SANITIZE_STRING,
+        'compose_to' => FILTER_UNSAFE_RAW,
         'compose_body' => FILTER_UNSAFE_RAW,
         'compose_subject' => FILTER_SANITIZE_STRING,
     )

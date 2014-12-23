@@ -174,7 +174,7 @@ return array(
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),
         'reply_body' => array(FILTER_SANITIZE_STRING, false),
         'reply_subject' => array(FILTER_SANITIZE_STRING, false),
-        'reply_to' => array(FILTER_SANITIZE_STRING, false),
+        'reply_to' => array(FILTER_UNSAFE_RAW, false),
 
     ),
     'allowed_cookie' => array(
