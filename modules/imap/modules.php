@@ -556,11 +556,11 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
         $txt = '<div class="msg_text_inner">';
         if ($this->get('msg_text')) {
             $struct = $this->get('msg_struct_current', array());
-            if (isset($struct['subtype']) && $struct['subtype'] == 'html') {
+            if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
                 $txt .= format_msg_html($this->get('msg_text'));
             }
-            elseif (isset($struct['type']) && $struct['type'] == 'image') {
-                $txt .= format_msg_image($this->get('msg_text'), $struct['subtype']);
+            elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
+                $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
             }
             else {
                 $txt .= format_msg_text($this->get('msg_text'), $this);

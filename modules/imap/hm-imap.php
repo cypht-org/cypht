@@ -970,10 +970,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         }
         if (is_array($struct)) {
             if (isset($struct['encoding']) && $struct['encoding']) {
-                if ($struct['encoding'] == 'quoted-printable') {
+                if (strtolower($struct['encoding']) == 'quoted-printable') {
                     $res = quoted_printable_decode($res);
                 }
-                if ($struct['encoding'] == 'base64') {
+                if (strtolower($struct['encoding']) == 'base64') {
                     $res = base64_decode($res);
                 }
             }
