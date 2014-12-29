@@ -686,7 +686,7 @@ var Hm_Folders = {
         if (path.length) {
             path = path.replace(/ /, '-');
             if (page == 'message_list') {
-                $('a', $('.'+Hm_Utils.clean_selector(path))).addClass('selected_menu');
+                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
             }
             else if (hm_list_parent()) {
@@ -853,6 +853,12 @@ var Hm_Utils = {
     },
     cancel_logout_event: function() {
         $('.cancel_logout').click(function() { $('.confirm_logout').hide(); return false; });
+    }
+};
+
+var elog = function(val) {
+    if (hm_debug()) {
+        console.log(val);
     }
 };
 
