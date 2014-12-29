@@ -151,7 +151,7 @@ var imap_all_mail_content = function(id) {
 };
 
 var imap_search_page_content = function(id) {
-    if (hm_search_terms && hm_search_terms.length) {
+    if (hm_search_terms()) {
         return imap_message_list_content(id, 'ajax_imap_search', Hm_Message_List.set_search_state);
     }
     return false;
