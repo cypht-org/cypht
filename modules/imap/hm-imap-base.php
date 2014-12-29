@@ -1433,7 +1433,7 @@ class Hm_IMAP_Struct {
                 return 'single';
             }
         }
-        elseif (is_array($vals[0]) && is_array($vals[1])) {
+        elseif (is_array($vals[0])) {
             return 'multi';
         }
         return false;

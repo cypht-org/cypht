@@ -849,11 +849,23 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * get the IMAP BODYSTRUCTURE of a message
      *
      * @param $uid int IMAP UID of the message
-     * @param $filter string alternative MIME message format to prioritize
      *
      * @return array message structure represented as a nested array
      */
     public function get_message_structure($uid) {
+        $result = $this->get_raw_bodystructure($uid);
+        $struct = $this->parse_bodystructure_response($result);
+        return $struct;
+    }
+
+    /**
+     * get the raw IMAP BODYSTRUCTURE response
+     *
+     * @param $uid int IMAP UID of the message
+     *
+     * @return array low-level parsed message structure 
+     */
+    private function get_raw_bodystructure($uid) {
         if (!$this->is_clean($uid, 'uid')) {
             return array();
         }
@@ -862,7 +874,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         $command = "UID FETCH $uid BODYSTRUCTURE\r\n";
         $cache = $this->check_cache($command);
         if ($cache !== false) {
-            //return $cache;
+            return $cache;
         }
         $this->send_command($command);
         $result = $this->get_response(false, true);
@@ -873,11 +885,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         if (!isset($result[0][4])) {
             $status = false;
         }
-        $struct = $this->parse_bodystructure_response($result);
         if ($status) {
-            return $this->cache_return_val($struct, $command);
+            return $this->cache_return_val($result, $command);
         }
-        return $struct;
+        return $result;
     }
 
     /**
