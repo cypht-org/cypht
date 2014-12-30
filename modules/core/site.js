@@ -108,6 +108,7 @@ var Hm_Ajax_Request = function() { return {
             Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
             $('body').removeClass('wait');
         }
+        res = null;
     }
 }; };
 
@@ -849,6 +850,21 @@ var Hm_Utils = {
                 $('.sys_messages').hide();
                 $('.sys_messages').html('');
             });
+        }
+    },
+    prune_local_storage: function() {
+        var i;
+        var key;
+        var value_size;
+        var size = sessionStorage.length;
+        if (size > 1) {
+            for (i = 0; i < size; i++) {
+                key = sessionStorage.key(i);
+                value_size = sessionStorage.getItem(key).length;
+                if (value_size > 0 && key != 'formatted_folder_list') {
+                    /* candidate for pruning */
+                }
+            }
         }
     },
     cancel_logout_event: function() {
