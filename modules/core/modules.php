@@ -699,9 +699,11 @@ class Hm_Output_header_content extends Hm_Output_Module {
 class Hm_Output_header_css extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
+        $mods = $this->get('router_module_list');
         if (DEBUG_MODE) {
             foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
-                if (is_readable(sprintf("%ssite.css", $name))) {
+                $mod = str_replace(array('modules/', '/'), '', $name);
+                if (stristr($mods, $mod) && is_readable(sprintf("%ssite.css", $name))) {
                     $res .= '<link href="'.sprintf("%ssite.css", $name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
             }
@@ -719,12 +721,14 @@ class Hm_Output_page_js extends Hm_Output_Module {
             $res = '';
             $zepto = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
             $core = false;
+            $mods = $this->get('router_module_list');
             foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 if ($name == 'modules/core/') {
                     $core = $name;
                     continue;
                 }
-                if (is_readable(sprintf("%ssite.js", $name))) {
+                $mod = str_replace(array('modules/', '/'), '', $name);
+                if (stristr($mods, $mod) && is_readable(sprintf("%ssite.js", $name))) {
                     $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $name).'"></script>';
                 }
             }
