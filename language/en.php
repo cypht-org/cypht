@@ -187,6 +187,16 @@ return array(
     'Saved user data on logout' => false,
     'Session destroyed on logout' => false,
     'Cound not add server: Connection refused' => false,
+    'small' => false,
+    'forward' => false,
+    'attach' => false,
+    'raw' => false,
+    'flag' => false,
+    'unflag' => false,
+    'All Email' => false,
+    'POP3 username' => false,
+    'POP3 password' => false,
+
 
     '%d second' => false,
     '%d seconds' => false,
