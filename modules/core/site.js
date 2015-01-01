@@ -806,7 +806,7 @@ var Hm_Utils = {
         var dsp;
         var i;
         var hash = window.location.hash;
-        var sections = ['.general_setting', '.unread_setting', '.flagged_setting', '.all_setting'];
+        var sections = ['.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting'];
         for (i=0;i<sections.length;i++) {
             dsp = Hm_Utils.get_from_local_storage(sections[i]);
             if (hash) {
