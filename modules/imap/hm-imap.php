@@ -910,7 +910,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             $response = array_slice($result[0], 5, -1);
         }
 
-        $this->struct_object = new Hm_IMAP_Struct($response);
+        $this->struct_object = new Hm_IMAP_Struct($response, $this);
         $struct = $this->struct_object->data();
         return $struct;
     }

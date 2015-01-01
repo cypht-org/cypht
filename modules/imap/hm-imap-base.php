@@ -1285,6 +1285,9 @@ class Hm_IMAP_Struct {
     private $envelope_format = array( 'date' => 0, 'subject' => 1, 'from' => 2, 'sender' => 3, 'reply-to' => 4,
         'to' => 5, 'cc' => 6, 'bcc' => 7, 'in-reply-to' => 8, 'message_id' => 9);
 
+    /* Hm_IMAP object */
+    private $imap = false;
+
     /**
      * Constructor. Takes the BODYSTRUCTURE response and builds a data representation
      *
@@ -1292,7 +1295,8 @@ class Hm_IMAP_Struct {
      *
      * @return void
      */
-    public function __construct($struct_response)  {
+    public function __construct($struct_response, $imap)  {
+        $this->imap = $imap;
         list($struct, $_) = $this->build($struct_response);
         $this->struct = $this->id_parts($struct);
     }
@@ -1395,7 +1399,7 @@ class Hm_IMAP_Struct {
         if ($val === 'NIL') {
             return false;
         }
-        return $val;
+        return $this->imap->decode_fld($val);
     }
 
     /**
