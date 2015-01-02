@@ -465,7 +465,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         $this->out('list_path', $list_path, false);
         $this->out('list_meta', $list_meta, false);
         $this->out('list_parent', $list_parent);
-        $this->out('list_page', $list_page);
+        $this->out('list_page', $list_page, false);
         $this->out('mailbox_list_title', $mailbox_list_title, false);
         $this->out('message_list_since', $message_list_since, false);
         $this->out('per_source_limit', $per_source_limit, false);
