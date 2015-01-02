@@ -988,8 +988,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                     $res = base64_decode($res);
                 }
             }
-            if (isset($struct['charset']) && $struct['charset']) {
-                $res = mb_convert_encoding($res, 'UTF-8', $struct['charset']);
+            if (isset($struct['attributes']['charset']) && $struct['attributes']['charset']) {
+                $res = mb_convert_encoding($res, 'UTF-8', $struct['attributes']['charset']);
             }
         }
         if ($status) {
