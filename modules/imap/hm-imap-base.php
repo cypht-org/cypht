@@ -1253,6 +1253,9 @@ class Hm_IMAP_Struct {
     /* Holds the current part number */
     private $part_number = '-1';
 
+    /* Holds the parent container type, if any */
+    private $parent_type = false;
+
     /* Valid top level MIME types */
     private $mime_types = array('application', 'audio', 'binary', 'image', 'message', 'model', 'multipart', 'text', 'video');
 
@@ -1469,19 +1472,16 @@ class Hm_IMAP_Struct {
         $part_number = $this->part_number;
         $len = count($vals);
         $this->part_number .= '.0';
+        $this->parent_type = 'message';
         $subs = array();
         if (isset($vals[8]) && is_array($vals[8])) {
-            if (!is_array($vals[8][0])) {
-                $subs = array_merge($subs, $this->id_parts(array($vals[8])));
-            }
-            else {
-                $subs = array_merge($subs, $this->id_parts($vals[8]));
-            }
+            $subs = array_merge($subs, $this->id_parts(array($vals[8])));
         }
         if (!empty($subs)) {
             $res['subs'] = $subs;
         }
         $this->part_number = $part_number;
+        $this->parent_type = false;
         return $res;
     }
 
@@ -1489,16 +1489,21 @@ class Hm_IMAP_Struct {
      * Parse multipart message part
      *
      * @param $vals array low-level IMAP response
+     * @param $increment bool flag to control part ids
      *
      * @return array
      */
-    private function id_multi_part($vals) {
-        $part_number = $this->part_number;
-        $this->part_number .= '.0';
+    private function id_multi_part($vals, $increment=false) {
+        if ($increment) {
+            $part_number = $this->part_number;
+            $this->part_number .= '.0';
+        }
         list($index, $subs) = $this->parse_multi_part_subs($vals);
         $res = $this->parse_multi_part_flds($index, $vals);
         $res['subs'] = $subs;
-        $this->part_number = $part_number;
+        if ($increment) {
+            $this->part_number = $part_number;
+        }
         return $res;
     }
 
@@ -1512,6 +1517,7 @@ class Hm_IMAP_Struct {
     private function parse_multi_part_subs($vals) {
         $index = 0;
         $subs = array();
+        $this->parent_type = 'multi';
         foreach($vals as $index => $val) {
             if (!is_array($val)) {
                 break;
@@ -1595,7 +1601,12 @@ class Hm_IMAP_Struct {
                     $res[$this->increment_part_number()] = $this->id_single_part($val);
                 }
                 elseif ( $part_type == 'multi' ) {
-                    $res[$this->increment_part_number()] = $this->id_multi_part($val);
+                    if ($this->parent_type == 'message') {
+                        $res[$this->part_number] = $this->id_multi_part($val);
+                    }
+                    else {
+                        $res[$this->increment_part_number()] = $this->id_multi_part($val, true);
+                    }
                 }
             }
         }
