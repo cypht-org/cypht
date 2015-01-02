@@ -98,7 +98,9 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $msg['folder'] = $form['folder'];
                     $msgs[] = $msg;
                 }
-                $this->out('imap_folder_detail', array_merge($imap->selected_mailbox, array('offset' => $offset, 'limit' => $limit)));
+                if ($imap->selected_mailbox) {
+                    $this->out('imap_folder_detail', array_merge($imap->selected_mailbox, array('offset' => $offset, 'limit' => $limit)));
+                }
             }
             $this->out('imap_mailbox_page', $msgs);
             $this->out('list_page', $list_page);
