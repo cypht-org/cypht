@@ -312,11 +312,12 @@ class Hm_IMAP_Base {
             /* properly parse the line */
             else {
                 list($line_cont, $chunks) = $this->parse_line($result[$n], $current_size, $max, $line_length);
-                if ($this->literal_overflow) {
-                    $current_size += strlen($this->literal_overflow);
-                    list($line_cont, $new_chunks) = $this->parse_line($this->literal_overflow, $current_size, $max, $line_length);
-                    $chunks = array_merge($chunks, $new_chunks);
+                while ($this->literal_overflow) {
+                    $lit_text = $this->literal_overflow;
                     $this->literal_overflow = false;
+                    $current_size += strlen($lit_text);
+                    list($line_cont, $new_chunks) = $this->parse_line($lit_text, $current_size, $max, $line_length);
+                    $chunks = array_merge($chunks, $new_chunks);
                 }
             }
 
@@ -1396,10 +1397,15 @@ class Hm_IMAP_Struct {
         elseif (is_array($val) && in_array($type, $this->envelope_addresses, true)) {
             return $this->envelope_address($val);
         }
-        if ($val === 'NIL') {
+        elseif ($val === 'NIL') {
             return false;
         }
-        return $this->imap->decode_fld($val);
+        elseif (!is_array($val)) {
+            return $this->imap->decode_fld($val);
+        }
+        else {
+            return $val;
+        }
     }
 
     /**
