@@ -1254,7 +1254,7 @@ class Hm_IMAP_Struct {
     private $part_number = '-1';
 
     /* Valid top level MIME types */
-    private $mime_types = array('application', 'audio', 'image', 'message', 'multipart', 'text', 'video');
+    private $mime_types = array('application', 'audio', 'binary', 'image', 'message', 'model', 'multipart', 'text', 'video');
 
     /* These are "readable" MESSAGE subtypes that should be treated as text */
     private $readable_message_types = array('delivery-status', 'external-body', 'disposition-notification', 'rfc822-headers');
@@ -1532,7 +1532,7 @@ class Hm_IMAP_Struct {
      * @return array
      */
     private function parse_multi_part_flds($index, $vals) {
-        $res = array('type' => 'message');
+        $res = array('type' => 'multipart');
         if ($index) {
             foreach ($this->multipart_format as $fld) {
                 if (isset($vals[$index])) {
