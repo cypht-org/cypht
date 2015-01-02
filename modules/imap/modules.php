@@ -525,7 +525,9 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     }
                     $this->out('msg_headers', $imap->get_message_headers($form['imap_msg_uid']));
                     $this->out('imap_msg_part', "$part");
-                    $this->out('msg_struct_current', $msg_struct_current);
+                    if ($msg_struct_current) {
+                        $this->out('msg_struct_current', $msg_struct_current);
+                    }
                     $this->out('msg_text', $msg_text);
                 }
             }
@@ -567,9 +569,9 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             else {
                 $txt .= format_msg_text($this->get('msg_text'), $this);
             }
-            $txt .= '</div>';
-            $this->out('msg_text', $txt);
         }
+        $txt .= '</div>';
+        $this->out('msg_text', $txt);
     }
 }
 
