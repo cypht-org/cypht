@@ -2,6 +2,8 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+require APP_PATH.'modules/contacts/hm-vcard.php';
+
 class Hm_Output_contacts_page_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_contacts"><a class="unread_link" href="?page=contacts">'.
