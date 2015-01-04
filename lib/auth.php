@@ -69,6 +69,23 @@ class Hm_Auth_DB extends Hm_Auth {
     }
 
     /**
+     * Delete a user account from the db
+     *
+     * @param $user string username
+     *
+     * @return bool true if successful
+     */
+    public function delete($user) {
+        if ($this->connect()) {
+            $sql = $this->dbh->prepare("delete from hm_user where username = ?");
+            if ($sql->execute(array($user))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Create a new or re-use an existing DB connection
      *
      * @return bool true if the connection is available
