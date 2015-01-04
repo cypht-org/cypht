@@ -37,4 +37,12 @@ class Hm_Mock_Config {
     }
 }
 
+function setup_db($config) {
+    $config->set('db_driver', 'mysql');
+    $config->set('db_host', '127.0.0.1');
+    $config->set('db_name', 'test');
+    $config->set('db_user', 'test');
+    $config->set('db_pass', '123456');
+}
+
 ?>
