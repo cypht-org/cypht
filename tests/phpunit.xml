@@ -11,7 +11,25 @@
     <testsuite name="db">
         <file>./db.php</file>
     </testsuite>
-    <testsuite name="form">
+    <testsuite name="format">
         <file>./format.php</file>
+    </testsuite>
+    <testsuite name="auth">
+        <file>./auth.php</file>
+    </testsuite>
+    <testsuite name="modules">
+        <file>./modules.php</file>
+    </testsuite>
+    <testsuite name="output">
+        <file>./output.php</file>
+    </testsuite>
+    <testsuite name="router">
+        <file>./router.php</file>
+    </testsuite>
+    <testsuite name="servers">
+        <file>./servers.php</file>
+    </testsuite>
+    <testsuite name="session">
+        <file>./session.php</file>
     </testsuite>
 </phpunit>
