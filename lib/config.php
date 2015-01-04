@@ -56,7 +56,7 @@ abstract class Hm_Config {
      *
      * @return void
      */
-    protected function set_tz() {
+    public function set_tz() {
         date_default_timezone_set($this->get('timezone_setting', 'UTC'));
     }
 }
@@ -87,7 +87,7 @@ class Hm_User_Config_File extends Hm_Config {
      * 
      * @return string filepath to the user config file
      */
-    private function get_path($username) {
+    public function get_path($username) {
         $path = $this->site_config->get('user_settings_dir', false);
         return sprintf('%s/%s.txt', $path, $username);
     }
@@ -240,13 +240,13 @@ class Hm_User_Config_DB extends Hm_Config {
 
 /**
  * File based site configuration
- * */
+ */
 class Hm_Site_Config_File extends Hm_Config {
 
     /**
      * Load data based on source
      *
-     * @param $source string source location for user data
+     * @param $source string source location for site configuration
      *
      * @return void
      */
@@ -257,8 +257,8 @@ class Hm_Site_Config_File extends Hm_Config {
     /**
      * Load user data from a file
      *
-     * @param $source string file path to the user settings
-     * @param $key string encryption key
+     * @param $source string file path to the site configuration
+     * @param $key string encryption key (unsued in this class)
      *
      * @return void
      */

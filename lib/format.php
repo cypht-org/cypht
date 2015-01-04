@@ -10,7 +10,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 abstract class HM_Format {
 
     /* output modules */
-    protected $modules = false;
+    protected $modules = array();
 
     /**
      * Return combined output from all modules. Must be overridden by specific

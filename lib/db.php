@@ -57,7 +57,7 @@ class Hm_DB {
      *
      * @param $site_config object site settings
      * 
-     * @return bool true on success
+     * @return object database connection on success
      */
     static public function connect($site_config) {
 
