@@ -28,7 +28,7 @@ class Hm_Test_Config extends PHPUnit_Framework_TestCase {
         $this->assertEquals('bar', $this->config->get('foo', false));
     }
     public function test_get_path() {
-        $this->assertEquals('./testuser.txt',  $this->config->get_path('testuser'));
+        $this->assertEquals('./data/testuser.txt',  $this->config->get_path('testuser'));
     }
     public function test_set_tz() {
         date_default_timezone_set('Europe/London');
@@ -51,7 +51,7 @@ class Hm_Test_Config extends PHPUnit_Framework_TestCase {
 
     /* tests for Hm_Site_Config_File */
     public function test_site_load() {
-        $config = new Hm_Site_Config_File('./siteconfig.rc');
+        $config = new Hm_Site_Config_File('./data/siteconfig.rc');
         $this->assertEquals(array('foo' => 'bar'), $config->dump());
     }
 

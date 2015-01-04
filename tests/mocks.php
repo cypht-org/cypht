@@ -25,7 +25,7 @@ class Hm_Mock_Config {
 
     public function get($id, $default) {
         if ($id == 'user_settings_dir') {
-            return '.';
+            return './data';
         }
         elseif (array_key_exists($id, $this->data)) {
             return $this->data[$id];
