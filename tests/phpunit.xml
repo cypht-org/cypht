@@ -1,0 +1,17 @@
+<phpunit bootstrap="./bootstrap.php" colors="true">
+    <testsuite name="cache">
+        <file>./cache.php</file>
+    </testsuite>
+    <testsuite name="crypt">
+        <file>./crypt.php</file>
+    </testsuite>
+    <testsuite name="config">
+        <file>./config.php</file>
+    </testsuite>
+    <testsuite name="db">
+        <file>./db.php</file>
+    </testsuite>
+    <testsuite name="form">
+        <file>./format.php</file>
+    </testsuite>
+</phpunit>
