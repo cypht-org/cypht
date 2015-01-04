@@ -7,10 +7,11 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
     /* set things up */
     public function setUp() {
         $this->config = new Hm_Mock_Config();
-        $this->config->set('db_driver', 'test');
     }
     public function test_connect() {
-        /* TODO */
+        $this->assertFalse(Hm_DB::connect($this->config));
+        setup_db($this->config);
+        $this->assertEquals('object', gettype(Hm_DB::connect($this->config)));
     }
 }
 
