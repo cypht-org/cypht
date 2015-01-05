@@ -49,7 +49,7 @@ abstract class HM_Format {
      *
      * @return array list of translated strings
      */
-    private function get_language($lang) {
+    public function get_language($lang) {
         $strings = array();
         if (file_exists(APP_PATH.'language/'.$lang.'.php')) {
             $strings = require APP_PATH.'language/'.$lang.'.php';
@@ -124,7 +124,7 @@ class Hm_Format_JSON extends HM_Format {
      *
      * @return array filtered data
      */
-    private function filter_output($data, $allowed) {
+    public function filter_output($data, $allowed) {
         foreach ($data as $name => $value) {
             if (!array_key_exists($name, $allowed)) {
                 unset($data[$name]);
