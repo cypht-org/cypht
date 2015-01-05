@@ -211,7 +211,7 @@ class Hm_User_Config_DB extends Hm_Config {
      *
      * @return bool true on success
      */
-    protected function connect() {
+    public function connect() {
         $this->dbh = Hm_DB::connect($this->site_config);
         if ($this->dbh) {
             return true;
@@ -233,8 +233,10 @@ class Hm_User_Config_DB extends Hm_Config {
             $sql = $this->dbh->prepare("update hm_user_settings set settings=? where username=?");
             if ($sql->execute(array($config, $username))) {
                 Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
+                return true;
             }
         }
+        return false;
     }
 }
 
