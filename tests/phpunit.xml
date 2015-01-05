@@ -23,6 +23,9 @@
     <testsuite name="output">
         <file>./output.php</file>
     </testsuite>
+    <testsuite name="request">
+        <file>./request.php</file>
+    </testsuite>
     <testsuite name="router">
         <file>./router.php</file>
     </testsuite>
