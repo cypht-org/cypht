@@ -30,6 +30,10 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
     public function test_delete() {
         $auth = new Hm_Auth_DB($this->config);
         $this->assertTrue($auth->delete('unittestuser'));
+        $config = new Hm_Mock_Config();
+        $auth = new Hm_Auth_DB($config);
+        $this->assertFalse($auth->delete('unittestuser'));
+
     }
 }
 

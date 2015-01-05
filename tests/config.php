@@ -55,7 +55,35 @@ class Hm_Test_Config extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('foo' => 'bar'), $config->dump());
     }
 
-    /* TODO: tests for Hm_User_Config_DB */
+    /* tests for Hm_User_Config_DB */
+
+    public function test_db_connect() {
+        $site_config = new Hm_Mock_Config();
+        setup_db($site_config);
+        $user_config = new Hm_User_Config_DB($site_config);
+        $this->assertTrue($user_config->connect());
+    }
+    public function test_db_load() {
+        $site_config = new Hm_Mock_Config();
+        setup_db($site_config);
+        $user_config = new Hm_User_Config_DB($site_config);
+        $this->assertEquals(array(), $user_config->dump());
+    }
+    public function test_db_reload() {
+        $site_config = new Hm_Mock_Config();
+        setup_db($site_config);
+        $user_config = new Hm_User_Config_DB($site_config);
+        $user_config->reload(array('foo' => 'bar'));
+        $this->assertEquals(array('foo' => 'bar'), $user_config->dump());
+    }
+    public function test_db_save() {
+        $site_config = new Hm_Mock_Config();
+        setup_db($site_config);
+        $user_config = new Hm_User_Config_DB($site_config);
+        $user_config->reload(array('foo' => 'bar'));
+        $this->assertTrue($user_config->save('testuser', 'testpass'));
+
+    }
 }
 
 ?>

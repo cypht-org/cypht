@@ -28,11 +28,14 @@ class Hm_Test_Cache extends PHPUnit_Framework_TestCase {
         $this->assertEquals('bar', Hm_Page_Cache::get('foo'));
         Hm_Page_Cache::concat('foo', 'foo');
         $this->assertEquals('barfoo', Hm_Page_Cache::get('foo'));
+        Hm_Page_Cache::concat('baz', 'baz');
+        $this->assertEquals('baz', Hm_Page_Cache::get('baz'));
     }
     public function test_del() {
         $this->assertEquals('bar', Hm_Page_Cache::get('foo'));
-        Hm_Page_Cache::del('foo');
-        $this->assertEquals(false, Hm_Page_Cache::get('foo'));
+        $this->assertTrue(Hm_Page_Cache::del('foo'));
+        $this->assertFalse(Hm_Page_Cache::get('foo'));
+        $this->assertFalse(Hm_Page_Cache::del('blah'));
     }
     public function test_flush() {
         $session = new Hm_Mock_Session();
