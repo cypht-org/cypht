@@ -469,7 +469,7 @@ class Hm_Request_Handler {
      *
      * @return void
      */
-    protected function run_modules() {
+    public function run_modules() {
         $input = array();
         $protected = array();
         foreach ($this->modules as $name => $args) {
