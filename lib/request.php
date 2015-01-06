@@ -59,7 +59,7 @@ class Hm_Request {
     public function __construct($filters) {
         $this->filter_request_input($filters);
         $this->get_other_request_details($filters);
-        $this->remove_super_globals();
+        $this->empty_super_globals();
 
         Hm_Debug::add('Using sapi: '.$this->sapi);
         Hm_Debug::add('Request type: '.$this->type);
@@ -101,19 +101,20 @@ class Hm_Request {
     }
 
     /**
-     * Unset PHP super globals so module sets can't "cheat" and use unsafe user input
+     * Empty out super globals.
      *
      * @return void
      */
-    private function remove_super_globals() {
-        unset($_POST);
-        unset($_SERVER);
-        unset($_GET);
-        unset($_COOKIE);
-        unset($GLOBALS);
-        unset($_FILES);
-        unset($_REQUEST);
-        unset($_ENV);
+    private function empty_super_globals() {
+        $_POST = array();
+        $_SERVER = array();
+        $_GET = array();
+        $_COOKIE = array();
+        $_FILES = array();
+        $_REQUEST = array();
+        $_ENV = array();
+        $GLOBALS = array('_SERVER' => array(), '_POST' => array(), '_GET' => array(), '_COOKIE' => array(),
+            '_FILES' => array(), '_REQUEST' => array(), '_ENV' => array());
     }
 
     /**
