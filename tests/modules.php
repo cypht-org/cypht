@@ -1,7 +1,7 @@
 <?php
 
-require '../modules/core/setup.php';
-require '../modules/core/modules.php';
+require_once '../modules/core/setup.php';
+require_once '../modules/core/modules.php';
 
 class Hm_Handler_Test extends Hm_Handler_Module {
     public function process() {
