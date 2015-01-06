@@ -16,6 +16,9 @@ class Hm_Output_Test extends Hm_Output_Module {
 class Hm_Test_Module_List {
     use Hm_Modules;
 }
+class Hm_Test_Module_List_Functions {
+    use Hm_Modules;
+}
 
 class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     private $output_mod;
@@ -40,6 +43,12 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     public function test_out() {
         $this->assertTrue($this->handler_mod->out('foo', 'bar'));
         $this->assertFalse($this->handler_mod->out('foo', 'foo'));
+    }
+    public function test_get() {
+        $this->assertEquals('bar', $this->output_mod->get('foo'));
+        $this->assertEquals('bar', $this->output_mod->get('foo', ''));
+        $this->assertEquals(0, $this->output_mod->get('foo', 3));
+        $this->assertEquals(array('bar'), $this->output_mod->get('foo', array()));
     }
     public function test_append() {
         $this->assertTrue($this->handler_mod->append('test', 'value'));
@@ -168,6 +177,51 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     }
 
     /* TODO: test for functions */
+    public function test_add_handler() {
+        add_handler('test', 'test_mod', false, 'core', 'date', 'after', false);
+        $mods = Hm_Handler_Modules::get_for_page('test');
+        $keys = array_keys($mods);
+        $this->assertEquals('test_mod', $keys[1]);
+    }
+    public function test_output_source() {
+        output_source('test');
+        add_output('test', 'source_test', false);
+        $this->assertEquals(array('date' => array('core', false), 'source_test' => array('test', false)), Hm_Output_Modules::get_for_page('test'));
+    }
+    public function test_handler_source() {
+        handler_source('test');
+        add_handler('newtest', 'source_test', false);
+        $this->assertEquals(array('source_test' => array('test', false)), Hm_Handler_Modules::get_for_page('newtest'));
+    }
+    public function test_replace_module() {
+        replace_module('handler', 'source_test', 'replace_test');
+        replace_module('output', 'source_test', 'replace_test');
+        $this->assertEquals(array('replace_test' => array('test', false)), Hm_Handler_Modules::get_for_page('newtest'));
+        $this->assertEquals(array('date' => array('core', false), 'replace_test' => array('test', false)), Hm_Output_Modules::get_for_page('test'));
+    }
+    public function test_add_output() {
+        add_output('test', 'add_output', false, 'add_output_test', 'replace_test', 'before', true);
+        $keys = array_keys(Hm_Output_Modules::get_for_page('test'));
+        $this->assertEquals('add_output', $keys[1]);
+    }
+    public function test_add_module_to_all_pages() {
+        add_module_to_all_pages('output', 'all_pages', false, 'test', false, false);
+        add_module_to_all_pages('handler', 'all_pages', false, 'test', false, false);
+        Hm_Output_Modules::process_all_page_queue();
+        Hm_Handler_Modules::process_all_page_queue();
+        $mods = Hm_Output_Modules::dump();
+        foreach ($mods as $name => $vals) {
+            if (!preg_match("/^ajax_/", $name)) {
+                $this->assertTrue(array_key_exists('all_pages', $vals));
+            }
+        }
+        $mods = Hm_Handler_Modules::dump();
+        foreach ($mods as $name => $vals) {
+            if (!preg_match("/^ajax_/", $name)) {
+                $this->assertTrue(array_key_exists('all_pages', $vals));
+            }
+        }
+    }
 }
 
 ?>

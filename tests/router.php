@@ -13,6 +13,8 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = true;
+        $mock_config->data['auth_type'] = "DB";
+        $mock_config->data['session_type'] = "DB";
         setup_db($mock_config);
         $mock_config->data['modules'] = 'imap,pop3';
         $this->router->process_request($mock_config);

@@ -70,7 +70,7 @@ function filters() {
         'allowed_pages' => array('test'),
         'allowed_post' => array('bar' => FILTER_VALIDATE_INT),
         'allowed_output' => array(),
-        'allowed_server' => array('HTTP_USER_AGENT' => FILTER_SANITIZE_STRING, 'REQUEST_URI' => FILTER_SANITIZE_STRING),
+        'allowed_server' => array('REQUEST_SCHEME' => FILTER_SANITIZE_STRING, 'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING, 'HTTPS' => FILTER_SANITIZE_STRING, 'HTTP_X_REQUESTED_WITH' => FILTER_SANITIZE_STRING, 'REQUEST_URI' => FILTER_SANITIZE_STRING),
         'allowed_get' => array('foo' => FILTER_UNSAFE_RAW),
         'allowed_cookie' => array()
     );
