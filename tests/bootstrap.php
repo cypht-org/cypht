@@ -1,7 +1,7 @@
 <?php
 
 /* debug mode has to be set to something or include files will die() */
-define('DEBUG_MODE', false);
+define('DEBUG_MODE', true);
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
