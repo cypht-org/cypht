@@ -1,6 +1,8 @@
 <?php
 
 class Hm_Mock_Session {
+
+    public $loaded = false;
     public $data = array();
 
     public function get($id, $default) {
@@ -17,6 +19,9 @@ class Hm_Mock_Session {
     }
     public function build_fingerprint($request, $site_key) {
         return 'fakefingerprint';
+    }
+    public function is_active() {
+        return true;
     }
 }
 class Hm_Mock_Config {
@@ -35,6 +40,16 @@ class Hm_Mock_Config {
     public function set($name, $value) {
         $this->data[$name] = $value;
     }
+}
+
+class Hm_Mock_Request {
+
+    public $type;
+
+    public function __construct($type) {
+        $this->type = $type;
+    }
+    public $post = array('hm_nonce' => 'asdf', 'fld1' => '0', 'fld2' => '1');
 }
 
 function setup_db($config) {
