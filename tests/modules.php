@@ -93,7 +93,7 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     }
     public function test_output_content() {
         /* TODO: fix */
-        print_r($this->output_mod->output_content('JSON', array(), array('bar')));
+        //print_r($this->output_mod->output_content('JSON', array(), array('bar')));
     }
     public function test_html_safe() {
         $this->assertEquals('&lt;script&gt;', $this->output_mod->html_safe('<script>'));
