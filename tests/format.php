@@ -9,9 +9,9 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
     private $html5;
    
     public function setUp() {
-       $this->json = new Hm_Format_JSON();
-       $this->html5 = new Hm_Format_HTML5();
-       Hm_Output_Modules::add('test', 'date', false, false, 'after', true, 'core');
+        $this->json = new Hm_Format_JSON();
+        $this->html5 = new Hm_Format_HTML5();
+        Hm_Output_Modules::add('test', 'date', false, false, 'after', true, 'core');
     }
 
     /* tests for Hm_Format_JSON and Hm_Format_HTML5 */
