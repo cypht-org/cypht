@@ -385,7 +385,7 @@ class Hm_PHP_Session extends Hm_Session {
      */
     public function get($name, $default=false, $user=false) {
         if ($user) {
-            return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data) ? $this->data['user_data'][$name] : $default;
+            return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data['user_data']) ? $this->data['user_data'][$name] : $default;
         }
         else {
             return array_key_exists($name, $this->data) ? $this->data[$name] : $default;
