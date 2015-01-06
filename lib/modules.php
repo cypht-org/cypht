@@ -455,7 +455,7 @@ class Hm_Request_Handler {
      *
      * @return void
      */
-    private function default_language() {
+    public function default_language() {
         if (!array_key_exists('language', $this->response)) {
             $default_lang = $this->config->get('default_language', false);
             if ($default_lang) {
