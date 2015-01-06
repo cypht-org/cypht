@@ -17,6 +17,9 @@ abstract class Hm_Session {
     /* set to true if the user authentication is local (DB) */
     public $internal_users = false;
 
+    /* don't send cookie when this flag is set */
+    public $no_cookie = false;
+
     /* key used to encrypt session data */
     protected $enc_key = '';
 
@@ -93,7 +96,7 @@ abstract class Hm_Session {
      *
      * @return void
      */
-    protected function check_fingerprint($request) {
+    public function check_fingerprint($request) {
         $id = $this->build_fingerprint($request);
         $fingerprint = $this->get('fingerprint', false);
         if (!$fingerprint || $fingerprint !== $id) {
@@ -216,7 +219,9 @@ abstract class Hm_Session {
      */
     public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='', $html_only=true) {
         if ($name == 'hm_reload_folders') {
-            setcookie($name, $value);
+            if (!$this->no_cookie) {
+                setcookie($name, $value);
+            }
         }
         if ($request->tls) {
             $secure = true;
@@ -230,7 +235,9 @@ abstract class Hm_Session {
         if (!$domain && array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
             $domain = $request->server['SERVER_NAME'];
         }
-        setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
+        if (!$this->no_cookie) {
+            setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
+        }
     }
 }
 
