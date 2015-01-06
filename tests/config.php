@@ -68,6 +68,8 @@ class Hm_Test_Config extends PHPUnit_Framework_TestCase {
         setup_db($site_config);
         $user_config = new Hm_User_Config_DB($site_config);
         $this->assertEquals(array(), $user_config->dump());
+        $user_config->load('testuser', 'testkey');
+        /* TODO: finish */
     }
     public function test_db_reload() {
         $site_config = new Hm_Mock_Config();
