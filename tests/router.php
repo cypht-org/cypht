@@ -20,10 +20,11 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         ob_end_clean();
     }
     public function test_merge_filters() {
+        $res = $this->router->merge_filters(filters(), array('allowed_get' => array('new' => 'thing')));
+        $this->assertEquals('thing', $res['allowed_get']['new']);
+        $res = $this->router->merge_filters(filters(), array('allowed_pages' => array('new')));
+        $this->assertTrue(in_array('new', $res['allowed_pages'], true));
     }
-    public function test_page_redirect() {
-    }
-
 }
 
 ?>
