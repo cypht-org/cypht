@@ -39,6 +39,15 @@ abstract class Hm_Auth {
 }
 
 /**
+ * Used for testing
+ */
+class Hm_Auth_None extends Hm_Auth {
+    public function check_credentials($user, $pass) {
+        return true;
+    }
+}
+
+/**
  * Authenticate against an included DB
  */
 class Hm_Auth_DB extends Hm_Auth {
