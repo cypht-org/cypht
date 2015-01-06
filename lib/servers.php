@@ -89,7 +89,7 @@ trait Hm_Server_List {
     public static function add($atts, $id=false) {
         $atts['object'] = false;
         $atts['connected'] = false;
-        if ($id) {
+        if ($id !== false) {
             self::$server_list[$id] = $atts;
         }
         else {
