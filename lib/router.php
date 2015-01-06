@@ -116,7 +116,7 @@ class Hm_Router {
         $filters = array();
         $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
             'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
-        $modules = explode(',', $config->get('modules', array()));
+        $modules = explode(',', $config->get('modules', ''));
         foreach ($modules as $name) {
             if (is_readable(sprintf(APP_PATH."modules/%s/setup.php", $name))) {
                 $filters = Hm_Router::merge_filters($filters, require sprintf(APP_PATH."modules/%s/setup.php", $name));
