@@ -32,6 +32,9 @@ class Hm_Mock_Config {
         if ($id == 'user_settings_dir') {
             return './data';
         }
+        elseif ($id == 'default_language') {
+            return 'es';
+        }
         elseif (array_key_exists($id, $this->data)) {
             return $this->data[$id];
         }
@@ -58,6 +61,9 @@ function setup_db($config) {
     $config->set('db_name', 'test');
     $config->set('db_user', 'test');
     $config->set('db_pass', '123456');
+}
+function flatten($str) {
+    return strtolower(str_replace(array("\n", "\t", "\r", " "), '', $str));
 }
 
 ?>
