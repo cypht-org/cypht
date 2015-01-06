@@ -512,7 +512,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      *
      * @return bool true on success
      */
-    protected function connect() {
+    public function connect() {
         $this->dbh = Hm_DB::connect($this->site_config);
         if ($this->dbh) {
             return true;
@@ -580,8 +580,9 @@ class Hm_DB_Session extends Hm_PHP_Session {
         if ($this->dbh) {
             $sql = $this->dbh->prepare("update hm_user_session set data=? where hm_id=?");
             $enc_data = $this->ciphertext($this->data);
-            $sql->execute(array($enc_data, $this->session_key));
+            return $sql->execute(array($enc_data, $this->session_key));
         }
+        return false;
     }
 
     /**
