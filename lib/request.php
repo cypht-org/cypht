@@ -76,10 +76,10 @@ class Hm_Request {
      * @return void
      */
     private function filter_request_input($filters) {
-        $this->server = $this->filter_input(INPUT_SERVER, $filters['allowed_server']);
-        $this->post = $this->filter_input(INPUT_POST, $filters['allowed_post']);
-        $this->get = $this->filter_input(INPUT_GET, $filters['allowed_get']);
-        $this->cookie = $this->filter_input(INPUT_COOKIE, $filters['allowed_cookie']);
+        $this->server = $this->filter_input(INPUT_SERVER, $_SERVER, $filters['allowed_server']);
+        $this->post = $this->filter_input(INPUT_POST, $_POST, $filters['allowed_post']);
+        $this->get = $this->filter_input(INPUT_GET, $_GET, $filters['allowed_get']);
+        $this->cookie = $this->filter_input(INPUT_COOKIE, $_COOKIE, $filters['allowed_cookie']);
     }
 
     /**
@@ -125,8 +125,8 @@ class Hm_Request {
      *
      * @return array filtered input data
      */
-    private function filter_input($type, $filters) {
-        $data = filter_input_array($type, $filters, false);
+    private function filter_input($type, $data, $filters) {
+        $data = filter_var_array($data, $filters, false);
         if (!$data) {
             return array();
         }
