@@ -26,16 +26,13 @@ class Hm_Mock_Session {
 }
 class Hm_Mock_Config {
 
-    public $data = array();
+    public $data = array(
+        'user_settings_dir' => './data',
+        'default_language' => 'es',
+    );
 
     public function get($id, $default) {
-        if ($id == 'user_settings_dir') {
-            return './data';
-        }
-        elseif ($id == 'default_language') {
-            return 'es';
-        }
-        elseif (array_key_exists($id, $this->data)) {
+        if (array_key_exists($id, $this->data)) {
             return $this->data[$id];
         }
         return $default;
@@ -47,7 +44,7 @@ class Hm_Mock_Config {
 
 class Hm_Mock_Request {
 
-    public $type;
+    public $invalid_input_detected;
     public $post = array('hm_nonce' => 'asdf', 'fld1' => '0', 'fld2' => '1');
     public $cookie = array();
     public $server = array('REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');
