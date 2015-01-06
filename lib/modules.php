@@ -52,7 +52,7 @@ trait Hm_Module_Output {
      *
      * @return bool true on success
      */
-    protected function append($name, $value) {
+    public function append($name, $value) {
         if (in_array($name, $this->protected, true)) {
             Hm_Debug::add(sprintf('MODULES: Cannot overwrite %s with %s', $name, print_r($value,true)));
             return false;
@@ -82,7 +82,7 @@ trait Hm_Module_Output {
      *
      * @return bool true on success
      */
-    protected function concat($name, $value) {
+    public function concat($name, $value) {
         if (array_key_exists($name, $this->output)) {
             if (is_string($this->output[$name])) {
                 $this->output[$name] .= $value;
@@ -222,9 +222,9 @@ abstract class Hm_Handler_Module {
     }
 
     /**
-     * Validate a form nonce. If this is a non-empty POST form from a normal
-     * HTTP request or from an AJAX update, it will take the user to the page
-     * "not found page" if the hm_nonce value is not present and valid
+     * Validate a form nonce. If this is a non-empty POST form from an
+     * HTTP request or AJAX update, it will take the user to the home
+     * page if the hm_nonce value is either not present or not valid
      *
      * @return void
      */
@@ -264,7 +264,7 @@ abstract class Hm_Handler_Module {
      *
      * @return array tuple with a bool indicating success, and an array of valid form values
      */
-    protected function process_form($form) {
+    public function process_form($form) {
         $post = $this->request->post;
         $success = false;
         $new_form = array();
@@ -435,7 +435,7 @@ class Hm_Request_Handler {
      *
      * @return void
      */
-    private function load_user_config_object() {
+    public function load_user_config_object() {
         $type = $this->config->get('user_config_type', 'file');
         switch ($type) {
             case 'DB':
