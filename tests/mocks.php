@@ -65,5 +65,14 @@ function setup_db($config) {
 function flatten($str) {
     return strtolower(str_replace(array("\n", "\t", "\r", " "), '', $str));
 }
+function filters() {
+    return array(
+        'allowed_post' => array('bar' => FILTER_VALIDATE_INT),
+        'allowed_output' => array(),
+        'allowed_server' => array('REQUEST_URI' => FILTER_SANITIZE_STRING),
+        'allowed_get' => array('foo' => FILTER_UNSAFE_RAW),
+        'allowed_cookie' => array()
+    );
+}
 
 ?>
