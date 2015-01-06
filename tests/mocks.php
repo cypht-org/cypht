@@ -48,11 +48,14 @@ class Hm_Mock_Config {
 class Hm_Mock_Request {
 
     public $type;
+    public $post = array('hm_nonce' => 'asdf', 'fld1' => '0', 'fld2' => '1');
+    public $cookie = array();
+    public $server = array();
+    public $tls = false;
 
     public function __construct($type) {
         $this->type = $type;
     }
-    public $post = array('hm_nonce' => 'asdf', 'fld1' => '0', 'fld2' => '1');
 }
 
 function setup_db($config) {
@@ -67,6 +70,7 @@ function flatten($str) {
 }
 function filters() {
     return array(
+        'allowed_pages' => array('test'),
         'allowed_post' => array('bar' => FILTER_VALIDATE_INT),
         'allowed_output' => array(),
         'allowed_server' => array('REQUEST_URI' => FILTER_SANITIZE_STRING),
