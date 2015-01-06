@@ -50,7 +50,7 @@ class Hm_Mock_Request {
     public $type;
     public $post = array('hm_nonce' => 'asdf', 'fld1' => '0', 'fld2' => '1');
     public $cookie = array();
-    public $server = array();
+    public $server = array('REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');
     public $tls = false;
 
     public function __construct($type) {
@@ -73,7 +73,7 @@ function filters() {
         'allowed_pages' => array('test'),
         'allowed_post' => array('bar' => FILTER_VALIDATE_INT),
         'allowed_output' => array(),
-        'allowed_server' => array('REQUEST_URI' => FILTER_SANITIZE_STRING),
+        'allowed_server' => array('HTTP_USER_AGENT' => FILTER_SANITIZE_STRING, 'REQUEST_URI' => FILTER_SANITIZE_STRING),
         'allowed_get' => array('foo' => FILTER_UNSAFE_RAW),
         'allowed_cookie' => array()
     );
