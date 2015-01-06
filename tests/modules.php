@@ -13,6 +13,9 @@ class Hm_Output_Test extends Hm_Output_Module {
         return '';
     }
 }
+class Hm_Test_Module_List {
+    use Hm_Modules;
+}
 
 class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     private $output_mod;
@@ -99,7 +102,7 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     /* tests for the Hm_Request_Handler class */
     public function test_process_request() {
         $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
-        $this->assertEquals(1, preg_match("/^\d\d:\d\d:\d\d/", $res['date']));
+        $this->assertEquals(1, preg_match("/^\d{1,2}:\d\d:\d\d/", $res['date']));
     }
     public function test_load_user_config_object() {
         $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
@@ -108,33 +111,60 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     public function test_default_language() {
         $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
         $this->request_handler->default_language();
-        /* TODO: add lang */
+        $this->assertEquals('es', $this->request_handler->response['language']);
     }
     public function test_run_modules() {
+        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
+        $this->request_handler->run_modules();
+        $this->assertTrue(isset($this->request_handler->response['date']));
     }
 
     /* tests for Hm_Modules trait */
-    public function test_queue_module_for_all_pages() {
-    }
     public function test_load() {
-    }
-    public function test_set_source() {
-    }
-    public function test_add_to_all_pages() {
+        Hm_Test_Module_List::load(array('test' => array('date' => array('core', false))));
+        $this->assertEquals(array('test' => array('date' => array('core', false))), Hm_Test_Module_List::dump());
     }
     public function test_add() {
-    }
-    public function test_replace() {
-    }
-    public function test_swap_key() {
-    }
-    public function test_try_queued_modules() {
-    }
-    public function test_del() {
-    }
-    public function test_get_for_page() {
+        Hm_Test_Module_List::add('test', 'date', false, false, false, true, 'core');
+        $this->assertEquals(array('test' => array('date' => array('core', false))), Hm_Test_Module_List::dump());
     }
     public function test_dump() {
+        $this->assertEquals(array('test' => array('date' => array('core', false))), Hm_Test_Module_List::dump());
+    }
+    public function test_add_to_all_pages() {
+        Hm_Test_Module_List::add_to_all_pages('test', false, false, false, 'core');
+        $mods = Hm_Test_Module_List::dump();
+        $this->assertEquals(array('core', false), $mods['test']['test']);
+    }
+    public function test_set_source() {
+        Hm_Test_Module_List::set_source('test');
+        Hm_Test_Module_List::add('test', 'new', false);
+        $mods = Hm_Test_Module_List::dump();
+        $this->assertEquals('test', $mods['test']['new'][0]);
+    }
+    public function test_replace() {
+        Hm_Test_Module_List::replace('new', 'more_new');
+        $mods = Hm_Test_Module_List::dump();
+        $this->assertEquals('test', $mods['test']['more_new'][0]);
+        $this->assertFalse(isset($mods['test']['new']));
+    }
+    public function test_del() {
+        $mods = Hm_Test_Module_List::dump();
+        $this->assertEquals('test', $mods['test']['more_new'][0]);
+        Hm_Test_Module_List::del('test', 'more_new');
+        $mods = Hm_Test_Module_List::dump();
+        $this->assertFalse(isset($mods['test']['more_new']));
+    }
+    public function test_get_for_page() {
+        $this->assertEquals(array('test' => array('core', false), 'date' => array('core', false)), Hm_Test_Module_List::get_for_page('test'));
+    }
+    public function test_queue_module_for_all_pages() {
+        Hm_Test_Module_List::queue_module_for_all_pages('testqueue', false, 'date', 'after', 'core');
+        Hm_Test_Module_List::process_all_page_queue();
+        $mods = Hm_Test_Module_List::dump();
+        $this->assertEquals(array('core', false), $mods['test']['testqueue']);
+    }
+    public function test_try_queued_modules() {
     }
 
     /* TODO: test for functions */
