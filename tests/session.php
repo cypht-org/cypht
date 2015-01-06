@@ -16,7 +16,7 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
     public function test_build_fingerprint() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
-        $this->assertEquals('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', $session->build_fingerprint($request));
+        $this->assertEquals('f60ed56a9c8275894022fe5a7a1625c33bdb55b729bb4e38962af4d1613eda25', $session->build_fingerprint($request));
     }
     public function test_record_unsaved() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
@@ -30,18 +30,20 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
     public function test_check() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
-        $session->check($request, 'unittestuser', 'unitestpass');
+        $session->check($request, 'unittestuser', 'unittestpass');
         $this->assertFalse($session->is_active());
     }
     public function test_change_pass() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $this->assertTrue($session->change_pass('unittestuser', 'unittestpass'));
     }
+    /* TODO: fix or remove */
     public function test_create() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
         //print_r($session->create($request, 'unittestuser', 'unittestpass'));
     }
+    /* TODO: fix or remove */
     public function test_start() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
@@ -87,6 +89,33 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
         $session->save_data();
         $this->assertEquals(array(), $_SESSION);
     }
+
+    /* tests for Hm_DB_Session */
+    public function test_db_connect() {
+        $_POST['user'] = 'unittestusers';
+        $_POST['pass'] = 'unittestpass';
+        $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
+        $this->assertTrue($session->connect());
+    }
+    public function test_db_end() {
+        $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTML5');
+        $session->end();
+        $this->assertFalse($session->is_active());
+    }
+    public function test_db_close_early() {
+        $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTML5');
+        $session->close_early();
+        $this->assertFalse($session->is_active());
+    }
+    public function test_db_save_data() {
+        $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTML5');
+        /* TODO: fix */
+        //print_r($session->save_data());
+    }
+
 }
 
 ?>
