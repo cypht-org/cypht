@@ -14,7 +14,13 @@ class Hm_Test_Output extends PHPUnit_Framework_TestCase {
     public function test_send_response() {
         ob_start();
         ob_start();
-        $this->http->send_response('test', array('X-Unit-Test', '1'));
+        $this->http->send_response('test', array('http_headers' => array()));
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEquals('test', $output);
+        ob_start();
+        ob_start();
+        $this->http->send_response('test', array());
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals('test', $output);
@@ -40,6 +46,15 @@ class Hm_Test_Output extends PHPUnit_Framework_TestCase {
     }
     public function test_show() {
         $this->assertTrue(strstr(flatten(Hm_Msgs::show('return')), 'msgtwo') !== false);
+        $this->assertNull(Hm_Msgs::show('log'));
+        ob_start();
+        Hm_Msgs::show();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertTrue(strlen($output) > 0);
+    }
+    public function test_elog() {
+        $this->assertNull(elog('test'));
     }
 
     /* tests for Hm_Debug */
