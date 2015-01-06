@@ -134,7 +134,7 @@ class Hm_Router {
      *
      * @return array list of filters, input, and output modules
      */
-    private function get_production_modules($config) {
+    public function get_production_modules($config) {
         $filters = $config->get('input_filters', array());
         $handler_mods = $config->get('handler_modules', array());
         $output_mods = $config->get('output_modules', array());
@@ -280,7 +280,9 @@ class Hm_Router {
                 $session->secure_cookie($request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
             }
             $session->end();
-            Hm_Router::page_redirect($request->server['REQUEST_URI']);
+            if (array_key_exists('REQUEST_URI', $request->server)) {
+                Hm_Router::page_redirect($request->server['REQUEST_URI']);
+            }
         }
     }
 
