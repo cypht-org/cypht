@@ -10,14 +10,18 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
 
     /* tests for Hm_Router */
     public function test_process_request() {
+        ob_start();
         $mock_config = new Hm_Mock_Config();
+        $mock_config->data['disable_tls'] = true;
         setup_db($mock_config);
-        ob_start();
-        ob_start();
+        $mock_config->data['modules'] = 'imap,pop3';
         $this->router->process_request($mock_config);
-        $output = ob_get_contents();
-        $this->assertTrue(strlen($output) > 0);
-        ob_end_clean();
+        $this->assertTrue(ob_get_length() > 0);
+    }
+    public function test_get_production_modules() {
+        $mock_config = new Hm_Mock_Config();
+        $mock_config->data['modules'] = 'imap,pop3';
+        $this->assertEquals(array(array(), array(), array()), $this->router->get_production_modules($mock_config));
     }
     public function test_merge_filters() {
         $res = $this->router->merge_filters(filters(), array('allowed_get' => array('new' => 'thing')));

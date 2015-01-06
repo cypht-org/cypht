@@ -1,4 +1,4 @@
-<phpunit bootstrap="./bootstrap.php" colors="true">
+<phpunit bootstrap="./bootstrap.php" strict="false" colors="true">
     <testsuite name="cache">
         <file>./cache.php</file>
     </testsuite>
@@ -20,14 +20,14 @@
     <testsuite name="modules">
         <file>./modules.php</file>
     </testsuite>
+    <testsuite name="router">
+        <file>./router.php</file>
+    </testsuite>
     <testsuite name="output">
         <file>./output.php</file>
     </testsuite>
     <testsuite name="request">
         <file>./request.php</file>
-    </testsuite>
-    <testsuite name="router">
-        <file>./router.php</file>
     </testsuite>
     <testsuite name="servers">
         <file>./servers.php</file>
