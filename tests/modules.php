@@ -106,6 +106,9 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         $this->request_handler->load_user_config_object();
     }
     public function test_default_language() {
+        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
+        $this->request_handler->default_language();
+        /* TODO: add lang */
     }
     public function test_run_modules() {
     }
