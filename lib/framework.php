@@ -23,6 +23,9 @@ if (!class_exists('Hm_Functions')) {
         public static function header($header) {
             return header($header);
         }
+        public static function cease() {
+            die();
+        }
     }
 }
 ?>
