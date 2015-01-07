@@ -2,9 +2,6 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-/* switch to control encryption. Please don't disable */
-define('MCRYPT_DATA', true);
-
 /* block mode */
 define('BLOCK_MODE', MCRYPT_MODE_CBC);
 
@@ -37,9 +34,6 @@ class Hm_Crypt {
      * @return string decrypted text
      */
     public static function plaintext($string, $key) {
-        if (!MCRYPT_DATA) {
-            return $string;
-        }
         $key = substr(md5($key), 0, mcrypt_get_key_size(self::$cipher, self::$mode));
         $string = base64_decode($string);
         $iv_size = self::iv_size();
@@ -57,9 +51,6 @@ class Hm_Crypt {
      * @return string encrypted text
      */
     public static function ciphertext($string, $key) {
-        if (!MCRYPT_DATA) {
-            return $string;
-        }
         $key = substr(md5($key), 0, mcrypt_get_key_size(self::$cipher, self::$mode));
         $iv_size = self::iv_size();
         $iv = mcrypt_create_iv($iv_size, self::$r_source);
