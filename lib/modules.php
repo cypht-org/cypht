@@ -89,7 +89,7 @@ trait Hm_Module_Output {
                 return true;
             }
             else {
-                Hm_Debug::add('Count not append %s to %s', print_r($value,true), $name);
+                Hm_Debug::add('Could not append %s to %s', print_r($value,true), $name);
                 return false;
             }
         }
@@ -188,13 +188,13 @@ abstract class Hm_Handler_Module {
     use Hm_Module_Output;
 
     /* session object */
-    protected $session = false;
+    public $session = false;
 
     /* request object */
-    protected $request = false;
+    public $request = false;
 
     /* site configuration object */
-    protected $config = false;
+    public $config = false;
 
     /* current request id */
     protected $page = false;
@@ -245,7 +245,7 @@ abstract class Hm_Handler_Module {
         }
         if (!$valid) {
             if ($this->request->type == 'AJAX') {
-                die(json_encode(array('status' => 'not callable')));;
+                Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
             }
             else {
                 if ($this->session->loaded) {
@@ -446,8 +446,7 @@ class Hm_Request_Handler {
             default:
                 $this->user_config = new Hm_User_Config_File($this->config);
                 Hm_Debug::add("Using file based user configuration");
-                break;
-        }
+                break; }
     }
 
     /**

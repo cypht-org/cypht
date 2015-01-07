@@ -299,7 +299,7 @@ class Hm_Router {
             $this->page = $request->post['hm_ajax_hook'];
         }
         elseif ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post) && !in_array($request->post['hm_ajax_hook'], $pages, true)) {
-            die(json_encode(array('status' => 'not callable')));;
+            Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
         }
         elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $pages, true)) {
             $this->page = $request->get['page'];
@@ -388,11 +388,11 @@ class Hm_Router {
         }
         if ($status == 303) {
             Hm_Debug::add('Redirect loop found');
-            die('Redirect loop discovered');
+            Hm_Functions::cease('Redirect loop discovered');
         }
         Hm_Functions::header('HTTP/1.1 303 Found');
         Hm_Functions::header('Location: '.$url);
-        exit;
+        Hm_Functions::cease();
     }
 }
 
