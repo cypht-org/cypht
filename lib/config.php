@@ -231,7 +231,7 @@ class Hm_User_Config_DB extends Hm_Config {
         $config = Hm_Crypt::ciphertext(serialize($this->config), $key);
         if ($this->connect()) {
             $sql = $this->dbh->prepare("update hm_user_settings set settings=? where username=?");
-            if ($sql->execute(array($config, $username))) {
+            if ($sql->execute(array($config, $username)) && $sql->rowCount() == 1) {
                 Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
                 return true;
             }
