@@ -76,10 +76,18 @@ class Hm_Request {
      * @return void
      */
     private function filter_request_input($filters) {
-        $this->server = $this->filter_input(INPUT_SERVER, $_SERVER, $filters['allowed_server']);
-        $this->post = $this->filter_input(INPUT_POST, $_POST, $filters['allowed_post']);
-        $this->get = $this->filter_input(INPUT_GET, $_GET, $filters['allowed_get']);
-        $this->cookie = $this->filter_input(INPUT_COOKIE, $_COOKIE, $filters['allowed_cookie']);
+        if (array_key_exists('allowed_server', $filters)) {
+            $this->server = $this->filter_input(INPUT_SERVER, $_SERVER, $filters['allowed_server']);
+        }
+        if (array_key_exists('allowed_post', $filters)) {
+            $this->post = $this->filter_input(INPUT_POST, $_POST, $filters['allowed_post']);
+        }
+        if (array_key_exists('allowed_get', $filters)) {
+            $this->get = $this->filter_input(INPUT_GET, $_GET, $filters['allowed_get']);
+        }
+        if (array_key_exists('allowed_cookie', $filters)) {
+            $this->cookie = $this->filter_input(INPUT_COOKIE, $_COOKIE, $filters['allowed_cookie']);
+        }
     }
 
     /**
@@ -91,7 +99,9 @@ class Hm_Request {
      */
     private function get_other_request_details($filters) {
         $this->sapi = php_sapi_name();
-        $this->allowed_output = $filters['allowed_output'];
+        if (array_key_exists('allowed_output', $filters)) {
+            $this->allowed_output = $filters['allowed_output'];
+        }
         if (array_key_exists('REQUEST_URI', $this->server)) {
             $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
         }

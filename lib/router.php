@@ -17,14 +17,15 @@ class Hm_Router {
      * the browser happens here.
      *
      * @param $config object site configuration object
+     * @param $debug_mode bool true to use debug modules
      *
      * @return array list of the response array, the session object, and the allowed output filters
      *               for ajax responses
      */
-    public function process_request($config) {
+    public function process_request($config, $debug_mode) {
 
         /* get module assignments and input whitelists */
-        list($filters, $handler_mods, $output_mods) = $this->process_module_setup($config);
+        list($filters, $handler_mods, $output_mods) = $this->process_module_setup($config, $debug_mode);
 
         /* process inbound data */
         $request = new Hm_Request($filters);
@@ -36,7 +37,7 @@ class Hm_Router {
         $session = $this->setup_session($config);
 
         /* determine page or ajax request name */
-        $this->get_page($request, $filters['allowed_pages']);
+        $this->get_page($request, $filters);
 
         /* load processing modules for this page */
         $this->load_module_sets($config, $handler_mods, $output_mods);
@@ -96,8 +97,8 @@ class Hm_Router {
      *
      * @return array list of filters, input, and output modules
      */
-    private function process_module_setup($config) {
-        if (DEBUG_MODE) {
+    private function process_module_setup($config, $debug_mode) {
+        if ($debug_mode) {
             return $this->get_debug_modules($config);
         }
         else {
@@ -290,11 +291,17 @@ class Hm_Router {
      * Determine the page id
      *
      * @param $request object request details
-     * @param $pages array list of allowed page ids from the modules
+     * @param $filters array list of filters
      *
      * @return void
      */
-    private function get_page($request, $pages) {
+    private function get_page($request, $filters) {
+        if (array_key_exists('allowed_pages', $filters)) {
+            $pages = $filters['allowed_pages'];
+        }
+        else {
+            $pages = array();
+        }
         if ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post) && in_array($request->post['hm_ajax_hook'], $pages, true)) {
             $this->page = $request->post['hm_ajax_hook'];
         }

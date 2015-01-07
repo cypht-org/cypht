@@ -38,7 +38,7 @@ require APP_PATH.'lib/ini_set.php';
 
 /* process request and send output to the browser */
 $router = new Hm_Router();
-$router->process_request($config);
+$router->process_request($config, DEBUG_MODE);
 
 /* log some debug stats about the page */
 if (DEBUG_MODE) {
