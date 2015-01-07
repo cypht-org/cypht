@@ -54,6 +54,7 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
         $request = new Hm_Mock_Request('HTML5');
         $session->create($request, 'unittestuser', 'unittestpass');
         $session->destroy($request);
+        $session->create($request, 'unittestuser', 'unittestpass');
     }
     public function test_start() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
