@@ -69,7 +69,13 @@ class Hm_Test_Config extends PHPUnit_Framework_TestCase {
         $user_config = new Hm_User_Config_DB($site_config);
         $this->assertEquals(array(), $user_config->dump());
         $user_config->load('testuser', 'testkey');
-        /* TODO: finish */
+        $this->assertEquals(array('foo' => 'bar'), $user_config->dump());
+        $user_config->reload(array());
+        $user_config->load('testuser', 'testpass');
+        $this->assertEquals(array(), $user_config->dump());
+        $user_config->reload(array());
+        $user_config->load(uniqid(), 'blah');
+        $this->assertEquals(array(), $user_config->dump());
     }
     public function test_db_reload() {
         $site_config = new Hm_Mock_Config();
@@ -80,10 +86,16 @@ class Hm_Test_Config extends PHPUnit_Framework_TestCase {
     }
     public function test_db_save() {
         $site_config = new Hm_Mock_Config();
+        $user_config = new Hm_User_Config_DB($site_config);
+        $user_config->reload(array('foo' => 'bar'));
+        $this->assertFalse($user_config->save('testuser', 'testkey'));
+
+        $site_config = new Hm_Mock_Config();
         setup_db($site_config);
         $user_config = new Hm_User_Config_DB($site_config);
         $user_config->reload(array('foo' => 'bar'));
-        $this->assertTrue($user_config->save('testuser', 'testpass'));
+        $this->assertTrue($user_config->save('testuser', 'testkey'));
+        $this->assertFalse($user_config->save(uniqid(), 'blah'));
 
     }
 }

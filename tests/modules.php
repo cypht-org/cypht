@@ -43,6 +43,8 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     public function test_out() {
         $this->assertTrue($this->handler_mod->out('foo', 'bar'));
         $this->assertFalse($this->handler_mod->out('foo', 'foo'));
+        $this->assertTrue($this->handler_mod->append('name', 'value'));
+        $this->assertFalse($this->handler_mod->out('name', 'value2'));
     }
     public function test_get() {
         $this->assertEquals('bar', $this->output_mod->get('foo'));
@@ -54,10 +56,14 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         $this->assertTrue($this->handler_mod->append('test', 'value'));
         $this->assertTrue($this->handler_mod->append('test', 'value'));
         $this->assertEquals(array('value', 'value'), $this->handler_mod->get('test'));
-        $this->handler_mod->out('no_append', 'blah', true);
+        $this->assertTrue($this->handler_mod->out('no_append', 'blah', true));
         $this->assertFalse($this->handler_mod->append('no_append', 'blah'));
+        $this->assertTrue($this->handler_mod->out('scaler', 'blah', false));
+        $this->assertFalse($this->handler_mod->append('scaler', 'blah'));
     }
     public function test_concat() {
+        $this->assertTrue($this->handler_mod->out('concat_test', array()));
+        $this->assertFalse($this->handler_mod->concat('concat_test', 'test'));
         $this->assertTrue($this->handler_mod->concat('concat', 'start'));
         $this->assertTrue($this->handler_mod->concat('concat', 'start'));
         $this->assertEquals('startstart', $this->handler_mod->get('concat'));
@@ -84,8 +90,14 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
 
     /* tests for the Hm_Handler_Module class */
     public function test_process_nonce() {
-        $this->parent->session->set('nonce_list', array('asdf'));
         $this->assertNull($this->handler_mod->process_nonce());
+        $this->handler_mod->session->set('nonce_list', array('asdf'));
+        $this->handler_mod->session->loaded = false;
+        $this->handler_mod->session->set('nonce_list', array('sdfg'));
+        $this->assertNull($this->handler_mod->process_nonce());
+        $this->handler_mod->request->type = 'AJAX';
+        $this->assertNull($this->handler_mod->process_nonce());
+        $this->handler_mod->session->set('nonce_list', array('asdf'));
     }
     public function test_process_form() {
         list($success, $form) = $this->handler_mod->process_form(array('fld1', 'fld2'));
@@ -97,15 +109,17 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
     }
 
     /* tests for the Hm_Output_Module class */
+    public function test_output_content() {
+        $this->output_mod->output_content('HTML5', array('Main' => false), array());
+        $this->assertEquals('Main', $this->output_mod->trans('Main'));
+    }
     public function test_trans() {
         $this->assertEquals('inbox', $this->output_mod->trans('inbox'));
-    }
-    public function test_output_content() {
-        /* TODO: fix */
-        //print_r($this->output_mod->output_content('JSON', array(), array('bar')));
+        $this->assertEquals('Main', $this->output_mod->trans('Main'));
     }
     public function test_html_safe() {
         $this->assertEquals('&lt;script&gt;', $this->output_mod->html_safe('<script>'));
+        $this->assertEquals('nohtml', $this->output_mod->html_safe('nohtml'));
     }
 
     /* tests for the Hm_Request_Handler class */
@@ -114,6 +128,11 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         $this->assertEquals(1, preg_match("/^\d{1,2}:\d\d:\d\d/", $res['date']));
     }
     public function test_load_user_config_object() {
+        $this->parent->config->set('user_config_type', 'DB');
+        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
+        $this->request_handler->load_user_config_object();
+
+        $this->parent->config->set('user_config_type', 'file');
         $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
         $this->request_handler->load_user_config_object();
     }
@@ -156,6 +175,11 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         $mods = Hm_Test_Module_List::dump();
         $this->assertEquals('test', $mods['test']['more_new'][0]);
         $this->assertFalse(isset($mods['test']['new']));
+        Hm_Test_Module_List::replace('more_new', 'even_newer', 'test');
+        $mods = Hm_Test_Module_List::dump();
+        $this->assertEquals('test', $mods['test']['even_newer'][0]);
+        $this->assertFalse(isset($mods['test']['more_new']));
+        Hm_Test_Module_List::replace('even_newer', 'more_new', 'test');
     }
     public function test_del() {
         $mods = Hm_Test_Module_List::dump();
@@ -174,6 +198,12 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('core', false), $mods['test']['testqueue']);
     }
     public function test_try_queued_modules() {
+        Hm_Test_Module_List::add('test', 'queued', false, 'not_added_yet', 'after', true, 'core');
+        $this->assertEquals(3, count(Hm_Test_Module_List::get_for_page('test')));
+        Hm_Test_Module_List::add('test', 'not_added_yet', false, 'date', 'after', false, 'core');
+        Hm_Test_Module_List::add('test', 'queued', false, 'never_added', 'after', false, 'core');
+        Hm_Test_Module_List::try_queued_modules();
+        $this->assertEquals(5, count(Hm_Test_Module_List::get_for_page('test')));
     }
 
     /* TODO: test for functions */

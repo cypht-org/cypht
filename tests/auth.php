@@ -21,16 +21,20 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $auth = new Hm_Auth_DB($this->config);
         $this->assertFalse($auth->check_credentials('unittestuser', 'notthepass'));
         $this->assertTrue($auth->check_credentials('unittestuser', 'unittestpass'));
+        $auth = new Hm_Auth_None($this->config);
+        $this->assertTrue($auth->check_credentials('any', 'thing'));
     }
     public function test_change_pass() {
         $auth = new Hm_Auth_DB($this->config);
         $this->assertTrue($auth->change_pass('unittestuser', 'newpass'));
         $this->assertFalse($auth->check_credentials('unittestuser', 'unittestpass'));
         $this->assertTrue($auth->check_credentials('unittestuser', 'newpass'));
+        $this->assertFalse($auth->change_pass('nobody', 'nopass'));
     }
     public function test_delete() {
         $auth = new Hm_Auth_DB($this->config);
         $this->assertTrue($auth->delete('unittestuser'));
+        $this->assertFalse($auth->delete('nobody'));
         $config = new Hm_Mock_Config();
         $auth = new Hm_Auth_DB($config);
         $this->assertFalse($auth->delete('unittestuser'));

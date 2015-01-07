@@ -32,7 +32,6 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
     public function test_check() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
-        $session->no_cookie = true;
         $session->check($request, 'unittestuser', 'unittestpass');
         $this->assertFalse($session->is_active());
         $session->destroy($request);
@@ -40,7 +39,6 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
     public function test_check_fingerprint() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
-        $session->no_cookie = true;
         $session->check($request, 'unittestuser', 'unittestpass');
         $this->assertFalse($session->is_active());
         $session->check_fingerprint($request);
@@ -49,19 +47,17 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
     }
     public function test_change_pass() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
-        $this->assertTrue($session->change_pass('unittestuser', 'unittestpass'));
+        $this->assertFalse($session->change_pass('unittestuser', 'unittestpass'));
     }
     public function test_create() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
-        $session->no_cookie = true;
         $session->create($request, 'unittestuser', 'unittestpass');
         $session->destroy($request);
     }
     public function test_start() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
-        $session->no_cookie = true;
         $session->start($request);
         $this->assertTrue($session->is_active());
         $session->destroy($request);
@@ -90,7 +86,6 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
     public function test_end() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
-        $session->no_cookie = true;
         $session->start($request);
         $this->assertTrue($session->is_active());
         $session->end();
@@ -105,7 +100,6 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
     public function test_save_data() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $session->set('test', 'testvalue');
-        $session->no_cookie = true;
         $session->save_data();
         $this->assertEquals(array(), $_SESSION);
         $request = new Hm_Mock_Request('HTML5');
@@ -128,7 +122,6 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
     public function test_db_start() {
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTML5');
-        $session->no_cookie = true;
         $session->loaded = true;
         $session->start($request);
         $this->assertTrue($session->is_active());

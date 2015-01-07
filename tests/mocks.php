@@ -2,7 +2,7 @@
 
 class Hm_Mock_Session {
 
-    public $loaded = false;
+    public $loaded = true;
     public $data = array();
 
     public function get($id, $default) {
@@ -22,6 +22,8 @@ class Hm_Mock_Session {
     }
     public function is_active() {
         return true;
+    }
+    public function destroy() {
     }
 }
 class Hm_Mock_Config {
@@ -49,10 +51,22 @@ class Hm_Mock_Request {
     public $cookie = array();
     public $server = array('REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');
     public $tls = false;
+    public $type;
 
     public function __construct($type) {
         $this->type = $type;
     }
+}
+
+class Hm_Functions {
+        public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') {
+            return true;
+        }
+        public static function header($header) {
+            return true;
+        }
+        public static function cease() {
+        }
 }
 
 function setup_db($config) {

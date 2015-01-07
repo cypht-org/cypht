@@ -14,7 +14,7 @@ class Hm_Test_Output extends PHPUnit_Framework_TestCase {
     public function test_send_response() {
         ob_start();
         ob_start();
-        $this->http->send_response('test', array('http_headers' => array()));
+        $this->http->send_response('test', array('http_headers' => array('test')));
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals('test', $output);

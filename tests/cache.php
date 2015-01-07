@@ -28,6 +28,8 @@ class Hm_Test_Cache extends PHPUnit_Framework_TestCase {
         $this->assertEquals('bar', Hm_Page_Cache::get('foo'));
         Hm_Page_Cache::concat('foo', 'foo');
         $this->assertEquals('barfoo', Hm_Page_Cache::get('foo'));
+        Hm_Page_Cache::concat('foo', 'bar', false, ':');
+        $this->assertEquals('barfoo:bar', Hm_Page_Cache::get('foo'));
         Hm_Page_Cache::concat('baz', 'baz');
         $this->assertEquals('baz', Hm_Page_Cache::get('baz'));
     }
@@ -63,6 +65,8 @@ class Hm_Test_Cache extends PHPUnit_Framework_TestCase {
         $this->assertTrue(Test_Uid_Cache::is_present('bar'));
     }
     public function test_uid_load() {
+        Test_Uid_Cache::load(array());
+        $this->assertFalse(Test_Uid_Cache::is_present('foobar'));
         Test_Uid_Cache::load(array('foobar'));
         $this->assertTrue(Test_Uid_Cache::is_present('foobar'));
     }
