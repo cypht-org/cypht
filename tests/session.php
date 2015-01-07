@@ -54,6 +54,7 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
         $this->assertFalse($session->change_pass('unittestuser', 'unittestpass'));
     }
     public function test_create() {
+        /* TODO: assertions */
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
         $session->create($request, 'unittestuser', 'unittestpass');
@@ -164,6 +165,7 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
         $this->assertFalse($session->is_active());
     }
     public function test_db_save_data() {
+        /* TODO: assertions */
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
         $session->loaded = true;
@@ -175,12 +177,14 @@ class Hm_Test_Session extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('data'), ($session->plaintext($session->ciphertext(array('data')))));
     }
     public function test_get_key() {
+        /* TODO: assertions */
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
         $request->cookie['hm_id'] = 'test';
         $session->get_key($request);
     }
     public function test_secure_cookie() {
+        /* TODO: assertions */
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
         $request->tls = true;

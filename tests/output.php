@@ -9,8 +9,6 @@ class Hm_Test_Output extends PHPUnit_Framework_TestCase {
     }
 
     /* tests for Hm_Output_HTTP */
-    public function test_output_content() {
-    }
     public function test_send_response() {
         ob_start();
         ob_start();

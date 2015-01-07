@@ -54,6 +54,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $this->assertTrue(in_array('new', $res['allowed_pages'], true));
     }
     public function test_for_tls() {
+        /* TODO assertions */
         $mock_config = new Hm_Mock_Config();
         $request = new Hm_Mock_Request('HTML5');
         $this->router->check_for_tls($mock_config, $request);
@@ -79,6 +80,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $this->assertEquals('notfound', $this->router->page);
     }
     public function test_check_for_redirect_msgs() {
+        /* TODO assertions */
         $request = new Hm_Mock_Request('AJAX');
         $request->post['hm_ajax_hook'] = 'test';
         $request->cookie['hm_msgs'] = base64_encode(serialize(array('test message')));
@@ -86,6 +88,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $this->router->check_for_redirected_msgs($session, $request);
     }
     public function test_check_for_redirect() {
+        /* TODO assertions */
         $request = new Hm_Mock_Request('HTTP');
         $request->post['hm_ajax_hook'] = 'test';
         $session = new Hm_Mock_Session();
@@ -93,6 +96,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $this->router->check_for_redirect($request, $session, array('no_redirect' => 1));
     }
     public function test_page_redirect() {
+        /* TODO assertions */
         Hm_Router::page_redirect('test', 303);
     }
     public function test_get_active_mods() {

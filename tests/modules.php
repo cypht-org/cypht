@@ -128,6 +128,7 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         $this->assertEquals(1, preg_match("/^\d{1,2}:\d\d:\d\d/", $res['date']));
     }
     public function test_load_user_config_object() {
+        /* TODO assertions */
         $this->parent->config->set('user_config_type', 'DB');
         $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
         $this->request_handler->load_user_config_object();
