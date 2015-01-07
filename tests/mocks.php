@@ -24,6 +24,13 @@ class Hm_Mock_Session {
         return true;
     }
     public function destroy() {
+        return true;
+    }
+    public function end() {
+       return true; 
+    }
+    public function secure_cookie($request, $name, $value, $lifetime) {
+        return true;
     }
 }
 class Hm_Mock_Config {
@@ -48,8 +55,9 @@ class Hm_Mock_Request {
 
     public $invalid_input_detected;
     public $post = array('hm_nonce' => 'asdf', 'fld1' => '0', 'fld2' => '1');
+    public $get = array();
     public $cookie = array();
-    public $server = array('REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');
+    public $server = array('SERVER_NAME' => 'test', 'REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');
     public $tls = false;
     public $type;
 
