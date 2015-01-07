@@ -48,17 +48,15 @@ trait Hm_Server_List {
                     $user = $server['user'];
                     $pass = $server['pass'];
                 }
-                if ($user && $pass) {
-                    $res = self::service_connect($id, $server, $user, $pass, $cache);
-                    if ($res) {
-                        self::$server_list[$id]['connected'] = true;
-                        if ($save_credentials) {
-                            self::$server_list[$id]['user'] = $user;
-                            self::$server_list[$id]['pass'] = $pass;
-                        }
+                $res = self::service_connect($id, $server, $user, $pass, $cache);
+                if ($res) {
+                    self::$server_list[$id]['connected'] = true;
+                    if ($save_credentials) {
+                        self::$server_list[$id]['user'] = $user;
+                        self::$server_list[$id]['pass'] = $pass;
                     }
-                    return self::$server_list[$id]['object'];
                 }
+                return self::$server_list[$id]['object'];
             }
         }
         return false;
