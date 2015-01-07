@@ -390,8 +390,8 @@ class Hm_Router {
             Hm_Debug::add('Redirect loop found');
             die('Redirect loop discovered');
         }
-        header('HTTP/1.1 303 Found');
-        header('Location: '.$url);
+        Hm_Functions::header('HTTP/1.1 303 Found');
+        Hm_Functions::header('Location: '.$url);
         exit;
     }
 }

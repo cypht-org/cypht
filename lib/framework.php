@@ -15,4 +15,14 @@ require APP_PATH.'lib/crypt.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 
+if (!class_exists('Hm_Functions')) {
+    class Hm_Functions {
+        public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') {
+            return setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
+        }
+        public static function header($header) {
+            return header($header);
+        }
+    }
+}
 ?>

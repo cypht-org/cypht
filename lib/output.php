@@ -48,7 +48,7 @@ class Hm_Output_HTTP extends Hm_Output {
      */
     protected function output_headers($headers) {
         foreach ($headers as $header) {
-            header($header);
+            Hm_Functions::header($header);
         }
     }
 
