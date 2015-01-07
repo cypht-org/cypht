@@ -10,7 +10,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Router {
 
     /* request id */
-    private $page = 'home';
+    public $page = 'home';
 
     /**
      * Main entry point to the router. All the work of processing input and sending output to and from
@@ -150,7 +150,7 @@ class Hm_Router {
      *
      * @return void
      */
-    private function check_for_tls($config, $request) {
+    public function check_for_tls($config, $request) {
         if (!$request->tls && !$config->get('disable_tls', false)) {
             if (array_key_exists('SERVER_NAME', $request->server) && array_key_exists('REQUEST_URI', $request->server)) {
                 Hm_Router::page_redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
@@ -197,7 +197,7 @@ class Hm_Router {
      *
      * @return array filter list
      */
-    private function get_active_mods($mod_list) {
+    public function get_active_mods($mod_list) {
         return array_unique(array_values(array_map(function($v) { return $v[0]; }, $mod_list)));
     }
 
@@ -209,7 +209,7 @@ class Hm_Router {
      *
      * @return void
      */
-    private function load_modules($class, $module_sets) {
+    public function load_modules($class, $module_sets) {
         foreach ($module_sets as $page => $modlist) {
             foreach ($modlist as $name => $vals) {
                 if ($this->page == $page) {
@@ -253,7 +253,7 @@ class Hm_Router {
      *
      * @return void
      */
-    private function check_for_redirected_msgs($session, $request) {
+    public function check_for_redirected_msgs($session, $request) {
         if (array_key_exists('hm_msgs', $request->cookie) && trim($request->cookie['hm_msgs'])) {
             $msgs = @unserialize(base64_decode($request->cookie['hm_msgs']));
             if (is_array($msgs)) {
@@ -271,7 +271,7 @@ class Hm_Router {
      *
      * @return void
      */
-    private function check_for_redirect($request, $session, $result) {
+    public function check_for_redirect($request, $session, $result) {
         if (array_key_exists('no_redirect', $result) && $result['no_redirect']) {
             return;
         }
@@ -295,7 +295,7 @@ class Hm_Router {
      *
      * @return void
      */
-    private function get_page($request, $filters) {
+    public function get_page($request, $filters) {
         if (array_key_exists('allowed_pages', $filters)) {
             $pages = $filters['allowed_pages'];
         }

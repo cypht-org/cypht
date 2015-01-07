@@ -45,6 +45,9 @@ class Hm_Auth_None extends Hm_Auth {
     public function check_credentials($user, $pass) {
         return true;
     }
+    public function create($user, $pass) {
+        return false;
+    }
 }
 
 /**

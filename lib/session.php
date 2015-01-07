@@ -160,7 +160,7 @@ abstract class Hm_Session {
      *
      * @return string encrypted session data
      */
-    protected function ciphertext($data) {
+    public function ciphertext($data) {
         return Hm_Crypt::ciphertext(serialize($data), $this->enc_key);
     }
 
@@ -171,7 +171,7 @@ abstract class Hm_Session {
      *
      * @return array decrpted session data
      */
-    protected function plaintext($data) {
+    public function plaintext($data) {
         return @unserialize(Hm_Crypt::plaintext($data, $this->enc_key));
     }
 
@@ -194,7 +194,7 @@ abstract class Hm_Session {
      *
      * @return void
      */
-    protected function get_key($request) {
+    public function get_key($request) {
         if (array_key_exists('hm_id', $request->cookie)) {
             $this->enc_key = $request->cookie['hm_id'];
         }
@@ -498,11 +498,13 @@ class Hm_DB_Session extends Hm_PHP_Session {
      *
      * @return bool true on success
      */
-    private function insert_session_row() {
-        $sql = $this->dbh->prepare("insert into hm_user_session values(?, ?, current_date)");
-        $enc_data = $this->ciphertext($this->data);
-        if ($sql->execute(array($this->session_key, $enc_data))) {
-            return true;
+    public function insert_session_row() {
+        if ($this->dbh) {
+            $sql = $this->dbh->prepare("insert into hm_user_session values(?, ?, current_date)");
+            $enc_data = $this->ciphertext($this->data);
+            if ($sql->execute(array($this->session_key, $enc_data))) {
+                return true;
+            }
         }
         return false;
     }
