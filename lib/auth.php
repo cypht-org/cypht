@@ -87,7 +87,7 @@ class Hm_Auth_DB extends Hm_Auth {
     public function delete($user) {
         if ($this->connect()) {
             $sql = $this->dbh->prepare("delete from hm_user where username = ?");
-            if ($sql->execute(array($user))) {
+            if ($sql->execute(array($user)) && $sql->rowCount() == 1) {
                 return true;
             }
         }
@@ -119,7 +119,7 @@ class Hm_Auth_DB extends Hm_Auth {
         $this->connect();
         $hash = pbkdf2_create_hash($pass);
         $sql = $this->dbh->prepare("update hm_user set hash=? where username=?");
-        if ($sql->execute(array($hash, $user))) {
+        if ($sql->execute(array($hash, $user)) && $sql->rowCount() == 1) {
             Hm_Msgs::add("Password changed");
             return true;
         }
