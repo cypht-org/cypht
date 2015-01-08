@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL | E_STRICT);
+
 /* debug mode has to be set to something or include files will die() */
 define('DEBUG_MODE', true);
 
