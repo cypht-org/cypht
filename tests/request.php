@@ -1,9 +1,19 @@
 <?php
 
+/**
+ * tests for the Hm_Request class
+ */
 class Hm_Test_Request extends PHPUnit_Framework_TestCase {
 
-    /* tests for the Hm_Request object */
+    public function setUp() {
+        require 'bootstrap.php';
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_request() {
+        
         $_SERVER['REQUEST_URI'] = 'test';
         $_GET['foo'] = 'bar';
         $_POST['bar'] = 1;
@@ -19,6 +29,10 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
         $this->assertFalse($req->tls);
         $this->assertFalse($req->mobile);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_request_again() {
         $_SERVER['REQUEST_URI'] = 'test';
         $_SERVER['HTTPS'] = 'on';
@@ -32,6 +46,10 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
         $this->assertTrue($req->tls);
         $this->assertTrue($req->mobile);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_one_more_time() {
         $_SERVER['REQUEST_URI'] = 'test?hmm=1';
         $_SERVER['REQUEST_SCHEME'] = 'https';

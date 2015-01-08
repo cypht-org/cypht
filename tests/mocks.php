@@ -1,10 +1,8 @@
 <?php
 
 class Hm_Mock_Session {
-
     public $loaded = true;
     public $data = array();
-
     public function get($id, $default) {
         if ($id == 'saved_pages') {
             return array('foo' => array('bar', false));
@@ -33,13 +31,12 @@ class Hm_Mock_Session {
         return true;
     }
 }
-class Hm_Mock_Config {
 
+class Hm_Mock_Config {
     public $data = array(
         'user_settings_dir' => './data',
         'default_language' => 'es',
     );
-
     public function get($id, $default) {
         if (array_key_exists($id, $this->data)) {
             return $this->data[$id];
@@ -60,12 +57,10 @@ class Hm_Mock_Request {
     public $server = array('SERVER_NAME' => 'test', 'REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');
     public $tls = false;
     public $type;
-
     public function __construct($type) {
         $this->type = $type;
     }
 }
-
 class Hm_Functions {
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') {
             return true;
@@ -96,6 +91,14 @@ function filters() {
         'allowed_get' => array('foo' => FILTER_UNSAFE_RAW),
         'allowed_cookie' => array()
     );
+}
+function build_parent_mock($request_type='HTML5') {
+    $parent = new stdClass();
+    $parent->session = new Hm_Mock_Session();
+    $parent->request = new Hm_Mock_Request($request_type);
+    $parent->config = new Hm_Mock_Config();
+    $parent->user_config = new Hm_Mock_Config();
+    return $parent;
 }
 
 ?>

@@ -2,14 +2,15 @@
 
 class Hm_Test_Router extends PHPUnit_Framework_TestCase {
 
-    private $router;
-
     public function setUp() {
-        $this->router = new Hm_Router();
+        require 'bootstrap.php';
     }
-
-    /* tests for Hm_Router */
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_process_request() {
+        $router = new Hm_Router();
         ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = true;
@@ -17,10 +18,15 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $mock_config->data['session_type'] = "DB";
         setup_db($mock_config);
         $mock_config->data['modules'] = 'imap';
-        $this->router->process_request($mock_config, true);
+        $router->process_request($mock_config, true);
         $this->assertTrue(ob_get_length() > 0);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_process_request_again() {
+        $router = new Hm_Router();
         ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = false;
@@ -28,10 +34,15 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $mock_config->data['session_type'] = "PHP";
         setup_db($mock_config);
         $mock_config->data['modules'] = 'pop3';
-        $this->router->process_request($mock_config, false);
+        $router->process_request($mock_config, false);
         $this->assertTrue(ob_get_length() > 0);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_process_request_again_again() {
+        $router = new Hm_Router();
         ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = false;
@@ -39,68 +50,112 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $mock_config->data['session_type'] = "DB";
         setup_db($mock_config);
         $mock_config->data['modules'] = 'pop3';
-        $this->router->process_request($mock_config, false);
+        $router->process_request($mock_config, false);
         $this->assertTrue(ob_get_length() > 0);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_get_production_modules() {
+        $router = new Hm_Router();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['modules'] = 'imap,pop3';
-        $this->assertEquals(array(array(), array(), array()), $this->router->get_production_modules($mock_config));
+        $this->assertEquals(array(array(), array(), array()), $router->get_production_modules($mock_config));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_merge_filters() {
-        $res = $this->router->merge_filters(filters(), array('allowed_get' => array('new' => 'thing')));
+        $router = new Hm_Router();
+        $res = $router->merge_filters(filters(), array('allowed_get' => array('new' => 'thing')));
         $this->assertEquals('thing', $res['allowed_get']['new']);
-        $res = $this->router->merge_filters(filters(), array('allowed_pages' => array('new')));
+        $res = $router->merge_filters(filters(), array('allowed_pages' => array('new')));
         $this->assertTrue(in_array('new', $res['allowed_pages'], true));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_for_tls() {
         /* TODO assertions */
+        $router = new Hm_Router();
         $mock_config = new Hm_Mock_Config();
         $request = new Hm_Mock_Request('HTML5');
-        $this->router->check_for_tls($mock_config, $request);
+        $router->check_for_tls($mock_config, $request);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_load_modules() {
+        $router = new Hm_Router();
         $modules = array('home' => array('test_mod' => array('source', false)));
-        $this->router->load_modules('Hm_Handler_Modules', $modules);
+        $router->load_modules('Hm_Handler_Modules', $modules);
         $mods = Hm_Handler_Modules::get_for_page('home');
         $this->assertTrue(isset($mods['test_mod']));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_get_page() {
+        $router = new Hm_Router();
         $request = new Hm_Mock_Request('AJAX');
         $request->post['hm_ajax_hook'] = 'test';
-        $this->router->get_page($request, array('allowed_pages' => array()));
-        $this->assertEquals('home', $this->router->page);
-        $this->router->get_page($request, array('allowed_pages' => array('test')));
-        $this->assertEquals('test', $this->router->page);
+        $router->get_page($request, array('allowed_pages' => array()));
+        $this->assertEquals('home', $router->page);
+        $router->get_page($request, array('allowed_pages' => array('test')));
+        $this->assertEquals('test', $router->page);
         $request = new Hm_Mock_Request('HTML5');
         $request->get['page'] = 'test';
-        $this->router->get_page($request, array('allowed_pages' => array('test')));
-        $this->assertEquals('test', $this->router->page);
-        $this->router->get_page($request, array('allowed_pages' => array()));
-        $this->assertEquals('notfound', $this->router->page);
+        $router->get_page($request, array('allowed_pages' => array('test')));
+        $this->assertEquals('test', $router->page);
+        $router->get_page($request, array('allowed_pages' => array()));
+        $this->assertEquals('notfound', $router->page);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_check_for_redirect_msgs() {
+        $router = new Hm_Router();
         /* TODO assertions */
         $request = new Hm_Mock_Request('AJAX');
         $request->post['hm_ajax_hook'] = 'test';
         $request->cookie['hm_msgs'] = base64_encode(serialize(array('test message')));
         $session = new Hm_Mock_Session();
-        $this->router->check_for_redirected_msgs($session, $request);
+        $router->check_for_redirected_msgs($session, $request);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_check_for_redirect() {
+        $router = new Hm_Router();
         /* TODO assertions */
         $request = new Hm_Mock_Request('HTTP');
         $request->post['hm_ajax_hook'] = 'test';
         $session = new Hm_Mock_Session();
-        $this->router->check_for_redirect($request, $session, array());
-        $this->router->check_for_redirect($request, $session, array('no_redirect' => 1));
+        $router->check_for_redirect($request, $session, array());
+        $router->check_for_redirect($request, $session, array('no_redirect' => 1));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_page_redirect() {
         /* TODO assertions */
         Hm_Router::page_redirect('test', 303);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_get_active_mods() {
-        $this->assertEquals(array('test_mod'), $this->router->get_active_mods(array('test_page' => array('test_mod'))));
+        $router = new Hm_Router();
+        $this->assertEquals(array('test_mod'), $router->get_active_mods(array('test_page' => array('test_mod'))));
     }
 }
 

@@ -1,4 +1,7 @@
-<phpunit bootstrap="./bootstrap.php" strict="false" colors="true">
+<phpunit strict="false" colors="true">
+    <testsuite name="session">
+        <file>./session.php</file>
+    </testsuite>
     <testsuite name="cache">
         <file>./cache.php</file>
     </testsuite>
@@ -31,9 +34,6 @@
     </testsuite>
     <testsuite name="servers">
         <file>./servers.php</file>
-    </testsuite>
-    <testsuite name="session">
-        <file>./session.php</file>
     </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false" processUncoveredFilesFromWhitelist="false">
