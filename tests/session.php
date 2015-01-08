@@ -21,6 +21,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
         $this->assertEquals('f60ed56a9c8275894022fe5a7a1625c33bdb55b729bb4e38962af4d1613eda25', $session->build_fingerprint($request));
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -28,8 +29,10 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      */
     public function test_record_unsaved() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $session->record_unsaved('test');
         $this->assertEquals(array('test'), $session->get('changed_settings'));
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -37,7 +40,9 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      */
     public function test_is_active() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $this->assertFalse($session->is_active());
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -75,7 +80,9 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      */
     public function test_change_pass() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $this->assertTrue($session->change_pass('unittestuser', 'unittestpass'));
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -92,6 +99,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $session->destroy($request);
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_None');
         $session->create($request, 'unittestuser', 'unittestpass');
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -118,6 +126,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $request->tls = true;
         $request->path = 'test';
         $this->assertEquals(array(true, 'test', 'test'), $session->set_session_params($request));
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -125,12 +134,14 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      */
     public function test_get_and_set() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $this->assertFalse($session->get('test'));
         $session->set('test', 'testvalue');
         $this->assertEquals('testvalue', $session->get('test'));
         $this->assertFalse($session->get('usertest', false, true));
         $session->set('usertest', 'uservalue', true);
         $this->assertEquals('uservalue', $session->get('usertest', false, true));
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -138,10 +149,12 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      */
     public function test_del() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $session->set('test', 'testvalue');
         $this->assertEquals('testvalue', $session->get('test'));
         $session->del('test');
         $this->assertFalse($session->get('test'));
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -154,6 +167,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $this->assertTrue($session->is_active());
         $session->end();
         $this->assertFalse($session->is_active());
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -161,9 +175,11 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      */
     public function test_close_early() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $session->set('test', 'testvalue');
         $session->close_early();
         $this->assertFalse($session->is_active());
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -171,10 +187,10 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      */
     public function test_save_data() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $session->set('test', 'testvalue');
         $session->save_data();
         $this->assertEquals(array(), $_SESSION);
-        $request = new Hm_Mock_Request('HTTP');
         $session->destroy($request);
     }
 }
@@ -200,10 +216,13 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $_POST['user'] = 'unittestusers';
         $_POST['pass'] = 'unittestpass';
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $this->assertTrue($session->connect());
+        $session->destroy($request);
         $config = new Hm_Mock_Config();
         $session = new Hm_DB_Session($config, 'Hm_Auth_DB');
         $this->assertFalse($session->connect());
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -214,6 +233,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $request = new Hm_Mock_Request('HTTP');
         $session->end();
         $this->assertFalse($session->is_active());
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -248,6 +268,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $request = new Hm_Mock_Request('HTTP');
         $session->close_early();
         $this->assertFalse($session->is_active());
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -260,6 +281,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $session->loaded = true;
         $session->start($request);
         $session->save_data();
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -267,7 +289,9 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
      */
     public function test_plaintext() {
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
         $this->assertEquals(array('data'), ($session->plaintext($session->ciphertext(array('data')))));
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -279,6 +303,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $request = new Hm_Mock_Request('HTTP');
         $request->cookie['hm_id'] = 'test';
         $session->get_key($request);
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -291,6 +316,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $request->tls = true;
         $request->path = 'test';
         $session->secure_cookie($request, 'name', 'value');
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
@@ -302,7 +328,8 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_None');
         $this->assertFalse($session->insert_session_row());
         $session->connect();
-        $this->assertFalse($session->insert_session_row());
+        $this->assertTrue($session->insert_session_row());
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled

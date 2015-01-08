@@ -69,7 +69,12 @@ class Hm_Functions {
             return true;
         }
         public static function cease() {
+            return true;
         }
+        public static function session_start() {
+            $_SESSION['data'] = 'PnKXMnQD+n1DsioDzeqK30CQ3uewo4a2Rp38s8NaNELGMrAkYG6gebvB3IvQgMLl'; 
+        }
+
 }
 
 function setup_db($config) {

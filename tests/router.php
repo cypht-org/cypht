@@ -7,10 +7,12 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
     }
     /**
      * @preserveGlobalState disabled
+     * @outputBuffering enabled
      * @runInSeparateProcess
      */
     public function test_process_request() {
         $router = new Hm_Router();
+        ob_start();
         ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = true;
@@ -20,6 +22,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $mock_config->data['modules'] = 'imap';
         $router->process_request($mock_config, true);
         $this->assertTrue(ob_get_length() > 0);
+        ob_end_clean();
     }
     /**
      * @preserveGlobalState disabled
@@ -27,6 +30,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
      */
     public function test_process_request_again() {
         $router = new Hm_Router();
+        ob_start();
         ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = false;
@@ -36,6 +40,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $mock_config->data['modules'] = 'pop3';
         $router->process_request($mock_config, false);
         $this->assertTrue(ob_get_length() > 0);
+        ob_end_clean();
     }
     /**
      * @preserveGlobalState disabled
@@ -43,6 +48,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
      */
     public function test_process_request_again_again() {
         $router = new Hm_Router();
+        ob_start();
         ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = false;
@@ -52,6 +58,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $mock_config->data['modules'] = 'pop3';
         $router->process_request($mock_config, false);
         $this->assertTrue(ob_get_length() > 0);
+        ob_end_clean();
     }
     /**
      * @preserveGlobalState disabled
