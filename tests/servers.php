@@ -7,7 +7,7 @@ class Hm_Mock_Server {
 }
 class Hm_Server_Wrapper {
     use Hm_Server_List;
-    public function service_connect($id, $server, $user, $pass, $cache) {
+    public static function service_connect($id, $server, $user, $pass, $cache) {
         self::$server_list[$id]['object'] = new Hm_Mock_Server();
         self::$server_list[$id]['connected'] = true;
         return true;
