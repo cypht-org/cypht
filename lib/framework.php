@@ -26,6 +26,9 @@ if (!class_exists('Hm_Functions')) {
         public static function cease() {
             die();
         }
+        public static function session_start() {
+            return session_start();
+        }
     }
 }
 ?>
