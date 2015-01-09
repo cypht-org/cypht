@@ -46,7 +46,7 @@ class Hm_Auth_None extends Hm_Auth {
         return true;
     }
     public function create($user, $pass) {
-        return false;
+        return true;
     }
 }
 
