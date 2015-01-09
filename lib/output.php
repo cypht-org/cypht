@@ -160,7 +160,7 @@ trait Hm_List {
      */
     public static function show($type='print') {
         if ($type == 'log') {
-            error_log(print_r(self::$msgs, true));
+            Hm_Functions::error_log(print_r(self::$msgs, true));
         }
         elseif ($type == 'return') {
             return print_r(self::$msgs, true);
@@ -209,7 +209,7 @@ function elog($mixed) {
         $bt = debug_backtrace();
         $caller = array_shift($bt);
         Hm_Debug::add(sprintf('ELOG called in %s at line %d', $caller['file'], $caller['line']));
-        error_log(Hm_Debug::str($mixed));
+        Hm_Functions::error_log(Hm_Debug::str($mixed));
     }
 }
 

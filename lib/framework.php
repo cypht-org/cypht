@@ -29,6 +29,9 @@ if (!class_exists('Hm_Functions')) {
         public static function session_start() {
             return session_start();
         }
+        public static function error_log($str) {
+            error_log($str);
+        }
     }
 }
 ?>
