@@ -18,7 +18,7 @@ abstract class Hm_Session {
     public $internal_users = false;
 
     /* key used to encrypt session data */
-    protected $enc_key = '';
+    public $enc_key = '';
 
     /* session data */
     protected $data = array();
@@ -488,7 +488,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
     protected $cname = 'hm_session';
 
     /* session key */
-    private $session_key = '';
+    public $session_key = '';
 
     /* DB handle */
     protected $dbh = false;
@@ -502,9 +502,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
         if ($this->dbh) {
             $sql = $this->dbh->prepare("insert into hm_user_session values(?, ?, current_date)");
             $enc_data = $this->ciphertext($this->data);
-            if ($sql->execute(array($this->session_key, $enc_data))) {
-                return true;
-            }
+            return $sql->execute(array($this->session_key, $enc_data));
         }
         return false;
     }
@@ -532,29 +530,50 @@ class Hm_DB_Session extends Hm_PHP_Session {
     public function start($request) {
         if ($this->connect()) {
             if ($this->loaded) {
-                $this->session_key = Hm_Crypt::unique_id(); 
-                $this->secure_cookie($request, $this->cname, $this->session_key, 0);
-                if ($this->insert_session_row()) {
-                    $this->active = true;
-                }
+                $this->start_new_session($request);
+            }
+            else if (!array_key_exists($this->cname, $request->cookie)) {
+                $this->destroy($request);
             }
             else {
-                if (!array_key_exists($this->cname, $request->cookie)) {
-                    $this->destroy($request);
-                }
-                else {
-                    $this->session_key = $request->cookie[$this->cname];
-                    $sql = $this->dbh->prepare('select data from hm_user_session where hm_id=?');
-                    if ($sql->execute(array($this->session_key))) {
-                        $results = $sql->fetch();
-                        if (is_array($results) && array_key_exists('data', $results)) {
-                            $data = $this->plaintext($results['data']);
-                            if (is_array($data)) {
-                                $this->active = true;
-                                $this->data = $data;
-                            }
-                        }
-                    }
+                $this->start_existing_session($request, $request->cookie[$this->cname]);
+            }
+        }
+    }
+
+    /**
+     * Start a new session
+     *
+     * @param $request object request details
+     *
+     * @return void
+     */
+    public function start_new_session($request) {
+        $this->session_key = Hm_Crypt::unique_id(); 
+        $this->secure_cookie($request, $this->cname, $this->session_key, 0);
+        if ($this->insert_session_row()) {
+            $this->active = true;
+        }
+    }
+
+    /**
+     * Continue an existing session
+     *
+     * @param $request object request details
+     * @param $key string session key
+     *
+     * @return void
+     */
+    public function start_existing_session($request, $key) {
+        $this->session_key = $key;
+        $sql = $this->dbh->prepare('select data from hm_user_session where hm_id=?');
+        if ($sql->execute(array($this->session_key))) {
+            $results = $sql->fetch();
+            if (is_array($results) && array_key_exists('data', $results)) {
+                $data = $this->plaintext($results['data']);
+                if (is_array($data)) {
+                    $this->active = true;
+                    $this->data = $data;
                 }
             }
         }
