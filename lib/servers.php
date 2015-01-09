@@ -153,19 +153,29 @@ trait Hm_Server_List {
      * @return void
      */
     public static function clean_up($id=false) {
-        foreach (self::$server_list as $index => $server) {
-            if ($id !== false && $id != $index) {
-                continue;
+        if ($id !== false && array_key_exists($id, self::$server_list)) {
+            self::disconnect($id);
+        }
+        else {
+            foreach (self::$server_list as $index => $server) {
+                self::disconnect($index);
             }
-            if ($server['connected'] && $server['object']) {
-                if (method_exists(self::$server_list[$index]['object'], 'disconnect')) {
-                    self::$server_list[$index]['object']->disconnect();
-                }
-                self::$server_list[$index]['connected'] = false;
-                if ($id !== false) {
-                    break;
-                }
+        }
+    }
+
+    /**
+     * Disconnect from a server
+     *
+     * @param $id int the server id to disconnect
+     *
+     * @return void
+     */
+    public static function disconnect($id) {
+        if (self::$server_list[$id]['connected'] && self::$server_list[$id]['object']) {
+            if (method_exists(self::$server_list[$id]['object'], 'disconnect')) {
+                self::$server_list[$id]['object']->disconnect();
             }
+            self::$server_list[$id]['connected'] = false;
         }
     }
 }
