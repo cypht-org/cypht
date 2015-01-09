@@ -331,7 +331,8 @@ class Hm_Router {
     private function process_page($request, $session, $config) {
         $response = array();
         $handler = new Hm_Request_Handler();
-        $response = $handler->process_request($this->page, $request, $session, $config);
+        $modules = Hm_Handler_Modules::get_for_page($this->page);
+        $response = $handler->process_request($this->page, $request, $session, $config, $modules);
         return $response;
     }
 

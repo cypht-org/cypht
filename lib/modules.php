@@ -416,14 +416,15 @@ class Hm_Request_Handler {
      * @param $request object request details
      * @param $session object session interface
      * @param $config object site settings
+     * @param $modules array list of modules for this page
      *
      * @return array combined array of module results
      */
-    public function process_request($page, $request, $session, $config) {
+    public function process_request($page, $request, $session, $config, $modules) {
         $this->request = $request;
         $this->session = $session;
         $this->config = $config;
-        $this->modules = Hm_Handler_Modules::get_for_page($page);
+        $this->modules = $modules;
         $this->load_user_config_object();
         $this->run_modules();
         $this->default_language();
