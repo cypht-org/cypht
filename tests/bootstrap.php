@@ -4,7 +4,9 @@
 error_reporting(E_ALL | E_STRICT);
 
 /* debug mode has to be set to something or include files will die() */
-define('DEBUG_MODE', false);
+if (!defined('DEBUG_MODE')) {
+    define('DEBUG_MODE', false);
+}
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
