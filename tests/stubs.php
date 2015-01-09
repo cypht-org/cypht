@@ -4,6 +4,12 @@ class Test_Uid_Cache {
     use Hm_Uid_Cache;
 }
 
+class Hm_Handler_test_mod extends Hm_Handler_Module {
+    public function process() {
+        $this->out('test', 'foo');
+    }
+}
+
 class Hm_Handler_Test extends Hm_Handler_Module {
     public function process() {
         return true;

@@ -37,7 +37,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $mock_config->data['auth_type'] = "None";
         $mock_config->data['session_type'] = "PHP";
         setup_db($mock_config);
-        $mock_config->data['modules'] = 'pop3';
+        $mock_config->data['modules'] = 'core';
         $router->process_request($mock_config, false);
         $this->assertTrue(ob_get_length() > 0);
         ob_end_clean();

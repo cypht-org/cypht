@@ -192,7 +192,7 @@ class Hm_Test_Request_Handler extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_process_request() {
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
+        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('test_mod' => array('core', false)));
         $this->assertEquals('es', $res['language']);
     }
     /**
@@ -202,11 +202,11 @@ class Hm_Test_Request_Handler extends PHPUnit_Framework_TestCase {
     public function test_load_user_config_object() {
         /* TODO assertions */
         $this->parent->config->set('user_config_type', 'DB');
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
+        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('nope' => array('core', false), 'test_mod' => array('core', false)));
         $this->request_handler->load_user_config_object();
 
         $this->parent->config->set('user_config_type', 'file');
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
+        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('test_mod' => array('core', false)));
         $this->request_handler->load_user_config_object();
     }
     /**
@@ -214,7 +214,7 @@ class Hm_Test_Request_Handler extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_default_language() {
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
+        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('test_mod' => array('core', false)));
         $this->request_handler->default_language();
         $this->assertEquals('es', $this->request_handler->response['language']);
     }
@@ -223,9 +223,9 @@ class Hm_Test_Request_Handler extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_run_modules() {
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config);
+        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('test_mod' => array('core', false)));
         $this->request_handler->run_modules();
-        $this->assertEquals(array('language' => 'es'), $this->request_handler->response);
+        $this->assertEquals(array('test' => 'foo'), $this->request_handler->response);
     }
 }
 
