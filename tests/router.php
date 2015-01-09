@@ -65,10 +65,19 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get_production_modules() {
+        /* TODO: fix assertion */
         $router = new Hm_Router();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['modules'] = 'imap,pop3';
         $this->assertEquals(array(array(), array(), array()), $router->get_production_modules($mock_config));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_load_module_set_files() {
+        $router = new Hm_Router();
+        $router->load_module_set_files(array('core'), array('core'));
     }
     /**
      * @preserveGlobalState disabled
@@ -164,6 +173,17 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
     public function test_get_active_mods() {
         $router = new Hm_Router();
         $this->assertEquals(array('test_mod'), $router->get_active_mods(array('test_page' => array('test_mod'))));
+    }
+}
+
+class Hm_Test_Debug_Page_Redirect extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        define('DEBUG_MODE', true);
+        require 'bootstrap.php';
+    }
+    public function test_debug_page_redirect() {
+        Hm_Router::page_redirect('test', 200);
     }
 }
 

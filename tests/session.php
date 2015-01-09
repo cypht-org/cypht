@@ -125,6 +125,9 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
     public function test_start() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
+        $request->cookie['PHPSESSID'] = 'asdf';
+        $session->start($request);
+        $session->enc_key = 'unittestpass';
         $session->start($request);
         $this->assertTrue($session->is_active());
         $request->invalid_input_detected = true;
@@ -274,6 +277,21 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $session->loaded = false;
         $session->start($request);
         $this->assertFalse($session->is_active());
+        $session->destroy($request);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_db_start_existing_session() {
+        $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->loaded = true;
+        $session->start($request);
+        $this->assertTrue($session->is_active());
+        $key = $session->session_key;
+        $session->end();
+        $session->start_existing_session($request, $key);
         $session->destroy($request);
     }
     /**

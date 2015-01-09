@@ -65,7 +65,7 @@ class Hm_Functions {
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
         public static function header($header) { return true; }
         public static function cease() { return true; }
-        public static function session_start() { $_SESSION['data'] = 'PnKXMnQD+n1DsioDzeqK30CQ3uewo4a2Rp38s8NaNELGMrAkYG6gebvB3IvQgMLl'; }
+        public static function session_start() { $_SESSION['data'] = 'KpZv3Ld4TsdPuKHF5r/EXfA5a9QGfIJRAa0EZrU3aK5tx3vXvKV345yOzs66NPh4'; }
         public static function error_log() { return true; }
 
 }
