@@ -55,10 +55,23 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $this->assertTrue($session->is_active());
         $session->destroy($request);
 
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $session->check($request, 'nobody', 'knows');
+        $this->assertFalse($session->is_active());
+        $session->destroy($request);
+
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request->cookie['PHPSESSID'] = 'testid';
+        $session->check($request);
+        $this->assertFalse($session->is_active());
+        $session->destroy($request);
+
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request->cookie['PHPSESSID'] = 'testid';
         $request->invalid_input_detected = true;
         $request->invalid_input_fields = array('test');
-        $session->check($request);
+        $session->check($request, 'unittestuser', 'unittestpass');
+        $this->assertFalse($session->is_active());
         $session->destroy($request);
     }
     /**
@@ -72,7 +85,11 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $this->assertTrue($session->is_active());
         $session->check_fingerprint($request);
         $this->assertTrue($session->is_active());
+        $request->server['HTTP_HOST'] = 'test';
+        $session->check_fingerprint($request);
+        $this->assertFalse($session->is_active());
         $session->destroy($request);
+
     }
     /**
      * @preserveGlobalState disabled

@@ -31,6 +31,7 @@ class Hm_Test_Modules_Output extends PHPUnit_Framework_TestCase {
         $this->assertEquals('bar', $this->handler_mod->get('foo', ''));
         $this->assertEquals(0, $this->handler_mod->get('foo', 3));
         $this->assertEquals(array('bar'), $this->handler_mod->get('foo', array()));
+        $this->assertEquals('default', $this->handler_mod->get('bar', 'default'));
     }
     /**
      * @preserveGlobalState disabled
@@ -117,6 +118,9 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
         $this->handler_mod->request->type = 'AJAX';
         $this->assertNull($this->handler_mod->process_nonce());
         $this->handler_mod->session->set('nonce_list', array('asdf'));
+        $this->parent->request->post = array();
+        $handler_mod = new Hm_Handler_Test($this->parent, false);
+        $this->assertNull($handler_mod->process_nonce());
     }
     /**
      * @preserveGlobalState disabled
@@ -146,8 +150,9 @@ class Hm_Test_Output_Module extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_output_content() {
-        $this->output_mod->output_content('HTML5', array('Main' => false), array());
+        $this->output_mod->output_content('HTML5', array('Main' => false, 'Test' => 'Translated', 'interface_lang' => 'en', 'interface_direction' => 'ltr'), array());
         $this->assertEquals('Main', $this->output_mod->trans('Main'));
+        $this->assertEquals('Translated', $this->output_mod->trans('Test'));
     }
     /**
      * @preserveGlobalState disabled
@@ -164,6 +169,9 @@ class Hm_Test_Output_Module extends PHPUnit_Framework_TestCase {
     public function test_html_safe() {
         $this->assertEquals('&lt;script&gt;', $this->output_mod->html_safe('<script>'));
         $this->assertEquals('nohtml', $this->output_mod->html_safe('nohtml'));
+    }
+    public function tearDown() {
+        unset($this->output_mod);
     }
 }
 

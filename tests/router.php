@@ -11,9 +11,9 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_process_request() {
+        ob_start();
+        ob_start();
         $router = new Hm_Router();
-        ob_start();
-        ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = true;
         $mock_config->data['auth_type'] = "DB";
@@ -29,9 +29,9 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_process_request_again() {
+        ob_start();
+        ob_start();
         $router = new Hm_Router();
-        ob_start();
-        ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = false;
         $mock_config->data['auth_type'] = "None";
@@ -47,9 +47,9 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_process_request_again_again() {
+        ob_start();
+        ob_start();
         $router = new Hm_Router();
-        ob_start();
-        ob_start();
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['disable_tls'] = false;
         $mock_config->data['auth_type'] = false;
@@ -145,6 +145,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $request = new Hm_Mock_Request('HTTP');
         $request->post['hm_ajax_hook'] = 'test';
         $session = new Hm_Mock_Session();
+        Hm_Msgs::add('test');
         $router->check_for_redirect($request, $session, array());
         $router->check_for_redirect($request, $session, array('no_redirect' => 1));
     }

@@ -73,6 +73,11 @@ class Hm_Test_Msgs extends PHPUnit_Framework_TestCase {
     public function test_show() {
         Hm_Msgs::add('msg two');
         $this->assertTrue(strstr(flatten(Hm_Msgs::show('return')), 'msgtwo') !== false);
+        ob_start();
+        Hm_Msgs::show();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertTrue(strlen($output) > 0);
     }
     /**
      * @preserveGlobalState disabled
