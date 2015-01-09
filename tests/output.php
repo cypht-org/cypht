@@ -78,6 +78,7 @@ class Hm_Test_Msgs extends PHPUnit_Framework_TestCase {
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertTrue(strlen($output) > 0);
+        Hm_Msgs::show('log');
     }
     /**
      * @preserveGlobalState disabled
@@ -89,7 +90,7 @@ class Hm_Test_Msgs extends PHPUnit_Framework_TestCase {
 }
 
 /**
- * tests form Hm_Debug
+ * tests for Hm_Debug
  */
 class Hm_Test_Debug extends PHPUnit_Framework_TestCase {
 
@@ -103,6 +104,28 @@ class Hm_Test_Debug extends PHPUnit_Framework_TestCase {
     public function test_load_page_stats() {
         Hm_Debug::load_page_stats();
         $this->assertTrue(count(Hm_Debug::get()) > 4);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+}
+
+/**
+ * tests for elog
+ */
+class Hm_Test_Elog extends PHPUnit_Framework_TestCase {
+    public function setUp() {
+        define( 'DEBUG_MODE', true);
+        require 'bootstrap.php';
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_elog() {
+        /* TODO: assertions */
+        elog('test');
     }
 }
 
