@@ -78,6 +78,7 @@ class Hm_Test_Server_List extends PHPUnit_Framework_TestCase {
         $atts = Hm_Server_Wrapper::dump(3, true);
         $this->assertFalse($atts['connected']);
         Hm_Server_Wrapper::clean_up(0);
+        Hm_Server_Wrapper::clean_up();
     }
 }
 
