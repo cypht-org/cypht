@@ -238,6 +238,18 @@ class Hm_Router {
             $this->get_active_mods(Hm_Handler_Modules::get_for_page($this->page))));
 
         $mods = explode(',', $config->get('modules', '')); 
+        $this->load_module_set_files($mods, $active_mods);
+    }
+
+    /**
+     * Load module set definition files
+     *
+     * @param $mods array modules to load
+     * @param $active_mods array list of active modules
+     *
+     * @return void
+     */
+    public function load_module_set_files($mods, $active_mods) {
         foreach ($mods as $name) {
             if (in_array($name, $active_mods, true) && is_readable(sprintf(APP_PATH.'modules/%s/modules.php', $name))) {
                 require sprintf(APP_PATH.'modules/%s/modules.php', $name);
