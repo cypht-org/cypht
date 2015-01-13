@@ -458,12 +458,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
                 /* get the basename part of the folder name. For a folder named "inbox.sent.march"
                  * with a delimiter of "." the basename would be "march" */
-                if (isset($folder_parts[(count($folder_parts) - 1)])) {
-                    $base_name = $folder_parts[(count($folder_parts) - 1)];
-                }
-                else {
-                    $base_name = $folder;
-                }
+                $base_name = $folder_parts[(count($folder_parts) - 1)];
 
                 /* determine the parent folder basename if it exists */
                 if (isset($folder_parts[(count($folder_parts) - 2)])) {
@@ -510,44 +505,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 /* store a parent list used below */
                 if ($parent && !in_array($parent, $parents)) {
                     $parents[$parent][] = $folders[$folder];
-                }
-            }
-        }
-
-        /* attempt to fix broken hierarchy issues. If a parent folder was not found fabricate
-         * it in the folder list */
-        $place_holders = array();
-        foreach ($parents as $val => $parent_list) {
-            foreach ($parent_list as $parent) {
-                $found = false;
-                foreach ($folders as $i => $vals) {
-                    if ($vals['name'] == $val) {
-                        $folders[$i]['has_kids'] = 1;
-                        $found = true;
-                        break;
-                    }
-                }
-                if (!$found) {
-                    if (count($parent['name_parts']) > 1) {
-                        foreach ($parent['name_parts'] as $i => $v) {
-                            $fname = implode($delim, array_slice($parent['name_parts'], 0, ($i + 1)));
-                            $name_parts = array_slice($parent['name_parts'], 0, ($i + 1));
-                            if (!isset($folders[$fname])) {
-                                $freal = $v;
-                                if ($i > 0) {
-                                    $fparent = implode($delim, array_slice($parent['name_parts'], 0, $i));
-                                }
-                                else {
-                                    $fparent = false;
-                                }
-                                $place_holders[] = $fname;
-                                $folders[$fname] = array('parent' => $fparent, 'delim' => $delim, 'name' => $freal,
-                                    'name_parts' => $name_parts, 'basename' => $freal, 'realname' => $fname,
-                                    'namespace' => $namespace, 'marked' => false, 'noselect' => true,
-                                    'can_have_kids' => true, 'has_kids' => true);
-                            }
-                        }
-                    }
                 }
             }
         }
