@@ -1102,7 +1102,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
         $res .= $output_mod->html_safe(strtolower($vals['type'])).' / '.$output_mod->html_safe(strtolower($vals['subtype']));
     }
     $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-        '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe($vals['attributes']['charset']) : '-').
+        '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '').
         '</td><td>'.$output_mod->html_safe($desc).'</td></tr>';
     return $res;
 }
