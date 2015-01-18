@@ -83,7 +83,7 @@ function human_readable_interval($date_str) {
     return implode(', ', $res);
 }
 
-function message_list_row($subject, $date, $timestamp, $from, $source, $id, $flags, $style, $url, $output_mod) {
+function message_list_row($subject, $date, $timestamp, $from, $source, $id, $flags, $style, $url, $output_mod, $new_win=false) {
         if ($style == 'email') {
             return array(
                 '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id)).'">'.
@@ -91,7 +91,7 @@ function message_list_row($subject, $date, $timestamp, $from, $source, $id, $fla
                     '<td class="source">'.$output_mod->html_safe($source).'</td>'.
                     '<td class="from">'.$output_mod->html_safe($from).'</td>'.
                     '<td class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
-                        '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
+                    '<a '.($new_win ? 'target="_blank"' : '').' href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
                     '</div></td>'.
                     '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></td>'.
                     '<td class="icon">'.(in_array('flagged', $flags) ? '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : '').'</td>'.
