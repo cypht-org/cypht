@@ -470,6 +470,13 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         $this->out('message_list_since', $message_list_since, false);
         $this->out('per_source_limit', $per_source_limit, false);
         $this->out('no_message_list_headers', $no_message_list_headers);
+        $this->out('message_list_fields', array(
+            array('chkbox_col', false, false),
+            array('source_col', 'source', 'Source'),
+            array('from_col', 'from', 'From'),
+            array('subject_col', 'subject', 'Subject'),
+            array('date_col', 'msg_date', 'Date'),
+            array('icon_col', false, false)), false);
     }
 }
 
@@ -1270,14 +1277,25 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
 
 class Hm_Output_message_list_start extends Hm_Output_Module {
     protected function output($format) {
+
+        $col_flds = array();
+        $header_flds = array();
+        foreach ($this->get('message_list_fields', array()) as $vals) {
+            if ($vals[0]) {
+                $col_flds[] = sprintf('<col class="%s">', $vals[0]);
+            }
+            if ($vals[1] && $vals[2]) {
+                $header_flds[] = sprintf('<th class="%s">%s</th>', $vals[1], $this->trans($vals[2]));
+            }
+        }
         $res = '<table class="message_table">';
         if (!$this->get('no_message_list_headers')) {
-            $res .= '<colgroup><col class="chkbox_col"><col class="source_col">'.
-            '<col class="from_col"><col class="subject_col"><col class="date_col">'.
-            '<col class="icon_col"></colgroup><thead><tr><th></th><th class="source">'.
-            $this->trans('Source').'</th><th class="from">'.$this->trans('From').
-            '</th><th class="subject">'.$this->trans('Subject').'</th><th class="msg_date">'.
-            $this->trans('Date').'</th><th></th></tr></thead>';
+            if (!empty($col_flds)) {
+                $res .= '<colgroup>'.implode('', $col_flds).'</colgroup>';
+            }
+            if (!empty($header_flds)) {
+                $res .= '<thead><tr>'.implode('', $header_flds).'</tr></thead>';
+            }
         }
         $res .= '<tbody>';
         return $res;
