@@ -2,6 +2,10 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+class Hm_Handler_hacker_news_fields extends Hm_Handler_Module {
+    public function process() {
+    }
+}
 class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
     public function process() {
         $data = array_slice(curl_fetch_json('https://hacker-news.firebaseio.com/v0/topstories.json'), 0, 20);

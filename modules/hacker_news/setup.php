@@ -6,6 +6,7 @@ handler_source('hacker_news');
 output_source('hacker_news');
 
 setup_base_page('hacker_news', 'core');
+add_handler('hacker_news', 'hacker_news_fields', true, 'hacker_news', 'message_list_type', 'after');
 add_output('hacker_news', 'hacker_news_heading', true, 'core', 'content_section_start', 'after');
 add_output('hacker_news', 'message_list_start', true, 'core', 'hacker_news_heading', 'after');
 add_output('hacker_news', 'hacker_news_table_end', true, 'core', 'message_list_start', 'after');
