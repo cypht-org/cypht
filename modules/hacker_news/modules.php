@@ -98,6 +98,9 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
                         $host = $url_parts['host'];
                     }
                 }
+                if (!$url) {
+                    $url = sprintf('https://%s/item?id=%d', $host, $item->id);
+                }
                 $comments = 0;
                 if (property_exists($item, 'kids')) {
                     $comments = count($item->kids);
