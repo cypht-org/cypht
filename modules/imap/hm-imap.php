@@ -212,7 +212,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             stream_context_set_option($ctx, 'ssl', 'verify_peer', $this->verify_peer);
 
             $timeout = 10;
-            $this->handle = stream_socket_client($this->server.':'.$this->port, $errorno, $errorstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
+            $this->handle = @stream_socket_client($this->server.':'.$this->port, $errorno, $errorstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
             if (is_resource($this->handle)) {
                 $this->debug[] = 'Successfully opened port to the IMAP server';
                 $this->state = 'connected';
