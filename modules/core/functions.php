@@ -83,33 +83,65 @@ function human_readable_interval($date_str) {
     return implode(', ', $res);
 }
 
-function message_list_row($subject, $date, $timestamp, $from, $source, $id, $flags, $style, $url, $output_mod, $new_win=false) {
-        if ($style == 'email') {
-            return array(
-                '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id)).'">'.
-                    '<td class="checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
-                    '<td class="source">'.$output_mod->html_safe($source).'</td>'.
-                    '<td class="from">'.$output_mod->html_safe($from).'</td>'.
-                    '<td class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
-                    '<a '.($new_win ? 'target="_blank"' : '').' href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
-                    '</div></td>'.
-                    '<td class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></td>'.
-                    '<td class="icon">'.(in_array('flagged', $flags) ? '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : '').'</td>'.
-                '</tr>', str_replace(' ', '-', $id));
+function message_list_row($values, $id, $style, $output_mod) {
+    $res = '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id)).'">';
+    if ($style == 'news') {
+        $res .= '<td class="news_cell checkbox_cell">';
+    }
+    foreach ($values as $vals) {
+        if (function_exists($vals[0])) {
+            $function = array_shift($vals);
+            $res .= $function($vals, $style, $output_mod);
         }
-        else {
-            return array(
-                '<tr style="display: none;" class="'.$output_mod->html_safe($id).'">'.
-                    '<td class="news_cell checkbox_cell"><input type="checkbox" value="'.$output_mod->html_safe($id).'" /></td>'.
-                    '<td class="news_cell"><div class="icon">'.(in_array('flagged', $flags) ? '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : '').'</div>'.
-                    '<div class="subject"><div class="'.$output_mod->html_safe(implode(' ', $flags)).'">'.
-                        '<a href="'.$output_mod->html_safe($url).'">'.$output_mod->html_safe($subject).'</a>'.
-                    '</div></div>'.
-                    '<div class="from">'.$output_mod->html_safe($source).' '.(trim($from) ? '- ' : '').$output_mod->html_safe($from).'</div>'.
-                    '<div class="msg_date">'.$date.'<input type="hidden" class="msg_timestamp" value="'.$output_mod->html_safe($timestamp).'" /></div>'.
-                '</td></tr>', $id);
-        }
+    }
+    if ($style == 'news') {
+        $res .= '</td>';
+    }
+    $res .= '</tr>';
+    return array($res, $id);
 }
+
+function safe_output_callback($vals, $style, $output_mod) {
+    if ($style == 'email') {
+        return sprintf('<td class="%s">%s</td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+    }
+    elseif ($style == 'news') {
+        return sprintf('<div class="%s">%s</div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+    }
+}
+function checkbox_callback($vals, $style, $output_mod) {
+    if ($style == 'email') {
+        return sprintf('<td class="checkbox_cell"><input type="checkbox" value="%s" /></td>', $output_mod->html_safe($vals[0]));
+    }
+    elseif ($style == 'news') {
+        return sprintf('<input type="checkbox" value="%s" /></td><td class="news_cell">', $output_mod->html_safe($vals[0]));
+    }
+}
+function subject_callback($vals, $style, $output_mod) {
+    if ($style == 'email') {
+        return sprintf('<td class="subject"><div class="%s"><a href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[0]));
+    }
+    elseif ($style == 'news') {
+        return sprintf('<div class="subject"><div class="%s"><a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[0]));
+    }
+}
+function date_callback($vals, $style, $output_mod) {
+    if ($style == 'email') {
+        return sprintf('<td class="msg_date">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+    }
+    elseif ($style == 'news') {
+        return sprintf('<div class="msg_date">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+    }
+}
+function icon_callback($vals, $style, $output_mod) {
+    if ($style == 'email') {
+        return sprintf('<td class="icon">%s</td>', (in_array('flagged', $vals[0]) ? '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : ''));
+    }
+    elseif ($style == 'news') {
+        return sprintf('<div class="icon">%s</div>', (in_array('flagged', $vals[0]) ? '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : ''));
+    }
+}
+
 
 function message_controls($output_mod) {
     return '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.

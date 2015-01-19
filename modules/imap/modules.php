@@ -971,7 +971,34 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $flags[] = 'flagged';
         }
         $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
-        $res[$id] = message_list_row($subject, $date, $timestamp, $from, $msg['server_name'], $id, $flags, $style, $url, $output_module);
+        if ($style == 'news') {
+            $res[$id] = message_list_row(array(
+                    array('checkbox_callback', $id),
+                    array('icon_callback', $flags),
+                    array('subject_callback', $subject, $url, $flags),
+                    array('safe_output_callback', 'source', $msg['server_name']),
+                    array('safe_output_callback', 'from', $from),
+                    array('date_callback', $date, $timestamp),
+                ),
+                $id,
+                $style,
+                $output_module
+            );
+        }
+        else {
+            $res[$id] = message_list_row(array(
+                    array('checkbox_callback', $id),
+                    array('safe_output_callback', 'source', $msg['server_name']),
+                    array('safe_output_callback', 'from', $from),
+                    array('subject_callback', $subject, $url, $flags),
+                    array('date_callback', $date, $timestamp),
+                    array('icon_callback', $flags)
+                ),
+                $id,
+                $style,
+                $output_module
+            );
+        }
     }
     return $res;
 }

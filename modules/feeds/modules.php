@@ -606,7 +606,34 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 else {
                     $from = '';
                 }
-                $res[$id] = message_list_row(strip_tags($item['title']), $date, $timestamp, $from, $item['server_name'], $id, $flags, $style, $url, $this);
+                if ($style == 'news') {
+                    $res[$id] = message_list_row(array(
+                            array('checkbox_callback', $id),
+                            array('icon_callback', $flags),
+                            array('subject_callback', strip_tags($item['title']), $url, $flags),
+                            array('safe_output_callback', 'source', $item['server_name']),
+                            array('safe_output_callback', 'from', $from),
+                            array('date_callback', $date, $timestamp),
+                        ),
+                        $id,
+                        $style,
+                        $this
+                    );
+                }
+                else {
+                    $res[$id] = message_list_row(array(
+                            array('checkbox_callback', $id),
+                            array('safe_output_callback', 'source', $item['server_name']),
+                            array('safe_output_callback', 'from', $from),
+                            array('subject_callback', strip_tags($item['title']), $url, $flags),
+                            array('date_callback', $date, $timestamp),
+                            array('icon_callback', $flags)
+                        ),
+                        $id,
+                        $style,
+                        $this
+                    );
+                }
             }
         }
         $this->out('formatted_message_list', $res);

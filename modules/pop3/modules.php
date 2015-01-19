@@ -721,7 +721,34 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         else {
             $flags = array('unseen');
         }
-        $res[$id] = message_list_row($subject, $date, $timestamp, $from, $msg['server_name'], $id, $flags, $style, $url, $output_module);
+        if ($style == 'news') {
+            $res[$id] = message_list_row(array(
+                    array('checkbox_callback', $id),
+                    array('icon_callback', $flags),
+                    array('subject_callback', $subject, $url, $flags),
+                    array('safe_output_callback', 'source', $msg['server_name']),
+                    array('safe_output_callback', 'from', $from),
+                    array('date_callback', $date, $timestamp),
+                ),
+                $id,
+                $style,
+                $output_module
+            );
+        }
+        else {
+            $res[$id] = message_list_row(array(
+                    array('checkbox_callback', $id),
+                    array('safe_output_callback', 'source', $msg['server_name']),
+                    array('safe_output_callback', 'from', $from),
+                    array('subject_callback', $subject, $url, $flags),
+                    array('date_callback', $date, $timestamp),
+                    array('icon_callback', $flags)
+                ),
+                $id,
+                $style,
+                $output_module
+            );
+        }
     }
     return $res;
 }

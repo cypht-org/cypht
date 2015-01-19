@@ -1287,6 +1287,9 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
             if ($vals[1] && $vals[2]) {
                 $header_flds[] = sprintf('<th class="%s">%s</th>', $vals[1], $this->trans($vals[2]));
             }
+            else {
+                $header_flds[] = '<th></th>';
+            }
         }
         $res = '<table class="message_table">';
         if (!$this->get('no_message_list_headers')) {
