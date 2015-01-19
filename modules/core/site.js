@@ -695,7 +695,7 @@ var Hm_Folders = {
                 $('.menu_'+Hm_Utils.clean_selector(hm_list_parent())).addClass('selected_menu');
             }
             else {
-                $('.menu_'+page).addClass('selected_menu');
+                $('.menu_'+path).addClass('selected_menu');
             }
         }
         else {
