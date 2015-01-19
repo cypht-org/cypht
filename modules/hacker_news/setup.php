@@ -25,10 +25,6 @@ return array(
     'allowed_pages' => array(
         'hacker_news',
         'ajax_hacker_news_data'
-    ),
-    'allowed_output' => array(
-    ),
-    'allowed_post' => array(
     )
 );
 

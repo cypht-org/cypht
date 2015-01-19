@@ -13,12 +13,31 @@ class Hm_Handler_hacker_news_fields extends Hm_Handler_Module {
             array('comment_col', 'comment', 'Comments'),
             array('date_col', 'msg_date', 'Date'),
             array('icon_col', false, false)), false);
+
+        $list_type = 'top20';
+        if (array_key_exists('list_path', $this->request->get)) {
+            $list_type = $this->request->get['list_path'];
+        }
+        $this->out('list_path', $list_type);
     }
 }
 
 class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
     public function process() {
-        $data = array_slice(curl_fetch_json('https://hacker-news.firebaseio.com/v0/topstories.json'), 0, 20);
+        $list_type = 'top20';
+        if (array_key_exists('list_path', $this->request->get)) {
+            $list_type = $this->request->get['list_path'];
+        }
+        if ($list_type == 'top20') {
+            $data = array_slice(curl_fetch_json('https://hacker-news.firebaseio.com/v0/topstories.json'), 0, 20);
+        }
+        elseif ($list_type == 'newest') {
+            $data = array();
+            $max_id = curl_fetch_json('https://hacker-news.firebaseio.com/v0/maxitem.json');
+            for ($i = 0; $i < 20; $i++) {
+                $data[] = $max_id - $i;
+            }
+        }
         $output = array();
         if (is_array($data)) {
             foreach ($data as $id) {
@@ -34,9 +53,12 @@ class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
 
 class Hm_Output_hacker_news_folders extends Hm_Output_Module {
     protected function output($format) {
-        $res = '<li class="menu_hacker_news"><a class="unread_link" href="?page=hacker_news">'.
+        $res = '<li class="menu_top20"><a class="unread_link" href="?page=hacker_news&list_path=top20">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$spreadsheet).
             '" alt="" width="16" height="16" /> '.$this->trans('Top 20').'</a></li>';
+        $res .= '<li class="menu_newest"><a class="unread_link" href="?page=hacker_news&list_path=newest">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$spreadsheet).
+            '" alt="" width="16" height="16" /> '.$this->trans('Latest').'</a></li>';
         $this->append('folder_sources', 'hacker_news_folders');
         Hm_Page_Cache::add('hacker_news_folders', $res, true);
         return '';
@@ -64,6 +86,9 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
                 $style = 'news';
             }
             foreach ($this->get('hacker_news_data', array()) as $index => $item) {
+                if (!property_exists($item, 'id')) {
+                    continue;
+                }
                 $url = '';
                 $host = 'news.ycombinator.com';
                 if ($item->type == 'story') {
@@ -77,12 +102,21 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
                 if (property_exists($item, 'kids')) {
                     $comments = count($item->kids);
                 }
+                if ($item->type == 'comment') {
+                    $subject = substr(mb_convert_encoding(strip_tags($item->text), 'UTF-8', 'HTML-ENTITIES'), 0, 120);
+                }
+                else {
+                    $subject = $item->title;
+                }
+                if (!property_exists($item, 'by')) {
+                    elog($item);
+                }
                 $date = date('r', $item->time);
                 if ($style == 'news') {
                     $res[$item->id] = message_list_row(array(
                             array('checkbox_callback', $item->id),
                             array('icon_callback', array()),
-                            array('subject_callback', $item->title, $url, array()),
+                            array('subject_callback', $subject, $url, array()),
                             array('safe_output_callback', 'source', $host),
                             array('safe_output_callback', 'from', $item->by),
                             array('date_callback', human_readable_interval($date), ($len - $index)),
@@ -97,7 +131,7 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
                             array('checkbox_callback', $item->id),
                             array('safe_output_callback', 'source', $host),
                             array('safe_output_callback', 'from', $item->by),
-                            array('subject_callback', $item->title, $url, array()),
+                            array('subject_callback', $subject, $url, array()),
                             array('score_callback', $item),
                             array('comment_callback', $item),
                             array('date_callback', human_readable_interval($date), ($len - $index)),

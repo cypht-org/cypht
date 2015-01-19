@@ -8,7 +8,6 @@ var load_hacker_news = function() {
 };
 var display_hacker_news = function(res) {
     Hm_Message_List.update([0], res.formatted_message_list, 'hacker_news');
-    console.log(res);
 }
 
 if (hm_page_name() == 'hacker_news') {
