@@ -16,6 +16,7 @@ add_output('ajax_hm_folders', 'hacker_news_folders',  true, 'hacker_news', 'fold
 add_handler('ajax_hacker_news_data', 'login', false, 'core');
 add_handler('ajax_hacker_news_data', 'load_user_data', true, 'core');
 add_handler('ajax_hacker_news_data', 'language', true, 'core');
+add_handler('ajax_hacker_news_data', 'message_list_type', true, 'core');
 add_handler('ajax_hacker_news_data', 'hacker_news_data',  true);
 add_handler('ajax_hacker_news_data', 'date', true, 'core');
 add_handler('ajax_hacker_news_data', 'http_headers', true, 'core');
