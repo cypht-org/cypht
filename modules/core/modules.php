@@ -1111,7 +1111,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
         foreach ($folder_sources as $src) {
             $parts = explode('_', $src);
             array_pop($parts);
-            $name = ucwords(strtolower(implode(' ', $parts)));
+            $name = ucwords(implode(' ', $parts));
             $res .= '<div class="src_name" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
                 '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" /></div>';
 
