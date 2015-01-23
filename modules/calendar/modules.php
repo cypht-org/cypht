@@ -5,7 +5,6 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_get_calendar_date extends Hm_Handler_Module {
     public function process() {
         $date = date('r');
-        elog($this->request);
         if (array_key_exists('date', $this->request->get)) {
             if (strtotime($this->request->get['date']) !== false) {
                 $date = $this->request->get['date'];
@@ -29,89 +28,175 @@ class Hm_Output_calendar_page_link extends Hm_Output_Module {
 class Hm_Output_calendar_content extends Hm_Output_Module {
     protected function output($format) {
         $date = $this->get('calendar_date', date('r'));
-        $cal = new Hm_Calendar($this, $date);
-        return '<div class="calendar"><div class="content_title">'.$this->trans(date('F, Y', strtotime($date))).'</div>'.
-            $cal->output().'</div>';
+        $cal = new Hm_Cal_Data();
+        $data = $cal->output($date, 'month');
+        $out = new Hm_Cal_Output($this);
+        $out = $out->output($data, $date, 'month');
+        return '<div class="calendar"><div class="content_title">'.$this->trans('Calendar').'</div>'.
+            $out.'</div>';
     }
 }
 
-class Hm_Calendar {
+class Hm_Cal_Output {
 
-    private $date;
     private $output_mod;
     private $today;
+    private $month;
+    private $year;
+    private $format;
+    private $date;
 
-    public function __construct($output_mod, $date=false) {
+    public function __construct($output_mod) {
         $this->output_mod = $output_mod;
-        $this->set_date($date);
-        $this->set_today();
+        $this->today = date('Y-m-d');
     }
-
-    private function set_today() {
-        if (date('Ym', $this->date) == date('Ym')) {
-            $this->today = (int) date('d');
-        }
-    }
-
-    private function set_date($date) {
-        if (!$date) {
-            $this->date = time();
+    public function output($data, $date, $format) {
+        $this->date = $date;
+        $this->year = date('Y', strtotime($date));
+        $this->format = $format;
+        if (method_exists($this, 'output_'.$format)) {
+            if ($format != 'year') {
+                $this->month = (int) date('n', strtotime($date));
+            }
+            return $this->{'output_'.$format}($data);
         }
         else {
-            $this->date = strtotime($date);
+            die('Invalid output format');
         }
     }
-
-    private function month_params() {
-        return array(
-            date('w', strtotime(date('Y-m-01', $this->date))),
-            date('t', $this->date)
-        );
+    private function output_day($day) {
+        $res = '<td class="';
+        if ($day == $this->today) {
+            $res .= 'today ';
+        }
+        if ($this->month != (int) date('n', strtotime($day))) {
+            $res .= 'offmonth ';
+        }
+        $res .= '">'.date('d', strtotime($day)).'</td>';
+        return $res;
     }
-
-    private function heading() {
-        $days = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
-        return '<tr>'.implode('', array_map(function($v) {
-            return sprintf('<th>%s</th>', $this->output_mod->trans($v)); }, $days)).'</tr>';
-
+    private function output_week($week) {
+        $res = '';
+        if ($this->format == 'week') {
+            $res .= '<div class="month_label">'.date('F, Y', strtotime($this->year.'-'.$this->month)).'</div>';
+            $res .= '<table class="calendar_week">';
+            $res .= $this->output_heading();
+        }
+        $res .= '<tr>';
+        foreach ($week as $day) {
+            $res .= $this->output_day($day);
+        }
+        $res .= '</tr>';
+        if ($this->format == 'week') {
+            $res .= '</table>';
+        }
+        return $res;
     }
-
-    public function output() {
-        $day = 1;
-        list($start, $end) = $this->month_params();
-        $res = '<table class="calendar">';
-        $res .= $this->heading();
-        while ($day < $end) {
-            list($row, $day) = $this->row($day, $start, $end);
-            $start = 0;
-            $res .= $row;
+    private function output_month($month) {
+        $res = '<div class="month_label">'.date('F, Y', strtotime($this->year.'-'.$this->month)).'</div>';
+        $res .= '<table class="calendar_month">';
+        $res .= $this->output_heading();
+        foreach ($month as $week) {
+            $res .= $this->output_week($week);
         }
         $res .= '</table>';
         return $res;
     }
-
-    private function row($day, $start, $end) {
-        $res = '<tr>';
-        for ($i = 0; $i < 7; $i++) {
-            list($cell, $day) = $this->cell($i, $day, $start, $end);
-            $res .= $cell;
+    private function output_year($year) {
+        $res = '<div class="calendar_year">';
+        foreach ($year as $id => $month) {
+            $this->month = $id;
+            $res .= $this->output_month($month);
         }
-        $res .= '</tr>';
-        return array($res, $day);
+        $res .= '</div>';
+        return $res;
     }
+    private function output_heading() {
+        $days = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+        return '<tr>'.implode('', array_map(function($v) {
+            return sprintf('<th>%s</th>', $this->output_mod->trans($v)); }, $days)).'</tr>';
+    }
+}
 
-    private function cell($current_day, $day, $start, $end) {
-        $res = '<td';
-        if ($day == $this->today) {
-            $res .= ' class="today"';
+class Hm_Cal_Data {
+
+    private $ts = false;
+    private $today = false;
+    private $day_pos = false;
+    private $month_pos = false;
+
+    public function __construct() {
+        $this->today = time();
+    }
+    public function output($str_time, $format='month') {
+        $this->check_input_params($str_time, $format);
+        if (method_exists($this, $format)) {
+            return $this->$format();
         }
-        $res .= '>';
-        if ($current_day >= $start && $day <= $end) {
-            $res .= $day;
-            $day++;
+    }
+    private function check_input_params($str_time, $format) {
+        $this->ts = strtotime($str_time);
+        if ($this->ts === false || $this->ts === -1) {
+            die('Invalid date input');
         }
-        $res .= '</td>';
-        return array($res, $day);
+        $this->set_start_ts($format);
+    }
+    private function set_start_ts($format) {
+        if (method_exists($this, 'start_'.$format)) {
+            $this->{'start_'.$format}($this->ts);
+        }
+        else {
+            die('Invalid output format');
+        }
+    } 
+    private function start_week($ts) {
+        $offset = date('w', $ts);
+        $this->day_pos = strtotime(sprintf('-%d day', $offset), $ts);
+    }
+    private function start_month($ts) {
+        $first_day = strtotime(date('Y-m-01', $ts));
+        $this->month_pos = (int) date('n', $ts);
+        $offset = date('w', $first_day);
+        $this->day_pos = strtotime(sprintf('-%d day', $offset), $first_day);
+    }
+    private function start_year($ts) {
+        $first_day = strtotime(date('Y-01-01', $ts));
+        $offset = date('w', $first_day);
+        $this->day_pos = strtotime(sprintf('-%d day', $offset), $first_day);
+        $this->month_pos = 1;
+    }
+    private function increment_day() {
+        $this->day_pos = strtotime('+1 day', $this->day_pos);
+    }
+    private function week() {
+        $res = array();
+        for ($i = 0; $i < 7; $i++) {
+            $res[] = $this->day();
+        }
+        return $res;
+    }
+    private function day() {
+        $day = date('Y-m-d', $this->day_pos);
+        $this->increment_day();
+        return $day;
+    }
+    private function month() {
+        $res = array();
+        for ($i = 0; $i < 6; $i++) {
+            $res[] = $this->week();
+            if ((int) date('n', $this->day_pos) !== $this->month_pos) {
+                break;
+            }
+        }
+        return $res;
+    }
+    private function year() {
+        $res = array();
+        for ($i = 0; $i < 12; $i++) {
+            $res[$this->month_pos] = $this->month();
+            $this->start_month($this->day_pos);
+        }
+        return $res;
     }
 }
 ?>
