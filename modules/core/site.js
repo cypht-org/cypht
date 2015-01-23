@@ -217,6 +217,8 @@ var Hm_Timer = {
 var Hm_Message_List = {
     range_start: '',
     sources: [],
+    deleted: [],
+
     page_caches: {
         'feeds': 'formatted_feed_data',
         'combined_inbox': 'formatted_combined_inbox',
@@ -308,6 +310,10 @@ var Hm_Message_List = {
         for (index in msgs) {
             row = msgs[index][0];
             id = msgs[index][1];
+            if (Hm_Message_List.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
+                elog('deleted message not displayed');
+                continue;
+            }
             if (!$('.'+Hm_Utils.clean_selector(id)).length) {
                 Hm_Message_List.insert_into_message_list(row);
                 $('.'+Hm_Utils.clean_selector(id)).show();
@@ -419,6 +425,9 @@ var Hm_Message_List = {
                 class_name = selected[index];
                 count--;
                 $('.'+Hm_Utils.clean_selector(class_name)).remove();
+                if (action_type == 'delete') {
+                    Hm_Message_List.deleted.push(class_name);
+                }
             }
         }
         Hm_Message_List.reset_checkboxes();
