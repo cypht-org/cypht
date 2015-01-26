@@ -191,7 +191,7 @@ add_handler('ajax_imap_combined_inbox', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_combined_inbox', 'imap_combined_inbox',  true);
 add_handler('ajax_imap_combined_inbox', 'date', true, 'core');
 add_handler('ajax_imap_combined_inbox', 'http_headers', true, 'core');
-add_output('ajax_imap_combined_inbox', 'filter_all_email', true);
+add_output('ajax_imap_combined_inbox', 'filter_combined_inbox', true);
 
 /* all email section */
 add_handler('ajax_imap_all_email', 'login', false, 'core');
