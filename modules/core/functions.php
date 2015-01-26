@@ -135,10 +135,10 @@ function date_callback($vals, $style, $output_mod) {
 }
 function icon_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
-        return sprintf('<td class="icon">%s</td>', (in_array('flagged', $vals[0]) ? '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : ''));
+        return sprintf('<td class="icon">%s</td>', (in_array('flagged', $vals[0]) ? '&#9733;' : ''));
     }
     elseif ($style == 'news') {
-        return sprintf('<div class="icon">%s</div>', (in_array('flagged', $vals[0]) ? '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />' : ''));
+        return sprintf('<div class="icon">%s</div>', (in_array('flagged', $vals[0]) ? '&#9733;' : ''));
     }
 }
 

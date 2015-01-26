@@ -413,7 +413,6 @@ var Hm_Message_List = {
         var index;
         var remove = false;
         var class_name = false;
-        var count = $(".message_list tbody tr").length;
         if (action_type == 'read' && hm_list_path() == 'unread') {
             remove = true;
         }
@@ -421,16 +420,72 @@ var Hm_Message_List = {
             remove = true;
         }
         if (remove) {
-            for (index in selected) {
-                class_name = selected[index];
-                count--;
-                $('.'+Hm_Utils.clean_selector(class_name)).remove();
-                if (action_type == 'delete') {
-                    Hm_Message_List.deleted.push(class_name);
-                }
+            Hm_Message_List.remove_after_action(action_type, selected);
+        }
+        else {
+            if (action_type == 'read' || action_type == 'unread') {
+                Hm_Message_List.read_after_action(action_type, selected);
+            }
+            else if (action_type == 'flag' || action_type == 'unflag') {
+                Hm_Message_List.flag_after_action(action_type, selected);
             }
         }
+        elog(hm_list_path());
+        Hm_Message_List.save_updated_list();
         Hm_Message_List.reset_checkboxes();
+    },
+
+    save_updated_list: function() {
+        if (Hm_Message_List.page_caches.hasOwnProperty(hm_list_path())) {
+            Hm_Message_List.set_message_list_state(Hm_Message_List.page_caches[hm_list_path()]);
+        }
+    },
+
+    remove_after_action: function(action_type, selected) {
+        var removed = 0;
+        for (index in selected) {
+            class_name = selected[index];
+            $('.'+Hm_Utils.clean_selector(class_name)).remove();
+            if (action_type == 'delete') {
+                Hm_Message_List.deleted.push(class_name);
+            }
+            removed++;
+        }
+        return removed;
+    },
+
+    read_after_action: function(action_type, selected) {
+        var read = 0;
+        var row;
+        for (index in selected) {
+            class_name = selected[index];
+            row = $('.'+Hm_Utils.clean_selector(class_name));
+            if (action_type == 'read') {
+                $('.subject > div', row).removeClass('unseen');
+            }
+            else {
+                $('.subject > div', row).addClass('unseen');
+            }
+            read++;
+        }
+        return read;
+    },
+
+    flag_after_action: function(action_type, selected) {
+        var read = 0;
+        var row;
+        for (index in selected) {
+            class_name = selected[index];
+            row = $('.'+Hm_Utils.clean_selector(class_name));
+            if (action_type == 'flag') {
+                $('.icon', row).html('&#9733;');
+            }
+            else {
+                $('.icon', row).empty();
+            }
+            read++;
+        }
+        return read;
     },
 
     load_sources: function() {
@@ -534,7 +589,7 @@ var Hm_Message_List = {
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
                 {'name': 'action_type', 'value': action_type},
                 {'name': 'message_ids', 'value': selected}],
-                Hm_Message_List.load_sources,
+                false,
                 []
             );
             Hm_Message_List.update_after_action(action_type, selected);
