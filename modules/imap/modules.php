@@ -495,8 +495,12 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('msg_server_id', $form['imap_server_id']);
             $this->out('msg_folder', $form['folder']);
             $part = false;
+            $prefetch = false;
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
                 $part = $this->request->post['imap_msg_part'];
+            }
+            elseif (isset($this->request->post['imap_prefetch']) && $this->request->post['imap_prefetch']) {
+                $prefetch = true;
             }
             if (array_key_exists('reply_format', $this->request->post) && $this->request->post['reply_format']) {
                 $this->out('reply_format', true);
@@ -504,6 +508,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if ($imap) {
+                $imap->read_only = $prefetch;
                 if ($imap->select_mailbox($form['folder'])) {
                     $msg_struct = $imap->get_message_structure($form['imap_msg_uid']);
                     $this->out('msg_struct', $msg_struct);

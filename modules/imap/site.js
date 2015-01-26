@@ -278,6 +278,47 @@ var get_message_content = function(msg_part) {
     return false;
 };
 
+var imap_prefetch_message_content = function(uid, server_id, folder) {
+    var div;
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
+        {'name': 'imap_msg_uid', 'value': uid},
+        {'name': 'imap_msg_part', 'value': ''},
+        {'name': 'imap_server_id', 'value': server_id},
+        {'name': 'imap_prefetch', 'value': true},
+        {'name': 'folder', 'value': folder}],
+        function(res) {
+            var key = uid+'_imap_'+server_id+'_'+folder;
+            if (!Hm_Utils.get_from_local_storage(key)) {
+                var div = $('<div></div>');
+                div.append(res.msg_headers);
+                div.append(res.msg_text);
+                div.append(res.msg_parts);
+                Hm_Utils.save_to_local_storage(key, div.html());
+                delete div;
+            }
+        },
+        [],
+        true
+    );
+    return false;
+};
+
+var imap_prefetch_msgs = function() {
+    var detail;
+    var key;
+    $('.message_table tbody tr').each(function() {
+        if ($(this).attr('class').match(/^imap/)) {
+            detail = Hm_Utils.parse_folder_path($(this).attr('class'), 'imap');
+            key = detail.uid+'_'+detail.type+'_'+detail.server_id+'_'+detail.folder;
+            if (!Hm_Utils.get_from_local_storage(key)) {
+                imap_prefetch_message_content(detail.uid, detail.server_id, detail.folder);
+                return false;
+            }
+        }
+    });
+}
+
 var imap_setup_message_view_page = function() {
     var msg_content = get_local_message_content();
     if (!msg_content || !msg_content.length) {
@@ -287,7 +328,24 @@ var imap_setup_message_view_page = function() {
         $('.msg_text').html(msg_content);
         document.title = $('.header_subject th').text();
         imap_message_view_finished();
+        if (hm_page_name() == 'message' && hm_list_parent() == 'unread') {
+            imap_read_prefetch();
+        }
     }
+};
+
+var imap_read_prefetch = function() {
+    var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    var uid = hm_msg_uid();
+    var msg_id = 'imap_'+detail.server_id+'_'+uid+'_'+detail.folder;
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
+        {'name': 'action_type', 'value': 'read'},
+        {'name': 'message_ids', 'value': [msg_id]}],
+        false,
+        [],
+        true
+    );
 };
 
 var imap_message_view_finished = function() {
@@ -366,4 +424,7 @@ else if (hm_page_name() == 'servers') {
 }
 else if (hm_page_name() == 'home') {
     setTimeout(imap_status_update, 100);
+}
+if (hm_page_name() == 'message_list' && hm_list_path() == 'unread') {
+    Hm_Timer.add_job(imap_prefetch_msgs, 35, true);
 }

@@ -267,6 +267,7 @@ return array(
         'imap_folder_state' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_msg_part' => FILTER_SANITIZE_STRING,
+        'imap_prefetch' => FILTER_VALIDATE_BOOLEAN,
         'imap_flag_state' => FILTER_SANITIZE_STRING,
     )
 );
