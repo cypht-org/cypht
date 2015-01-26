@@ -111,9 +111,6 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
                 else {
                     $subject = $item->title;
                 }
-                if (!property_exists($item, 'by')) {
-                    elog($item);
-                }
                 $date = date('r', $item->time);
                 if ($style == 'news') {
                     $res[$item->id] = message_list_row(array(
