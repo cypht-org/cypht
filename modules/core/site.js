@@ -311,7 +311,6 @@ var Hm_Message_List = {
             row = msgs[index][0];
             id = msgs[index][1];
             if (Hm_Message_List.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
-                elog('deleted message not displayed');
                 continue;
             }
             if (!$('.'+Hm_Utils.clean_selector(id)).length) {
@@ -428,7 +427,6 @@ var Hm_Message_List = {
                 Hm_Message_List.flag_after_action(action_type, selected);
             }
         }
-        elog(hm_list_path());
         Hm_Message_List.save_updated_list();
         Hm_Message_List.reset_checkboxes();
     },
