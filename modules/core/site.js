@@ -410,9 +410,7 @@ var Hm_Message_List = {
     },
 
     update_after_action: function(action_type, selected) {
-        var index;
         var remove = false;
-        var class_name = false;
         if (action_type == 'read' && hm_list_path() == 'unread') {
             remove = true;
         }
@@ -443,6 +441,8 @@ var Hm_Message_List = {
 
     remove_after_action: function(action_type, selected) {
         var removed = 0;
+        var class_name = false;
+        var index;
         for (index in selected) {
             class_name = selected[index];
             $('.'+Hm_Utils.clean_selector(class_name)).remove();
@@ -457,6 +457,8 @@ var Hm_Message_List = {
     read_after_action: function(action_type, selected) {
         var read = 0;
         var row;
+        var index;
+        var class_name = false;
         for (index in selected) {
             class_name = selected[index];
             row = $('.'+Hm_Utils.clean_selector(class_name));
@@ -472,8 +474,9 @@ var Hm_Message_List = {
     },
 
     flag_after_action: function(action_type, selected) {
-        var read = 0;
+        var flagged = 0;
         var row;
+        var index;
         for (index in selected) {
             class_name = selected[index];
             row = $('.'+Hm_Utils.clean_selector(class_name));
@@ -483,9 +486,9 @@ var Hm_Message_List = {
             else {
                 $('.icon', row).empty();
             }
-            read++;
+            flagged++;
         }
-        return read;
+        return flagged;
     },
 
     load_sources: function() {
