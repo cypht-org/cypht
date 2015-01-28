@@ -236,7 +236,9 @@ class Hm_Router {
         $this->load_modules('Hm_Output_Modules', $output);
         $active_mods = array_unique(array_merge($this->get_active_mods(Hm_Output_Modules::get_for_page($this->page)),
             $this->get_active_mods(Hm_Handler_Modules::get_for_page($this->page))));
-
+        if (!count($active_mods)) {
+            Hm_Functions::cease('No module assignments found');
+        }
         $mods = explode(',', $config->get('modules', '')); 
         $this->load_module_set_files($mods, $active_mods);
     }
