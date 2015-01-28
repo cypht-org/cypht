@@ -87,6 +87,14 @@ var Hm_Ajax_Request = function() { return {
             if (this.callback) {
                 this.callback(res);
             }
+            if (hm_debug() && res.debug) {
+                var key;
+                var data = [];
+                for (key in res.debug) {
+                    data.push([res.debug[key]]);
+                }
+                console.log(data.join(" | "));
+            }
         }
     },
 
@@ -95,10 +103,12 @@ var Hm_Ajax_Request = function() { return {
     },
 
     always: function(res) {
-        var dt = new Date();
-        var elapsed = dt.getTime() - this.start_time;
-        var msg = 'AJAX request finished in ' + elapsed + ' millis';
-        Hm_Debug.add(msg);
+        if (hm_debug()) {
+            var dt = new Date();
+            var elapsed = dt.getTime() - this.start_time;
+            var msg = 'AJAX request finished in ' + elapsed + ' millis';
+            Hm_Debug_Output.add(msg);
+        }
         Hm_Ajax.request_count--;
         if (Hm_Ajax.request_count === 0) {
             if (Hm_Ajax.batch_callback) {
@@ -113,24 +123,24 @@ var Hm_Ajax_Request = function() { return {
 }; };
 
 /* debug output */
-var Hm_Debug = {
+var Hm_Debug_Output = {
     max: 5,
     count: 0,
     add: function(msg) {
-        Hm_Debug.count++;
+        Hm_Debug_Output.count++;
         $('.debug').prepend('<div>'+msg+'</div>');
-        if (Hm_Debug.check()) {
-            Hm_Debug.prune();
+        if (Hm_Debug_Output.check()) {
+            Hm_Debug_Output.prune();
         }
     },
 
     check: function() {
-        return Hm_Debug.count > Hm_Debug.max;
+        return Hm_Debug_Output.count > Hm_Debug_Output.max;
     },
 
     prune: function() {
         $('.debug > div:last-child').remove();
-        Hm_Debug.count--;
+        Hm_Debug_Output.count--;
     }
 };
 

@@ -165,7 +165,7 @@ trait Hm_List {
             Hm_Functions::error_log(print_r(self::$msgs, true));
         }
         elseif ($type == 'return') {
-            return print_r(self::$msgs, true);
+            return self::$msgs;
         }
         else {
             print_r(self::$msgs);

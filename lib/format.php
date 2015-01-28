@@ -113,6 +113,10 @@ class Hm_Format_JSON extends HM_Format {
         $input['router_user_msgs'] = Hm_Msgs::get();
         $output = $this->run_modules($input, 'JSON', $lang_str);
         $output = $this->filter_output($output, $allowed_output);
+        if (DEBUG_MODE) {
+            Hm_Debug::load_page_stats();
+            $output['debug'] = Hm_Debug::show('return');
+        }
         return json_encode($output, JSON_FORCE_OBJECT);
     }
 
