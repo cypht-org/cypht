@@ -941,7 +941,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 if (strtolower($struct['encoding']) == 'quoted-printable') {
                     $res = quoted_printable_decode($res);
                 }
-                if (strtolower($struct['encoding']) == 'base64') {
+                elseif (strtolower($struct['encoding']) == 'base64') {
                     $res = base64_decode($res);
                 }
             }
