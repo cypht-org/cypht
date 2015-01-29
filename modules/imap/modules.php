@@ -522,6 +522,9 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
                         $msg_struct_current = array_shift($struct);
                         $msg_text = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $msg_struct_current);
+                        if (isset($msg_struct_current['subtype']) && strtolower($msg_struct_current['subtype'] == 'html')) {
+                            $msg_text = add_attached_images($msg_text, $form['imap_msg_uid'], $msg_struct, $imap);
+                        }
                     }
                     else {
                         list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
@@ -1199,6 +1202,20 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
     }
     usort($msg_list, 'sort_by_internal_date');
     return $msg_list;
+}
+
+function add_attached_images($txt, $uid, $struct, $imap) {
+    if (preg_match_all("/src=('|\"|)cid:([^@]+@[^\s'\"]+)/", $txt, $matches)) {
+        $cids = array_pop($matches);
+        foreach ($cids as $id) {
+            $part = $imap->search_bodystructure($struct, array('id' => $id, 'type' => 'image'), true);
+            $part_ids = array_keys($part);
+            $part_id = array_pop($part_ids);
+            $img = $imap->get_message_content($uid, $part_id, false, $part[$part_id]);
+            $txt = str_replace('cid:'.$id, 'data:image/'.$part[$part_id]['subtype'].';base64,'.chunk_split(base64_encode($img)), $txt);
+        }
+    }
+    return $txt;
 }
 
 ?>
