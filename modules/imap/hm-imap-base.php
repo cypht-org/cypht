@@ -1652,7 +1652,7 @@ class Hm_IMAP_Struct {
                 }
             }
             foreach ($flds as $name => $fld_val) {
-                if (isset($vals[$name]) && stristr($fld_val, $vals[$name])) {
+                if (isset($vals[$name]) && stristr($vals[$name], $fld_val)) {
                     $matches++;
                 }
             }
