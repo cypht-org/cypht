@@ -198,9 +198,7 @@ function format_msg_html($str, $external_resources=false) {
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$external_resources) {
-        $config->set('URI.DisableResources', true);
-        $config->set('URI.DisableExternalResources', true);
-        $config->set('URI.DisableExternal', true);
+        $config->set('URI.AllowedSchemes', array('data' => true));
     }
     $config->set('HTML.TargetBlank', true);
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
