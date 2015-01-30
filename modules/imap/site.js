@@ -163,16 +163,20 @@ var imap_background_unread_content = function(id) {
         {'name': 'imap_server_ids', 'value': id}],
         imap_background_unread_content_result,
         [],
-        true,
-        false
+        true
     );
     return false;
 };
 var imap_background_unread_content_result = function(res) {
     var ids = [res.imap_server_id];
     var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
+    var count = $('tr', cache).length;
     Hm_Message_List.update(ids, res.formatted_message_list, 'imap', cache);
     Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
+    if ($('tr', cache).length > count) {
+        $('.menu_unread > a').css('font-weight', 'bold');
+        Hm_Folders.save_folder_list();
+    }
 };
 
 var imap_combined_unread_content = function(id) {
@@ -308,7 +312,7 @@ var imap_prefetch_message_content = function(uid, server_id, folder) {
         function(res) {
             var key = uid+'_imap_'+server_id+'_'+folder;
             if (!Hm_Utils.get_from_local_storage(key)) {
-                var div = $('<div></div>');
+                div = $('<div></div>');
                 div.append(res.msg_headers);
                 div.append(res.msg_text);
                 div.append(res.msg_parts);
@@ -444,7 +448,7 @@ else if (hm_page_name() == 'home') {
     setTimeout(imap_status_update, 100);
 }
 if (hm_page_name() != 'message_list' && hm_list_path() != 'unread') {
-    Hm_Message_List.add_sources();
+    Hm_Message_List.add_sources(hm_data_sources());
     Hm_Timer.add_job(Hm_Message_List.load_sources, 40, true);
 }
 Hm_Timer.add_job(imap_prefetch_msgs, 12, true);

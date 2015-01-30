@@ -529,12 +529,12 @@ var Hm_Message_List = {
         $('.refresh_link').click(function() { return Hm_Message_List.load_sources(); });
     },
 
-    add_sources: function() {
-        Hm_Message_List.sources = hm_data_sources();
+    add_sources: function(sources) {
+        Hm_Message_List.sources = sources;
     },
 
     setup_combined_view: function(cache_name) {
-        Hm_Message_List.add_sources();
+        Hm_Message_List.add_sources(hm_data_sources());
         var data = Hm_Utils.get_from_local_storage(cache_name);
         if (data && data.length) {
             $('.message_table tbody').html(data);
@@ -988,5 +988,9 @@ $(function() {
         $('.source_link').click(function() { $('.list_sources').toggle(); return false; });
         $('.del_src_link').click(function() { return Hm_Message_List.remove_page_source(this); });
         $('.add_src_link').click(function() { return Hm_Message_List.add_page_source(); });
+        if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
+            $('.menu_unread > a').css('font-weight', 'normal');
+            Hm_Folders.save_folder_list();
+        }
     }
 });
