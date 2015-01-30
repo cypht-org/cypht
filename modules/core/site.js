@@ -87,14 +87,6 @@ var Hm_Ajax_Request = function() { return {
             if (this.callback) {
                 this.callback(res);
             }
-            if (hm_debug() && res.debug) {
-                var key;
-                var data = [];
-                for (key in res.debug) {
-                    data.push([res.debug[key]]);
-                }
-                console.log(data.join(" | "));
-            }
         }
     },
 
@@ -237,12 +229,6 @@ var Hm_Message_List = {
         'flagged': 'formatted_flagged_data'
     },
 
-    update: function(ids, msgs, type) {
-        var msg_ids = Hm_Message_List.add_rows(msgs);
-        var count = Hm_Message_List.remove_rows(ids, msg_ids, type);
-        return count;
-    },
-
     add_page_source: function() {
         var details;
         $('.folders a').each(function() {
@@ -293,8 +279,22 @@ var Hm_Message_List = {
         Hm_Message_List.sources = new_sources;
     },
 
-    remove_rows: function(ids, msg_ids, type) {
-        var count = $('.message_table tbody tr').length;
+    update: function(ids, msgs, type, cache) {
+        var msg_rows;
+        if (!cache) {
+            msg_rows = $('.message_table tbody');
+        }
+        else {
+            msg_rows = cache;
+        }
+        var msg_ids = Hm_Message_List.add_rows(msgs, msg_rows);
+        var count = Hm_Message_List.remove_rows(ids, msg_ids, type, msg_rows);
+        return count;
+    },
+
+
+    remove_rows: function(ids, msg_ids, type, msg_rows) {
+        var count = $('tr', msg_rows).length;
         var i;
         var filter_function = function() {
             var id = this.className;
@@ -304,12 +304,12 @@ var Hm_Message_List = {
             }
         };
         for (i=0;i<ids.length;i++) {
-            $('.message_table tbody tr[class^='+type+'_'+ids[i]+'_]').filter(filter_function);
+            $('tr[class^='+type+'_'+ids[i]+'_]', msg_rows).filter(filter_function);
         }
         return count;
     },
 
-    add_rows: function(msgs) {
+    add_rows: function(msgs, msg_rows) {
         var msg_ids = [];
         var row;
         var id;
@@ -323,28 +323,28 @@ var Hm_Message_List = {
             if (Hm_Message_List.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
                 continue;
             }
-            if (!$('.'+Hm_Utils.clean_selector(id)).length) {
-                Hm_Message_List.insert_into_message_list(row);
-                $('.'+Hm_Utils.clean_selector(id)).show();
+            if (!$('.'+Hm_Utils.clean_selector(id), msg_rows).length) { 
+                Hm_Message_List.insert_into_message_list(row, msg_rows);
+                $('.'+Hm_Utils.clean_selector(id), msg_rows).show();
             }
             else {
                 timestr = $('.msg_date', $(row)).html();
                 subject = $('.subject', $(row)).html();
                 timeint = $('.msg_timestamp', $(row)).val();
-                $('.msg_date', $('.'+Hm_Utils.clean_selector(id))).html(timestr);
-                $('.subject', $('.'+Hm_Utils.clean_selector(id))).html(subject);
-                $('.msg_timestamp', $('.'+Hm_Utils.clean_selector(id))).val(timeint);
+                $('.msg_date', $('.'+Hm_Utils.clean_selector(id), msg_rows)).html(timestr);
+                $('.subject', $('.'+Hm_Utils.clean_selector(id), msg_rows)).html(subject);
+                $('.msg_timestamp', $('.'+Hm_Utils.clean_selector(id), msg_rows)).val(timeint);
             }
             msg_ids.push(id);
         }
         return msg_ids;
     },
 
-    insert_into_message_list: function(row) {
+    insert_into_message_list: function(row, msg_rows) {
         var timestr = $('.msg_timestamp', $(row)).val();
         var element = false;
         var timestr2;
-        $('.message_table tbody tr').each(function() {
+        $('tr', msg_rows).each(function() {
             timestr2 = $('.msg_timestamp', $(this)).val();
             if ((timestr*1) >= (timestr2*1)) {
                 element = $(this);
@@ -352,10 +352,10 @@ var Hm_Message_List = {
             }
         });
         if (element) {
-            $(row).insertBefore(element);
+            $(row, msg_rows).insertBefore(element);
         }
         else {
-            $('.message_table tbody').append(row);
+            msg_rows.append(row);
         }
     },
 
