@@ -443,10 +443,8 @@ else if (hm_page_name() == 'servers') {
 else if (hm_page_name() == 'home') {
     setTimeout(imap_status_update, 100);
 }
-if ($(Hm_Utils.get_from_local_storage('formatted_unread_data')).length > 0) {
-    Hm_Timer.add_job(imap_prefetch_msgs, 12, true);
-}
 if (hm_page_name() != 'message_list' && hm_list_path() != 'unread') {
     Hm_Message_List.add_sources();
     Hm_Timer.add_job(Hm_Message_List.load_sources, 40, true);
 }
+Hm_Timer.add_job(imap_prefetch_msgs, 12, true);
