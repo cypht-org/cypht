@@ -7,12 +7,14 @@ output_source('imap');
 
 /* add stuff to the home page */
 add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('home', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('home', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('home', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
 add_output('home', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
 add_handler('servers', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('servers', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('servers', 'add_imap_servers_to_page_data', true, 'imap', 'process_add_imap_server', 'after');
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'add_imap_servers_to_page_data', 'after');
@@ -22,11 +24,13 @@ add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* settings page data */
 add_handler('settings', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('settings', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('settings', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* compose page data */
 add_handler('compose', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('compose', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('compose', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('compose', 'imap_process_reply_fields', true, 'imap', 'add_imap_servers_to_page_data', 'after');
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -34,6 +38,7 @@ add_output('compose', 'imap_reply_details', true, 'imap', 'page_js', 'before');
 
 /* search page data */
 add_handler('search', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('search', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('search', 'load_imap_servers_for_search',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('search', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 
@@ -45,12 +50,14 @@ add_handler('message_list', 'imap_message_list_type', true, 'imap', 'message_lis
 
 /* message view page */
 add_handler('message', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('message', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* page not found */
 add_handler('notfound', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('notfound', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('notfound', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('notfound', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
 add_output('notfound', 'imap_server_ids', true, 'imap', 'page_js', 'before');

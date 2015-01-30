@@ -359,7 +359,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $callback = 'imap_all_mail_content';
                 break;
             default:
-                $callback = false;
+                $callback = 'imap_background_unread_content';
                 break;
         }
         if ($callback) {
@@ -632,7 +632,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 '<a href="#" class="header_toggle">'.$this->trans('all').'</a>'.
                 '<a class="header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
                 ' | <a href="?page=compose&amp;reply_uid='.$this->html_safe($this->get('msg_text_uid', 0)).
-                '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $this->get('msg_server_id'), $this->get('msg_folder'))).'">reply</a>'.
+                '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $this->get('msg_server_id'), $this->get('msg_folder'))).'">'.
+                $this->trans('reply').'</a>'.
                 ' | <a href="?page=compose">'.$this->trans('forward').'</a>'.
                 ' | <a href="?page=compose">'.$this->trans('attach').'</a>'.
                 ' | <a class="msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
