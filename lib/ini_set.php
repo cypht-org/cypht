@@ -60,4 +60,6 @@ if ($config->get('user_settings_dir', false) && is_readable($config->get('user_s
 }
 ini_set('open_basedir', $base);
 
+ignore_user_abort(true);
+
 ?>
