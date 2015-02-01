@@ -28,8 +28,8 @@ class Hm_Crypt {
     /**
      * Convert ciphertext to plaintext
      *
-     * @param $string string ciphertext to decrypt
-     * @param $key string encryption key
+     * @param string $string ciphertext to decrypt
+     * @param string $key encryption key
      *
      * @return string decrypted text
      */
@@ -45,8 +45,8 @@ class Hm_Crypt {
     /**
      * Convert plaintext into ciphertext
      *
-     * @param $string string plaintext to encrypt
-     * @param $key string encryption key
+     * @param string $string plaintext to encrypt
+     * @param string $key encryption key
      *
      * @return string encrypted text
      */
@@ -96,7 +96,7 @@ class Hm_Nonce {
     /**
      * Load a saved list from the session
      *
-     * @param $session object session interface
+     * @param object $session session interface
      * 
      * @return void
      */
@@ -117,7 +117,7 @@ class Hm_Nonce {
     /**
      * Validate the site key
      *
-     * @param $key string key to validate
+     * @param string $key key to validate
      *
      * @return bool
      */
@@ -153,7 +153,7 @@ class Hm_Nonce {
     /**
      * Save the list into the session
      *
-     * @param $session object session interface
+     * @param object $session session interface
      *
      * @return void
      */
@@ -164,7 +164,7 @@ class Hm_Nonce {
     /**
      * Validate a nonce
      *
-     * @param $nonce string value to check
+     * @param string $nonce value to check
      *
      * @return bool true on success
      */

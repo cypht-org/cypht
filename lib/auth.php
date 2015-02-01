@@ -19,7 +19,7 @@ abstract class Hm_Auth {
     /**
      * Assign site config
      *
-     * @param $config object site config
+     * @param object $config site config
      *
      * @return void
      */
@@ -30,8 +30,8 @@ abstract class Hm_Auth {
     /**
      * This is the method new auth mechs need to override.
      *
-     * @param $user string username
-     * @param $pass string password
+     * @param string $user username
+     * @param string $pass password
      *
      * @return bool true if the user is authenticated, false otherwise
      */
@@ -61,8 +61,8 @@ class Hm_Auth_DB extends Hm_Auth {
     /**
      * Send the username and password to the configured DB for authentication
      *
-     * @param $user string username
-     * @param $pass string password
+     * @param string $user username
+     * @param string $pass password
      *
      * @return bool true if authentication worked
      */
@@ -83,7 +83,7 @@ class Hm_Auth_DB extends Hm_Auth {
     /**
      * Delete a user account from the db
      *
-     * @param $user string username
+     * @param string $user username
      *
      * @return bool true if successful
      */
@@ -113,8 +113,8 @@ class Hm_Auth_DB extends Hm_Auth {
     /**
      * Change the password for a user in the DB
      *
-     * @param $user string username
-     * @param $pass string password
+     * @param string $user username
+     * @param string $pass password
      *
      * @return bool true on success
      */
@@ -132,9 +132,9 @@ class Hm_Auth_DB extends Hm_Auth {
     /**
      * Create a new user in the DB
      *
-     * @param $request object request details
-     * @param $user string username
-     * @param $pass string password
+     * @param object $request request details
+     * @param string $user username
+     * @param string $pass password
      */
     public function create($user, $pass) {
         $this->connect();

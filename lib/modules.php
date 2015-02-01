@@ -22,9 +22,9 @@ trait Hm_Module_Output {
     /**
      * Add a name value pair to the output array
      *
-     * @param $name string name of value to store
-     * @param $value mixed value
-     * @param $protected bool true disallows overwriting
+     * @param string $name name of value to store
+     * @param mixed $value value
+     * @param bool $protected true disallows overwriting
      *
      * @return bool true on success
      */
@@ -47,8 +47,8 @@ trait Hm_Module_Output {
     /**
      * append a value to an array, create it if does not exist
      *
-     * @param $name string array name
-     * @param $value value to add
+     * @param string $name array name
+     * @param string $value value to add
      *
      * @return bool true on success
      */
@@ -77,8 +77,8 @@ trait Hm_Module_Output {
     /**
      * Concatenate a value
      *
-     * @param $name string name to add to
-     * @param $value string value to add
+     * @param string $name name to add to
+     * @param string $value value to add
      *
      * @return bool true on success
      */
@@ -120,9 +120,9 @@ trait Hm_Module_Output {
     /**
      * Fetch an output value
      *
-     * @param $name string key to fetch the value for
-     * @param $default mixed default return value if not found
-     * @param $typed if a default value is given, typecast the result to it's type
+     * @param string $name key to fetch the value for
+     * @param mixed $default default return value if not found
+     * @param string $typed if a default value is given, typecast the result to it's type
      *
      * @return mixed value if found or default
      */
@@ -143,7 +143,7 @@ trait Hm_Module_Output {
     /**
      * Check for a key
      *
-     * @param $name string key name
+     * @param string $name key name
      *
      * @return bool true if found
      */
@@ -154,8 +154,8 @@ trait Hm_Module_Output {
     /**
      * Check to see if a value matches a list
      *
-     * @param $name string name to check
-     * @param $values array list to check against
+     * @param string $name name to check
+     * @param array $values list to check against
      *
      * @return bool true if found
      */
@@ -205,10 +205,10 @@ abstract class Hm_Handler_Module {
     /**
      * Assign input and state sources
      *
-     * @param $parent object instance of the Hm_Request_Handler class
-     * @param $logged_in bool true if currently logged in
-     * @param $output array data from handler modules
-     * @param $protected array list of protected output names
+     * @param object $parent instance of the Hm_Request_Handler class
+     * @param bool $logged_in true if currently logged in
+     * @param array $output data from handler modules
+     * @param array $protected list of protected output names
      *
      * @return void
      */
@@ -260,7 +260,7 @@ abstract class Hm_Handler_Module {
     /**
      * Process an HTTP POST form
      *
-     * @param $form array list of required field names in the form
+     * @param array $form list of required field names in the form
      *
      * @return array tuple with a bool indicating success, and an array of valid form values
      */
@@ -308,8 +308,8 @@ abstract class Hm_Output_Module {
     /**
      * Constructor
      *
-     * @param $input data from handler modules
-     * @param $protected array list of protected keys
+     * @param array $input data from handler modules
+     * @param array $protected list of protected keys
      *
      * @return void
      */
@@ -321,7 +321,7 @@ abstract class Hm_Output_Module {
     /**
      * Return a translated string if possible
      *
-     * @param $string the string to be translated
+     * @param the $string string to be translated
      * 
      * @return string translated string
      */
@@ -343,8 +343,8 @@ abstract class Hm_Output_Module {
     /**
      * Build output by calling module specific output functions
      *
-     * @param $formt string output type, either HTML5 or AJAX
-     * @param $lang_str array list of language translation strings
+     * @param string $formt output type, either HTML5 or AJAX
+     * @param array $lang_str list of language translation strings
      *
      * @return mixed module output, a string for HTML5 format,
      *               and an array for AJAX
@@ -363,7 +363,7 @@ abstract class Hm_Output_Module {
     /**
      * Sanitize input string
      *
-     * @param $string string text to sanitize
+     * @param string $string text to sanitize
      *
      * @return string sanitized value
      */
@@ -374,7 +374,7 @@ abstract class Hm_Output_Module {
     /**
      * Output modules need to override this method to add to a page or AJAX response
      *
-     * @param $format string either AJAX or HTML5
+     * @param string $format either AJAX or HTML5
      *
      * @return mixed should return an array if $format == AJAX, or an HTML5 formatted
      *               string if set to HTML5
@@ -412,11 +412,11 @@ class Hm_Request_Handler {
     /**
      * Process the modules for a given page id
      *
-     * @param $page string page id
-     * @param $request object request details
-     * @param $session object session interface
-     * @param $config object site settings
-     * @param $modules array list of modules for this page
+     * @param string $page page id
+     * @param object $request request details
+     * @param object $session session interface
+     * @param object $config site settings
+     * @param array $modules list of modules for this page
      *
      * @return array combined array of module results
      */
@@ -516,11 +516,11 @@ trait Hm_Modules {
     /**
      * Queue a module to be added to all defined pages
      *
-     * @param $module string the module to add
-     * @param $logged_in bool true if the module requires the user to be logged in
-     * @param $marker string the module to insert before or after
-     * @param $placement string "before" or "after" the $marker module
-     * @param $source string the module set containing this module
+     * @param string $module the module to add
+     * @param bool $logged_in true if the module requires the user to be logged in
+     * @param string $marker the module to insert before or after
+     * @param string $placement "before" or "after" the $marker module
+     * @param string $source the module set containing this module
      *
      * return void
      */
@@ -542,7 +542,7 @@ trait Hm_Modules {
     /**
      * Load a complete formatted module list
      *
-     * @param $mod_list array list of module assignments
+     * @param array $mod_list list of module assignments
      *
      * @return void
      */
@@ -553,7 +553,7 @@ trait Hm_Modules {
     /**
      * Assign the module set name
      *
-     * @param $source string the name of the module set (imap, pop3, core, etc)
+     * @param string $source the name of the module set (imap, pop3, core, etc)
      *
      * @return void
      */
@@ -564,11 +564,11 @@ trait Hm_Modules {
     /**
      * Add a module to every defined page
      *
-     * @param $module string the module to add
-     * @param $logged_in bool true if the module requires the user to be logged in
-     * @param $marker string the module to insert before or after
-     * @param $placement string "before" or "after" the $marker module
-     * @param $source string the module set containing this module
+     * @param string $module the module to add
+     * @param bool $logged_in true if the module requires the user to be logged in
+     * @param string $marker the module to insert before or after
+     * @param string $placement "before" or "after" the $marker module
+     * @param string $source the module set containing this module
      *
      * @return void
      */
@@ -583,13 +583,13 @@ trait Hm_Modules {
     /**
      * Add a module to a single page
      *
-     * @param $page string the page to assign the module to
-     * @param $module string the module to add
-     * @param $logged_in bool true if the module requires the user to be logged in
-     * @param $marker string the module to insert before or after
-     * @param $placement string "before" or "after" the $marker module
-     * @param $queue bool true to attempt to re-insert the module later on failure
-     * @param $source string the module set containing this module
+     * @param string $page the page to assign the module to
+     * @param string $module the module to add
+     * @param bool $logged_in true if the module requires the user to be logged in
+     * @param string $marker the module to insert before or after
+     * @param string $placement "before" or "after" the $marker module
+     * @param bool $queue true to attempt to re-insert the module later on failure
+     * @param string $source the module set containing this module
      *
      * @return void
      */
@@ -637,9 +637,9 @@ trait Hm_Modules {
     /**
      * Replace an already assigned module with a different one
      *
-     * @param $target string module name to replace
-     * @param $replacement string module name to swap in
-     * @param $page string page to replace assignment on, try all pages if false
+     * @param string $target module name to replace
+     * @param string $replacement module name to swap in
+     * @param string $page page to replace assignment on, try all pages if false
      *
      * @return void
      */
@@ -661,9 +661,9 @@ trait Hm_Modules {
     /**
      * Helper function to swap the key of an array and maintain it's value
      *
-     * @param $target string array key to replace
-     * @param $replacement string array key to swap in
-     * @param $modules array list of modules
+     * @param string $target array key to replace
+     * @param string $replacement array key to swap in
+     * @param array $modules list of modules
      *
      * @return array new list with the key swapped out
      */
@@ -695,8 +695,8 @@ trait Hm_Modules {
     /**
      * Delete a module from the internal list
      *
-     * @param $page string page to delete from
-     * @param $module string module name to delete
+     * @param string $page page to delete from
+     * @param string $module module name to delete
      *
      * @return void
      */
@@ -709,7 +709,7 @@ trait Hm_Modules {
     /**
      * Return all the modules assigned to a given page
      *
-     * @param $page string the request name
+     * @param string $page the request name
      * 
      * @return array list of assigned modules
      */
@@ -752,7 +752,7 @@ class Hm_Output_Modules { use Hm_Modules; }
 /**
  * Add a module set name to the input processing manager
  *
- * @param $source string module set name
+ * @param string $source module set name
  *
  * @return void
  */
@@ -763,7 +763,7 @@ function handler_source($source) {
 /**
  * Add a module set name to the output module manager
  *
- * @param $source string module set name
+ * @param string $source module set name
  *
  * @return void
  */
@@ -774,10 +774,10 @@ function output_source($source) {
 /**
  * Replace an already assigned module with a different one
  *
- * @param $type string either output or handler
- * @param $target string module name to replace
- * @param $replacement string module to swap in
- * @param $page request id, otherwise try all pages names
+ * @param string $type either output or handler
+ * @param string $target module name to replace
+ * @param string $replacement module to swap in
+ * @param string $page request id, otherwise try all page names
  *
  * $return void/
  */
@@ -793,12 +793,12 @@ function replace_module($type, $target, $replacement, $page=false) {
 /**
  * Add an input handler module to a specific page
  *
- * @param $mod string name of the module to add
- * @param $logged_in bool true if the module should only fire when logged in
- * @param $source string the module set containing the module code
- * @param $marker string the module name used to determine where to insert
- * @param $placement string "before" or "after" the $marker module name
- * @param $queue bool true if the module should be queued and retryed on failure
+ * @param string $mod name of the module to add
+ * @param bool $logged_in true if the module should only fire when logged in
+ * @param string $source the module set containing the module code
+ * @param string $marker the module name used to determine where to insert
+ * @param string $placement "before" or "after" the $marker module name
+ * @param bool $queue true if the module should be queued and retryed on failure
  *
  * @return void
  */
@@ -809,12 +809,12 @@ function add_handler($page, $mod, $logged_in, $source=false, $marker=false, $pla
 /**
  * Add an output module to a specific page
  *
- * @param $mod string name of the module to add
- * @param $logged_in bool true if the module should only fire when logged in
- * @param $source string the module set containing the module code
- * @param $marker string the module name used to determine where to insert
- * @param $placement string "before" or "after" the $marker module name
- * @param $queue bool true if the module should be queued and retryed on failure
+ * @param string $mod name of the module to add
+ * @param bool $logged_in true if the module should only fire when logged in
+ * @param string $source the module set containing the module code
+ * @param string $marker the module name used to determine where to insert
+ * @param string $placement "before" or "after" the $marker module name
+ * @param bool $queue true if the module should be queued and retryed on failure
  *
  * @return void
  */
@@ -825,12 +825,12 @@ function add_output($page, $mod, $logged_in, $source=false, $marker=false, $plac
 /**
  * Add an input or output module to all possible pages
  *
- * @param $type string either output or handler
- * @param $mod string name of the module to add
- * @param $logged_in bool true if the module should only fire when logged in
- * @param $source string the module set containing the module code
- * @param $marker string the module name used to determine where to insert
- * @param $placement string "before" or "after" the $marker module name
+ * @param string $type either output or handler
+ * @param string $mod name of the module to add
+ * @param bool $logged_in true if the module should only fire when logged in
+ * @param string $source the module set containing the module code
+ * @param string $marker the module name used to determine where to insert
+ * @param string $placement "before" or "after" the $marker module name
  *
  * @return void
  */

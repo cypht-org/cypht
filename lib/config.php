@@ -30,8 +30,8 @@ abstract class Hm_Config {
     /**
      * Set a config value
      *
-     * @param $name string config value name
-     * @param $value string config value
+     * @param string $name config value name
+     * @param string $value config value
      *
      * @return void
      */
@@ -42,8 +42,8 @@ abstract class Hm_Config {
     /**
      * Return a config value if it exists
      *
-     * @param $name string config value name
-     * @param $default mixed value to return if the name is not found
+     * @param string $name config value name
+     * @param mixed $default value to return if the name is not found
      *
      * @return mixed found value, otherwise $default
      */
@@ -72,7 +72,7 @@ class Hm_User_Config_File extends Hm_Config {
     /**
      * Load site configuration
      *
-     * @param $config object site config
+     * @param object $config site config
      *
      * @return void
      */
@@ -83,7 +83,7 @@ class Hm_User_Config_File extends Hm_Config {
     /**
      * Get the filesystem path for a user settings file
      *
-     * @param $username string username
+     * @param string $username username
      * 
      * @return string filepath to the user config file
      */
@@ -95,8 +95,8 @@ class Hm_User_Config_File extends Hm_Config {
     /**
      * Load the settings for a user
      *
-     * @param $username string username
-     * @param $key string key to decrypt the user data
+     * @param string $username username
+     * @param string $key key to decrypt the user data
      *
      * @return void
      */
@@ -117,7 +117,7 @@ class Hm_User_Config_File extends Hm_Config {
     /**
      * Reload from outside input
      *
-     * @param $data array new user data
+     * @param array $data new user data
      *
      * @return void
      */
@@ -129,8 +129,8 @@ class Hm_User_Config_File extends Hm_Config {
     /**
      * Save user settings to a file
      *
-     * @param $username string username
-     * @param $key string encryption key
+     * @param string $username username
+     * @param string $key encryption key
      *
      * @return void
      */
@@ -155,7 +155,7 @@ class Hm_User_Config_DB extends Hm_Config {
     /**
      * Load site config
      *
-     * @param $config object site config
+     * @param object $config site config
      *
      * @return void
      */
@@ -166,8 +166,8 @@ class Hm_User_Config_DB extends Hm_Config {
     /**
      * Load the user settings from the DB
      *
-     * @param $username string username
-     * @param $key string encryption key
+     * @param string $username username
+     * @param string $key encryption key
      *
      * @return void
      */
@@ -197,7 +197,7 @@ class Hm_User_Config_DB extends Hm_Config {
     /**
      * Reload from outside input
      *
-     * @param $data array new user data
+     * @param array $data new user data
      *
      * @return void
      */
@@ -222,8 +222,8 @@ class Hm_User_Config_DB extends Hm_Config {
     /**
      * Save user settings to the DB
      *
-     * @param $username string username
-     * @param $key string encryption key
+     * @param string $username username
+     * @param string $key encryption key
      *
      * @return void
      */
@@ -248,7 +248,7 @@ class Hm_Site_Config_File extends Hm_Config {
     /**
      * Load data based on source
      *
-     * @param $source string source location for site configuration
+     * @param string $source source location for site configuration
      *
      * @return void
      */
@@ -259,8 +259,8 @@ class Hm_Site_Config_File extends Hm_Config {
     /**
      * Load user data from a file
      *
-     * @param $source string file path to the site configuration
-     * @param $key string encryption key (unsued in this class)
+     * @param string $source file path to the site configuration
+     * @param string $key encryption key (unsued in this class)
      *
      * @return void
      */

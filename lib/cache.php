@@ -13,9 +13,9 @@ class Hm_Page_Cache {
     /**
      * Add a page
      *
-     * @param $key string key to access the page data
-     * @param $page string data to cache
-     * @param $save bool flag used to cache between logins
+     * @param string $key key to access the page data
+     * @param string $page data to cache
+     * @param bool $save flag used to cache between logins
      *
      * @return void
      */
@@ -26,10 +26,10 @@ class Hm_Page_Cache {
     /**
      * Concatenate new cache data to an existing page
      *
-     * @param $key string key to access the page data
-     * @param $page string data to cache
-     * @param $save bool flag used to cache between logins
-     * @param $delim string delimiter used between values
+     * @param string $key key to access the page data
+     * @param string $page data to cache
+     * @param bool $save flag used to cache between logins
+     * @param string $delim delimiter used between values
      *
      * @return void
      */
@@ -50,7 +50,7 @@ class Hm_Page_Cache {
     /**
      * Delete a page from the cache
      *
-     * @param $key string key name of the data to delete
+     * @param string $key key name of the data to delete
      *
      * @return bool true on success
      */
@@ -65,7 +65,7 @@ class Hm_Page_Cache {
     /**
      * Fetch a cached value from the list
      *
-     * @param $key string key name of the data to fetch
+     * @param string $key key name of the data to fetch
      *
      * @return mixed string value on success, bool false on failure
      */
@@ -89,7 +89,7 @@ class Hm_Page_Cache {
     /**
      * Remove all cached values
      *
-     * @param $session object session interface
+     * @param object $session session interface
      *
      * @return void
      */
@@ -102,7 +102,7 @@ class Hm_Page_Cache {
     /**
      * Load cached pages from session data
      *
-     * @param $session object session interface
+     * @param object $session session interface
      *
      * @return void
      */
@@ -114,7 +114,7 @@ class Hm_Page_Cache {
     /**
      * Save the page cache in the session
      *
-     * @param $session object session interface
+     * @param object $session session interface
      *
      * @return void
      */
@@ -143,7 +143,7 @@ trait Hm_Uid_Cache {
 
     /* Load UIDs from an outside source
      *
-     * @param $uid_array list of uids
+     * @param list $uid_array of uids
      *
      * @return void
      */
@@ -159,7 +159,7 @@ trait Hm_Uid_Cache {
     /**
      * Determine if a UID is present
      *
-     * @param $uid string UID to search for
+     * @param string $uid UID to search for
      *
      * @return bool true if te UID exists
      */
@@ -179,7 +179,7 @@ trait Hm_Uid_Cache {
     /**
      * Add a UID to the list
      *
-     * @param $uid string uid to add
+     * @param string $uid uid to add
      */
     public static function add($uid) {
         self::$uids[$uid] = 0;
@@ -188,7 +188,7 @@ trait Hm_Uid_Cache {
     /**
      * Remove a UID from the list
      *
-     * @param $uid string uid to remove
+     * @param string $uid uid to remove
      *
      * @return bool true on success
      */

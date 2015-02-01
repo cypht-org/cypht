@@ -19,7 +19,7 @@ class Hm_DB {
     /**
      * Load DB configuration from the site config
      *
-     * @param $site_config object site config
+     * @param object $site_config site config
      *
      * @return void
      */
@@ -55,7 +55,7 @@ class Hm_DB {
     /**
      * Connect to a DB server
      *
-     * @param $site_config object site settings
+     * @param object $site_config site settings
      * 
      * @return object database connection on success
      */

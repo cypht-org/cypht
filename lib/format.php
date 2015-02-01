@@ -16,9 +16,9 @@ abstract class HM_Format {
      * Return combined output from all modules. Must be overridden by specific
      * output classes
      *
-     * @param $input array data from the handler modules
-     * @param $lang_str array language definitions
-     * @param $allowed_output array allowed fields for JSON responses
+     * @param array $input data from the handler modules
+     * @param array $lang_str language definitions
+     * @param array $allowed_output allowed fields for JSON responses
      *
      * @return mixed combined output
      */
@@ -27,8 +27,8 @@ abstract class HM_Format {
     /**
      * Setup and run the abstract content() function
      *
-     * @param $input array data from the handler modules
-     * @param $allowed_output array allowed fields for JSON responses
+     * @param array $input data from the handler modules
+     * @param array $allowed_output allowed fields for JSON responses
      *
      * @return mixed formatted content
      */
@@ -45,7 +45,7 @@ abstract class HM_Format {
     /**
      * Load language translation strings
      *
-     * @param $lang string langauge name
+     * @param string $lang langauge name
      *
      * @return array list of translated strings
      */
@@ -60,9 +60,9 @@ abstract class HM_Format {
     /**
      * Run output modules and collect the results
      *
-     * @param $input array data from the handler modules
-     * @param $format string output format type, either JSON or HTML5
-     * @param $lang_str array langauge strings
+     * @param array $input data from the handler modules
+     * @param string $format output format type, either JSON or HTML5
+     * @param array $lang_str langauge strings
      *
      * @return mixed module results
      */
@@ -103,9 +103,9 @@ class Hm_Format_JSON extends HM_Format {
     /**
      * Run modules and merge + filter the result array
      *
-     * @param $input array data from the handler modules
-     * @param $lang_str array langauge strings
-     * @param $allowed_output array allowed fields for JSON responses
+     * @param array $input data from the handler modules
+     * @param array $lang_str langauge strings
+     * @param array $allowed_output allowed fields for JSON responses
      *
      * @return JSON encoded data to be sent to the browser
      */
@@ -123,8 +123,8 @@ class Hm_Format_JSON extends HM_Format {
     /**
      * Filter data against module set white lists before sending it to the browser
      *
-     * @param $data array output module data to filter
-     * @param $allowed array set of white list filters
+     * @param array $data output module data to filter
+     * @param array $allowed set of white list filters
      *
      * @return array filtered data
      */
@@ -160,9 +160,9 @@ class Hm_Format_HTML5 extends HM_Format {
     /**
      * Collect and return content from modules for HTTP requests
      *
-     * @param $input array data from the handler modules
-     * @param $lang_str array langauge strings
-     * @param $allowed_output array allowed fields for JSON responses
+     * @param array $input data from the handler modules
+     * @param array $lang_str langauge strings
+     * @param array $allowed_output allowed fields for JSON responses
      *
      * @return string HTML5 content
      */

@@ -13,11 +13,11 @@ trait Hm_Server_List {
     /**
      * Server lists must override this method to connect
      *
-     * @param $id int server id
-     * @param $server string server hostname or ip
-     * @param $user string username for authentication
-     * @param $pass string password for authentication
-     * @param $cache mixed cached connection data
+     * @param int $id server id
+     * @param string $server server hostname or ip
+     * @param string $user username for authentication
+     * @param string $pass password for authentication
+     * @param mixed $cache cached connection data
      *
      * @return bool true on success
      */
@@ -26,11 +26,11 @@ trait Hm_Server_List {
     /**
      * Connect to a server
      *
-     * @param $id int server id
-     * @param $cache mixed cached server data
-     * @param $user string username
-     * @param $pass string password
-     * @param $save_credentials bool true to save the username and password
+     * @param int $id server id
+     * @param mixed $cache cached server data
+     * @param string $user username
+     * @param string $pass password
+     * @param bool $save_credentials true to save the username and password
      *
      * @return mixed connection object on success, otherwise false
      */
@@ -65,7 +65,7 @@ trait Hm_Server_List {
     /**
      * Remove the username and password from a connection
      *
-     * @param $id int server id
+     * @param int $id server id
      *
      * @return void
      */
@@ -79,8 +79,8 @@ trait Hm_Server_List {
     /**
      * Add a server definition
      *
-     * @param $atts array server details
-     * @param $id int server id
+     * @param array $atts server details
+     * @param int $id server id
      *
      * @return void
      */
@@ -98,7 +98,7 @@ trait Hm_Server_List {
     /**
      * Remove a server
      *
-     * @param $id int server id
+     * @param int $id server id
      *
      * @return bool true on success
      */
@@ -113,8 +113,8 @@ trait Hm_Server_List {
     /**
      * Return all server details
      *
-     * @param $id int if not false, return details for this server only
-     * @param $full bool true to return passwords for server connections. CAREFUL!
+     * @param int $id if not false, return details for this server only
+     * @param bool $full true to return passwords for server connections. CAREFUL!
      *
      * @return array server details
      */
@@ -148,7 +148,7 @@ trait Hm_Server_List {
     /**
      * Try to disconnect cleanly
      *
-     * @param $id int server id
+     * @param int $id server id
      *
      * @return void
      */
@@ -166,7 +166,7 @@ trait Hm_Server_List {
     /**
      * Disconnect from a server
      *
-     * @param $id int the server id to disconnect
+     * @param int $id the server id to disconnect
      *
      * @return void
      */

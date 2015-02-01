@@ -16,8 +16,8 @@ class Hm_Router {
      * Main entry point to the router. All the work of processing input and sending output to and from
      * the browser happens here.
      *
-     * @param $config object site configuration object
-     * @param $debug_mode bool true to use debug modules
+     * @param object $config site configuration object
+     * @param bool $debug_mode true to use debug modules
      *
      * @return array list of the response array, the session object, and the allowed output filters
      *               for ajax responses
@@ -67,8 +67,8 @@ class Hm_Router {
     /**
      * Format result of output modules
      *
-     * @param $response_data mixed data from output modules
-     * @param $allowed_output array filters applied to JSON formatted output
+     * @param mixed $response_data data from output modules
+     * @param array $allowed_output filters applied to JSON formatted output
      *
      * @return mixed formatted content
      */
@@ -80,8 +80,8 @@ class Hm_Router {
     /**
      * Send the formatted content to the user
      *
-     * @param $output mixed data to send to the user
-     * @param $response_data mixed router details
+     * @param mixed $output data to send to the user
+     * @param mixed $response_data router details
      *
      * @return void
      */
@@ -93,7 +93,7 @@ class Hm_Router {
     /**
      * Build a list of module properties
      *
-     * @param $config object site config object
+     * @param object $config site config object
      *
      * @return array list of filters, input, and output modules
      */
@@ -109,7 +109,7 @@ class Hm_Router {
     /**
      * Get module data when in debug mode
      *
-     * @param $config object site config object
+     * @param object $config site config object
      *
      * @return array list of filters, input, and output modules
      */
@@ -131,7 +131,7 @@ class Hm_Router {
     /**
      * Get module data when in production mode
      *
-     * @param $config object site config object
+     * @param object $config site config object
      *
      * @return array list of filters, input, and output modules
      */
@@ -145,8 +145,8 @@ class Hm_Router {
     /**
      * Force TLS connections unless the site config has it disabled
      *
-     * @param $config object site config object
-     * @param $request object request object
+     * @param object $config site config object
+     * @param object $request request object
      *
      * @return void
      */
@@ -162,7 +162,7 @@ class Hm_Router {
      * Start the correct session and auth objects. This only initiates the objects
      * and does not process any session values yet
      *
-     * @param $config object site config object
+     * @param object $config site config object
      *
      * @return object new session object
      */
@@ -193,7 +193,7 @@ class Hm_Router {
     /**
      * Return the subset of active modules from a supplied list
      *
-     * @param $mod_list array list of modules
+     * @param array $mod_list list of modules
      *
      * @return array filter list
      */
@@ -204,8 +204,8 @@ class Hm_Router {
     /**
      * Load modules into a module manager
      *
-     * @param $class string name of the module manager to use
-     * @param $module_sets array list of modules by page
+     * @param string $class name of the module manager to use
+     * @param array $module_sets list of modules by page
      *
      * @return void
      */
@@ -224,9 +224,9 @@ class Hm_Router {
     /**
      * Load all module sets and include required modules.php files
      *
-     * @param $config object site config object
-     * @param $handlers array list of handler modules
-     * @param $output array list of output modules
+     * @param object $config site config object
+     * @param array $handlers list of handler modules
+     * @param array $output list of output modules
      *
      * @return void
      */
@@ -246,8 +246,8 @@ class Hm_Router {
     /**
      * Load module set definition files
      *
-     * @param $mods array modules to load
-     * @param $active_mods array list of active modules
+     * @param array $mods modules to load
+     * @param array $active_mods list of active modules
      *
      * @return void
      */
@@ -262,8 +262,8 @@ class Hm_Router {
     /**
      * Collect pending user notices from a cookie after a redirect
      *
-     * @param $session object session interface
-     * @param $request object request details
+     * @param object $session session interface
+     * @param object $request request details
      *
      * @return void
      */
@@ -280,8 +280,8 @@ class Hm_Router {
     /**
      * Redirect the page after a POST form is submitted and forward any user notices
      *
-     * @param $request object request details
-     * @param $session object session interface
+     * @param object $request request details
+     * @param object $session session interface
      *
      * @return void
      */
@@ -304,8 +304,8 @@ class Hm_Router {
     /**
      * Determine the page id
      *
-     * @param $request object request details
-     * @param $filters array list of filters
+     * @param object $request request details
+     * @param array $filters list of filters
      *
      * @return void
      */
@@ -336,9 +336,9 @@ class Hm_Router {
     /**
      * Process all the data handler modules for this page
      *
-     * @param $request object request details
-     * @param $session object session interface
-     * @param $config object site config
+     * @param object $request request details
+     * @param object $session session interface
+     * @param object $config site config
      *
      * @return array combined handler module output
      */
@@ -353,10 +353,10 @@ class Hm_Router {
     /**
      * Merge the combined response from the handler modules with some default values
      *
-     * @param $response array combined result of the handler modules
-     * @param $config object site config
-     * @param $request object request details
-     * @param $session object session interface
+     * @param array $response combined result of the handler modules
+     * @param object $config site config
+     * @param object $request request details
+     * @param object $session session interface
      *
      * @return void
      */
@@ -376,8 +376,8 @@ class Hm_Router {
     /**
      * Merge input filters from module sets
      *
-     * @param $existing array already collected filters
-     * @param $new array new filters to merge
+     * @param array $existing already collected filters
+     * @param array $new new filters to merge
      *
      * @return array merged list
      */
@@ -398,7 +398,7 @@ class Hm_Router {
     /**
      * Perform an HTTP redirect
      *
-     * @param $url string url to redirect to
+     * @param string $url url to redirect to
      *
      * @return void
      */

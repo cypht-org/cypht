@@ -10,7 +10,7 @@ abstract class Hm_Output {
     /**
      * Extended classes must override this method to output content
      *
-     * @param $content mixed data to output
+     * @param mixed $content data to output
      *
      * @return void
      */
@@ -19,8 +19,8 @@ abstract class Hm_Output {
     /**
      * Wrapper around extended class output_content() calls
      *
-     * @param $response mixed data to output
-     * @param $input array raw module data
+     * @param mixed $response data to output
+     * @param array $input raw module data
      *
      * @return void
      */
@@ -42,7 +42,7 @@ class Hm_Output_HTTP extends Hm_Output {
     /**
      * Send HTTP headers
      *
-     * @param $headers array headers to send
+     * @param array $headers headers to send
      *
      * @return void
      */
@@ -55,8 +55,8 @@ class Hm_Output_HTTP extends Hm_Output {
     /**
      * Send response content to the browser
      *
-     * @param $content mixed data to send
-     * @param $headers array HTTP headers to set
+     * @param mixed $content data to send
+     * @param array $headers HTTP headers to set
      *
      * @return void
      */
@@ -115,7 +115,7 @@ trait Hm_List {
     /**
      * Add a message
      *
-     * @param $string string message to add
+     * @param string $string message to add
      *
      * @return void
      */
@@ -135,7 +135,7 @@ trait Hm_List {
     /**
      * Stringify a value
      *
-     * @param $mixed mixed value to stringify
+     * @param mixed $mixed value to stringify
      *
      * @return string
      */
@@ -156,7 +156,7 @@ trait Hm_List {
     /**
      * Show all messages
      *
-     * @param $type string can be one of "print", "log", or "return"
+     * @param string $type can be one of "print", "log", or "return"
      *
      * @return mixed
      */
@@ -202,7 +202,7 @@ class Hm_Debug {
 /**
  * Easy to use error logging
  *
- * @param $mixed value to send to the log
+ * @param value $mixed to send to the log
  * 
  * @return void
  */

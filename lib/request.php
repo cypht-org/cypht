@@ -52,7 +52,7 @@ class Hm_Request {
     /**
      * Process request details
      *
-     * @param $filters array list of input filters from module sets
+     * @param array $filters list of input filters from module sets
      *
      * @return void
      */
@@ -71,7 +71,7 @@ class Hm_Request {
     /**
      * Sanitize and filter user and server input
      *
-     * @param $filters array list of input filters from module sets
+     * @param array $filters list of input filters from module sets
      *
      * @return void
      */
@@ -93,7 +93,7 @@ class Hm_Request {
     /**
      * Collect other useful details about a request
      *
-     * @param $filters array list of input filters from module sets
+     * @param array $filters list of input filters from module sets
      *
      * @return void
      */
@@ -210,7 +210,7 @@ class Hm_Request {
     /**
      * Make sure a url path is sane
      *
-     * @param $uri string path to check
+     * @param string $uri path to check
      *
      * @return string clean url path
      */
