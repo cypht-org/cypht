@@ -18,6 +18,7 @@ return array(
     ),
     'allowed_get' => array(
         'date' => FILTER_SANITIZE_STRING,
+        'view' => FILTER_SANITIZE_STRING,
     ),
 );
 

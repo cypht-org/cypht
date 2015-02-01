@@ -10,6 +10,11 @@ class Hm_Handler_get_calendar_date extends Hm_Handler_Module {
                 $date = $this->request->get['date'];
             }
         }
+        if (array_key_exists('view', $this->request->get)) {
+            if (in_array($this->request->get['view'], array('month', 'year', 'week'), true)) {
+                $this->out('calendar_view', $this->request->get['view']);
+            }
+        }
         $this->out('calendar_date', $date);
     }
 }
@@ -28,10 +33,11 @@ class Hm_Output_calendar_page_link extends Hm_Output_Module {
 class Hm_Output_calendar_content extends Hm_Output_Module {
     protected function output($format) {
         $date = $this->get('calendar_date', date('r'));
+        $view = $this->get('calendar_view', 'month');
         $cal = new Hm_Cal_Data();
-        $data = $cal->output($date, 'month');
+        $data = $cal->output($date, $view);
         $out = new Hm_Cal_Output($this);
-        $out = $out->output($data, $date, 'month');
+        $out = $out->output($data, $date, $view);
         return '<div class="calendar"><div class="content_title">'.$this->trans('Calendar').'</div>'.
             $out.'</div>';
     }
@@ -78,7 +84,7 @@ class Hm_Cal_Output {
     private function output_week($week) {
         $res = '';
         if ($this->format == 'week') {
-            $res .= '<div class="month_label">'.date('F, Y', strtotime($this->year.'-'.$this->month)).'</div>';
+            $res .= $this->title();
             $res .= '<table class="calendar_week">';
             $res .= $this->output_heading();
         }
@@ -92,8 +98,30 @@ class Hm_Cal_Output {
         }
         return $res;
     }
+    private function prev_next_week() {
+        return array(sprintf('<a href="?page=calendar&date=%s">&lt;</a>', date('Y-m-d', strtotime("-1 week", strtotime($this->date)))),
+            sprintf('<a href="?page=calendar&date=%s">&gt;</a>', date('Y-m-d', strtotime("+1 week", strtotime($this->date)))));
+    }
+    private function prev_next_month() {
+        return array(sprintf('<a href="?page=calendar&date=%s">&lt;</a>', date('Y-m', strtotime("-1 month", strtotime($this->year.'-'.$this->month)))),
+            sprintf('<a href="?page=calendar&date=%s">&gt;</a>', date('Y-m', strtotime("+1 month", strtotime($this->year.'-'.$this->month)))));
+    }
+    private function prev_next_year() {
+        return array(sprintf('<a href="?page=calendar&date=%s">&lt;</a>', date('Y', strtotime("-1 year", strtotime($this->date)))),
+            sprintf('<a href="?page=calendar&date=%s">&gt;</a>', date('Y', strtotime("+1 year", strtotime($this->date)))));
+    }
+    private function prev_next() {
+        if (method_exists($this, 'prev_next_'.$this->format)) {
+            return $this->{'prev_next_'.$this->format}();
+        }
+        die('invalid format');
+    }
+    private function title() {
+        list($prev, $next) = $this->prev_next();
+        return '<div class="month_label">'.$prev.' '.date('F, Y', strtotime($this->year.'-'.$this->month)).' '.$next.'</div>';
+    }
     private function output_month($month) {
-        $res = '<div class="month_label">'.date('F, Y', strtotime($this->year.'-'.$this->month)).'</div>';
+        $res = $this->title();
         $res .= '<table class="calendar_month">';
         $res .= $this->output_heading();
         foreach ($month as $week) {
