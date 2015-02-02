@@ -1,8 +1,15 @@
 <?php
 
+/**
+ * Configuration objects
+ * @package framework
+ * @subpackage config
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * class Hm_Config
  * Base class for both site and user configuration data management
  */
 abstract class Hm_Config {
@@ -62,6 +69,7 @@ abstract class Hm_Config {
 }
 
 /**
+ * class Hm_User_Config_File
  * File based user settings
  */
 class Hm_User_Config_File extends Hm_Config {
@@ -142,6 +150,7 @@ class Hm_User_Config_File extends Hm_Config {
 }
 
 /**
+ * class Hm_User_Config_DB
  * DB based user settings
  */
 class Hm_User_Config_DB extends Hm_Config {
@@ -241,6 +250,7 @@ class Hm_User_Config_DB extends Hm_Config {
 }
 
 /**
+ * class Hm_Site_Config_File
  * File based site configuration
  */
 class Hm_Site_Config_File extends Hm_Config {

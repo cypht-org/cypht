@@ -1,8 +1,15 @@
 <?php
 
+/**
+ * Database wrapper
+ * @package framework
+ * @subpackage db
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * class Hm_DB
  * DB interface for the framework and modules
  */
 class Hm_DB {

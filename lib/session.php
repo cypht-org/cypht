@@ -1,10 +1,17 @@
 <?php
 
+/**
+ * Session handling
+ * @package framework
+ * @subpackage session
+ */
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * class Hm_Session
  * Base class for session management. All session interaction happens through
  * classes that extend this.
+ * @abstract
  */
 abstract class Hm_Session {
 
@@ -235,6 +242,7 @@ abstract class Hm_Session {
 }
 
 /**
+ * class Hm_PHP_Session
  * PHP Sessions that extend the base session class
  */
 class Hm_PHP_Session extends Hm_Session {
@@ -479,6 +487,7 @@ class Hm_PHP_Session extends Hm_Session {
 }
 
 /**
+ * class Hm_DB_Session
  * This session class uses a PDO compatible DB to manage session data. It does not
  * use PHP session handlers at all and is a completely indenpendant session system.
  */

@@ -1,8 +1,14 @@
 <?php
 
+/**
+ * Request router
+ * @package framework
+ * @subpackage router
+ */
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * class Hm_Router
  * Page request router. This class ties together everything needed to process
  * a request, initiate a session, run handler modules assigned to the request,
  * and possibly do an HTTP redirect

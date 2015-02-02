@@ -1,11 +1,19 @@
 <?php
 
+/**
+ * Format output
+ * @package framework
+ * @subpackage format
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * class HM_Format
  * Base class for output formatting. Currently JSON and HTML5 formats are
  * supported. To add support for a new format this class must be extended
  * and the content method needs to be overridden.
+ * @abstract
  */
 abstract class HM_Format {
 
@@ -96,6 +104,7 @@ abstract class HM_Format {
 }
 
 /**
+ * class Hm_Format_JSON
  * Handles JSON formatted results for AJAX requests
  */
 class Hm_Format_JSON extends HM_Format {
@@ -113,10 +122,6 @@ class Hm_Format_JSON extends HM_Format {
         $input['router_user_msgs'] = Hm_Msgs::get();
         $output = $this->run_modules($input, 'JSON', $lang_str);
         $output = $this->filter_output($output, $allowed_output);
-        if (DEBUG_MODE) {
-            Hm_Debug::load_page_stats();
-            $output['debug'] = Hm_Debug::show('return');
-        }
         return json_encode($output, JSON_FORCE_OBJECT);
     }
 
@@ -153,6 +158,7 @@ class Hm_Format_JSON extends HM_Format {
 }
 
 /**
+ * class Hm_Format_HTML5
  * Handles HTML5 formatted results for normal HTTP requests
  */
 class Hm_Format_HTML5 extends HM_Format {
