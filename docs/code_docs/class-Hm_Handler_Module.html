@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_Handler_Module | Cypht Framework Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?684867790"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li class="active"><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li class="active"><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Hm_Handler_Module.html">Hm_Handler_Module</a></li>
+				<li><a href="class-Hm_Handler_Modules.html">Hm_Handler_Modules</a></li>
+				<li><a href="class-Hm_Output_Module.html">Hm_Output_Module</a></li>
+				<li><a href="class-Hm_Output_Modules.html">Hm_Output_Modules</a></li>
+				<li><a href="class-Hm_Request_Handler.html">Hm_Request_Handler</a></li>
+			</ul>
+
+
+			<h3>Traits</h3>
+			<ul>
+				<li><a href="class-Hm_Module_Output.html">Hm_Module_Output</a></li>
+				<li><a href="class-Hm_Modules.html">Hm_Modules</a></li>
+			</ul>
+
+
+
+			<h3>Functions</h3>
+			<ul>
+				<li><a href="function-add_handler.html">add_handler</a></li>
+				<li><a href="function-add_module_to_all_pages.html">add_module_to_all_pages</a></li>
+				<li><a href="function-add_output.html">add_output</a></li>
+				<li><a href="function-handler_source.html">handler_source</a></li>
+				<li><a href="function-output_source.html">output_source</a></li>
+				<li><a href="function-replace_module.html">replace_module</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-framework.modules.html" title="Summary of framework\modules"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_Handler_Module</h1>
+
+
+	<div class="description">
+	
+<p>class Hm_Handler_Module Base class for data input processing modules, called
+"handler modules"</p>
+
+<p>All modules that deal with processing input data extend from this class. It
+provides access to input and state through the following member variables:</p>
+
+<p>$session The session interface object $request The HTTP request details
+object $config The site config object $user_config The user settings object for
+the current user</p>
+
+<p>Modules that extend this class need to override the process function Modules
+can pass information to the output modules using the out() and append() methods,
+and see data from other modules with the get() method</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+<b><span>Hm_Handler_Module</span></b>			
+			
+			 uses 
+				<a href="class-Hm_Module_Output.html"><span>Hm_Module_Output</span></a>
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		<b>Abstract</b><br>
+		
+		
+		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.modules.html">modules</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_Handler_Module.html#177-294" title="Go to source code">modules.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Hm_Handler_Module.html#213-230" title="Go to source code">__construct</a>( <span>object <var>$parent</var></span>, <span>boolean <var>$logged_in</var></span>, <span>array <var>$output</var> = <span class="php-keyword1">array</span>()</span>, <span>array <var>$protected</var> = <span class="php-keyword1">array</span>() </span> )</code>
+
+		<div class="description short">
+			
+<p>Assign input and state sources</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Assign input and state sources</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$parent</var></dt>
+					<dd><code>object</code><br>$parent instance of the Hm_Request_Handler class</dd>
+					<dt><var>$logged_in</var></dt>
+					<dd><code>boolean</code><br>$logged_in true if currently logged in</dd>
+					<dt><var>$output</var></dt>
+					<dd><code>array</code><br>$output data from handler modules</dd>
+					<dt><var>$protected</var></dt>
+					<dd><code>array</code><br>$protected list of protected output names</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="process_nonce" id="_process_nonce">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_process_nonce">#</a>
+		<code><a href="source-class-Hm_Handler_Module.html#232-266" title="Go to source code">process_nonce</a>( )</code>
+
+		<div class="description short">
+			
+<p>Validate a form nonce. If this is a non-empty POST form from an HTTP request
+or AJAX update, it will take the user to the home page if the hm_nonce value is
+either not present or not valid</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Validate a form nonce. If this is a non-empty POST form from an HTTP request
+or AJAX update, it will take the user to the home page if the hm_nonce value is
+either not present or not valid</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="process_form" id="_process_form">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_process_form">#</a>
+		<code><a href="source-class-Hm_Handler_Module.html#268-288" title="Go to source code">process_form</a>( <span>array <var>$form</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Process an HTTP POST form</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Process an HTTP POST form</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$form</var></dt>
+					<dd><code>array</code><br>$form list of required field names in the form</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>tuple with a bool indicating success, and an array of valid form values<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="process" id="_process">
+
+		<td class="attributes"><code>
+			abstract public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_process">#</a>
+		<code><a href="source-class-Hm_Handler_Module.html#290-293" title="Go to source code">process</a>( )</code>
+
+		<div class="description short">
+			
+<p>Handler modules need to override this method to do work</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Handler modules need to override this method to do work</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+	<table class="summary used">
+	<caption>Methods used from <a href="class-Hm_Module_Output.html#methods">Hm_Module_Output</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_Module_Output.html#_append">()</a>, 
+			<a href="class-Hm_Module_Output.html#_concat">()</a>, 
+			<a href="class-Hm_Module_Output.html#_exists">()</a>, 
+			<a href="class-Hm_Module_Output.html#_get">()</a>, 
+			<a href="class-Hm_Module_Output.html#_in">()</a>, 
+			<a href="class-Hm_Module_Output.html#_module_output">()</a>, 
+			<a href="class-Hm_Module_Output.html#_out">()</a>, 
+			<a href="class-Hm_Module_Output.html#_output_protected">()</a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="session" id="$session">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Handler_Module.html#199" title="Go to source code"><var>$session</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$session" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="request" id="$request">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Handler_Module.html#202" title="Go to source code"><var>$request</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$request" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="config" id="$config">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Handler_Module.html#205" title="Go to source code"><var>$config</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$config" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="page" id="$page">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Handler_Module.html#208" title="Go to source code"><var>$page</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$page" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="user_config" id="$user_config">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Handler_Module.html#211" title="Go to source code"><var>$user_config</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$user_config" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+	<table class="summary used">
+	<caption>Properties used from <a href="class-Hm_Module_Output.html#properties">Hm_Module_Output</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_Module_Output.html#$appendable"><var>$appendable</var></a>, 
+			<a href="class-Hm_Module_Output.html#$output"><var>$output</var></a>, 
+			<a href="class-Hm_Module_Output.html#$protected"><var>$protected</var></a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>
