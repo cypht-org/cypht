@@ -4,7 +4,7 @@ body { min-width: 500px; padding: 0px; margin: 0px; font-family: Sans-Serif; wid
 h1 { text-shadow: 1px -1px 1px #999; margin: 0px; padding: 0px; font-size: 80px; text-align: left; color: #fff; letter-spacing: -2px; text-align: center; padding-top: 20px; padding-bottom: 20px; }
 .selected { color: #333 !important; }
 .para {clear: both; max-width: 40em; border-left: dashed 1px #ddd; border-right: dashed 1px #ddd; margin: 0px; margin-left: auto; margin-right: auto; padding: 20px; padding-left: 30px; font-size: 12pt; min-height: 400px; line-height: 20pt; color: #666; margin-top: 20px; }
-li { margin-bottom: 10px; margin-right: 15px; list-style-type: square; }
+li { margin-bottom: 10px; margin-right: 15px; list-style-type: none; }
 .links a { color: #aaa; letter-spacing: 0px; font-variant: small-caps; text-transform: lowercase; font-size: 110%; margin-right: 5px; margin-left: 5px; }
 .footer { text-align: center; margin-bottom: 20px; margin-top: 20px; }
 .footer a { color: #ccc !important; }
@@ -16,3 +16,4 @@ h1 span { margin-right: 2px; vertical-align: -2px; }
 .aft { background-color: #bbb; border-radius: 10px 0px 0px 0px }
 .for { background-color: #bbb; border-radius: 0px 10px 0px 0px }
 ul { margin: 0px; }
+ul li:before { margin-left: -2em; color: #aaa; content: '\229A'; padding-right: 1em; }
