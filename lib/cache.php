@@ -1,9 +1,18 @@
 <?php
 
+/**
+ * Cache structures
+ * @package framework
+ * @subpackage cache
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * class Hm_Page_Cache
  * Used to cache HTML5 formatted sections of a page
+ * @package framework
+ * @subpackage cache
  */
 class Hm_Page_Cache {
 
@@ -135,6 +144,8 @@ class Hm_Page_Cache {
 /**
  * Helper struct to provide data sources the don't track messages read or flagged state
  * (like POP3 or RSS) with an alternative.
+ * @package framework
+ * @subpackage cache
  */
 trait Hm_Uid_Cache {
 

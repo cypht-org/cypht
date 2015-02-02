@@ -1,9 +1,16 @@
 <?php
 
+/**
+ * Output content
+ * @package framework
+ * @subpackage output
+ */
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * class Hm_Output
  * Base class that controls how data is output
+ * @abstract
  */
 abstract class Hm_Output {
 
@@ -35,6 +42,7 @@ abstract class Hm_Output {
 }
 
 /**
+ * class Hm_Output_HTTP
  * Output request responses using HTTP
  */
 class Hm_Output_HTTP extends Hm_Output {
@@ -68,8 +76,9 @@ class Hm_Output_HTTP extends Hm_Output {
 }
 
 /**
+ * class Hm_Image_Sources
  * Data URLs for icons used by the interface.
- * TODO: eventually move this to a themes module
+ * @todo eventually move this to a themes module
  */
 class Hm_Image_Sources {
 
@@ -174,11 +183,13 @@ trait Hm_List {
 }
 
 /**
+ * class Hm_Msgs
  * Notices the user sees
  */
 class Hm_Msgs { use Hm_List; }
 
 /**
+ * class Hm_Debug
  * System debug notices
  */
 class Hm_Debug {

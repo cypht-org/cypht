@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Encryption
+ * @package framework
+ * @subpackage crypt
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /* block mode */
@@ -12,6 +18,7 @@ define('CIPHER', MCRYPT_RIJNDAEL_128);
 define('RAND_SOURCE', MCRYPT_RAND);
 
 /**
+ * class Hm_Crypt
  * Class to make encryption easier
  */
 class Hm_Crypt {
@@ -77,6 +84,7 @@ class Hm_Crypt {
 }
 
 /**
+ * class Hm_Nonce
  * Manage nonces easily for modules
  */
 class Hm_Nonce {

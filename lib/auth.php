@@ -1,12 +1,20 @@
 <?php
 
+/**
+ * Authentication classes
+ * @package framework
+ * @subpackage auth
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * class Hm_Auth
  * Base class for authentication
  *
  * Creating a new authentication method requires extending this class
  * and overriding the check_credentials method
+ * @abstract
  */
 abstract class Hm_Auth {
 
@@ -39,6 +47,7 @@ abstract class Hm_Auth {
 }
 
 /**
+ * class Hm_Auth_None
  * Used for testing
  */
 class Hm_Auth_None extends Hm_Auth {
@@ -51,6 +60,7 @@ class Hm_Auth_None extends Hm_Auth {
 }
 
 /**
+ * class Hm_Auth_DB
  * Authenticate against an included DB
  */
 class Hm_Auth_DB extends Hm_Auth {

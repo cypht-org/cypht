@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Server list manager
+ * @package framework
+ * @subpackage servers
+ */
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**

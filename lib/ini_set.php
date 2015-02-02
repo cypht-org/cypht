@@ -2,6 +2,12 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * Tweak ini settings
+ * @package framework
+ * @subpackage setup
+ */
+
 /* compress output if possible */
 ini_set('zlib.output_compression', 'On');
 
