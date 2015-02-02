@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang=en-us>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cypht</title><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" class="tab_icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAFVJREFUOI3NkkEKACEMA2d92fpzfVn3oHhYqAF7qIFeSpImUMjGA1jEoEQTFKAC/UDbp3bhBRqj0m7a5C78F56Rx5MEdUBHFMlkV09ogN3xB7kG+fgA0tc160Jy09wAAAAASUVORK5CYII=">
+    <link type="text/css" rel="stylesheet" media="all" href="site.css" />
+  </head>
+  <body>
+  <div class="inner">
+  <h1><span>C</span>ypht</h1>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="features.html">Features</a>
+      <a class="selected" href="security.html">Security</a>
+      <a href="code.html">Code</a>
+      <a href="install.html">Install</a>
+    </div>
+</div>
+    <div class="para">
+<ul>
+<li>
+Session level data is encrypted with a long random string generated each time you login.
+</li>
+<li>
+Persistant data stored between logins is encrypted with your clear text password, which is not stored anywhere on the server or in the session.
+</li>
+<li>
+All cookies are session level, HTTP only, and have the secure flag, path, and domain values set.
+</li>
+<li>
+All encryption is AES compliant using PHP MCRYPT with tunable knobs.
+</li>
+<li>
+TLS everwhere - forced TLS for browsers, and TLS/STARTTLS support for IMAP, POP3, and SMTP connections.
+</li>
+<li>
+HTTP request header fingerprinting and dynamic session ids.
+</li>
+<li>
+Built in nonce checking for all HTTP POST requests, including AJAX based requests. It is not possible for modules to override the nonce check.
+</li>
+<li>
+Security related HTTP headers like X-XSS-Protection, X-Content-Type-Options, and Content-Security-Policy.
+</li>
+<li>
+An optional two factor authentication module that uses a free SMS 2fa service from Swipeidentity.
+</li>
+<li>
+Only white-listed and typed/sanitized input is allowed. Modules must pre-define input in order to have access to it.
+</li>
+<li>
+Modules have no access to PHP super-globals, and there are no globally scoped variables at all (there are a few static class instances with private data structures that use getter/setter methods).
+</li>
+<li>
+PHP ini settings are tightened up for extra security, including open basedir and session best practices.
+</li>
+<li>
+No writable files or directories are used inside the webserver document root, and only 3 files need to be insde the document root to run the program.
+</li>
+<li>
+Optional local DB based authentication uses PBKDF2 hashing.
+</li>
+<li>
+Easy ouput escaping inside modules for potentially dangerous content.
+</li>
+<li>
+Configurable idle timeout module set that ends a session after a predetermined amount of idle time.
+</li>
+<li>
+Module design enforces a separation of input processing and output formatting, and encourages concise methods, which makes the code easier to debug and audit.
+</li>
+</ul>
+    </div>
+  </body>
+</html>
