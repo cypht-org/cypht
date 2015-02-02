@@ -24,7 +24,7 @@
 Session level data is encrypted with a long random string generated each time you login.
 </li>
 <li>
-Persistant data stored between logins is encrypted with your clear text password, which is not stored anywhere on the server or in the session.
+Persistent data stored between logins is encrypted with your clear text password, which is not stored anywhere on the server or in the session.
 </li>
 <li>
 All cookies are session level, HTTP only, and have the secure flag, path, and domain values set.
@@ -33,7 +33,7 @@ All cookies are session level, HTTP only, and have the secure flag, path, and do
 All encryption is AES compliant using PHP MCRYPT with tunable knobs.
 </li>
 <li>
-TLS everwhere - forced TLS for browsers, and TLS/STARTTLS support for IMAP, POP3, and SMTP connections.
+TLS everywhere - forced TLS for browsers, and TLS/STARTTLS support for IMAP, POP3, and SMTP connections.
 </li>
 <li>
 HTTP request header fingerprinting and dynamic session ids.
@@ -57,13 +57,13 @@ Modules have no access to PHP super-globals, and there are no globally scoped va
 PHP ini settings are tightened up for extra security, including open basedir and session best practices.
 </li>
 <li>
-No writable files or directories are used inside the webserver document root, and only 3 files need to be insde the document root to run the program.
+No writable files or directories are used inside the web-server document root, and only 3 files need to be inside the document root to run the program.
 </li>
 <li>
 Optional local DB based authentication uses PBKDF2 hashing.
 </li>
 <li>
-Easy ouput escaping inside modules for potentially dangerous content.
+Easy output escaping inside modules for potentially dangerous content.
 </li>
 <li>
 Configurable idle timeout module set that ends a session after a predetermined amount of idle time.
