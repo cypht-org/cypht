@@ -1,4 +1,5 @@
 hm3
 ===
 
-PHP framework playground for a new Hastymail version
+New Hastymail webmail project (HM3) AKA Cypht. Alpha quality at best.
+http://cypht.org
