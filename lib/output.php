@@ -213,7 +213,7 @@ class Hm_Debug {
 /**
  * Easy to use error logging
  *
- * @param value $mixed to send to the log
+ * @param mixed $mixed vaule to send to the log
  * 
  * @return void
  */
