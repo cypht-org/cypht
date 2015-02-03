@@ -20,7 +20,26 @@
     </div>
   </div>
   <div class="para">
-      Information about the module system is coming soon.
+      Cypht has a modular design. Instead of an application with a plugin API, Cypht is an application
+      comprised entirely of plugins, or as we call them, "module sets". There is only one required set,
+      the "core" modules. These can be added to, or even replaced, by site specific modules. All the
+      functionality of Cypht is broken out into module sets, and each set is built from small pieces
+      that are also easy to override. The module system is powerful, but also a bit complex. First let's
+      take a look at the module sets that come with Cypht:<br /><br />
+      <ul>
+          <li><b>account</b><br />Provides UI features to create accounts and for users to update passwords (when using the built-in DB authentication).</li>
+          <li><b>calendar</b><br /> Basic calendar with no event support yet.</li>
+          <li><b>contacts</b><br /> Contact management. Currently unwritten.</li>
+          <li><b>core</b><br /> Handles basic page layout, logging in and out, and the default settings pages.</li>
+          <li><b>feeds</b><br /> Allows users to add RSS/ATOM feeds to their content sources.</li>
+          <li><b>idle_timer</b><br /> Uses a polling mechanism to keep the PHP session alive, and to end it at the designated time.</li>
+          <li><b>imap</b><br /> Allows users to access IMAP accounts.</li>
+          <li><b>info</b><br /> Adds support pages like "Help", "Bugs", and "Development" to the Settings menu.</li>
+          <li><b>pop3</b><br /> Allows users to access POP3 accounts.</li>
+          <li><b>profiles</b><br /> Create profiles with specific user information and associated IMAP/POP3/SMTP servers. Currently unwritten.</li>
+          <li><b>smtp</b><br /> Send outbound E-mail. This module is functional but buggy.</li>
+          <li><b>swipe_2fa</b><br /> Really cool 2-factor authentication module set using the SwipeIdentify free 2FA service.</li>
+        </ul>
   </div>
   </body>
 </html>
