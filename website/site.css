@@ -1,7 +1,7 @@
 html { background-color: #fff; overflow-y: scroll; }
 a { color: teal; text-decoration: none; }
 body { min-width: 500px; padding: 0px; margin: 0px; font-family: Sans-Serif; width: 100%; background-color: #fff }
-h1 { text-shadow: 1px -1px 1px #999; margin: 0px; padding: 0px; font-size: 80px; text-align: left; color: #fff; letter-spacing: -2px; text-align: center; padding-top: 20px; padding-bottom: 20px; }
+h1 { text-shadow: 1px -1px 1px #666; margin: 0px; padding: 0px; font-size: 80px; text-align: left; color: #fff; letter-spacing: -2px; text-align: center; padding-top: 20px; padding-bottom: 20px; }
 .selected { color: #333 !important; }
 .para {clear: both; max-width: 40em; border-left: dashed 1px #ddd; border-right: dashed 1px #ddd; margin: 0px; margin-left: auto; margin-right: auto; padding: 20px; padding-left: 30px; font-size: 12pt; min-height: 400px; line-height: 20pt; color: #666; margin-top: 20px; }
 li { margin-bottom: 10px; margin-right: 15px; list-style-type: none; }
