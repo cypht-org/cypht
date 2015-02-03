@@ -21,10 +21,11 @@
   <div class="para">
       <ul>
           <li>Download and extract the program somewhere</li>
-          <li>Edit the hm3.ini file to your liking. Setup the storage directories and DB configuration for your site. The hm3.ini file has lots of information to help with this.</li>
-          <li>Run "php ./scripts/config_gen.php" from the main directory. If you change the hm3.ini file, you need to re-run this command for it to take effect.</li>
-          <li>Symlink or move the site/* files to the webserver where you want to host the software.</li>
-          <li>That is all.</li>
+          <li>Edit the hm3.ini file to your liking. Setup the storage directories and DB configuration for your needs. See the comments in the ini file for more information.</li>
+          <li>Run "php ./scripts/config_gen.php" from the main directory to generate the production site. If you change the hm3.ini file, you need to re-run this command for your changes to take effect.</li>
+          <li>Symlink or move the files in the "site" directory to the web-server where you want to host the software.</li>
+          <li>You can enable a debug site by symlinking or moving the main download directory to the web-server document root and accessing it's index.php file. Don't do this in production it could be bad.</li>
+          <li>That is all for now.</li>
       </ul>
   </div>
   </body>
