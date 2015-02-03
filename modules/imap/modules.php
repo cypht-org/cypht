@@ -345,6 +345,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
         else {
             $path = '';
         }
+        elog($path);
         switch ($path) {
             case 'unread':
                 $callback = 'imap_combined_unread_content';
@@ -359,7 +360,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $callback = 'imap_all_mail_content';
                 break;
             default:
-                $callback = 'imap_background_unread_content';
+                if (!preg_match("/^imap_/", $path)) {
+                    $callback = 'imap_background_unread_content';
+                }
                 break;
         }
         if ($callback) {
