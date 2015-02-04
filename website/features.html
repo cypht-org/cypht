@@ -43,11 +43,11 @@ controlled execution environment, but modules are where the actual work is done.
       <li>
 Simple interface translation system that does not use gettext or .po files, just
 arrays of translated strings defined in PHP. Currently all translations are seeded
-with strings from the Google Translate API. Right to left langauges are supported.
+with strings from the Google Translate API. Right to left languages are supported.
       </li>
       <li>
 Currently modules for IMAP and POP3 are pretty robust, and the SMTP module set
-is functional but still under development.
+is functional, but still under development.
       </li>
       <li>
 Sessions and user data can be stored in any PDO compatible database or flat
@@ -62,8 +62,12 @@ wasted parsing unused code paths.
       </li>
       <li>
 There is a build process that pre-calculates module assignments and combines
-and compresses page assets.  There is also a developer mode in which individual
-components are included directly for easy debugging and development.
+and compresses page assets, making the production version of your site as fast
+as possible. There is also a developer mode in which individual components are
+included directly for easy debugging and module development.
+      </li>
+      <li>
+The HTML5 Page structure is semantic and simple, with attention paid to accessibility best-practices.
       </li>
       <li>
 The application framework weighs in at about 1800 lines (SLOC) and has 100% unit test coverage with PHPUnit (there are still a few missing assertions).

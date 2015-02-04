@@ -25,7 +25,7 @@
 Session level data is encrypted with a long random string generated each time you login.
 </li>
 <li>
-Persistent data stored between logins is encrypted with your clear text password, which is not stored anywhere on the server or in the session.
+Persistent data stored between logins is encrypted with your clear text password, which is obviously not stored anywhere on the server or in the session.
 </li>
 <li>
 All cookies are session level, HTTP only, and have the secure flag, path, and domain values set.
@@ -67,7 +67,7 @@ Optional local DB based authentication uses PBKDF2 hashing.
 Easy output escaping inside modules for potentially dangerous content.
 </li>
 <li>
-Configurable idle timeout module set that ends a session after a predetermined amount of idle time.
+Configurable idle timeout module set that ends a session after a predetermined amount of time.
 </li>
 <li>
 Module design enforces a separation of input processing and output formatting, and encourages concise methods, which makes the code easier to debug and audit.
