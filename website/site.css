@@ -18,3 +18,4 @@ h1 span { margin-right: 2px; vertical-align: -2px; }
 ul { margin: 0px; }
 ul li:before { margin-left: -2em; color: #aaa; content: '\229A'; padding-right: 1em; }
 .para a { color: #111 !important; }
+.e_hl { color: #999; }
