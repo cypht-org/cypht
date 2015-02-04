@@ -345,7 +345,12 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
         else {
             $path = '';
         }
-        elog($path);
+        if (array_key_exists('page', $this->request->get)) {
+            $page = $this->request->get['page'];
+        }
+        else {
+            $page = false;
+        }
         switch ($path) {
             case 'unread':
                 $callback = 'imap_combined_unread_content';
@@ -360,7 +365,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $callback = 'imap_all_mail_content';
                 break;
             default:
-                if (!preg_match("/^imap_/", $path)) {
+                if ($page != 'message_list') {
                     $callback = 'imap_background_unread_content';
                 }
                 break;
