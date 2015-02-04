@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_DB_Session | Cypht Framework Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?684867790"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li class="active"><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li class="active"><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Hm_DB_Session.html">Hm_DB_Session</a></li>
+				<li><a href="class-Hm_PHP_Session.html">Hm_PHP_Session</a></li>
+				<li><a href="class-Hm_Session.html">Hm_Session</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-framework.session.html" title="Summary of framework\session"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_DB_Session</h1>
+
+
+	<div class="description">
+	
+<p>class Hm_DB_Session This session class uses a PDO compatible DB to manage
+session data. It does not use PHP session handlers at all and is a completely
+indenpendant session system.</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+			<a href="class-Hm_Session.html"><span>Hm_Session</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by">
+			<a href="class-Hm_PHP_Session.html"><span>Hm_PHP_Session</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:60px">
+			<img src="resources/inherit.png" alt="Extended by">
+<b><span>Hm_DB_Session</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.session.html">session</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_DB_Session.html#489-644" title="Go to source code">session.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="insert_session_row" id="_insert_session_row">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_insert_session_row">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#505-517" title="Go to source code">insert_session_row</a>( )</code>
+
+		<div class="description short">
+			
+<p>Create a new session</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Create a new session</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true on success<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="connect" id="_connect">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_connect">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#519-530" title="Go to source code">connect</a>( )</code>
+
+		<div class="description short">
+			
+<p>Connect to the configured DB</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Connect to the configured DB</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true on success<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="start" id="_start">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_start">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#532-551" title="Go to source code">start</a>( <span>object <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Start the session. This could be an existing session or a new login</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Start the session. This could be an existing session or a new login</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$request</var></dt>
+					<dd><code>object</code><br>$request request details</dd>
+				</dl></div>
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Hm_PHP_Session.html#_start">Hm_PHP_Session::start()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="start_new_session" id="_start_new_session">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_start_new_session">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#553-566" title="Go to source code">start_new_session</a>( <span>object <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Start a new session</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Start a new session</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$request</var></dt>
+					<dd><code>object</code><br>$request request details</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="start_existing_session" id="_start_existing_session">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_start_existing_session">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#568-589" title="Go to source code">start_existing_session</a>( <span>object <var>$request</var></span>, <span>string <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Continue an existing session</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Continue an existing session</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$request</var></dt>
+					<dd><code>object</code><br>$request request details</dd>
+					<dt><var>$key</var></dt>
+					<dd><code>string</code><br>$key session key</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="end" id="_end">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_end">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#591-602" title="Go to source code">end</a>( )</code>
+
+		<div class="description short">
+			
+<p>End a session after a page request is complete. This only closes the session
+and does not destroy it</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>End a session after a page request is complete. This only closes the session
+and does not destroy it</p>
+
+
+
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Hm_PHP_Session.html#_end">Hm_PHP_Session::end()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="save_data" id="_save_data">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_save_data">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#604-616" title="Go to source code">save_data</a>( )</code>
+
+		<div class="description short">
+			
+<p>Write session data to the db</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Write session data to the db</p>
+
+
+
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Hm_PHP_Session.html#_save_data">Hm_PHP_Session::save_data()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="close_early" id="_close_early">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_close_early">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#618-626" title="Go to source code">close_early</a>( )</code>
+
+		<div class="description short">
+			
+<p>Close a session early, but don't destroy it</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Close a session early, but don't destroy it</p>
+
+
+
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Hm_PHP_Session.html#_close_early">Hm_PHP_Session::close_early()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="destroy" id="_destroy">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_destroy">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#628-643" title="Go to source code">destroy</a>( <span>object <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Destroy a session for good</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Destroy a session for good</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$request</var></dt>
+					<dd><code>object</code><br>$request request details</dd>
+				</dl></div>
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Hm_PHP_Session.html#_destroy">Hm_PHP_Session::destroy()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Hm_PHP_Session.html#methods">Hm_PHP_Session</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_PHP_Session.html#_auth">auth()</a>, 
+			<a href="class-Hm_PHP_Session.html#_change_pass">change_pass()</a>, 
+			<a href="class-Hm_PHP_Session.html#_check">check()</a>, 
+			<a href="class-Hm_PHP_Session.html#_create">create()</a>, 
+			<a href="class-Hm_PHP_Session.html#_del">del()</a>, 
+			<a href="class-Hm_PHP_Session.html#_get">get()</a>, 
+			<a href="class-Hm_PHP_Session.html#_set">set()</a>, 
+			<a href="class-Hm_PHP_Session.html#_set_session_params">set_session_params()</a>
+		</code></td>
+	</tr>
+	</table>
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Hm_Session.html#methods">Hm_Session</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_Session.html#___construct">__construct()</a>, 
+			<a href="class-Hm_Session.html#_build_fingerprint">build_fingerprint()</a>, 
+			<a href="class-Hm_Session.html#_check_fingerprint">check_fingerprint()</a>, 
+			<a href="class-Hm_Session.html#_ciphertext">ciphertext()</a>, 
+			<a href="class-Hm_Session.html#_get_key">get_key()</a>, 
+			<a href="class-Hm_Session.html#_is_active">is_active()</a>, 
+			<a href="class-Hm_Session.html#_just_started">just_started()</a>, 
+			<a href="class-Hm_Session.html#_load_auth_mech">load_auth_mech()</a>, 
+			<a href="class-Hm_Session.html#_plaintext">plaintext()</a>, 
+			<a href="class-Hm_Session.html#_record_unsaved">record_unsaved()</a>, 
+			<a href="class-Hm_Session.html#_secure_cookie">secure_cookie()</a>, 
+			<a href="class-Hm_Session.html#_set_fingerprint">set_fingerprint()</a>, 
+			<a href="class-Hm_Session.html#_set_key">set_key()</a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="cname" id="$cname">
+		<td class="attributes"><code>
+			protected  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_DB_Session.html#497" title="Go to source code"><var>$cname</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'hm_session'</span></code></td>
+		<td class="description"><div>
+			<a href="#$cname" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="session_key" id="$session_key">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_DB_Session.html#500" title="Go to source code"><var>$session_key</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">''</span></code></td>
+		<td class="description"><div>
+			<a href="#$session_key" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="dbh" id="$dbh">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_DB_Session.html#503" title="Go to source code"><var>$dbh</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$dbh" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Properties inherited from <a href="class-Hm_Session.html#properties">Hm_Session</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_Session.html#$active"><var>$active</var></a>, 
+			<a href="class-Hm_Session.html#$auth_class"><var>$auth_class</var></a>, 
+			<a href="class-Hm_Session.html#$auth_mech"><var>$auth_mech</var></a>, 
+			<a href="class-Hm_Session.html#$data"><var>$data</var></a>, 
+			<a href="class-Hm_Session.html#$enc_key"><var>$enc_key</var></a>, 
+			<a href="class-Hm_Session.html#$internal_users"><var>$internal_users</var></a>, 
+			<a href="class-Hm_Session.html#$loaded"><var>$loaded</var></a>, 
+			<a href="class-Hm_Session.html#$session_closed"><var>$session_closed</var></a>, 
+			<a href="class-Hm_Session.html#$site_config"><var>$site_config</var></a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

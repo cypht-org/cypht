@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_Auth_DB | Cypht Framework Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?684867790"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li class="active"><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li class="active"><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Hm_Auth.html">Hm_Auth</a></li>
+				<li class="active"><a href="class-Hm_Auth_DB.html">Hm_Auth_DB</a></li>
+				<li><a href="class-Hm_Auth_None.html">Hm_Auth_None</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-framework.auth.html" title="Summary of framework\auth"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_Auth_DB</h1>
+
+
+	<div class="description">
+	
+<p>class Hm_Auth_DB Authenticate against an included DB</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+			<a href="class-Hm_Auth.html"><span>Hm_Auth</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by">
+<b><span>Hm_Auth_DB</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.auth.html">auth</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_Auth_DB.html#62-169" title="Go to source code">auth.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="check_credentials" id="_check_credentials">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_check_credentials">#</a>
+		<code><a href="source-class-Hm_Auth_DB.html#71-91" title="Go to source code">check_credentials</a>( <span>string <var>$user</var></span>, <span>string <var>$pass</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Send the username and password to the configured DB for authentication</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Send the username and password to the configured DB for authentication</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$user</var></dt>
+					<dd><code>string</code><br>$user username</dd>
+					<dt><var>$pass</var></dt>
+					<dd><code>string</code><br>$pass password</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true if authentication worked<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="delete" id="_delete">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_delete">#</a>
+		<code><a href="source-class-Hm_Auth_DB.html#93-108" title="Go to source code">delete</a>( <span>string <var>$user</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Delete a user account from the db</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Delete a user account from the db</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$user</var></dt>
+					<dd><code>string</code><br>$user username</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true if successful<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="connect" id="_connect">
+
+		<td class="attributes"><code>
+			 protected 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_connect">#</a>
+		<code><a href="source-class-Hm_Auth_DB.html#110-121" title="Go to source code">connect</a>( )</code>
+
+		<div class="description short">
+			
+<p>Create a new or re-use an existing DB connection</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Create a new or re-use an existing DB connection</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true if the connection is available<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="change_pass" id="_change_pass">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_change_pass">#</a>
+		<code><a href="source-class-Hm_Auth_DB.html#123-140" title="Go to source code">change_pass</a>( <span>string <var>$user</var></span>, <span>string <var>$pass</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Change the password for a user in the DB</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Change the password for a user in the DB</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$user</var></dt>
+					<dd><code>string</code><br>$user username</dd>
+					<dt><var>$pass</var></dt>
+					<dd><code>string</code><br>$pass password</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true on success<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="create" id="_create">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_create">#</a>
+		<code><a href="source-class-Hm_Auth_DB.html#142-168" title="Go to source code">create</a>( <span>object <var>$user</var></span>, <span>string <var>$pass</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Create a new user in the DB</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Create a new user in the DB</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$user</var></dt>
+					<dd><code>object</code><br>$request request details</dd>
+					<dt><var>$pass</var></dt>
+					<dd><code>string</code><br>$user username</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Hm_Auth.html#methods">Hm_Auth</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_Auth.html#___construct">__construct()</a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="internal_users" id="$internal_users">
+		<td class="attributes"><code>
+			public static 
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Auth_DB.html#69" title="Go to source code"><var>$internal_users</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">true</span></code></td>
+		<td class="description"><div>
+			<a href="#$internal_users" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Properties inherited from <a href="class-Hm_Auth.html#properties">Hm_Auth</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_Auth.html#$site_config"><var>$site_config</var></a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

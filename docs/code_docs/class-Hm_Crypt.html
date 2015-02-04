@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_Crypt | Cypht Framework Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?684867790"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li class="active"><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li class="active"><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Hm_Crypt.html">Hm_Crypt</a></li>
+				<li><a href="class-Hm_Nonce.html">Hm_Nonce</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-framework.crypt.html" title="Summary of framework\crypt"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_Crypt</h1>
+
+
+	<div class="description">
+	
+<p>class Hm_Crypt Class to make encryption easier</p>
+
+	</div>
+
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.crypt.html">crypt</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_Crypt.html#20-84" title="Go to source code">crypt.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="plaintext" id="_plaintext">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_plaintext">#</a>
+		<code><a href="source-class-Hm_Crypt.html#35-50" title="Go to source code">plaintext</a>( <span>string <var>$string</var></span>, <span>string <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Convert ciphertext to plaintext</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Convert ciphertext to plaintext</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$string</var></dt>
+					<dd><code>string</code><br>$string ciphertext to decrypt</dd>
+					<dt><var>$key</var></dt>
+					<dd><code>string</code><br>$key encryption key</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>decrypted text<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="ciphertext" id="_ciphertext">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_ciphertext">#</a>
+		<code><a href="source-class-Hm_Crypt.html#52-65" title="Go to source code">ciphertext</a>( <span>string <var>$string</var></span>, <span>string <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Convert plaintext into ciphertext</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Convert plaintext into ciphertext</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$string</var></dt>
+					<dd><code>string</code><br>$string plaintext to encrypt</dd>
+					<dt><var>$key</var></dt>
+					<dd><code>string</code><br>$key encryption key</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>encrypted text<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="iv_size" id="_iv_size">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_iv_size">#</a>
+		<code><a href="source-class-Hm_Crypt.html#67-74" title="Go to source code">iv_size</a>( )</code>
+
+		<div class="description short">
+			
+<p>Calculate iv size</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Calculate iv size</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>"Initialization Vector" size for the selected cipher/mode<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="unique_id" id="_unique_id">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_unique_id">#</a>
+		<code><a href="source-class-Hm_Crypt.html#76-83" title="Go to source code">unique_id</a>( <span>mixed <var>$size</var> = <span class="php-num">128</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Return a unique-enough-key for session cookie ids</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return a unique-enough-key for session cookie ids</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="mode" id="$mode">
+		<td class="attributes"><code>
+			private static 
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Crypt.html#27" title="Go to source code"><var>$mode</var></a>
+		</td>
+		<td class="value"><code>BLOCK_MODE</code></td>
+		<td class="description"><div>
+			<a href="#$mode" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="cipher" id="$cipher">
+		<td class="attributes"><code>
+			private static 
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Crypt.html#30" title="Go to source code"><var>$cipher</var></a>
+		</td>
+		<td class="value"><code>CIPHER</code></td>
+		<td class="description"><div>
+			<a href="#$cipher" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="r_source" id="$r_source">
+		<td class="attributes"><code>
+			private static 
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Crypt.html#33" title="Go to source code"><var>$r_source</var></a>
+		</td>
+		<td class="value"><code>RAND_SOURCE</code></td>
+		<td class="description"><div>
+			<a href="#$r_source" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

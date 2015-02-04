@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Function add_output | Cypht Framework Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?684867790"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li class="active"><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li class="active"><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Hm_Handler_Module.html">Hm_Handler_Module</a></li>
+				<li><a href="class-Hm_Handler_Modules.html">Hm_Handler_Modules</a></li>
+				<li><a href="class-Hm_Output_Module.html">Hm_Output_Module</a></li>
+				<li><a href="class-Hm_Output_Modules.html">Hm_Output_Modules</a></li>
+				<li><a href="class-Hm_Request_Handler.html">Hm_Request_Handler</a></li>
+			</ul>
+
+
+			<h3>Traits</h3>
+			<ul>
+				<li><a href="class-Hm_Module_Output.html">Hm_Module_Output</a></li>
+				<li><a href="class-Hm_Modules.html">Hm_Modules</a></li>
+			</ul>
+
+
+
+			<h3>Functions</h3>
+			<ul>
+				<li><a href="function-add_handler.html">add_handler</a></li>
+				<li><a href="function-add_module_to_all_pages.html">add_module_to_all_pages</a></li>
+				<li class="active"><a href="function-add_output.html">add_output</a></li>
+				<li><a href="function-handler_source.html">handler_source</a></li>
+				<li><a href="function-output_source.html">output_source</a></li>
+				<li><a href="function-replace_module.html">replace_module</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-framework.modules.html" title="Summary of framework\modules"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Function</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="function">
+	<h1>Function add_output</h1>
+
+
+	<div class="description">
+	
+<p>Add an output module to a specific page</p>
+
+	</div>
+
+	<div class="info">
+		
+		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.modules.html">modules</a><br>
+		<b>Located at</b> <a href="source-function-add_output.html#821-835" title="Go to source code">modules.php</a><br>
+	</div>
+
+
+	<table class="summary" id="parameters">
+	<caption>Parameters summary</caption>
+	<tr id="$page">
+		<td class="name"><code>string</code></td>
+		<td class="value"><code><var>$page</var></code></td>
+		<td>
+			$mod name of the module to add
+		</td>
+	</tr>
+	<tr id="$mod">
+		<td class="name"><code>boolean</code></td>
+		<td class="value"><code><var>$mod</var></code></td>
+		<td>
+			$logged_in true if the module should only fire when logged in
+		</td>
+	</tr>
+	<tr id="$logged_in">
+		<td class="name"><code>string</code></td>
+		<td class="value"><code><var>$logged_in</var></code></td>
+		<td>
+			$source the module set containing the module code
+		</td>
+	</tr>
+	<tr id="$source">
+		<td class="name"><code>string</code></td>
+		<td class="value"><code><var>$source</var> = <span class="php-keyword1">false</span></code></td>
+		<td>
+			$marker the module name used to determine where to insert
+		</td>
+	</tr>
+	<tr id="$marker">
+		<td class="name"><code>string</code></td>
+		<td class="value"><code><var>$marker</var> = <span class="php-keyword1">false</span></code></td>
+		<td>
+			$placement "before" or "after" the $marker module name
+		</td>
+	</tr>
+	<tr id="$placement">
+		<td class="name"><code>boolean</code></td>
+		<td class="value"><code><var>$placement</var> = <span class="php-quote">'after'</span></code></td>
+		<td>
+			$queue true if the module should be queued and retryed on failure
+		</td>
+	</tr>
+	<tr id="$queue">
+		<td class="name"><code>mixed</code></td>
+		<td class="value"><code><var>$queue</var> = <span class="php-keyword1">true</span></code></td>
+		<td>
+			
+		</td>
+	</tr>
+	</table>
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>
