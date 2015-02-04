@@ -447,7 +447,7 @@ else if (hm_page_name() == 'servers') {
 else if (hm_page_name() == 'home') {
     setTimeout(imap_status_update, 100);
 }
-if (hm_page_name() != 'message_list' && hm_list_path() != 'unread') {
+if (hm_page_name() != 'message_list' && hm_page_name() != 'search' && hm_list_path() != 'unread') {
     Hm_Message_List.add_sources(hm_data_sources());
     Hm_Timer.add_job(Hm_Message_List.load_sources, 40, true);
 }

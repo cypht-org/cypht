@@ -365,7 +365,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $callback = 'imap_all_mail_content';
                 break;
             default:
-                if ($page != 'message_list') {
+                if ($page != 'message_list' && $page != 'search') {
                     $callback = 'imap_background_unread_content';
                 }
                 break;
