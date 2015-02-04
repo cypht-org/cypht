@@ -46,7 +46,7 @@ Built in nonce checking for all HTTP POST requests, including AJAX based request
 Security related HTTP headers like X-XSS-Protection, X-Content-Type-Options, and Content-Security-Policy.
 </li>
 <li>
-An optional two factor authentication module that uses a free SMS 2fa service from Swipeidentity.
+Two factor authentication module set that uses a free SMS based 2FA service from Swipeidentity.
 </li>
 <li>
 Only white-listed and typed/sanitized input is allowed. Modules must pre-define input in order to have access to it.
@@ -55,7 +55,7 @@ Only white-listed and typed/sanitized input is allowed. Modules must pre-define 
 Modules have no access to PHP super-globals, and there are no globally scoped variables at all (there are a few static class instances with private data structures that use getter/setter methods).
 </li>
 <li>
-PHP ini settings are tightened up for extra security, including open basedir and session best practices.
+PHP ini settings are tightened up at runtime for extra security, including open basedir and session best practices.
 </li>
 <li>
 No writable files or directories are used inside the web-server document root, and only 3 files need to be inside the document root to run the program.
