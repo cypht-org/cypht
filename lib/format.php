@@ -9,7 +9,6 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * class HM_Format
  * Base class for output formatting. Currently JSON and HTML5 formats are
  * supported. To add support for a new format this class must be extended
  * and the content method needs to be overridden.
@@ -104,7 +103,6 @@ abstract class HM_Format {
 }
 
 /**
- * class Hm_Format_JSON
  * Handles JSON formatted results for AJAX requests
  */
 class Hm_Format_JSON extends HM_Format {
@@ -158,7 +156,6 @@ class Hm_Format_JSON extends HM_Format {
 }
 
 /**
- * class Hm_Format_HTML5
  * Handles HTML5 formatted results for normal HTTP requests
  */
 class Hm_Format_HTML5 extends HM_Format {
