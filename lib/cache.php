@@ -9,7 +9,6 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * class Hm_Page_Cache
  * Used to cache HTML5 formatted sections of a page
  * @package framework
  * @subpackage cache
