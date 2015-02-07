@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Core modules
+ * @package modules
+ * @subpackage core/functions
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
@@ -7,7 +13,6 @@ if (!defined('DEBUG_MODE')) { die(); }
  *
  * @param $name string the page id
  * @param $source string the module set name
- *
  * @return void
  */
 function setup_base_page($name, $source=false) {
