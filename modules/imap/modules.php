@@ -1,9 +1,18 @@
 <?php
 
+/**
+ * Core modules
+ * @package modules
+ * @subpackage imap
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/imap/hm-imap.php';
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_process_reply_fields extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('reply_source', $this->request->get) && preg_match("/^imap_(\d+)_(.+)$/", $this->request->get['reply_source'])) {
@@ -15,6 +24,9 @@ class Hm_Handler_imap_process_reply_fields extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
@@ -32,6 +44,9 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
     public function process() {
 
@@ -64,6 +79,9 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
     public function process() {
 
@@ -109,6 +127,9 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_IMAP_List::dump();
@@ -125,6 +146,9 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_flag_state', 'imap_msg_uid', 'imap_server_id', 'folder'));
@@ -152,6 +176,9 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
@@ -187,6 +214,9 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_search extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -203,6 +233,9 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -223,6 +256,9 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_flagged extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -237,6 +273,9 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_status extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -260,6 +299,9 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -275,6 +317,9 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['submit_imap_server'])) {
@@ -305,6 +350,9 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_IMAP_List::dump(false, true);
@@ -321,6 +369,9 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_IMAP_List::dump(false, true);
@@ -329,6 +380,9 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
     public function process() {
         foreach (Hm_IMAP_List::dump() as $index => $vals) {
@@ -337,6 +391,9 @@ class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
     public function process() {
         $callback = false;
@@ -379,6 +436,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('imap_servers', array());
@@ -406,6 +466,9 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_IMAP_List::dump();
@@ -416,12 +479,18 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
     public function process() {
         $this->session->set('imap_cache', array());
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_connect extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['imap_connect'])) {
@@ -450,6 +519,9 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_forget extends Hm_Handler_Module {
     public function process() {
         $just_forgot_credentials = false;
@@ -470,6 +542,9 @@ class Hm_Handler_imap_forget extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_save extends Hm_Handler_Module {
     public function process() {
         $just_saved_credentials = false;
@@ -496,6 +571,9 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_message_content extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
@@ -552,6 +630,9 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/handler
+ */
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['imap_delete'])) {
@@ -572,6 +653,9 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output($format) {
         $txt = '<div class="msg_text_inner">';
@@ -592,6 +676,9 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_message_struct extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('msg_struct')) {
@@ -604,6 +691,9 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('msg_headers')) {
@@ -661,6 +751,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -713,6 +806,9 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     protected function output($format) {
         $count = count($this->get('imap_servers', array()));
@@ -734,6 +830,9 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -748,6 +847,9 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_imap_reply_details extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -761,12 +863,18 @@ class Hm_Output_imap_reply_details extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
     protected function output($format) {
         return '<input type="hidden" class="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('imap_servers', array ())))).'" />';
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -780,6 +888,9 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -794,6 +905,9 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -809,6 +923,9 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_imap_search extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('imap_search_results')) {
@@ -820,6 +937,9 @@ class Hm_Output_filter_imap_search extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_flagged_data extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('imap_flagged_data')) {
@@ -831,6 +951,9 @@ class Hm_Output_filter_flagged_data extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('imap_unread_data')) {
@@ -842,6 +965,9 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_all_email extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('imap_combined_inbox_data')) {
@@ -853,6 +979,9 @@ class Hm_Output_filter_all_email extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('imap_combined_inbox_data')) {
@@ -864,6 +993,9 @@ class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_folder_page extends Hm_Output_Module {
     protected function output($format) {
         $res = array();
@@ -877,6 +1009,9 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/output
+ */
 class Hm_Output_filter_reply_content extends Hm_Output_Module {
     protected function output($format) {
         $reply_subject = 'Re: [No Subject]';
@@ -920,6 +1055,9 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function prepare_imap_message_list($msgs, $mod, $type) {
     $style = $mod->get('news_list_style') ? 'news' : 'email';
     if ($mod->get('is_mobile')) {
@@ -929,6 +1067,9 @@ function prepare_imap_message_list($msgs, $mod, $type) {
     $mod->out('formatted_message_list', $res);
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function format_imap_folder_section($folders, $id, $output_mod) {
     $results = '<ul class="inner_list">';
     foreach ($folders as $folder_name => $folder) {
@@ -954,6 +1095,9 @@ function format_imap_folder_section($folders, $id, $output_mod) {
     return $results;
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function format_imap_message_list($msg_list, $output_module, $parent_list=false, $style='email') {
     $res = array();
     foreach($msg_list as $msg) {
@@ -1021,6 +1165,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
     return $res;
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function process_imap_message_ids($ids) {
     $res = array();
     foreach (explode(',', $ids) as $id) {
@@ -1040,6 +1187,9 @@ function process_imap_message_ids($ids) {
     return $res;
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function build_page_links($detail, $path) {
     $links = '';
     $first = '';
@@ -1087,6 +1237,9 @@ function build_page_links($detail, $path) {
     return $prev.' '.$first.$links.$last.' '.$next;
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     $allowed = array(
         'textplain',
@@ -1152,6 +1305,9 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     return $res;
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function format_msg_part_section($struct, $output_mod, $part, $level=0) {
     $res = '';
     foreach ($struct as $id => $vals) {
@@ -1170,11 +1326,17 @@ function format_msg_part_section($struct, $output_mod, $part, $level=0) {
     return $res;
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function sort_by_internal_date($a, $b) {
     if ($a['internal_date'] == $b['internal_date']) return 0;
     return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function merge_imap_search_results($ids, $search_type, $session, $folders = array('INBOX'), $limit=0, $terms=array()) {
     $msg_list = array();
     foreach($ids as $id) {
@@ -1214,6 +1376,9 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
     return $msg_list;
 }
 
+/**
+ * @subpackage imap/functions
+ */
 function add_attached_images($txt, $uid, $struct, $imap) {
     if (preg_match_all("/src=('|\"|)cid:([^@]+@[^\s'\"]+)/", $txt, $matches)) {
         $cids = array_pop($matches);
