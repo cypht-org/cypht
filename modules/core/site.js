@@ -323,6 +323,7 @@ var Hm_Message_List = {
             if (Hm_Message_List.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
                 continue;
             }
+            id = id.replace(/ /, '-');
             if (!$('.'+Hm_Utils.clean_selector(id), msg_rows).length) { 
                 Hm_Message_List.insert_into_message_list(row, msg_rows);
                 $('.'+Hm_Utils.clean_selector(id), msg_rows).show();
@@ -556,7 +557,7 @@ var Hm_Message_List = {
         if (list && list.length) {
             list = JSON.parse(list);
             for (class_name in list) {
-                $('.'+class_name).remove();
+                $('.'+Hm_Utils.clean_selector(class_name)).remove();
             }
             Hm_Utils.save_to_local_storage('read_message_list', '');
         }
@@ -760,8 +761,7 @@ var Hm_Folders = {
         var path = hm_list_path();
         $('.folder_list').find('*').removeClass('selected_menu');
         if (path.length) {
-            path = path.replace(/ /, '-');
-            if (page == 'message_list') {
+            if (page == 'message_list' || page == 'message') {
                 $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
             }
@@ -908,7 +908,7 @@ var Hm_Utils = {
         return false;
     },
     clean_selector: function(str) {
-        return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
+        return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1").replace(/ /, '-');
     },
     toggle_long_headers: function() {
         $('.long_header').toggle();

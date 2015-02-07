@@ -8,7 +8,6 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * class Hm_Module_Output
  * Module data management. These functions provide an interface for modules (both handler and output)
  * to fetch data set by other modules and to return their own output. Handler modules must use these
  * methods to set a response, output modules must if the format is AJAX, otherwise they should return
@@ -175,7 +174,6 @@ trait Hm_Module_Output {
 }
 
 /**
- * class Hm_Handler_Module
  * Base class for data input processing modules, called "handler modules"
  *
  * All modules that deal with processing input data extend from this class.
@@ -294,7 +292,6 @@ abstract class Hm_Handler_Module {
 }
 
 /**
- * class Hm_Output_Module
  * Base class for output modules
  *
  * All modules that output data to a request must extend this class and define
@@ -393,7 +390,6 @@ abstract class Hm_Output_Module {
 }
 
 /**
- * class Hm_Request_Handler
  * Input processing module "runner"
  *
  * This is a wrapper around input or "handler" module execution.
@@ -743,7 +739,6 @@ trait Hm_Modules {
 }
 
 /**
- * class Hm_Handler_Modules
  * Class to manage all the input processing modules
  */
 class Hm_Handler_Modules { use Hm_Modules; }

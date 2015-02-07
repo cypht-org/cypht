@@ -339,11 +339,18 @@ class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
 
 class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
     public function process() {
+        $callback = false;
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
         }
         else {
             $path = '';
+        }
+        if (array_key_exists('page', $this->request->get)) {
+            $page = $this->request->get['page'];
+        }
+        else {
+            $page = false;
         }
         switch ($path) {
             case 'unread':
@@ -359,7 +366,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $callback = 'imap_all_mail_content';
                 break;
             default:
-                $callback = 'imap_background_unread_content';
+                if ($page != 'message_list' && $page != 'search') {
+                    $callback = 'imap_background_unread_content';
+                }
                 break;
         }
         if ($callback) {
