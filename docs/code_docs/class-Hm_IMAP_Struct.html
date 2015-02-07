@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_IMAP_Struct | Cypht Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?294563344"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.imap.html">imap<span></span></a>
+						<ul>
+				<li><a href="package-modules.imap.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.imap.handler.html">handler</a>
+						</li>
+				<li class="active"><a href="package-modules.imap.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.imap.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Hm_Auth_IMAP.html">Hm_Auth_IMAP</a></li>
+				<li><a href="class-Hm_IMAP.html">Hm_IMAP</a></li>
+				<li><a href="class-Hm_IMAP_Base.html">Hm_IMAP_Base</a></li>
+				<li><a href="class-Hm_IMAP_Cache.html">Hm_IMAP_Cache</a></li>
+				<li><a href="class-Hm_IMAP_List.html">Hm_IMAP_List</a></li>
+				<li><a href="class-Hm_IMAP_Parser.html">Hm_IMAP_Parser</a></li>
+				<li class="active"><a href="class-Hm_IMAP_Struct.html">Hm_IMAP_Struct</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-modules.imap.lib.html" title="Summary of modules\imap\lib"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_IMAP_Struct</h1>
+
+
+	<div class="description">
+	
+<p>Represent a message structure by parsing the results from the IMAP
+BODYSTRUCTURE command</p>
+
+	</div>
+
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.imap.html">imap</a>\<a href="package-modules.imap.lib.html">lib</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_IMAP_Struct.html#1240-1694" title="Go to source code">hm-imap-base.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1292-1303" title="Go to source code">__construct</a>( <span>array <var>$struct_response</var></span>, <span>mixed <var>$imap</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Constructor. Takes the BODYSTRUCTURE response and builds a data
+representation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Constructor. Takes the BODYSTRUCTURE response and builds a data
+representation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$struct_response</var></dt>
+					<dd><code>array</code><br>$struct_response low-level parsed IMAP response</dd>
+					<dt><var>$imap</var></dt>
+					<dd></dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="build" id="_build">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_build">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1305-1331" title="Go to source code">build</a>( <span>array <var>$array</var></span>, <span>integer <var>$index</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Builds a nested array based on parens in the input</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Builds a nested array based on parens in the input</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$array</var></dt>
+					<dd><code>array</code><br>$array low-level parsed IMAP response</dd>
+					<dt><var>$index</var></dt>
+					<dd><code>integer</code><br>$index position in the list</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>tuple of the parsed result and index<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="attribute_set" id="_attribute_set">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_attribute_set">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1332-1349" title="Go to source code">attribute_set</a>( <span>array <var>$vals</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Create a name =&gt; value attribute set</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Create a name =&gt; value attribute set</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals set of attributes</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="envelope_address" id="_envelope_address">
+
+		<td class="attributes"><code>
+			 private 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_envelope_address">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1351-1380" title="Go to source code">envelope_address</a>( <span>array <var>$vals</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parse an ENVELOPE address</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parse an ENVELOPE address</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals parts of an address</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="set_value" id="_set_value">
+
+		<td class="attributes"><code>
+			 private 
+			prepared
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_set_value">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1382-1409" title="Go to source code">set_value</a>( <span>mixed <var>$val</var></span>, <span>string <var>$type</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Prepare a value to be added to the structure</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Prepare a value to be added to the structure</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$val</var></dt>
+					<dd><code>mixed</code><br>$val value to add</dd>
+					<dt><var>$type</var></dt>
+					<dd><code>string</code><br>$type optional value type</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>prepared</code><br>value<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="envelope" id="_envelope">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_envelope">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1411-1426" title="Go to source code">envelope</a>( <span>array <var>$vals</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parse an RFC822 ENVELOPE section</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parse an RFC822 ENVELOPE section</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals low-level IMAP response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_part_type" id="_get_part_type">
+
+		<td class="attributes"><code>
+			 private 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_part_type">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1428-1450" title="Go to source code">get_part_type</a>( <span>array <var>$vals</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Determine if this is a multipart, rfc822 message, or single part type</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Determine if this is a multipart, rfc822 message, or single part type</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals low-level IMAP response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="id_rfc822_part" id="_id_rfc822_part">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_id_rfc822_part">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1452-1483" title="Go to source code">id_rfc822_part</a>( <span>array <var>$vals</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parse an RFC822 message part</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parse an RFC822 message part</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals low-level IMAP response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="id_multi_part" id="_id_multi_part">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_id_multi_part">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1485-1505" title="Go to source code">id_multi_part</a>( <span>array <var>$vals</var></span>, <span>boolean <var>$increment</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Parse multipart message part</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parse multipart message part</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals low-level IMAP response</dd>
+					<dt><var>$increment</var></dt>
+					<dd><code>boolean</code><br>$increment flag to control part ids</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parse_multi_part_subs" id="_parse_multi_part_subs">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parse_multi_part_subs">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1507-1527" title="Go to source code">parse_multi_part_subs</a>( <span>array <var>$vals</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parse multipart message parts</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parse multipart message parts</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals low-level IMAP response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>last index and subs array<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parse_multi_part_flds" id="_parse_multi_part_flds">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parse_multi_part_flds">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1529-1551" title="Go to source code">parse_multi_part_flds</a>( <span>integer <var>$index</var></span>, <span>array <var>$vals</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parse multipart message fields</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parse multipart message fields</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$index</var></dt>
+					<dd><code>integer</code><br>$index position in the array</dd>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals low-level parsed IMAP response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="id_single_part" id="_id_single_part">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_id_single_part">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1553-1577" title="Go to source code">id_single_part</a>( <span>array <var>$vals</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parse single message part</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parse single message part</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$vals</var></dt>
+					<dd><code>array</code><br>$vals low-level IMAP response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="id_parts" id="_id_parts">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_id_parts">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1579-1611" title="Go to source code">id_parts</a>( <span>array <var>$struct</var></span> )</code>
+
+		<div class="description short">
+			
+<p>parse the message parts at the current "level"</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>parse the message parts at the current "level"</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$struct</var></dt>
+					<dd><code>array</code><br>$struct low-level IMAP response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="increment_part_number" id="_increment_part_number">
+
+		<td class="attributes"><code>
+			 private 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_increment_part_number">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1613-1631" title="Go to source code">increment_part_number</a>( )</code>
+
+		<div class="description short">
+			
+<p>Increment the message part number in the weird way IMAP does.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Increment the message part number in the weird way IMAP does.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="recursive_search" id="_recursive_search">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_recursive_search">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1633-1672" title="Go to source code">recursive_search</a>( <span>array <var>$struct</var></span>, <span>array <var>$flds</var></span>, <span>boolean <var>$all</var></span>, <span>array <var>$res</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Search a parsed BODYSTRUCTURE response</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Search a parsed BODYSTRUCTURE response</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$struct</var></dt>
+					<dd><code>array</code><br>$struct the response to search</dd>
+					<dt><var>$flds</var></dt>
+					<dd><code>array</code><br>$flds key =&gt; value list of fields and values to search for</dd>
+					<dt><var>$all</var></dt>
+					<dd><code>boolean</code><br>$all true to return all matching parts</dd>
+					<dt><var>$res</var></dt>
+					<dd><code>array</code><br>$res holds results during recursive iterations</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of matching parts<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="data" id="_data">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_data">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1674-1681" title="Go to source code">data</a>( )</code>
+
+		<div class="description short">
+			
+<p>Return structure</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return structure</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="search" id="_search">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_search">#</a>
+		<code><a href="source-class-Hm_IMAP_Struct.html#1683-1693" title="Go to source code">search</a>( <span>array <var>$flds</var></span>, <span>boolean <var>$all</var> = <span class="php-keyword1">true</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Public search function, returns a list of matching parts</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Public search function, returns a list of matching parts</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$flds</var></dt>
+					<dd><code>array</code><br>$flds key =&gt; value pairs of fields and values to search on</dd>
+					<dt><var>$all</var></dt>
+					<dd><code>boolean</code><br>$all true to return all matches</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="struct" id="$struct">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1248" title="Go to source code"><var>$struct</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$struct" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="part_number" id="$part_number">
+		<td class="attributes"><code>
+			private  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1251" title="Go to source code"><var>$part_number</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'-1'</span></code></td>
+		<td class="description"><div>
+			<a href="#$part_number" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="parent_type" id="$parent_type">
+		<td class="attributes"><code>
+			private  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1254" title="Go to source code"><var>$parent_type</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$parent_type" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="mime_types" id="$mime_types">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1257" title="Go to source code"><var>$mime_types</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>(<span class="php-quote">'application'</span>, <span class="php-quote">'audio'</span>, <span class="php-quote">'binary'</span>, <span class="php-quote">'image'</span>, <span class="php-quote">'message'</span>, <span class="php-quote">'model'</span>, <span class="php-quote">'multipart'</span>, <span class="php-quote">'text'</span>, <span class="php-quote">'video'</span>)</code></td>
+		<td class="description"><div>
+			<a href="#$mime_types" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="readable_message_types" id="$readable_message_types">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1260" title="Go to source code"><var>$readable_message_types</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>(<span class="php-quote">'delivery-status'</span>, <span class="php-quote">'external-body'</span>, <span class="php-quote">'disposition-notification'</span>, <span class="php-quote">'rfc822-headers'</span>)</code></td>
+		<td class="description"><div>
+			<a href="#$readable_message_types" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="single_format" id="$single_format">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1263-1264" title="Go to source code"><var>$single_format</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>( <span class="php-quote">'type'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'subtype'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'attributes'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'id'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'description'</span> =&gt; <span class="php-num">4</span>,
+    <span class="php-quote">'encoding'</span> =&gt; <span class="php-num">5</span>, <span class="php-quote">'size'</span> =&gt; <span class="php-num">6</span>, <span class="php-quote">'md5'</span> =&gt; <span class="php-num">7</span>, <span class="php-quote">'file_attributes'</span> =&gt; <span class="php-num">8</span>, <span class="php-quote">'langauge'</span> =&gt; <span class="php-num">9</span>, <span class="php-quote">'location'</span> =&gt; <span class="php-num">10</span>,)</code></td>
+		<td class="description"><div>
+			<a href="#$single_format" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="text_format" id="$text_format">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1267-1269" title="Go to source code"><var>$text_format</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>( <span class="php-quote">'type'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'subtype'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'attributes'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'id'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'description'</span> =&gt; <span class="php-num">4</span>,
+    <span class="php-quote">'encoding'</span> =&gt; <span class="php-num">5</span>, <span class="php-quote">'size'</span> =&gt; <span class="php-num">6</span>, <span class="php-quote">'lines'</span> =&gt; <span class="php-num">7</span>, <span class="php-quote">'md5'</span> =&gt; <span class="php-num">8</span>, <span class="php-quote">'disposition'</span> =&gt; <span class="php-num">9</span>, <span class="php-quote">'file_attributes'</span> =&gt; <span class="php-num">10</span>,
+    <span class="php-quote">'langauge'</span> =&gt; <span class="php-num">11</span>, <span class="php-quote">'location'</span> =&gt; <span class="php-num">12</span>,)</code></td>
+		<td class="description"><div>
+			<a href="#$text_format" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="rfc822_format" id="$rfc822_format">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1272-1274" title="Go to source code"><var>$rfc822_format</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>( <span class="php-quote">'type'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'subtype'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'attributes'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'id'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'description'</span> =&gt; <span class="php-num">4</span>,
+    <span class="php-quote">'encoding'</span> =&gt; <span class="php-num">5</span>, <span class="php-quote">'size'</span> =&gt; <span class="php-num">6</span>, <span class="php-quote">'envelope'</span> =&gt; <span class="php-num">7</span>, <span class="php-quote">'body_lines'</span> =&gt; <span class="php-num">9</span>, <span class="php-quote">'body_attributes'</span> =&gt; <span class="php-num">10</span>, <span class="php-quote">'disposition'</span> =&gt; <span class="php-num">11</span>,
+    <span class="php-quote">'language'</span> =&gt; <span class="php-num">12</span>, <span class="php-quote">'location'</span> =&gt; <span class="php-num">13</span>)</code></td>
+		<td class="description"><div>
+			<a href="#$rfc822_format" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="multipart_format" id="$multipart_format">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1277" title="Go to source code"><var>$multipart_format</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>( <span class="php-quote">'subtype'</span>, <span class="php-quote">'attributes'</span>, <span class="php-quote">'disposition'</span>, <span class="php-quote">'language'</span>, <span class="php-quote">'location'</span>)</code></td>
+		<td class="description"><div>
+			<a href="#$multipart_format" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="envelope_addresses" id="$envelope_addresses">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1280" title="Go to source code"><var>$envelope_addresses</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>( <span class="php-quote">'from'</span>, <span class="php-quote">'sender'</span>, <span class="php-quote">'reply-to'</span>, <span class="php-quote">'to'</span>, <span class="php-quote">'cc'</span>, <span class="php-quote">'bcc'</span>, <span class="php-quote">'in-reply-to'</span>)</code></td>
+		<td class="description"><div>
+			<a href="#$envelope_addresses" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="address_format" id="$address_format">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1283" title="Go to source code"><var>$address_format</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>( <span class="php-quote">'name'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'route'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'mailbox'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'domain'</span> =&gt; <span class="php-num">3</span>,)</code></td>
+		<td class="description"><div>
+			<a href="#$address_format" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="envelope_format" id="$envelope_format">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1286-1287" title="Go to source code"><var>$envelope_format</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>( <span class="php-quote">'date'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'subject'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'from'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'sender'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'reply-to'</span> =&gt; <span class="php-num">4</span>,
+    <span class="php-quote">'to'</span> =&gt; <span class="php-num">5</span>, <span class="php-quote">'cc'</span> =&gt; <span class="php-num">6</span>, <span class="php-quote">'bcc'</span> =&gt; <span class="php-num">7</span>, <span class="php-quote">'in-reply-to'</span> =&gt; <span class="php-num">8</span>, <span class="php-quote">'message_id'</span> =&gt; <span class="php-num">9</span>)</code></td>
+		<td class="description"><div>
+			<a href="#$envelope_format" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="imap" id="$imap">
+		<td class="attributes"><code>
+			private  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP_Struct.html#1290" title="Go to source code"><var>$imap</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$imap" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

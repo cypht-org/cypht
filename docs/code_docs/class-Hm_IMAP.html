@@ -1,0 +1,2919 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_IMAP | Cypht Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?294563344"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.imap.html">imap<span></span></a>
+						<ul>
+				<li><a href="package-modules.imap.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.imap.handler.html">handler</a>
+						</li>
+				<li class="active"><a href="package-modules.imap.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.imap.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Hm_Auth_IMAP.html">Hm_Auth_IMAP</a></li>
+				<li class="active"><a href="class-Hm_IMAP.html">Hm_IMAP</a></li>
+				<li><a href="class-Hm_IMAP_Base.html">Hm_IMAP_Base</a></li>
+				<li><a href="class-Hm_IMAP_Cache.html">Hm_IMAP_Cache</a></li>
+				<li><a href="class-Hm_IMAP_List.html">Hm_IMAP_List</a></li>
+				<li><a href="class-Hm_IMAP_Parser.html">Hm_IMAP_Parser</a></li>
+				<li><a href="class-Hm_IMAP_Struct.html">Hm_IMAP_Struct</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-modules.imap.lib.html" title="Summary of modules\imap\lib"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_IMAP</h1>
+
+
+	<div class="description">
+	
+<p>public interface to IMAP commands</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+			<a href="class-Hm_IMAP_Base.html"><span>Hm_IMAP_Base</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by">
+			<a href="class-Hm_IMAP_Parser.html"><span>Hm_IMAP_Parser</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:60px">
+			<img src="resources/inherit.png" alt="Extended by">
+			<a href="class-Hm_IMAP_Cache.html"><span>Hm_IMAP_Cache</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:90px">
+			<img src="resources/inherit.png" alt="Extended by">
+<b><span>Hm_IMAP</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.imap.html">imap</a>\<a href="package-modules.imap.lib.html">lib</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_IMAP.html#97-2109" title="Go to source code">hm-imap.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Hm_IMAP.html#190-194" title="Go to source code">__construct</a>( )</code>
+
+		<div class="description short">
+			
+<p>constructor</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>constructor</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="connect" id="_connect">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_connect">#</a>
+		<code><a href="source-class-Hm_IMAP.html#198-245" title="Go to source code">connect</a>( <span>array <var>$config</var></span> )</code>
+
+		<div class="description short">
+			
+<p>connect to the imap server</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>connect to the imap server</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$config</var></dt>
+					<dd><code>array</code><br>$config list of configuration options for this connections</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true on connection sucess<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="disconnect" id="_disconnect">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_disconnect">#</a>
+		<code><a href="source-class-Hm_IMAP.html#247-261" title="Go to source code">disconnect</a>( )</code>
+
+		<div class="description short">
+			
+<p>close the IMAP connection</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>close the IMAP connection</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="authenticate" id="_authenticate">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_authenticate">#</a>
+		<code><a href="source-class-Hm_IMAP.html#263-324" title="Go to source code">authenticate</a>( <span>string <var>$username</var></span>, <span>string <var>$password</var></span> )</code>
+
+		<div class="description short">
+			
+<p>authenticate the username/password</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>authenticate the username/password</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$username</var></dt>
+					<dd><code>string</code><br>$username IMAP login name</dd>
+					<dt><var>$password</var></dt>
+					<dd><code>string</code><br>$password IMAP password</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true on sucessful login<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="starttls" id="_starttls">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_starttls">#</a>
+		<code><a href="source-class-Hm_IMAP.html#326-349" title="Go to source code">starttls</a>( )</code>
+
+		<div class="description short">
+			
+<p>attempt starttls</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>attempt starttls</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_capability" id="_get_capability">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_capability">#</a>
+		<code><a href="source-class-Hm_IMAP.html#353-373" title="Go to source code">get_capability</a>( )</code>
+
+		<div class="description short">
+			
+<p>fetch IMAP server capability response</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>fetch IMAP server capability response</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>capability response<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_mailbox_list" id="_get_mailbox_list">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_mailbox_list">#</a>
+		<code><a href="source-class-Hm_IMAP.html#375-534" title="Go to source code">get_mailbox_list</a>( <span>boolean <var>$lsub</var> = <span class="php-keyword1">false</span></span>, <span>mixed <var>$mailbox</var> = <span class="php-quote">''</span></span>, <span>mixed <var>$keyword</var> = <span class="php-quote">'*'</span></span> )</code>
+
+		<div class="description short">
+			
+<p>get a list of mailbox folders</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>get a list of mailbox folders</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$lsub</var></dt>
+					<dd><code>boolean</code><br>$lsub flag to limit results to subscribed folders only</dd>
+					<dt><var>$mailbox</var></dt>
+					<dd></dd>
+					<dt><var>$keyword</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>associative array of folder details<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_namespaces" id="_get_namespaces">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_namespaces">#</a>
+		<code><a href="source-class-Hm_IMAP.html#536-587" title="Go to source code">get_namespaces</a>( )</code>
+
+		<div class="description short">
+			
+<p>get IMAP folder namespaces</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>get IMAP folder namespaces</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of available namespace details<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="select_mailbox" id="_select_mailbox">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_select_mailbox">#</a>
+		<code><a href="source-class-Hm_IMAP.html#589-647" title="Go to source code">select_mailbox</a>( <span>string <var>$mailbox</var></span> )</code>
+
+		<div class="description short">
+			
+<p>select a mailbox</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>select a mailbox</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox the mailbox to attempt to select</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of information about the selected mailbox<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_mailbox_status" id="_get_mailbox_status">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_mailbox_status">#</a>
+		<code><a href="source-class-Hm_IMAP.html#649-667" title="Go to source code">get_mailbox_status</a>( <span>string <var>$mailbox</var></span>, <span>array <var>$args</var> = <span class="php-keyword1">array</span>(<span class="php-quote">'UNSEEN'</span>, <span class="php-quote">'UIDVALIDITY'</span>, <span class="php-quote">'UIDNEXT'</span>, <span class="php-quote">'MESSAGES'</span>, <span class="php-quote">'RECENT'</span>)</span> )</code>
+
+		<div class="description short">
+			
+<p>issue IMAP status command on a mailbox</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>issue IMAP status command on a mailbox</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox IMAP mailbox to check</dd>
+					<dt><var>$args</var></dt>
+					<dd><code>array</code><br>$args list of properties to fetch</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of attribute values discovered<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="poll" id="_poll">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_poll">#</a>
+		<code><a href="source-class-Hm_IMAP.html#671-691" title="Go to source code">poll</a>( )</code>
+
+		<div class="description short">
+			
+<p>use IMAP NOOP to poll for untagged server messages</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>use IMAP NOOP to poll for untagged server messages</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of properties that have changed since SELECT<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_message_list" id="_get_message_list">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_message_list">#</a>
+		<code><a href="source-class-Hm_IMAP.html#693-815" title="Go to source code">get_message_list</a>( <span>mixed <var>$uids</var></span>, <span>boolean <var>$raw</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>return a header list for the supplied message uids</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>return a header list for the supplied message uids</p>
+
+<p>TODO: refactor. abstract header line continuation parsing for re-use</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$uids</var></dt>
+					<dd><code>mixed</code><br>$uids an array of uids or a valid IMAP sequence set as a string</dd>
+					<dt><var>$raw</var></dt>
+					<dd><code>boolean</code><br>$raw flag to disable decoding header values</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of headers and values for the specified uids<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_message_structure" id="_get_message_structure">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_message_structure">#</a>
+		<code><a href="source-class-Hm_IMAP.html#817-828" title="Go to source code">get_message_structure</a>( <span>integer <var>$uid</var></span> )</code>
+
+		<div class="description short">
+			
+<p>get the IMAP BODYSTRUCTURE of a message</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>get the IMAP BODYSTRUCTURE of a message</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$uid</var></dt>
+					<dd><code>integer</code><br>$uid IMAP UID of the message</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>message structure represented as a nested array<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_raw_bodystructure" id="_get_raw_bodystructure">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_raw_bodystructure">#</a>
+		<code><a href="source-class-Hm_IMAP.html#830-861" title="Go to source code">get_raw_bodystructure</a>( <span>integer <var>$uid</var></span> )</code>
+
+		<div class="description short">
+			
+<p>get the raw IMAP BODYSTRUCTURE response</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>get the raw IMAP BODYSTRUCTURE response</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$uid</var></dt>
+					<dd><code>integer</code><br>$uid IMAP UID of the message</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>low-level parsed message structure<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parse_bodystructure_response" id="_parse_bodystructure_response">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parse_bodystructure_response">#</a>
+		<code><a href="source-class-Hm_IMAP.html#863-885" title="Go to source code">parse_bodystructure_response</a>( <span>array <var>$result</var></span> )</code>
+
+		<div class="description short">
+			
+<p>New BODYSTRUCTURE parsing routine</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>New BODYSTRUCTURE parsing routine</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$result</var></dt>
+					<dd><code>array</code><br>$result low-level IMAP response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_message_content" id="_get_message_content">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_message_content">#</a>
+		<code><a href="source-class-Hm_IMAP.html#887-968" title="Go to source code">get_message_content</a>( <span>integer <var>$uid</var></span>, <span>string <var>$message_part</var></span>, <span>boolean <var>$max</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$struct</var> = <span class="php-keyword1">true</span></span> )</code>
+
+		<div class="description short">
+			
+<p>get content for a message part</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>get content for a message part</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$uid</var></dt>
+					<dd><code>integer</code><br>$uid a single IMAP message UID</dd>
+					<dt><var>$message_part</var></dt>
+					<dd><code>string</code><br>$message_part the IMAP message part number</dd>
+					<dt><var>$max</var></dt>
+					<dd><code>boolean</code><br>$raw flag to enabled fetching the entire message as text</dd>
+					<dt><var>$struct</var></dt>
+					<dd><code>integer</code><br>$max maximum read length to allow.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>message content<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="search" id="_search">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_search">#</a>
+		<code><a href="source-class-Hm_IMAP.html#970-1061" title="Go to source code">search</a>( <span>string <var>$target</var> = <span class="php-quote">'ALL'</span></span>, <span>mixed <var>$uids</var> = <span class="php-keyword1">false</span></span>, <span>string <var>$terms</var> = <span class="php-keyword1">array</span>()</span>, <span>string <var>$esearch</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>use IMAP SEARCH or ESEARCH /** search a field for a keyword</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>use IMAP SEARCH or ESEARCH /** search a field for a keyword</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$target</var></dt>
+					<dd><code>string</code><br>$target message types to search. can be ALL, UNSEEN, ANSWERED, etc</dd>
+					<dt><var>$uids</var></dt>
+					<dd><code>mixed</code><br>$uids an array of uids or a valid IMAP sequence set as a string (or false for
+ALL)</dd>
+					<dt><var>$terms</var></dt>
+					<dd><code>string</code><br>$fld optional field to search</dd>
+					<dt><var>$esearch</var></dt>
+					<dd><code>string</code><br>$term optional search term</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of IMAP message UIDs that match the search<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_message_headers" id="_get_message_headers">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_message_headers">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1063-1158" title="Go to source code">get_message_headers</a>( <span>integer <var>$uid</var></span>, <span>string <var>$message_part</var> = <span class="php-keyword1">false</span></span>, <span>mixed <var>$raw</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>get the headers for the selected message</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>get the headers for the selected message</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$uid</var></dt>
+					<dd><code>integer</code><br>$uid IMAP message UID</dd>
+					<dt><var>$message_part</var></dt>
+					<dd><code>string</code><br>$message_part IMAP message part number</dd>
+					<dt><var>$raw</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>associate array of message headers<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="start_message_stream" id="_start_message_stream">
+
+		<td class="attributes"><code>
+			 public 
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_start_message_stream">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1160-1190" title="Go to source code">start_message_stream</a>( <span>integer <var>$uid</var></span>, <span>string <var>$message_part</var></span> )</code>
+
+		<div class="description short">
+			
+<p>start streaming a message part. returns the number of characters in the
+message</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>start streaming a message part. returns the number of characters in the
+message</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$uid</var></dt>
+					<dd><code>integer</code><br>$uid IMAP message UID</dd>
+					<dt><var>$message_part</var></dt>
+					<dd><code>string</code><br>$message_part IMAP message part number</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>the size of the message queued up to stream<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="read_stream_line" id="_read_stream_line">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_read_stream_line">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1192-1223" title="Go to source code">read_stream_line</a>( <span>integer <var>$size</var> = <span class="php-num">1024</span></span> )</code>
+
+		<div class="description short">
+			
+<p>read a line from a message stream. Called until it returns false will
+"stream" a message part content one line at a time. useful for avoiding memory
+consumption when dealing with large attachments</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>read a line from a message stream. Called until it returns false will
+"stream" a message part content one line at a time. useful for avoiding memory
+consumption when dealing with large attachments</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$size</var></dt>
+					<dd><code>integer</code><br>$size chunk size to read using fgets</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>chunk of the streamed message<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="sort_by_fetch" id="_sort_by_fetch">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_sort_by_fetch">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1225-1359" title="Go to source code">sort_by_fetch</a>( <span>string <var>$sort</var></span>, <span>boolean <var>$reverse</var></span>, <span>string <var>$filter</var></span>, <span>string <var>$uid_str</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>use FETCH to sort a list of uids when SORT is not available</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>use FETCH to sort a list of uids when SORT is not available</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sort</var></dt>
+					<dd><code>string</code><br>$sort the sort field</dd>
+					<dt><var>$reverse</var></dt>
+					<dd><code>boolean</code><br>$reverse flag to reverse the results</dd>
+					<dt><var>$filter</var></dt>
+					<dd><code>string</code><br>$filter IMAP message type (UNSEEN, ANSWERED, DELETED, etc)</dd>
+					<dt><var>$uid_str</var></dt>
+					<dd><code>string</code><br>$uid_str IMAP sequence set string or false</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of UIDs in the sort order<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="delete_mailbox" id="_delete_mailbox">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_delete_mailbox">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1363-1389" title="Go to source code">delete_mailbox</a>( <span>string <var>$mailbox</var></span> )</code>
+
+		<div class="description short">
+			
+<p>delete an existing mailbox</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>delete an existing mailbox</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox IMAP mailbox name to delete</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>tru if the mailbox was deleted<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rename_mailbox" id="_rename_mailbox">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_rename_mailbox">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1391-1418" title="Go to source code">rename_mailbox</a>( <span>string <var>$mailbox</var></span>, <span>string <var>$new_mailbox</var></span> )</code>
+
+		<div class="description short">
+			
+<p>rename and existing mailbox</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>rename and existing mailbox</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox IMAP mailbox to rename</dd>
+					<dt><var>$new_mailbox</var></dt>
+					<dd><code>string</code><br>$new_mailbox new name for the mailbox</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true if the rename operation worked<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="create_mailbox" id="_create_mailbox">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_create_mailbox">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1420-1446" title="Go to source code">create_mailbox</a>( <span>string <var>$mailbox</var></span> )</code>
+
+		<div class="description short">
+			
+<p>create a new mailbox</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>create a new mailbox</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox IMAP mailbox name</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true if the mailbox was created<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="message_action" id="_message_action">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_message_action">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1448-1534" title="Go to source code">message_action</a>( <span>string <var>$action</var></span>, <span>mixed <var>$uids</var></span>, <span>string <var>$mailbox</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>perform an IMAP action on a message</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>perform an IMAP action on a message</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$action</var></dt>
+					<dd><code>string</code><br>$action action to perform, can be one of READ, UNREAD, FLAG, UNFLAG, ANSWERED,
+DELETE, UNDELETE, EXPUNGE, or COPY</dd>
+					<dt><var>$uids</var></dt>
+					<dd><code>mixed</code><br>$uids an array of uids or a valid IMAP sequence set as a string</dd>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox destination IMAP mailbox name for operations the require one</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="append_start" id="_append_start">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_append_start">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1536-1563" title="Go to source code">append_start</a>( <span>string <var>$mailbox</var></span>, <span>integer <var>$size</var></span>, <span>boolean <var>$seen</var> = <span class="php-keyword1">true</span></span> )</code>
+
+		<div class="description short">
+			
+<p>start writing a message to a folder with IMAP APPEND</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>start writing a message to a folder with IMAP APPEND</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox IMAP mailbox name</dd>
+					<dt><var>$size</var></dt>
+					<dd><code>integer</code><br>$size size of the message to be written</dd>
+					<dt><var>$seen</var></dt>
+					<dd><code>boolean</code><br>$seen flag to mark the message seen $return bool true on success</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="append_feed" id="_append_feed">
+
+		<td class="attributes"><code>
+			 public 
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_append_feed">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1565-1576" title="Go to source code">append_feed</a>( <span>string <var>$string</var></span> )</code>
+
+		<div class="description short">
+			
+<p>write a line to an active IMAP APPEND operation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>write a line to an active IMAP APPEND operation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$string</var></dt>
+					<dd><code>string</code><br>$string line to write</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>length written<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="append_end" id="_append_end">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_append_end">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1578-1586" title="Go to source code">append_end</a>( )</code>
+
+		<div class="description short">
+			
+<p>finish an IMAP APPEND operation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>finish an IMAP APPEND operation</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true on success<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="convert_sequence_to_array" id="_convert_sequence_to_array">
+
+		<td class="attributes"><code>
+			 public 
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_convert_sequence_to_array">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1590-1611" title="Go to source code">convert_sequence_to_array</a>( <span>string <var>$sequence</var></span> )</code>
+
+		<div class="description short">
+			
+<p>convert a sequence string to an array</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>convert a sequence string to an array</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sequence</var></dt>
+					<dd><code>string</code><br>$sequence an IMAP sequence string</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>$array list of ids<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="convert_array_to_sequence" id="_convert_array_to_sequence">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_convert_array_to_sequence">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1613-1655" title="Go to source code">convert_array_to_sequence</a>( <span>array <var>$array</var></span> )</code>
+
+		<div class="description short">
+			
+<p>convert an array into a sequence string</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>convert an array into a sequence string</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$array</var></dt>
+					<dd><code>array</code><br>$array list of ids</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>an IMAP sequence string<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="decode_fld" id="_decode_fld">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_decode_fld">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1657-1682" title="Go to source code">decode_fld</a>( <span>string <var>$string</var></span> )</code>
+
+		<div class="description short">
+			
+<p>decode mail fields to human readable text</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>decode mail fields to human readable text</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$string</var></dt>
+					<dd><code>string</code><br>$string field to decode</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>decoded field<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="is_supported" id="_is_supported">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_is_supported">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1684-1693" title="Go to source code">is_supported</a>( <span>string <var>$extension</var></span> )</code>
+
+		<div class="description short">
+			
+<p>check if an IMAP extension is supported by the server</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>check if an IMAP extension is supported by the server</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$extension</var></dt>
+					<dd><code>string</code><br>$extension name of an extension</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true if the extension is supported<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_state" id="_get_state">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_state">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1695-1706" title="Go to source code">get_state</a>( )</code>
+
+		<div class="description short">
+			
+<p>returns current IMAP state</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>returns current IMAP state</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>one of: disconnected = no IMAP server TCP connection connected = an IMAP server
+TCP connection exists authenticated = successfully authenticated to the IMAP
+server selected = a mailbox has been selected<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="show_debug" id="_show_debug">
+
+		<td class="attributes"><code>
+			 public 
+			void/string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_show_debug">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1708-1725" title="Go to source code">show_debug</a>( <span>boolean <var>$full</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$return</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>output IMAP session debug info</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>output IMAP session debug info</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$full</var></dt>
+					<dd><code>boolean</code><br>$full flag to enable full IMAP response display</dd>
+					<dt><var>$return</var></dt>
+					<dd><code>boolean</code><br>$return flag to return the debug results instead of printing them</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>void/string</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="search_bodystructure" id="_search_bodystructure">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_search_bodystructure">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1727-1738" title="Go to source code">search_bodystructure</a>( <span>array <var>$struct</var></span>, <span>string <var>$search_flds</var></span>, <span>array <var>$all</var> = <span class="php-keyword1">true</span></span>, <span>mixed <var>$res</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>search a nested BODYSTRUCTURE response for a specific part</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>search a nested BODYSTRUCTURE response for a specific part</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$struct</var></dt>
+					<dd><code>array</code><br>$struct the structure to search</dd>
+					<dt><var>$search_flds</var></dt>
+					<dd><code>string</code><br>$search_term the search term</dd>
+					<dt><var>$all</var></dt>
+					<dd><code>array</code><br>$search_flds list of fields to search for the term</dd>
+					<dt><var>$res</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>array of all matching parts from the message<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_quota" id="_get_quota">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_quota">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1742-1765" title="Go to source code">get_quota</a>( <span>string <var>$quota_root</var> = <span class="php-quote">''</span></span> )</code>
+
+		<div class="description short">
+			
+<p>use the IMAP GETQUOTA command to fetch quota information</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>use the IMAP GETQUOTA command to fetch quota information</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$quota_root</var></dt>
+					<dd><code>string</code><br>$quota_root named quota root to fetch</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of quota details<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_quota_root" id="_get_quota_root">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_quota_root">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1767-1790" title="Go to source code">get_quota_root</a>( <span>string <var>$mailbox</var></span> )</code>
+
+		<div class="description short">
+			
+<p>use the IMAP GETQUOTAROOT command to fetch quota information about a
+mailbox</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>use the IMAP GETQUOTAROOT command to fetch quota information about a
+mailbox</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox IMAP folder to check</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of quota details<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="enable" id="_enable">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_enable">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1792-1824" title="Go to source code">enable</a>( )</code>
+
+		<div class="description short">
+			
+<p>use the ENABLE extension to tell the IMAP server what extensions we
+support</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>use the ENABLE extension to tell the IMAP server what extensions we
+support</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of supported extensions that can be enabled<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="unselect_mailbox" id="_unselect_mailbox">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_unselect_mailbox">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1826-1839" title="Go to source code">unselect_mailbox</a>( )</code>
+
+		<div class="description short">
+			
+<p>unselect the selected mailbox</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>unselect the selected mailbox</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>true on success<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="id" id="_id">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_id">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1841-1887" title="Go to source code">id</a>( )</code>
+
+		<div class="description short">
+			
+<p>use the ID extension</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>use the ID extension</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of server properties on success<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_message_sort_order" id="_get_message_sort_order">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_message_sort_order">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1889-1953" title="Go to source code">get_message_sort_order</a>( <span>string <var>$sort</var> = <span class="php-quote">'ARRIVAL'</span></span>, <span>boolean <var>$reverse</var> = <span class="php-keyword1">true</span></span>, <span>string <var>$filter</var> = <span class="php-quote">'ALL'</span></span>, <span>mixed <var>$esort</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>use the SORT extension to get a sorted UID list</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>use the SORT extension to get a sorted UID list</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sort</var></dt>
+					<dd><code>string</code><br>$sort sort order. can be one of ARRIVAL, DATE, CC, TO, SUBJECT, FROM, or SIZE</dd>
+					<dt><var>$reverse</var></dt>
+					<dd><code>boolean</code><br>$reverse flag to reverse the sort order</dd>
+					<dt><var>$filter</var></dt>
+					<dd><code>string</code><br>$filter can be one of ALL, SEEN, UNSEEN ANSWERED, UNANSWERED, DELETED,
+UNDELETED, FLAGGED, or UNFLAGGED</dd>
+					<dt><var>$esort</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of IMAP message UIDs<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="google_search" id="_google_search">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_google_search">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1955-1981" title="Go to source code">google_search</a>( <span>string <var>$search_str</var></span> )</code>
+
+		<div class="description short">
+			
+<p>search using the Google X-GM-RAW IMAP extension</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>search using the Google X-GM-RAW IMAP extension</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$search_str</var></dt>
+					<dd><code>string</code><br>$start_str formatted search string like "has:attachment in:unread"</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of IMAP UIDs that match the search<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="enable_compression" id="_enable_compression">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_enable_compression">#</a>
+		<code><a href="source-class-Hm_IMAP.html#1983-1999" title="Go to source code">enable_compression</a>( )</code>
+
+		<div class="description short">
+			
+<p>attempt enable IMAP COMPRESS extension TODO: currently does not work ...</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>attempt enable IMAP COMPRESS extension TODO: currently does not work ...</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_first_message_part" id="_get_first_message_part">
+
+		<td class="attributes"><code>
+			 public 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_first_message_part">#</a>
+		<code><a href="source-class-Hm_IMAP.html#2003-2039" title="Go to source code">get_first_message_part</a>( <span>integer <var>$uid</var></span>, <span>string <var>$type</var></span>, <span>string <var>$subtype</var> = <span class="php-keyword1">false</span></span>, <span>mixed <var>$struct</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+<p>return the formatted message content of the first part that matches the
+supplied MIME type</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>return the formatted message content of the first part that matches the
+supplied MIME type</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$uid</var></dt>
+					<dd><code>integer</code><br>$uid IMAP UID value for the message</dd>
+					<dt><var>$type</var></dt>
+					<dd><code>string</code><br>$type Primary MIME type like "text"</dd>
+					<dt><var>$subtype</var></dt>
+					<dd><code>string</code><br>$subtype Secondary MIME type like "plain"</dd>
+					<dt><var>$struct</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>formatted message content, bool false if no matching part is found<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_mailbox_page" id="_get_mailbox_page">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_mailbox_page">#</a>
+		<code><a href="source-class-Hm_IMAP.html#2042-2086" title="Go to source code">get_mailbox_page</a>( <span>string <var>$mailbox</var></span>, <span>string <var>$sort</var></span>, <span>string <var>$rev</var></span>, <span>integer <var>$filter</var></span>, <span>integer <var>$offset</var> = <span class="php-num">0</span></span>, <span>mixed <var>$limit</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>return a list of headers and UIDs for a page of a mailbox</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>return a list of headers and UIDs for a page of a mailbox</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$mailbox</var></dt>
+					<dd><code>string</code><br>$mailbox the mailbox to access</dd>
+					<dt><var>$sort</var></dt>
+					<dd><code>string</code><br>$sort sort order. can be one of ARRIVAL, DATE, CC, TO, SUBJECT, FROM, or SIZE</dd>
+					<dt><var>$rev</var></dt>
+					<dd><code>string</code><br>$filter type of messages to include (UNSEEN, ANSWERED, ALL, etc)</dd>
+					<dt><var>$filter</var></dt>
+					<dd><code>integer</code><br>$limit max number of messages to return</dd>
+					<dt><var>$offset</var></dt>
+					<dd><code>integer</code><br>$offset offset from the first message in the list</dd>
+					<dt><var>$limit</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of headers<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_folder_list_by_level" id="_get_folder_list_by_level">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_folder_list_by_level">#</a>
+		<code><a href="source-class-Hm_IMAP.html#2088-2108" title="Go to source code">get_folder_list_by_level</a>( <span>string <var>$level</var> = <span class="php-quote">''</span></span> )</code>
+
+		<div class="description short">
+			
+<p>return all the folders contained at a hierarchy level, and if possible, if
+they have sub-folders</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>return all the folders contained at a hierarchy level, and if possible, if
+they have sub-folders</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$level</var></dt>
+					<dd><code>string</code><br>$level mailbox name or empty string for the top level</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of matching folders<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Hm_IMAP_Cache.html#methods">Hm_IMAP_Cache</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_IMAP_Cache.html#_bust_cache">bust_cache()</a>, 
+			<a href="class-Hm_IMAP_Cache.html#_cache_return_val">cache_return_val()</a>, 
+			<a href="class-Hm_IMAP_Cache.html#_check_cache">check_cache()</a>, 
+			<a href="class-Hm_IMAP_Cache.html#_collect_cache_entries_to_prune">collect_cache_entries_to_prune()</a>, 
+			<a href="class-Hm_IMAP_Cache.html#_dump_cache">dump_cache()</a>, 
+			<a href="class-Hm_IMAP_Cache.html#_load_cache">load_cache()</a>, 
+			<a href="class-Hm_IMAP_Cache.html#_prune_cache">prune_cache()</a>, 
+			<a href="class-Hm_IMAP_Cache.html#_update_cache_data">update_cache_data()</a>
+		</code></td>
+	</tr>
+	</table>
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Hm_IMAP_Parser.html#methods">Hm_IMAP_Parser</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_IMAP_Parser.html#_build_list_commands">build_list_commands()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_build_qresync_params">build_qresync_params()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_check_mailbox_state_change">check_mailbox_state_change()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_flag_match">flag_match()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_get_adjacent_response_value">get_adjacent_response_value()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_get_flag_values">get_flag_values()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_parse_esearch_response">parse_esearch_response()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_parse_extensions_from_capability">parse_extensions_from_capability()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_parse_quota_response">parse_quota_response()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_parse_status_response">parse_status_response()</a>, 
+			<a href="class-Hm_IMAP_Parser.html#_parse_untagged_responses">parse_untagged_responses()</a>
+		</code></td>
+	</tr>
+	</table>
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Hm_IMAP_Base.html#methods">Hm_IMAP_Base</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_IMAP_Base.html#_apply_config">apply_config()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_check_response">check_response()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_fgets">fgets()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_get_response">get_response()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_input_validate">input_validate()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_is_clean">is_clean()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_parse_line">parse_line()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_send_command">send_command()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_utf7_decode">utf7_decode()</a>, 
+			<a href="class-Hm_IMAP_Base.html#_utf7_encode">utf7_encode()</a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="max_read" id="$max_read">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#106" title="Go to source code"><var>$max_read</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$max_read" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="verify_peer_name" id="$verify_peer_name">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#109" title="Go to source code"><var>$verify_peer_name</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$verify_peer_name" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="verify_peer" id="$verify_peer">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#110" title="Go to source code"><var>$verify_peer</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$verify_peer" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="server" id="$server">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#113" title="Go to source code"><var>$server</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'127.0.0.1'</span></code></td>
+		<td class="description"><div>
+			<a href="#$server" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="port" id="$port">
+		<td class="attributes"><code>
+			public  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#116" title="Go to source code"><var>$port</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">143</span></code></td>
+		<td class="description"><div>
+			<a href="#$port" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="tls" id="$tls">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#119" title="Go to source code"><var>$tls</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$tls" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="read_only" id="$read_only">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#122" title="Go to source code"><var>$read_only</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$read_only" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="utf7_folders" id="$utf7_folders">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#125" title="Go to source code"><var>$utf7_folders</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$utf7_folders" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="auth" id="$auth">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#128" title="Go to source code"><var>$auth</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$auth" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="search_charset" id="$search_charset">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#131" title="Go to source code"><var>$search_charset</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">''</span></code></td>
+		<td class="description"><div>
+			<a href="#$search_charset" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="sort_speedup" id="$sort_speedup">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#134" title="Go to source code"><var>$sort_speedup</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">true</span></code></td>
+		<td class="description"><div>
+			<a href="#$sort_speedup" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="use_cache" id="$use_cache">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#137" title="Go to source code"><var>$use_cache</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">true</span></code></td>
+		<td class="description"><div>
+			<a href="#$use_cache" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="folder_max" id="$folder_max">
+		<td class="attributes"><code>
+			public  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#140" title="Go to source code"><var>$folder_max</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">50000</span></code></td>
+		<td class="description"><div>
+			<a href="#$folder_max" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="max_history" id="$max_history">
+		<td class="attributes"><code>
+			public  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#143" title="Go to source code"><var>$max_history</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">1000</span></code></td>
+		<td class="description"><div>
+			<a href="#$max_history" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="default_delimiter" id="$default_delimiter">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#146" title="Go to source code"><var>$default_delimiter</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'/'</span></code></td>
+		<td class="description"><div>
+			<a href="#$default_delimiter" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="default_prefix" id="$default_prefix">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#149" title="Go to source code"><var>$default_prefix</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">''</span></code></td>
+		<td class="description"><div>
+			<a href="#$default_prefix" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="blacklisted_extensions" id="$blacklisted_extensions">
+		<td class="attributes"><code>
+			public  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#152" title="Go to source code"><var>$blacklisted_extensions</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$blacklisted_extensions" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="cache_limit" id="$cache_limit">
+		<td class="attributes"><code>
+			public  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#155" title="Go to source code"><var>$cache_limit</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">100</span></code></td>
+		<td class="description"><div>
+			<a href="#$cache_limit" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="no_caps" id="$no_caps">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#158" title="Go to source code"><var>$no_caps</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$no_caps" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="app_name" id="$app_name">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#161" title="Go to source code"><var>$app_name</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'Hm_IMAP'</span></code></td>
+		<td class="description"><div>
+			<a href="#$app_name" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="app_version" id="$app_version">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#162" title="Go to source code"><var>$app_version</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'3.0'</span></code></td>
+		<td class="description"><div>
+			<a href="#$app_version" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="app_vendor" id="$app_vendor">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#163" title="Go to source code"><var>$app_vendor</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'Hastymail Development Group'</span></code></td>
+		<td class="description"><div>
+			<a href="#$app_vendor" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="app_support_url" id="$app_support_url">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#164" title="Go to source code"><var>$app_support_url</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'http://hastymail.org/contact_us/'</span></code></td>
+		<td class="description"><div>
+			<a href="#$app_support_url" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="con_error_msg" id="$con_error_msg">
+		<td class="attributes"><code>
+			public  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#167" title="Go to source code"><var>$con_error_msg</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">''</span></code></td>
+		<td class="description"><div>
+			<a href="#$con_error_msg" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="con_error_num" id="$con_error_num">
+		<td class="attributes"><code>
+			public  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#168" title="Go to source code"><var>$con_error_num</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">0</span></code></td>
+		<td class="description"><div>
+			<a href="#$con_error_num" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="selected_mailbox" id="$selected_mailbox">
+		<td class="attributes"><code>
+			public  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#171" title="Go to source code"><var>$selected_mailbox</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$selected_mailbox" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="special_use_mailboxes" id="$special_use_mailboxes">
+		<td class="attributes"><code>
+			public  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#174-182" title="Go to source code"><var>$special_use_mailboxes</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>(
+    <span class="php-quote">'\All'</span> =&gt; <span class="php-keyword1">false</span>,
+    <span class="php-quote">'\Archive'</span> =&gt; <span class="php-keyword1">false</span>,
+    <span class="php-quote">'\Drafts'</span> =&gt; <span class="php-keyword1">false</span>,
+    <span class="php-quote">'\Flagged'</span> =&gt; <span class="php-keyword1">false</span>,
+    <span class="php-quote">'\Junk'</span> =&gt; <span class="php-keyword1">false</span>,
+    <span class="php-quote">'\Sent'</span> =&gt; <span class="php-keyword1">false</span>,
+    <span class="php-quote">'\Trash'</span> =&gt; <span class="php-keyword1">false</span>
+)</code></td>
+		<td class="description"><div>
+			<a href="#$special_use_mailboxes" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="state" id="$state">
+		<td class="attributes"><code>
+			private  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#185" title="Go to source code"><var>$state</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">'disconnected'</span></code></td>
+		<td class="description"><div>
+			<a href="#$state" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="stream_size" id="$stream_size">
+		<td class="attributes"><code>
+			private  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_IMAP.html#188" title="Go to source code"><var>$stream_size</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">0</span></code></td>
+		<td class="description"><div>
+			<a href="#$stream_size" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Properties inherited from <a href="class-Hm_IMAP_Base.html#properties">Hm_IMAP_Base</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_IMAP_Base.html#$cache_data"><var>$cache_data</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$cached_response"><var>$cached_response</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$capability"><var>$capability</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$client_extensions"><var>$client_extensions</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$command_count"><var>$command_count</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$commands"><var>$commands</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$config"><var>$config</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$current_command"><var>$current_command</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$debug"><var>$debug</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$declared_extensions"><var>$declared_extensions</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$enabled_extensions"><var>$enabled_extensions</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$handle"><var>$handle</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$literal_overflow"><var>$literal_overflow</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$responses"><var>$responses</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$server_id"><var>$server_id</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$struct_object"><var>$struct_object</var></a>, 
+			<a href="class-Hm_IMAP_Base.html#$supported_extensions"><var>$supported_extensions</var></a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>
