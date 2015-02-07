@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Core modules
+ * @package modules
+ * @subpackage core
+ */
+
+/**
+ * @subpackage core/functions
+ */
 function message_list_meta($input, $output_mod) {
     if (!array_key_exists('list_meta', $input) || !$input['list_meta']) {
         return '';
@@ -38,6 +47,9 @@ function message_list_meta($input, $output_mod) {
         '<span class="total"></span> '.$output_mod->trans('total').'</div>';
 }
 
+/**
+ * @subpackage core/functions
+ */
 function human_readable_interval($date_str) {
     $precision     = 2;
     $interval_time = array();
@@ -83,6 +95,9 @@ function human_readable_interval($date_str) {
     return implode(', ', $res);
 }
 
+/**
+ * @subpackage core/functions
+ */
 function message_list_row($values, $id, $style, $output_mod) {
     $res = '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id)).'">';
     if ($style == 'news') {
@@ -101,6 +116,9 @@ function message_list_row($values, $id, $style, $output_mod) {
     return array($res, $id);
 }
 
+/**
+ * @subpackage core/functions
+ */
 function safe_output_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
         return sprintf('<td class="%s" title="%s">%s</td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[1]));
@@ -109,6 +127,10 @@ function safe_output_callback($vals, $style, $output_mod) {
         return sprintf('<div class="%s" title="%s">%s</div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[1]));
     }
 }
+
+/**
+ * @subpackage core/functions
+ */
 function checkbox_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
         return sprintf('<td class="checkbox_cell"><input type="checkbox" value="%s" /></td>', $output_mod->html_safe($vals[0]));
@@ -117,6 +139,10 @@ function checkbox_callback($vals, $style, $output_mod) {
         return sprintf('<input type="checkbox" value="%s" /></td><td class="news_cell">', $output_mod->html_safe($vals[0]));
     }
 }
+
+/**
+ * @subpackage core/functions
+ */
 function subject_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
         return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[0]));
@@ -125,6 +151,10 @@ function subject_callback($vals, $style, $output_mod) {
         return sprintf('<div class="subject"><div class="%s" title="%s"><a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[0]));
     }
 }
+
+/**
+ * @subpackage core/functions
+ */
 function date_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
         return sprintf('<td class="msg_date" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
@@ -133,6 +163,10 @@ function date_callback($vals, $style, $output_mod) {
         return sprintf('<div class="msg_date">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
     }
 }
+
+/**
+ * @subpackage core/functions
+ */
 function icon_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
         return sprintf('<td class="icon">%s</td>', (in_array('flagged', $vals[0]) ? '&#9733;' : ''));
@@ -142,6 +176,9 @@ function icon_callback($vals, $style, $output_mod) {
     }
 }
 
+/**
+ * @subpackage core/functions
+ */
 function message_controls($output_mod) {
     return '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
         '<div class="msg_controls">'.
@@ -152,6 +189,9 @@ function message_controls($output_mod) {
         '<a href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></div>';
 }
 
+/**
+ * @subpackage core/functions
+ */
 function message_since_dropdown($since, $name, $output_mod) {
     $times = array(
         'today' => 'Today',
@@ -174,6 +214,9 @@ function message_since_dropdown($since, $name, $output_mod) {
     return $res;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function process_since_argument($val, $validate=false) {
     $date = false;
     $valid = false;
@@ -192,6 +235,9 @@ function process_since_argument($val, $validate=false) {
     return $date;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function format_msg_html($str, $external_resources=false) {
     require APP_PATH.'third_party/HTMLPurifier.standalone.php';
     $config = HTMLPurifier_Config::createDefault();
@@ -206,10 +252,16 @@ function format_msg_html($str, $external_resources=false) {
     return $res;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function format_msg_image($str, $mime_type) {
     return '<img alt="" src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
 }
 
+/**
+ * @subpackage core/functions
+ */
 function format_msg_text($str, $output_mod, $links=true) {
     $str = str_replace("\t", '    ', $str);
     $str = nl2br(str_replace(' ', '<wbr>', ($output_mod->html_safe($str))));
@@ -220,6 +272,9 @@ function format_msg_text($str, $output_mod, $links=true) {
     return str_replace('<wbr>', '&#160;<wbr>', $str);
 }
 
+/**
+ * @subpackage core/functions
+ */
 function display_value($name, $haystack, $type=false, $default='') {
     if (!array_key_exists($name, $haystack)) {
         return $default;
@@ -247,10 +302,16 @@ function display_value($name, $haystack, $type=false, $default='') {
     return $res;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function format_reply_text($txt) {
     return '> '.str_replace("\n", "\n> ", $txt);
 }
 
+/**
+ * @subpackage core/functions
+ */
 function interface_langs() {
     return array(
         'en' => 'English',
@@ -300,6 +361,9 @@ function interface_langs() {
     );
 }
 
+/**
+ * @subpackage core/functions
+ */
 function translate_time_str($str, $output_mod) {
     $parts = explode(',', $str);
     $res = array();
@@ -315,11 +379,17 @@ function translate_time_str($str, $output_mod) {
     return $str;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function list_controls($refresh_link, $config_link, $source_link=false) {
     return '<div class="list_controls">'.
         $refresh_link.$source_link.$config_link.'</div>';
 }
 
+/**
+ * @subpackage core/functions
+ */
 function list_sources($sources, $output_mod) {
     $res = '<div class="list_sources">';
     $res .= '<div class="src_title">'.$output_mod->html_safe('Sources').'</div>';
@@ -344,6 +414,9 @@ function list_sources($sources, $output_mod) {
     return $res;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function format_data_sources($array, $output_mod) {
     $objects = array();
     foreach ($array as $values) {
@@ -361,6 +434,9 @@ function format_data_sources($array, $output_mod) {
     return '['.implode(',', $objects).']';
 }
 
+/**
+ * @subpackage core/functions
+ */
 function validate_search_terms($terms) {
     $terms = trim(strip_tags($terms));
     if (!$terms) {
@@ -369,6 +445,9 @@ function validate_search_terms($terms) {
     return $terms;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function validate_search_fld($fld) {
     if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'))) {
         return $fld;
@@ -376,6 +455,9 @@ function validate_search_fld($fld) {
     return false;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function search_field_selection($current, $output_mod) {
     $flds = array(
         'TEXT' => 'Entire message',
@@ -395,6 +477,9 @@ function search_field_selection($current, $output_mod) {
     return $res;
 }
 
+/**
+ * @subpackage core/functions
+ */
 function email_is_active($mod_list) {
     if (stristr($mod_list, 'imap') && stristr($mod_list, 'pop3')) {
         return true;
