@@ -12,6 +12,7 @@
       <a title="Home page" href="index.html">Home</a>
       <a class="selected" href="features.html" title="More about Cypht features">Features</a>
       <a href="security.html" title="Information about security practices">Security</a>
+      <a href="modules.html" title="How Cypht module sets work">Mods</a>
       <a href="https://github.com/jasonmunro/hm3" title="Browse or download the source from github">Code</a>
       <a href="docs/code_docs/index.html" title="Code documentation generated with apigen">Docs</a>
       <a href="install.html" title="Installation instructions">Install</a>
@@ -21,13 +22,12 @@
     <div class="para">
       <ul>
       <li>
-Inbox, unread, and flagged message views combining all your E-mail accounts and
-RSS feeds, as well as normal E-mail client folder navigation.
+Combined Inbox, unread, and flagged message views for all your E-mail accounts (and
+RSS feeds), as well as normal E-mail client folder navigation.
       </li>
       <li>
-All the work of processing a request and providing a response is done with
-module sets. The application framework manages module assignment and provides a
-controlled execution environment, but modules are where the actual work is done.
+          Search all your E-mail accounts and RSS feeds at once with a simple form.
+      </li>
       <li>
 Pages are comprised of only 3 HTTP requests totaling ~40KB (gzipped).  Data to
 populate a page from different sources is collected with parallel AJAX
@@ -36,12 +36,18 @@ cache content for speedier reloads.  All the little interface icons use
 data-urls so they are served inline.
       </li>
       <li>
-Simple interface translation system that does not use gettext or .po files, just
-arrays of translated strings defined in PHP.
+All the work of processing a request and providing a response is done with
+module sets. The application framework manages module assignment and provides a
+controlled execution environment, but modules are where the actual work is done.
       </li>
       <li>
-Currently modules for IMAP and POP3 are pretty robust, and the SMTP module set
-is functional but still under development.
+Simple interface translation system that does not use gettext or .po files, just
+arrays of translated strings defined in PHP. All 45 translations are seeded
+with strings from the Google Translate API. Right to left languages are supported.
+      </li>
+      <li>
+Module sets for IMAP and POP3 are pretty robust, and the SMTP module set
+is functional, but still under development.
       </li>
       <li>
 Sessions and user data can be stored in any PDO compatible database or flat
@@ -51,13 +57,17 @@ be overridden for site specific needs without breaking module sets.
       </li>
       <li>
 On the server, page request processing peaks at around 2-4MB of memory. The module system
-only includes PHP files required to process the current page request, so time is not
+only includes PHP files required to process the current request, so time is not
 wasted parsing unused code paths.
       </li>
       <li>
 There is a build process that pre-calculates module assignments and combines
-and compresses page assets.  There is also a developer mode in which individual
-components are included directly for easy debugging and development.
+and compresses page assets, making the production version of your site as fast
+as possible. There is also a developer mode in which individual components are
+included directly for easy debugging and module development.
+      </li>
+      <li>
+The HTML5 Page structure is semantic and simple, with attention paid to accessibility best-practices.
       </li>
       <li>
 The application framework weighs in at about 1800 lines (SLOC) and has 100% unit test coverage with PHPUnit (there are still a few missing assertions).

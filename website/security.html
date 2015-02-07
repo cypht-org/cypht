@@ -12,6 +12,7 @@
       <a title="Home page" href="index.html">Home</a>
       <a href="features.html" title="More about Cypht features">Features</a>
       <a class="selected" href="security.html" title="Information about security practices">Security</a>
+      <a href="modules.html" title="How Cypht module sets work">Mods</a>
       <a href="https://github.com/jasonmunro/hm3" title="Browse or download the source from github">Code</a>
       <a href="docs/code_docs/index.html" title="Code documentation generated with apigen">Docs</a>
       <a href="install.html" title="Installation instructions">Install</a>
@@ -24,7 +25,7 @@
 Session level data is encrypted with a long random string generated each time you login.
 </li>
 <li>
-Persistent data stored between logins is encrypted with your clear text password, which is not stored anywhere on the server or in the session.
+Persistent data stored between logins is encrypted with your clear text password, which is obviously not stored anywhere on the server or in the session.
 </li>
 <li>
 All cookies are session level, HTTP only, and have the secure flag, path, and domain values set.
@@ -45,7 +46,7 @@ Built in nonce checking for all HTTP POST requests, including AJAX based request
 Security related HTTP headers like X-XSS-Protection, X-Content-Type-Options, and Content-Security-Policy.
 </li>
 <li>
-An optional two factor authentication module that uses a free SMS 2fa service from Swipeidentity.
+Two factor authentication module set that uses a free SMS based 2FA service from Swipeidentity.
 </li>
 <li>
 Only white-listed and typed/sanitized input is allowed. Modules must pre-define input in order to have access to it.
@@ -54,7 +55,7 @@ Only white-listed and typed/sanitized input is allowed. Modules must pre-define 
 Modules have no access to PHP super-globals, and there are no globally scoped variables at all (there are a few static class instances with private data structures that use getter/setter methods).
 </li>
 <li>
-PHP ini settings are tightened up for extra security, including open basedir and session best practices.
+PHP ini settings are tightened up at runtime for extra security, including open basedir and session best practices.
 </li>
 <li>
 No writable files or directories are used inside the web-server document root, and only 3 files need to be inside the document root to run the program.
@@ -66,7 +67,7 @@ Optional local DB based authentication uses PBKDF2 hashing.
 Easy output escaping inside modules for potentially dangerous content.
 </li>
 <li>
-Configurable idle timeout module set that ends a session after a predetermined amount of idle time.
+Configurable idle timeout module set that ends a session after a predetermined amount of time.
 </li>
 <li>
 Module design enforces a separation of input processing and output formatting, and encourages concise methods, which makes the code easier to debug and audit.

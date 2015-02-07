@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+	<meta name="robots" content="noindex">
+
+	<title>File functions.php | Cypht Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?3961820859"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li class="active"><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li class="active"><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+				<li><a href="package-None.html">None</a>
+						</li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+
+
+
+
+
+			<h3>Functions</h3>
+			<ul>
+				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
+				<li><a href="function-date_callback.html">date_callback</a></li>
+				<li><a href="function-display_value.html">display_value</a></li>
+				<li><a href="function-email_is_active.html">email_is_active</a></li>
+				<li><a href="function-format_data_sources.html">format_data_sources</a></li>
+				<li><a href="function-format_msg_html.html">format_msg_html</a></li>
+				<li><a href="function-format_msg_image.html">format_msg_image</a></li>
+				<li><a href="function-format_msg_text.html">format_msg_text</a></li>
+				<li><a href="function-format_reply_text.html">format_reply_text</a></li>
+				<li><a href="function-human_readable_interval.html">human_readable_interval</a></li>
+				<li><a href="function-icon_callback.html">icon_callback</a></li>
+				<li><a href="function-interface_langs.html">interface_langs</a></li>
+				<li><a href="function-list_controls.html">list_controls</a></li>
+				<li><a href="function-list_sources.html">list_sources</a></li>
+				<li><a href="function-message_controls.html">message_controls</a></li>
+				<li><a href="function-message_list_meta.html">message_list_meta</a></li>
+				<li class="active"><a href="function-message_list_row.html">message_list_row</a></li>
+				<li><a href="function-message_since_dropdown.html">message_since_dropdown</a></li>
+				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
+				<li><a href="function-safe_output_callback.html">safe_output_callback</a></li>
+				<li><a href="function-search_field_selection.html">search_field_selection</a></li>
+				<li><a href="function-subject_callback.html">subject_callback</a></li>
+				<li><a href="function-translate_time_str.html">translate_time_str</a></li>
+				<li><a href="function-validate_search_fld.html">validate_search_fld</a></li>
+				<li><a href="function-validate_search_terms.html">validate_search_terms</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-modules.core.functions.html" title="Summary of modules\core\functions"><span>Package</span></a>
+			</li>
+			<li>
+				<a href="function-message_list_row.html" title="Summary of message_list_row"><span>Function</span></a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<pre><code><span id="1" class="l"><a class="l" href="#1">  1: </a><span class="xlang">&lt;?php</span>
+</span><span id="2" class="l"><a class="l" href="#2">  2: </a>
+</span><span id="3" class="l"><a class="l" href="#3">  3: </a><span class="php-comment">/**
+</span></span><span id="4" class="l"><a class="l" href="#4">  4: </a><span class="php-comment"> * Core modules
+</span></span><span id="5" class="l"><a class="l" href="#5">  5: </a><span class="php-comment"> * @package modules
+</span></span><span id="6" class="l"><a class="l" href="#6">  6: </a><span class="php-comment"> * @subpackage core
+</span></span><span id="7" class="l"><a class="l" href="#7">  7: </a><span class="php-comment"> */</span>
+</span><span id="8" class="l"><a class="l" href="#8">  8: </a>
+</span><span id="9" class="l"><a class="l" href="#9">  9: </a><span class="php-comment">/**
+</span></span><span id="10" class="l"><a class="l" href="#10"> 10: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="11" class="l"><a class="l" href="#11"> 11: </a><span class="php-comment"> */</span>
+</span><span id="12" class="l"><a class="l" href="#12"> 12: </a><span class="php-keyword1">function</span> <a id="_message_list_meta" href="#_message_list_meta">message_list_meta</a>(<span class="php-var">$input</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="13" class="l"><a class="l" href="#13"> 13: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'list_meta'</span>, <span class="php-var">$input</span>) || !<span class="php-var">$input</span>[<span class="php-quote">'list_meta'</span>]) {
+</span><span id="14" class="l"><a class="l" href="#14"> 14: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
+</span><span id="15" class="l"><a class="l" href="#15"> 15: </a>    }
+</span><span id="16" class="l"><a class="l" href="#16"> 16: </a>    <span class="php-var">$limit</span> = <span class="php-num">0</span>;
+</span><span id="17" class="l"><a class="l" href="#17"> 17: </a>    <span class="php-var">$since</span> = <span class="php-keyword1">false</span>;
+</span><span id="18" class="l"><a class="l" href="#18"> 18: </a>    <span class="php-var">$times</span> = <span class="php-keyword1">array</span>(
+</span><span id="19" class="l"><a class="l" href="#19"> 19: </a>        <span class="php-quote">'today'</span> =&gt; <span class="php-quote">'Today'</span>,
+</span><span id="20" class="l"><a class="l" href="#20"> 20: </a>        <span class="php-quote">'-1 week'</span> =&gt; <span class="php-quote">'Last 7 days'</span>,
+</span><span id="21" class="l"><a class="l" href="#21"> 21: </a>        <span class="php-quote">'-2 weeks'</span> =&gt; <span class="php-quote">'Last 2 weeks'</span>,
+</span><span id="22" class="l"><a class="l" href="#22"> 22: </a>        <span class="php-quote">'-4 weeks'</span> =&gt; <span class="php-quote">'Last 4 weeks'</span>,
+</span><span id="23" class="l"><a class="l" href="#23"> 23: </a>        <span class="php-quote">'-6 weeks'</span> =&gt; <span class="php-quote">'Last 6 weeks'</span>,
+</span><span id="24" class="l"><a class="l" href="#24"> 24: </a>        <span class="php-quote">'-6 months'</span> =&gt; <span class="php-quote">'Last 6 months'</span>,
+</span><span id="25" class="l"><a class="l" href="#25"> 25: </a>        <span class="php-quote">'-1 year'</span> =&gt; <span class="php-quote">'Last year'</span>
+</span><span id="26" class="l"><a class="l" href="#26"> 26: </a>    );
+</span><span id="27" class="l"><a class="l" href="#27"> 27: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'per_source_limit'</span>, <span class="php-var">$input</span>)) {
+</span><span id="28" class="l"><a class="l" href="#28"> 28: </a>        <span class="php-var">$limit</span> = <span class="php-var">$input</span>[<span class="php-quote">'per_source_limit'</span>];
+</span><span id="29" class="l"><a class="l" href="#29"> 29: </a>    }
+</span><span id="30" class="l"><a class="l" href="#30"> 30: </a>    <span class="php-keyword1">if</span> (!<span class="php-var">$limit</span>) {
+</span><span id="31" class="l"><a class="l" href="#31"> 31: </a>        <span class="php-var">$limit</span> = DEFAULT_PER_SOURCE;
+</span><span id="32" class="l"><a class="l" href="#32"> 32: </a>    }
+</span><span id="33" class="l"><a class="l" href="#33"> 33: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'message_list_since'</span>, <span class="php-var">$input</span>)) {
+</span><span id="34" class="l"><a class="l" href="#34"> 34: </a>        <span class="php-var">$since</span> = <span class="php-var">$input</span>[<span class="php-quote">'message_list_since'</span>];
+</span><span id="35" class="l"><a class="l" href="#35"> 35: </a>    }
+</span><span id="36" class="l"><a class="l" href="#36"> 36: </a>    <span class="php-keyword1">if</span> (!<span class="php-var">$since</span>) {
+</span><span id="37" class="l"><a class="l" href="#37"> 37: </a>        <span class="php-var">$since</span> = DEFAULT_SINCE;
+</span><span id="38" class="l"><a class="l" href="#38"> 38: </a>    }
+</span><span id="39" class="l"><a class="l" href="#39"> 39: </a>    <span class="php-var">$dt</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'%s'</span>, <span class="php-keyword2">strtolower</span>(<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-var">$times</span>[<span class="php-var">$since</span>])));
+</span><span id="40" class="l"><a class="l" href="#40"> 40: </a>    <span class="php-var">$max</span> = <span class="php-keyword2">sprintf</span>(<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'sources@%d each'</span>), <span class="php-var">$limit</span>);
+</span><span id="41" class="l"><a class="l" href="#41"> 41: </a>
+</span><span id="42" class="l"><a class="l" href="#42"> 42: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;list_meta&quot;&gt;'</span>.
+</span><span id="43" class="l"><a class="l" href="#43"> 43: </a>        <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$dt</span>).
+</span><span id="44" class="l"><a class="l" href="#44"> 44: </a>        <span class="php-quote">'&lt;b&gt;-&lt;/b&gt;'</span>.
+</span><span id="45" class="l"><a class="l" href="#45"> 45: </a>        <span class="php-quote">'&lt;span class=&quot;src_count&quot;&gt;&lt;/span&gt; '</span>.<span class="php-var">$max</span>.
+</span><span id="46" class="l"><a class="l" href="#46"> 46: </a>        <span class="php-quote">'&lt;b&gt;-&lt;/b&gt;'</span>.
+</span><span id="47" class="l"><a class="l" href="#47"> 47: </a>        <span class="php-quote">'&lt;span class=&quot;total&quot;&gt;&lt;/span&gt; '</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'total'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="48" class="l"><a class="l" href="#48"> 48: </a>}
+</span><span id="49" class="l"><a class="l" href="#49"> 49: </a>
+</span><span id="50" class="l"><a class="l" href="#50"> 50: </a><span class="php-comment">/**
+</span></span><span id="51" class="l"><a class="l" href="#51"> 51: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="52" class="l"><a class="l" href="#52"> 52: </a><span class="php-comment"> */</span>
+</span><span id="53" class="l"><a class="l" href="#53"> 53: </a><span class="php-keyword1">function</span> <a id="_human_readable_interval" href="#_human_readable_interval">human_readable_interval</a>(<span class="php-var">$date_str</span>) {
+</span><span id="54" class="l"><a class="l" href="#54"> 54: </a>    <span class="php-var">$precision</span>     = <span class="php-num">2</span>;
+</span><span id="55" class="l"><a class="l" href="#55"> 55: </a>    <span class="php-var">$interval_time</span> = <span class="php-keyword1">array</span>();
+</span><span id="56" class="l"><a class="l" href="#56"> 56: </a>    <span class="php-var">$now</span>           = <span class="php-keyword2">time</span>();
+</span><span id="57" class="l"><a class="l" href="#57"> 57: </a>    <span class="php-var">$date</span>          = <span class="php-keyword2">strtotime</span>(<span class="php-var">$date_str</span>);
+</span><span id="58" class="l"><a class="l" href="#58"> 58: </a>    <span class="php-var">$interval</span>      = <span class="php-var">$now</span> - <span class="php-var">$date</span>;
+</span><span id="59" class="l"><a class="l" href="#59"> 59: </a>    <span class="php-var">$res</span>           = <span class="php-keyword1">array</span>();
+</span><span id="60" class="l"><a class="l" href="#60"> 60: </a>
+</span><span id="61" class="l"><a class="l" href="#61"> 61: </a>    <span class="php-var">$t</span>[<span class="php-quote">'second'</span>] = <span class="php-num">1</span>;
+</span><span id="62" class="l"><a class="l" href="#62"> 62: </a>    <span class="php-var">$t</span>[<span class="php-quote">'minute'</span>] = <span class="php-var">$t</span>[<span class="php-quote">'second'</span>]*<span class="php-num">60</span>;
+</span><span id="63" class="l"><a class="l" href="#63"> 63: </a>    <span class="php-var">$t</span>[<span class="php-quote">'hour'</span>]   = <span class="php-var">$t</span>[<span class="php-quote">'minute'</span>]*<span class="php-num">60</span>;
+</span><span id="64" class="l"><a class="l" href="#64"> 64: </a>    <span class="php-var">$t</span>[<span class="php-quote">'day'</span>]    = <span class="php-var">$t</span>[<span class="php-quote">'hour'</span>]*<span class="php-num">24</span>;
+</span><span id="65" class="l"><a class="l" href="#65"> 65: </a>    <span class="php-var">$t</span>[<span class="php-quote">'week'</span>]   = <span class="php-var">$t</span>[<span class="php-quote">'day'</span>]*<span class="php-num">7</span>;
+</span><span id="66" class="l"><a class="l" href="#66"> 66: </a>    <span class="php-var">$t</span>[<span class="php-quote">'month'</span>]  = <span class="php-var">$t</span>[<span class="php-quote">'day'</span>]*<span class="php-num">30</span>;
+</span><span id="67" class="l"><a class="l" href="#67"> 67: </a>    <span class="php-var">$t</span>[<span class="php-quote">'year'</span>]   = <span class="php-var">$t</span>[<span class="php-quote">'week'</span>]*<span class="php-num">52</span>;
+</span><span id="68" class="l"><a class="l" href="#68"> 68: </a>
+</span><span id="69" class="l"><a class="l" href="#69"> 69: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$interval</span> &lt; <span class="php-num">0</span>) {
+</span><span id="70" class="l"><a class="l" href="#70"> 70: </a>        <span class="php-var">$interval</span> += <span class="php-var">$t</span>[<span class="php-quote">'hour'</span>];
+</span><span id="71" class="l"><a class="l" href="#71"> 71: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$interval</span> &lt; <span class="php-num">0</span>) {
+</span><span id="72" class="l"><a class="l" href="#72"> 72: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'From the future!'</span>;
+</span><span id="73" class="l"><a class="l" href="#73"> 73: </a>        }
+</span><span id="74" class="l"><a class="l" href="#74"> 74: </a>    }
+</span><span id="75" class="l"><a class="l" href="#75"> 75: </a>    <span class="php-keyword1">elseif</span> (<span class="php-var">$interval</span> == <span class="php-num">0</span>) {
+</span><span id="76" class="l"><a class="l" href="#76"> 76: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'Just now'</span>;
+</span><span id="77" class="l"><a class="l" href="#77"> 77: </a>    }
+</span><span id="78" class="l"><a class="l" href="#78"> 78: </a>
+</span><span id="79" class="l"><a class="l" href="#79"> 79: </a>    <span class="php-keyword1">foreach</span> (<span class="php-keyword2">array_reverse</span>(<span class="php-var">$t</span>) <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$val</span>) {
+</span><span id="80" class="l"><a class="l" href="#80"> 80: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$interval_time</span>[<span class="php-var">$name</span>] = (<span class="php-var">$interval</span>/<span class="php-var">$val</span> &gt; <span class="php-num">0</span>) ? <span class="php-keyword2">floor</span>(<span class="php-var">$interval</span>/<span class="php-var">$val</span>) : <span class="php-keyword1">false</span>) {
+</span><span id="81" class="l"><a class="l" href="#81"> 81: </a>            <span class="php-var">$interval</span> -= <span class="php-var">$val</span>*<span class="php-var">$interval_time</span>[<span class="php-var">$name</span>];
+</span><span id="82" class="l"><a class="l" href="#82"> 82: </a>        }
+</span><span id="83" class="l"><a class="l" href="#83"> 83: </a>    }
+</span><span id="84" class="l"><a class="l" href="#84"> 84: </a>
+</span><span id="85" class="l"><a class="l" href="#85"> 85: </a>    <span class="php-var">$interval_time</span> = <span class="php-keyword2">array_slice</span>(<span class="php-keyword2">array_filter</span>(<span class="php-var">$interval_time</span>, <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$v</span> &gt; <span class="php-num">0</span>; }), <span class="php-num">0</span>, <span class="php-var">$precision</span>);
+</span><span id="86" class="l"><a class="l" href="#86"> 86: </a>
+</span><span id="87" class="l"><a class="l" href="#87"> 87: </a>    <span class="php-keyword1">foreach</span>(<span class="php-var">$interval_time</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$val</span>) {
+</span><span id="88" class="l"><a class="l" href="#88"> 88: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$val</span> &gt; <span class="php-num">1</span>) {
+</span><span id="89" class="l"><a class="l" href="#89"> 89: </a>            <span class="php-var">$res</span>[] = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'%d %ss'</span>, <span class="php-var">$val</span>, <span class="php-var">$name</span>);
+</span><span id="90" class="l"><a class="l" href="#90"> 90: </a>        }
+</span><span id="91" class="l"><a class="l" href="#91"> 91: </a>        <span class="php-keyword1">else</span> {
+</span><span id="92" class="l"><a class="l" href="#92"> 92: </a>            <span class="php-var">$res</span>[] = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'%d %s'</span>, <span class="php-var">$val</span>, <span class="php-var">$name</span>);
+</span><span id="93" class="l"><a class="l" href="#93"> 93: </a>        }
+</span><span id="94" class="l"><a class="l" href="#94"> 94: </a>    }
+</span><span id="95" class="l"><a class="l" href="#95"> 95: </a>    <span class="php-keyword1">return</span> <span class="php-keyword2">implode</span>(<span class="php-quote">', '</span>, <span class="php-var">$res</span>);
+</span><span id="96" class="l"><a class="l" href="#96"> 96: </a>}
+</span><span id="97" class="l"><a class="l" href="#97"> 97: </a>
+</span><span id="98" class="l"><a class="l" href="#98"> 98: </a><span class="php-comment">/**
+</span></span><span id="99" class="l"><a class="l" href="#99"> 99: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="100" class="l"><a class="l" href="#100">100: </a><span class="php-comment"> */</span>
+</span><span id="101" class="l"><a class="l" href="#101">101: </a><span class="php-keyword1">function</span> <a id="_message_list_row" href="#_message_list_row">message_list_row</a>(<span class="php-var">$values</span>, <span class="php-var">$id</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="102" class="l"><a class="l" href="#102">102: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;tr style=&quot;display: none;&quot; class=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">str_replace</span>(<span class="php-quote">' '</span>, <span class="php-quote">'-'</span>, <span class="php-var">$id</span>)).<span class="php-quote">'&quot;&gt;'</span>;
+</span><span id="103" class="l"><a class="l" href="#103">103: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="104" class="l"><a class="l" href="#104">104: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;td class=&quot;news_cell checkbox_cell&quot;&gt;'</span>;
+</span><span id="105" class="l"><a class="l" href="#105">105: </a>    }
+</span><span id="106" class="l"><a class="l" href="#106">106: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$values</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="107" class="l"><a class="l" href="#107">107: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">function_exists</span>(<span class="php-var">$vals</span>[<span class="php-num">0</span>])) {
+</span><span id="108" class="l"><a class="l" href="#108">108: </a>            <span class="php-var">$function</span> = <span class="php-keyword2">array_shift</span>(<span class="php-var">$vals</span>);
+</span><span id="109" class="l"><a class="l" href="#109">109: </a>            <span class="php-var">$res</span> .= <span class="php-var">$function</span>(<span class="php-var">$vals</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>);
+</span><span id="110" class="l"><a class="l" href="#110">110: </a>        }
+</span><span id="111" class="l"><a class="l" href="#111">111: </a>    }
+</span><span id="112" class="l"><a class="l" href="#112">112: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="113" class="l"><a class="l" href="#113">113: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/td&gt;'</span>;
+</span><span id="114" class="l"><a class="l" href="#114">114: </a>    }
+</span><span id="115" class="l"><a class="l" href="#115">115: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/tr&gt;'</span>;
+</span><span id="116" class="l"><a class="l" href="#116">116: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(<span class="php-var">$res</span>, <span class="php-var">$id</span>);
+</span><span id="117" class="l"><a class="l" href="#117">117: </a>}
+</span><span id="118" class="l"><a class="l" href="#118">118: </a>
+</span><span id="119" class="l"><a class="l" href="#119">119: </a><span class="php-comment">/**
+</span></span><span id="120" class="l"><a class="l" href="#120">120: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="121" class="l"><a class="l" href="#121">121: </a><span class="php-comment"> */</span>
+</span><span id="122" class="l"><a class="l" href="#122">122: </a><span class="php-keyword1">function</span> <a id="_safe_output_callback" href="#_safe_output_callback">safe_output_callback</a>(<span class="php-var">$vals</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="123" class="l"><a class="l" href="#123">123: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
+</span><span id="124" class="l"><a class="l" href="#124">124: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;td class=&quot;%s&quot; title=&quot;%s&quot;&gt;%s&lt;/td&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]));
+</span><span id="125" class="l"><a class="l" href="#125">125: </a>    }
+</span><span id="126" class="l"><a class="l" href="#126">126: </a>    <span class="php-keyword1">elseif</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="127" class="l"><a class="l" href="#127">127: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;%s&quot; title=&quot;%s&quot;&gt;%s&lt;/div&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]));
+</span><span id="128" class="l"><a class="l" href="#128">128: </a>    }
+</span><span id="129" class="l"><a class="l" href="#129">129: </a>}
+</span><span id="130" class="l"><a class="l" href="#130">130: </a>
+</span><span id="131" class="l"><a class="l" href="#131">131: </a><span class="php-comment">/**
+</span></span><span id="132" class="l"><a class="l" href="#132">132: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="133" class="l"><a class="l" href="#133">133: </a><span class="php-comment"> */</span>
+</span><span id="134" class="l"><a class="l" href="#134">134: </a><span class="php-keyword1">function</span> <a id="_checkbox_callback" href="#_checkbox_callback">checkbox_callback</a>(<span class="php-var">$vals</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="135" class="l"><a class="l" href="#135">135: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
+</span><span id="136" class="l"><a class="l" href="#136">136: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;td class=&quot;checkbox_cell&quot;&gt;&lt;input type=&quot;checkbox&quot; value=&quot;%s&quot; /&gt;&lt;/td&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]));
+</span><span id="137" class="l"><a class="l" href="#137">137: </a>    }
+</span><span id="138" class="l"><a class="l" href="#138">138: </a>    <span class="php-keyword1">elseif</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="139" class="l"><a class="l" href="#139">139: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;input type=&quot;checkbox&quot; value=&quot;%s&quot; /&gt;&lt;/td&gt;&lt;td class=&quot;news_cell&quot;&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]));
+</span><span id="140" class="l"><a class="l" href="#140">140: </a>    }
+</span><span id="141" class="l"><a class="l" href="#141">141: </a>}
+</span><span id="142" class="l"><a class="l" href="#142">142: </a>
+</span><span id="143" class="l"><a class="l" href="#143">143: </a><span class="php-comment">/**
+</span></span><span id="144" class="l"><a class="l" href="#144">144: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="145" class="l"><a class="l" href="#145">145: </a><span class="php-comment"> */</span>
+</span><span id="146" class="l"><a class="l" href="#146">146: </a><span class="php-keyword1">function</span> <a id="_subject_callback" href="#_subject_callback">subject_callback</a>(<span class="php-var">$vals</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="147" class="l"><a class="l" href="#147">147: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
+</span><span id="148" class="l"><a class="l" href="#148">148: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;td class=&quot;subject&quot;&gt;&lt;div class=&quot;%s&quot;&gt;&lt;a title=&quot;%s&quot; href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">implode</span>(<span class="php-quote">' '</span>, <span class="php-var">$vals</span>[<span class="php-num">2</span>])), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]));
+</span><span id="149" class="l"><a class="l" href="#149">149: </a>    }
+</span><span id="150" class="l"><a class="l" href="#150">150: </a>    <span class="php-keyword1">elseif</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="151" class="l"><a class="l" href="#151">151: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;subject&quot;&gt;&lt;div class=&quot;%s&quot; title=&quot;%s&quot;&gt;&lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">implode</span>(<span class="php-quote">' '</span>, <span class="php-var">$vals</span>[<span class="php-num">2</span>])), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]));
+</span><span id="152" class="l"><a class="l" href="#152">152: </a>    }
+</span><span id="153" class="l"><a class="l" href="#153">153: </a>}
+</span><span id="154" class="l"><a class="l" href="#154">154: </a>
+</span><span id="155" class="l"><a class="l" href="#155">155: </a><span class="php-comment">/**
+</span></span><span id="156" class="l"><a class="l" href="#156">156: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="157" class="l"><a class="l" href="#157">157: </a><span class="php-comment"> */</span>
+</span><span id="158" class="l"><a class="l" href="#158">158: </a><span class="php-keyword1">function</span> <a id="_date_callback" href="#_date_callback">date_callback</a>(<span class="php-var">$vals</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="159" class="l"><a class="l" href="#159">159: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
+</span><span id="160" class="l"><a class="l" href="#160">160: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;td class=&quot;msg_date&quot; title=&quot;%s&quot;&gt;%s&lt;input type=&quot;hidden&quot; class=&quot;msg_timestamp&quot; value=&quot;%s&quot; /&gt;&lt;/td&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$vals</span>[<span class="php-num">1</span>])), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]));
+</span><span id="161" class="l"><a class="l" href="#161">161: </a>    }
+</span><span id="162" class="l"><a class="l" href="#162">162: </a>    <span class="php-keyword1">elseif</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="163" class="l"><a class="l" href="#163">163: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;msg_date&quot;&gt;%s&lt;input type=&quot;hidden&quot; class=&quot;msg_timestamp&quot; value=&quot;%s&quot; /&gt;&lt;/div&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]), <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]));
+</span><span id="164" class="l"><a class="l" href="#164">164: </a>    }
+</span><span id="165" class="l"><a class="l" href="#165">165: </a>}
+</span><span id="166" class="l"><a class="l" href="#166">166: </a>
+</span><span id="167" class="l"><a class="l" href="#167">167: </a><span class="php-comment">/**
+</span></span><span id="168" class="l"><a class="l" href="#168">168: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="169" class="l"><a class="l" href="#169">169: </a><span class="php-comment"> */</span>
+</span><span id="170" class="l"><a class="l" href="#170">170: </a><span class="php-keyword1">function</span> <a id="_icon_callback" href="#_icon_callback">icon_callback</a>(<span class="php-var">$vals</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="171" class="l"><a class="l" href="#171">171: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
+</span><span id="172" class="l"><a class="l" href="#172">172: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;td class=&quot;icon&quot;&gt;%s&lt;/td&gt;'</span>, (<span class="php-keyword2">in_array</span>(<span class="php-quote">'flagged'</span>, <span class="php-var">$vals</span>[<span class="php-num">0</span>]) ? <span class="php-quote">'&amp;#9733;'</span> : <span class="php-quote">''</span>));
+</span><span id="173" class="l"><a class="l" href="#173">173: </a>    }
+</span><span id="174" class="l"><a class="l" href="#174">174: </a>    <span class="php-keyword1">elseif</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="175" class="l"><a class="l" href="#175">175: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;icon&quot;&gt;%s&lt;/div&gt;'</span>, (<span class="php-keyword2">in_array</span>(<span class="php-quote">'flagged'</span>, <span class="php-var">$vals</span>[<span class="php-num">0</span>]) ? <span class="php-quote">'&amp;#9733;'</span> : <span class="php-quote">''</span>));
+</span><span id="176" class="l"><a class="l" href="#176">176: </a>    }
+</span><span id="177" class="l"><a class="l" href="#177">177: </a>}
+</span><span id="178" class="l"><a class="l" href="#178">178: </a>
+</span><span id="179" class="l"><a class="l" href="#179">179: </a><span class="php-comment">/**
+</span></span><span id="180" class="l"><a class="l" href="#180">180: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="181" class="l"><a class="l" href="#181">181: </a><span class="php-comment"> */</span>
+</span><span id="182" class="l"><a class="l" href="#182">182: </a><span class="php-keyword1">function</span> <a id="_message_controls" href="#_message_controls">message_controls</a>(<span class="php-var">$output_mod</span>) {
+</span><span id="183" class="l"><a class="l" href="#183">183: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;a class=&quot;toggle_link&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;x&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$check</span>.<span class="php-quote">'&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;&lt;/a&gt;'</span>.
+</span><span id="184" class="l"><a class="l" href="#184">184: </a>        <span class="php-quote">'&lt;div class=&quot;msg_controls&quot;&gt;'</span>.
+</span><span id="185" class="l"><a class="l" href="#185">185: </a>        <span class="php-quote">'&lt;a href=&quot;#&quot; data-action=&quot;read&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Read'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="186" class="l"><a class="l" href="#186">186: </a>        <span class="php-quote">'&lt;a href=&quot;#&quot; data-action=&quot;unread&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Unread'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="187" class="l"><a class="l" href="#187">187: </a>        <span class="php-quote">'&lt;a href=&quot;#&quot; data-action=&quot;flag&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Flag'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="188" class="l"><a class="l" href="#188">188: </a>        <span class="php-quote">'&lt;a href=&quot;#&quot; data-action=&quot;unflag&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Unflag'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="189" class="l"><a class="l" href="#189">189: </a>        <span class="php-quote">'&lt;a href=&quot;#&quot; data-action=&quot;delete&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/div&gt;'</span>;
+</span><span id="190" class="l"><a class="l" href="#190">190: </a>}
+</span><span id="191" class="l"><a class="l" href="#191">191: </a>
+</span><span id="192" class="l"><a class="l" href="#192">192: </a><span class="php-comment">/**
+</span></span><span id="193" class="l"><a class="l" href="#193">193: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="194" class="l"><a class="l" href="#194">194: </a><span class="php-comment"> */</span>
+</span><span id="195" class="l"><a class="l" href="#195">195: </a><span class="php-keyword1">function</span> <a id="_message_since_dropdown" href="#_message_since_dropdown">message_since_dropdown</a>(<span class="php-var">$since</span>, <span class="php-var">$name</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="196" class="l"><a class="l" href="#196">196: </a>    <span class="php-var">$times</span> = <span class="php-keyword1">array</span>(
+</span><span id="197" class="l"><a class="l" href="#197">197: </a>        <span class="php-quote">'today'</span> =&gt; <span class="php-quote">'Today'</span>,
+</span><span id="198" class="l"><a class="l" href="#198">198: </a>        <span class="php-quote">'-1 week'</span> =&gt; <span class="php-quote">'Last 7 days'</span>,
+</span><span id="199" class="l"><a class="l" href="#199">199: </a>        <span class="php-quote">'-2 weeks'</span> =&gt; <span class="php-quote">'Last 2 weeks'</span>,
+</span><span id="200" class="l"><a class="l" href="#200">200: </a>        <span class="php-quote">'-4 weeks'</span> =&gt; <span class="php-quote">'Last 4 weeks'</span>,
+</span><span id="201" class="l"><a class="l" href="#201">201: </a>        <span class="php-quote">'-6 weeks'</span> =&gt; <span class="php-quote">'Last 6 weeks'</span>,
+</span><span id="202" class="l"><a class="l" href="#202">202: </a>        <span class="php-quote">'-6 months'</span> =&gt; <span class="php-quote">'Last 6 months'</span>,
+</span><span id="203" class="l"><a class="l" href="#203">203: </a>        <span class="php-quote">'-1 year'</span> =&gt; <span class="php-quote">'Last year'</span>
+</span><span id="204" class="l"><a class="l" href="#204">204: </a>    );
+</span><span id="205" class="l"><a class="l" href="#205">205: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;select name=&quot;'</span>.<span class="php-var">$name</span>.<span class="php-quote">'&quot; id=&quot;'</span>.<span class="php-var">$name</span>.<span class="php-quote">'&quot; class=&quot;message_list_since&quot;&gt;'</span>;
+</span><span id="206" class="l"><a class="l" href="#206">206: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$times</span> <span class="php-keyword1">as</span> <span class="php-var">$val</span> =&gt; <span class="php-var">$label</span>) {
+</span><span id="207" class="l"><a class="l" href="#207">207: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option'</span>;
+</span><span id="208" class="l"><a class="l" href="#208">208: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$val</span> == <span class="php-var">$since</span>) {
+</span><span id="209" class="l"><a class="l" href="#209">209: </a>            <span class="php-var">$res</span> .= <span class="php-quote">' selected=&quot;selected&quot;'</span>;
+</span><span id="210" class="l"><a class="l" href="#210">210: </a>        }
+</span><span id="211" class="l"><a class="l" href="#211">211: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' value=&quot;'</span>.<span class="php-var">$val</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-var">$label</span>).<span class="php-quote">'&lt;/option&gt;'</span>;
+</span><span id="212" class="l"><a class="l" href="#212">212: </a>    }
+</span><span id="213" class="l"><a class="l" href="#213">213: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/select&gt;'</span>;
+</span><span id="214" class="l"><a class="l" href="#214">214: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="215" class="l"><a class="l" href="#215">215: </a>}
+</span><span id="216" class="l"><a class="l" href="#216">216: </a>
+</span><span id="217" class="l"><a class="l" href="#217">217: </a><span class="php-comment">/**
+</span></span><span id="218" class="l"><a class="l" href="#218">218: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="219" class="l"><a class="l" href="#219">219: </a><span class="php-comment"> */</span>
+</span><span id="220" class="l"><a class="l" href="#220">220: </a><span class="php-keyword1">function</span> <a id="_process_since_argument" href="#_process_since_argument">process_since_argument</a>(<span class="php-var">$val</span>, <span class="php-var">$validate</span>=<span class="php-keyword1">false</span>) {
+</span><span id="221" class="l"><a class="l" href="#221">221: </a>    <span class="php-var">$date</span> = <span class="php-keyword1">false</span>;
+</span><span id="222" class="l"><a class="l" href="#222">222: </a>    <span class="php-var">$valid</span> = <span class="php-keyword1">false</span>;
+</span><span id="223" class="l"><a class="l" href="#223">223: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-var">$val</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'-1 week'</span>, <span class="php-quote">'-2 weeks'</span>, <span class="php-quote">'-4 weeks'</span>, <span class="php-quote">'-6 weeks'</span>, <span class="php-quote">'-6 months'</span>, <span class="php-quote">'-1 year'</span>))) {
+</span><span id="224" class="l"><a class="l" href="#224">224: </a>        <span class="php-var">$valid</span> = <span class="php-var">$val</span>;
+</span><span id="225" class="l"><a class="l" href="#225">225: </a>        <span class="php-var">$date</span> = <span class="php-keyword2">date</span>(<span class="php-quote">'j-M-Y'</span>, <span class="php-keyword2">strtotime</span>(<span class="php-var">$val</span>));
+</span><span id="226" class="l"><a class="l" href="#226">226: </a>    }
+</span><span id="227" class="l"><a class="l" href="#227">227: </a>    <span class="php-keyword1">else</span> {
+</span><span id="228" class="l"><a class="l" href="#228">228: </a>        <span class="php-var">$val</span> = <span class="php-quote">'today'</span>;
+</span><span id="229" class="l"><a class="l" href="#229">229: </a>        <span class="php-var">$valid</span> = <span class="php-var">$val</span>;
+</span><span id="230" class="l"><a class="l" href="#230">230: </a>        <span class="php-var">$date</span> = <span class="php-keyword2">date</span>(<span class="php-quote">'j-M-Y'</span>);
+</span><span id="231" class="l"><a class="l" href="#231">231: </a>    }
+</span><span id="232" class="l"><a class="l" href="#232">232: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$validate</span>) {
+</span><span id="233" class="l"><a class="l" href="#233">233: </a>        <span class="php-keyword1">return</span> <span class="php-var">$valid</span>;
+</span><span id="234" class="l"><a class="l" href="#234">234: </a>    }
+</span><span id="235" class="l"><a class="l" href="#235">235: </a>    <span class="php-keyword1">return</span> <span class="php-var">$date</span>;
+</span><span id="236" class="l"><a class="l" href="#236">236: </a>}
+</span><span id="237" class="l"><a class="l" href="#237">237: </a>
+</span><span id="238" class="l"><a class="l" href="#238">238: </a><span class="php-comment">/**
+</span></span><span id="239" class="l"><a class="l" href="#239">239: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="240" class="l"><a class="l" href="#240">240: </a><span class="php-comment"> */</span>
+</span><span id="241" class="l"><a class="l" href="#241">241: </a><span class="php-keyword1">function</span> <a id="_format_msg_html" href="#_format_msg_html">format_msg_html</a>(<span class="php-var">$str</span>, <span class="php-var">$external_resources</span>=<span class="php-keyword1">false</span>) {
+</span><span id="242" class="l"><a class="l" href="#242">242: </a>    <span class="php-keyword1">require</span> APP_PATH.<span class="php-quote">'third_party/HTMLPurifier.standalone.php'</span>;
+</span><span id="243" class="l"><a class="l" href="#243">243: </a>    <span class="php-var">$config</span> = HTMLPurifier_Config::createDefault();
+</span><span id="244" class="l"><a class="l" href="#244">244: </a>    <span class="php-var">$config</span>-&gt;set(<span class="php-quote">'Cache.DefinitionImpl'</span>, <span class="php-keyword1">null</span>);
+</span><span id="245" class="l"><a class="l" href="#245">245: </a>    <span class="php-keyword1">if</span> (!<span class="php-var">$external_resources</span>) {
+</span><span id="246" class="l"><a class="l" href="#246">246: </a>        <span class="php-var">$config</span>-&gt;set(<span class="php-quote">'URI.AllowedSchemes'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'data'</span> =&gt; <span class="php-keyword1">true</span>));
+</span><span id="247" class="l"><a class="l" href="#247">247: </a>    }
+</span><span id="248" class="l"><a class="l" href="#248">248: </a>    <span class="php-var">$config</span>-&gt;set(<span class="php-quote">'HTML.TargetBlank'</span>, <span class="php-keyword1">true</span>);
+</span><span id="249" class="l"><a class="l" href="#249">249: </a>    <span class="php-var">$config</span>-&gt;set(<span class="php-quote">'Filter.ExtractStyleBlocks.TidyImpl'</span>, <span class="php-keyword1">true</span>);
+</span><span id="250" class="l"><a class="l" href="#250">250: </a>    <span class="php-var">$purifier</span> = <span class="php-keyword1">new</span> HTMLPurifier(<span class="php-var">$config</span>);
+</span><span id="251" class="l"><a class="l" href="#251">251: </a>    <span class="php-var">$res</span> = <span class="php-var">$purifier</span>-&gt;purify(<span class="php-var">$str</span>);
+</span><span id="252" class="l"><a class="l" href="#252">252: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="253" class="l"><a class="l" href="#253">253: </a>}
+</span><span id="254" class="l"><a class="l" href="#254">254: </a>
+</span><span id="255" class="l"><a class="l" href="#255">255: </a><span class="php-comment">/**
+</span></span><span id="256" class="l"><a class="l" href="#256">256: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="257" class="l"><a class="l" href="#257">257: </a><span class="php-comment"> */</span>
+</span><span id="258" class="l"><a class="l" href="#258">258: </a><span class="php-keyword1">function</span> <a id="_format_msg_image" href="#_format_msg_image">format_msg_image</a>(<span class="php-var">$str</span>, <span class="php-var">$mime_type</span>) {
+</span><span id="259" class="l"><a class="l" href="#259">259: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;data:image/'</span>.<span class="php-var">$mime_type</span>.<span class="php-quote">';base64,'</span>.<span class="php-keyword2">chunk_split</span>(<span class="php-keyword2">base64_encode</span>(<span class="php-var">$str</span>)).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="260" class="l"><a class="l" href="#260">260: </a>}
+</span><span id="261" class="l"><a class="l" href="#261">261: </a>
+</span><span id="262" class="l"><a class="l" href="#262">262: </a><span class="php-comment">/**
+</span></span><span id="263" class="l"><a class="l" href="#263">263: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="264" class="l"><a class="l" href="#264">264: </a><span class="php-comment"> */</span>
+</span><span id="265" class="l"><a class="l" href="#265">265: </a><span class="php-keyword1">function</span> <a id="_format_msg_text" href="#_format_msg_text">format_msg_text</a>(<span class="php-var">$str</span>, <span class="php-var">$output_mod</span>, <span class="php-var">$links</span>=<span class="php-keyword1">true</span>) {
+</span><span id="266" class="l"><a class="l" href="#266">266: </a>    <span class="php-var">$str</span> = <span class="php-keyword2">str_replace</span>(<span class="php-quote">&quot;\t&quot;</span>, <span class="php-quote">'    '</span>, <span class="php-var">$str</span>);
+</span><span id="267" class="l"><a class="l" href="#267">267: </a>    <span class="php-var">$str</span> = <span class="php-keyword2">nl2br</span>(<span class="php-keyword2">str_replace</span>(<span class="php-quote">' '</span>, <span class="php-quote">'&lt;wbr&gt;'</span>, (<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$str</span>))));
+</span><span id="268" class="l"><a class="l" href="#268">268: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$links</span>) {
+</span><span id="269" class="l"><a class="l" href="#269">269: </a>        <span class="php-var">$link_regex</span> = <span class="php-quote">&quot;/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&amp;=\+</span><span class="php-var">$</span><span class="php-quote">,\[\]%[:alnum:]])+)/m&quot;</span>;
+</span><span id="270" class="l"><a class="l" href="#270">270: </a>        <span class="php-var">$str</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-var">$link_regex</span>, <span class="php-quote">&quot;&lt;a target=\&quot;_blank\&quot; href=\&quot;</span><span class="php-var">$1</span><span class="php-quote">\&quot;&gt;</span><span class="php-var">$1</span><span class="php-quote">&lt;/a&gt;&quot;</span>, <span class="php-var">$str</span>);
+</span><span id="271" class="l"><a class="l" href="#271">271: </a>    }
+</span><span id="272" class="l"><a class="l" href="#272">272: </a>    <span class="php-keyword1">return</span> <span class="php-keyword2">str_replace</span>(<span class="php-quote">'&lt;wbr&gt;'</span>, <span class="php-quote">'&amp;#160;&lt;wbr&gt;'</span>, <span class="php-var">$str</span>);
+</span><span id="273" class="l"><a class="l" href="#273">273: </a>}
+</span><span id="274" class="l"><a class="l" href="#274">274: </a>
+</span><span id="275" class="l"><a class="l" href="#275">275: </a><span class="php-comment">/**
+</span></span><span id="276" class="l"><a class="l" href="#276">276: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="277" class="l"><a class="l" href="#277">277: </a><span class="php-comment"> */</span>
+</span><span id="278" class="l"><a class="l" href="#278">278: </a><span class="php-keyword1">function</span> <a id="_display_value" href="#_display_value">display_value</a>(<span class="php-var">$name</span>, <span class="php-var">$haystack</span>, <span class="php-var">$type</span>=<span class="php-keyword1">false</span>, <span class="php-var">$default</span>=<span class="php-quote">''</span>) {
+</span><span id="279" class="l"><a class="l" href="#279">279: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$name</span>, <span class="php-var">$haystack</span>)) {
+</span><span id="280" class="l"><a class="l" href="#280">280: </a>        <span class="php-keyword1">return</span> <span class="php-var">$default</span>;
+</span><span id="281" class="l"><a class="l" href="#281">281: </a>    }
+</span><span id="282" class="l"><a class="l" href="#282">282: </a>    <span class="php-var">$value</span> = <span class="php-var">$haystack</span>[<span class="php-var">$name</span>];
+</span><span id="283" class="l"><a class="l" href="#283">283: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">false</span>;
+</span><span id="284" class="l"><a class="l" href="#284">284: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$type</span>) {
+</span><span id="285" class="l"><a class="l" href="#285">285: </a>        <span class="php-var">$name</span> = <span class="php-var">$type</span>;
+</span><span id="286" class="l"><a class="l" href="#286">286: </a>    }
+</span><span id="287" class="l"><a class="l" href="#287">287: </a>    <span class="php-keyword1">switch</span>(<span class="php-var">$name</span>) {
+</span><span id="288" class="l"><a class="l" href="#288">288: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'from'</span>:
+</span><span id="289" class="l"><a class="l" href="#289">289: </a>            <span class="php-var">$value</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/(\&lt;.+\&gt;)/U&quot;</span>, <span class="php-quote">''</span>, <span class="php-var">$value</span>);
+</span><span id="290" class="l"><a class="l" href="#290">290: </a>            <span class="php-var">$res</span> = <span class="php-keyword2">str_replace</span>(<span class="php-quote">'&quot;'</span>, <span class="php-quote">''</span>, <span class="php-var">$value</span>);
+</span><span id="291" class="l"><a class="l" href="#291">291: </a>            <span class="php-keyword1">break</span>;
+</span><span id="292" class="l"><a class="l" href="#292">292: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'date'</span>:
+</span><span id="293" class="l"><a class="l" href="#293">293: </a>            <span class="php-var">$res</span> = human_readable_interval(<span class="php-var">$value</span>);
+</span><span id="294" class="l"><a class="l" href="#294">294: </a>            <span class="php-keyword1">break</span>;
+</span><span id="295" class="l"><a class="l" href="#295">295: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'time'</span>:
+</span><span id="296" class="l"><a class="l" href="#296">296: </a>            <span class="php-var">$res</span> = <span class="php-keyword2">strtotime</span>(<span class="php-var">$value</span>);
+</span><span id="297" class="l"><a class="l" href="#297">297: </a>            <span class="php-keyword1">break</span>;
+</span><span id="298" class="l"><a class="l" href="#298">298: </a>        <span class="php-keyword1">default</span>:
+</span><span id="299" class="l"><a class="l" href="#299">299: </a>            <span class="php-var">$res</span> = <span class="php-var">$value</span>;
+</span><span id="300" class="l"><a class="l" href="#300">300: </a>            <span class="php-keyword1">break</span>;
+</span><span id="301" class="l"><a class="l" href="#301">301: </a>    }
+</span><span id="302" class="l"><a class="l" href="#302">302: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="303" class="l"><a class="l" href="#303">303: </a>}
+</span><span id="304" class="l"><a class="l" href="#304">304: </a>
+</span><span id="305" class="l"><a class="l" href="#305">305: </a><span class="php-comment">/**
+</span></span><span id="306" class="l"><a class="l" href="#306">306: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="307" class="l"><a class="l" href="#307">307: </a><span class="php-comment"> */</span>
+</span><span id="308" class="l"><a class="l" href="#308">308: </a><span class="php-keyword1">function</span> <a id="_format_reply_text" href="#_format_reply_text">format_reply_text</a>(<span class="php-var">$txt</span>) {
+</span><span id="309" class="l"><a class="l" href="#309">309: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&gt; '</span>.<span class="php-keyword2">str_replace</span>(<span class="php-quote">&quot;\n&quot;</span>, <span class="php-quote">&quot;\n&gt; &quot;</span>, <span class="php-var">$txt</span>);
+</span><span id="310" class="l"><a class="l" href="#310">310: </a>}
+</span><span id="311" class="l"><a class="l" href="#311">311: </a>
+</span><span id="312" class="l"><a class="l" href="#312">312: </a><span class="php-comment">/**
+</span></span><span id="313" class="l"><a class="l" href="#313">313: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="314" class="l"><a class="l" href="#314">314: </a><span class="php-comment"> */</span>
+</span><span id="315" class="l"><a class="l" href="#315">315: </a><span class="php-keyword1">function</span> <a id="_interface_langs" href="#_interface_langs">interface_langs</a>() {
+</span><span id="316" class="l"><a class="l" href="#316">316: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(
+</span><span id="317" class="l"><a class="l" href="#317">317: </a>        <span class="php-quote">'en'</span> =&gt; <span class="php-quote">'English'</span>,
+</span><span id="318" class="l"><a class="l" href="#318">318: </a>        <span class="php-quote">'es'</span> =&gt; <span class="php-quote">'Spanish'</span>,
+</span><span id="319" class="l"><a class="l" href="#319">319: </a>        <span class="php-quote">'zh'</span> =&gt; <span class="php-quote">'Chinese (Simplified)'</span>,
+</span><span id="320" class="l"><a class="l" href="#320">320: </a>        <span class="php-quote">'zh_TW'</span> =&gt; <span class="php-quote">'Chinese (Traditional)'</span>,
+</span><span id="321" class="l"><a class="l" href="#321">321: </a>        <span class="php-quote">'ar'</span> =&gt; <span class="php-quote">'Arabic'</span>,
+</span><span id="322" class="l"><a class="l" href="#322">322: </a>        <span class="php-quote">'fr'</span> =&gt; <span class="php-quote">'French'</span>,
+</span><span id="323" class="l"><a class="l" href="#323">323: </a>        <span class="php-quote">'nl'</span> =&gt; <span class="php-quote">'Dutch'</span>,
+</span><span id="324" class="l"><a class="l" href="#324">324: </a>        <span class="php-quote">'de'</span> =&gt; <span class="php-quote">'German'</span>,
+</span><span id="325" class="l"><a class="l" href="#325">325: </a>        <span class="php-quote">'hi'</span> =&gt; <span class="php-quote">'Hindi'</span>,
+</span><span id="326" class="l"><a class="l" href="#326">326: </a>        <span class="php-quote">'it'</span> =&gt; <span class="php-quote">'Italian'</span>,
+</span><span id="327" class="l"><a class="l" href="#327">327: </a>        <span class="php-quote">'ja'</span> =&gt; <span class="php-quote">'Japanese'</span>,
+</span><span id="328" class="l"><a class="l" href="#328">328: </a>        <span class="php-quote">'ko'</span> =&gt; <span class="php-quote">'Korean'</span>,
+</span><span id="329" class="l"><a class="l" href="#329">329: </a>        <span class="php-quote">'pl'</span> =&gt; <span class="php-quote">'Polish'</span>,
+</span><span id="330" class="l"><a class="l" href="#330">330: </a>        <span class="php-quote">'pt'</span> =&gt; <span class="php-quote">'Portuguese'</span>,
+</span><span id="331" class="l"><a class="l" href="#331">331: </a>        <span class="php-quote">'ru'</span> =&gt; <span class="php-quote">'Russian'</span>,
+</span><span id="332" class="l"><a class="l" href="#332">332: </a>        <span class="php-quote">'ro'</span> =&gt; <span class="php-quote">'Romanian'</span>,
+</span><span id="333" class="l"><a class="l" href="#333">333: </a>        <span class="php-quote">'sv'</span> =&gt; <span class="php-quote">'Sweedish'</span>,
+</span><span id="334" class="l"><a class="l" href="#334">334: </a>        <span class="php-quote">'th'</span> =&gt; <span class="php-quote">'Thai'</span>,
+</span><span id="335" class="l"><a class="l" href="#335">335: </a>        <span class="php-quote">'vi'</span> =&gt; <span class="php-quote">'Vietnamese'</span>,
+</span><span id="336" class="l"><a class="l" href="#336">336: </a>        <span class="php-quote">'cs'</span> =&gt; <span class="php-quote">'Czech'</span>,
+</span><span id="337" class="l"><a class="l" href="#337">337: </a>        <span class="php-quote">'da'</span> =&gt; <span class="php-quote">'Danish'</span>,
+</span><span id="338" class="l"><a class="l" href="#338">338: </a>        <span class="php-quote">'et'</span> =&gt; <span class="php-quote">'Estonian'</span>,
+</span><span id="339" class="l"><a class="l" href="#339">339: </a>        <span class="php-quote">'fi'</span> =&gt; <span class="php-quote">'Finish'</span>,
+</span><span id="340" class="l"><a class="l" href="#340">340: </a>        <span class="php-quote">'tl'</span> =&gt; <span class="php-quote">'Filipino'</span>,
+</span><span id="341" class="l"><a class="l" href="#341">341: </a>        <span class="php-quote">'ka'</span> =&gt; <span class="php-quote">'Georgian'</span>,
+</span><span id="342" class="l"><a class="l" href="#342">342: </a>        <span class="php-quote">'el'</span> =&gt; <span class="php-quote">'Greek'</span>,
+</span><span id="343" class="l"><a class="l" href="#343">343: </a>        <span class="php-quote">'iw'</span> =&gt; <span class="php-quote">'Hebrew'</span>,
+</span><span id="344" class="l"><a class="l" href="#344">344: </a>        <span class="php-quote">'hu'</span> =&gt; <span class="php-quote">'Hungarian'</span>,
+</span><span id="345" class="l"><a class="l" href="#345">345: </a>        <span class="php-quote">'id'</span> =&gt; <span class="php-quote">'Indonesian'</span>,
+</span><span id="346" class="l"><a class="l" href="#346">346: </a>        <span class="php-quote">'kn'</span> =&gt; <span class="php-quote">'Kannada'</span>,
+</span><span id="347" class="l"><a class="l" href="#347">347: </a>        <span class="php-quote">'lo'</span> =&gt; <span class="php-quote">'Lao'</span>,
+</span><span id="348" class="l"><a class="l" href="#348">348: </a>        <span class="php-quote">'lv'</span> =&gt; <span class="php-quote">'Latvian'</span>,
+</span><span id="349" class="l"><a class="l" href="#349">349: </a>        <span class="php-quote">'lt'</span> =&gt; <span class="php-quote">'Lithuanian'</span>,
+</span><span id="350" class="l"><a class="l" href="#350">350: </a>        <span class="php-quote">'mt'</span> =&gt; <span class="php-quote">'Maltese'</span>,
+</span><span id="351" class="l"><a class="l" href="#351">351: </a>        <span class="php-quote">'mn'</span> =&gt; <span class="php-quote">'Mongolian'</span>,
+</span><span id="352" class="l"><a class="l" href="#352">352: </a>        <span class="php-quote">'ne'</span> =&gt; <span class="php-quote">'Nepalia'</span>,
+</span><span id="353" class="l"><a class="l" href="#353">353: </a>        <span class="php-quote">'no'</span> =&gt; <span class="php-quote">'Norwegian'</span>,
+</span><span id="354" class="l"><a class="l" href="#354">354: </a>        <span class="php-quote">'fa'</span> =&gt; <span class="php-quote">'Persian'</span>,
+</span><span id="355" class="l"><a class="l" href="#355">355: </a>        <span class="php-quote">'pa'</span> =&gt; <span class="php-quote">'Punjabi'</span>,
+</span><span id="356" class="l"><a class="l" href="#356">356: </a>        <span class="php-quote">'sr'</span> =&gt; <span class="php-quote">'Serbian'</span>,
+</span><span id="357" class="l"><a class="l" href="#357">357: </a>        <span class="php-quote">'so'</span> =&gt; <span class="php-quote">'Somali'</span>,
+</span><span id="358" class="l"><a class="l" href="#358">358: </a>        <span class="php-quote">'sw'</span> =&gt; <span class="php-quote">'Swahili'</span>,
+</span><span id="359" class="l"><a class="l" href="#359">359: </a>        <span class="php-quote">'uk'</span> =&gt; <span class="php-quote">'Ukranian'</span>,
+</span><span id="360" class="l"><a class="l" href="#360">360: </a>        <span class="php-quote">'yi'</span> =&gt; <span class="php-quote">'Yiddish'</span>,
+</span><span id="361" class="l"><a class="l" href="#361">361: </a>    );
+</span><span id="362" class="l"><a class="l" href="#362">362: </a>}
+</span><span id="363" class="l"><a class="l" href="#363">363: </a>
+</span><span id="364" class="l"><a class="l" href="#364">364: </a><span class="php-comment">/**
+</span></span><span id="365" class="l"><a class="l" href="#365">365: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="366" class="l"><a class="l" href="#366">366: </a><span class="php-comment"> */</span>
+</span><span id="367" class="l"><a class="l" href="#367">367: </a><span class="php-keyword1">function</span> <a id="_translate_time_str" href="#_translate_time_str">translate_time_str</a>(<span class="php-var">$str</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="368" class="l"><a class="l" href="#368">368: </a>    <span class="php-var">$parts</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">','</span>, <span class="php-var">$str</span>);
+</span><span id="369" class="l"><a class="l" href="#369">369: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="370" class="l"><a class="l" href="#370">370: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$parts</span> <span class="php-keyword1">as</span> <span class="php-var">$part</span>) {
+</span><span id="371" class="l"><a class="l" href="#371">371: </a>        <span class="php-var">$part</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$part</span>);
+</span><span id="372" class="l"><a class="l" href="#372">372: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/(\d+)/&quot;</span>, <span class="php-var">$part</span>, <span class="php-var">$matches</span>)) {
+</span><span id="373" class="l"><a class="l" href="#373">373: </a>            <span class="php-var">$res</span>[] = <span class="php-keyword2">sprintf</span>(<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/(\d+)/&quot;</span>, <span class="php-quote">'%d'</span>, <span class="php-var">$part</span>)), <span class="php-var">$matches</span>[<span class="php-num">1</span>]);
+</span><span id="374" class="l"><a class="l" href="#374">374: </a>        }
+</span><span id="375" class="l"><a class="l" href="#375">375: </a>    }
+</span><span id="376" class="l"><a class="l" href="#376">376: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$res</span>)) {
+</span><span id="377" class="l"><a class="l" href="#377">377: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">implode</span>(<span class="php-quote">', '</span>, <span class="php-var">$res</span>);
+</span><span id="378" class="l"><a class="l" href="#378">378: </a>    }
+</span><span id="379" class="l"><a class="l" href="#379">379: </a>    <span class="php-keyword1">return</span> <span class="php-var">$str</span>;
+</span><span id="380" class="l"><a class="l" href="#380">380: </a>}
+</span><span id="381" class="l"><a class="l" href="#381">381: </a>
+</span><span id="382" class="l"><a class="l" href="#382">382: </a><span class="php-comment">/**
+</span></span><span id="383" class="l"><a class="l" href="#383">383: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="384" class="l"><a class="l" href="#384">384: </a><span class="php-comment"> */</span>
+</span><span id="385" class="l"><a class="l" href="#385">385: </a><span class="php-keyword1">function</span> <a id="_list_controls" href="#_list_controls">list_controls</a>(<span class="php-var">$refresh_link</span>, <span class="php-var">$config_link</span>, <span class="php-var">$source_link</span>=<span class="php-keyword1">false</span>) {
+</span><span id="386" class="l"><a class="l" href="#386">386: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;list_controls&quot;&gt;'</span>.
+</span><span id="387" class="l"><a class="l" href="#387">387: </a>        <span class="php-var">$refresh_link</span>.<span class="php-var">$source_link</span>.<span class="php-var">$config_link</span>.<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="388" class="l"><a class="l" href="#388">388: </a>}
+</span><span id="389" class="l"><a class="l" href="#389">389: </a>
+</span><span id="390" class="l"><a class="l" href="#390">390: </a><span class="php-comment">/**
+</span></span><span id="391" class="l"><a class="l" href="#391">391: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="392" class="l"><a class="l" href="#392">392: </a><span class="php-comment"> */</span>
+</span><span id="393" class="l"><a class="l" href="#393">393: </a><span class="php-keyword1">function</span> <a id="_list_sources" href="#_list_sources">list_sources</a>(<span class="php-var">$sources</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="394" class="l"><a class="l" href="#394">394: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;list_sources&quot;&gt;'</span>;
+</span><span id="395" class="l"><a class="l" href="#395">395: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;src_title&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-quote">'Sources'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="396" class="l"><a class="l" href="#396">396: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$sources</span> <span class="php-keyword1">as</span> <span class="php-var">$src</span>) {
+</span><span id="397" class="l"><a class="l" href="#397">397: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$src</span>[<span class="php-quote">'type'</span>] == <span class="php-quote">'imap'</span> &amp;&amp; !<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'folder'</span>, <span class="php-var">$src</span>)) {
+</span><span id="398" class="l"><a class="l" href="#398">398: </a>            <span class="php-var">$folder</span> = <span class="php-quote">'_INBOX'</span>;
+</span><span id="399" class="l"><a class="l" href="#399">399: </a>        }
+</span><span id="400" class="l"><a class="l" href="#400">400: </a>        <span class="php-keyword1">elseif</span> (!<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'folder'</span>, <span class="php-var">$src</span>)) {
+</span><span id="401" class="l"><a class="l" href="#401">401: </a>            <span class="php-var">$folder</span> = <span class="php-quote">''</span>;
+</span><span id="402" class="l"><a class="l" href="#402">402: </a>        }
+</span><span id="403" class="l"><a class="l" href="#403">403: </a>        <span class="php-keyword1">else</span> {
+</span><span id="404" class="l"><a class="l" href="#404">404: </a>            <span class="php-var">$folder</span> = <span class="php-quote">'_'</span>.<span class="php-var">$src</span>[<span class="php-quote">'folder'</span>];
+</span><span id="405" class="l"><a class="l" href="#405">405: </a>        }
+</span><span id="406" class="l"><a class="l" href="#406">406: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;list_src&quot;&gt;'</span>.
+</span><span id="407" class="l"><a class="l" href="#407">407: </a>            <span class="php-quote">'&lt;a class=&quot;del_src_link&quot; href=&quot;#&quot; data-id=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'%s_%s%s'</span>, <span class="php-var">$src</span>[<span class="php-quote">'type'</span>], <span class="php-var">$src</span>[<span class="php-quote">'id'</span>], <span class="php-var">$folder</span>)).<span class="php-quote">'&quot;&gt;X&lt;/a&gt;'</span>.
+</span><span id="408" class="l"><a class="l" href="#408">408: </a>            <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$src</span>[<span class="php-quote">'type'</span>]).<span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$src</span>[<span class="php-quote">'name'</span>]);
+</span><span id="409" class="l"><a class="l" href="#409">409: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">str_replace</span>(<span class="php-quote">'_'</span>, <span class="php-quote">''</span>, <span class="php-var">$folder</span>));
+</span><span id="410" class="l"><a class="l" href="#410">410: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="411" class="l"><a class="l" href="#411">411: </a>    }
+</span><span id="412" class="l"><a class="l" href="#412">412: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;#&quot; class=&quot;add_src_link&quot;&gt;Add&lt;/a&gt;'</span>;
+</span><span id="413" class="l"><a class="l" href="#413">413: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="414" class="l"><a class="l" href="#414">414: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="415" class="l"><a class="l" href="#415">415: </a>}
+</span><span id="416" class="l"><a class="l" href="#416">416: </a>
+</span><span id="417" class="l"><a class="l" href="#417">417: </a><span class="php-comment">/**
+</span></span><span id="418" class="l"><a class="l" href="#418">418: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="419" class="l"><a class="l" href="#419">419: </a><span class="php-comment"> */</span>
+</span><span id="420" class="l"><a class="l" href="#420">420: </a><span class="php-keyword1">function</span> <a id="_format_data_sources" href="#_format_data_sources">format_data_sources</a>(<span class="php-var">$array</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="421" class="l"><a class="l" href="#421">421: </a>    <span class="php-var">$objects</span> = <span class="php-keyword1">array</span>();
+</span><span id="422" class="l"><a class="l" href="#422">422: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$array</span> <span class="php-keyword1">as</span> <span class="php-var">$values</span>) {
+</span><span id="423" class="l"><a class="l" href="#423">423: </a>        <span class="php-var">$items</span> = <span class="php-keyword1">array</span>();
+</span><span id="424" class="l"><a class="l" href="#424">424: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$values</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
+</span><span id="425" class="l"><a class="l" href="#425">425: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$name</span> == <span class="php-quote">'callback'</span>) {
+</span><span id="426" class="l"><a class="l" href="#426">426: </a>                <span class="php-var">$items</span>[] = <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$name</span>).<span class="php-quote">':'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$value</span>);
+</span><span id="427" class="l"><a class="l" href="#427">427: </a>            }
+</span><span id="428" class="l"><a class="l" href="#428">428: </a>            <span class="php-keyword1">else</span> {
+</span><span id="429" class="l"><a class="l" href="#429">429: </a>                <span class="php-var">$items</span>[] = <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$name</span>).<span class="php-quote">':&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$value</span>).<span class="php-quote">'&quot;'</span>;
+</span><span id="430" class="l"><a class="l" href="#430">430: </a>            }
+</span><span id="431" class="l"><a class="l" href="#431">431: </a>        }
+</span><span id="432" class="l"><a class="l" href="#432">432: </a>        <span class="php-var">$objects</span>[] = <span class="php-quote">'{'</span>.<span class="php-keyword2">implode</span>(<span class="php-quote">','</span>, <span class="php-var">$items</span>).<span class="php-quote">'}'</span>;
+</span><span id="433" class="l"><a class="l" href="#433">433: </a>    }
+</span><span id="434" class="l"><a class="l" href="#434">434: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'['</span>.<span class="php-keyword2">implode</span>(<span class="php-quote">','</span>, <span class="php-var">$objects</span>).<span class="php-quote">']'</span>;
+</span><span id="435" class="l"><a class="l" href="#435">435: </a>}
+</span><span id="436" class="l"><a class="l" href="#436">436: </a>
+</span><span id="437" class="l"><a class="l" href="#437">437: </a><span class="php-comment">/**
+</span></span><span id="438" class="l"><a class="l" href="#438">438: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="439" class="l"><a class="l" href="#439">439: </a><span class="php-comment"> */</span>
+</span><span id="440" class="l"><a class="l" href="#440">440: </a><span class="php-keyword1">function</span> <a id="_validate_search_terms" href="#_validate_search_terms">validate_search_terms</a>(<span class="php-var">$terms</span>) {
+</span><span id="441" class="l"><a class="l" href="#441">441: </a>    <span class="php-var">$terms</span> = <span class="php-keyword2">trim</span>(<span class="php-keyword2">strip_tags</span>(<span class="php-var">$terms</span>));
+</span><span id="442" class="l"><a class="l" href="#442">442: </a>    <span class="php-keyword1">if</span> (!<span class="php-var">$terms</span>) {
+</span><span id="443" class="l"><a class="l" href="#443">443: </a>        <span class="php-var">$terms</span> = <span class="php-keyword1">false</span>;
+</span><span id="444" class="l"><a class="l" href="#444">444: </a>    }
+</span><span id="445" class="l"><a class="l" href="#445">445: </a>    <span class="php-keyword1">return</span> <span class="php-var">$terms</span>;
+</span><span id="446" class="l"><a class="l" href="#446">446: </a>}
+</span><span id="447" class="l"><a class="l" href="#447">447: </a>
+</span><span id="448" class="l"><a class="l" href="#448">448: </a><span class="php-comment">/**
+</span></span><span id="449" class="l"><a class="l" href="#449">449: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="450" class="l"><a class="l" href="#450">450: </a><span class="php-comment"> */</span>
+</span><span id="451" class="l"><a class="l" href="#451">451: </a><span class="php-keyword1">function</span> <a id="_validate_search_fld" href="#_validate_search_fld">validate_search_fld</a>(<span class="php-var">$fld</span>) {
+</span><span id="452" class="l"><a class="l" href="#452">452: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-var">$fld</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'TEXT'</span>, <span class="php-quote">'BODY'</span>, <span class="php-quote">'FROM'</span>, <span class="php-quote">'SUBJECT'</span>))) {
+</span><span id="453" class="l"><a class="l" href="#453">453: </a>        <span class="php-keyword1">return</span> <span class="php-var">$fld</span>;
+</span><span id="454" class="l"><a class="l" href="#454">454: </a>    }
+</span><span id="455" class="l"><a class="l" href="#455">455: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="456" class="l"><a class="l" href="#456">456: </a>}
+</span><span id="457" class="l"><a class="l" href="#457">457: </a>
+</span><span id="458" class="l"><a class="l" href="#458">458: </a><span class="php-comment">/**
+</span></span><span id="459" class="l"><a class="l" href="#459">459: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="460" class="l"><a class="l" href="#460">460: </a><span class="php-comment"> */</span>
+</span><span id="461" class="l"><a class="l" href="#461">461: </a><span class="php-keyword1">function</span> <a id="_search_field_selection" href="#_search_field_selection">search_field_selection</a>(<span class="php-var">$current</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="462" class="l"><a class="l" href="#462">462: </a>    <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(
+</span><span id="463" class="l"><a class="l" href="#463">463: </a>        <span class="php-quote">'TEXT'</span> =&gt; <span class="php-quote">'Entire message'</span>,
+</span><span id="464" class="l"><a class="l" href="#464">464: </a>        <span class="php-quote">'BODY'</span> =&gt; <span class="php-quote">'Message body'</span>,
+</span><span id="465" class="l"><a class="l" href="#465">465: </a>        <span class="php-quote">'SUBJECT'</span> =&gt; <span class="php-quote">'Subject'</span>,
+</span><span id="466" class="l"><a class="l" href="#466">466: </a>        <span class="php-quote">'FROM'</span> =&gt; <span class="php-quote">'From'</span>,
+</span><span id="467" class="l"><a class="l" href="#467">467: </a>    );
+</span><span id="468" class="l"><a class="l" href="#468">468: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;select id=&quot;search_fld&quot; name=&quot;search_fld&quot;&gt;'</span>;
+</span><span id="469" class="l"><a class="l" href="#469">469: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$flds</span> <span class="php-keyword1">as</span> <span class="php-var">$val</span> =&gt; <span class="php-var">$name</span>) {
+</span><span id="470" class="l"><a class="l" href="#470">470: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
+</span><span id="471" class="l"><a class="l" href="#471">471: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$current</span> == <span class="php-var">$val</span>) {
+</span><span id="472" class="l"><a class="l" href="#472">472: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
+</span><span id="473" class="l"><a class="l" href="#473">473: </a>        }
+</span><span id="474" class="l"><a class="l" href="#474">474: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;'</span>.<span class="php-var">$val</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-var">$name</span>).<span class="php-quote">'&lt;/option&gt;'</span>;
+</span><span id="475" class="l"><a class="l" href="#475">475: </a>    }
+</span><span id="476" class="l"><a class="l" href="#476">476: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/select&gt;'</span>;
+</span><span id="477" class="l"><a class="l" href="#477">477: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="478" class="l"><a class="l" href="#478">478: </a>}
+</span><span id="479" class="l"><a class="l" href="#479">479: </a>
+</span><span id="480" class="l"><a class="l" href="#480">480: </a><span class="php-comment">/**
+</span></span><span id="481" class="l"><a class="l" href="#481">481: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="482" class="l"><a class="l" href="#482">482: </a><span class="php-comment"> */</span>
+</span><span id="483" class="l"><a class="l" href="#483">483: </a><span class="php-keyword1">function</span> <a id="_email_is_active" href="#_email_is_active">email_is_active</a>(<span class="php-var">$mod_list</span>) {
+</span><span id="484" class="l"><a class="l" href="#484">484: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$mod_list</span>, <span class="php-quote">'imap'</span>) &amp;&amp; <span class="php-keyword2">stristr</span>(<span class="php-var">$mod_list</span>, <span class="php-quote">'pop3'</span>)) {
+</span><span id="485" class="l"><a class="l" href="#485">485: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="486" class="l"><a class="l" href="#486">486: </a>    }
+</span><span id="487" class="l"><a class="l" href="#487">487: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="488" class="l"><a class="l" href="#488">488: </a>}
+</span><span id="489" class="l"><a class="l" href="#489">489: </a>
+</span><span id="490" class="l"><a class="l" href="#490">490: </a><span class="xlang">?&gt;</span>
+</span><span id="491" class="l"><a class="l" href="#491">491: </a></span></code></pre>
+
+	<div id="footer">
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

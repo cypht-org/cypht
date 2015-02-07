@@ -12,6 +12,7 @@
       <a title="Home page" href="index.html">Home</a>
       <a href="features.html" title="More about Cypht features">Features</a>
       <a href="security.html" title="Information about security practices">Security</a>
+      <a href="modules.html" title="How Cypht module sets work">Mods</a>
       <a href="https://github.com/jasonmunro/hm3" title="Browse or download the source from github">Code</a>
       <a href="docs/code_docs/index.html" title="Code documentation generated with apigen">Docs</a>
       <a class="selected" href="install.html" title="Installation instructions">Install</a>
@@ -21,10 +22,10 @@
   <div class="para">
       <ul>
           <li>Download and extract the program somewhere</li>
-          <li>Edit the hm3.ini file to your liking. Setup any DB schema you want to use as advised in the ini file.</li>
-          <li>Run php ./scripts/config_gen.php from the main directory</li>
-          <li>Symlink or move the site/* files to the webserver where you want to host the software</li>
-          <li>That is all</li>
+          <li>Edit the hm3.ini file to your liking. Setup the storage directories and DB configuration for your needs. See the comments in the ini file for more information.</li>
+          <li>Run "php ./scripts/config_gen.php" from the main directory to generate the production site. If you change the hm3.ini file, you need to re-run this command for your changes to take effect.</li>
+          <li>Symlink or move the newly created files in the "site" directory to the web-server where you want to host the software.</li>
+          <li>You can enable a debug site by symlinking or moving the main download directory to the web-server document root and accessing it's index.php file. Don't do this in production. It could be bad.</li>
       </ul>
   </div>
   </body>

@@ -8,7 +8,6 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * class Hm_Request
  * Data request details
  *
  * This is an interface to HTTP request details. All request data 

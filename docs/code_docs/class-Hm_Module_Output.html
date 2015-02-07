@@ -4,10 +4,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="generator" content="ApiGen 2.8.0">
 
-	<title>Trait Hm_Module_Output | Cypht Framework Documentation</title>
+	<title>Trait Hm_Module_Output | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?684867790"></script>
+	<script type="text/javascript" src="elementlist.js?3961820859"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -50,6 +50,19 @@
 				<li><a href="package-framework.setup.html">setup</a>
 						</li>
 							</ul></li>
+				<li><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+				<li><a href="package-None.html">None</a>
+						</li>
 			</ul>
 		</div>
 
@@ -131,11 +144,11 @@
 
 	<div class="description">
 	
-<p>class Hm_Module_Output Module data management. These functions provide an
-interface for modules (both handler and output) to fetch data set by other
-modules and to return their own output. Handler modules must use these methods
-to set a response, output modules must if the format is AJAX, otherwise they
-should return an HTML5 string</p>
+<p>Module data management. These functions provide an interface for modules
+(both handler and output) to fetch data set by other modules and to return their
+own output. Handler modules must use these methods to set a response, output
+modules must if the format is AJAX, otherwise they should return an HTML5
+string</p>
 
 	</div>
 
@@ -151,6 +164,94 @@ should return an HTML5 string</p>
 			<a href="class-Hm_Output_Module.html">Hm_Output_Module</a>
 	</div>
 
+	<div>
+		<h4>Indirect Known Users</h4>
+			<a href="class-Hm_Handler_close_session_early.html">Hm_Handler_close_session_early</a>, 
+			<a href="class-Hm_Handler_date.html">Hm_Handler_date</a>, 
+			<a href="class-Hm_Handler_process_all_email_source_max_setting.html">Hm_Handler_process_all_email_source_max_setting</a>, 
+			<a href="class-Hm_Handler_process_all_since_setting.html">Hm_Handler_process_all_since_setting</a>, 
+			<a href="class-Hm_Handler_process_all_source_max_setting.html">Hm_Handler_process_all_source_max_setting</a>, 
+			<a href="class-Hm_Handler_process_flagged_since_setting.html">Hm_Handler_process_flagged_since_setting</a>, 
+			<a href="class-Hm_Handler_process_flagged_source_max_setting.html">Hm_Handler_process_flagged_source_max_setting</a>, 
+			<a href="class-Hm_Handler_process_language_setting.html">Hm_Handler_process_language_setting</a>, 
+			<a href="class-Hm_Handler_process_list_style_setting.html">Hm_Handler_process_list_style_setting</a>, 
+			<a href="class-Hm_Handler_process_search_terms.html">Hm_Handler_process_search_terms</a>, 
+			<a href="class-Hm_Handler_process_timezone_setting.html">Hm_Handler_process_timezone_setting</a>, 
+			<a href="class-Hm_Handler_process_unread_since_setting.html">Hm_Handler_process_unread_since_setting</a>, 
+			<a href="class-Hm_Handler_default_page_data.html">Hm_Handler_default_page_data</a>, 
+			<a href="class-Hm_Handler_process_unread_source_max_setting.html">Hm_Handler_process_unread_source_max_setting</a>, 
+			<a href="class-Hm_Handler_reload_folder_cookie.html">Hm_Handler_reload_folder_cookie</a>, 
+			<a href="class-Hm_Handler_save_user_data.html">Hm_Handler_save_user_data</a>, 
+			<a href="class-Hm_Handler_save_user_settings.html">Hm_Handler_save_user_settings</a>, 
+			<a href="class-Hm_Handler_title.html">Hm_Handler_title</a>, 
+			<a href="class-Hm_Output_all_email_since_setting.html">Hm_Output_all_email_since_setting</a>, 
+			<a href="class-Hm_Output_all_email_source_max_setting.html">Hm_Output_all_email_source_max_setting</a>, 
+			<a href="class-Hm_Output_all_since_setting.html">Hm_Output_all_since_setting</a>, 
+			<a href="class-Hm_Output_all_source_max_setting.html">Hm_Output_all_source_max_setting</a>, 
+			<a href="class-Hm_Output_content_end.html">Hm_Output_content_end</a>, 
+			<a href="class-Hm_Handler_http_headers.html">Hm_Handler_http_headers</a>, 
+			<a href="class-Hm_Output_content_section_end.html">Hm_Output_content_section_end</a>, 
+			<a href="class-Hm_Output_content_section_start.html">Hm_Output_content_section_start</a>, 
+			<a href="class-Hm_Output_content_start.html">Hm_Output_content_start</a>, 
+			<a href="class-Hm_Output_date.html">Hm_Output_date</a>, 
+			<a href="class-Hm_Output_email_menu_content.html">Hm_Output_email_menu_content</a>, 
+			<a href="class-Hm_Output_end_settings_form.html">Hm_Output_end_settings_form</a>, 
+			<a href="class-Hm_Output_flagged_since_setting.html">Hm_Output_flagged_since_setting</a>, 
+			<a href="class-Hm_Output_flagged_source_max_setting.html">Hm_Output_flagged_source_max_setting</a>, 
+			<a href="class-Hm_Output_folder_list_content_end.html">Hm_Output_folder_list_content_end</a>, 
+			<a href="class-Hm_Output_folder_list_content_start.html">Hm_Output_folder_list_content_start</a>, 
+			<a href="class-Hm_Handler_language.html">Hm_Handler_language</a>, 
+			<a href="class-Hm_Output_folder_list_end.html">Hm_Output_folder_list_end</a>, 
+			<a href="class-Hm_Output_folder_list_start.html">Hm_Output_folder_list_start</a>, 
+			<a href="class-Hm_Output_header_content.html">Hm_Output_header_content</a>, 
+			<a href="class-Hm_Output_header_css.html">Hm_Output_header_css</a>, 
+			<a href="class-Hm_Output_header_end.html">Hm_Output_header_end</a>, 
+			<a href="class-Hm_Output_header_start.html">Hm_Output_header_start</a>, 
+			<a href="class-Hm_Output_js_data.html">Hm_Output_js_data</a>, 
+			<a href="class-Hm_Output_js_search_data.html">Hm_Output_js_search_data</a>, 
+			<a href="class-Hm_Output_language_setting.html">Hm_Output_language_setting</a>, 
+			<a href="class-Hm_Output_list_style_setting.html">Hm_Output_list_style_setting</a>, 
+			<a href="class-Hm_Handler_load_user_data.html">Hm_Handler_load_user_data</a>, 
+			<a href="class-Hm_Output_loading_icon.html">Hm_Output_loading_icon</a>, 
+			<a href="class-Hm_Output_login.html">Hm_Output_login</a>, 
+			<a href="class-Hm_Output_logout_menu_item.html">Hm_Output_logout_menu_item</a>, 
+			<a href="class-Hm_Output_main_menu_content.html">Hm_Output_main_menu_content</a>, 
+			<a href="class-Hm_Output_main_menu_end.html">Hm_Output_main_menu_end</a>, 
+			<a href="class-Hm_Output_main_menu_start.html">Hm_Output_main_menu_start</a>, 
+			<a href="class-Hm_Output_message_end.html">Hm_Output_message_end</a>, 
+			<a href="class-Hm_Output_message_list_end.html">Hm_Output_message_list_end</a>, 
+			<a href="class-Hm_Output_message_list_heading.html">Hm_Output_message_list_heading</a>, 
+			<a href="class-Hm_Output_message_list_start.html">Hm_Output_message_list_start</a>, 
+			<a href="class-Hm_Handler_login.html">Hm_Handler_login</a>, 
+			<a href="class-Hm_Output_message_start.html">Hm_Output_message_start</a>, 
+			<a href="class-Hm_Output_msgs.html">Hm_Output_msgs</a>, 
+			<a href="class-Hm_Output_notfound_content.html">Hm_Output_notfound_content</a>, 
+			<a href="class-Hm_Output_page_js.html">Hm_Output_page_js</a>, 
+			<a href="class-Hm_Output_search_content_end.html">Hm_Output_search_content_end</a>, 
+			<a href="class-Hm_Output_search_content_start.html">Hm_Output_search_content_start</a>, 
+			<a href="class-Hm_Output_search_form.html">Hm_Output_search_form</a>, 
+			<a href="class-Hm_Output_search_from_folder_list.html">Hm_Output_search_from_folder_list</a>, 
+			<a href="class-Hm_Output_search_results_table_end.html">Hm_Output_search_results_table_end</a>, 
+			<a href="class-Hm_Output_server_content_end.html">Hm_Output_server_content_end</a>, 
+			<a href="class-Hm_Handler_logout.html">Hm_Handler_logout</a>, 
+			<a href="class-Hm_Output_server_content_start.html">Hm_Output_server_content_start</a>, 
+			<a href="class-Hm_Output_server_status_end.html">Hm_Output_server_status_end</a>, 
+			<a href="class-Hm_Output_server_status_start.html">Hm_Output_server_status_start</a>, 
+			<a href="class-Hm_Output_settings_menu_content.html">Hm_Output_settings_menu_content</a>, 
+			<a href="class-Hm_Output_settings_menu_end.html">Hm_Output_settings_menu_end</a>, 
+			<a href="class-Hm_Output_settings_menu_start.html">Hm_Output_settings_menu_start</a>, 
+			<a href="class-Hm_Output_start_all_email_settings.html">Hm_Output_start_all_email_settings</a>, 
+			<a href="class-Hm_Output_start_everything_settings.html">Hm_Output_start_everything_settings</a>, 
+			<a href="class-Hm_Output_start_flagged_settings.html">Hm_Output_start_flagged_settings</a>, 
+			<a href="class-Hm_Output_start_general_settings.html">Hm_Output_start_general_settings</a>, 
+			<a href="class-Hm_Handler_message_list_type.html">Hm_Handler_message_list_type</a>, 
+			<a href="class-Hm_Output_start_settings_form.html">Hm_Output_start_settings_form</a>, 
+			<a href="class-Hm_Output_start_unread_settings.html">Hm_Output_start_unread_settings</a>, 
+			<a href="class-Hm_Output_timezone_setting.html">Hm_Output_timezone_setting</a>, 
+			<a href="class-Hm_Output_unread_since_setting.html">Hm_Output_unread_since_setting</a>, 
+			<a href="class-Hm_Output_unread_source_max_setting.html">Hm_Output_unread_source_max_setting</a>, 
+			<a href="class-Hm_Handler_process_all_email_since_setting.html">Hm_Handler_process_all_email_since_setting</a>
+	</div>
 
 	<div class="info">
 		
@@ -158,7 +259,7 @@ should return an HTML5 string</p>
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.modules.html">modules</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_Module_Output.html#10-175" title="Go to source code">modules.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_Module_Output.html#10-174" title="Go to source code">modules.php</a><br>
 	</div>
 
 
@@ -176,7 +277,7 @@ should return an HTML5 string</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_out">#</a>
-		<code><a href="source-class-Hm_Module_Output.html#28-51" title="Go to source code">out</a>( <span>string <var>$name</var></span>, <span>mixed <var>$value</var></span>, <span>boolean <var>$protected</var> = <span class="php-keyword1">true</span></span> )</code>
+		<code><a href="source-class-Hm_Module_Output.html#27-50" title="Go to source code">out</a>( <span>string <var>$name</var></span>, <span>mixed <var>$value</var></span>, <span>boolean <var>$protected</var> = <span class="php-keyword1">true</span></span> )</code>
 
 		<div class="description short">
 			
@@ -222,7 +323,7 @@ should return an HTML5 string</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_append">#</a>
-		<code><a href="source-class-Hm_Module_Output.html#53-81" title="Go to source code">append</a>( <span>string <var>$name</var></span>, <span>string <var>$value</var></span> )</code>
+		<code><a href="source-class-Hm_Module_Output.html#52-80" title="Go to source code">append</a>( <span>string <var>$name</var></span>, <span>string <var>$value</var></span> )</code>
 
 		<div class="description short">
 			
@@ -266,7 +367,7 @@ should return an HTML5 string</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_concat">#</a>
-		<code><a href="source-class-Hm_Module_Output.html#83-106" title="Go to source code">concat</a>( <span>string <var>$name</var></span>, <span>string <var>$value</var></span> )</code>
+		<code><a href="source-class-Hm_Module_Output.html#82-105" title="Go to source code">concat</a>( <span>string <var>$name</var></span>, <span>string <var>$value</var></span> )</code>
 
 		<div class="description short">
 			
@@ -310,7 +411,7 @@ should return an HTML5 string</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_module_output">#</a>
-		<code><a href="source-class-Hm_Module_Output.html#108-115" title="Go to source code">module_output</a>( )</code>
+		<code><a href="source-class-Hm_Module_Output.html#107-114" title="Go to source code">module_output</a>( )</code>
 
 		<div class="description short">
 			
@@ -347,7 +448,7 @@ should return an HTML5 string</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output_protected">#</a>
-		<code><a href="source-class-Hm_Module_Output.html#117-124" title="Go to source code">output_protected</a>( )</code>
+		<code><a href="source-class-Hm_Module_Output.html#116-123" title="Go to source code">output_protected</a>( )</code>
 
 		<div class="description short">
 			
@@ -384,7 +485,7 @@ should return an HTML5 string</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get">#</a>
-		<code><a href="source-class-Hm_Module_Output.html#126-147" title="Go to source code">get</a>( <span>string <var>$name</var></span>, <span>mixed <var>$default</var> = <span class="php-keyword1">NULL</span></span>, <span>string <var>$typed</var> = <span class="php-keyword1">true</span></span> )</code>
+		<code><a href="source-class-Hm_Module_Output.html#125-146" title="Go to source code">get</a>( <span>string <var>$name</var></span>, <span>mixed <var>$default</var> = <span class="php-keyword1">NULL</span></span>, <span>string <var>$typed</var> = <span class="php-keyword1">true</span></span> )</code>
 
 		<div class="description short">
 			
@@ -430,7 +531,7 @@ should return an HTML5 string</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_exists">#</a>
-		<code><a href="source-class-Hm_Module_Output.html#149-158" title="Go to source code">exists</a>( <span>string <var>$name</var></span> )</code>
+		<code><a href="source-class-Hm_Module_Output.html#148-157" title="Go to source code">exists</a>( <span>string <var>$name</var></span> )</code>
 
 		<div class="description short">
 			
@@ -472,7 +573,7 @@ should return an HTML5 string</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_in">#</a>
-		<code><a href="source-class-Hm_Module_Output.html#160-173" title="Go to source code">in</a>( <span>string <var>$name</var></span>, <span>array <var>$values</var></span> )</code>
+		<code><a href="source-class-Hm_Module_Output.html#159-172" title="Go to source code">in</a>( <span>string <var>$name</var></span>, <span>array <var>$values</var></span> )</code>
 
 		<div class="description short">
 			
@@ -527,7 +628,7 @@ should return an HTML5 string</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Module_Output.html#20" title="Go to source code"><var>$output</var></a>
+				<a href="source-class-Hm_Module_Output.html#19" title="Go to source code"><var>$output</var></a>
 		</td>
 		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
 		<td class="description"><div>
@@ -550,7 +651,7 @@ should return an HTML5 string</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Module_Output.html#23" title="Go to source code"><var>$protected</var></a>
+				<a href="source-class-Hm_Module_Output.html#22" title="Go to source code"><var>$protected</var></a>
 		</td>
 		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
 		<td class="description"><div>
@@ -573,7 +674,7 @@ should return an HTML5 string</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Module_Output.html#26" title="Go to source code"><var>$appendable</var></a>
+				<a href="source-class-Hm_Module_Output.html#25" title="Go to source code"><var>$appendable</var></a>
 		</td>
 		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
 		<td class="description"><div>
@@ -599,7 +700,7 @@ should return an HTML5 string</p>
 </div>
 
 	<div id="footer">
-		Cypht Framework Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
 	</div>
 </div>
 </div>
