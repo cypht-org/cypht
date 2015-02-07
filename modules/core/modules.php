@@ -85,10 +85,13 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process input from the max per source setting for the Unread page in the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'unread_per_source'));
         $new_settings = $this->get('new_user_settings', array());
@@ -112,10 +115,13 @@ class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process input from the max per source setting for the All E-mail page in the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_email_per_source'));
         $new_settings = $this->get('new_user_settings', array());
@@ -139,10 +145,13 @@ class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module 
 }
 
 /**
- *
+ * Process input from the max per source setting for the Everything page in the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_per_source'));
         $new_settings = $this->get('new_user_settings', array());
@@ -166,10 +175,13 @@ class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process input from the max per source setting for the Flagged page in the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'flagged_per_source'));
         $new_settings = $this->get('new_user_settings', array());
@@ -193,10 +205,13 @@ class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process "since" setting for the Flagged page in the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'flagged_since'));
         $new_settings = $this->get('new_user_settings', array());
@@ -214,10 +229,13 @@ class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process "since" setting for the Everything page in the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_since'));
         $new_settings = $this->get('new_user_settings', array());
@@ -235,10 +253,13 @@ class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process "since" setting for the All E-mail page in the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_all_email_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_email_since'));
         $new_settings = $this->get('new_user_settings', array());
@@ -256,10 +277,13 @@ class Hm_Handler_process_all_email_since_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process "since" setting for the Unread page in the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'unread_since'));
         $new_settings = $this->get('new_user_settings', array());
@@ -277,10 +301,13 @@ class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process language setting from the general section of the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
+    /**
+     * @todo add validation
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
         $new_settings = $this->get('new_user_settings', array());
@@ -298,10 +325,13 @@ class Hm_Handler_process_language_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process the timezone setting from the general section of the settings page
  * @subpackage core/handler
  */
 class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
+    /**
+     * @todo: add validation
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'timezone_setting'));
         $new_settings = $this->get('new_user_settings', array());
@@ -319,11 +349,14 @@ class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Save settings from the settings page to persistant storage
  * @subpackage core/handler
- * @todo save current settings in session when saving fails
  */
 class Hm_Handler_save_user_settings extends Hm_Handler_Module {
+    /**
+     * validate the supplied password and save the settings if possible
+     * @todo save current settings in session when saving fails
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'password'));
         if ($success) {
@@ -353,47 +386,58 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
             }
         }
         elseif (array_key_exists('save_settings', $this->request->post)) {
-            /** TODO: save current settings in session */
             Hm_Msgs::add('ERRYour password is required to save your settings to the server');
         }
     }
 }
 
 /**
- *
+ * Setup a default title
  * @subpackage core/handler
  */
 class Hm_Handler_title extends Hm_Handler_Module {
+    /**
+     * output a default title based on the page URL argument
+     */
     public function process() {
         $this->out('title', ucfirst($this->page));
     }
 }
 
 /**
- *
+ * Setup the current language
  * @subpackage core/handler
  */
 class Hm_Handler_language extends Hm_Handler_Module {
+    /**
+     * output the user configured language or English if not set
+     */
     public function process() {
         $this->out('language', $this->user_config->get('language_setting', 'en'));
     }
 }
 
 /**
- *
+ * Setup the date
  * @subpackage core/handler
  */
 class Hm_Handler_date extends Hm_Handler_Module {
+    /**
+     * output a simple date string
+     */
     public function process() {
         $this->out('date', date('G:i:s'));
     }
 }
 
 /**
- *
+ * Process a potential login attempt
  * @subpackage core/handler
  */
 class Hm_Handler_login extends Hm_Handler_Module {
+    /**
+     * Perform a new login if the form was submitted, otherwise check for and continue a session if it exists
+     */
     public function process() {
         if (!$this->get('create_username', false)) {
             list($success, $form) = $this->process_form(array('username', 'password'));
@@ -414,20 +458,26 @@ class Hm_Handler_login extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Setup default page data
  * @subpackage core/handler
  */
 class Hm_Handler_default_page_data extends Hm_Handler_Module {
+    /**
+     * For now the data_sources array is the onl default
+     */
     public function process() {
         $this->out('data_sources', array(), false);
     }
 }
 
 /**
- *
+ * Load user data
  * @subpackage core/handler
  */
 class Hm_Handler_load_user_data extends Hm_Handler_Module {
+    /**
+     * Load data from persistant storage on login, or from the session if already logged in
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('username', 'password'));
         if ($this->session->is_active()) {
@@ -450,10 +500,13 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Save user data to the session
  * @subpackage core/handler
  */
 class Hm_Handler_save_user_data extends Hm_Handler_Module {
+    /**
+     * @todo rename to make it obvious this is session only
+     */
     public function process() {
         $user_data = $this->user_config->dump();
         if (!empty($user_data)) {
@@ -463,10 +516,13 @@ class Hm_Handler_save_user_data extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Process a logout
  * @subpackage core/handler
  */
 class Hm_Handler_logout extends Hm_Handler_Module {
+    /**
+     * Clean up everything on logout
+     */
     public function process() {
         if (array_key_exists('logout', $this->request->post) && !$this->session->loaded) {
             $this->session->destroy($this->request);
@@ -503,11 +559,13 @@ class Hm_Handler_logout extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Setup the message list type based on URL arguments
  * @subpackage core/handler
- * @todo clean this up somehow
  */
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
+    /**
+     * @todo clean this up somehow
+     */
     public function process() {
         $uid = '';
         $list_path = '';
@@ -589,10 +647,13 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
 }
 
 /**
- *
+ * Set a cookie to instruct the JS to reload the folder list
  * @subpackage core/handler
  */
 class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
+    /**
+     * This cookie will be deleted by JS
+     */
     public function process() {
         if ($this->get('reload_folders', false)) {
             $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
@@ -601,9 +662,13 @@ class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
 }
 
 /**
+ * Process search terms from a URL
  * @subpackage core/handler
  */
 class Hm_Handler_process_search_terms extends Hm_Handler_Module {
+    /**
+     * validate and set search tems in the session
+     */
     public function process() {
         if (array_key_exists('search_terms', $this->request->get)) {
             $this->out('run_search', 1);
@@ -1596,10 +1661,10 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 
 /**
  * @subpackage core/output
+ * @todo remove modle specific stuff
  */
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($format) {
-        /** TODO: remove module specific stuff, use data sources? */
         if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds', 'email'))) {
             $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
