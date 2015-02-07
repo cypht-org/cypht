@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Core modules
+ * @package modules
+ * @subpackage core
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 define('MAX_PER_SOURCE', 100);
@@ -8,13 +14,27 @@ define('DEFAULT_SINCE', 'today');
 
 require APP_PATH.'modules/core/functions.php';
 
+/**
+ * Close the session before it's automatically closed at the end of page processing
+ * @subpackage core/handler
+ */
 class Hm_Handler_close_session_early extends Hm_Handler_Module {
+    /***
+     * Uses the close_early method of the session this->session object
+     */
     public function process() {
         $this->session->close_early();
     }
 }
 
+/**
+ * Build a list of HTTP headers to output to the browser
+ * @subpackage core/handler
+ */
 class Hm_Handler_http_headers extends Hm_Handler_Module {
+    /***
+     * These are pretty restrictive, but the idea is to have a secure starting point
+     */
     public function process() {
         $headers = array();
         if ($this->get('language')) {
@@ -34,7 +54,15 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
     }
 }
 
+/**
+ * Process input from the the list style setting in the general settings section.
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
+
+    /**
+     * Can be one of two values, 'email_style' or 'list_style'. The default is 'email_style'.
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'list_style'));
         $new_settings = $this->get('new_user_settings', array());
@@ -56,6 +84,10 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'unread_per_source'));
@@ -79,6 +111,10 @@ class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_email_per_source'));
@@ -102,6 +138,10 @@ class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module 
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_per_source'));
@@ -125,6 +165,10 @@ class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'flagged_per_source'));
@@ -148,6 +192,10 @@ class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'flagged_since'));
@@ -165,6 +213,10 @@ class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_since'));
@@ -182,6 +234,10 @@ class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_all_email_since_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'all_email_since'));
@@ -199,6 +255,10 @@ class Hm_Handler_process_all_email_since_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'unread_since'));
@@ -216,6 +276,10 @@ class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
@@ -233,6 +297,10 @@ class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'timezone_setting'));
@@ -250,6 +318,11 @@ class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ * @todo save current settings in session when saving fails
+ */
 class Hm_Handler_save_user_settings extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'password'));
@@ -269,7 +342,6 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                 }
                 else {
                     Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
-                    /* TODO: save current settings in session */
                     $pass = false;
                 }
                 if ($user && $path && $pass) {
@@ -281,30 +353,46 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
             }
         }
         elseif (array_key_exists('save_settings', $this->request->post)) {
-            /* TODO: save current settings in session */
+            /** TODO: save current settings in session */
             Hm_Msgs::add('ERRYour password is required to save your settings to the server');
         }
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_title extends Hm_Handler_Module {
     public function process() {
         $this->out('title', ucfirst($this->page));
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_language extends Hm_Handler_Module {
     public function process() {
         $this->out('language', $this->user_config->get('language_setting', 'en'));
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_date extends Hm_Handler_Module {
     public function process() {
         $this->out('date', date('G:i:s'));
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_login extends Hm_Handler_Module {
     public function process() {
         if (!$this->get('create_username', false)) {
@@ -325,12 +413,20 @@ class Hm_Handler_login extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_default_page_data extends Hm_Handler_Module {
     public function process() {
         $this->out('data_sources', array(), false);
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_load_user_data extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('username', 'password'));
@@ -353,6 +449,10 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_save_user_data extends Hm_Handler_Module {
     public function process() {
         $user_data = $this->user_config->dump();
@@ -362,6 +462,10 @@ class Hm_Handler_save_user_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_logout extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('logout', $this->request->post) && !$this->session->loaded) {
@@ -398,7 +502,11 @@ class Hm_Handler_logout extends Hm_Handler_Module {
     }
 }
 
-/* TODO: clean this up somehow */
+/**
+ *
+ * @subpackage core/handler
+ * @todo clean this up somehow
+ */
 class Hm_Handler_message_list_type extends Hm_Handler_Module {
     public function process() {
         $uid = '';
@@ -480,6 +588,10 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
     }
 }
 
+/**
+ *
+ * @subpackage core/handler
+ */
 class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
     public function process() {
         if ($this->get('reload_folders', false)) {
@@ -488,6 +600,9 @@ class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage core/handler
+ */
 class Hm_Handler_process_search_terms extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('search_terms', $this->request->get)) {
@@ -506,6 +621,9 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_search_from_folder_list extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
@@ -520,18 +638,27 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_search_content_start extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="search_content"><div class="content_title">'.$this->trans('Search');
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_search_content_end extends Hm_Output_Module {
     protected function output($format) {
         return '</div>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_search_form extends Hm_Output_Module {
     protected function output($format) {
         $terms = $this->get('search_terms', '');
@@ -552,12 +679,18 @@ class Hm_Output_search_form extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_search_results_table_end extends Hm_Output_Module {
     protected function output($format) {
         return '</tbody></table>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_js_search_data extends Hm_Output_Module {
     protected function output($format) {
         return '<script type="text/javascript">'.
@@ -567,6 +700,9 @@ class Hm_Output_js_search_data extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_login extends Hm_Output_Module {
     protected function output($format) {
         if (!$this->get('router_login_state')) {
@@ -596,24 +732,36 @@ class Hm_Output_login extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_server_content_start extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="content_title">'.$this->trans('Servers').'</div><div class="server_content">';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_server_content_end extends Hm_Output_Module {
     protected function output($format) {
         return '</div>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_date extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="date">'.$this->html_safe($this->get('date')).'</div>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_msgs extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -638,6 +786,9 @@ class Hm_Output_msgs extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_header_start extends Hm_Output_Module {
     protected function output($format) {
         $lang = 'en';
@@ -654,12 +805,18 @@ class Hm_Output_header_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_header_end extends Hm_Output_Module {
     protected function output($format) {
         return '</head>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_content_start extends Hm_Output_Module {
     protected function output($format) {
         $res = '<body><noscript class="noscript">'.
@@ -675,6 +832,9 @@ class Hm_Output_content_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_header_content extends Hm_Output_Module {
     protected function output($format) {
         $title = '';
@@ -703,12 +863,15 @@ class Hm_Output_header_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_header_css extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
         $mods = $this->get('router_module_list');
         if (DEBUG_MODE) {
-            foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+            foreach (glob('modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $mod = str_replace(array('modules/', '/'), '', $name);
                 if (stristr($mods, $mod) && is_readable(sprintf("%ssite.css", $name))) {
                     $res .= '<link href="'.sprintf("%ssite.css", $name).'" media="all" rel="stylesheet" type="text/css" />';
@@ -722,6 +885,9 @@ class Hm_Output_header_css extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_page_js extends Hm_Output_Module {
     protected function output($format) {
         if (DEBUG_MODE) {
@@ -729,7 +895,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
             $zepto = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
             $core = false;
             $mods = $this->get('router_module_list');
-            foreach (glob('modules/*', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+            foreach (glob('modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 if ($name == 'modules/core/') {
                     $core = $name;
                     continue;
@@ -750,6 +916,9 @@ class Hm_Output_page_js extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_content_end extends Hm_Output_Module {
     protected function output($format) {
         if (defined('DEBUG_MODE') && DEBUG_MODE) {
@@ -761,6 +930,9 @@ class Hm_Output_content_end extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_js_data extends Hm_Output_Module {
     protected function output($format) {
         return '<script type="text/javascript">'.
@@ -774,12 +946,18 @@ class Hm_Output_js_data extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_loading_icon extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="loading_icon"></div>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_start_settings_form extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="user_settings"><div class="content_title">'.$this->trans('Site Settings').'</div>'.
@@ -789,6 +967,9 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_list_style_setting extends Hm_Output_Module {
     protected function output($format) {
         $options = array('email_style' => 'Email', 'news_style' => 'News');
@@ -815,6 +996,9 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_start_flagged_settings extends Hm_Output_Module {
     protected function output($format) {
         return '<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle">'.
@@ -823,6 +1007,9 @@ class Hm_Output_start_flagged_settings extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_start_everything_settings extends Hm_Output_Module {
     protected function output($format) {
         return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle">'.
@@ -831,6 +1018,9 @@ class Hm_Output_start_everything_settings extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_start_unread_settings extends Hm_Output_Module {
     protected function output($format) {
         return '<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle">'.
@@ -839,6 +1029,9 @@ class Hm_Output_start_unread_settings extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_start_all_email_settings extends Hm_Output_Module {
     protected function output($format) {
         if (!email_is_active($this->get('router_module_list'))) {
@@ -850,6 +1043,9 @@ class Hm_Output_start_all_email_settings extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_start_general_settings extends Hm_Output_Module {
     protected function output($format) {
         return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle">'.
@@ -858,6 +1054,9 @@ class Hm_Output_start_general_settings extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
     protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
@@ -871,6 +1070,9 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_unread_since_setting extends Hm_Output_Module {
     protected function output($format) {
         $since = false;
@@ -884,6 +1086,9 @@ class Hm_Output_unread_since_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
     protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
@@ -897,6 +1102,9 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_flagged_since_setting extends Hm_Output_Module {
     protected function output($format) {
         $since = false;
@@ -910,6 +1118,9 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
     protected function output($format) {
         if (!email_is_active($this->get('router_module_list'))) {
@@ -926,6 +1137,9 @@ class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_all_source_max_setting extends Hm_Output_Module {
     protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
@@ -939,6 +1153,9 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_all_email_since_setting extends Hm_Output_Module {
     protected function output($format) {
         if (!email_is_active($this->get('router_module_list'))) {
@@ -955,6 +1172,9 @@ class Hm_Output_all_email_since_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_all_since_setting extends Hm_Output_Module {
     protected function output($format) {
         $since = false;
@@ -968,6 +1188,9 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_language_setting extends Hm_Output_Module {
     protected function output($format) {
         $langs = interface_langs();
@@ -992,6 +1215,9 @@ class Hm_Output_language_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_timezone_setting extends Hm_Output_Module {
     protected function output($format) {
         $zones = timezone_identifiers_list();
@@ -1016,6 +1242,9 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output($format) {
         return '<tr><td class="submit_cell" colspan="2">'.
@@ -1027,6 +1256,9 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_folder_list_start extends Hm_Output_Module {
     protected function output($format) {
         $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
@@ -1035,6 +1267,9 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_folder_list_content_start extends Hm_Output_Module {
     protected function output($format) {
         if ($format == 'HTML5') {
@@ -1044,6 +1279,9 @@ class Hm_Output_folder_list_content_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_main_menu_start extends Hm_Output_Module {
     protected function output($format) {
         $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main').
@@ -1056,6 +1294,9 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_main_menu_content extends Hm_Output_Module {
     protected function output($format) {
         $email = false;
@@ -1082,6 +1323,9 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
     protected function output($format) {
         $res =  '<li><a class="unread_link logout_link" href="#"><img class="account_icon" src="'.
@@ -1094,6 +1338,9 @@ class Hm_Output_logout_menu_item extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_main_menu_end extends Hm_Output_Module {
     protected function output($format) {
         $res = '</ul></div>';
@@ -1104,6 +1351,9 @@ class Hm_Output_main_menu_end extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_email_menu_content extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -1136,6 +1386,9 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_settings_menu_start extends Hm_Output_Module {
     protected function output($format) {
         $res = '<div class="src_name" data-source=".settings">'.$this->trans('Settings').
@@ -1148,6 +1401,9 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_settings_menu_content extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
@@ -1163,6 +1419,9 @@ class Hm_Output_settings_menu_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_settings_menu_end extends Hm_Output_Module {
     protected function output($format) {
         $res = '</ul>';
@@ -1173,6 +1432,9 @@ class Hm_Output_settings_menu_end extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_folder_list_content_end extends Hm_Output_Module {
     protected function output($format) {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
@@ -1185,24 +1447,36 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_folder_list_end extends Hm_Output_Module {
     protected function output($format) {
         return '</div></nav>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_content_section_start extends Hm_Output_Module {
     protected function output($format) {
         return '<main class="content_cell">';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_content_section_end extends Hm_Output_Module {
     protected function output($format) {
         return '</main>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_server_status_start extends Hm_Output_Module {
     protected function output($format) {
         $res = '<div class="server_status"><div class="content_title">'.$this->trans('Home').'</div>';
@@ -1212,12 +1486,18 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_server_status_end extends Hm_Output_Module {
     protected function output($format) {
         return '</tbody></table></div>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_message_start extends Hm_Output_Module {
     protected function output($format) {
         if ($this->in('list_parent', array('search', 'flagged', 'combined_inbox', 'unread', 'feeds', 'email'))) {
@@ -1261,12 +1541,18 @@ class Hm_Output_message_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_message_end extends Hm_Output_Module {
     protected function output($format) {
         return '</div>';
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_notfound_content extends Hm_Output_Module {
     protected function output($format) {
         $res = '<div class="content_title">'.$this->trans('Page Not Found!').'</div>';
@@ -1275,6 +1561,9 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_message_list_start extends Hm_Output_Module {
     protected function output($format) {
 
@@ -1305,9 +1594,12 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     protected function output($format) {
-        /* TODO: remove module specific stuff, use data sources? */
+        /** TODO: remove module specific stuff, use data sources? */
         if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds', 'email'))) {
             $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
@@ -1338,6 +1630,9 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_message_list_end extends Hm_Output_Module {
     protected function output($format) {
         $res = '</tbody></table><div class="page_links"></div></div>';
