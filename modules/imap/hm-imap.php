@@ -219,7 +219,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             $this->debug[] = 'Connecting to '.$this->server.' on port '.$this->port;
             $ctx = stream_context_create();
 
-            /* TODO: make this optional */
             stream_context_set_option($ctx, 'ssl', 'verify_peer_name', $this->verify_peer_name);
             stream_context_set_option($ctx, 'ssl', 'verify_peer', $this->verify_peer);
 
@@ -693,7 +692,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     /**
      * return a header list for the supplied message uids
      *
-     * TODO: refactor. abstract header line continuation parsing for re-use
+     * @todo refactor. abstract header line continuation parsing for re-use
      *
      * @param mixed $uids an array of uids or a valid IMAP sequence set as a string
      * @param bool $raw flag to disable decoding header values
@@ -1982,7 +1981,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * attempt enable IMAP COMPRESS extension
-     * TODO: currently does not work ...
+     * @todo: currently does not work ...
      *
      * @return void
      */
