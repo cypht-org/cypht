@@ -339,6 +339,7 @@ class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
 
 class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
     public function process() {
+        $callback = false;
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
         }
