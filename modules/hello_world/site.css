@@ -1,0 +1,8 @@
+/**
+ * Style defined here will be combined and optionally minified with css from other
+ * modules duing the build process. Only one css file is used in normal mode. All
+ * individual css files from all activated modules are used in DEBUG_MODE
+ */
+.hw { float: right; margin-right: 200px; margin-top: 5px; }
+.hwpage { width: 100%; font-size: 80pt; text-align: center; margin-top: 100px; color: #aaa; }
+.hw_ajax_link { font-size: 12pt; cursor: pointer; }
