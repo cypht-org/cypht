@@ -7,7 +7,7 @@
 	<title>Package modules\helloworld\output | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3954677913"></script>
+	<script type="text/javascript" src="elementlist.js?3022528054"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -106,6 +106,8 @@
 							</ul></li>
 				<li class="active"><a href="package-modules.helloworld.html">helloworld<span></span></a>
 						<ul>
+				<li><a href="package-modules.helloworld.handler.html">handler</a>
+						</li>
 				<li class="active"><a href="package-modules.helloworld.output.html">output</a>
 						</li>
 							</ul></li>
@@ -182,7 +184,9 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
+				<li><a href="class-Hm_Output_hello_world_ajax_content.html">Hm_Output_hello_world_ajax_content</a></li>
 				<li><a href="class-Hm_Output_hello_world_home_page.html">Hm_Output_hello_world_home_page</a></li>
+				<li><a href="class-Hm_Output_hello_world_page_content.html">Hm_Output_hello_world_page_content</a></li>
 			</ul>
 
 
@@ -237,10 +241,23 @@
 <table class="summary" id="classes">
 <caption>Classes summary</caption>
 <tr>
+	<td class="name"><a href="class-Hm_Output_hello_world_ajax_content.html">Hm_Output_hello_world_ajax_content</a></td>
+	<td>Another output module, this one is called from an AJAX request in site.js. AJAX
+requests need to use $this-&gt;out('name', 'value') to add to the JSON response.
+They name used must be whitelisted in the setup.php file under 'allowed_output'.</td>
+</tr>
+<tr>
 	<td class="name"><a href="class-Hm_Output_hello_world_home_page.html">Hm_Output_hello_world_home_page</a></td>
 	<td>This is an output modules that was assigned to the "home" page id. It outputs
 after the content_section_start core module, and outputs a div with "hello
 world" as a link to the hello world page</td>
+</tr>
+<tr>
+	<td class="name"><a href="class-Hm_Output_hello_world_page_content.html">Hm_Output_hello_world_page_content</a></td>
+	<td>This is an output module assigned to the hello_world page identifier (this is
+done in the setup.php file). This looks for the data sent from the
+Hm_Handler_hello_world_page_handler module and outputs it after the
+content_section_start module</td>
 </tr>
 </table>
 
