@@ -7,7 +7,11 @@
  */
 
 /**
+ * Build meta information for a message list
  * @subpackage core/functions
+ * @param array $input module output
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function message_list_meta($input, $output_mod) {
     if (!array_key_exists('list_meta', $input) || !$input['list_meta']) {
@@ -48,7 +52,10 @@ function message_list_meta($input, $output_mod) {
 }
 
 /**
+ * Build a human readable interval string
  * @subpackage core/functions
+ * @param string $date_str date string parsable by strtotime()
+ * @return string
  */
 function human_readable_interval($date_str) {
     $precision     = 2;
@@ -96,7 +103,13 @@ function human_readable_interval($date_str) {
 }
 
 /**
+ * Output a message list row of data using callbacks
  * @subpackage core/functions
+ * @param array $values data and callbacks for each cell
+ * @param string $id unique id for the message
+ * @param string $style message list style (news or email)
+ * @param object $output_mod Hm_Output_Module
+ * @return array
  */
 function message_list_row($values, $id, $style, $output_mod) {
     $res = '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id)).'">';
@@ -117,7 +130,12 @@ function message_list_row($values, $id, $style, $output_mod) {
 }
 
 /**
+ * Generic callback for a message list table cell
  * @subpackage core/functions
+ * @param array $vals data for the cell
+ * @param string $style message list style
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function safe_output_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
@@ -129,7 +147,12 @@ function safe_output_callback($vals, $style, $output_mod) {
 }
 
 /**
+ * Callback for a message list checkbox
  * @subpackage core/functions
+ * @param array $vals data for the cell
+ * @param string $style message list style
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function checkbox_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
@@ -141,7 +164,12 @@ function checkbox_callback($vals, $style, $output_mod) {
 }
 
 /**
+ * Callback for a subject cell in a message list
  * @subpackage core/functions
+ * @param array $vals data for the cell
+ * @param string $style message list style
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function subject_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
@@ -153,7 +181,12 @@ function subject_callback($vals, $style, $output_mod) {
 }
 
 /**
+ * Callback for a date cell in a message list
  * @subpackage core/functions
+ * @param array $vals data for the cell
+ * @param string $style message list style
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function date_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
@@ -165,7 +198,12 @@ function date_callback($vals, $style, $output_mod) {
 }
 
 /**
+ * Callback for an icon in a message list row
  * @subpackage core/functions
+ * @param array $vals data for the cell
+ * @param string $style message list style
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function icon_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
@@ -177,7 +215,10 @@ function icon_callback($vals, $style, $output_mod) {
 }
 
 /**
+ * Output message controls
  * @subpackage core/functions
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function message_controls($output_mod) {
     return '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
@@ -190,7 +231,12 @@ function message_controls($output_mod) {
 }
 
 /**
+ * Output select element for "received since" options
  * @subpackage core/functions
+ * @param string $since current value to pre-select
+ * @param string $name name used as the elements id and name
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function message_since_dropdown($since, $name, $output_mod) {
     $times = array(
@@ -215,12 +261,15 @@ function message_since_dropdown($since, $name, $output_mod) {
 }
 
 /**
+ * Return a date for a "received since" value, or just sanitize it
  * @subpackage core/functions
+ * @param string $val "received since" value to process
+ * @param bool $validate flag to limit to validation only
  */
 function process_since_argument($val, $validate=false) {
     $date = false;
     $valid = false;
-    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'))) {
+    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'), true)) {
         $valid = $val;
         $date = date('j-M-Y', strtotime($val));
     }
@@ -236,7 +285,11 @@ function process_since_argument($val, $validate=false) {
 }
 
 /**
+ * Format a message body that has HMTL markup
  * @subpackage core/functions
+ * @param string $str message HTML
+ * @param bool $external_resources flag to allow external resources in the HTML
+ * @return string
  */
 function format_msg_html($str, $external_resources=false) {
     require APP_PATH.'third_party/HTMLPurifier.standalone.php';
@@ -253,14 +306,21 @@ function format_msg_html($str, $external_resources=false) {
 }
 
 /**
+ * Format image data
  * @subpackage core/functions
+ * @param string $str binary image data
+ * @param string $mime_type type of image
+ * return string
  */
 function format_msg_image($str, $mime_type) {
     return '<img alt="" src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
 }
 
 /**
+ * Format a plain text message
  * @subpackage core/functions
+ * @param string $str message text
+ * @param object $output_mod Hm_Output_Module
  */
 function format_msg_text($str, $output_mod, $links=true) {
     $str = str_replace("\t", '    ', $str);
@@ -273,7 +333,13 @@ function format_msg_text($str, $output_mod, $links=true) {
 }
 
 /**
+ * Format a value for display
  * @subpackage core/functions
+ * @param string $name value name to find/format
+ * @param array $haystack details to search for the value name
+ * @param bool $type optional format type
+ * @param mixed $default value to return if the name is not found
+ * @return string
  */
 function display_value($name, $haystack, $type=false, $default='') {
     if (!array_key_exists($name, $haystack)) {
@@ -303,14 +369,19 @@ function display_value($name, $haystack, $type=false, $default='') {
 }
 
 /**
+ * Format reply text
  * @subpackage core/functions
+ * @param string $txt message text
+ * @return string
  */
 function format_reply_text($txt) {
     return '> '.str_replace("\n", "\n> ", $txt);
 }
 
 /**
+ * Valid interface langs (supported by Google Translate API)
  * @subpackage core/functions
+ * @return array
  */
 function interface_langs() {
     return array(
@@ -362,7 +433,11 @@ function interface_langs() {
 }
 
 /**
+ * Tranlate a human readable time string
  * @subpackage core/functions
+ * @param string $str string to translate
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function translate_time_str($str, $output_mod) {
     $parts = explode(',', $str);
@@ -380,7 +455,12 @@ function translate_time_str($str, $output_mod) {
 }
 
 /**
+ * Output message list controls
  * @subpackage core/functions
+ * @param string $refresh_link refresh link tag
+ * @param string $config_link configuration link tag
+ * @param string $source_link source link tag
+ * @return string
  */
 function list_controls($refresh_link, $config_link, $source_link=false) {
     return '<div class="list_controls">'.
@@ -388,7 +468,10 @@ function list_controls($refresh_link, $config_link, $source_link=false) {
 }
 
 /**
+ * Output a source list for a message list
  * @subpackage core/functions
+ * @param array $sources source of the list
+ * @param object $output_mod Hm_Output_Module
  */
 function list_sources($sources, $output_mod) {
     $res = '<div class="list_sources">';
@@ -415,7 +498,11 @@ function list_sources($sources, $output_mod) {
 }
 
 /**
+ * Format a data source to be a valid JS object
  * @subpackage core/functions
+ * @param array $array values to format
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function format_data_sources($array, $output_mod) {
     $objects = array();
@@ -435,7 +522,10 @@ function format_data_sources($array, $output_mod) {
 }
 
 /**
+ * Validate search terms
  * @subpackage core/functions
+ * @param string $terms search terms to validate
+ * @return string
  */
 function validate_search_terms($terms) {
     $terms = trim(strip_tags($terms));
@@ -446,7 +536,10 @@ function validate_search_terms($terms) {
 }
 
 /**
+ * Validate the name of a search field
  * @subpackage core/functions
+ * @param string $fld name to validate
+ * @return mixed
  */
 function validate_search_fld($fld) {
     if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'))) {
@@ -456,7 +549,11 @@ function validate_search_fld($fld) {
 }
 
 /**
+ * Output a select element for the search field
  * @subpackage core/functions
+ * @param string $current currently selected field
+ * @param object $output_mod Hm_Output_Module
+ * @return string
  */
 function search_field_selection($current, $output_mod) {
     $flds = array(
@@ -478,7 +575,10 @@ function search_field_selection($current, $output_mod) {
 }
 
 /**
+ * Determine if E-mail modules are active
  * @subpackage core/functions
+ * @param string $mod_list list of active module sets
+ * @return mixed
  */
 function email_is_active($mod_list) {
     if (stristr($mod_list, 'imap') && stristr($mod_list, 'pop3')) {
