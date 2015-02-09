@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Swipe Identity modules
+ * @package modules
+ * @subpackage swipe2fa
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage swipe2fa/handler
+ */
 class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
     public function process() {
 
@@ -106,6 +115,9 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage swipe2fa/output
+ */
 class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
     protected function output($format) {
 
@@ -179,7 +191,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
 
 /**
  * include swipe api code and instantiate an object
- *
+ * @subpackage swipe2fa/functions
  * @return array list containing the api object and api config
  */
 function setup_swipe_api($ini_file) {
@@ -199,10 +211,9 @@ function setup_swipe_api($ini_file) {
 
 /**
  * start an api transaction
- *
+ * @subpackage swipe2fa/functions
  * @param $api object swipe api object
  * @param $api_config array api configuration fom the ini file
- *
  * @return void
  */
 function start_api($api, $api_config) {
@@ -218,12 +229,11 @@ function start_api($api, $api_config) {
 
 /**
  * check the 2fa state
- *
+ * @subpackage swipe2fa/functions
  * @param $api object swipe api object
  * @param $api_config array api configuration fom the ini file
  * @param $username string username used with the api
  * @param $address string ip address from the server REMOTE_ADDR value
- *
  * @return int api return code
  */
 function get_secondfactor_state($api, $api_config, $username, $address) {

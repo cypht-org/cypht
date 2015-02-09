@@ -1,7 +1,15 @@
 <?php
 
+/**
+ * Account modules
+ * @package modules
+ * @subpackage account
+ */
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage account/handler
+ */
 class Hm_Handler_process_change_password extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2'));
@@ -23,6 +31,9 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage account/handler
+ */
 class Hm_Handler_process_create_account extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('create_username', 'create_password', 'create_password_again'));
@@ -39,12 +50,18 @@ class Hm_Handler_process_create_account extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage account/handler
+ */
 class Hm_Handler_check_internal_users extends Hm_Handler_Module {
     public function process() {
         $this->out('internal_users', $this->session->internal_users);
     }
 }
 
+/**
+ * @subpackage account/output
+ */
 class Hm_Output_create_account_link extends Hm_Output_Module {
     protected function output($format) {
         if (!$this->get('router_login_state') && $this->get('internal_users')) {
@@ -53,12 +70,18 @@ class Hm_Output_create_account_link extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage account/output
+ */
 class Hm_Output_no_login extends Hm_Output_Module {
     protected function output($format) {
         return '';
     }
 }
 
+/**
+ * @subpackage account/output
+ */
 class Hm_Output_create_form extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('router_login_state')) {
@@ -81,6 +104,9 @@ class Hm_Output_create_form extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage account/output
+ */
 class Hm_Output_change_password extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -92,6 +118,5 @@ class Hm_Output_change_password extends Hm_Output_Module {
         return $res;
     }
 }
-
 
 ?>

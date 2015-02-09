@@ -1,8 +1,17 @@
 <?php
 
+/**
+ * SMTP libs
+ * @package modules
+ * @subpackage smtp
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
-/* SMTP connection manager */
+/**
+ * SMTP connection manager
+ * @subpackage smtp/lib
+ */
 class Hm_SMTP_List {
     
     use Hm_Server_List;
@@ -27,6 +36,10 @@ class Hm_SMTP_List {
     }
 }
 
+/**
+ * Connect to and interact with SMTP servers
+ * @subpackage smtp/lib
+ */
 class Hm_SMTP {
     private $config;
     private $server;
@@ -562,6 +575,10 @@ class Hm_SMTP {
     }
 }
 
+/**
+ * Build a MIME message
+ * @subpackage smtp/lib
+ */
 class Hm_MIME_Msg {
     private $headers = array('MIME-Version' => '1.0');
     private $body = '';

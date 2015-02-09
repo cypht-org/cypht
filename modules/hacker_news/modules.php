@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Hacker News modules
+ * @package modules
+ * @subpackage hackernews
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage hackernews/handler
+ */
 class Hm_Handler_hacker_news_fields extends Hm_Handler_Module {
     public function process() {
         $this->out('message_list_fields', array(
@@ -22,6 +31,9 @@ class Hm_Handler_hacker_news_fields extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage hackernews/handler
+ */
 class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
     public function process() {
         $list_type = 'top20';
@@ -51,6 +63,9 @@ class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage hackernews/output
+ */
 class Hm_Output_hacker_news_folders extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_top20"><a class="unread_link" href="?page=hacker_news&list_path=top20">'.
@@ -65,18 +80,27 @@ class Hm_Output_hacker_news_folders extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage hackernews/output
+ */
 class Hm_Output_hacker_news_heading extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="content_title">'.$this->trans('Hacker News').'</div>';
     }
 }
 
+/**
+ * @subpackage hackernews/output
+ */
 class Hm_Output_hacker_news_table_end extends Hm_Output_Module {
     protected function output($format) {
         return '</tbody></table>';
     }
 }
 
+/**
+ * @subpackage hackernews/output
+ */
 class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
     protected function output($format) {
         $res = array();
@@ -147,6 +171,10 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
         $this->out('formatted_message_list', $res);
     }
 }
+
+/**
+ * @subpackage hackernews/functions
+ */
 function comment_callback($vals, $style, $output_mod) {
     $item = $vals[0];
     $comments = 0;
@@ -156,6 +184,9 @@ function comment_callback($vals, $style, $output_mod) {
     return sprintf('<td>%d</td>', $comments);
 }
 
+/**
+ * @subpackage hackernews/functions
+ */
 function score_callback($vals, $style, $output_mod) {
     $item = $vals[0];
     $score = 0;
@@ -165,6 +196,9 @@ function score_callback($vals, $style, $output_mod) {
     return sprintf('<td>%d</td>', $score);
 }
 
+/**
+ * @subpackage hackernews/functions
+ */
 function curl_fetch_json($url) {
     $curl_handle=curl_init();
     curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 '.
