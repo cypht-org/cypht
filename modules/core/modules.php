@@ -687,9 +687,13 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
 }
 
 /**
+ * Simple search form for the folder list
  * @subpackage core/output
  */
 class Hm_Output_search_from_folder_list extends Hm_Output_Module {
+    /**
+     * Add a search form to the top of the folder list
+     */
     protected function output($format) {
         $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).
@@ -704,31 +708,45 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
 }
 
 /**
+ * Start the search results content section
  * @subpackage core/output
  */
 class Hm_Output_search_content_start extends Hm_Output_Module {
+    /**
+     * Leaves two open div tags that are closed in Hm_Output_search_content_end and Hm_Output_search_form
+     */
     protected function output($format) {
         return '<div class="search_content"><div class="content_title">'.$this->trans('Search');
     }
 }
 
 /**
+ * End of the search results content section
  * @subpackage core/output
  */
 class Hm_Output_search_content_end extends Hm_Output_Module {
+    /**
+     * Closes a div opened in Hm_Output_search_content_start
+     */
     protected function output($format) {
         return '</div>';
     }
 }
 
 /**
+ * Output the search form used on the search page
  * @subpackage core/output
  */
 class Hm_Output_search_form extends Hm_Output_Module {
+    /**
+     * Closes one of the divs left open in Hm_Output_search_content_start
+     */
     protected function output($format) {
         $terms = $this->get('search_terms', '');
-        $source_link = '<a href="#" title="Sources" class="source_link"><img alt="'.$this->trans('Sources').'" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
-        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.$this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+        $source_link = '<a href="#" title="Sources" class="source_link"><img alt="'.$this->trans('Sources').
+            '" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
+            $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
         $res = '<div class="search_form">'.
             '<form method="get"><input type="hidden" name="page" value="search" />'.
             ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
@@ -745,18 +763,25 @@ class Hm_Output_search_form extends Hm_Output_Module {
 }
 
 /**
+ * Closes the search results table
  * @subpackage core/output
  */
 class Hm_Output_search_results_table_end extends Hm_Output_Module {
+    /**
+     */
     protected function output($format) {
         return '</tbody></table>';
     }
 }
 
 /**
+ * Some inline JS used by the search page
  * @subpackage core/output
  */
 class Hm_Output_js_search_data extends Hm_Output_Module {
+    /**
+     * adds two JS functions used on the search page
+     */
     protected function output($format) {
         return '<script type="text/javascript">'.
             'var hm_search_terms = function() { return "'.$this->html_safe($this->get('search_terms', '')).'"; };'.
@@ -766,9 +791,13 @@ class Hm_Output_js_search_data extends Hm_Output_Module {
 }
 
 /**
+ * Outputs the login or logout form
  * @subpackage core/output
  */
 class Hm_Output_login extends Hm_Output_Module {
+    /**
+     * Looks at the current login state and outputs the correct form
+     */
     protected function output($format) {
         if (!$this->get('router_login_state')) {
             return '<form class="login_form" method="POST">'.
@@ -798,36 +827,52 @@ class Hm_Output_login extends Hm_Output_Module {
 }
 
 /**
+ * Start the content section for the servers page
  * @subpackage core/output
  */
 class Hm_Output_server_content_start extends Hm_Output_Module {
+    /**
+     * The server_content div is closed in Hm_Output_server_content_end
+     */
     protected function output($format) {
         return '<div class="content_title">'.$this->trans('Servers').'</div><div class="server_content">';
     }
 }
 
 /**
+ * Close the server content section
  * @subpackage core/output
  */
 class Hm_Output_server_content_end extends Hm_Output_Module {
+    /**
+     * Closes the div tag opened in Hm_Output_server_content_start
+     */
     protected function output($format) {
         return '</div>';
     }
 }
 
 /**
+ * Output a date
  * @subpackage core/output
  */
 class Hm_Output_date extends Hm_Output_Module {
+    /**
+     * Currently not show in the display (hidden with CSS)
+     */
     protected function output($format) {
         return '<div class="date">'.$this->html_safe($this->get('date')).'</div>';
     }
 }
 
 /**
+ * Display system messages
  * @subpackage core/output
  */
 class Hm_Output_msgs extends Hm_Output_Module {
+    /**
+     * Error level messages start with ERR and will be shown in red
+     */
     protected function output($format) {
         $res = '';
         $msgs = Hm_Msgs::get();
@@ -852,9 +897,13 @@ class Hm_Output_msgs extends Hm_Output_Module {
 }
 
 /**
+ * Start the HTML5 document
  * @subpackage core/output
  */
 class Hm_Output_header_start extends Hm_Output_Module {
+    /**
+     * Doctype, html, head, and a meta tag for charset. The head section is not closed yet
+     */
     protected function output($format) {
         $lang = 'en';
         $dir = 'ltr';
@@ -871,18 +920,27 @@ class Hm_Output_header_start extends Hm_Output_Module {
 }
 
 /**
+ * Close the HTML5 head tag
  * @subpackage core/output
  */
 class Hm_Output_header_end extends Hm_Output_Module {
+    /**
+     * Close the head tag opened in Hm_Output_header_start
+     */
     protected function output($format) {
         return '</head>';
     }
 }
 
 /**
+ * Start the content section
  * @subpackage core/output
  */
 class Hm_Output_content_start extends Hm_Output_Module {
+    /**
+     * Outputs the starting body tag and a noscript warning. Clears the local session cache
+     * if not logged in, or adds a page wide nonce used by ajax requests
+     */
     protected function output($format) {
         $res = '<body><noscript class="noscript">'.
             $this->trans(sprintf('You Need to have Javascript enabled to use %s, sorry about that!',
@@ -898,9 +956,13 @@ class Hm_Output_content_start extends Hm_Output_Module {
 }
 
 /**
+ * Outputs HTML5 head tag content
  * @subpackage core/output
  */
 class Hm_Output_header_content extends Hm_Output_Module {
+    /**
+     * Setup a title, base URL, a tab icon, and viewport settings
+     */
     protected function output($format) {
         $title = '';
         if (!$this->get('router_login_state')) {
@@ -929,9 +991,13 @@ class Hm_Output_header_content extends Hm_Output_Module {
 }
 
 /**
+ * Outputs CSS
  * @subpackage core/output
  */
 class Hm_Output_header_css extends Hm_Output_Module {
+    /**
+     * In debug mode adds each module css file to the page, otherwise uses the combined version
+     */
     protected function output($format) {
         $res = '';
         $mods = $this->get('router_module_list');
@@ -951,9 +1017,14 @@ class Hm_Output_header_css extends Hm_Output_Module {
 }
 
 /**
+ * Output JS
  * @subpackage core/output
  */
 class Hm_Output_page_js extends Hm_Output_Module {
+    /**
+     * In debug mode adds each module js file to the page, otherwise uses the combined version.
+     * Includes the zepto library.
+     */
     protected function output($format) {
         if (DEBUG_MODE) {
             $res = '';
@@ -982,9 +1053,13 @@ class Hm_Output_page_js extends Hm_Output_Module {
 }
 
 /**
+ * End the page content
  * @subpackage core/output
  */
 class Hm_Output_content_end extends Hm_Output_Module {
+    /**
+     * Closes the body and html tags
+     */
     protected function output($format) {
         if (defined('DEBUG_MODE') && DEBUG_MODE) {
             return '<div class="debug"></div></body></html>';
@@ -996,9 +1071,13 @@ class Hm_Output_content_end extends Hm_Output_Module {
 }
 
 /**
+ * Outputs page details for the JS
  * @subpackage core/output
  */
 class Hm_Output_js_data extends Hm_Output_Module {
+    /**
+     * Uses function wrappers to make the data immutable from JS
+     */
     protected function output($format) {
         return '<script type="text/javascript">'.
             'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.
@@ -1012,18 +1091,26 @@ class Hm_Output_js_data extends Hm_Output_Module {
 }
 
 /**
+ * Outputs a load icon
  * @subpackage core/output
  */
 class Hm_Output_loading_icon extends Hm_Output_Module {
+    /**
+     * Sort of ugly loading icon animated with js/css
+     */
     protected function output($format) {
         return '<div class="loading_icon"></div>';
     }
 }
 
 /**
+ * Start the main form on the settings page
  * @subpackage core/output
  */
 class Hm_Output_start_settings_form extends Hm_Output_Module {
+    /**
+     * Opens a div, form and table
+     */
     protected function output($format) {
         return '<div class="user_settings"><div class="content_title">'.$this->trans('Site Settings').'</div>'.
             '<form method="POST"><input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
@@ -1033,9 +1120,13 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
 }
 
 /**
+ * Outputs the list style option on the settings page
  * @subpackage core/output
  */
 class Hm_Output_list_style_setting extends Hm_Output_Module {
+    /**
+     * Can be either "news style" or the default "email style"
+     */
     protected function output($format) {
         $options = array('email_style' => 'Email', 'news_style' => 'News');
         $settings = $this->get('user_settings', array());
@@ -1062,9 +1153,13 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
 }
 
 /**
+ * Starts the Flagged section on the settings page
  * @subpackage core/output
  */
 class Hm_Output_start_flagged_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the flagged messages view
+     */
     protected function output($format) {
         return '<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />'.
@@ -1073,9 +1168,13 @@ class Hm_Output_start_flagged_settings extends Hm_Output_Module {
 }
 
 /**
+ * Start the Everything section on the settings page
  * @subpackage core/output
  */
 class Hm_Output_start_everything_settings extends Hm_Output_Module {
+    /**
+     * Setttings in this section control the Everything view
+     */
     protected function output($format) {
         return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$box.'" width="16" height="16" />'.
@@ -1084,9 +1183,13 @@ class Hm_Output_start_everything_settings extends Hm_Output_Module {
 }
 
 /**
+ * Start the Unread section on the settings page
  * @subpackage core/output
  */
 class Hm_Output_start_unread_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the Unread view
+     */
     protected function output($format) {
         return '<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
@@ -1095,9 +1198,14 @@ class Hm_Output_start_unread_settings extends Hm_Output_Module {
 }
 
 /**
+ * Start the E-mail section on the settings page.
  * @subpackage core/output
  */
 class Hm_Output_start_all_email_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the All E-mail view. Skipped if there are no
+     * E-mail enabled module sets.
+     */
     protected function output($format) {
         if (!email_is_active($this->get('router_module_list'))) {
             return '';
@@ -1109,9 +1217,13 @@ class Hm_Output_start_all_email_settings extends Hm_Output_Module {
 }
 
 /**
+ * Start the general settings section
  * @subpackage core/output
  */
 class Hm_Output_start_general_settings extends Hm_Output_Module {
+    /**
+     * General settings like langauge and timezone will go here
+     */
     protected function output($format) {
         return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$cog.'" width="16" height="16" />'.
@@ -1120,9 +1232,13 @@ class Hm_Output_start_general_settings extends Hm_Output_Module {
 }
 
 /**
+ * Option for the maximum number of messages per source for the Unread page
  * @subpackage core/output
  */
 class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_unread_source_max_setting
+     */
     protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
@@ -1136,9 +1252,13 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the "received since" date range for the Unread page
  * @subpackage core/output
  */
 class Hm_Output_unread_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_unread_since_setting
+     */
     protected function output($format) {
         $since = false;
         $settings = $this->get('user_settings', array());
@@ -1152,9 +1272,13 @@ class Hm_Output_unread_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the maximum number of messages per source for the Flagged page
  * @subpackage core/output
  */
 class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_flagged_source_max_setting
+     */
     protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
@@ -1168,10 +1292,14 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the "received since" date range for the Flagged page
  * @subpackage core/output
  */
 class Hm_Output_flagged_since_setting extends Hm_Output_Module {
     protected function output($format) {
+        /**
+         * Processed by Hm_Handler_process_flagged_since_setting
+         */
         $since = false;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('flagged_since', $settings)) {
@@ -1184,9 +1312,13 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the maximum number of messages per source for the All E-mail  page
  * @subpackage core/output
  */
 class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_email_source_max_setting
+     */
     protected function output($format) {
         if (!email_is_active($this->get('router_module_list'))) {
             return '';
@@ -1203,9 +1335,13 @@ class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the maximum number of messages per source for the Everything page
  * @subpackage core/output
  */
 class Hm_Output_all_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_source_max_setting
+     */
     protected function output($format) {
         $sources = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
@@ -1219,9 +1355,13 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the "received since" date range for the All E-mail page
  * @subpackage core/output
  */
 class Hm_Output_all_email_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_email_since_setting
+     */
     protected function output($format) {
         if (!email_is_active($this->get('router_module_list'))) {
             return '';
@@ -1238,9 +1378,13 @@ class Hm_Output_all_email_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the "received since" date range for the Everything page
  * @subpackage core/output
  */
 class Hm_Output_all_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_since_setting
+     */
     protected function output($format) {
         $since = false;
         $settings = $this->get('user_settings', array());
@@ -1254,9 +1398,13 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the language setting
  * @subpackage core/output
  */
 class Hm_Output_language_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_language_setting
+     */
     protected function output($format) {
         $langs = interface_langs();
         $translated = array();
@@ -1281,9 +1429,13 @@ class Hm_Output_language_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the timezone setting
  * @subpackage core/output
  */
 class Hm_Output_timezone_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_timezone_setting
+     */
     protected function output($format) {
         $zones = timezone_identifiers_list();
         $settings = $this->get('user_settings', array());
@@ -1308,9 +1460,13 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
 }
 
 /**
+ * Ends the settings table
  * @subpackage core/output
  */
 class Hm_Output_end_settings_form extends Hm_Output_Module {
+    /**
+     * Closes the table, form and div opened in Hm_Output_start_settings_form
+     */
     protected function output($format) {
         return '<tr><td class="submit_cell" colspan="2">'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
@@ -1322,9 +1478,13 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
 }
 
 /**
+ * Start the folder list
  * @subpackage core/output
  */
 class Hm_Output_folder_list_start extends Hm_Output_Module {
+    /**
+     * Opens the folder list nav tag
+     */
     protected function output($format) {
         $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
             '<nav class="folder_cell"><div class="folder_list">';
@@ -1333,9 +1493,13 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
 }
 
 /**
+ * Start the folder list content
  * @subpackage core/output
  */
 class Hm_Output_folder_list_content_start extends Hm_Output_Module {
+    /**
+     * Creates a modfiable string called formatted_folder_list other modules append to
+     */
     protected function output($format) {
         if ($format == 'HTML5') {
             return '';
@@ -1345,9 +1509,13 @@ class Hm_Output_folder_list_content_start extends Hm_Output_Module {
 }
 
 /**
+ * Start the Main menu section of the folder list
  * @subpackage core/output
  */
 class Hm_Output_main_menu_start extends Hm_Output_Module {
+    /**
+     * Opens a div and unordered list tag
+     */
     protected function output($format) {
         $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main').
         '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
@@ -1360,9 +1528,14 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
 }
 
 /**
+ * Content for the Main menu section of the folder list
  * @subpackage core/output
  */
 class Hm_Output_main_menu_content extends Hm_Output_Module {
+    /**
+     * Links to default pages: Home, Everything, Unread and Flagged
+     * @todo break this up into smaller modules
+     */
     protected function output($format) {
         $email = false;
         if (in_array('email_folders', $this->get('folder_sources', array()))) {
@@ -1389,6 +1562,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
 }
 
 /**
+ * Outputs the logout link in the Main menu of the folder list
  * @subpackage core/output
  */
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
@@ -1404,6 +1578,7 @@ class Hm_Output_logout_menu_item extends Hm_Output_Module {
 }
 
 /**
+ * Close the Main menu section of the folder list
  * @subpackage core/output
  */
 class Hm_Output_main_menu_end extends Hm_Output_Module {
@@ -1417,9 +1592,13 @@ class Hm_Output_main_menu_end extends Hm_Output_Module {
 }
 
 /**
+ * Output the E-mail section of the folder list
  * @subpackage core/output
  */
 class Hm_Output_email_menu_content extends Hm_Output_Module {
+    /**
+     * Displays a list of all configured E-mail accounts
+     */
     protected function output($format) {
         $res = '';
         $folder_sources = array_unique($this->get('folder_sources', array()));
@@ -1452,9 +1631,13 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
 }
 
 /**
+ * Start the Settings section of the folder list
  * @subpackage core/output
  */
 class Hm_Output_settings_menu_start extends Hm_Output_Module {
+    /**
+     * Opens an unordered list
+     */
     protected function output($format) {
         $res = '<div class="src_name" data-source=".settings">'.$this->trans('Settings').
             '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
@@ -1467,9 +1650,13 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
 }
 
 /**
+ * Content for the Settings menu section of the folder list
  * @subpackage core/output
  */
 class Hm_Output_settings_menu_content extends Hm_Output_Module {
+    /**
+     * Outputs links to the Servers and Site Settings pages
+     */
     protected function output($format) {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).
@@ -1485,9 +1672,13 @@ class Hm_Output_settings_menu_content extends Hm_Output_Module {
 }
 
 /**
+ * Closes the Settings menu in the folder list
  * @subpackage core/output
  */
 class Hm_Output_settings_menu_end extends Hm_Output_Module {
+    /**
+     * Closes the ul tag opened in Hm_Output_settings_menu_start
+     */
     protected function output($format) {
         $res = '</ul>';
         if ($format == 'HTML5') {
@@ -1498,9 +1689,13 @@ class Hm_Output_settings_menu_end extends Hm_Output_Module {
 }
 
 /**
+ * End of the content section of the folder list
  * @subpackage core/output
  */
 class Hm_Output_folder_list_content_end extends Hm_Output_Module {
+    /**
+     * Adds collapse and reload links
+     */
     protected function output($format) {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
         $res .= '<a href="#" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.
@@ -1513,36 +1708,52 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
 }
 
 /**
+ * Closes the folder list
  * @subpackage core/output
  */
 class Hm_Output_folder_list_end extends Hm_Output_Module {
+    /**
+     * Closes the div and nav tags opened in Hm_Output_folder_list_start
+     */
     protected function output($format) {
         return '</div></nav>';
     }
 }
 
 /**
+ * Starts the main content section
  * @subpackage core/output
  */
 class Hm_Output_content_section_start extends Hm_Output_Module {
+    /**
+     * Opens a main tag for the primary content section
+     */
     protected function output($format) {
         return '<main class="content_cell">';
     }
 }
 
 /**
+ * Closes the main content section
  * @subpackage core/output
  */
 class Hm_Output_content_section_end extends Hm_Output_Module {
+    /**
+     * Closes the main tag opened in Hm_Output_content_section_start
+     */
     protected function output($format) {
         return '</main>';
     }
 }
 
 /**
+ * Starts a status table used on the home page
  * @subpackage core/output
  */
 class Hm_Output_server_status_start extends Hm_Output_Module {
+    /**
+     * Modules populate this table to run a status check from the home page
+     */
     protected function output($format) {
         $res = '<div class="server_status"><div class="content_title">'.$this->trans('Home').'</div>';
         $res .= '<table><thead><tr><th>'.$this->trans('Type').'</th><th>'.$this->trans('Name').'</th><th>'.
@@ -1552,18 +1763,26 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
 }
 
 /**
+ * Close the status table used on the home page
  * @subpackage core/output
  */
 class Hm_Output_server_status_end extends Hm_Output_Module {
+    /**
+     * Close the table opened in Hm_Output_server_status_start
+     */
     protected function output($format) {
         return '</tbody></table></div>';
     }
 }
 
 /**
+ * Starts the message view page
  * @subpackage core/output
  */
 class Hm_Output_message_start extends Hm_Output_Module {
+    /**
+     * @todo this is pretty ugly, clean it up and remove module specific stuff
+     */
     protected function output($format) {
         if ($this->in('list_parent', array('search', 'flagged', 'combined_inbox', 'unread', 'feeds', 'email'))) {
             if ($this->get('list_parent') == 'combined_inbox') {
@@ -1607,18 +1826,26 @@ class Hm_Output_message_start extends Hm_Output_Module {
 }
 
 /**
+ * Close the message view content section
  * @subpackage core/output
  */
 class Hm_Output_message_end extends Hm_Output_Module {
+    /**
+     * Closes the div opened in Hm_Output_message_start
+     */
     protected function output($format) {
         return '</div>';
     }
 }
 
 /**
+ * Not found content for a bad page request
  * @subpackage core/output
  */
 class Hm_Output_notfound_content extends Hm_Output_Module {
+    /**
+     * Simple "page not found" page content
+     */
     protected function output($format) {
         $res = '<div class="content_title">'.$this->trans('Page Not Found!').'</div>';
         $res .= '<div class="empty_list"><br />'.$this->trans('Nothingness').'</div>';
@@ -1627,9 +1854,13 @@ class Hm_Output_notfound_content extends Hm_Output_Module {
 }
 
 /**
+ * Start the table for a message list
  * @subpackage core/output
  */
 class Hm_Output_message_list_start extends Hm_Output_Module {
+    /**
+     * Uses the message_list_fields input to determine the format.
+     */
     protected function output($format) {
 
         $col_flds = array();
@@ -1660,10 +1891,13 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
 }
 
 /**
+ * Output the heading for a message list
  * @subpackage core/output
- * @todo remove modle specific stuff
  */
 class Hm_Output_message_list_heading extends Hm_Output_Module {
+    /**
+     * @todo remove modle specific stuff
+     */
     protected function output($format) {
         if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds', 'email'))) {
             $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
@@ -1696,9 +1930,13 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
 }
 
 /**
+ * End a message list table
  * @subpackage core/output
  */
 class Hm_Output_message_list_end extends Hm_Output_Module {
+    /**
+     * Close the table opened in Hm_Output_message_list_start
+     */
     protected function output($format) {
         $res = '</tbody></table><div class="page_links"></div></div>';
         return $res;
