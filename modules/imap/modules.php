@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Core modules
+ * IMAP modules
  * @package modules
  * @subpackage imap
  */
