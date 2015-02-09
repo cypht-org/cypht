@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Profile modules
+ * @package modules
+ * @subpackage profile
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage profile/output
+ */
 class Hm_Output_profile_page_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">'.
@@ -13,6 +22,9 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage profile/output
+ */
 class Hm_Output_profile_content extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="profile_content"><div class="content_title">'.$this->trans('Profiles').'</div></div>';

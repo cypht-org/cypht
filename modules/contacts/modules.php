@@ -1,9 +1,18 @@
 <?php
 
+/**
+ * Contact modules
+ * @package modules
+ * @subpackage contacts
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/contacts/hm-vcard.php';
 
+/**
+ * @subpackage contacts/output
+ */
 class Hm_Output_contacts_page_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_contacts"><a class="unread_link" href="?page=contacts">'.
@@ -15,6 +24,9 @@ class Hm_Output_contacts_page_link extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage contacts/output
+ */
 class Hm_Output_contacts_content extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="contacts_content"><div class="content_title">'.$this->trans('Contacts').'</div></div>';

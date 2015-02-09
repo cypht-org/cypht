@@ -1,8 +1,17 @@
 <?php
 
+/**
+ * POP3 modules
+ * @package modules
+ * @subpackage pop3
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
-/* POP3 connection manager */
+/**
+ * POP3 connection manager
+ * @subpackage pop3/lib
+ */
 class Hm_POP3_List {
     
     use Hm_Server_List;
@@ -26,6 +35,7 @@ class Hm_POP3_List {
 
 /**
  * Authenticate against a POP3 server
+ * @subpackage pop3/lib
  */
 class Hm_Auth_POP3 extends Hm_Auth {
 
@@ -80,10 +90,18 @@ class Hm_Auth_POP3 extends Hm_Auth {
     }
 }
 
+/**
+ * Used to mark messages as "read"
+ * @subpackage pop3/lib
+ */
 class Hm_POP3_Seen_Cache {
     use Hm_Uid_Cache;
 }
 
+/**
+ * Connect to and interact with POP3 servers
+ * @subpackage pop3/lib
+ */
 class Hm_POP3 {
     var $server;
     var $starttls;

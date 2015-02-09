@@ -1,9 +1,18 @@
 <?php
 
+/**
+ * SMTP modules
+ * @package modules
+ * @subpackage smtp
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/smtp/hm-smtp.php';
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('smtp_servers', array());
@@ -13,6 +22,9 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['submit_smtp_server'])) {
@@ -43,6 +55,9 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_SMTP_List::dump();
@@ -50,6 +65,9 @@ class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_SMTP_List::dump(false, true);
@@ -57,6 +75,9 @@ class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_save extends Hm_Handler_Module {
     public function process() {
         $just_saved_credentials = false;
@@ -81,6 +102,9 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_forget extends Hm_Handler_Module {
     public function process() {
         $just_forgot_credentials = false;
@@ -100,6 +124,9 @@ class Hm_Handler_smtp_forget extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_delete extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['smtp_delete'])) {
@@ -119,6 +146,9 @@ class Hm_Handler_smtp_delete extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_connect extends Hm_Handler_Module {
     public function process() {
         $smtp = false;
@@ -143,6 +173,9 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('smtp_send', $this->request->post)) {
@@ -187,6 +220,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage smtp/output
+ */
 class Hm_Output_compose_form extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
@@ -200,6 +236,9 @@ class Hm_Output_compose_form extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage smtp/output
+ */
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
     protected function output($format) {
         $count = $this->get('smtp_servers', array());
@@ -221,6 +260,9 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage smtp/output
+ */
 class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -272,6 +314,9 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage smtp/output
+ */
 class Hm_Output_compose_page_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
@@ -284,6 +329,9 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage smtp/functions
+ */
 function smtp_server_dropdown($data, $output_mod) {
     $res = '<select name="smtp_server_id" class="compose_server">';
     if (array_key_exists('smtp_servers', $data)) {
@@ -295,6 +343,9 @@ function smtp_server_dropdown($data, $output_mod) {
     return $res;
 }
 
+/**
+ * @subpackage smtp/functions
+ */
 function build_mime_msg($to, $subject, $body, $from) {
     $headers = array(
         'from' => $from,

@@ -1,9 +1,18 @@
 <?php
 
+/**
+ * Feeds modules
+ * @package modules
+ * @subpackage feeds
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/feeds/hm-feed.php';
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_feed_list_type extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
@@ -28,6 +37,9 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'feed_limit'));
@@ -51,6 +63,9 @@ class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_process_feed_since_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'feed_since'));
@@ -68,6 +83,9 @@ class Hm_Handler_process_feed_since_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_process_unread_feeds_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings'));
@@ -90,6 +108,9 @@ class Hm_Handler_process_unread_feeds_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_feed_connect extends Hm_Handler_Module {
     public function process() {
         $failed = true; 
@@ -112,6 +133,9 @@ class Hm_Handler_feed_connect extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_delete_feed extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['delete_feed'])) {
@@ -132,6 +156,9 @@ class Hm_Handler_delete_feed extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_feed_status extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
@@ -153,6 +180,9 @@ class Hm_Handler_feed_status extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_feed_message_action extends Hm_Handler_Module {
     public function process() {
 
@@ -177,6 +207,9 @@ class Hm_Handler_feed_message_action extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
@@ -254,6 +287,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_feed_item_content extends Hm_Handler_Module {
     public function process() {
         $content = '';
@@ -302,6 +338,9 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_process_add_feed extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['submit_feed'])) {
@@ -361,6 +400,9 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
     public function process() {
         $feeds = $this->user_config->get('feeds', array());
@@ -371,6 +413,9 @@ class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
     public function process() {
         $excluded = false;
@@ -388,6 +433,9 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
     public function process() {
         foreach (Hm_Feed_List::dump() as $index => $vals) {
@@ -397,6 +445,9 @@ class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
     public function process() {
         $callback = false;
@@ -437,6 +488,9 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_save_feeds extends Hm_Handler_Module {
     public function process() {
         $feeds = Hm_Feed_List::dump();
@@ -445,6 +499,9 @@ class Hm_Handler_save_feeds extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/handler
+ */
 class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
     public function process() {
         $feeds = Hm_Feed_List::dump();
@@ -458,6 +515,9 @@ class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_add_feed_dialog extends Hm_Output_Module {
     protected function output($format) {
         if ($format == 'HTML5') {
@@ -478,6 +538,9 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_display_configured_feeds extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -499,12 +562,18 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_feed_ids extends Hm_Output_Module {
     protected function output($format) {
         return '<input type="hidden" class="feed_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('feeds', array())))).'" />';
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('feed_message_content')) {
@@ -533,6 +602,9 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
     protected function output($format) {
         $res = array();
@@ -640,6 +712,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_filter_feed_folders extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -658,6 +733,9 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_display_feeds_status extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -669,6 +747,9 @@ class Hm_Output_display_feeds_status extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_unread_feeds_included extends Hm_Output_Module {
     protected function output($format) {
         $settings = $this->get('user_settings');
@@ -683,6 +764,9 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('feed_connect_status') == 'Connected') {
@@ -695,6 +779,9 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output($format) {
         return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle">'.
@@ -702,6 +789,9 @@ class Hm_Output_start_feed_settings extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_feed_since_setting extends Hm_Output_Module {
     protected function output($format) {
         $since = false;
@@ -714,6 +804,9 @@ class Hm_Output_feed_since_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_feed_limit_setting extends Hm_Output_Module {
     protected function output($format) {
         $limit = DEFAULT_PER_SOURCE;
@@ -726,6 +819,9 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage feeds/functions
+ */
 function address_from_url($str) {
     $res = $str;
     $url_bits = parse_url($str);
@@ -735,6 +831,9 @@ function address_from_url($str) {
     return $res;
 }
 
+/**
+ * @subpackage feeds/functions
+ */
 function is_feed($url, $limit=20) {
     $feed = new Hm_Feed();
     $feed->limit = $limit;
@@ -748,6 +847,9 @@ function is_feed($url, $limit=20) {
     }
 }
 
+/**
+ * @subpackage feeds/functions
+ */
 function search_for_feeds($html) {
     $type = false;
     $href = false;
@@ -766,6 +868,9 @@ function search_for_feeds($html) {
     return array($type, $href);
 }
 
+/**
+ * @subpackage feeds/functions
+ */
 function search_feed_item($item, $terms, $since, $fld) {
 
     if (array_key_exists('pubdate', $item)) {

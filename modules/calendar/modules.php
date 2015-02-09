@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Calendar modules
+ * @package modules
+ * @subpackage calendar
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage calendar/handler
+ */
 class Hm_Handler_get_calendar_date extends Hm_Handler_Module {
     public function process() {
         $date = date('r');
@@ -19,6 +28,9 @@ class Hm_Handler_get_calendar_date extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage calendar/output
+ */
 class Hm_Output_calendar_page_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_calendar"><a class="unread_link" href="?page=calendar">'.
@@ -30,6 +42,9 @@ class Hm_Output_calendar_page_link extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage calendar/output
+ */
 class Hm_Output_calendar_content extends Hm_Output_Module {
     protected function output($format) {
         $date = $this->get('calendar_date', date('r'));
@@ -43,6 +58,9 @@ class Hm_Output_calendar_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage calendar/lib
+ */
 class Hm_Cal_Output {
 
     private $output_mod;
@@ -146,6 +164,9 @@ class Hm_Cal_Output {
     }
 }
 
+/**
+ * @subpackage calendar/lib
+ */
 class Hm_Cal_Data {
 
     private $ts = false;

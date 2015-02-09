@@ -1,7 +1,17 @@
 <?php
 
+/**
+ * Feeds modules
+ * @package modules
+ * @subpackage feeds
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * Manage a list of feeds
+ * @subpackage feeds/lib
+ */
 class Hm_Feed_List {
 
     use Hm_Server_List;
@@ -15,10 +25,18 @@ class Hm_Feed_List {
     }
 }
 
+/**
+ * Used to cahce "read" feed item ids
+ * @subpackage feeds/lib
+ */
 class Hm_Feed_Seen_Cache {
     use Hm_Uid_Cache;
 }
 
+/**
+ * Connect to and parse RSS/ATOM feeds
+ * @subpackage feeds/lib
+ */
 class Hm_Feed {
     var $url;
     var $id;
@@ -293,4 +311,5 @@ class Hm_Feed {
         }
     }
 }
+
 ?>

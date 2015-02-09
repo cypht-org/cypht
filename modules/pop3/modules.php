@@ -1,9 +1,18 @@
 <?php
 
+/**
+ * POP3 modules
+ * @package modules
+ * @subpackage pop3
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/pop3/hm-pop3.php';
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
@@ -27,6 +36,9 @@ class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'pop3_limit'));
@@ -50,6 +62,9 @@ class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_process_pop3_since_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'pop3_since'));
@@ -67,6 +82,9 @@ class Hm_Handler_process_pop3_since_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_status extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('pop3_server_ids'));
@@ -85,6 +103,9 @@ class Hm_Handler_pop3_status extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
     public function process() {
 
@@ -107,6 +128,9 @@ class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
     public function process() {
 
@@ -186,6 +210,9 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
     public function process() {
 
@@ -231,6 +258,9 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_save extends Hm_Handler_Module {
     public function process() {
         $just_saved_credentials = false;
@@ -255,6 +285,9 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_forget extends Hm_Handler_Module {
     public function process() {
         $just_forgot_credentials = false;
@@ -274,6 +307,9 @@ class Hm_Handler_pop3_forget extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_delete extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['pop3_delete'])) {
@@ -293,6 +329,9 @@ class Hm_Handler_pop3_delete extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_pop3_connect extends Hm_Handler_Module {
     public function process() {
         $pop3 = false;
@@ -314,6 +353,9 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_load_pop3_cache extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_POP3_List::dump();
@@ -325,11 +367,17 @@ class Hm_Handler_load_pop3_cache extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_save_pop3_cache extends Hm_Handler_Module {
     public function process() {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_load_pop3_servers_for_search extends Hm_Handler_Module {
     public function process() {
         foreach (Hm_POP3_List::dump() as $index => $vals) {
@@ -338,6 +386,9 @@ class Hm_Handler_load_pop3_servers_for_search extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_load_pop3_servers_for_message_list extends Hm_Handler_Module {
     public function process() {
         $server_id = false;
@@ -376,6 +427,9 @@ class Hm_Handler_load_pop3_servers_for_message_list extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('pop3_servers', array());
@@ -404,6 +458,9 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['submit_pop3_server'])) {
@@ -434,6 +491,9 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_POP3_List::dump();
@@ -444,6 +504,9 @@ class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_load_pop3_folders extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_POP3_List::dump();
@@ -460,6 +523,9 @@ class Hm_Handler_load_pop3_folders extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/handler
+ */
 class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_POP3_List::dump(false, true);
@@ -469,6 +535,9 @@ class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
     protected function output($format) {
         $count = count($this->get('pop3_servers', array()));
@@ -490,6 +559,9 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -541,6 +613,9 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -555,6 +630,9 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('pop3_message_headers')) {
@@ -610,6 +688,9 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
     protected function output($format) {
         $formatted_message_list = array();
@@ -630,12 +711,18 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_pop3_server_ids extends Hm_Output_Module {
     protected function output($format) {
         return '<input type="hidden" class="pop3_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('pop3_servers', array())))).'" />';
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_display_pop3_status extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
@@ -650,6 +737,9 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_start_pop3_settings extends Hm_Output_Module {
     protected function output($format) {
         return '<tr><td data-target=".pop3_setting" colspan="2" class="settings_subtitle">'.
@@ -657,6 +747,9 @@ class Hm_Output_start_pop3_settings extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_pop3_since_setting extends Hm_Output_Module {
     protected function output($format) {
         $since = false;
@@ -669,6 +762,9 @@ class Hm_Output_pop3_since_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
     protected function output($format) {
         $limit = DEFAULT_PER_SOURCE;
@@ -681,6 +777,9 @@ class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pop3/output
+ */
 class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
     protected function output($format) {
         if ($this->get('pop3_connect_status') == 'Authenticated') {
@@ -694,6 +793,9 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
 }
 
 
+/**
+ * @subpackage pop3/functions
+ */
 function format_pop3_message_list($msg_list, $output_module, $style, $login_time, $list_parent) {
     $res = array();
     foreach($msg_list as $msg_id => $msg) {
@@ -753,6 +855,9 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
     return $res;
 }
 
+/**
+ * @subpackage pop3/functions
+ */
 function search_pop3_msg($body, $headers, $terms, $fld) {
     if ($fld == 'TEXT') {
         if (stristr($body, $terms)) {

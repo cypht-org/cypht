@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Info modules
+ * @package modules
+ * @subpackage info
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage info/output
+ */
 class Hm_Output_dev_content extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="dev_content"><div class="content_title">'.$this->trans('Developer Documentation').'</div>'.
@@ -9,6 +18,9 @@ class Hm_Output_dev_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage info/output
+ */
 class Hm_Output_bug_report_form extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="bug_report"><div class="content_title">'.$this->trans('Report a bug').'</div>'.
@@ -16,6 +28,9 @@ class Hm_Output_bug_report_form extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage info/output
+ */
 class Hm_Output_help_content extends Hm_Output_Module {
     protected function output($format) {
         return '<div class="help_content"><div class="content_title">'.$this->trans('Help').'</div>'.
@@ -23,6 +38,9 @@ class Hm_Output_help_content extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage info/output
+ */
 class Hm_Output_developer_doc_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">'.
@@ -34,6 +52,9 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage info/output
+ */
 class Hm_Output_bug_report_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_bug_report"><a class="unread_link" href="?page=bug_report">'.
@@ -45,6 +66,9 @@ class Hm_Output_bug_report_link extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage info/output
+ */
 class Hm_Output_help_page_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_help"><a class="unread_link" href="?page=help">'.
@@ -55,6 +79,5 @@ class Hm_Output_help_page_link extends Hm_Output_Module {
         $this->concat('formatted_folder_list', $res);
     }
 }
-
 
 ?>

@@ -1,7 +1,15 @@
 <?php
 
+/**
+ * WordPress modules
+ * @package modules
+ * @subpackage wordpress
+ */
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage wordpress/output
+ */
 class Hm_Output_wordpress_folders extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=wordpress&list_path=wp_notifications">'.
@@ -12,7 +20,5 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
         return '';
     }
 }
-
-
 
 ?>

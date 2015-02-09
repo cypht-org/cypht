@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Contacts modules
+ * @package modules
+ * @subpackage contacts
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage contacts/lib
+ */
 class Hm_Vcard_Reader {
 
     public function __construct($vcard_data) {
@@ -18,6 +27,9 @@ class Hm_Vcard_Reader {
 
 }
 
+/**
+ * @subpackage contacts/lib
+ */
 class Hm_Vcard_Store {
 
     private $cards = array();
@@ -49,6 +61,9 @@ class Hm_Vcard_Store {
     }
 }
 
+/**
+ * @subpackage contacts/lib
+ */
 class Hm_Vcard {
 
     private $data = array();

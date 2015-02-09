@@ -1,8 +1,16 @@
-
 <?php
+
+/**
+ * Idle timer modules
+ * @package modules
+ * @subpackage idletimer
+ */
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage idletimer/handler
+ */
 class Hm_Handler_process_idle_time extends Hm_Handler_Module {
     public function process() {
         $idle_time = 0;
@@ -17,6 +25,9 @@ class Hm_Handler_process_idle_time extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage idletimer/handler
+ */
 class Hm_Handler_process_idle_time_setting extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'idle_time'));
@@ -39,6 +50,9 @@ class Hm_Handler_process_idle_time_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage idletimer/output
+ */
 class Hm_Output_idle_time_setting extends Hm_Output_Module {
     protected function output($format) {
         $options = array(
