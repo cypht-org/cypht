@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_MIME_Msg | Cypht Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?3954677913"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.html">account<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.account.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.calendar.html">calendar<span></span></a>
+						<ul>
+				<li><a href="package-modules.calendar.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.calendar.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.calendar.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.contacts.html">contacts<span></span></a>
+						<ul>
+				<li><a href="package-modules.contacts.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.contacts.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.feeds.html">feeds<span></span></a>
+						<ul>
+				<li><a href="package-modules.feeds.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.feeds.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.feeds.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.feeds.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.hackernews.html">hackernews<span></span></a>
+						<ul>
+				<li><a href="package-modules.hackernews.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.hackernews.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.hackernews.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.helloworld.html">helloworld<span></span></a>
+						<ul>
+				<li><a href="package-modules.helloworld.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.idletimer.html">idletimer<span></span></a>
+						<ul>
+				<li><a href="package-modules.idletimer.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.idletimer.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.imap.html">imap<span></span></a>
+						<ul>
+				<li><a href="package-modules.imap.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.imap.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.imap.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.imap.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.info.html">info<span></span></a>
+						<ul>
+				<li><a href="package-modules.info.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.pop3.html">pop3<span></span></a>
+						<ul>
+				<li><a href="package-modules.pop3.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.pop3.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.pop3.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.pop3.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.profile.html">profile<span></span></a>
+						<ul>
+				<li><a href="package-modules.profile.output.html">output</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.smtp.html">smtp<span></span></a>
+						<ul>
+				<li><a href="package-modules.smtp.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.smtp.handler.html">handler</a>
+						</li>
+				<li class="active"><a href="package-modules.smtp.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.smtp.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.swipe2fa.html">swipe2fa<span></span></a>
+						<ul>
+				<li><a href="package-modules.swipe2fa.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.wordpress.html">wordpress<span></span></a>
+						<ul>
+				<li><a href="package-modules.wordpress.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Hm_MIME_Msg.html">Hm_MIME_Msg</a></li>
+				<li><a href="class-Hm_SMTP.html">Hm_SMTP</a></li>
+				<li><a href="class-Hm_SMTP_List.html">Hm_SMTP_List</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-modules.smtp.lib.html" title="Summary of modules\smtp\lib"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_MIME_Msg</h1>
+
+
+	<div class="description">
+	
+<p>Build a MIME message</p>
+
+	</div>
+
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.smtp.html">smtp</a>\<a href="package-modules.smtp.lib.html">lib</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_MIME_Msg.html#578-798" title="Go to source code">smtp/hm-smtp.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#588-594" title="Go to source code">__construct</a>( <span>mixed <var>$to</var></span>, <span>mixed <var>$subject</var></span>, <span>mixed <var>$body</var></span>, <span>mixed <var>$from</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_mime_msg" id="_get_mime_msg">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_mime_msg">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#597-603" title="Go to source code">get_mime_msg</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="match_email_full" id="_match_email_full">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_match_email_full">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#606-638" title="Go to source code">match_email_full</a>( <span>mixed <var>$val</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="validate_local_full" id="_validate_local_full">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_validate_local_full">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#640-655" title="Go to source code">validate_local_full</a>( <span>mixed <var>$val</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="validate_domain_full" id="_validate_domain_full">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_validate_domain_full">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#657-664" title="Go to source code">validate_domain_full</a>( <span>mixed <var>$val</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="encode_header_fld" id="_encode_header_fld">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_encode_header_fld">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#666-707" title="Go to source code">encode_header_fld</a>( <span>mixed <var>$input</var></span>, <span>mixed <var>$email</var> = <span class="php-keyword1">true</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_recipient_addresses" id="_get_recipient_addresses">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_recipient_addresses">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#709-744" title="Go to source code">get_recipient_addresses</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="prep_message_body" id="_prep_message_body">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_prep_message_body">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#746-761" title="Go to source code">prep_message_body</a>( <span>mixed <var>$body</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="qp_encode" id="_qp_encode">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_qp_encode">#</a>
+		<code><a href="source-class-Hm_MIME_Msg.html#763-797" title="Go to source code">qp_encode</a>( <span>mixed <var>$string</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="headers" id="$headers">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_MIME_Msg.html#583" title="Go to source code"><var>$headers</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>(<span class="php-quote">'MIME-Version'</span> =&gt; <span class="php-quote">'1.0'</span>)</code></td>
+		<td class="description"><div>
+			<a href="#$headers" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="body" id="$body">
+		<td class="attributes"><code>
+			private  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_MIME_Msg.html#584" title="Go to source code"><var>$body</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">''</span></code></td>
+		<td class="description"><div>
+			<a href="#$body" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="allow_unqualified_addresses" id="$allow_unqualified_addresses">
+		<td class="attributes"><code>
+			private  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_MIME_Msg.html#585" title="Go to source code"><var>$allow_unqualified_addresses</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$allow_unqualified_addresses" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

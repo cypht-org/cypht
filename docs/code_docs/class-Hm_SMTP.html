@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_SMTP | Cypht Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?3954677913"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.html">account<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.account.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.calendar.html">calendar<span></span></a>
+						<ul>
+				<li><a href="package-modules.calendar.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.calendar.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.calendar.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.contacts.html">contacts<span></span></a>
+						<ul>
+				<li><a href="package-modules.contacts.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.contacts.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.feeds.html">feeds<span></span></a>
+						<ul>
+				<li><a href="package-modules.feeds.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.feeds.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.feeds.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.feeds.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.hackernews.html">hackernews<span></span></a>
+						<ul>
+				<li><a href="package-modules.hackernews.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.hackernews.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.hackernews.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.helloworld.html">helloworld<span></span></a>
+						<ul>
+				<li><a href="package-modules.helloworld.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.idletimer.html">idletimer<span></span></a>
+						<ul>
+				<li><a href="package-modules.idletimer.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.idletimer.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.imap.html">imap<span></span></a>
+						<ul>
+				<li><a href="package-modules.imap.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.imap.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.imap.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.imap.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.info.html">info<span></span></a>
+						<ul>
+				<li><a href="package-modules.info.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.pop3.html">pop3<span></span></a>
+						<ul>
+				<li><a href="package-modules.pop3.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.pop3.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.pop3.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.pop3.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.profile.html">profile<span></span></a>
+						<ul>
+				<li><a href="package-modules.profile.output.html">output</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.smtp.html">smtp<span></span></a>
+						<ul>
+				<li><a href="package-modules.smtp.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.smtp.handler.html">handler</a>
+						</li>
+				<li class="active"><a href="package-modules.smtp.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.smtp.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.swipe2fa.html">swipe2fa<span></span></a>
+						<ul>
+				<li><a href="package-modules.swipe2fa.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.wordpress.html">wordpress<span></span></a>
+						<ul>
+				<li><a href="package-modules.wordpress.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Hm_MIME_Msg.html">Hm_MIME_Msg</a></li>
+				<li class="active"><a href="class-Hm_SMTP.html">Hm_SMTP</a></li>
+				<li><a href="class-Hm_SMTP_List.html">Hm_SMTP_List</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-modules.smtp.lib.html" title="Summary of modules\smtp\lib"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_SMTP</h1>
+
+
+	<div class="description">
+	
+<p>Connect to and interact with SMTP servers</p>
+
+	</div>
+
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.smtp.html">smtp</a>\<a href="package-modules.smtp.lib.html">lib</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_SMTP.html#39-576" title="Go to source code">smtp/hm-smtp.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Hm_SMTP.html#66-111" title="Go to source code">__construct</a>( <span>mixed <var>$conf</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="send_command" id="_send_command">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_send_command">#</a>
+		<code><a href="source-class-Hm_SMTP.html#114-119" title="Go to source code">send_command</a>( <span>mixed <var>$command</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="get_response" id="_get_response">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_response">#</a>
+		<code><a href="source-class-Hm_SMTP.html#125-153" title="Go to source code">get_response</a>( <span>mixed <var>$chunked</var> = <span class="php-keyword1">true</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parse_line" id="_parse_line">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parse_line">#</a>
+		<code><a href="source-class-Hm_SMTP.html#156-167" title="Go to source code">parse_line</a>( <span>mixed <var>$line</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="compare_response" id="_compare_response">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_compare_response">#</a>
+		<code><a href="source-class-Hm_SMTP.html#174-190" title="Go to source code">compare_response</a>( <span>mixed <var>$chunked_response</var></span>, <span>mixed <var>$check</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="capabilities" id="_capabilities">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_capabilities">#</a>
+		<code><a href="source-class-Hm_SMTP.html#194-213" title="Go to source code">capabilities</a>( <span>mixed <var>$ehlo_response</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="connect" id="_connect">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_connect">#</a>
+		<code><a href="source-class-Hm_SMTP.html#216-278" title="Go to source code">connect</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="choose_auth" id="_choose_auth">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_choose_auth">#</a>
+		<code><a href="source-class-Hm_SMTP.html#280-290" title="Go to source code">choose_auth</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="authenticate" id="_authenticate">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_authenticate">#</a>
+		<code><a href="source-class-Hm_SMTP.html#293-371" title="Go to source code">authenticate</a>( <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span>, <span>mixed <var>$mech</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parse_ntlm_type_two" id="_parse_ntlm_type_two">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parse_ntlm_type_two">#</a>
+		<code><a href="source-class-Hm_SMTP.html#374-394" title="Go to source code">parse_ntlm_type_two</a>( <span>mixed <var>$bin_str</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="build_ntlm_type_one" id="_build_ntlm_type_one">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_build_ntlm_type_one">#</a>
+		<code><a href="source-class-Hm_SMTP.html#397-402" title="Go to source code">build_ntlm_type_one</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="build_ntlm_type_three" id="_build_ntlm_type_three">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_build_ntlm_type_three">#</a>
+		<code><a href="source-class-Hm_SMTP.html#405-427" title="Go to source code">build_ntlm_type_three</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="ntlm_security_buffer" id="_ntlm_security_buffer">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_ntlm_security_buffer">#</a>
+		<code><a href="source-class-Hm_SMTP.html#430-432" title="Go to source code">ntlm_security_buffer</a>( <span>mixed <var>$len</var></span>, <span>mixed <var>$offset</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="build_lm_response" id="_build_lm_response">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_build_lm_response">#</a>
+		<code><a href="source-class-Hm_SMTP.html#435-450" title="Go to source code">build_lm_response</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="build_ntlm_response" id="_build_ntlm_response">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_build_ntlm_response">#</a>
+		<code><a href="source-class-Hm_SMTP.html#453-460" title="Go to source code">build_ntlm_response</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="apply_ntlm_hash" id="_apply_ntlm_hash">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_apply_ntlm_hash">#</a>
+		<code><a href="source-class-Hm_SMTP.html#463-470" title="Go to source code">apply_ntlm_hash</a>( <span>mixed <var>$challenge</var></span>, <span>mixed <var>$hash</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="des_encrypt" id="_des_encrypt">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_des_encrypt">#</a>
+		<code><a href="source-class-Hm_SMTP.html#473-494" title="Go to source code">des_encrypt</a>( <span>mixed <var>$string</var></span>, <span>mixed <var>$challenge</var> = <span class="php-quote">'KGS!@#$%'</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="send_message" id="_send_message">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_send_message">#</a>
+		<code><a href="source-class-Hm_SMTP.html#497-550" title="Go to source code">send_message</a>( <span>mixed <var>$from</var></span>, <span>mixed <var>$recipients</var></span>, <span>mixed <var>$message</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="puke" id="_puke">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_puke">#</a>
+		<code><a href="source-class-Hm_SMTP.html#552-557" title="Go to source code">puke</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="disconnect" id="_disconnect">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_disconnect">#</a>
+		<code><a href="source-class-Hm_SMTP.html#560-568" title="Go to source code">disconnect</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="clean" id="_clean">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_clean">#</a>
+		<code><a href="source-class-Hm_SMTP.html#570-575" title="Go to source code">clean</a>( <span>mixed <var>$val</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="config" id="$config">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#44" title="Go to source code"><var>$config</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$config" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="server" id="$server">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#45" title="Go to source code"><var>$server</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$server" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="starttls" id="$starttls">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#46" title="Go to source code"><var>$starttls</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$starttls" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="port" id="$port">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#47" title="Go to source code"><var>$port</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$port" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="tls" id="$tls">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#48" title="Go to source code"><var>$tls</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$tls" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="auth" id="$auth">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#49" title="Go to source code"><var>$auth</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$auth" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="handle" id="$handle">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#50" title="Go to source code"><var>$handle</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$handle" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="debug" id="$debug">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#51" title="Go to source code"><var>$debug</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$debug" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="hostname" id="$hostname">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#52" title="Go to source code"><var>$hostname</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$hostname" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="command_count" id="$command_count">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#53" title="Go to source code"><var>$command_count</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$command_count" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="commands" id="$commands">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#54" title="Go to source code"><var>$commands</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$commands" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="responses" id="$responses">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#55" title="Go to source code"><var>$responses</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$responses" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="smtp_err" id="$smtp_err">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#56" title="Go to source code"><var>$smtp_err</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$smtp_err" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="banner" id="$banner">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#57" title="Go to source code"><var>$banner</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$banner" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="capability" id="$capability">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#58" title="Go to source code"><var>$capability</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$capability" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="connected" id="$connected">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#59" title="Go to source code"><var>$connected</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$connected" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="crlf" id="$crlf">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#60" title="Go to source code"><var>$crlf</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$crlf" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="line_length" id="$line_length">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#61" title="Go to source code"><var>$line_length</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$line_length" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="username" id="$username">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#62" title="Go to source code"><var>$username</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$username" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="password" id="$password">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#63" title="Go to source code"><var>$password</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$password" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="state" id="$state">
+		<td class="attributes"><code>
+			public  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#64" title="Go to source code"><var>$state</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$state" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

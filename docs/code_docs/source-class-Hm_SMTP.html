@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+	<meta name="robots" content="noindex">
+
+	<title>File smtp/hm-smtp.php | Cypht Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?3954677913"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.html">account<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.account.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.calendar.html">calendar<span></span></a>
+						<ul>
+				<li><a href="package-modules.calendar.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.calendar.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.calendar.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.contacts.html">contacts<span></span></a>
+						<ul>
+				<li><a href="package-modules.contacts.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.contacts.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.feeds.html">feeds<span></span></a>
+						<ul>
+				<li><a href="package-modules.feeds.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.feeds.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.feeds.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.feeds.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.hackernews.html">hackernews<span></span></a>
+						<ul>
+				<li><a href="package-modules.hackernews.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.hackernews.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.hackernews.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.helloworld.html">helloworld<span></span></a>
+						<ul>
+				<li><a href="package-modules.helloworld.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.idletimer.html">idletimer<span></span></a>
+						<ul>
+				<li><a href="package-modules.idletimer.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.idletimer.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.imap.html">imap<span></span></a>
+						<ul>
+				<li><a href="package-modules.imap.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.imap.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.imap.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.imap.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.info.html">info<span></span></a>
+						<ul>
+				<li><a href="package-modules.info.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.pop3.html">pop3<span></span></a>
+						<ul>
+				<li><a href="package-modules.pop3.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.pop3.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.pop3.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.pop3.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.profile.html">profile<span></span></a>
+						<ul>
+				<li><a href="package-modules.profile.output.html">output</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.smtp.html">smtp<span></span></a>
+						<ul>
+				<li><a href="package-modules.smtp.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.smtp.handler.html">handler</a>
+						</li>
+				<li class="active"><a href="package-modules.smtp.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.smtp.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.swipe2fa.html">swipe2fa<span></span></a>
+						<ul>
+				<li><a href="package-modules.swipe2fa.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.wordpress.html">wordpress<span></span></a>
+						<ul>
+				<li><a href="package-modules.wordpress.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Hm_MIME_Msg.html">Hm_MIME_Msg</a></li>
+				<li class="active"><a href="class-Hm_SMTP.html">Hm_SMTP</a></li>
+				<li><a href="class-Hm_SMTP_List.html">Hm_SMTP_List</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-modules.smtp.lib.html" title="Summary of modules\smtp\lib"><span>Package</span></a>
+			</li>
+			<li>
+				<a href="class-Hm_SMTP.html" title="Summary of Hm_SMTP"><span>Class</span></a>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<pre><code><span id="1" class="l"><a class="l" href="#1">  1: </a><span class="xlang">&lt;?php</span>
+</span><span id="2" class="l"><a class="l" href="#2">  2: </a>
+</span><span id="3" class="l"><a class="l" href="#3">  3: </a><span class="php-comment">/**
+</span></span><span id="4" class="l"><a class="l" href="#4">  4: </a><span class="php-comment"> * SMTP libs
+</span></span><span id="5" class="l"><a class="l" href="#5">  5: </a><span class="php-comment"> * @package modules
+</span></span><span id="6" class="l"><a class="l" href="#6">  6: </a><span class="php-comment"> * @subpackage smtp
+</span></span><span id="7" class="l"><a class="l" href="#7">  7: </a><span class="php-comment"> */</span>
+</span><span id="8" class="l"><a class="l" href="#8">  8: </a>
+</span><span id="9" class="l"><a class="l" href="#9">  9: </a><span class="php-keyword1">if</span> (!<span class="php-keyword2">defined</span>(<span class="php-quote">'DEBUG_MODE'</span>)) { <span class="php-keyword1">die</span>(); }
+</span><span id="10" class="l"><a class="l" href="#10"> 10: </a>
+</span><span id="11" class="l"><a class="l" href="#11"> 11: </a><span class="php-comment">/**
+</span></span><span id="12" class="l"><a class="l" href="#12"> 12: </a><span class="php-comment"> * SMTP connection manager
+</span></span><span id="13" class="l"><a class="l" href="#13"> 13: </a><span class="php-comment"> * @subpackage smtp/lib
+</span></span><span id="14" class="l"><a class="l" href="#14"> 14: </a><span class="php-comment"> */</span>
+</span><span id="15" class="l"><a class="l" href="#15"> 15: </a><span class="php-keyword1">class</span> <a id="Hm_SMTP_List" href="#Hm_SMTP_List">Hm_SMTP_List</a> {
+</span><span id="16" class="l"><a class="l" href="#16"> 16: </a>    
+</span><span id="17" class="l"><a class="l" href="#17"> 17: </a>    <span class="php-keyword1">use</span> Hm_Server_List;
+</span><span id="18" class="l"><a class="l" href="#18"> 18: </a>
+</span><span id="19" class="l"><a class="l" href="#19"> 19: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">static</span> <span class="php-keyword1">function</span> <a id="_service_connect" href="#_service_connect">service_connect</a>(<span class="php-var">$id</span>, <span class="php-var">$server</span>, <span class="php-var">$user</span>, <span class="php-var">$pass</span>, <span class="php-var">$cache</span>=<span class="php-keyword1">false</span>) {
+</span><span id="20" class="l"><a class="l" href="#20"> 20: </a>        self::<span class="php-var">$server_list</span>[<span class="php-var">$id</span>][<span class="php-quote">'object'</span>] = <span class="php-keyword1">new</span> Hm_SMTP(
+</span><span id="21" class="l"><a class="l" href="#21"> 21: </a>            <span class="php-keyword1">array</span>(
+</span><span id="22" class="l"><a class="l" href="#22"> 22: </a>                <span class="php-quote">'server'</span>    =&gt; <span class="php-var">$server</span>[<span class="php-quote">'server'</span>],
+</span><span id="23" class="l"><a class="l" href="#23"> 23: </a>                <span class="php-quote">'port'</span>      =&gt; <span class="php-var">$server</span>[<span class="php-quote">'port'</span>],
+</span><span id="24" class="l"><a class="l" href="#24"> 24: </a>                <span class="php-quote">'tls'</span>       =&gt; <span class="php-var">$server</span>[<span class="php-quote">'tls'</span>],
+</span><span id="25" class="l"><a class="l" href="#25"> 25: </a>                <span class="php-quote">'username'</span>  =&gt; <span class="php-var">$user</span>,
+</span><span id="26" class="l"><a class="l" href="#26"> 26: </a>                <span class="php-quote">'password'</span>  =&gt; <span class="php-var">$pass</span>
+</span><span id="27" class="l"><a class="l" href="#27"> 27: </a>            )
+</span><span id="28" class="l"><a class="l" href="#28"> 28: </a>        );
+</span><span id="29" class="l"><a class="l" href="#29"> 29: </a>        <span class="php-keyword1">if</span> (!self::<span class="php-var">$server_list</span>[<span class="php-var">$id</span>][<span class="php-quote">'object'</span>]-&gt;connect()) {
+</span><span id="30" class="l"><a class="l" href="#30"> 30: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$server_list</span>[<span class="php-var">$id</span>][<span class="php-quote">'object'</span>];
+</span><span id="31" class="l"><a class="l" href="#31"> 31: </a>        }
+</span><span id="32" class="l"><a class="l" href="#32"> 32: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="33" class="l"><a class="l" href="#33"> 33: </a>    }
+</span><span id="34" class="l"><a class="l" href="#34"> 34: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">static</span> <span class="php-keyword1">function</span> <a id="_get_cache" href="#_get_cache">get_cache</a>(<span class="php-var">$session</span>, <span class="php-var">$id</span>) {
+</span><span id="35" class="l"><a class="l" href="#35"> 35: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="36" class="l"><a class="l" href="#36"> 36: </a>    }
+</span><span id="37" class="l"><a class="l" href="#37"> 37: </a>}
+</span><span id="38" class="l"><a class="l" href="#38"> 38: </a>
+</span><span id="39" class="l"><a class="l" href="#39"> 39: </a><span class="php-comment">/**
+</span></span><span id="40" class="l"><a class="l" href="#40"> 40: </a><span class="php-comment"> * Connect to and interact with SMTP servers
+</span></span><span id="41" class="l"><a class="l" href="#41"> 41: </a><span class="php-comment"> * @subpackage smtp/lib
+</span></span><span id="42" class="l"><a class="l" href="#42"> 42: </a><span class="php-comment"> */</span>
+</span><span id="43" class="l"><a class="l" href="#43"> 43: </a><span class="php-keyword1">class</span> <a id="Hm_SMTP" href="#Hm_SMTP">Hm_SMTP</a> {
+</span><span id="44" class="l"><a class="l" href="#44"> 44: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$config" href="#$config">$config</a></span>;
+</span><span id="45" class="l"><a class="l" href="#45"> 45: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$server" href="#$server">$server</a></span>;
+</span><span id="46" class="l"><a class="l" href="#46"> 46: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$starttls" href="#$starttls">$starttls</a></span>;
+</span><span id="47" class="l"><a class="l" href="#47"> 47: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$port" href="#$port">$port</a></span>;
+</span><span id="48" class="l"><a class="l" href="#48"> 48: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$tls" href="#$tls">$tls</a></span>;
+</span><span id="49" class="l"><a class="l" href="#49"> 49: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$auth" href="#$auth">$auth</a></span>;
+</span><span id="50" class="l"><a class="l" href="#50"> 50: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$handle" href="#$handle">$handle</a></span>;
+</span><span id="51" class="l"><a class="l" href="#51"> 51: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$debug" href="#$debug">$debug</a></span>;
+</span><span id="52" class="l"><a class="l" href="#52"> 52: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$hostname" href="#$hostname">$hostname</a></span>;
+</span><span id="53" class="l"><a class="l" href="#53"> 53: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$command_count" href="#$command_count">$command_count</a></span>;
+</span><span id="54" class="l"><a class="l" href="#54"> 54: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$commands" href="#$commands">$commands</a></span>;
+</span><span id="55" class="l"><a class="l" href="#55"> 55: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$responses" href="#$responses">$responses</a></span>;
+</span><span id="56" class="l"><a class="l" href="#56"> 56: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$smtp_err" href="#$smtp_err">$smtp_err</a></span>;
+</span><span id="57" class="l"><a class="l" href="#57"> 57: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$banner" href="#$banner">$banner</a></span>;
+</span><span id="58" class="l"><a class="l" href="#58"> 58: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$capability" href="#$capability">$capability</a></span>;
+</span><span id="59" class="l"><a class="l" href="#59"> 59: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$connected" href="#$connected">$connected</a></span>;
+</span><span id="60" class="l"><a class="l" href="#60"> 60: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$crlf" href="#$crlf">$crlf</a></span>;
+</span><span id="61" class="l"><a class="l" href="#61"> 61: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$line_length" href="#$line_length">$line_length</a></span>;
+</span><span id="62" class="l"><a class="l" href="#62"> 62: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$username" href="#$username">$username</a></span>;
+</span><span id="63" class="l"><a class="l" href="#63"> 63: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$password" href="#$password">$password</a></span>;
+</span><span id="64" class="l"><a class="l" href="#64"> 64: </a>    <span class="php-keyword1">public</span> <span class="php-var"><a id="$state" href="#$state">$state</a></span>;
+</span><span id="65" class="l"><a class="l" href="#65"> 65: </a>
+</span><span id="66" class="l"><a class="l" href="#66"> 66: </a>    <span class="php-keyword1">function</span> <a id="___construct" href="#___construct">__construct</a>(<span class="php-var">$conf</span>) {
+</span><span id="67" class="l"><a class="l" href="#67"> 67: </a>
+</span><span id="68" class="l"><a class="l" href="#68"> 68: </a>        <span class="php-var">$this</span>-&gt;hostname = <span class="php-keyword2">php_uname</span>(<span class="php-quote">'n'</span>);
+</span><span id="69" class="l"><a class="l" href="#69"> 69: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/:\d+</span><span class="php-var">$</span><span class="php-quote">/&quot;</span>, <span class="php-var">$this</span>-&gt;hostname)) {
+</span><span id="70" class="l"><a class="l" href="#70"> 70: </a>            <span class="php-var">$this</span>-&gt;hostname = <span class="php-keyword2">substr</span>(<span class="php-var">$this</span>-&gt;hostname, <span class="php-num">0</span>, <span class="php-keyword2">strpos</span>(<span class="php-var">$this</span>-&gt;hostname, <span class="php-quote">':'</span>));
+</span><span id="71" class="l"><a class="l" href="#71"> 71: </a>        }
+</span><span id="72" class="l"><a class="l" href="#72"> 72: </a>        <span class="php-var">$this</span>-&gt;debug = <span class="php-keyword1">array</span>();
+</span><span id="73" class="l"><a class="l" href="#73"> 73: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$conf</span>[<span class="php-quote">'server'</span>])) {
+</span><span id="74" class="l"><a class="l" href="#74"> 74: </a>            <span class="php-var">$this</span>-&gt;server = <span class="php-var">$conf</span>[<span class="php-quote">'server'</span>];
+</span><span id="75" class="l"><a class="l" href="#75"> 75: </a>        }
+</span><span id="76" class="l"><a class="l" href="#76"> 76: </a>        <span class="php-keyword1">else</span> {
+</span><span id="77" class="l"><a class="l" href="#77"> 77: </a>            <span class="php-var">$this</span>-&gt;server = <span class="php-quote">'127.0.0.1'</span>;
+</span><span id="78" class="l"><a class="l" href="#78"> 78: </a>        }
+</span><span id="79" class="l"><a class="l" href="#79"> 79: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$conf</span>[<span class="php-quote">'port'</span>])) {
+</span><span id="80" class="l"><a class="l" href="#80"> 80: </a>            <span class="php-var">$this</span>-&gt;port = <span class="php-var">$conf</span>[<span class="php-quote">'port'</span>];
+</span><span id="81" class="l"><a class="l" href="#81"> 81: </a>        }
+</span><span id="82" class="l"><a class="l" href="#82"> 82: </a>        <span class="php-keyword1">else</span> {
+</span><span id="83" class="l"><a class="l" href="#83"> 83: </a>            <span class="php-var">$this</span>-&gt;port = <span class="php-num">25</span>;
+</span><span id="84" class="l"><a class="l" href="#84"> 84: </a>        }
+</span><span id="85" class="l"><a class="l" href="#85"> 85: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$conf</span>[<span class="php-quote">'tls'</span>]) &amp;&amp; <span class="php-var">$conf</span>[<span class="php-quote">'tls'</span>]) {
+</span><span id="86" class="l"><a class="l" href="#86"> 86: </a>            <span class="php-var">$this</span>-&gt;tls = <span class="php-keyword1">true</span>;
+</span><span id="87" class="l"><a class="l" href="#87"> 87: </a>        }
+</span><span id="88" class="l"><a class="l" href="#88"> 88: </a>        <span class="php-keyword1">else</span> {
+</span><span id="89" class="l"><a class="l" href="#89"> 89: </a>            <span class="php-var">$this</span>-&gt;tls = <span class="php-keyword1">false</span>;
+</span><span id="90" class="l"><a class="l" href="#90"> 90: </a>        }
+</span><span id="91" class="l"><a class="l" href="#91"> 91: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;tls) {
+</span><span id="92" class="l"><a class="l" href="#92"> 92: </a>            <span class="php-var">$this</span>-&gt;starttls = <span class="php-keyword1">true</span>;
+</span><span id="93" class="l"><a class="l" href="#93"> 93: </a>        }
+</span><span id="94" class="l"><a class="l" href="#94"> 94: </a>        <span class="php-var">$this</span>-&gt;smtp_err = <span class="php-quote">''</span>;
+</span><span id="95" class="l"><a class="l" href="#95"> 95: </a>        <span class="php-var">$this</span>-&gt;supports_tls = <span class="php-keyword1">false</span>;
+</span><span id="96" class="l"><a class="l" href="#96"> 96: </a>        <span class="php-var">$this</span>-&gt;auth = <span class="php-keyword1">true</span>;
+</span><span id="97" class="l"><a class="l" href="#97"> 97: </a>        <span class="php-var">$this</span>-&gt;supports_auth = <span class="php-keyword1">array</span>();
+</span><span id="98" class="l"><a class="l" href="#98"> 98: </a>        <span class="php-var">$this</span>-&gt;handle = <span class="php-keyword1">false</span>;
+</span><span id="99" class="l"><a class="l" href="#99"> 99: </a>        <span class="php-var">$this</span>-&gt;state = <span class="php-quote">'started'</span>;
+</span><span id="100" class="l"><a class="l" href="#100">100: </a>        <span class="php-var">$this</span>-&gt;command_count = <span class="php-num">0</span>;
+</span><span id="101" class="l"><a class="l" href="#101">101: </a>        <span class="php-var">$this</span>-&gt;commands = <span class="php-keyword1">array</span>();
+</span><span id="102" class="l"><a class="l" href="#102">102: </a>        <span class="php-var">$this</span>-&gt;responses = <span class="php-keyword1">array</span>();
+</span><span id="103" class="l"><a class="l" href="#103">103: </a>        <span class="php-var">$this</span>-&gt;banner = <span class="php-quote">''</span>;
+</span><span id="104" class="l"><a class="l" href="#104">104: </a>        <span class="php-var">$this</span>-&gt;crlf = <span class="php-quote">&quot;\r\n&quot;</span>;
+</span><span id="105" class="l"><a class="l" href="#105">105: </a>        <span class="php-var">$this</span>-&gt;capability = <span class="php-quote">''</span>;
+</span><span id="106" class="l"><a class="l" href="#106">106: </a>        <span class="php-var">$this</span>-&gt;line_length = <span class="php-num">2048</span>;
+</span><span id="107" class="l"><a class="l" href="#107">107: </a>        <span class="php-var">$this</span>-&gt;connected = <span class="php-keyword1">false</span>;
+</span><span id="108" class="l"><a class="l" href="#108">108: </a>        <span class="php-var">$this</span>-&gt;username = <span class="php-var">$conf</span>[<span class="php-quote">'username'</span>];
+</span><span id="109" class="l"><a class="l" href="#109">109: </a>        <span class="php-var">$this</span>-&gt;password = <span class="php-var">$conf</span>[<span class="php-quote">'password'</span>];
+</span><span id="110" class="l"><a class="l" href="#110">110: </a>        <span class="php-var">$this</span>-&gt;max_message_size = <span class="php-num">0</span>;
+</span><span id="111" class="l"><a class="l" href="#111">111: </a>    }
+</span><span id="112" class="l"><a class="l" href="#112">112: </a>
+</span><span id="113" class="l"><a class="l" href="#113">113: </a>    <span class="php-comment">/* send command to the server. Append &quot;\r\n&quot; to the end. */</span>
+</span><span id="114" class="l"><a class="l" href="#114">114: </a>    <span class="php-keyword1">function</span> <a id="_send_command" href="#_send_command">send_command</a>(<span class="php-var">$command</span>) {
+</span><span id="115" class="l"><a class="l" href="#115">115: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_resource</span>(<span class="php-var">$this</span>-&gt;handle)) {
+</span><span id="116" class="l"><a class="l" href="#116">116: </a>            <span class="php-keyword2">fputs</span>(<span class="php-var">$this</span>-&gt;handle, <span class="php-var">$command</span>.<span class="php-var">$this</span>-&gt;crlf);
+</span><span id="117" class="l"><a class="l" href="#117">117: </a>        }
+</span><span id="118" class="l"><a class="l" href="#118">118: </a>        <span class="php-var">$this</span>-&gt;commands[] = <span class="php-keyword2">trim</span>(<span class="php-var">$command</span>);
+</span><span id="119" class="l"><a class="l" href="#119">119: </a>    }
+</span><span id="120" class="l"><a class="l" href="#120">120: </a>
+</span><span id="121" class="l"><a class="l" href="#121">121: </a>    <span class="php-comment">/* loop through &quot;lines&quot; returned from smtp and parse
+</span></span><span id="122" class="l"><a class="l" href="#122">122: </a><span class="php-comment">       them. It can return the lines in a raw format, or 
+</span></span><span id="123" class="l"><a class="l" href="#123">123: </a><span class="php-comment">       parsed into atoms. 
+</span></span><span id="124" class="l"><a class="l" href="#124">124: </a><span class="php-comment">    */</span>
+</span><span id="125" class="l"><a class="l" href="#125">125: </a>    <span class="php-keyword1">function</span> <a id="_get_response" href="#_get_response">get_response</a>(<span class="php-var">$chunked</span>=<span class="php-keyword1">true</span>) {
+</span><span id="126" class="l"><a class="l" href="#126">126: </a>        <span class="php-var">$n</span> = -<span class="php-num">1</span>;
+</span><span id="127" class="l"><a class="l" href="#127">127: </a>        <span class="php-var">$result</span> = <span class="php-keyword1">array</span>();
+</span><span id="128" class="l"><a class="l" href="#128">128: </a>        <span class="php-var">$chunked_result</span> = <span class="php-keyword1">array</span>();
+</span><span id="129" class="l"><a class="l" href="#129">129: </a>        <span class="php-keyword1">do</span> {
+</span><span id="130" class="l"><a class="l" href="#130">130: </a>            <span class="php-var">$n</span>++;
+</span><span id="131" class="l"><a class="l" href="#131">131: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_resource</span>(<span class="php-var">$this</span>-&gt;handle)) {
+</span><span id="132" class="l"><a class="l" href="#132">132: </a>                <span class="php-keyword1">break</span>;
+</span><span id="133" class="l"><a class="l" href="#133">133: </a>            }
+</span><span id="134" class="l"><a class="l" href="#134">134: </a>            <span class="php-var">$result</span>[<span class="php-var">$n</span>] = <span class="php-keyword2">fgets</span>(<span class="php-var">$this</span>-&gt;handle, <span class="php-var">$this</span>-&gt;line_length);
+</span><span id="135" class="l"><a class="l" href="#135">135: </a>            <span class="php-var">$chunks</span> = <span class="php-var">$this</span>-&gt;parse_line(<span class="php-var">$result</span>[<span class="php-var">$n</span>]);
+</span><span id="136" class="l"><a class="l" href="#136">136: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$chunked</span>) {
+</span><span id="137" class="l"><a class="l" href="#137">137: </a>                <span class="php-var">$chunked_result</span>[] = <span class="php-var">$chunks</span>;
+</span><span id="138" class="l"><a class="l" href="#138">138: </a>            }
+</span><span id="139" class="l"><a class="l" href="#139">139: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword2">trim</span>(<span class="php-var">$result</span>[<span class="php-var">$n</span>])) {
+</span><span id="140" class="l"><a class="l" href="#140">140: </a>                <span class="php-keyword1">unset</span>(<span class="php-var">$result</span>[<span class="php-var">$n</span>]);
+</span><span id="141" class="l"><a class="l" href="#141">141: </a>                <span class="php-keyword1">break</span>;
+</span><span id="142" class="l"><a class="l" href="#142">142: </a>            }
+</span><span id="143" class="l"><a class="l" href="#143">143: </a>            <span class="php-var">$cont</span> = <span class="php-keyword1">false</span>;
+</span><span id="144" class="l"><a class="l" href="#144">144: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">strlen</span>(<span class="php-var">$result</span>[<span class="php-var">$n</span>]) &gt; <span class="php-num">3</span> &amp;&amp; <span class="php-keyword2">substr</span>(<span class="php-var">$result</span>[<span class="php-var">$n</span>], <span class="php-num">3</span>, <span class="php-num">1</span>) == <span class="php-quote">'-'</span>) {
+</span><span id="145" class="l"><a class="l" href="#145">145: </a>                <span class="php-var">$cont</span> = <span class="php-keyword1">true</span>;
+</span><span id="146" class="l"><a class="l" href="#146">146: </a>            }
+</span><span id="147" class="l"><a class="l" href="#147">147: </a>        } <span class="php-keyword1">while</span> (<span class="php-var">$cont</span>);
+</span><span id="148" class="l"><a class="l" href="#148">148: </a>        <span class="php-var">$this</span>-&gt;responses[] = <span class="php-var">$result</span>;
+</span><span id="149" class="l"><a class="l" href="#149">149: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$chunked</span>) {
+</span><span id="150" class="l"><a class="l" href="#150">150: </a>            <span class="php-var">$result</span> = <span class="php-var">$chunked_result</span>;
+</span><span id="151" class="l"><a class="l" href="#151">151: </a>        }
+</span><span id="152" class="l"><a class="l" href="#152">152: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
+</span><span id="153" class="l"><a class="l" href="#153">153: </a>    }
+</span><span id="154" class="l"><a class="l" href="#154">154: </a>
+</span><span id="155" class="l"><a class="l" href="#155">155: </a>    <span class="php-comment">/* parse out a line */</span>
+</span><span id="156" class="l"><a class="l" href="#156">156: </a>    <span class="php-keyword1">function</span> <a id="_parse_line" href="#_parse_line">parse_line</a>(<span class="php-var">$line</span>) {
+</span><span id="157" class="l"><a class="l" href="#157">157: </a>        <span class="php-var">$parts</span> = <span class="php-keyword1">array</span>();
+</span><span id="158" class="l"><a class="l" href="#158">158: </a>
+</span><span id="159" class="l"><a class="l" href="#159">159: </a>        <span class="php-var">$code</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$line</span>, <span class="php-num">0</span>, <span class="php-num">3</span>);
+</span><span id="160" class="l"><a class="l" href="#160">160: </a>        <span class="php-var">$parts</span>[] = <span class="php-var">$code</span>;
+</span><span id="161" class="l"><a class="l" href="#161">161: </a>
+</span><span id="162" class="l"><a class="l" href="#162">162: </a>        <span class="php-var">$remainder</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">' '</span>,<span class="php-keyword2">substr</span>(<span class="php-var">$line</span>, <span class="php-num">4</span>));
+</span><span id="163" class="l"><a class="l" href="#163">163: </a>        <span class="php-var">$parts</span>[] = <span class="php-var">$remainder</span>;
+</span><span id="164" class="l"><a class="l" href="#164">164: </a>
+</span><span id="165" class="l"><a class="l" href="#165">165: </a>        <span class="php-keyword1">return</span> <span class="php-var">$parts</span>;
+</span><span id="166" class="l"><a class="l" href="#166">166: </a>        
+</span><span id="167" class="l"><a class="l" href="#167">167: </a>    }
+</span><span id="168" class="l"><a class="l" href="#168">168: </a>    <span class="php-comment">/* Checks if the numeric response matches the code in $check. 
+</span></span><span id="169" class="l"><a class="l" href="#169">169: </a><span class="php-comment">       The return value is simalar to strcmp
+</span></span><span id="170" class="l"><a class="l" href="#170">170: </a><span class="php-comment">       Returns &lt;0 if $check is less than the response
+</span></span><span id="171" class="l"><a class="l" href="#171">171: </a><span class="php-comment">       Returns  0 if $check is equal to the response
+</span></span><span id="172" class="l"><a class="l" href="#172">172: </a><span class="php-comment">       Returns &gt;0 if $check is greater than the response
+</span></span><span id="173" class="l"><a class="l" href="#173">173: </a><span class="php-comment">    */</span>
+</span><span id="174" class="l"><a class="l" href="#174">174: </a>    <span class="php-keyword1">function</span> <a id="_compare_response" href="#_compare_response">compare_response</a>(<span class="php-var">$chunked_response</span>, <span class="php-var">$check</span>) {
+</span><span id="175" class="l"><a class="l" href="#175">175: </a>        <span class="php-var">$size</span> = <span class="php-keyword2">count</span>(<span class="php-var">$chunked_response</span>);
+</span><span id="176" class="l"><a class="l" href="#176">176: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$size</span>) {
+</span><span id="177" class="l"><a class="l" href="#177">177: </a>            <span class="php-var">$last</span> = <span class="php-var">$chunked_response</span>[<span class="php-var">$size</span>-<span class="php-num">1</span>];
+</span><span id="178" class="l"><a class="l" href="#178">178: </a>            <span class="php-var">$code</span> = <span class="php-var">$last</span>[<span class="php-num">0</span>];
+</span><span id="179" class="l"><a class="l" href="#179">179: </a>        }
+</span><span id="180" class="l"><a class="l" href="#180">180: </a>        <span class="php-keyword1">else</span> {
+</span><span id="181" class="l"><a class="l" href="#181">181: </a>            <span class="php-var">$code</span> = <span class="php-keyword1">false</span>;
+</span><span id="182" class="l"><a class="l" href="#182">182: </a>        }
+</span><span id="183" class="l"><a class="l" href="#183">183: </a>        <span class="php-var">$return_val</span> = <span class="php-keyword2">strcmp</span>(<span class="php-var">$check</span>,<span class="php-var">$code</span>);
+</span><span id="184" class="l"><a class="l" href="#184">184: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$return_val</span>) {
+</span><span id="185" class="l"><a class="l" href="#185">185: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$chunked_response</span>[<span class="php-num">0</span>][<span class="php-num">1</span>])) {
+</span><span id="186" class="l"><a class="l" href="#186">186: </a>                <span class="php-var">$this</span>-&gt;smtp_err = <span class="php-keyword2">join</span>(<span class="php-quote">' '</span>, <span class="php-var">$chunked_response</span>[<span class="php-num">0</span>][<span class="php-num">1</span>]);
+</span><span id="187" class="l"><a class="l" href="#187">187: </a>            }
+</span><span id="188" class="l"><a class="l" href="#188">188: </a>        }
+</span><span id="189" class="l"><a class="l" href="#189">189: </a>        <span class="php-keyword1">return</span> <span class="php-var">$return_val</span>;
+</span><span id="190" class="l"><a class="l" href="#190">190: </a>    }
+</span><span id="191" class="l"><a class="l" href="#191">191: </a>
+</span><span id="192" class="l"><a class="l" href="#192">192: </a>    <span class="php-comment">/* determine what capabilities the server has.
+</span></span><span id="193" class="l"><a class="l" href="#193">193: </a><span class="php-comment">       Pass it the chunked response from EHLO  */</span>
+</span><span id="194" class="l"><a class="l" href="#194">194: </a>    <span class="php-keyword1">function</span> <a id="_capabilities" href="#_capabilities">capabilities</a>(<span class="php-var">$ehlo_response</span>) {
+</span><span id="195" class="l"><a class="l" href="#195">195: </a>        <span class="php-keyword1">foreach</span>(<span class="php-var">$ehlo_response</span> <span class="php-keyword1">as</span> <span class="php-var">$line</span>) {
+</span><span id="196" class="l"><a class="l" href="#196">196: </a>            <span class="php-var">$feature</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$line</span>[<span class="php-num">1</span>][<span class="php-num">0</span>]);
+</span><span id="197" class="l"><a class="l" href="#197">197: </a>            <span class="php-keyword1">switch</span>(<span class="php-keyword2">strtolower</span>(<span class="php-var">$feature</span>)) {
+</span><span id="198" class="l"><a class="l" href="#198">198: </a>                <span class="php-keyword1">case</span> <span class="php-quote">'starttls'</span>: <span class="php-comment">// supports starttls</span>
+</span><span id="199" class="l"><a class="l" href="#199">199: </a>                    <span class="php-var">$this</span>-&gt;supports_tls = <span class="php-keyword1">true</span>;
+</span><span id="200" class="l"><a class="l" href="#200">200: </a>                    <span class="php-keyword1">break</span>;
+</span><span id="201" class="l"><a class="l" href="#201">201: </a>                <span class="php-keyword1">case</span> <span class="php-quote">'auth'</span>: <span class="php-comment">// supported auth mechanisims</span>
+</span><span id="202" class="l"><a class="l" href="#202">202: </a>                    <span class="php-var">$auth_mecs</span> = <span class="php-keyword2">array_slice</span>(<span class="php-var">$line</span>[<span class="php-num">1</span>], <span class="php-num">1</span>);
+</span><span id="203" class="l"><a class="l" href="#203">203: </a>                    <span class="php-var">$this</span>-&gt;supports_auth = <span class="php-var">$auth_mecs</span>;
+</span><span id="204" class="l"><a class="l" href="#204">204: </a>                    <span class="php-keyword1">break</span>;
+</span><span id="205" class="l"><a class="l" href="#205">205: </a>                <span class="php-keyword1">case</span> <span class="php-quote">'size'</span>: <span class="php-comment">// advisary maximum message size</span>
+</span><span id="206" class="l"><a class="l" href="#206">206: </a>                    <span class="php-keyword1">if</span>(<span class="php-keyword1">isset</span>(<span class="php-var">$line</span>[<span class="php-num">1</span>][<span class="php-num">1</span>]) &amp;&amp; <span class="php-keyword2">is_numeric</span>(<span class="php-var">$line</span>[<span class="php-num">1</span>][<span class="php-num">1</span>])) {
+</span><span id="207" class="l"><a class="l" href="#207">207: </a>                        <span class="php-var">$this</span>-&gt;max_message_size = <span class="php-var">$line</span>[<span class="php-num">1</span>][<span class="php-num">1</span>];
+</span><span id="208" class="l"><a class="l" href="#208">208: </a>                    }
+</span><span id="209" class="l"><a class="l" href="#209">209: </a>                    <span class="php-keyword1">break</span>;
+</span><span id="210" class="l"><a class="l" href="#210">210: </a>            }
+</span><span id="211" class="l"><a class="l" href="#211">211: </a>        }
+</span><span id="212" class="l"><a class="l" href="#212">212: </a>
+</span><span id="213" class="l"><a class="l" href="#213">213: </a>    }
+</span><span id="214" class="l"><a class="l" href="#214">214: </a>
+</span><span id="215" class="l"><a class="l" href="#215">215: </a>    <span class="php-comment">/* establish a connection to the server. */</span>
+</span><span id="216" class="l"><a class="l" href="#216">216: </a>    <span class="php-keyword1">function</span> <a id="_connect" href="#_connect">connect</a>() {
+</span><span id="217" class="l"><a class="l" href="#217">217: </a>        <span class="php-var">$certfile</span> = <span class="php-keyword1">false</span>;
+</span><span id="218" class="l"><a class="l" href="#218">218: </a>        <span class="php-var">$certpass</span> = <span class="php-keyword1">false</span>;
+</span><span id="219" class="l"><a class="l" href="#219">219: </a>        <span class="php-var">$result</span> = <span class="php-quote">'An error occured connecting to the SMTP server'</span>;
+</span><span id="220" class="l"><a class="l" href="#220">220: </a>        <span class="php-var">$server</span> = <span class="php-var">$this</span>-&gt;server;
+</span><span id="221" class="l"><a class="l" href="#221">221: </a>
+</span><span id="222" class="l"><a class="l" href="#222">222: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;tls) {
+</span><span id="223" class="l"><a class="l" href="#223">223: </a>            <span class="php-var">$server</span> = <span class="php-quote">'tls://'</span>.<span class="php-var">$server</span>;
+</span><span id="224" class="l"><a class="l" href="#224">224: </a>        } 
+</span><span id="225" class="l"><a class="l" href="#225">225: </a>        <span class="php-var">$this</span>-&gt;debug[] = <span class="php-quote">'Connecting to '</span>.<span class="php-var">$server</span>.<span class="php-quote">' on port '</span>.<span class="php-var">$this</span>-&gt;port;
+</span><span id="226" class="l"><a class="l" href="#226">226: </a>        <span class="php-var">$this</span>-&gt;handle = @<span class="php-keyword2">fsockopen</span>(<span class="php-var">$server</span>, <span class="php-var">$this</span>-&gt;port, <span class="php-var">$errorno</span>, <span class="php-var">$errorstr</span>, <span class="php-num">30</span>);
+</span><span id="227" class="l"><a class="l" href="#227">227: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_resource</span>(<span class="php-var">$this</span>-&gt;handle)) {
+</span><span id="228" class="l"><a class="l" href="#228">228: </a>            <span class="php-var">$this</span>-&gt;debug[] = <span class="php-quote">'Successfully opened port to the SMTP server'</span>;
+</span><span id="229" class="l"><a class="l" href="#229">229: </a>            <span class="php-var">$this</span>-&gt;connected = <span class="php-keyword1">true</span>;
+</span><span id="230" class="l"><a class="l" href="#230">230: </a>            <span class="php-var">$this</span>-&gt;state = <span class="php-quote">'connected'</span>;
+</span><span id="231" class="l"><a class="l" href="#231">231: </a>        }
+</span><span id="232" class="l"><a class="l" href="#232">232: </a>        <span class="php-keyword1">else</span> {
+</span><span id="233" class="l"><a class="l" href="#233">233: </a>            <span class="php-var">$this</span>-&gt;debug[] = <span class="php-quote">'Could not connect to the SMTP server'</span>;
+</span><span id="234" class="l"><a class="l" href="#234">234: </a>            <span class="php-var">$this</span>-&gt;debug[] = <span class="php-quote">'fsockopen errors #'</span>.<span class="php-var">$errorno</span>.<span class="php-quote">'. '</span>.<span class="php-var">$errorstr</span>;
+</span><span id="235" class="l"><a class="l" href="#235">235: </a>            <span class="php-var">$result</span> = <span class="php-quote">'Could not connect to the configured SMTP server'</span>;
+</span><span id="236" class="l"><a class="l" href="#236">236: </a>        }
+</span><span id="237" class="l"><a class="l" href="#237">237: </a>        <span class="php-var">$this</span>-&gt;banner = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="238" class="l"><a class="l" href="#238">238: </a>        <span class="php-var">$command</span> = <span class="php-quote">'EHLO '</span>.<span class="php-var">$this</span>-&gt;hostname;
+</span><span id="239" class="l"><a class="l" href="#239">239: </a>        <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="240" class="l"><a class="l" href="#240">240: </a>        <span class="php-var">$response</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="241" class="l"><a class="l" href="#241">241: </a>        <span class="php-var">$this</span>-&gt;capabilities(<span class="php-var">$response</span>);
+</span><span id="242" class="l"><a class="l" href="#242">242: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;starttls &amp;&amp; <span class="php-var">$this</span>-&gt;supports_tls) {
+</span><span id="243" class="l"><a class="l" href="#243">243: </a>            <span class="php-var">$command</span> = <span class="php-quote">'STARTTLS'</span>;
+</span><span id="244" class="l"><a class="l" href="#244">244: </a>            <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="245" class="l"><a class="l" href="#245">245: </a>            <span class="php-var">$response</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="246" class="l"><a class="l" href="#246">246: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$response</span>, <span class="php-quote">'220'</span>) != <span class="php-num">0</span>) {
+</span><span id="247" class="l"><a class="l" href="#247">247: </a>                <span class="php-var">$result</span> = <span class="php-quote">'An error occured during the STARTTLS command'</span>;
+</span><span id="248" class="l"><a class="l" href="#248">248: </a>            }
+</span><span id="249" class="l"><a class="l" href="#249">249: </a>            <span class="php-keyword1">if</span>(<span class="php-keyword1">isset</span>(<span class="php-var">$certfile</span>) &amp;&amp; <span class="php-var">$certfile</span>) {
+</span><span id="250" class="l"><a class="l" href="#250">250: </a>                <span class="php-keyword2">stream_context_set_option</span>(<span class="php-var">$this</span>-&gt;handle, <span class="php-quote">'tls'</span>, <span class="php-quote">'local_cert'</span>, <span class="php-var">$certfile</span>);
+</span><span id="251" class="l"><a class="l" href="#251">251: </a>                <span class="php-keyword1">if</span>(<span class="php-var">$certpass</span>) {
+</span><span id="252" class="l"><a class="l" href="#252">252: </a>                    <span class="php-keyword2">stream_context_set_option</span>(<span class="php-var">$this</span>-&gt;handle, <span class="php-quote">'tls'</span>, <span class="php-quote">'passphrase'</span>, <span class="php-var">$certpass</span>);
+</span><span id="253" class="l"><a class="l" href="#253">253: </a>                }
+</span><span id="254" class="l"><a class="l" href="#254">254: </a>            }
+</span><span id="255" class="l"><a class="l" href="#255">255: </a>            <span class="php-keyword2">stream_socket_enable_crypto</span>(<span class="php-var">$this</span>-&gt;handle, <span class="php-keyword1">true</span>, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+</span><span id="256" class="l"><a class="l" href="#256">256: </a>            <span class="php-var">$command</span> = <span class="php-quote">'EHLO '</span>.<span class="php-var">$this</span>-&gt;hostname;
+</span><span id="257" class="l"><a class="l" href="#257">257: </a>            <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="258" class="l"><a class="l" href="#258">258: </a>            <span class="php-var">$response</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="259" class="l"><a class="l" href="#259">259: </a>            <span class="php-var">$this</span>-&gt;capabilities(<span class="php-var">$response</span>);
+</span><span id="260" class="l"><a class="l" href="#260">260: </a>        }
+</span><span id="261" class="l"><a class="l" href="#261">261: </a>        <span class="php-keyword1">if</span>(<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$response</span>,<span class="php-quote">'250'</span>) != <span class="php-num">0</span>) {
+</span><span id="262" class="l"><a class="l" href="#262">262: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occured during the EHLO command'</span>;
+</span><span id="263" class="l"><a class="l" href="#263">263: </a>        }
+</span><span id="264" class="l"><a class="l" href="#264">264: </a>        <span class="php-keyword1">else</span> {
+</span><span id="265" class="l"><a class="l" href="#265">265: </a>            <span class="php-keyword1">if</span>(<span class="php-var">$this</span>-&gt;auth) {
+</span><span id="266" class="l"><a class="l" href="#266">266: </a>                <span class="php-var">$mech</span> = <span class="php-var">$this</span>-&gt;choose_auth();
+</span><span id="267" class="l"><a class="l" href="#267">267: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$mech</span>) {
+</span><span id="268" class="l"><a class="l" href="#268">268: </a>                    <span class="php-var">$result</span> = <span class="php-var">$this</span>-&gt;authenticate(<span class="php-var">$this</span>-&gt;username, <span class="php-var">$this</span>-&gt;password, <span class="php-var">$mech</span>);
+</span><span id="269" class="l"><a class="l" href="#269">269: </a>                }
+</span><span id="270" class="l"><a class="l" href="#270">270: </a>            }
+</span><span id="271" class="l"><a class="l" href="#271">271: </a>            <span class="php-keyword1">else</span> {
+</span><span id="272" class="l"><a class="l" href="#272">272: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;state == <span class="php-quote">'connected'</span>) {
+</span><span id="273" class="l"><a class="l" href="#273">273: </a>                    <span class="php-var">$result</span> = <span class="php-keyword1">false</span>;
+</span><span id="274" class="l"><a class="l" href="#274">274: </a>                }
+</span><span id="275" class="l"><a class="l" href="#275">275: </a>            }
+</span><span id="276" class="l"><a class="l" href="#276">276: </a>        }
+</span><span id="277" class="l"><a class="l" href="#277">277: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
+</span><span id="278" class="l"><a class="l" href="#278">278: </a>    }
+</span><span id="279" class="l"><a class="l" href="#279">279: </a>
+</span><span id="280" class="l"><a class="l" href="#280">280: </a>    <span class="php-keyword1">function</span> <a id="_choose_auth" href="#_choose_auth">choose_auth</a>() {
+</span><span id="281" class="l"><a class="l" href="#281">281: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$this</span>-&gt;supports_auth)) {
+</span><span id="282" class="l"><a class="l" href="#282">282: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="283" class="l"><a class="l" href="#283">283: </a>        }
+</span><span id="284" class="l"><a class="l" href="#284">284: </a>        <span class="php-var">$requested</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'cram-md5'</span>,<span class="php-quote">'login'</span>,<span class="php-quote">'plain'</span>);
+</span><span id="285" class="l"><a class="l" href="#285">285: </a>        <span class="php-var">$intersect</span> = <span class="php-keyword2">array_intersect</span>(<span class="php-var">$requested</span>,<span class="php-var">$this</span>-&gt;supports_auth);
+</span><span id="286" class="l"><a class="l" href="#286">286: </a>        <span class="php-keyword1">if</span>(<span class="php-keyword2">count</span>(<span class="php-var">$intersect</span>) &gt; <span class="php-num">0</span>) {
+</span><span id="287" class="l"><a class="l" href="#287">287: </a>            <span class="php-keyword1">return</span> <span class="php-var">$intersect</span>[<span class="php-num">0</span>];
+</span><span id="288" class="l"><a class="l" href="#288">288: </a>        }
+</span><span id="289" class="l"><a class="l" href="#289">289: </a>        <span class="php-keyword1">return</span> <span class="php-var">$requested</span>[ <span class="php-keyword2">count</span>(<span class="php-var">$requested</span>) - <span class="php-num">1</span> ];
+</span><span id="290" class="l"><a class="l" href="#290">290: </a>    }
+</span><span id="291" class="l"><a class="l" href="#291">291: </a>
+</span><span id="292" class="l"><a class="l" href="#292">292: </a>    <span class="php-comment">/* authenticate the username and password to the server */</span>
+</span><span id="293" class="l"><a class="l" href="#293">293: </a>    <span class="php-keyword1">function</span> <a id="_authenticate" href="#_authenticate">authenticate</a>(<span class="php-var">$username</span>, <span class="php-var">$password</span>, <span class="php-var">$mech</span>) {
+</span><span id="294" class="l"><a class="l" href="#294">294: </a>        <span class="php-var">$result</span> = <span class="php-keyword1">false</span>;
+</span><span id="295" class="l"><a class="l" href="#295">295: </a>        <span class="php-keyword1">switch</span> (<span class="php-keyword2">strtolower</span>(<span class="php-var">$mech</span>)) {
+</span><span id="296" class="l"><a class="l" href="#296">296: </a>            <span class="php-keyword1">case</span> <span class="php-quote">'external'</span>:
+</span><span id="297" class="l"><a class="l" href="#297">297: </a>                <span class="php-var">$command</span> = <span class="php-quote">'AUTH EXTERNAL '</span>.<span class="php-keyword2">base64_encode</span>(<span class="php-var">$username</span>);
+</span><span id="298" class="l"><a class="l" href="#298">298: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="299" class="l"><a class="l" href="#299">299: </a>                <span class="php-keyword1">break</span>;
+</span><span id="300" class="l"><a class="l" href="#300">300: </a>            <span class="php-keyword1">case</span> <span class="php-quote">'cram-md5'</span>:
+</span><span id="301" class="l"><a class="l" href="#301">301: </a>                <span class="php-var">$command</span> = <span class="php-quote">'AUTH CRAM-MD5'</span>;
+</span><span id="302" class="l"><a class="l" href="#302">302: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="303" class="l"><a class="l" href="#303">303: </a>                <span class="php-var">$response</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="304" class="l"><a class="l" href="#304">304: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$response</span>) || !<span class="php-keyword1">isset</span>(<span class="php-var">$response</span>[<span class="php-num">0</span>][<span class="php-num">1</span>][<span class="php-num">0</span>]) || <span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$response</span>,<span class="php-quote">'334'</span>) != <span class="php-num">0</span>) {
+</span><span id="305" class="l"><a class="l" href="#305">305: </a>                    <span class="php-var">$result</span> = <span class="php-quote">'FATAL: SMTP server does not support AUTH CRAM-MD5'</span>;
+</span><span id="306" class="l"><a class="l" href="#306">306: </a>                }
+</span><span id="307" class="l"><a class="l" href="#307">307: </a>                <span class="php-keyword1">else</span> {
+</span><span id="308" class="l"><a class="l" href="#308">308: </a>                    <span class="php-var">$challenge</span> = <span class="php-keyword2">base64_decode</span>(<span class="php-keyword2">trim</span>(<span class="php-var">$response</span>[<span class="php-num">0</span>][<span class="php-num">1</span>][<span class="php-num">0</span>]));
+</span><span id="309" class="l"><a class="l" href="#309">309: </a>                    <span class="php-var">$password</span> .= <span class="php-keyword2">str_repeat</span>(<span class="php-keyword2">chr</span>(<span class="php-num">0x00</span>), (<span class="php-num">64</span>-<span class="php-keyword2">strlen</span>(<span class="php-var">$password</span>)));
+</span><span id="310" class="l"><a class="l" href="#310">310: </a>                    <span class="php-var">$ipad</span> = <span class="php-keyword2">str_repeat</span>(<span class="php-keyword2">chr</span>(<span class="php-num">0x36</span>), <span class="php-num">64</span>);
+</span><span id="311" class="l"><a class="l" href="#311">311: </a>                    <span class="php-var">$opad</span> = <span class="php-keyword2">str_repeat</span>(<span class="php-keyword2">chr</span>(<span class="php-num">0x5c</span>), <span class="php-num">64</span>);
+</span><span id="312" class="l"><a class="l" href="#312">312: </a>                    <span class="php-var">$digest</span> = <span class="php-keyword2">bin2hex</span>(<span class="php-keyword2">pack</span>(<span class="php-quote">'H*'</span>, <span class="php-keyword2">md5</span>((<span class="php-var">$password</span> ^ <span class="php-var">$opad</span>).<span class="php-keyword2">pack</span>(<span class="php-quote">'H*'</span>, <span class="php-keyword2">md5</span>((<span class="php-var">$password</span> ^ <span class="php-var">$ipad</span>).<span class="php-var">$challenge</span>)))));
+</span><span id="313" class="l"><a class="l" href="#313">313: </a>                    <span class="php-var">$command</span> = <span class="php-keyword2">base64_encode</span>(<span class="php-var">$username</span>.<span class="php-quote">' '</span>.<span class="php-var">$digest</span>);
+</span><span id="314" class="l"><a class="l" href="#314">314: </a>                    <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="315" class="l"><a class="l" href="#315">315: </a>                }
+</span><span id="316" class="l"><a class="l" href="#316">316: </a>                <span class="php-keyword1">break</span>;
+</span><span id="317" class="l"><a class="l" href="#317">317: </a>            <span class="php-keyword1">case</span> <span class="php-quote">'ntlm'</span>:
+</span><span id="318" class="l"><a class="l" href="#318">318: </a>                <span class="php-var">$command</span> = <span class="php-quote">'AUTH NTLM '</span>.<span class="php-var">$this</span>-&gt;build_ntlm_type_one();
+</span><span id="319" class="l"><a class="l" href="#319">319: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="320" class="l"><a class="l" href="#320">320: </a>                <span class="php-var">$response</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="321" class="l"><a class="l" href="#321">321: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$response</span>) || !<span class="php-keyword1">isset</span>(<span class="php-var">$response</span>[<span class="php-num">0</span>][<span class="php-num">1</span>][<span class="php-num">0</span>]) || <span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$response</span>,<span class="php-quote">'334'</span>) != <span class="php-num">0</span>) {
+</span><span id="322" class="l"><a class="l" href="#322">322: </a>                    <span class="php-var">$result</span> = <span class="php-quote">'FATAL: SMTP server does not support AUTH NTLM'</span>;
+</span><span id="323" class="l"><a class="l" href="#323">323: </a>                }
+</span><span id="324" class="l"><a class="l" href="#324">324: </a>                <span class="php-keyword1">else</span> {
+</span><span id="325" class="l"><a class="l" href="#325">325: </a>                    <span class="php-var">$ntlm_res</span> = <span class="php-var">$this</span>-&gt;parse_ntlm_type_two(<span class="php-var">$response</span>[<span class="php-num">0</span>][<span class="php-num">1</span>][<span class="php-num">0</span>]);
+</span><span id="326" class="l"><a class="l" href="#326">326: </a>                    <span class="php-var">$command</span> = <span class="php-var">$this</span>-&gt;build_ntlm_type_three(<span class="php-var">$ntlm_res</span>, <span class="php-var">$username</span>, <span class="php-var">$password</span>);
+</span><span id="327" class="l"><a class="l" href="#327">327: </a>                    <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="328" class="l"><a class="l" href="#328">328: </a>                }
+</span><span id="329" class="l"><a class="l" href="#329">329: </a>                <span class="php-keyword1">break</span>;
+</span><span id="330" class="l"><a class="l" href="#330">330: </a>            <span class="php-keyword1">case</span> <span class="php-quote">'login'</span>:
+</span><span id="331" class="l"><a class="l" href="#331">331: </a>                <span class="php-var">$command</span> = <span class="php-quote">'AUTH LOGIN'</span>;
+</span><span id="332" class="l"><a class="l" href="#332">332: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="333" class="l"><a class="l" href="#333">333: </a>                <span class="php-var">$response</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="334" class="l"><a class="l" href="#334">334: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$response</span>) || <span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$response</span>,<span class="php-quote">'334'</span>) != <span class="php-num">0</span>) {
+</span><span id="335" class="l"><a class="l" href="#335">335: </a>                    <span class="php-var">$result</span> =  <span class="php-quote">'FATAL: SMTP server does not support AUTH LOGIN'</span>;
+</span><span id="336" class="l"><a class="l" href="#336">336: </a>                }
+</span><span id="337" class="l"><a class="l" href="#337">337: </a>                <span class="php-keyword1">else</span> {
+</span><span id="338" class="l"><a class="l" href="#338">338: </a>                    <span class="php-var">$command</span> = <span class="php-keyword2">base64_encode</span>(<span class="php-var">$username</span>);
+</span><span id="339" class="l"><a class="l" href="#339">339: </a>                    <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="340" class="l"><a class="l" href="#340">340: </a>                    <span class="php-var">$response</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="341" class="l"><a class="l" href="#341">341: </a>                    <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$response</span>) || <span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$response</span>,<span class="php-quote">'334'</span>) != <span class="php-num">0</span>) {
+</span><span id="342" class="l"><a class="l" href="#342">342: </a>                        <span class="php-var">$result</span> = <span class="php-quote">'FATAL: SMTP server does not support AUTH LOGIN'</span>;
+</span><span id="343" class="l"><a class="l" href="#343">343: </a>                    }
+</span><span id="344" class="l"><a class="l" href="#344">344: </a>                    <span class="php-var">$command</span> = <span class="php-keyword2">base64_encode</span>(<span class="php-var">$password</span>);
+</span><span id="345" class="l"><a class="l" href="#345">345: </a>                    <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="346" class="l"><a class="l" href="#346">346: </a>                }
+</span><span id="347" class="l"><a class="l" href="#347">347: </a>                <span class="php-keyword1">break</span>;
+</span><span id="348" class="l"><a class="l" href="#348">348: </a>            <span class="php-keyword1">case</span> <span class="php-quote">'plain'</span>:
+</span><span id="349" class="l"><a class="l" href="#349">349: </a>                <span class="php-var">$command</span> = <span class="php-quote">'AUTH PLAIN '</span>.<span class="php-keyword2">base64_encode</span>(<span class="php-quote">&quot;\0&quot;</span>.<span class="php-var">$username</span>.<span class="php-quote">&quot;\0&quot;</span>.<span class="php-var">$password</span>);
+</span><span id="350" class="l"><a class="l" href="#350">350: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="351" class="l"><a class="l" href="#351">351: </a>                <span class="php-keyword1">break</span>;
+</span><span id="352" class="l"><a class="l" href="#352">352: </a>            <span class="php-keyword1">default</span>:
+</span><span id="353" class="l"><a class="l" href="#353">353: </a>                <span class="php-var">$result</span> = <span class="php-quote">'FATAL: Unknown SMTP AUTH mechanism: '</span>.<span class="php-var">$mech</span>;
+</span><span id="354" class="l"><a class="l" href="#354">354: </a>                <span class="php-keyword1">exit</span>;
+</span><span id="355" class="l"><a class="l" href="#355">355: </a>        }
+</span><span id="356" class="l"><a class="l" href="#356">356: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$result</span>) {
+</span><span id="357" class="l"><a class="l" href="#357">357: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occured authenticating to the SMTP server'</span>;
+</span><span id="358" class="l"><a class="l" href="#358">358: </a>            <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="359" class="l"><a class="l" href="#359">359: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$res</span>, <span class="php-quote">'235'</span>) == <span class="php-num">0</span>) {
+</span><span id="360" class="l"><a class="l" href="#360">360: </a>                <span class="php-var">$this</span>-&gt;state = <span class="php-quote">'authed'</span>;
+</span><span id="361" class="l"><a class="l" href="#361">361: </a>                <span class="php-var">$result</span> = <span class="php-keyword1">false</span>;
+</span><span id="362" class="l"><a class="l" href="#362">362: </a>            }
+</span><span id="363" class="l"><a class="l" href="#363">363: </a>            <span class="php-keyword1">else</span> {
+</span><span id="364" class="l"><a class="l" href="#364">364: </a>                <span class="php-var">$result</span> = <span class="php-quote">'Authorization failure'</span>;
+</span><span id="365" class="l"><a class="l" href="#365">365: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$res</span>[<span class="php-num">0</span>][<span class="php-num">1</span>])) {
+</span><span id="366" class="l"><a class="l" href="#366">366: </a>                    <span class="php-var">$result</span> .= <span class="php-quote">': '</span>.<span class="php-keyword2">implode</span>(<span class="php-quote">' '</span>, <span class="php-var">$res</span>[<span class="php-num">0</span>][<span class="php-num">1</span>]);
+</span><span id="367" class="l"><a class="l" href="#367">367: </a>                }
+</span><span id="368" class="l"><a class="l" href="#368">368: </a>            }
+</span><span id="369" class="l"><a class="l" href="#369">369: </a>        }
+</span><span id="370" class="l"><a class="l" href="#370">370: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
+</span><span id="371" class="l"><a class="l" href="#371">371: </a>    }
+</span><span id="372" class="l"><a class="l" href="#372">372: </a>
+</span><span id="373" class="l"><a class="l" href="#373">373: </a>    <span class="php-comment">/* parse NTLM challenge string */</span>
+</span><span id="374" class="l"><a class="l" href="#374">374: </a>    <span class="php-keyword1">function</span> <a id="_parse_ntlm_type_two" href="#_parse_ntlm_type_two">parse_ntlm_type_two</a>(<span class="php-var">$bin_str</span>) {
+</span><span id="375" class="l"><a class="l" href="#375">375: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="376" class="l"><a class="l" href="#376">376: </a>        <span class="php-var">$res</span>[<span class="php-quote">'vals'</span>] = <span class="php-keyword2">unpack</span>(<span class="php-quote">'a8prefix/Vtype/vname_len/vname_space/Vname_offset/Vflags/A8challenge/A8context/vtarget_len/vtarget_space/Vtarget_offset'</span>, <span class="php-keyword2">base64_decode</span>(<span class="php-var">$bin_str</span>));
+</span><span id="377" class="l"><a class="l" href="#377">377: </a>        <span class="php-var">$res</span>[<span class="php-quote">'name'</span>] = <span class="php-keyword2">unpack</span>(<span class="php-quote">'A'</span>.<span class="php-var">$res</span>[<span class="php-quote">'vals'</span>][<span class="php-quote">'name_len'</span>].<span class="php-quote">'name'</span>, <span class="php-keyword2">substr</span>(<span class="php-keyword2">base64_decode</span>(<span class="php-var">$bin_str</span>), <span class="php-var">$res</span>[<span class="php-quote">'vals'</span>][<span class="php-quote">'name_offset'</span>], <span class="php-var">$res</span>[<span class="php-quote">'vals'</span>][<span class="php-quote">'name_len'</span>]));
+</span><span id="378" class="l"><a class="l" href="#378">378: </a>        <span class="php-var">$target</span> = <span class="php-keyword2">substr</span>(<span class="php-keyword2">base64_decode</span>(<span class="php-var">$bin_str</span>), <span class="php-var">$res</span>[<span class="php-quote">'vals'</span>][<span class="php-quote">'target_offset'</span>], <span class="php-var">$res</span>[<span class="php-quote">'vals'</span>][<span class="php-quote">'target_len'</span>]);
+</span><span id="379" class="l"><a class="l" href="#379">379: </a>        <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-num">2</span> =&gt; <span class="php-quote">'domain'</span>, <span class="php-num">1</span> =&gt; <span class="php-quote">'server'</span>, <span class="php-num">4</span> =&gt; <span class="php-quote">'dns_domain'</span>, <span class="php-num">3</span> =&gt; <span class="php-quote">'dns_server'</span>);
+</span><span id="380" class="l"><a class="l" href="#380">380: </a>        <span class="php-var">$names</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'domain'</span> =&gt; <span class="php-quote">''</span>, <span class="php-quote">'server'</span> =&gt; <span class="php-quote">''</span>, <span class="php-quote">'dns_domain'</span> =&gt; <span class="php-quote">''</span>, <span class="php-quote">'dns_server'</span> =&gt; <span class="php-quote">''</span>);
+</span><span id="381" class="l"><a class="l" href="#381">381: </a>        <span class="php-keyword1">while</span> (<span class="php-var">$target</span>) {
+</span><span id="382" class="l"><a class="l" href="#382">382: </a>            <span class="php-var">$atts</span> = <span class="php-keyword2">unpack</span>(<span class="php-quote">'vfld/vlen'</span>, <span class="php-var">$target</span>);
+</span><span id="383" class="l"><a class="l" href="#383">383: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$atts</span>[<span class="php-quote">'fld'</span>] == <span class="php-num">0</span>) {
+</span><span id="384" class="l"><a class="l" href="#384">384: </a>                <span class="php-keyword1">break</span>;
+</span><span id="385" class="l"><a class="l" href="#385">385: </a>            }
+</span><span id="386" class="l"><a class="l" href="#386">386: </a>            <span class="php-var">$fld</span> = <span class="php-keyword2">unpack</span>(<span class="php-quote">'A'</span>.<span class="php-var">$atts</span>[<span class="php-quote">'len'</span>], <span class="php-keyword2">substr</span>(<span class="php-var">$target</span>, <span class="php-num">4</span>));
+</span><span id="387" class="l"><a class="l" href="#387">387: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$flds</span>[<span class="php-var">$atts</span>[<span class="php-quote">'fld'</span>]])) {
+</span><span id="388" class="l"><a class="l" href="#388">388: </a>                <span class="php-var">$names</span>[<span class="php-var">$flds</span>[<span class="php-var">$atts</span>[<span class="php-quote">'fld'</span>]]] = <span class="php-var">$fld</span>;
+</span><span id="389" class="l"><a class="l" href="#389">389: </a>            }
+</span><span id="390" class="l"><a class="l" href="#390">390: </a>            <span class="php-var">$target</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$target</span>, (<span class="php-num">4</span> + <span class="php-var">$atts</span>[<span class="php-quote">'len'</span>]));
+</span><span id="391" class="l"><a class="l" href="#391">391: </a>        }
+</span><span id="392" class="l"><a class="l" href="#392">392: </a>        <span class="php-var">$res</span>[<span class="php-quote">'names'</span>] = <span class="php-var">$names</span>;
+</span><span id="393" class="l"><a class="l" href="#393">393: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="394" class="l"><a class="l" href="#394">394: </a>    }
+</span><span id="395" class="l"><a class="l" href="#395">395: </a>
+</span><span id="396" class="l"><a class="l" href="#396">396: </a>    <span class="php-comment">/* build initial NTLM message string */</span>
+</span><span id="397" class="l"><a class="l" href="#397">397: </a>    <span class="php-keyword1">function</span> <a id="_build_ntlm_type_one" href="#_build_ntlm_type_one">build_ntlm_type_one</a>() {
+</span><span id="398" class="l"><a class="l" href="#398">398: </a>        <span class="php-var">$pre</span> = <span class="php-quote">'NTLMSSP'</span>.<span class="php-keyword2">chr</span>(<span class="php-num">0</span>);
+</span><span id="399" class="l"><a class="l" href="#399">399: </a>        <span class="php-var">$type</span> = <span class="php-keyword2">pack</span>(<span class="php-quote">'V'</span>, <span class="php-num">1</span>);
+</span><span id="400" class="l"><a class="l" href="#400">400: </a>        <span class="php-var">$flags</span> = <span class="php-keyword2">pack</span>(<span class="php-quote">'V'</span>, <span class="php-num">0x00000201</span>);
+</span><span id="401" class="l"><a class="l" href="#401">401: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">base64_encode</span>(<span class="php-var">$pre</span>.<span class="php-var">$type</span>.<span class="php-var">$flags</span>);
+</span><span id="402" class="l"><a class="l" href="#402">402: </a>    }
+</span><span id="403" class="l"><a class="l" href="#403">403: </a>
+</span><span id="404" class="l"><a class="l" href="#404">404: </a>    <span class="php-comment">/* build NTLM challenge response string */</span>
+</span><span id="405" class="l"><a class="l" href="#405">405: </a>    <span class="php-keyword1">function</span> <a id="_build_ntlm_type_three" href="#_build_ntlm_type_three">build_ntlm_type_three</a>(<span class="php-var">$msg_data</span>, <span class="php-var">$username</span>, <span class="php-var">$password</span>) {
+</span><span id="406" class="l"><a class="l" href="#406">406: </a>        <span class="php-var">$username</span> = <span class="php-keyword2">iconv</span>(<span class="php-quote">'UTF-8'</span>, <span class="php-quote">'UTF-16LE'</span>, <span class="php-var">$username</span>);
+</span><span id="407" class="l"><a class="l" href="#407">407: </a>        <span class="php-var">$target</span> = <span class="php-var">$msg_data</span>[<span class="php-quote">'name'</span>][<span class="php-quote">'name'</span>];
+</span><span id="408" class="l"><a class="l" href="#408">408: </a>        <span class="php-var">$host</span> = <span class="php-keyword2">iconv</span>(<span class="php-quote">'UTF-8'</span>, <span class="php-quote">'UTF-16LE'</span>, <span class="php-keyword2">php_uname</span>(<span class="php-quote">'n'</span>));
+</span><span id="409" class="l"><a class="l" href="#409">409: </a>        <span class="php-var">$pre</span> = <span class="php-quote">'NTLMSSP'</span>.<span class="php-keyword2">chr</span>(<span class="php-num">0</span>);
+</span><span id="410" class="l"><a class="l" href="#410">410: </a>        <span class="php-var">$type</span> = <span class="php-keyword2">pack</span>(<span class="php-quote">'V'</span>, <span class="php-num">3</span>);
+</span><span id="411" class="l"><a class="l" href="#411">411: </a>        <span class="php-var">$lm_response</span> = <span class="php-var">$this</span>-&gt;build_lm_response(<span class="php-var">$msg_data</span>, <span class="php-var">$username</span>, <span class="php-var">$password</span>);
+</span><span id="412" class="l"><a class="l" href="#412">412: </a>        <span class="php-var">$ntlm_response</span> = <span class="php-var">$this</span>-&gt;build_ntlm_response(<span class="php-var">$msg_data</span>, <span class="php-var">$username</span>, <span class="php-var">$password</span>);
+</span><span id="413" class="l"><a class="l" href="#413">413: </a>        <span class="php-var">$flags</span> = <span class="php-keyword2">pack</span>(<span class="php-quote">'V'</span>, <span class="php-num">0x00000201</span>);
+</span><span id="414" class="l"><a class="l" href="#414">414: </a>        <span class="php-var">$offset</span> = <span class="php-keyword2">strlen</span>(<span class="php-var">$pre</span>.<span class="php-var">$type</span>)+<span class="php-num">52</span>;
+</span><span id="415" class="l"><a class="l" href="#415">415: </a>        <span class="php-var">$target_sec</span> = <span class="php-var">$this</span>-&gt;ntlm_security_buffer(<span class="php-keyword2">strlen</span>(<span class="php-var">$target</span>), <span class="php-var">$offset</span>);
+</span><span id="416" class="l"><a class="l" href="#416">416: </a>        <span class="php-var">$offset</span> += <span class="php-keyword2">strlen</span>(<span class="php-var">$target</span>);
+</span><span id="417" class="l"><a class="l" href="#417">417: </a>        <span class="php-var">$user_sec</span> = <span class="php-var">$this</span>-&gt;ntlm_security_buffer(<span class="php-keyword2">strlen</span>(<span class="php-var">$username</span>), <span class="php-var">$offset</span>);
+</span><span id="418" class="l"><a class="l" href="#418">418: </a>        <span class="php-var">$offset</span> += <span class="php-keyword2">strlen</span>(<span class="php-var">$username</span>);
+</span><span id="419" class="l"><a class="l" href="#419">419: </a>        <span class="php-var">$host_sec</span> = <span class="php-var">$this</span>-&gt;ntlm_security_buffer(<span class="php-keyword2">strlen</span>(<span class="php-var">$host</span>), <span class="php-var">$offset</span>);
+</span><span id="420" class="l"><a class="l" href="#420">420: </a>        <span class="php-var">$offset</span> += <span class="php-keyword2">strlen</span>(<span class="php-var">$host</span>);
+</span><span id="421" class="l"><a class="l" href="#421">421: </a>        <span class="php-var">$lm_sec</span> = <span class="php-var">$this</span>-&gt;ntlm_security_buffer(<span class="php-keyword2">strlen</span>(<span class="php-var">$lm_response</span>), <span class="php-var">$offset</span>);
+</span><span id="422" class="l"><a class="l" href="#422">422: </a>        <span class="php-var">$offset</span> += <span class="php-keyword2">strlen</span>(<span class="php-var">$lm_response</span>);
+</span><span id="423" class="l"><a class="l" href="#423">423: </a>        <span class="php-var">$ntlm_sec</span> = <span class="php-var">$this</span>-&gt;ntlm_security_buffer(<span class="php-keyword2">strlen</span>(<span class="php-var">$ntlm_response</span>), <span class="php-var">$offset</span>);
+</span><span id="424" class="l"><a class="l" href="#424">424: </a>        <span class="php-var">$offset</span> += <span class="php-keyword2">strlen</span>(<span class="php-var">$ntlm_response</span>);
+</span><span id="425" class="l"><a class="l" href="#425">425: </a>        <span class="php-var">$sess_sec</span> = <span class="php-var">$this</span>-&gt;ntlm_security_buffer(<span class="php-num">0</span>, <span class="php-var">$offset</span>);
+</span><span id="426" class="l"><a class="l" href="#426">426: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">base64_encode</span>(<span class="php-var">$pre</span>.<span class="php-var">$type</span>.<span class="php-var">$lm_sec</span>.<span class="php-var">$ntlm_sec</span>.<span class="php-var">$target_sec</span>.<span class="php-var">$user_sec</span>.<span class="php-var">$host_sec</span>.<span class="php-var">$sess_sec</span>.<span class="php-var">$flags</span>.<span class="php-var">$target</span>.<span class="php-var">$username</span>.<span class="php-var">$host</span>.<span class="php-var">$lm_response</span>.<span class="php-var">$ntlm_response</span>);
+</span><span id="427" class="l"><a class="l" href="#427">427: </a>    }
+</span><span id="428" class="l"><a class="l" href="#428">428: </a>
+</span><span id="429" class="l"><a class="l" href="#429">429: </a>    <span class="php-comment">/* build an NTLM &quot;security buffer&quot; for the type 3 response string */</span>
+</span><span id="430" class="l"><a class="l" href="#430">430: </a>    <span class="php-keyword1">function</span> <a id="_ntlm_security_buffer" href="#_ntlm_security_buffer">ntlm_security_buffer</a>(<span class="php-var">$len</span>, <span class="php-var">$offset</span>) {
+</span><span id="431" class="l"><a class="l" href="#431">431: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">pack</span>(<span class="php-quote">'vvV'</span>, <span class="php-var">$len</span>, <span class="php-var">$len</span>, <span class="php-var">$offset</span>);
+</span><span id="432" class="l"><a class="l" href="#432">432: </a>    }
+</span><span id="433" class="l"><a class="l" href="#433">433: </a>
+</span><span id="434" class="l"><a class="l" href="#434">434: </a>    <span class="php-comment">/* build the NTLM lm hash then ecnrypt the challenge string with it */</span>
+</span><span id="435" class="l"><a class="l" href="#435">435: </a>    <span class="php-keyword1">function</span> <a id="_build_lm_response" href="#_build_lm_response">build_lm_response</a>(<span class="php-var">$msg_data</span>, <span class="php-var">$username</span>, <span class="php-var">$password</span>){
+</span><span id="436" class="l"><a class="l" href="#436">436: </a>        <span class="php-var">$pass</span> = <span class="php-keyword2">strtoupper</span>(<span class="php-var">$password</span>);
+</span><span id="437" class="l"><a class="l" href="#437">437: </a>        <span class="php-keyword1">while</span> (<span class="php-keyword2">strlen</span>(<span class="php-var">$pass</span>) &lt; <span class="php-num">14</span>) {
+</span><span id="438" class="l"><a class="l" href="#438">438: </a>            <span class="php-var">$pass</span> .= <span class="php-keyword2">chr</span>(<span class="php-num">0</span>);
+</span><span id="439" class="l"><a class="l" href="#439">439: </a>        }
+</span><span id="440" class="l"><a class="l" href="#440">440: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strlen</span>(<span class="php-var">$pass</span>) &gt; <span class="php-num">14</span>) {
+</span><span id="441" class="l"><a class="l" href="#441">441: </a>            <span class="php-keyword1">return</span> <span class="php-keyword2">str_repeat</span>(<span class="php-keyword2">chr</span>(<span class="php-num">0</span>), <span class="php-num">16</span>);
+</span><span id="442" class="l"><a class="l" href="#442">442: </a>        }
+</span><span id="443" class="l"><a class="l" href="#443">443: </a>        <span class="php-var">$p1</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$pass</span>, <span class="php-num">0</span>, <span class="php-num">7</span>);
+</span><span id="444" class="l"><a class="l" href="#444">444: </a>        <span class="php-var">$p2</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$pass</span>, <span class="php-num">7</span>);
+</span><span id="445" class="l"><a class="l" href="#445">445: </a>        <span class="php-var">$lm_hash</span> = <span class="php-var">$this</span>-&gt;des_encrypt(<span class="php-var">$p1</span>).<span class="php-var">$this</span>-&gt;des_encrypt(<span class="php-var">$p2</span>);
+</span><span id="446" class="l"><a class="l" href="#446">446: </a>        <span class="php-keyword1">while</span> (<span class="php-keyword2">strlen</span>(<span class="php-var">$lm_hash</span>) &lt; <span class="php-num">21</span>) {
+</span><span id="447" class="l"><a class="l" href="#447">447: </a>            <span class="php-var">$lm_hash</span> .= <span class="php-keyword2">chr</span>(<span class="php-num">0</span>);
+</span><span id="448" class="l"><a class="l" href="#448">448: </a>        }
+</span><span id="449" class="l"><a class="l" href="#449">449: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;apply_ntlm_hash(<span class="php-var">$msg_data</span>[<span class="php-quote">'vals'</span>][<span class="php-quote">'challenge'</span>], <span class="php-var">$lm_hash</span>);
+</span><span id="450" class="l"><a class="l" href="#450">450: </a>    }
+</span><span id="451" class="l"><a class="l" href="#451">451: </a>
+</span><span id="452" class="l"><a class="l" href="#452">452: </a>    <span class="php-comment">/* build the NTLM ntlm hash then ecnrypt the challenge string with it */</span>
+</span><span id="453" class="l"><a class="l" href="#453">453: </a>    <span class="php-keyword1">function</span> <a id="_build_ntlm_response" href="#_build_ntlm_response">build_ntlm_response</a>(<span class="php-var">$msg_data</span>, <span class="php-var">$username</span>, <span class="php-var">$password</span>){
+</span><span id="454" class="l"><a class="l" href="#454">454: </a>        <span class="php-var">$password</span> = <span class="php-keyword2">iconv</span>(<span class="php-quote">'UTF-8'</span>, <span class="php-quote">'UTF-16LE'</span>, <span class="php-var">$password</span>);
+</span><span id="455" class="l"><a class="l" href="#455">455: </a>        <span class="php-var">$ntlm_hash</span> = <span class="php-keyword2">hash</span>(<span class="php-quote">'md4'</span>, <span class="php-var">$password</span>, <span class="php-keyword1">true</span>);
+</span><span id="456" class="l"><a class="l" href="#456">456: </a>        <span class="php-keyword1">while</span> (<span class="php-keyword2">strlen</span>(<span class="php-var">$ntlm_hash</span>) &lt; <span class="php-num">21</span>) {
+</span><span id="457" class="l"><a class="l" href="#457">457: </a>            <span class="php-var">$ntlm_hash</span> .= <span class="php-keyword2">chr</span>(<span class="php-num">0</span>);
+</span><span id="458" class="l"><a class="l" href="#458">458: </a>        }
+</span><span id="459" class="l"><a class="l" href="#459">459: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;apply_ntlm_hash(<span class="php-var">$msg_data</span>[<span class="php-quote">'vals'</span>][<span class="php-quote">'challenge'</span>], <span class="php-var">$ntlm_hash</span>);
+</span><span id="460" class="l"><a class="l" href="#460">460: </a>    }
+</span><span id="461" class="l"><a class="l" href="#461">461: </a>
+</span><span id="462" class="l"><a class="l" href="#462">462: </a>    <span class="php-comment">/* encrypt the challenge string with the lm/ntlm hash */</span>
+</span><span id="463" class="l"><a class="l" href="#463">463: </a>    <span class="php-keyword1">function</span> <a id="_apply_ntlm_hash" href="#_apply_ntlm_hash">apply_ntlm_hash</a>(<span class="php-var">$challenge</span>, <span class="php-var">$hash</span>) {
+</span><span id="464" class="l"><a class="l" href="#464">464: </a>        <span class="php-var">$p1</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$hash</span>, <span class="php-num">0</span>, <span class="php-num">7</span>);
+</span><span id="465" class="l"><a class="l" href="#465">465: </a>        <span class="php-var">$p2</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$hash</span>, <span class="php-num">7</span>, <span class="php-num">7</span>);
+</span><span id="466" class="l"><a class="l" href="#466">466: </a>        <span class="php-var">$p3</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$hash</span>, <span class="php-num">14</span>, <span class="php-num">7</span>);
+</span><span id="467" class="l"><a class="l" href="#467">467: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;des_encrypt(<span class="php-var">$p1</span>, <span class="php-var">$challenge</span>).
+</span><span id="468" class="l"><a class="l" href="#468">468: </a>            <span class="php-var">$this</span>-&gt;des_encrypt(<span class="php-var">$p2</span>, <span class="php-var">$challenge</span>).
+</span><span id="469" class="l"><a class="l" href="#469">469: </a>            <span class="php-var">$this</span>-&gt;des_encrypt(<span class="php-var">$p3</span>, <span class="php-var">$challenge</span>);
+</span><span id="470" class="l"><a class="l" href="#470">470: </a>    }
+</span><span id="471" class="l"><a class="l" href="#471">471: </a>
+</span><span id="472" class="l"><a class="l" href="#472">472: </a>    <span class="php-comment">/* NTLM compatible DES encryption */</span>
+</span><span id="473" class="l"><a class="l" href="#473">473: </a>    <span class="php-keyword1">function</span> <a id="_des_encrypt" href="#_des_encrypt">des_encrypt</a>(<span class="php-var">$string</span>, <span class="php-var">$challenge</span>=<span class="php-quote">'KGS!@#$%'</span>) {
+</span><span id="474" class="l"><a class="l" href="#474">474: </a>        <span class="php-var">$key</span> = <span class="php-keyword1">array</span>();
+</span><span id="475" class="l"><a class="l" href="#475">475: </a>        <span class="php-var">$tmp</span> = <span class="php-keyword1">array</span>();
+</span><span id="476" class="l"><a class="l" href="#476">476: </a>        <span class="php-var">$len</span> = <span class="php-keyword2">strlen</span>(<span class="php-var">$string</span>);
+</span><span id="477" class="l"><a class="l" href="#477">477: </a>        <span class="php-keyword1">for</span> (<span class="php-var">$i</span>=<span class="php-num">0</span>; <span class="php-var">$i</span>&lt;<span class="php-num">7</span>; ++<span class="php-var">$i</span>)
+</span><span id="478" class="l"><a class="l" href="#478">478: </a>            <span class="php-var">$tmp</span>[] = <span class="php-var">$i</span> &lt; <span class="php-var">$len</span> ? <span class="php-keyword2">ord</span>(<span class="php-var">$string</span>[<span class="php-var">$i</span>]) : <span class="php-num">0</span>;
+</span><span id="479" class="l"><a class="l" href="#479">479: </a>        <span class="php-var">$key</span>[] = <span class="php-var">$tmp</span>[<span class="php-num">0</span>] &amp; <span class="php-num">254</span>;
+</span><span id="480" class="l"><a class="l" href="#480">480: </a>        <span class="php-var">$key</span>[] = (<span class="php-var">$tmp</span>[<span class="php-num">0</span>] &lt;&lt; <span class="php-num">7</span>) | (<span class="php-var">$tmp</span>[<span class="php-num">1</span>] &gt;&gt; <span class="php-num">1</span>);
+</span><span id="481" class="l"><a class="l" href="#481">481: </a>        <span class="php-var">$key</span>[] = (<span class="php-var">$tmp</span>[<span class="php-num">1</span>] &lt;&lt; <span class="php-num">6</span>) | (<span class="php-var">$tmp</span>[<span class="php-num">2</span>] &gt;&gt; <span class="php-num">2</span>);
+</span><span id="482" class="l"><a class="l" href="#482">482: </a>        <span class="php-var">$key</span>[] = (<span class="php-var">$tmp</span>[<span class="php-num">2</span>] &lt;&lt; <span class="php-num">5</span>) | (<span class="php-var">$tmp</span>[<span class="php-num">3</span>] &gt;&gt; <span class="php-num">3</span>);
+</span><span id="483" class="l"><a class="l" href="#483">483: </a>        <span class="php-var">$key</span>[] = (<span class="php-var">$tmp</span>[<span class="php-num">3</span>] &lt;&lt; <span class="php-num">4</span>) | (<span class="php-var">$tmp</span>[<span class="php-num">4</span>] &gt;&gt; <span class="php-num">4</span>);
+</span><span id="484" class="l"><a class="l" href="#484">484: </a>        <span class="php-var">$key</span>[] = (<span class="php-var">$tmp</span>[<span class="php-num">4</span>] &lt;&lt; <span class="php-num">3</span>) | (<span class="php-var">$tmp</span>[<span class="php-num">5</span>] &gt;&gt; <span class="php-num">5</span>);
+</span><span id="485" class="l"><a class="l" href="#485">485: </a>        <span class="php-var">$key</span>[] = (<span class="php-var">$tmp</span>[<span class="php-num">5</span>] &lt;&lt; <span class="php-num">2</span>) | (<span class="php-var">$tmp</span>[<span class="php-num">6</span>] &gt;&gt; <span class="php-num">6</span>);
+</span><span id="486" class="l"><a class="l" href="#486">486: </a>        <span class="php-var">$key</span>[] = <span class="php-var">$tmp</span>[<span class="php-num">6</span>] &lt;&lt; <span class="php-num">1</span>;
+</span><span id="487" class="l"><a class="l" href="#487">487: </a>        <span class="php-var">$is</span> = <span class="php-keyword2">mcrypt_get_iv_size</span>(MCRYPT_DES, MCRYPT_MODE_ECB);
+</span><span id="488" class="l"><a class="l" href="#488">488: </a>        <span class="php-var">$iv</span> = <span class="php-keyword2">mcrypt_create_iv</span>(<span class="php-var">$is</span>, MCRYPT_RAND);
+</span><span id="489" class="l"><a class="l" href="#489">489: </a>        <span class="php-var">$key0</span> = <span class="php-quote">&quot;&quot;</span>;
+</span><span id="490" class="l"><a class="l" href="#490">490: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$key</span> <span class="php-keyword1">as</span> <span class="php-var">$k</span>)
+</span><span id="491" class="l"><a class="l" href="#491">491: </a>            <span class="php-var">$key0</span> .= <span class="php-keyword2">chr</span>(<span class="php-var">$k</span>);
+</span><span id="492" class="l"><a class="l" href="#492">492: </a>        <span class="php-var">$crypt</span> = <span class="php-keyword2">mcrypt_encrypt</span>(MCRYPT_DES, <span class="php-var">$key0</span>, <span class="php-var">$challenge</span>, MCRYPT_MODE_ECB, <span class="php-var">$iv</span>);
+</span><span id="493" class="l"><a class="l" href="#493">493: </a>        <span class="php-keyword1">return</span> <span class="php-var">$crypt</span>;
+</span><span id="494" class="l"><a class="l" href="#494">494: </a>    }
+</span><span id="495" class="l"><a class="l" href="#495">495: </a>
+</span><span id="496" class="l"><a class="l" href="#496">496: </a>    <span class="php-comment">/* Send a message */</span>
+</span><span id="497" class="l"><a class="l" href="#497">497: </a>    <span class="php-keyword1">function</span> <a id="_send_message" href="#_send_message">send_message</a>(<span class="php-var">$from</span>, <span class="php-var">$recipients</span>, <span class="php-var">$message</span>) {
+</span><span id="498" class="l"><a class="l" href="#498">498: </a>        <span class="php-var">$this</span>-&gt;clean(<span class="php-var">$from</span>);
+</span><span id="499" class="l"><a class="l" href="#499">499: </a>        <span class="php-var">$command</span> = <span class="php-quote">'MAIL FROM:&lt;'</span>.<span class="php-var">$from</span>.<span class="php-quote">'&gt;'</span>;
+</span><span id="500" class="l"><a class="l" href="#500">500: </a>        <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="501" class="l"><a class="l" href="#501">501: </a>        <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="502" class="l"><a class="l" href="#502">502: </a>        <span class="php-var">$bail</span> = <span class="php-keyword1">false</span>;
+</span><span id="503" class="l"><a class="l" href="#503">503: </a>        <span class="php-var">$result</span> = <span class="php-quote">'An error occured sending the message'</span>;
+</span><span id="504" class="l"><a class="l" href="#504">504: </a>        <span class="php-keyword1">if</span>(<span class="php-keyword2">is_array</span>(<span class="php-var">$recipients</span>)) {
+</span><span id="505" class="l"><a class="l" href="#505">505: </a>            <span class="php-keyword1">foreach</span>(<span class="php-var">$recipients</span> <span class="php-keyword1">as</span> <span class="php-var">$rcpt</span>) {
+</span><span id="506" class="l"><a class="l" href="#506">506: </a>                <span class="php-var">$this</span>-&gt;clean(<span class="php-var">$rcpt</span>);
+</span><span id="507" class="l"><a class="l" href="#507">507: </a>                <span class="php-var">$command</span> = <span class="php-quote">'RCPT TO:&lt;'</span>.<span class="php-var">$rcpt</span>.<span class="php-quote">'&gt;'</span>;
+</span><span id="508" class="l"><a class="l" href="#508">508: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="509" class="l"><a class="l" href="#509">509: </a>                <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="510" class="l"><a class="l" href="#510">510: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$res</span>, <span class="php-quote">'250'</span>) != <span class="php-num">0</span>) {
+</span><span id="511" class="l"><a class="l" href="#511">511: </a>                    <span class="php-var">$bail</span> = <span class="php-keyword1">true</span>;
+</span><span id="512" class="l"><a class="l" href="#512">512: </a>                    <span class="php-keyword1">break</span>;
+</span><span id="513" class="l"><a class="l" href="#513">513: </a>                }
+</span><span id="514" class="l"><a class="l" href="#514">514: </a>            }
+</span><span id="515" class="l"><a class="l" href="#515">515: </a>        }
+</span><span id="516" class="l"><a class="l" href="#516">516: </a>        <span class="php-keyword1">else</span> {
+</span><span id="517" class="l"><a class="l" href="#517">517: </a>            <span class="php-var">$this</span>-&gt;clean(<span class="php-var">$recipients</span>);
+</span><span id="518" class="l"><a class="l" href="#518">518: </a>            <span class="php-var">$command</span> = <span class="php-quote">'RCPT TO:&lt;'</span>.<span class="php-var">$recipients</span>.<span class="php-quote">'&gt;'</span>;
+</span><span id="519" class="l"><a class="l" href="#519">519: </a>            <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="520" class="l"><a class="l" href="#520">520: </a>            <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="521" class="l"><a class="l" href="#521">521: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$res</span>, <span class="php-quote">'250'</span>) != <span class="php-num">0</span>) {
+</span><span id="522" class="l"><a class="l" href="#522">522: </a>                <span class="php-var">$bail</span> = <span class="php-keyword1">true</span>;
+</span><span id="523" class="l"><a class="l" href="#523">523: </a>            }
+</span><span id="524" class="l"><a class="l" href="#524">524: </a>        }
+</span><span id="525" class="l"><a class="l" href="#525">525: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$bail</span>) {
+</span><span id="526" class="l"><a class="l" href="#526">526: </a>            <span class="php-var">$command</span> = <span class="php-quote">'DATA'</span>;
+</span><span id="527" class="l"><a class="l" href="#527">527: </a>            <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="528" class="l"><a class="l" href="#528">528: </a>            <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="529" class="l"><a class="l" href="#529">529: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$res</span>, <span class="php-quote">'354'</span>) != <span class="php-num">0</span>) {
+</span><span id="530" class="l"><a class="l" href="#530">530: </a>                <span class="php-var">$result</span> = <span class="php-quote">'An error occured during the DATA command'</span>;
+</span><span id="531" class="l"><a class="l" href="#531">531: </a>            }
+</span><span id="532" class="l"><a class="l" href="#532">532: </a>            <span class="php-keyword1">else</span> {
+</span><span id="533" class="l"><a class="l" href="#533">533: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$message</span>);
+</span><span id="534" class="l"><a class="l" href="#534">534: </a>                <span class="php-comment">/* TODO: process attachments */</span>
+</span><span id="535" class="l"><a class="l" href="#535">535: </a>                <span class="php-var">$command</span> = <span class="php-var">$this</span>-&gt;crlf.<span class="php-quote">'.'</span>;
+</span><span id="536" class="l"><a class="l" href="#536">536: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="537" class="l"><a class="l" href="#537">537: </a>                <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="538" class="l"><a class="l" href="#538">538: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$res</span>, <span class="php-quote">'250'</span>) == <span class="php-num">0</span>) {
+</span><span id="539" class="l"><a class="l" href="#539">539: </a>                    <span class="php-var">$result</span> = <span class="php-keyword1">false</span>;
+</span><span id="540" class="l"><a class="l" href="#540">540: </a>                }
+</span><span id="541" class="l"><a class="l" href="#541">541: </a>                <span class="php-keyword1">else</span> {
+</span><span id="542" class="l"><a class="l" href="#542">542: </a>                    <span class="php-var">$result</span> = <span class="php-quote">'An error occured sending the message DATA'</span>;
+</span><span id="543" class="l"><a class="l" href="#543">543: </a>                }
+</span><span id="544" class="l"><a class="l" href="#544">544: </a>            }
+</span><span id="545" class="l"><a class="l" href="#545">545: </a>        }
+</span><span id="546" class="l"><a class="l" href="#546">546: </a>        <span class="php-keyword1">else</span> {
+</span><span id="547" class="l"><a class="l" href="#547">547: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occured during the RCPT command'</span>;
+</span><span id="548" class="l"><a class="l" href="#548">548: </a>        }
+</span><span id="549" class="l"><a class="l" href="#549">549: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
+</span><span id="550" class="l"><a class="l" href="#550">550: </a>    }
+</span><span id="551" class="l"><a class="l" href="#551">551: </a>
+</span><span id="552" class="l"><a class="l" href="#552">552: </a>    <span class="php-keyword1">function</span> <a id="_puke" href="#_puke">puke</a>() {
+</span><span id="553" class="l"><a class="l" href="#553">553: </a>        <span class="php-keyword1">return</span>
+</span><span id="554" class="l"><a class="l" href="#554">554: </a>            <span class="php-keyword2">print_r</span>(<span class="php-var">$this</span>-&gt;debug, <span class="php-keyword1">true</span>).
+</span><span id="555" class="l"><a class="l" href="#555">555: </a>            <span class="php-keyword2">print_r</span>(<span class="php-var">$this</span>-&gt;commands, <span class="php-keyword1">true</span>).
+</span><span id="556" class="l"><a class="l" href="#556">556: </a>            <span class="php-keyword2">print_r</span>(<span class="php-var">$this</span>-&gt;responses, <span class="php-keyword1">true</span>);
+</span><span id="557" class="l"><a class="l" href="#557">557: </a>    } 
+</span><span id="558" class="l"><a class="l" href="#558">558: </a>
+</span><span id="559" class="l"><a class="l" href="#559">559: </a>    <span class="php-comment">/* issue a logout and close the socket to the server */</span>
+</span><span id="560" class="l"><a class="l" href="#560">560: </a>    <span class="php-keyword1">function</span> <a id="_disconnect" href="#_disconnect">disconnect</a>() {
+</span><span id="561" class="l"><a class="l" href="#561">561: </a>        <span class="php-var">$command</span> = <span class="php-quote">'QUIT'</span>;
+</span><span id="562" class="l"><a class="l" href="#562">562: </a>        <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
+</span><span id="563" class="l"><a class="l" href="#563">563: </a>        <span class="php-var">$this</span>-&gt;state = <span class="php-quote">'disconnected'</span>;
+</span><span id="564" class="l"><a class="l" href="#564">564: </a>        <span class="php-var">$result</span> = <span class="php-var">$this</span>-&gt;get_response();
+</span><span id="565" class="l"><a class="l" href="#565">565: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_resource</span>(<span class="php-var">$this</span>-&gt;handle)) {
+</span><span id="566" class="l"><a class="l" href="#566">566: </a>            <span class="php-keyword2">fclose</span>(<span class="php-var">$this</span>-&gt;handle);
+</span><span id="567" class="l"><a class="l" href="#567">567: </a>        }
+</span><span id="568" class="l"><a class="l" href="#568">568: </a>    }
+</span><span id="569" class="l"><a class="l" href="#569">569: </a>
+</span><span id="570" class="l"><a class="l" href="#570">570: </a>    <span class="php-keyword1">function</span> <a id="_clean" href="#_clean">clean</a>(<span class="php-var">$val</span>) {
+</span><span id="571" class="l"><a class="l" href="#571">571: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/^[^\r\n]+</span><span class="php-var">$</span><span class="php-quote">/&quot;</span>, <span class="php-var">$val</span>)) {
+</span><span id="572" class="l"><a class="l" href="#572">572: </a>            <span class="php-keyword2">print_r</span>(<span class="php-quote">&quot;INVALID SMTP INPUT DETECTED: &lt;b&gt;</span><span class="php-var">$val</span><span class="php-quote">&lt;/b&gt;&quot;</span>);
+</span><span id="573" class="l"><a class="l" href="#573">573: </a>            <span class="php-keyword1">exit</span>;
+</span><span id="574" class="l"><a class="l" href="#574">574: </a>        }
+</span><span id="575" class="l"><a class="l" href="#575">575: </a>    }
+</span><span id="576" class="l"><a class="l" href="#576">576: </a>}
+</span><span id="577" class="l"><a class="l" href="#577">577: </a>
+</span><span id="578" class="l"><a class="l" href="#578">578: </a><span class="php-comment">/**
+</span></span><span id="579" class="l"><a class="l" href="#579">579: </a><span class="php-comment"> * Build a MIME message
+</span></span><span id="580" class="l"><a class="l" href="#580">580: </a><span class="php-comment"> * @subpackage smtp/lib
+</span></span><span id="581" class="l"><a class="l" href="#581">581: </a><span class="php-comment"> */</span>
+</span><span id="582" class="l"><a class="l" href="#582">582: </a><span class="php-keyword1">class</span> <a id="Hm_MIME_Msg" href="#Hm_MIME_Msg">Hm_MIME_Msg</a> {
+</span><span id="583" class="l"><a class="l" href="#583">583: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$headers" href="#$headers">$headers</a></span> = <span class="php-keyword1">array</span>(<span class="php-quote">'MIME-Version'</span> =&gt; <span class="php-quote">'1.0'</span>);
+</span><span id="584" class="l"><a class="l" href="#584">584: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$body" href="#$body">$body</a></span> = <span class="php-quote">''</span>;
+</span><span id="585" class="l"><a class="l" href="#585">585: </a>    <span class="php-keyword1">private</span> <span class="php-var"><a id="$allow_unqualified_addresses" href="#$allow_unqualified_addresses">$allow_unqualified_addresses</a></span> = <span class="php-keyword1">false</span>;
+</span><span id="586" class="l"><a class="l" href="#586">586: </a>
+</span><span id="587" class="l"><a class="l" href="#587">587: </a>    <span class="php-comment">/* build mime message data */</span>
+</span><span id="588" class="l"><a class="l" href="#588">588: </a>    <span class="php-keyword1">function</span> <a id="___construct" href="#___construct">__construct</a>(<span class="php-var">$to</span>, <span class="php-var">$subject</span>, <span class="php-var">$body</span>, <span class="php-var">$from</span>) {
+</span><span id="589" class="l"><a class="l" href="#589">589: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'To'</span>] = <span class="php-var">$this</span>-&gt;encode_header_fld(<span class="php-var">$to</span>);
+</span><span id="590" class="l"><a class="l" href="#590">590: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Subject'</span>] = <span class="php-var">$this</span>-&gt;encode_header_fld(<span class="php-var">$subject</span>);
+</span><span id="591" class="l"><a class="l" href="#591">591: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Date'</span>] = <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>);
+</span><span id="592" class="l"><a class="l" href="#592">592: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Message-ID'</span>] = <span class="php-quote">'&lt;'</span>.<span class="php-keyword2">md5</span>(<span class="php-keyword2">uniqid</span>(<span class="php-keyword2">rand</span>(),<span class="php-num">1</span>)).<span class="php-quote">'@'</span>.<span class="php-keyword2">php_uname</span>(<span class="php-quote">'n'</span>).<span class="php-quote">'&gt;'</span>;
+</span><span id="593" class="l"><a class="l" href="#593">593: </a>        <span class="php-var">$this</span>-&gt;body = <span class="php-var">$this</span>-&gt;prep_message_body(<span class="php-var">$body</span>);
+</span><span id="594" class="l"><a class="l" href="#594">594: </a>    }
+</span><span id="595" class="l"><a class="l" href="#595">595: </a>
+</span><span id="596" class="l"><a class="l" href="#596">596: </a>    <span class="php-comment">/* output mime message */</span>
+</span><span id="597" class="l"><a class="l" href="#597">597: </a>    <span class="php-keyword1">function</span> <a id="_get_mime_msg" href="#_get_mime_msg">get_mime_msg</a>() {
+</span><span id="598" class="l"><a class="l" href="#598">598: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="599" class="l"><a class="l" href="#599">599: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;headers <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$val</span>) {
+</span><span id="600" class="l"><a class="l" href="#600">600: </a>            <span class="php-var">$res</span> .= <span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;%s: %s\r\n&quot;</span>, <span class="php-var">$name</span>, <span class="php-var">$val</span>);
+</span><span id="601" class="l"><a class="l" href="#601">601: </a>        }
+</span><span id="602" class="l"><a class="l" href="#602">602: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>.<span class="php-quote">&quot;\r\n&quot;</span>.<span class="php-var">$this</span>-&gt;body;
+</span><span id="603" class="l"><a class="l" href="#603">603: </a>    }
+</span><span id="604" class="l"><a class="l" href="#604">604: </a>
+</span><span id="605" class="l"><a class="l" href="#605">605: </a>    <span class="php-comment">/* try to accurately validate an E-mail. Based on RFC 3696 */</span>
+</span><span id="606" class="l"><a class="l" href="#606">606: </a>    <span class="php-keyword1">function</span> <a id="_match_email_full" href="#_match_email_full">match_email_full</a>(<span class="php-var">$val</span>) {
+</span><span id="607" class="l"><a class="l" href="#607">607: </a>        <span class="php-comment">/* defaults */</span>
+</span><span id="608" class="l"><a class="l" href="#608">608: </a>        <span class="php-var">$domain</span> = <span class="php-keyword1">false</span>;
+</span><span id="609" class="l"><a class="l" href="#609">609: </a>        <span class="php-var">$local</span> = <span class="php-keyword1">false</span>;
+</span><span id="610" class="l"><a class="l" href="#610">610: </a>        <span class="php-comment">/* basic checks to weed out obviously incorrect values */</span>
+</span><span id="611" class="l"><a class="l" href="#611">611: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword2">trim</span>(<span class="php-var">$val</span>) || <span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) &gt; <span class="php-num">320</span>) {
+</span><span id="612" class="l"><a class="l" href="#612">612: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="613" class="l"><a class="l" href="#613">613: </a>        }
+</span><span id="614" class="l"><a class="l" href="#614">614: </a>        <span class="php-comment">/* determine if this is a local address or if it has a domain part */</span>
+</span><span id="615" class="l"><a class="l" href="#615">615: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strpos</span>(<span class="php-var">$val</span>, <span class="php-quote">'@'</span>) !== <span class="php-keyword1">false</span>) {
+</span><span id="616" class="l"><a class="l" href="#616">616: </a>            <span class="php-var">$local</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$val</span>, <span class="php-num">0</span>, <span class="php-keyword2">strrpos</span>(<span class="php-var">$val</span>, <span class="php-quote">'@'</span>));
+</span><span id="617" class="l"><a class="l" href="#617">617: </a>            <span class="php-var">$domain</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$val</span>, (<span class="php-keyword2">strrpos</span>(<span class="php-var">$val</span>, <span class="php-quote">'@'</span>) + <span class="php-num">1</span>));
+</span><span id="618" class="l"><a class="l" href="#618">618: </a>        }
+</span><span id="619" class="l"><a class="l" href="#619">619: </a>        <span class="php-keyword1">else</span> {
+</span><span id="620" class="l"><a class="l" href="#620">620: </a>            <span class="php-var">$local</span> = <span class="php-var">$val</span>;
+</span><span id="621" class="l"><a class="l" href="#621">621: </a>        }
+</span><span id="622" class="l"><a class="l" href="#622">622: </a>        <span class="php-comment">/* domain is not require but the local part is */</span>
+</span><span id="623" class="l"><a class="l" href="#623">623: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$local</span>) {
+</span><span id="624" class="l"><a class="l" href="#624">624: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="625" class="l"><a class="l" href="#625">625: </a>        }
+</span><span id="626" class="l"><a class="l" href="#626">626: </a>        <span class="php-keyword1">else</span> {
+</span><span id="627" class="l"><a class="l" href="#627">627: </a>            <span class="php-comment">/* if we have a domain validate it. */</span>
+</span><span id="628" class="l"><a class="l" href="#628">628: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$domain</span> &amp;&amp; !<span class="php-var">$this</span>-&gt;validate_domain_full(<span class="php-var">$domain</span>)) {
+</span><span id="629" class="l"><a class="l" href="#629">629: </a>                <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="630" class="l"><a class="l" href="#630">630: </a>            }
+</span><span id="631" class="l"><a class="l" href="#631">631: </a>            <span class="php-comment">/* validate the required local part */</span>
+</span><span id="632" class="l"><a class="l" href="#632">632: </a>            <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;validate_local_full(<span class="php-var">$local</span>)) {
+</span><span id="633" class="l"><a class="l" href="#633">633: </a>                <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="634" class="l"><a class="l" href="#634">634: </a>            }
+</span><span id="635" class="l"><a class="l" href="#635">635: </a>        }
+</span><span id="636" class="l"><a class="l" href="#636">636: </a>        <span class="php-comment">/* E-mail is valid */</span>
+</span><span id="637" class="l"><a class="l" href="#637">637: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="638" class="l"><a class="l" href="#638">638: </a>    }
+</span><span id="639" class="l"><a class="l" href="#639">639: </a>
+</span><span id="640" class="l"><a class="l" href="#640">640: </a>    <span class="php-keyword1">function</span> <a id="_validate_local_full" href="#_validate_local_full">validate_local_full</a>(<span class="php-var">$val</span>) {
+</span><span id="641" class="l"><a class="l" href="#641">641: </a>        <span class="php-comment">/* check length, &quot;.&quot; rules, and for characters &gt; ASCII 127 */</span>
+</span><span id="642" class="l"><a class="l" href="#642">642: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) &gt; <span class="php-num">64</span> || <span class="php-var">$val</span>{<span class="php-num">0</span>} == <span class="php-quote">'.'</span> || <span class="php-var">$val</span>{(<span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) -<span class="php-num">1</span>)} == <span class="php-quote">'.'</span> || <span class="php-keyword2">strstr</span>(<span class="php-var">$val</span>, <span class="php-quote">'..'</span>) ||
+</span><span id="643" class="l"><a class="l" href="#643">643: </a>            <span class="php-keyword2">preg_match</span>(<span class="php-quote">'/[^\x00-\x7F]/'</span>,<span class="php-var">$val</span>)) {
+</span><span id="644" class="l"><a class="l" href="#644">644: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="645" class="l"><a class="l" href="#645">645: </a>        }
+</span><span id="646" class="l"><a class="l" href="#646">646: </a>        <span class="php-comment">/* remove escaped characters and quoted strings */</span>
+</span><span id="647" class="l"><a class="l" href="#647">647: </a>        <span class="php-var">$local</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/\\\\.{1}/&quot;</span>, <span class="php-quote">''</span>, <span class="php-var">$val</span>);
+</span><span id="648" class="l"><a class="l" href="#648">648: </a>        <span class="php-var">$local</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/\&quot;[^\&quot;]+\&quot;/&quot;</span>, <span class="php-quote">''</span>, <span class="php-var">$local</span>);
+</span><span id="649" class="l"><a class="l" href="#649">649: </a>
+</span><span id="650" class="l"><a class="l" href="#650">650: </a>        <span class="php-comment">/* validate remaining unescaped characters */</span>
+</span><span id="651" class="l"><a class="l" href="#651">651: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/[[:print:]]/&quot;</span>, <span class="php-var">$local</span>) &amp;&amp; !<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/[@\\\&quot;,\[\]]/&quot;</span>, <span class="php-var">$local</span>)) {
+</span><span id="652" class="l"><a class="l" href="#652">652: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="653" class="l"><a class="l" href="#653">653: </a>        }
+</span><span id="654" class="l"><a class="l" href="#654">654: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="655" class="l"><a class="l" href="#655">655: </a>    }
+</span><span id="656" class="l"><a class="l" href="#656">656: </a>
+</span><span id="657" class="l"><a class="l" href="#657">657: </a>    <span class="php-keyword1">function</span> <a id="_validate_domain_full" href="#_validate_domain_full">validate_domain_full</a>(<span class="php-var">$val</span>) {
+</span><span id="658" class="l"><a class="l" href="#658">658: </a>        <span class="php-comment">/* check for a dot, max allowed length and standard ASCII characters */</span>
+</span><span id="659" class="l"><a class="l" href="#659">659: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strpos</span>(<span class="php-var">$val</span>, <span class="php-quote">'.'</span>) === <span class="php-keyword1">false</span> || <span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) &gt; <span class="php-num">255</span> || <span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/[^A-Z0-9\-\.]/i&quot;</span>, <span class="php-var">$val</span>) ||
+</span><span id="660" class="l"><a class="l" href="#660">660: </a>            <span class="php-var">$val</span>{<span class="php-num">0</span>} == <span class="php-quote">'-'</span> || <span class="php-var">$val</span>{(<span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) - <span class="php-num">1</span>)} == <span class="php-quote">'-'</span>) {
+</span><span id="661" class="l"><a class="l" href="#661">661: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="662" class="l"><a class="l" href="#662">662: </a>        }
+</span><span id="663" class="l"><a class="l" href="#663">663: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="664" class="l"><a class="l" href="#664">664: </a>    }
+</span><span id="665" class="l"><a class="l" href="#665">665: </a>
+</span><span id="666" class="l"><a class="l" href="#666">666: </a>    <span class="php-keyword1">function</span> <a id="_encode_header_fld" href="#_encode_header_fld">encode_header_fld</a>(<span class="php-var">$input</span>, <span class="php-var">$email</span>=<span class="php-keyword1">true</span>) {
+</span><span id="667" class="l"><a class="l" href="#667">667: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="668" class="l"><a class="l" href="#668">668: </a>        <span class="php-var">$input</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$input</span>, <span class="php-quote">',; '</span>);
+</span><span id="669" class="l"><a class="l" href="#669">669: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strstr</span>(<span class="php-var">$input</span>, <span class="php-quote">' '</span>)) {
+</span><span id="670" class="l"><a class="l" href="#670">670: </a>            <span class="php-var">$parts</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">' '</span>, <span class="php-var">$input</span>);
+</span><span id="671" class="l"><a class="l" href="#671">671: </a>        }
+</span><span id="672" class="l"><a class="l" href="#672">672: </a>        <span class="php-keyword1">else</span> {
+</span><span id="673" class="l"><a class="l" href="#673">673: </a>            <span class="php-var">$parts</span>[] = <span class="php-var">$input</span>;
+</span><span id="674" class="l"><a class="l" href="#674">674: </a>        }
+</span><span id="675" class="l"><a class="l" href="#675">675: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$parts</span> <span class="php-keyword1">as</span> <span class="php-var">$v</span>) {
+</span><span id="676" class="l"><a class="l" href="#676">676: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">'/(?:[^\x00-\x7F])/'</span>,<span class="php-var">$v</span>) === <span class="php-num">1</span>) {
+</span><span id="677" class="l"><a class="l" href="#677">677: </a>                <span class="php-var">$leading_quote</span> = <span class="php-keyword1">false</span>;
+</span><span id="678" class="l"><a class="l" href="#678">678: </a>                <span class="php-var">$trailing_quote</span> = <span class="php-keyword1">false</span>;
+</span><span id="679" class="l"><a class="l" href="#679">679: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">substr</span>(<span class="php-var">$v</span>, <span class="php-num">0</span>, <span class="php-num">1</span>) == <span class="php-quote">'&quot;'</span>) {
+</span><span id="680" class="l"><a class="l" href="#680">680: </a>                    <span class="php-var">$v</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$v</span>, <span class="php-num">1</span>);
+</span><span id="681" class="l"><a class="l" href="#681">681: </a>                    <span class="php-var">$leading_quote</span> = <span class="php-keyword1">true</span>;
+</span><span id="682" class="l"><a class="l" href="#682">682: </a>                }
+</span><span id="683" class="l"><a class="l" href="#683">683: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">substr</span>(<span class="php-var">$v</span>, -<span class="php-num">1</span>) == <span class="php-quote">'&quot;'</span>) {
+</span><span id="684" class="l"><a class="l" href="#684">684: </a>                    <span class="php-var">$trailing_quote</span> = <span class="php-keyword1">true</span>;
+</span><span id="685" class="l"><a class="l" href="#685">685: </a>                    <span class="php-var">$v</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$v</span>, <span class="php-num">0</span>, -<span class="php-num">1</span>);
+</span><span id="686" class="l"><a class="l" href="#686">686: </a>                }
+</span><span id="687" class="l"><a class="l" href="#687">687: </a>                <span class="php-var">$enc_val</span> = <span class="php-quote">'=?UTF-8?B?'</span>.<span class="php-keyword2">base64_encode</span>(<span class="php-var">$v</span>).<span class="php-quote">'?='</span>;
+</span><span id="688" class="l"><a class="l" href="#688">688: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$leading_quote</span>) {
+</span><span id="689" class="l"><a class="l" href="#689">689: </a>                    <span class="php-var">$enc_val</span> = <span class="php-quote">'&quot;'</span>.<span class="php-var">$enc_val</span>;
+</span><span id="690" class="l"><a class="l" href="#690">690: </a>                }
+</span><span id="691" class="l"><a class="l" href="#691">691: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$trailing_quote</span>) {
+</span><span id="692" class="l"><a class="l" href="#692">692: </a>                    <span class="php-var">$enc_val</span> = <span class="php-var">$enc_val</span>.<span class="php-quote">'&quot;'</span>;
+</span><span id="693" class="l"><a class="l" href="#693">693: </a>                }
+</span><span id="694" class="l"><a class="l" href="#694">694: </a>                <span class="php-var">$res</span>[] = <span class="php-var">$enc_val</span>;
+</span><span id="695" class="l"><a class="l" href="#695">695: </a>            }
+</span><span id="696" class="l"><a class="l" href="#696">696: </a>            <span class="php-keyword1">else</span> {
+</span><span id="697" class="l"><a class="l" href="#697">697: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$email</span> &amp;&amp; <span class="php-keyword2">strpos</span>(<span class="php-var">$v</span>, <span class="php-quote">'@'</span>) !== <span class="php-keyword1">false</span> &amp;&amp; <span class="php-var">$this</span>-&gt;match_email_full(<span class="php-var">$v</span>)) {
+</span><span id="698" class="l"><a class="l" href="#698">698: </a>                    <span class="php-var">$res</span>[] = <span class="php-quote">'&lt;'</span>.<span class="php-var">$v</span>.<span class="php-quote">'&gt;'</span>;
+</span><span id="699" class="l"><a class="l" href="#699">699: </a>                }
+</span><span id="700" class="l"><a class="l" href="#700">700: </a>                <span class="php-keyword1">else</span> {
+</span><span id="701" class="l"><a class="l" href="#701">701: </a>                    <span class="php-var">$res</span>[] = <span class="php-var">$v</span>;
+</span><span id="702" class="l"><a class="l" href="#702">702: </a>                }
+</span><span id="703" class="l"><a class="l" href="#703">703: </a>            }
+</span><span id="704" class="l"><a class="l" href="#704">704: </a>        }
+</span><span id="705" class="l"><a class="l" href="#705">705: </a>        <span class="php-var">$string</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/\s{2,}/&quot;</span>, <span class="php-quote">' '</span>, <span class="php-keyword2">trim</span>(<span class="php-keyword2">implode</span>(<span class="php-quote">' '</span>, <span class="php-var">$res</span>)));
+</span><span id="706" class="l"><a class="l" href="#706">706: </a>        <span class="php-keyword1">return</span> <span class="php-var">$string</span>;
+</span><span id="707" class="l"><a class="l" href="#707">707: </a>    }
+</span><span id="708" class="l"><a class="l" href="#708">708: </a>
+</span><span id="709" class="l"><a class="l" href="#709">709: </a>    <span class="php-keyword1">function</span> <a id="_get_recipient_addresses" href="#_get_recipient_addresses">get_recipient_addresses</a>() {
+</span><span id="710" class="l"><a class="l" href="#710">710: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="711" class="l"><a class="l" href="#711">711: </a>        <span class="php-keyword1">foreach</span> (<span class="php-keyword1">array</span>(<span class="php-quote">'To'</span>, <span class="php-quote">'Cc'</span>, <span class="php-quote">'Bcc'</span>) <span class="php-keyword1">as</span> <span class="php-var">$fld</span>) {
+</span><span id="712" class="l"><a class="l" href="#712">712: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$fld</span>, <span class="php-var">$this</span>-&gt;headers)) {
+</span><span id="713" class="l"><a class="l" href="#713">713: </a>                <span class="php-keyword1">continue</span>;
+</span><span id="714" class="l"><a class="l" href="#714">714: </a>            }
+</span><span id="715" class="l"><a class="l" href="#715">715: </a>            <span class="php-var">$v</span> = <span class="php-var">$this</span>-&gt;headers[<span class="php-var">$fld</span>];
+</span><span id="716" class="l"><a class="l" href="#716">716: </a>            <span class="php-var">$v</span> = <span class="php-keyword2">trim</span>(<span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/(\r|\n|\t)/m&quot;</span>, <span class="php-quote">' '</span>, <span class="php-var">$v</span>));
+</span><span id="717" class="l"><a class="l" href="#717">717: </a>            <span class="php-var">$v</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/(\&quot;[^\&quot;\\\]*(?:\\\.[^\&quot;\\\]*)*\&quot;)/&quot;</span>, <span class="php-quote">' '</span>, <span class="php-var">$v</span>);
+</span><span id="718" class="l"><a class="l" href="#718">718: </a>            <span class="php-var">$v</span> = <span class="php-keyword2">str_replace</span>(<span class="php-keyword1">array</span>(<span class="php-quote">','</span>, <span class="php-quote">';'</span>), <span class="php-keyword1">array</span>(<span class="php-quote">' , '</span>, <span class="php-quote">' ; '</span>), <span class="php-var">$v</span>); 
+</span><span id="719" class="l"><a class="l" href="#719">719: </a>            <span class="php-var">$v</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/\s+/&quot;</span>, <span class="php-quote">' '</span>, <span class="php-var">$v</span>);
+</span><span id="720" class="l"><a class="l" href="#720">720: </a>            <span class="php-var">$bits</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">' '</span>, <span class="php-var">$v</span>);
+</span><span id="721" class="l"><a class="l" href="#721">721: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$bits</span> <span class="php-keyword1">as</span> <span class="php-var">$val</span>) {
+</span><span id="722" class="l"><a class="l" href="#722">722: </a>                <span class="php-var">$val</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$val</span>);
+</span><span id="723" class="l"><a class="l" href="#723">723: </a>                <span class="php-keyword1">if</span> (!<span class="php-var">$val</span>) {
+</span><span id="724" class="l"><a class="l" href="#724">724: </a>                    <span class="php-keyword1">continue</span>;
+</span><span id="725" class="l"><a class="l" href="#725">725: </a>                }
+</span><span id="726" class="l"><a class="l" href="#726">726: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">strstr</span>(<span class="php-var">$val</span>, <span class="php-quote">'@'</span>)) {
+</span><span id="727" class="l"><a class="l" href="#727">727: </a>                    <span class="php-var">$address</span> = <span class="php-keyword2">ltrim</span>(<span class="php-keyword2">rtrim</span>(<span class="php-var">$val</span> ,<span class="php-quote">'&gt;'</span>), <span class="php-quote">'&lt;'</span>);
+</span><span id="728" class="l"><a class="l" href="#728">728: </a>                    <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;match_email_full(<span class="php-var">$address</span>)) {
+</span><span id="729" class="l"><a class="l" href="#729">729: </a>                        <span class="php-var">$res</span>[] = <span class="php-var">$address</span>;
+</span><span id="730" class="l"><a class="l" href="#730">730: </a>                    }
+</span><span id="731" class="l"><a class="l" href="#731">731: </a>                }
+</span><span id="732" class="l"><a class="l" href="#732">732: </a>            }
+</span><span id="733" class="l"><a class="l" href="#733">733: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;allow_unqualified_addresses) {
+</span><span id="734" class="l"><a class="l" href="#734">734: </a>                <span class="php-var">$bits</span> = <span class="php-keyword2">preg_split</span>(<span class="php-quote">&quot;/(;|,)/&quot;</span>, <span class="php-var">$v</span>);
+</span><span id="735" class="l"><a class="l" href="#735">735: </a>                <span class="php-keyword1">foreach</span> (<span class="php-var">$bits</span> <span class="php-keyword1">as</span> <span class="php-var">$val</span>) {
+</span><span id="736" class="l"><a class="l" href="#736">736: </a>                        <span class="php-var">$val</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$val</span>);
+</span><span id="737" class="l"><a class="l" href="#737">737: </a>                    <span class="php-keyword1">if</span> (!<span class="php-keyword2">strstr</span>(<span class="php-var">$val</span>, <span class="php-quote">' '</span>) &amp;&amp; !<span class="php-keyword2">strstr</span>(<span class="php-var">$val</span>, <span class="php-quote">'@'</span>) &amp;&amp; <span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) &gt; <span class="php-num">2</span>) {
+</span><span id="738" class="l"><a class="l" href="#738">738: </a>                        <span class="php-var">$res</span>[] = <span class="php-var">$val</span>;
+</span><span id="739" class="l"><a class="l" href="#739">739: </a>                    }
+</span><span id="740" class="l"><a class="l" href="#740">740: </a>                }
+</span><span id="741" class="l"><a class="l" href="#741">741: </a>            }
+</span><span id="742" class="l"><a class="l" href="#742">742: </a>        }
+</span><span id="743" class="l"><a class="l" href="#743">743: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="744" class="l"><a class="l" href="#744">744: </a>    }
+</span><span id="745" class="l"><a class="l" href="#745">745: </a>
+</span><span id="746" class="l"><a class="l" href="#746">746: </a>    <span class="php-keyword1">function</span> <a id="_prep_message_body" href="#_prep_message_body">prep_message_body</a>(<span class="php-var">$body</span>) {
+</span><span id="747" class="l"><a class="l" href="#747">747: </a>        <span class="php-var">$message</span> = <span class="php-keyword2">mb_convert_encoding</span>(<span class="php-keyword2">trim</span>(<span class="php-var">$body</span>), <span class="php-quote">&quot;HTML-ENTITIES&quot;</span>, <span class="php-quote">&quot;UTF-8&quot;</span>);
+</span><span id="748" class="l"><a class="l" href="#748">748: </a>        <span class="php-var">$message</span> = <span class="php-keyword2">mb_convert_encoding</span>(<span class="php-var">$message</span>, <span class="php-quote">&quot;UTF-8&quot;</span>, <span class="php-quote">&quot;HTML-ENTITIES&quot;</span>);
+</span><span id="749" class="l"><a class="l" href="#749">749: </a>        <span class="php-var">$message</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$body</span>);
+</span><span id="750" class="l"><a class="l" href="#750">750: </a>        <span class="php-var">$message</span> = <span class="php-keyword2">str_replace</span>(<span class="php-quote">&quot;\r\n&quot;</span>, <span class="php-quote">&quot;\n&quot;</span>, <span class="php-var">$message</span>);
+</span><span id="751" class="l"><a class="l" href="#751">751: </a>        <span class="php-var">$lines</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">&quot;\n&quot;</span>, <span class="php-var">$message</span>);
+</span><span id="752" class="l"><a class="l" href="#752">752: </a>        <span class="php-var">$new_lines</span> = <span class="php-keyword1">array</span>();
+</span><span id="753" class="l"><a class="l" href="#753">753: </a>        <span class="php-keyword1">foreach</span>(<span class="php-var">$lines</span> <span class="php-keyword1">as</span> <span class="php-var">$line</span>) {
+</span><span id="754" class="l"><a class="l" href="#754">754: </a>            <span class="php-var">$line</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$line</span>, <span class="php-quote">&quot;\r\n&quot;</span>).<span class="php-quote">&quot;\r\n&quot;</span>;
+</span><span id="755" class="l"><a class="l" href="#755">755: </a>            <span class="php-var">$new_lines</span>[] = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/^\.\r\n/&quot;</span>, <span class="php-quote">&quot;..\r\n&quot;</span>, <span class="php-var">$line</span>);
+</span><span id="756" class="l"><a class="l" href="#756">756: </a>        }
+</span><span id="757" class="l"><a class="l" href="#757">757: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Content-Type'</span>] = <span class="php-quote">'text/plain; charset=UTF-8; format=flowed'</span>;
+</span><span id="758" class="l"><a class="l" href="#758">758: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Content-Transfer-Encoding'</span>] = <span class="php-quote">'quoted-printable'</span>;
+</span><span id="759" class="l"><a class="l" href="#759">759: </a>        <span class="php-var">$body</span> = <span class="php-keyword2">implode</span>(<span class="php-quote">''</span>, <span class="php-var">$new_lines</span>);
+</span><span id="760" class="l"><a class="l" href="#760">760: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;qp_encode(<span class="php-var">$body</span>);
+</span><span id="761" class="l"><a class="l" href="#761">761: </a>    }
+</span><span id="762" class="l"><a class="l" href="#762">762: </a>
+</span><span id="763" class="l"><a class="l" href="#763">763: </a>    <span class="php-keyword1">function</span> <a id="_qp_encode" href="#_qp_encode">qp_encode</a>(<span class="php-var">$string</span>) {
+</span><span id="764" class="l"><a class="l" href="#764">764: </a>        <span class="php-var">$string</span> = <span class="php-keyword2">str_replace</span>(<span class="php-quote">&quot;\r\n&quot;</span>, <span class="php-quote">&quot;\n&quot;</span>, <span class="php-var">$string</span>);
+</span><span id="765" class="l"><a class="l" href="#765">765: </a>        <span class="php-var">$lines</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">&quot;\n&quot;</span>, <span class="php-var">$string</span>);
+</span><span id="766" class="l"><a class="l" href="#766">766: </a>        <span class="php-var">$new_lines</span> = <span class="php-keyword1">array</span>();
+</span><span id="767" class="l"><a class="l" href="#767">767: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$lines</span> <span class="php-keyword1">as</span> <span class="php-var">$v</span>) {
+</span><span id="768" class="l"><a class="l" href="#768">768: </a>            <span class="php-var">$new_line</span> = <span class="php-quote">''</span>;
+</span><span id="769" class="l"><a class="l" href="#769">769: </a>            <span class="php-var">$char_count</span> = <span class="php-num">0</span>;
+</span><span id="770" class="l"><a class="l" href="#770">770: </a>            <span class="php-keyword1">while</span> (<span class="php-var">$v</span>) {
+</span><span id="771" class="l"><a class="l" href="#771">771: </a>                <span class="php-var">$char</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$v</span>, <span class="php-num">0</span>, <span class="php-num">1</span>);
+</span><span id="772" class="l"><a class="l" href="#772">772: </a>                <span class="php-var">$ord</span> = <span class="php-keyword2">ord</span>(<span class="php-var">$char</span>);
+</span><span id="773" class="l"><a class="l" href="#773">773: </a>                <span class="php-var">$v</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$v</span>, <span class="php-num">1</span>);
+</span><span id="774" class="l"><a class="l" href="#774">774: </a>                <span class="php-keyword1">switch</span> (<span class="php-keyword1">true</span>) {
+</span><span id="775" class="l"><a class="l" href="#775">775: </a>                    <span class="php-keyword1">case</span> (<span class="php-var">$ord</span> &gt; <span class="php-num">32</span> &amp;&amp; <span class="php-var">$ord</span> &lt; <span class="php-num">61</span>) || (<span class="php-var">$ord</span> &gt; <span class="php-num">61</span> &amp;&amp; <span class="php-var">$ord</span> &lt; <span class="php-num">127</span>):
+</span><span id="776" class="l"><a class="l" href="#776">776: </a>                        <span class="php-var">$new_line</span> .= <span class="php-var">$char</span>;
+</span><span id="777" class="l"><a class="l" href="#777">777: </a>                        <span class="php-var">$char_count</span>++;
+</span><span id="778" class="l"><a class="l" href="#778">778: </a>                        <span class="php-keyword1">break</span>;
+</span><span id="779" class="l"><a class="l" href="#779">779: </a>                    <span class="php-keyword1">case</span> <span class="php-var">$ord</span> == <span class="php-num">9</span>:
+</span><span id="780" class="l"><a class="l" href="#780">780: </a>                    <span class="php-keyword1">case</span> <span class="php-var">$ord</span> == <span class="php-num">32</span>:
+</span><span id="781" class="l"><a class="l" href="#781">781: </a>                        <span class="php-var">$new_line</span> .= <span class="php-var">$char</span>;
+</span><span id="782" class="l"><a class="l" href="#782">782: </a>                        <span class="php-keyword1">break</span>;
+</span><span id="783" class="l"><a class="l" href="#783">783: </a>                    <span class="php-keyword1">default</span>:
+</span><span id="784" class="l"><a class="l" href="#784">784: </a>                        <span class="php-var">$new_line</span> .= <span class="php-quote">'='</span>.<span class="php-keyword2">strtoupper</span>(<span class="php-keyword2">dechex</span>(<span class="php-var">$ord</span>));
+</span><span id="785" class="l"><a class="l" href="#785">785: </a>                        <span class="php-var">$char_count</span> += <span class="php-num">3</span>;
+</span><span id="786" class="l"><a class="l" href="#786">786: </a>                        <span class="php-keyword1">break</span>;
+</span><span id="787" class="l"><a class="l" href="#787">787: </a>                }
+</span><span id="788" class="l"><a class="l" href="#788">788: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$char_count</span> &gt; <span class="php-num">72</span>) {
+</span><span id="789" class="l"><a class="l" href="#789">789: </a>                    <span class="php-var">$new_lines</span>[] = <span class="php-var">$new_line</span>.<span class="php-quote">'='</span>;
+</span><span id="790" class="l"><a class="l" href="#790">790: </a>                    <span class="php-var">$char_count</span> = <span class="php-num">0</span>;
+</span><span id="791" class="l"><a class="l" href="#791">791: </a>                    <span class="php-var">$new_line</span> = <span class="php-quote">''</span>;
+</span><span id="792" class="l"><a class="l" href="#792">792: </a>                }
+</span><span id="793" class="l"><a class="l" href="#793">793: </a>            }
+</span><span id="794" class="l"><a class="l" href="#794">794: </a>            <span class="php-var">$new_lines</span>[] = <span class="php-var">$new_line</span>;
+</span><span id="795" class="l"><a class="l" href="#795">795: </a>        }
+</span><span id="796" class="l"><a class="l" href="#796">796: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">implode</span>(<span class="php-quote">&quot;\r\n&quot;</span>, <span class="php-var">$new_lines</span>);
+</span><span id="797" class="l"><a class="l" href="#797">797: </a>    }
+</span><span id="798" class="l"><a class="l" href="#798">798: </a>}
+</span><span id="799" class="l"><a class="l" href="#799">799: </a>
+</span><span id="800" class="l"><a class="l" href="#800">800: </a><span class="xlang">?&gt;</span>
+</span><span id="801" class="l"><a class="l" href="#801">801: </a></span></code></pre>
+
+	<div id="footer">
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>
