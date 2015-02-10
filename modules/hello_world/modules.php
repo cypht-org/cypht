@@ -47,9 +47,9 @@ class Hm_Handler_hello_world_page_handler extends Hm_Handler_Module {
  * @subpackage helloworld/output
  */
 class Hm_Output_hello_world_page_content extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         /**
-         * $format is either HTML5 or AJAX. $this->get() attempts to fetch data sent to the output
+         * $this->format is either HTML5 or AJAX. $this->get() attempts to fetch data sent to the output
          * modules by handler modules $this->get has an optional second argument to set a default
          * return value if the name is not found.
          */
@@ -72,7 +72,7 @@ class Hm_Output_hello_world_page_content extends Hm_Output_Module {
  * @subpackage helloworld/output
  */
 class Hm_Output_hello_world_home_page extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         /**
          * $this->trans() will try to find a translation in the user's current langauge for
          * the supplied string. It also sanitizes output. If you don't want to translate you
@@ -90,7 +90,7 @@ class Hm_Output_hello_world_home_page extends Hm_Output_Module {
  * @subpackage helloworld/output
  */
 class Hm_Output_hello_world_ajax_content extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $this->out('hello_world_ajax_result', $this->trans('Hello World Again!'));
     }
 }

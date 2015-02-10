@@ -657,7 +657,7 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_message_body extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $txt = '<div class="msg_text_inner">';
         if ($this->get('msg_text')) {
             $struct = $this->get('msg_struct_current', array());
@@ -680,7 +680,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_message_struct extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('msg_struct')) {
             $res = '<table class="msg_parts">';
             $part = $this->get('imap_msg_part', '1');
@@ -695,7 +695,7 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
             $from = '';
@@ -755,7 +755,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
 
@@ -810,7 +810,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $count = count($this->get('imap_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section">'.
@@ -834,7 +834,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_display_imap_status extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
             if ($vals['name'] == 'Default-Auth-Server') {
@@ -851,7 +851,7 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_imap_reply_details extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         if ($this->get('imap_reply_source')) {
             $res .= '<input type="hidden" class="imap_reply_source" value="'.$this->html_safe($this->get('imap_reply_source')).'" />';
@@ -867,7 +867,7 @@ class Hm_Output_imap_reply_details extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         return '<input type="hidden" class="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('imap_servers', array ())))).'" />';
     }
 }
@@ -876,7 +876,7 @@ class Hm_Output_imap_server_ids extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         $folder_data = $this->get('imap_expanded_folder_data', array());
         if (!empty($folder_data)) {
@@ -892,7 +892,7 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         if ($this->get('imap_connect_status') != 'disconnected') {
             $res .= '<span class="online">'.$this->trans(ucwords($this->get('imap_connect_status'))).
@@ -909,7 +909,7 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
@@ -927,7 +927,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_imap_search extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('imap_search_results')) {
             prepare_imap_message_list($this->get('imap_search_results'), $this, 'search');
         }
@@ -941,7 +941,7 @@ class Hm_Output_filter_imap_search extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_flagged_data extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('imap_flagged_data')) {
             prepare_imap_message_list($this->get('imap_flagged_data'), $this, 'flagged');
         }
@@ -955,7 +955,7 @@ class Hm_Output_filter_flagged_data extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('imap_unread_data')) {
             prepare_imap_message_list($this->get('imap_unread_data'), $this, 'unread');
         }
@@ -969,7 +969,7 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_all_email extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('imap_combined_inbox_data')) {
             prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'email');
         }
@@ -983,7 +983,7 @@ class Hm_Output_filter_all_email extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('imap_combined_inbox_data')) {
             prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox');
         }
@@ -997,7 +997,7 @@ class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_folder_page extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = array();
         if ($this->get('imap_mailbox_page')) {
             prepare_imap_message_list($this->get('imap_mailbox_page'), $this, false);
@@ -1013,7 +1013,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_reply_content extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $reply_subject = 'Re: [No Subject]';
         $reply_to = '';
         $reply_body = '';

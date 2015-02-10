@@ -539,7 +539,7 @@ class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $count = count($this->get('pop3_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="pop3_server_setup"><div data-target=".pop3_section" class="server_section">'.
@@ -563,7 +563,7 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         foreach ($this->get('pop3_servers', array()) as $index => $vals) {
 
@@ -617,7 +617,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         foreach ($this->get('pop3_folders', array()) as $id => $folder) {
             $res .= '<li class="pop3_'.$this->html_safe($id).'">'.
@@ -634,7 +634,7 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('pop3_message_headers')) {
             $txt = '';
             $from = '';
@@ -692,7 +692,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $formatted_message_list = array();
         if ($this->get('pop3_mailbox_page')) {
             $style = $this->get('news_list_style') ? 'news' : 'email';
@@ -715,7 +715,7 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_pop3_server_ids extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         return '<input type="hidden" class="pop3_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('pop3_servers', array())))).'" />';
     }
 }
@@ -724,7 +724,7 @@ class Hm_Output_pop3_server_ids extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_display_pop3_status extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         foreach ($this->get('pop3_servers', array()) as $index => $vals) {
             if ($vals['name'] == 'Default-Auth-Server') {
@@ -741,7 +741,7 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_start_pop3_settings extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         return '<tr><td data-target=".pop3_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" />'.$this->trans('POP3 Settings').'</td></tr>';
     }
@@ -751,7 +751,7 @@ class Hm_Output_start_pop3_settings extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_pop3_since_setting extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $since = false;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('pop3_since', $settings)) {
@@ -766,7 +766,7 @@ class Hm_Output_pop3_since_setting extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $limit = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('pop3_limit', $settings)) {
@@ -781,7 +781,7 @@ class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
  * @subpackage pop3/output
  */
 class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('pop3_connect_status') == 'Authenticated') {
             $this->out('pop3_status_display', '<span class="online">'.
                 $this->trans(ucwords($this->get('pop3_connect_status'))).'</span> in '.round($this->get('pop3_connect_time'), 3));

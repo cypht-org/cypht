@@ -67,7 +67,7 @@ class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
  * @subpackage hackernews/output
  */
 class Hm_Output_hacker_news_folders extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '<li class="menu_top20"><a class="unread_link" href="?page=hacker_news&list_path=top20">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$spreadsheet).
             '" alt="" width="16" height="16" /> '.$this->trans('Top 20').'</a></li>';
@@ -84,7 +84,7 @@ class Hm_Output_hacker_news_folders extends Hm_Output_Module {
  * @subpackage hackernews/output
  */
 class Hm_Output_hacker_news_heading extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         return '<div class="content_title">'.$this->trans('Hacker News').'</div>';
     }
 }
@@ -93,7 +93,7 @@ class Hm_Output_hacker_news_heading extends Hm_Output_Module {
  * @subpackage hackernews/output
  */
 class Hm_Output_hacker_news_table_end extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         return '</tbody></table>';
     }
 }
@@ -102,7 +102,7 @@ class Hm_Output_hacker_news_table_end extends Hm_Output_Module {
  * @subpackage hackernews/output
  */
 class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = array();
         if ($len = count($this->get('hacker_news_data', array()))) {
             $style = $this->get('news_list_style') ? 'news' : 'email';

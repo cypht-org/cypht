@@ -54,7 +54,7 @@ class Hm_Handler_process_idle_time_setting extends Hm_Handler_Module {
  * @subpackage idletimer/output
  */
 class Hm_Output_idle_time_setting extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $options = array(
             1 => '1 Hour',
             2 => '2 Hours',

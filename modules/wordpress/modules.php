@@ -11,7 +11,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  * @subpackage wordpress/output
  */
 class Hm_Output_wordpress_folders extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=wordpress&list_path=wp_notifications">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
             '" alt="" width="16" height="16" /> '.$this->trans('Notifications').'</a></li>';
