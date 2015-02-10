@@ -363,10 +363,7 @@ var Hm_Message_List = {
     reset_checkboxes: function() {
         $('input[type=checkbox]').each(function () { this.checked = false; });
         Hm_Message_List.toggle_msg_controls();
-        $('input[type=checkbox]').click(function(e) {
-            Hm_Message_List.toggle_msg_controls();
-            Hm_Message_List.check_select_range(e);
-        });
+        Hm_Message_List.set_checkbox_callback();
     },
 
     select_range: function(start, end) {
@@ -541,8 +538,8 @@ var Hm_Message_List = {
             $('.message_table tbody').html(data);
             if (cache_name == 'formatted_unread_data') {
                 Hm_Message_List.clear_read_messages();
-                Hm_Message_List.set_checkbox_callback();
             }
+            Hm_Message_List.set_checkbox_callback();
         }
         if (hm_page_name() == 'search' && hm_run_search() == "0") {
             Hm_Timer.add_job(Hm_Message_List.load_sources, 60, true);
