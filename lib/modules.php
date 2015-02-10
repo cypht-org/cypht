@@ -312,6 +312,9 @@ abstract class Hm_Output_Module {
     /* UI layout direction */
     protected $dir = 'ltr';
 
+    /* Output format (AJAX or HTML5) */
+    protected $format = false;
+
     /**
      * Constructor
      *
@@ -358,6 +361,7 @@ abstract class Hm_Output_Module {
      */
     public function output_content($format, $lang_str, $protected) {
         $this->lstr = $lang_str;
+        $this->format = $format;
         if (array_key_exists('interface_lang', $lang_str)) {
             $this->lang = $lang_str['interface_lang'];
         }
