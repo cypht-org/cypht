@@ -19,6 +19,7 @@ ul { margin: 0px; }
 ul li:before { margin-left: -2em; color: #aaa; content: '\229A'; padding-right: 1em; }
 .para a { color: #111 !important; }
 .e_hl { color: #999; }
-.screenshot { box-shadow: 5px 5px 7px #ccc; border: solid 1px #ddd; margin-bottom: 20px; }
+.screenshot { box-shadow: 5px 5px 7px #ccc; border: solid 1px #ddd; }
+figcaption { text-align: center; padding-bottom: 15px; font-size: 90%; font-style: italic; }
 h3 { margin: 10px; margin-left: 0px; margin-top: 30px; padding: 0px; }
 .top { margin-top: 0px !important; }
