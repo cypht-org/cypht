@@ -350,9 +350,7 @@ var imap_setup_message_view_page = function() {
         $('.msg_text').html(msg_content);
         document.title = $('.header_subject th').text();
         imap_message_view_finished();
-        if (hm_page_name() == 'message' && hm_list_parent() == 'unread') {
-            imap_read_prefetch();
-        }
+        imap_read_prefetch();
     }
 };
 
