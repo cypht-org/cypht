@@ -794,7 +794,7 @@
 </span></span><span id="539" class="l"><a class="l" href="#539">539: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="540" class="l"><a class="l" href="#540">540: </a><span class="php-comment"> */</span>
 </span><span id="541" class="l"><a class="l" href="#541">541: </a><span class="php-keyword1">class</span> <a id="Hm_Output_add_pop3_server_dialog" href="#Hm_Output_add_pop3_server_dialog">Hm_Output_add_pop3_server_dialog</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="542" class="l"><a class="l" href="#542">542: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="542" class="l"><a class="l" href="#542">542: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="543" class="l"><a class="l" href="#543">543: </a>        <span class="php-var">$count</span> = <span class="php-keyword2">count</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_servers'</span>, <span class="php-keyword1">array</span>()));
 </span><span id="544" class="l"><a class="l" href="#544">544: </a>        <span class="php-var">$count</span> = <span class="php-keyword2">sprintf</span>(<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'%d configured'</span>), <span class="php-var">$count</span>);
 </span><span id="545" class="l"><a class="l" href="#545">545: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;pop3_server_setup&quot;&gt;&lt;div data-target=&quot;.pop3_section&quot; class=&quot;server_section&quot;&gt;'</span>.
@@ -818,7 +818,7 @@
 </span></span><span id="563" class="l"><a class="l" href="#563">563: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="564" class="l"><a class="l" href="#564">564: </a><span class="php-comment"> */</span>
 </span><span id="565" class="l"><a class="l" href="#565">565: </a><span class="php-keyword1">class</span> <a id="Hm_Output_display_configured_pop3_servers" href="#Hm_Output_display_configured_pop3_servers">Hm_Output_display_configured_pop3_servers</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="566" class="l"><a class="l" href="#566">566: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="566" class="l"><a class="l" href="#566">566: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="567" class="l"><a class="l" href="#567">567: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="568" class="l"><a class="l" href="#568">568: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_servers'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
 </span><span id="569" class="l"><a class="l" href="#569">569: </a>
@@ -872,7 +872,7 @@
 </span></span><span id="617" class="l"><a class="l" href="#617">617: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="618" class="l"><a class="l" href="#618">618: </a><span class="php-comment"> */</span>
 </span><span id="619" class="l"><a class="l" href="#619">619: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_pop3_folders" href="#Hm_Output_filter_pop3_folders">Hm_Output_filter_pop3_folders</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="620" class="l"><a class="l" href="#620">620: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="620" class="l"><a class="l" href="#620">620: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="621" class="l"><a class="l" href="#621">621: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="622" class="l"><a class="l" href="#622">622: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_folders'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$folder</span>) {
 </span><span id="623" class="l"><a class="l" href="#623">623: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;pop3_'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>.
@@ -889,7 +889,7 @@
 </span></span><span id="634" class="l"><a class="l" href="#634">634: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="635" class="l"><a class="l" href="#635">635: </a><span class="php-comment"> */</span>
 </span><span id="636" class="l"><a class="l" href="#636">636: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_pop3_message_content" href="#Hm_Output_filter_pop3_message_content">Hm_Output_filter_pop3_message_content</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="637" class="l"><a class="l" href="#637">637: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="637" class="l"><a class="l" href="#637">637: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="638" class="l"><a class="l" href="#638">638: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_message_headers'</span>)) {
 </span><span id="639" class="l"><a class="l" href="#639">639: </a>            <span class="php-var">$txt</span> = <span class="php-quote">''</span>;
 </span><span id="640" class="l"><a class="l" href="#640">640: </a>            <span class="php-var">$from</span> = <span class="php-quote">''</span>;
@@ -947,7 +947,7 @@
 </span></span><span id="692" class="l"><a class="l" href="#692">692: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="693" class="l"><a class="l" href="#693">693: </a><span class="php-comment"> */</span>
 </span><span id="694" class="l"><a class="l" href="#694">694: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_pop3_message_list" href="#Hm_Output_filter_pop3_message_list">Hm_Output_filter_pop3_message_list</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="695" class="l"><a class="l" href="#695">695: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="695" class="l"><a class="l" href="#695">695: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="696" class="l"><a class="l" href="#696">696: </a>        <span class="php-var">$formatted_message_list</span> = <span class="php-keyword1">array</span>();
 </span><span id="697" class="l"><a class="l" href="#697">697: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_mailbox_page'</span>)) {
 </span><span id="698" class="l"><a class="l" href="#698">698: </a>            <span class="php-var">$style</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'news_list_style'</span>) ? <span class="php-quote">'news'</span> : <span class="php-quote">'email'</span>;
@@ -970,7 +970,7 @@
 </span></span><span id="715" class="l"><a class="l" href="#715">715: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="716" class="l"><a class="l" href="#716">716: </a><span class="php-comment"> */</span>
 </span><span id="717" class="l"><a class="l" href="#717">717: </a><span class="php-keyword1">class</span> <a id="Hm_Output_pop3_server_ids" href="#Hm_Output_pop3_server_ids">Hm_Output_pop3_server_ids</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="718" class="l"><a class="l" href="#718">718: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="718" class="l"><a class="l" href="#718">718: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="719" class="l"><a class="l" href="#719">719: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;input type=&quot;hidden&quot; class=&quot;pop3_server_ids&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-keyword2">implode</span>(<span class="php-quote">','</span>, <span class="php-keyword2">array_keys</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_servers'</span>, <span class="php-keyword1">array</span>())))).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="720" class="l"><a class="l" href="#720">720: </a>    }
 </span><span id="721" class="l"><a class="l" href="#721">721: </a>}
@@ -979,7 +979,7 @@
 </span></span><span id="724" class="l"><a class="l" href="#724">724: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="725" class="l"><a class="l" href="#725">725: </a><span class="php-comment"> */</span>
 </span><span id="726" class="l"><a class="l" href="#726">726: </a><span class="php-keyword1">class</span> <a id="Hm_Output_display_pop3_status" href="#Hm_Output_display_pop3_status">Hm_Output_display_pop3_status</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="727" class="l"><a class="l" href="#727">727: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="727" class="l"><a class="l" href="#727">727: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="728" class="l"><a class="l" href="#728">728: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="729" class="l"><a class="l" href="#729">729: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_servers'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
 </span><span id="730" class="l"><a class="l" href="#730">730: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$vals</span>[<span class="php-quote">'name'</span>] == <span class="php-quote">'Default-Auth-Server'</span>) {
@@ -996,7 +996,7 @@
 </span></span><span id="741" class="l"><a class="l" href="#741">741: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="742" class="l"><a class="l" href="#742">742: </a><span class="php-comment"> */</span>
 </span><span id="743" class="l"><a class="l" href="#743">743: </a><span class="php-keyword1">class</span> <a id="Hm_Output_start_pop3_settings" href="#Hm_Output_start_pop3_settings">Hm_Output_start_pop3_settings</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="744" class="l"><a class="l" href="#744">744: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="744" class="l"><a class="l" href="#744">744: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="745" class="l"><a class="l" href="#745">745: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td data-target=&quot;.pop3_setting&quot; colspan=&quot;2&quot; class=&quot;settings_subtitle&quot;&gt;'</span>.
 </span><span id="746" class="l"><a class="l" href="#746">746: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$env_closed</span>.<span class="php-quote">'&quot; /&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'POP3 Settings'</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
 </span><span id="747" class="l"><a class="l" href="#747">747: </a>    }
@@ -1006,7 +1006,7 @@
 </span></span><span id="751" class="l"><a class="l" href="#751">751: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="752" class="l"><a class="l" href="#752">752: </a><span class="php-comment"> */</span>
 </span><span id="753" class="l"><a class="l" href="#753">753: </a><span class="php-keyword1">class</span> <a id="Hm_Output_pop3_since_setting" href="#Hm_Output_pop3_since_setting">Hm_Output_pop3_since_setting</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="754" class="l"><a class="l" href="#754">754: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="754" class="l"><a class="l" href="#754">754: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="755" class="l"><a class="l" href="#755">755: </a>        <span class="php-var">$since</span> = <span class="php-keyword1">false</span>;
 </span><span id="756" class="l"><a class="l" href="#756">756: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="757" class="l"><a class="l" href="#757">757: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'pop3_since'</span>, <span class="php-var">$settings</span>)) {
@@ -1021,7 +1021,7 @@
 </span></span><span id="766" class="l"><a class="l" href="#766">766: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="767" class="l"><a class="l" href="#767">767: </a><span class="php-comment"> */</span>
 </span><span id="768" class="l"><a class="l" href="#768">768: </a><span class="php-keyword1">class</span> <a id="Hm_Output_pop3_limit_setting" href="#Hm_Output_pop3_limit_setting">Hm_Output_pop3_limit_setting</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="769" class="l"><a class="l" href="#769">769: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="769" class="l"><a class="l" href="#769">769: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="770" class="l"><a class="l" href="#770">770: </a>        <span class="php-var">$limit</span> = DEFAULT_PER_SOURCE;
 </span><span id="771" class="l"><a class="l" href="#771">771: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="772" class="l"><a class="l" href="#772">772: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'pop3_limit'</span>, <span class="php-var">$settings</span>)) {
@@ -1036,7 +1036,7 @@
 </span></span><span id="781" class="l"><a class="l" href="#781">781: </a><span class="php-comment"> * @subpackage pop3/output
 </span></span><span id="782" class="l"><a class="l" href="#782">782: </a><span class="php-comment"> */</span>
 </span><span id="783" class="l"><a class="l" href="#783">783: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_pop3_status_data" href="#Hm_Output_filter_pop3_status_data">Hm_Output_filter_pop3_status_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="784" class="l"><a class="l" href="#784">784: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="784" class="l"><a class="l" href="#784">784: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="785" class="l"><a class="l" href="#785">785: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_connect_status'</span>) == <span class="php-quote">'Authenticated'</span>) {
 </span><span id="786" class="l"><a class="l" href="#786">786: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'pop3_status_display'</span>, <span class="php-quote">'&lt;span class=&quot;online&quot;&gt;'</span>.
 </span><span id="787" class="l"><a class="l" href="#787">787: </a>                <span class="php-var">$this</span>-&gt;trans(<span class="php-keyword2">ucwords</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_connect_status'</span>))).<span class="php-quote">'&lt;/span&gt; in '</span>.<span class="php-keyword2">round</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'pop3_connect_time'</span>), <span class="php-num">3</span>));

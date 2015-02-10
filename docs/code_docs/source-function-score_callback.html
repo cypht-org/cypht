@@ -305,7 +305,7 @@
 </span></span><span id="67" class="l"><a class="l" href="#67"> 67: </a><span class="php-comment"> * @subpackage hackernews/output
 </span></span><span id="68" class="l"><a class="l" href="#68"> 68: </a><span class="php-comment"> */</span>
 </span><span id="69" class="l"><a class="l" href="#69"> 69: </a><span class="php-keyword1">class</span> <a id="Hm_Output_hacker_news_folders" href="#Hm_Output_hacker_news_folders">Hm_Output_hacker_news_folders</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="70" class="l"><a class="l" href="#70"> 70: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="70" class="l"><a class="l" href="#70"> 70: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="71" class="l"><a class="l" href="#71"> 71: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_top20&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=hacker_news&amp;list_path=top20&quot;&gt;'</span>.
 </span><span id="72" class="l"><a class="l" href="#72"> 72: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$spreadsheet</span>).
 </span><span id="73" class="l"><a class="l" href="#73"> 73: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Top 20'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
@@ -322,7 +322,7 @@
 </span></span><span id="84" class="l"><a class="l" href="#84"> 84: </a><span class="php-comment"> * @subpackage hackernews/output
 </span></span><span id="85" class="l"><a class="l" href="#85"> 85: </a><span class="php-comment"> */</span>
 </span><span id="86" class="l"><a class="l" href="#86"> 86: </a><span class="php-keyword1">class</span> <a id="Hm_Output_hacker_news_heading" href="#Hm_Output_hacker_news_heading">Hm_Output_hacker_news_heading</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="87" class="l"><a class="l" href="#87"> 87: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="87" class="l"><a class="l" href="#87"> 87: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="88" class="l"><a class="l" href="#88"> 88: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Hacker News'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="89" class="l"><a class="l" href="#89"> 89: </a>    }
 </span><span id="90" class="l"><a class="l" href="#90"> 90: </a>}
@@ -331,7 +331,7 @@
 </span></span><span id="93" class="l"><a class="l" href="#93"> 93: </a><span class="php-comment"> * @subpackage hackernews/output
 </span></span><span id="94" class="l"><a class="l" href="#94"> 94: </a><span class="php-comment"> */</span>
 </span><span id="95" class="l"><a class="l" href="#95"> 95: </a><span class="php-keyword1">class</span> <a id="Hm_Output_hacker_news_table_end" href="#Hm_Output_hacker_news_table_end">Hm_Output_hacker_news_table_end</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="96" class="l"><a class="l" href="#96"> 96: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="96" class="l"><a class="l" href="#96"> 96: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="97" class="l"><a class="l" href="#97"> 97: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/tbody&gt;&lt;/table&gt;'</span>;
 </span><span id="98" class="l"><a class="l" href="#98"> 98: </a>    }
 </span><span id="99" class="l"><a class="l" href="#99"> 99: </a>}
@@ -340,7 +340,7 @@
 </span></span><span id="102" class="l"><a class="l" href="#102">102: </a><span class="php-comment"> * @subpackage hackernews/output
 </span></span><span id="103" class="l"><a class="l" href="#103">103: </a><span class="php-comment"> */</span>
 </span><span id="104" class="l"><a class="l" href="#104">104: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_hacker_news_data" href="#Hm_Output_filter_hacker_news_data">Hm_Output_filter_hacker_news_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="105" class="l"><a class="l" href="#105">105: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="105" class="l"><a class="l" href="#105">105: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="106" class="l"><a class="l" href="#106">106: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
 </span><span id="107" class="l"><a class="l" href="#107">107: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$len</span> = <span class="php-keyword2">count</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'hacker_news_data'</span>, <span class="php-keyword1">array</span>()))) {
 </span><span id="108" class="l"><a class="l" href="#108">108: </a>            <span class="php-var">$style</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'news_list_style'</span>) ? <span class="php-quote">'news'</span> : <span class="php-quote">'email'</span>;

@@ -349,7 +349,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output">#</a>
-		<code><a href="source-class-Hm_Output_page_js.html#1024-1052" title="Go to source code">output</a>( <span>string <var>$format</var></span> )</code>
+		<code><a href="source-class-Hm_Output_page_js.html#1024-1052" title="Go to source code">output</a>( )</code>
 
 		<div class="description short">
 			
@@ -365,16 +365,11 @@ combined version. Includes the zepto library.</p>
 
 
 
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$format</var></dt>
-					<dd><code>string</code><br>$format either AJAX or HTML5</dd>
-				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code>mixed</code><br>should return an array if $format == AJAX, or an HTML5 formatted string if set
-to HTML5<br>
+					<code>mixed</code><br>should output with $this-&gt;output() if $this-&gt;format == AJAX, or return an
+HTML5 formatted string if set to HTML5<br>
 				</div>
 
 
@@ -428,6 +423,7 @@ to HTML5<br>
 	<tr>
 		<td><code>
 			<a href="class-Hm_Output_Module.html#$dir"><var>$dir</var></a>, 
+			<a href="class-Hm_Output_Module.html#$format"><var>$format</var></a>, 
 			<a href="class-Hm_Output_Module.html#$lang"><var>$lang</var></a>, 
 			<a href="class-Hm_Output_Module.html#$lstr"><var>$lstr</var></a>
 		</code></td>

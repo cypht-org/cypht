@@ -954,13 +954,13 @@
 </span><span id="694" class="l"><a class="l" href="#694"> 694: </a>    <span class="php-comment">/**
 </span></span><span id="695" class="l"><a class="l" href="#695"> 695: </a><span class="php-comment">     * Add a search form to the top of the folder list
 </span></span><span id="696" class="l"><a class="l" href="#696"> 696: </a><span class="php-comment">     */</span>
-</span><span id="697" class="l"><a class="l" href="#697"> 697: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="697" class="l"><a class="l" href="#697"> 697: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="698" class="l"><a class="l" href="#698"> 698: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_search&quot;&gt;&lt;form method=&quot;get&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=search&quot;&gt;'</span>.
 </span><span id="699" class="l"><a class="l" href="#699"> 699: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$search</span>).
 </span><span id="700" class="l"><a class="l" href="#700"> 700: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;&lt;/a&gt;&lt;input type=&quot;hidden&quot; name=&quot;page&quot; value=&quot;search&quot; /&gt;'</span>.
 </span><span id="701" class="l"><a class="l" href="#701"> 701: </a>            <span class="php-quote">'&lt;input type=&quot;search&quot; class=&quot;search_terms&quot; name=&quot;search_terms&quot; placeholder=&quot;'</span>.
 </span><span id="702" class="l"><a class="l" href="#702"> 702: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search'</span>).<span class="php-quote">'&quot; /&gt;&lt;/form&gt;&lt;/li&gt;'</span>;
-</span><span id="703" class="l"><a class="l" href="#703"> 703: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="703" class="l"><a class="l" href="#703"> 703: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="704" class="l"><a class="l" href="#704"> 704: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="705" class="l"><a class="l" href="#705"> 705: </a>        }
 </span><span id="706" class="l"><a class="l" href="#706"> 706: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -975,7 +975,7 @@
 </span><span id="715" class="l"><a class="l" href="#715"> 715: </a>    <span class="php-comment">/**
 </span></span><span id="716" class="l"><a class="l" href="#716"> 716: </a><span class="php-comment">     * Leaves two open div tags that are closed in Hm_Output_search_content_end and Hm_Output_search_form
 </span></span><span id="717" class="l"><a class="l" href="#717"> 717: </a><span class="php-comment">     */</span>
-</span><span id="718" class="l"><a class="l" href="#718"> 718: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="718" class="l"><a class="l" href="#718"> 718: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="719" class="l"><a class="l" href="#719"> 719: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;search_content&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search'</span>);
 </span><span id="720" class="l"><a class="l" href="#720"> 720: </a>    }
 </span><span id="721" class="l"><a class="l" href="#721"> 721: </a>}
@@ -988,7 +988,7 @@
 </span><span id="728" class="l"><a class="l" href="#728"> 728: </a>    <span class="php-comment">/**
 </span></span><span id="729" class="l"><a class="l" href="#729"> 729: </a><span class="php-comment">     * Closes a div opened in Hm_Output_search_content_start
 </span></span><span id="730" class="l"><a class="l" href="#730"> 730: </a><span class="php-comment">     */</span>
-</span><span id="731" class="l"><a class="l" href="#731"> 731: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="731" class="l"><a class="l" href="#731"> 731: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="732" class="l"><a class="l" href="#732"> 732: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="733" class="l"><a class="l" href="#733"> 733: </a>    }
 </span><span id="734" class="l"><a class="l" href="#734"> 734: </a>}
@@ -1001,7 +1001,7 @@
 </span><span id="741" class="l"><a class="l" href="#741"> 741: </a>    <span class="php-comment">/**
 </span></span><span id="742" class="l"><a class="l" href="#742"> 742: </a><span class="php-comment">     * Closes one of the divs left open in Hm_Output_search_content_start
 </span></span><span id="743" class="l"><a class="l" href="#743"> 743: </a><span class="php-comment">     */</span>
-</span><span id="744" class="l"><a class="l" href="#744"> 744: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="744" class="l"><a class="l" href="#744"> 744: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="745" class="l"><a class="l" href="#745"> 745: </a>        <span class="php-var">$terms</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'search_terms'</span>, <span class="php-quote">''</span>);
 </span><span id="746" class="l"><a class="l" href="#746"> 746: </a>        <span class="php-var">$source_link</span> = <span class="php-quote">'&lt;a href=&quot;#&quot; title=&quot;Sources&quot; class=&quot;source_link&quot;&gt;&lt;img alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Sources'</span>).
 </span><span id="747" class="l"><a class="l" href="#747"> 747: </a>            <span class="php-quote">'&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$folder</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
@@ -1029,7 +1029,7 @@
 </span><span id="769" class="l"><a class="l" href="#769"> 769: </a><span class="php-keyword1">class</span> <a id="Hm_Output_search_results_table_end" href="#Hm_Output_search_results_table_end">Hm_Output_search_results_table_end</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
 </span><span id="770" class="l"><a class="l" href="#770"> 770: </a>    <span class="php-comment">/**
 </span></span><span id="771" class="l"><a class="l" href="#771"> 771: </a><span class="php-comment">     */</span>
-</span><span id="772" class="l"><a class="l" href="#772"> 772: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="772" class="l"><a class="l" href="#772"> 772: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="773" class="l"><a class="l" href="#773"> 773: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/tbody&gt;&lt;/table&gt;'</span>;
 </span><span id="774" class="l"><a class="l" href="#774"> 774: </a>    }
 </span><span id="775" class="l"><a class="l" href="#775"> 775: </a>}
@@ -1042,7 +1042,7 @@
 </span><span id="782" class="l"><a class="l" href="#782"> 782: </a>    <span class="php-comment">/**
 </span></span><span id="783" class="l"><a class="l" href="#783"> 783: </a><span class="php-comment">     * adds two JS functions used on the search page
 </span></span><span id="784" class="l"><a class="l" href="#784"> 784: </a><span class="php-comment">     */</span>
-</span><span id="785" class="l"><a class="l" href="#785"> 785: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="785" class="l"><a class="l" href="#785"> 785: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="786" class="l"><a class="l" href="#786"> 786: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;script type=&quot;text/javascript&quot;&gt;'</span>.
 </span><span id="787" class="l"><a class="l" href="#787"> 787: </a>            <span class="php-quote">'var hm_search_terms = function() { return &quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'search_terms'</span>, <span class="php-quote">''</span>)).<span class="php-quote">'&quot;; };'</span>.
 </span><span id="788" class="l"><a class="l" href="#788"> 788: </a>            <span class="php-quote">'var hm_run_search = function() { return &quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'run_search'</span>, <span class="php-num">0</span>)).<span class="php-quote">'&quot;; };'</span>.
@@ -1058,7 +1058,7 @@
 </span><span id="798" class="l"><a class="l" href="#798"> 798: </a>    <span class="php-comment">/**
 </span></span><span id="799" class="l"><a class="l" href="#799"> 799: </a><span class="php-comment">     * Looks at the current login state and outputs the correct form
 </span></span><span id="800" class="l"><a class="l" href="#800"> 800: </a><span class="php-comment">     */</span>
-</span><span id="801" class="l"><a class="l" href="#801"> 801: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="801" class="l"><a class="l" href="#801"> 801: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="802" class="l"><a class="l" href="#802"> 802: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_login_state'</span>)) {
 </span><span id="803" class="l"><a class="l" href="#803"> 803: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;form class=&quot;login_form&quot; method=&quot;POST&quot;&gt;'</span>.
 </span><span id="804" class="l"><a class="l" href="#804"> 804: </a>                <span class="php-quote">'&lt;h1 class=&quot;title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_app_name'</span>, <span class="php-quote">''</span>)).<span class="php-quote">'&lt;/h1&gt;'</span>.
@@ -1094,7 +1094,7 @@
 </span><span id="834" class="l"><a class="l" href="#834"> 834: </a>    <span class="php-comment">/**
 </span></span><span id="835" class="l"><a class="l" href="#835"> 835: </a><span class="php-comment">     * The server_content div is closed in Hm_Output_server_content_end
 </span></span><span id="836" class="l"><a class="l" href="#836"> 836: </a><span class="php-comment">     */</span>
-</span><span id="837" class="l"><a class="l" href="#837"> 837: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="837" class="l"><a class="l" href="#837"> 837: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="838" class="l"><a class="l" href="#838"> 838: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Servers'</span>).<span class="php-quote">'&lt;/div&gt;&lt;div class=&quot;server_content&quot;&gt;'</span>;
 </span><span id="839" class="l"><a class="l" href="#839"> 839: </a>    }
 </span><span id="840" class="l"><a class="l" href="#840"> 840: </a>}
@@ -1107,7 +1107,7 @@
 </span><span id="847" class="l"><a class="l" href="#847"> 847: </a>    <span class="php-comment">/**
 </span></span><span id="848" class="l"><a class="l" href="#848"> 848: </a><span class="php-comment">     * Closes the div tag opened in Hm_Output_server_content_start
 </span></span><span id="849" class="l"><a class="l" href="#849"> 849: </a><span class="php-comment">     */</span>
-</span><span id="850" class="l"><a class="l" href="#850"> 850: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="850" class="l"><a class="l" href="#850"> 850: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="851" class="l"><a class="l" href="#851"> 851: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="852" class="l"><a class="l" href="#852"> 852: </a>    }
 </span><span id="853" class="l"><a class="l" href="#853"> 853: </a>}
@@ -1120,7 +1120,7 @@
 </span><span id="860" class="l"><a class="l" href="#860"> 860: </a>    <span class="php-comment">/**
 </span></span><span id="861" class="l"><a class="l" href="#861"> 861: </a><span class="php-comment">     * Currently not show in the display (hidden with CSS)
 </span></span><span id="862" class="l"><a class="l" href="#862"> 862: </a><span class="php-comment">     */</span>
-</span><span id="863" class="l"><a class="l" href="#863"> 863: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="863" class="l"><a class="l" href="#863"> 863: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="864" class="l"><a class="l" href="#864"> 864: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;date&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'date'</span>)).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="865" class="l"><a class="l" href="#865"> 865: </a>    }
 </span><span id="866" class="l"><a class="l" href="#866"> 866: </a>}
@@ -1133,7 +1133,7 @@
 </span><span id="873" class="l"><a class="l" href="#873"> 873: </a>    <span class="php-comment">/**
 </span></span><span id="874" class="l"><a class="l" href="#874"> 874: </a><span class="php-comment">     * Error level messages start with ERR and will be shown in red
 </span></span><span id="875" class="l"><a class="l" href="#875"> 875: </a><span class="php-comment">     */</span>
-</span><span id="876" class="l"><a class="l" href="#876"> 876: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="876" class="l"><a class="l" href="#876"> 876: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="877" class="l"><a class="l" href="#877"> 877: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="878" class="l"><a class="l" href="#878"> 878: </a>        <span class="php-var">$msgs</span> = Hm_Msgs::get();
 </span><span id="879" class="l"><a class="l" href="#879"> 879: </a>        <span class="php-var">$logged_out_class</span> = <span class="php-quote">''</span>;
@@ -1164,7 +1164,7 @@
 </span><span id="904" class="l"><a class="l" href="#904"> 904: </a>    <span class="php-comment">/**
 </span></span><span id="905" class="l"><a class="l" href="#905"> 905: </a><span class="php-comment">     * Doctype, html, head, and a meta tag for charset. The head section is not closed yet
 </span></span><span id="906" class="l"><a class="l" href="#906"> 906: </a><span class="php-comment">     */</span>
-</span><span id="907" class="l"><a class="l" href="#907"> 907: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="907" class="l"><a class="l" href="#907"> 907: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="908" class="l"><a class="l" href="#908"> 908: </a>        <span class="php-var">$lang</span> = <span class="php-quote">'en'</span>;
 </span><span id="909" class="l"><a class="l" href="#909"> 909: </a>        <span class="php-var">$dir</span> = <span class="php-quote">'ltr'</span>;
 </span><span id="910" class="l"><a class="l" href="#910"> 910: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;lang) {
@@ -1187,7 +1187,7 @@
 </span><span id="927" class="l"><a class="l" href="#927"> 927: </a>    <span class="php-comment">/**
 </span></span><span id="928" class="l"><a class="l" href="#928"> 928: </a><span class="php-comment">     * Close the head tag opened in Hm_Output_header_start
 </span></span><span id="929" class="l"><a class="l" href="#929"> 929: </a><span class="php-comment">     */</span>
-</span><span id="930" class="l"><a class="l" href="#930"> 930: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="930" class="l"><a class="l" href="#930"> 930: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="931" class="l"><a class="l" href="#931"> 931: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/head&gt;'</span>;
 </span><span id="932" class="l"><a class="l" href="#932"> 932: </a>    }
 </span><span id="933" class="l"><a class="l" href="#933"> 933: </a>}
@@ -1201,7 +1201,7 @@
 </span></span><span id="941" class="l"><a class="l" href="#941"> 941: </a><span class="php-comment">     * Outputs the starting body tag and a noscript warning. Clears the local session cache
 </span></span><span id="942" class="l"><a class="l" href="#942"> 942: </a><span class="php-comment">     * if not logged in, or adds a page wide nonce used by ajax requests
 </span></span><span id="943" class="l"><a class="l" href="#943"> 943: </a><span class="php-comment">     */</span>
-</span><span id="944" class="l"><a class="l" href="#944"> 944: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="944" class="l"><a class="l" href="#944"> 944: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="945" class="l"><a class="l" href="#945"> 945: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;body&gt;&lt;noscript class=&quot;noscript&quot;&gt;'</span>.
 </span><span id="946" class="l"><a class="l" href="#946"> 946: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'You Need to have Javascript enabled to use %s, sorry about that!'</span>,
 </span><span id="947" class="l"><a class="l" href="#947"> 947: </a>            <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_app_name'</span>)))).<span class="php-quote">'&lt;/noscript&gt;'</span>;
@@ -1223,7 +1223,7 @@
 </span><span id="963" class="l"><a class="l" href="#963"> 963: </a>    <span class="php-comment">/**
 </span></span><span id="964" class="l"><a class="l" href="#964"> 964: </a><span class="php-comment">     * Setup a title, base URL, a tab icon, and viewport settings
 </span></span><span id="965" class="l"><a class="l" href="#965"> 965: </a><span class="php-comment">     */</span>
-</span><span id="966" class="l"><a class="l" href="#966"> 966: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="966" class="l"><a class="l" href="#966"> 966: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="967" class="l"><a class="l" href="#967"> 967: </a>        <span class="php-var">$title</span> = <span class="php-quote">''</span>;
 </span><span id="968" class="l"><a class="l" href="#968"> 968: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_login_state'</span>)) {
 </span><span id="969" class="l"><a class="l" href="#969"> 969: </a>            <span class="php-var">$title</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_app_name'</span>);
@@ -1258,7 +1258,7 @@
 </span><span id="998" class="l"><a class="l" href="#998"> 998: </a>    <span class="php-comment">/**
 </span></span><span id="999" class="l"><a class="l" href="#999"> 999: </a><span class="php-comment">     * In debug mode adds each module css file to the page, otherwise uses the combined version
 </span></span><span id="1000" class="l"><a class="l" href="#1000">1000: </a><span class="php-comment">     */</span>
-</span><span id="1001" class="l"><a class="l" href="#1001">1001: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1001" class="l"><a class="l" href="#1001">1001: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1002" class="l"><a class="l" href="#1002">1002: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="1003" class="l"><a class="l" href="#1003">1003: </a>        <span class="php-var">$mods</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_module_list'</span>);
 </span><span id="1004" class="l"><a class="l" href="#1004">1004: </a>        <span class="php-keyword1">if</span> (DEBUG_MODE) {
@@ -1285,7 +1285,7 @@
 </span></span><span id="1025" class="l"><a class="l" href="#1025">1025: </a><span class="php-comment">     * In debug mode adds each module js file to the page, otherwise uses the combined version.
 </span></span><span id="1026" class="l"><a class="l" href="#1026">1026: </a><span class="php-comment">     * Includes the zepto library.
 </span></span><span id="1027" class="l"><a class="l" href="#1027">1027: </a><span class="php-comment">     */</span>
-</span><span id="1028" class="l"><a class="l" href="#1028">1028: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1028" class="l"><a class="l" href="#1028">1028: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1029" class="l"><a class="l" href="#1029">1029: </a>        <span class="php-keyword1">if</span> (DEBUG_MODE) {
 </span><span id="1030" class="l"><a class="l" href="#1030">1030: </a>            <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="1031" class="l"><a class="l" href="#1031">1031: </a>            <span class="php-var">$zepto</span> = <span class="php-quote">'&lt;script type=&quot;text/javascript&quot; src=&quot;third_party/zepto.min.js&quot;&gt;&lt;/script&gt;'</span>;
@@ -1320,7 +1320,7 @@
 </span><span id="1060" class="l"><a class="l" href="#1060">1060: </a>    <span class="php-comment">/**
 </span></span><span id="1061" class="l"><a class="l" href="#1061">1061: </a><span class="php-comment">     * Closes the body and html tags
 </span></span><span id="1062" class="l"><a class="l" href="#1062">1062: </a><span class="php-comment">     */</span>
-</span><span id="1063" class="l"><a class="l" href="#1063">1063: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1063" class="l"><a class="l" href="#1063">1063: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1064" class="l"><a class="l" href="#1064">1064: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">defined</span>(<span class="php-quote">'DEBUG_MODE'</span>) &amp;&amp; DEBUG_MODE) {
 </span><span id="1065" class="l"><a class="l" href="#1065">1065: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;debug&quot;&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;'</span>;
 </span><span id="1066" class="l"><a class="l" href="#1066">1066: </a>        }
@@ -1338,7 +1338,7 @@
 </span><span id="1078" class="l"><a class="l" href="#1078">1078: </a>    <span class="php-comment">/**
 </span></span><span id="1079" class="l"><a class="l" href="#1079">1079: </a><span class="php-comment">     * Uses function wrappers to make the data immutable from JS
 </span></span><span id="1080" class="l"><a class="l" href="#1080">1080: </a><span class="php-comment">     */</span>
-</span><span id="1081" class="l"><a class="l" href="#1081">1081: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1081" class="l"><a class="l" href="#1081">1081: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1082" class="l"><a class="l" href="#1082">1082: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;script type=&quot;text/javascript&quot;&gt;'</span>.
 </span><span id="1083" class="l"><a class="l" href="#1083">1083: </a>            <span class="php-quote">'var hm_debug = function() { return &quot;'</span>.(DEBUG_MODE ? <span class="php-quote">'1'</span> : <span class="php-quote">'0'</span>).<span class="php-quote">'&quot;; };'</span>.
 </span><span id="1084" class="l"><a class="l" href="#1084">1084: </a>            <span class="php-quote">'var hm_page_name = function() { return &quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_page_name'</span>)).<span class="php-quote">'&quot;; };'</span>.
@@ -1358,7 +1358,7 @@
 </span><span id="1098" class="l"><a class="l" href="#1098">1098: </a>    <span class="php-comment">/**
 </span></span><span id="1099" class="l"><a class="l" href="#1099">1099: </a><span class="php-comment">     * Sort of ugly loading icon animated with js/css
 </span></span><span id="1100" class="l"><a class="l" href="#1100">1100: </a><span class="php-comment">     */</span>
-</span><span id="1101" class="l"><a class="l" href="#1101">1101: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1101" class="l"><a class="l" href="#1101">1101: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1102" class="l"><a class="l" href="#1102">1102: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;loading_icon&quot;&gt;&lt;/div&gt;'</span>;
 </span><span id="1103" class="l"><a class="l" href="#1103">1103: </a>    }
 </span><span id="1104" class="l"><a class="l" href="#1104">1104: </a>}
@@ -1371,7 +1371,7 @@
 </span><span id="1111" class="l"><a class="l" href="#1111">1111: </a>    <span class="php-comment">/**
 </span></span><span id="1112" class="l"><a class="l" href="#1112">1112: </a><span class="php-comment">     * Opens a div, form and table
 </span></span><span id="1113" class="l"><a class="l" href="#1113">1113: </a><span class="php-comment">     */</span>
-</span><span id="1114" class="l"><a class="l" href="#1114">1114: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1114" class="l"><a class="l" href="#1114">1114: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1115" class="l"><a class="l" href="#1115">1115: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;user_settings&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Site Settings'</span>).<span class="php-quote">'&lt;/div&gt;'</span>.
 </span><span id="1116" class="l"><a class="l" href="#1116">1116: </a>            <span class="php-quote">'&lt;form method=&quot;POST&quot;&gt;&lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
 </span><span id="1117" class="l"><a class="l" href="#1117">1117: </a>            <span class="php-quote">'&lt;table class=&quot;settings_table&quot;&gt;&lt;colgroup&gt;'</span>.
@@ -1387,7 +1387,7 @@
 </span><span id="1127" class="l"><a class="l" href="#1127">1127: </a>    <span class="php-comment">/**
 </span></span><span id="1128" class="l"><a class="l" href="#1128">1128: </a><span class="php-comment">     * Can be either &quot;news style&quot; or the default &quot;email style&quot;
 </span></span><span id="1129" class="l"><a class="l" href="#1129">1129: </a><span class="php-comment">     */</span>
-</span><span id="1130" class="l"><a class="l" href="#1130">1130: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1130" class="l"><a class="l" href="#1130">1130: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1131" class="l"><a class="l" href="#1131">1131: </a>        <span class="php-var">$options</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'email_style'</span> =&gt; <span class="php-quote">'Email'</span>, <span class="php-quote">'news_style'</span> =&gt; <span class="php-quote">'News'</span>);
 </span><span id="1132" class="l"><a class="l" href="#1132">1132: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="1133" class="l"><a class="l" href="#1133">1133: </a>
@@ -1420,7 +1420,7 @@
 </span><span id="1160" class="l"><a class="l" href="#1160">1160: </a>    <span class="php-comment">/**
 </span></span><span id="1161" class="l"><a class="l" href="#1161">1161: </a><span class="php-comment">     * Settings in this section control the flagged messages view
 </span></span><span id="1162" class="l"><a class="l" href="#1162">1162: </a><span class="php-comment">     */</span>
-</span><span id="1163" class="l"><a class="l" href="#1163">1163: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1163" class="l"><a class="l" href="#1163">1163: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1164" class="l"><a class="l" href="#1164">1164: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td data-target=&quot;.flagged_setting&quot; colspan=&quot;2&quot; class=&quot;settings_subtitle&quot;&gt;'</span>.
 </span><span id="1165" class="l"><a class="l" href="#1165">1165: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$star</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
 </span><span id="1166" class="l"><a class="l" href="#1166">1166: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Flagged'</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
@@ -1435,7 +1435,7 @@
 </span><span id="1175" class="l"><a class="l" href="#1175">1175: </a>    <span class="php-comment">/**
 </span></span><span id="1176" class="l"><a class="l" href="#1176">1176: </a><span class="php-comment">     * Setttings in this section control the Everything view
 </span></span><span id="1177" class="l"><a class="l" href="#1177">1177: </a><span class="php-comment">     */</span>
-</span><span id="1178" class="l"><a class="l" href="#1178">1178: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1178" class="l"><a class="l" href="#1178">1178: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1179" class="l"><a class="l" href="#1179">1179: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td data-target=&quot;.all_setting&quot; colspan=&quot;2&quot; class=&quot;settings_subtitle&quot;&gt;'</span>.
 </span><span id="1180" class="l"><a class="l" href="#1180">1180: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$box</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
 </span><span id="1181" class="l"><a class="l" href="#1181">1181: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Everything'</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
@@ -1450,7 +1450,7 @@
 </span><span id="1190" class="l"><a class="l" href="#1190">1190: </a>    <span class="php-comment">/**
 </span></span><span id="1191" class="l"><a class="l" href="#1191">1191: </a><span class="php-comment">     * Settings in this section control the Unread view
 </span></span><span id="1192" class="l"><a class="l" href="#1192">1192: </a><span class="php-comment">     */</span>
-</span><span id="1193" class="l"><a class="l" href="#1193">1193: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1193" class="l"><a class="l" href="#1193">1193: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1194" class="l"><a class="l" href="#1194">1194: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td data-target=&quot;.unread_setting&quot; colspan=&quot;2&quot; class=&quot;settings_subtitle&quot;&gt;'</span>.
 </span><span id="1195" class="l"><a class="l" href="#1195">1195: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$env_closed</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
 </span><span id="1196" class="l"><a class="l" href="#1196">1196: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Unread'</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
@@ -1466,7 +1466,7 @@
 </span></span><span id="1206" class="l"><a class="l" href="#1206">1206: </a><span class="php-comment">     * Settings in this section control the All E-mail view. Skipped if there are no
 </span></span><span id="1207" class="l"><a class="l" href="#1207">1207: </a><span class="php-comment">     * E-mail enabled module sets.
 </span></span><span id="1208" class="l"><a class="l" href="#1208">1208: </a><span class="php-comment">     */</span>
-</span><span id="1209" class="l"><a class="l" href="#1209">1209: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1209" class="l"><a class="l" href="#1209">1209: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1210" class="l"><a class="l" href="#1210">1210: </a>        <span class="php-keyword1">if</span> (!email_is_active(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_module_list'</span>))) {
 </span><span id="1211" class="l"><a class="l" href="#1211">1211: </a>            <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
 </span><span id="1212" class="l"><a class="l" href="#1212">1212: </a>        }
@@ -1484,7 +1484,7 @@
 </span><span id="1224" class="l"><a class="l" href="#1224">1224: </a>    <span class="php-comment">/**
 </span></span><span id="1225" class="l"><a class="l" href="#1225">1225: </a><span class="php-comment">     * General settings like langauge and timezone will go here
 </span></span><span id="1226" class="l"><a class="l" href="#1226">1226: </a><span class="php-comment">     */</span>
-</span><span id="1227" class="l"><a class="l" href="#1227">1227: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1227" class="l"><a class="l" href="#1227">1227: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1228" class="l"><a class="l" href="#1228">1228: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td data-target=&quot;.general_setting&quot; colspan=&quot;2&quot; class=&quot;settings_subtitle&quot;&gt;'</span>.
 </span><span id="1229" class="l"><a class="l" href="#1229">1229: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$cog</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
 </span><span id="1230" class="l"><a class="l" href="#1230">1230: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'General'</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
@@ -1499,7 +1499,7 @@
 </span><span id="1239" class="l"><a class="l" href="#1239">1239: </a>    <span class="php-comment">/**
 </span></span><span id="1240" class="l"><a class="l" href="#1240">1240: </a><span class="php-comment">     * Processed by Hm_Handler_process_unread_source_max_setting
 </span></span><span id="1241" class="l"><a class="l" href="#1241">1241: </a><span class="php-comment">     */</span>
-</span><span id="1242" class="l"><a class="l" href="#1242">1242: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1242" class="l"><a class="l" href="#1242">1242: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1243" class="l"><a class="l" href="#1243">1243: </a>        <span class="php-var">$sources</span> = DEFAULT_PER_SOURCE;
 </span><span id="1244" class="l"><a class="l" href="#1244">1244: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="1245" class="l"><a class="l" href="#1245">1245: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'unread_per_source'</span>, <span class="php-var">$settings</span>)) {
@@ -1519,7 +1519,7 @@
 </span><span id="1259" class="l"><a class="l" href="#1259">1259: </a>    <span class="php-comment">/**
 </span></span><span id="1260" class="l"><a class="l" href="#1260">1260: </a><span class="php-comment">     * Processed by Hm_Handler_process_unread_since_setting
 </span></span><span id="1261" class="l"><a class="l" href="#1261">1261: </a><span class="php-comment">     */</span>
-</span><span id="1262" class="l"><a class="l" href="#1262">1262: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1262" class="l"><a class="l" href="#1262">1262: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1263" class="l"><a class="l" href="#1263">1263: </a>        <span class="php-var">$since</span> = <span class="php-keyword1">false</span>;
 </span><span id="1264" class="l"><a class="l" href="#1264">1264: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="1265" class="l"><a class="l" href="#1265">1265: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'unread_since'</span>, <span class="php-var">$settings</span>)) {
@@ -1539,7 +1539,7 @@
 </span><span id="1279" class="l"><a class="l" href="#1279">1279: </a>    <span class="php-comment">/**
 </span></span><span id="1280" class="l"><a class="l" href="#1280">1280: </a><span class="php-comment">     * Processed by Hm_Handler_process_flagged_source_max_setting
 </span></span><span id="1281" class="l"><a class="l" href="#1281">1281: </a><span class="php-comment">     */</span>
-</span><span id="1282" class="l"><a class="l" href="#1282">1282: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1282" class="l"><a class="l" href="#1282">1282: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1283" class="l"><a class="l" href="#1283">1283: </a>        <span class="php-var">$sources</span> = DEFAULT_PER_SOURCE;
 </span><span id="1284" class="l"><a class="l" href="#1284">1284: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="1285" class="l"><a class="l" href="#1285">1285: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'flagged_per_source'</span>, <span class="php-var">$settings</span>)) {
@@ -1556,7 +1556,7 @@
 </span></span><span id="1296" class="l"><a class="l" href="#1296">1296: </a><span class="php-comment"> * @subpackage core/output
 </span></span><span id="1297" class="l"><a class="l" href="#1297">1297: </a><span class="php-comment"> */</span>
 </span><span id="1298" class="l"><a class="l" href="#1298">1298: </a><span class="php-keyword1">class</span> <a id="Hm_Output_flagged_since_setting" href="#Hm_Output_flagged_since_setting">Hm_Output_flagged_since_setting</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1299" class="l"><a class="l" href="#1299">1299: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1299" class="l"><a class="l" href="#1299">1299: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1300" class="l"><a class="l" href="#1300">1300: </a>        <span class="php-comment">/**
 </span></span><span id="1301" class="l"><a class="l" href="#1301">1301: </a><span class="php-comment">         * Processed by Hm_Handler_process_flagged_since_setting
 </span></span><span id="1302" class="l"><a class="l" href="#1302">1302: </a><span class="php-comment">         */</span>
@@ -1579,7 +1579,7 @@
 </span><span id="1319" class="l"><a class="l" href="#1319">1319: </a>    <span class="php-comment">/**
 </span></span><span id="1320" class="l"><a class="l" href="#1320">1320: </a><span class="php-comment">     * Processed by Hm_Handler_process_all_email_source_max_setting
 </span></span><span id="1321" class="l"><a class="l" href="#1321">1321: </a><span class="php-comment">     */</span>
-</span><span id="1322" class="l"><a class="l" href="#1322">1322: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1322" class="l"><a class="l" href="#1322">1322: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1323" class="l"><a class="l" href="#1323">1323: </a>        <span class="php-keyword1">if</span> (!email_is_active(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_module_list'</span>))) {
 </span><span id="1324" class="l"><a class="l" href="#1324">1324: </a>            <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
 </span><span id="1325" class="l"><a class="l" href="#1325">1325: </a>        }
@@ -1602,7 +1602,7 @@
 </span><span id="1342" class="l"><a class="l" href="#1342">1342: </a>    <span class="php-comment">/**
 </span></span><span id="1343" class="l"><a class="l" href="#1343">1343: </a><span class="php-comment">     * Processed by Hm_Handler_process_all_source_max_setting
 </span></span><span id="1344" class="l"><a class="l" href="#1344">1344: </a><span class="php-comment">     */</span>
-</span><span id="1345" class="l"><a class="l" href="#1345">1345: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1345" class="l"><a class="l" href="#1345">1345: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1346" class="l"><a class="l" href="#1346">1346: </a>        <span class="php-var">$sources</span> = DEFAULT_PER_SOURCE;
 </span><span id="1347" class="l"><a class="l" href="#1347">1347: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="1348" class="l"><a class="l" href="#1348">1348: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'all_per_source'</span>, <span class="php-var">$settings</span>)) {
@@ -1622,7 +1622,7 @@
 </span><span id="1362" class="l"><a class="l" href="#1362">1362: </a>    <span class="php-comment">/**
 </span></span><span id="1363" class="l"><a class="l" href="#1363">1363: </a><span class="php-comment">     * Processed by Hm_Handler_process_all_email_since_setting
 </span></span><span id="1364" class="l"><a class="l" href="#1364">1364: </a><span class="php-comment">     */</span>
-</span><span id="1365" class="l"><a class="l" href="#1365">1365: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1365" class="l"><a class="l" href="#1365">1365: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1366" class="l"><a class="l" href="#1366">1366: </a>        <span class="php-keyword1">if</span> (!email_is_active(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_module_list'</span>))) {
 </span><span id="1367" class="l"><a class="l" href="#1367">1367: </a>            <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
 </span><span id="1368" class="l"><a class="l" href="#1368">1368: </a>        }
@@ -1645,7 +1645,7 @@
 </span><span id="1385" class="l"><a class="l" href="#1385">1385: </a>    <span class="php-comment">/**
 </span></span><span id="1386" class="l"><a class="l" href="#1386">1386: </a><span class="php-comment">     * Processed by Hm_Handler_process_all_since_setting
 </span></span><span id="1387" class="l"><a class="l" href="#1387">1387: </a><span class="php-comment">     */</span>
-</span><span id="1388" class="l"><a class="l" href="#1388">1388: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1388" class="l"><a class="l" href="#1388">1388: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1389" class="l"><a class="l" href="#1389">1389: </a>        <span class="php-var">$since</span> = <span class="php-keyword1">false</span>;
 </span><span id="1390" class="l"><a class="l" href="#1390">1390: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="1391" class="l"><a class="l" href="#1391">1391: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'all_since'</span>, <span class="php-var">$settings</span>)) {
@@ -1665,7 +1665,7 @@
 </span><span id="1405" class="l"><a class="l" href="#1405">1405: </a>    <span class="php-comment">/**
 </span></span><span id="1406" class="l"><a class="l" href="#1406">1406: </a><span class="php-comment">     * Processed by Hm_Handler_process_language_setting
 </span></span><span id="1407" class="l"><a class="l" href="#1407">1407: </a><span class="php-comment">     */</span>
-</span><span id="1408" class="l"><a class="l" href="#1408">1408: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1408" class="l"><a class="l" href="#1408">1408: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1409" class="l"><a class="l" href="#1409">1409: </a>        <span class="php-var">$langs</span> = interface_langs();
 </span><span id="1410" class="l"><a class="l" href="#1410">1410: </a>        <span class="php-var">$translated</span> = <span class="php-keyword1">array</span>();
 </span><span id="1411" class="l"><a class="l" href="#1411">1411: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$langs</span> <span class="php-keyword1">as</span> <span class="php-var">$code</span> =&gt; <span class="php-var">$name</span>) {
@@ -1696,7 +1696,7 @@
 </span><span id="1436" class="l"><a class="l" href="#1436">1436: </a>    <span class="php-comment">/**
 </span></span><span id="1437" class="l"><a class="l" href="#1437">1437: </a><span class="php-comment">     * Processed by Hm_Handler_process_timezone_setting
 </span></span><span id="1438" class="l"><a class="l" href="#1438">1438: </a><span class="php-comment">     */</span>
-</span><span id="1439" class="l"><a class="l" href="#1439">1439: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1439" class="l"><a class="l" href="#1439">1439: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1440" class="l"><a class="l" href="#1440">1440: </a>        <span class="php-var">$zones</span> = <span class="php-keyword2">timezone_identifiers_list</span>();
 </span><span id="1441" class="l"><a class="l" href="#1441">1441: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
 </span><span id="1442" class="l"><a class="l" href="#1442">1442: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'timezone'</span>, <span class="php-var">$settings</span>)) {
@@ -1727,7 +1727,7 @@
 </span><span id="1467" class="l"><a class="l" href="#1467">1467: </a>    <span class="php-comment">/**
 </span></span><span id="1468" class="l"><a class="l" href="#1468">1468: </a><span class="php-comment">     * Closes the table, form and div opened in Hm_Output_start_settings_form
 </span></span><span id="1469" class="l"><a class="l" href="#1469">1469: </a><span class="php-comment">     */</span>
-</span><span id="1470" class="l"><a class="l" href="#1470">1470: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1470" class="l"><a class="l" href="#1470">1470: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1471" class="l"><a class="l" href="#1471">1471: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td class=&quot;submit_cell&quot; colspan=&quot;2&quot;&gt;'</span>.
 </span><span id="1472" class="l"><a class="l" href="#1472">1472: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;password&quot;&gt;Password&lt;/label&gt;&lt;input required id=&quot;password&quot; '</span>.
 </span><span id="1473" class="l"><a class="l" href="#1473">1473: </a>            <span class="php-quote">'name=&quot;password&quot; class=&quot;save_settings_password&quot; type=&quot;password&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
@@ -1745,7 +1745,7 @@
 </span><span id="1485" class="l"><a class="l" href="#1485">1485: </a>    <span class="php-comment">/**
 </span></span><span id="1486" class="l"><a class="l" href="#1486">1486: </a><span class="php-comment">     * Opens the folder list nav tag
 </span></span><span id="1487" class="l"><a class="l" href="#1487">1487: </a><span class="php-comment">     */</span>
-</span><span id="1488" class="l"><a class="l" href="#1488">1488: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1488" class="l"><a class="l" href="#1488">1488: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1489" class="l"><a class="l" href="#1489">1489: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;a class=&quot;folder_toggle&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$big_caret</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>.
 </span><span id="1490" class="l"><a class="l" href="#1490">1490: </a>            <span class="php-quote">'&lt;nav class=&quot;folder_cell&quot;&gt;&lt;div class=&quot;folder_list&quot;&gt;'</span>;
 </span><span id="1491" class="l"><a class="l" href="#1491">1491: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
@@ -1760,8 +1760,8 @@
 </span><span id="1500" class="l"><a class="l" href="#1500">1500: </a>    <span class="php-comment">/**
 </span></span><span id="1501" class="l"><a class="l" href="#1501">1501: </a><span class="php-comment">     * Creates a modfiable string called formatted_folder_list other modules append to
 </span></span><span id="1502" class="l"><a class="l" href="#1502">1502: </a><span class="php-comment">     */</span>
-</span><span id="1503" class="l"><a class="l" href="#1503">1503: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
-</span><span id="1504" class="l"><a class="l" href="#1504">1504: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1503" class="l"><a class="l" href="#1503">1503: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
+</span><span id="1504" class="l"><a class="l" href="#1504">1504: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1505" class="l"><a class="l" href="#1505">1505: </a>            <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
 </span><span id="1506" class="l"><a class="l" href="#1506">1506: </a>        }
 </span><span id="1507" class="l"><a class="l" href="#1507">1507: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-quote">''</span>, <span class="php-keyword1">false</span>);
@@ -1776,11 +1776,11 @@
 </span><span id="1516" class="l"><a class="l" href="#1516">1516: </a>    <span class="php-comment">/**
 </span></span><span id="1517" class="l"><a class="l" href="#1517">1517: </a><span class="php-comment">     * Opens a div and unordered list tag
 </span></span><span id="1518" class="l"><a class="l" href="#1518">1518: </a><span class="php-comment">     */</span>
-</span><span id="1519" class="l"><a class="l" href="#1519">1519: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1519" class="l"><a class="l" href="#1519">1519: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1520" class="l"><a class="l" href="#1520">1520: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;src_name main_menu&quot; data-source=&quot;.main&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Main'</span>).
 </span><span id="1521" class="l"><a class="l" href="#1521">1521: </a>        <span class="php-quote">'&lt;img alt=&quot;&quot; class=&quot;menu_caret&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$chevron</span>.<span class="php-quote">'&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;'</span>.
 </span><span id="1522" class="l"><a class="l" href="#1522">1522: </a>        <span class="php-quote">'&lt;/div&gt;&lt;div class=&quot;main&quot;&gt;&lt;ul class=&quot;folders&quot;&gt;'</span>;
-</span><span id="1523" class="l"><a class="l" href="#1523">1523: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1523" class="l"><a class="l" href="#1523">1523: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1524" class="l"><a class="l" href="#1524">1524: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1525" class="l"><a class="l" href="#1525">1525: </a>        }
 </span><span id="1526" class="l"><a class="l" href="#1526">1526: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1796,7 +1796,7 @@
 </span></span><span id="1536" class="l"><a class="l" href="#1536">1536: </a><span class="php-comment">     * Links to default pages: Home, Everything, Unread and Flagged
 </span></span><span id="1537" class="l"><a class="l" href="#1537">1537: </a><span class="php-comment">     * @todo break this up into smaller modules
 </span></span><span id="1538" class="l"><a class="l" href="#1538">1538: </a><span class="php-comment">     */</span>
-</span><span id="1539" class="l"><a class="l" href="#1539">1539: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1539" class="l"><a class="l" href="#1539">1539: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1540" class="l"><a class="l" href="#1540">1540: </a>        <span class="php-var">$email</span> = <span class="php-keyword1">false</span>;
 </span><span id="1541" class="l"><a class="l" href="#1541">1541: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-quote">'email_folders'</span>, <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'folder_sources'</span>, <span class="php-keyword1">array</span>()))) {
 </span><span id="1542" class="l"><a class="l" href="#1542">1542: </a>            <span class="php-var">$email</span> = <span class="php-keyword1">true</span>;
@@ -1814,7 +1814,7 @@
 </span><span id="1554" class="l"><a class="l" href="#1554">1554: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$star</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Flagged'</span>).
 </span><span id="1555" class="l"><a class="l" href="#1555">1555: </a>            <span class="php-quote">'&lt;/a&gt; &lt;span class=&quot;flagged_count&quot;&gt;&lt;/span&gt;&lt;/li&gt;'</span>;
 </span><span id="1556" class="l"><a class="l" href="#1556">1556: </a>
-</span><span id="1557" class="l"><a class="l" href="#1557">1557: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1557" class="l"><a class="l" href="#1557">1557: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1558" class="l"><a class="l" href="#1558">1558: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1559" class="l"><a class="l" href="#1559">1559: </a>        }
 </span><span id="1560" class="l"><a class="l" href="#1560">1560: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1826,11 +1826,11 @@
 </span></span><span id="1566" class="l"><a class="l" href="#1566">1566: </a><span class="php-comment"> * @subpackage core/output
 </span></span><span id="1567" class="l"><a class="l" href="#1567">1567: </a><span class="php-comment"> */</span>
 </span><span id="1568" class="l"><a class="l" href="#1568">1568: </a><span class="php-keyword1">class</span> <a id="Hm_Output_logout_menu_item" href="#Hm_Output_logout_menu_item">Hm_Output_logout_menu_item</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1569" class="l"><a class="l" href="#1569">1569: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1569" class="l"><a class="l" href="#1569">1569: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1570" class="l"><a class="l" href="#1570">1570: </a>        <span class="php-var">$res</span> =  <span class="php-quote">'&lt;li&gt;&lt;a class=&quot;unread_link logout_link&quot; href=&quot;#&quot;&gt;&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.
 </span><span id="1571" class="l"><a class="l" href="#1571">1571: </a>            <span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$power</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Logout'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
 </span><span id="1572" class="l"><a class="l" href="#1572">1572: </a>
-</span><span id="1573" class="l"><a class="l" href="#1573">1573: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1573" class="l"><a class="l" href="#1573">1573: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1574" class="l"><a class="l" href="#1574">1574: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1575" class="l"><a class="l" href="#1575">1575: </a>        }
 </span><span id="1576" class="l"><a class="l" href="#1576">1576: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1842,9 +1842,9 @@
 </span></span><span id="1582" class="l"><a class="l" href="#1582">1582: </a><span class="php-comment"> * @subpackage core/output
 </span></span><span id="1583" class="l"><a class="l" href="#1583">1583: </a><span class="php-comment"> */</span>
 </span><span id="1584" class="l"><a class="l" href="#1584">1584: </a><span class="php-keyword1">class</span> <a id="Hm_Output_main_menu_end" href="#Hm_Output_main_menu_end">Hm_Output_main_menu_end</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1585" class="l"><a class="l" href="#1585">1585: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1585" class="l"><a class="l" href="#1585">1585: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1586" class="l"><a class="l" href="#1586">1586: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;'</span>;
-</span><span id="1587" class="l"><a class="l" href="#1587">1587: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1587" class="l"><a class="l" href="#1587">1587: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1588" class="l"><a class="l" href="#1588">1588: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1589" class="l"><a class="l" href="#1589">1589: </a>        }
 </span><span id="1590" class="l"><a class="l" href="#1590">1590: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1859,7 +1859,7 @@
 </span><span id="1599" class="l"><a class="l" href="#1599">1599: </a>    <span class="php-comment">/**
 </span></span><span id="1600" class="l"><a class="l" href="#1600">1600: </a><span class="php-comment">     * Displays a list of all configured E-mail accounts
 </span></span><span id="1601" class="l"><a class="l" href="#1601">1601: </a><span class="php-comment">     */</span>
-</span><span id="1602" class="l"><a class="l" href="#1602">1602: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1602" class="l"><a class="l" href="#1602">1602: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1603" class="l"><a class="l" href="#1603">1603: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="1604" class="l"><a class="l" href="#1604">1604: </a>        <span class="php-var">$folder_sources</span> = <span class="php-keyword2">array_unique</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'folder_sources'</span>, <span class="php-keyword1">array</span>()));
 </span><span id="1605" class="l"><a class="l" href="#1605">1605: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$folder_sources</span> <span class="php-keyword1">as</span> <span class="php-var">$src</span>) {
@@ -1883,7 +1883,7 @@
 </span><span id="1623" class="l"><a class="l" href="#1623">1623: </a>            }
 </span><span id="1624" class="l"><a class="l" href="#1624">1624: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;'</span>;
 </span><span id="1625" class="l"><a class="l" href="#1625">1625: </a>        }
-</span><span id="1626" class="l"><a class="l" href="#1626">1626: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1626" class="l"><a class="l" href="#1626">1626: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1627" class="l"><a class="l" href="#1627">1627: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1628" class="l"><a class="l" href="#1628">1628: </a>        }
 </span><span id="1629" class="l"><a class="l" href="#1629">1629: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1898,11 +1898,11 @@
 </span><span id="1638" class="l"><a class="l" href="#1638">1638: </a>    <span class="php-comment">/**
 </span></span><span id="1639" class="l"><a class="l" href="#1639">1639: </a><span class="php-comment">     * Opens an unordered list
 </span></span><span id="1640" class="l"><a class="l" href="#1640">1640: </a><span class="php-comment">     */</span>
-</span><span id="1641" class="l"><a class="l" href="#1641">1641: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1641" class="l"><a class="l" href="#1641">1641: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1642" class="l"><a class="l" href="#1642">1642: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;src_name&quot; data-source=&quot;.settings&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Settings'</span>).
 </span><span id="1643" class="l"><a class="l" href="#1643">1643: </a>            <span class="php-quote">'&lt;img class=&quot;menu_caret&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$chevron</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;'</span>.
 </span><span id="1644" class="l"><a class="l" href="#1644">1644: </a>            <span class="php-quote">'&lt;/div&gt;&lt;ul style=&quot;display: none;&quot; class=&quot;settings folders&quot;&gt;'</span>;
-</span><span id="1645" class="l"><a class="l" href="#1645">1645: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1645" class="l"><a class="l" href="#1645">1645: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1646" class="l"><a class="l" href="#1646">1646: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1647" class="l"><a class="l" href="#1647">1647: </a>        }
 </span><span id="1648" class="l"><a class="l" href="#1648">1648: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1917,14 +1917,14 @@
 </span><span id="1657" class="l"><a class="l" href="#1657">1657: </a>    <span class="php-comment">/**
 </span></span><span id="1658" class="l"><a class="l" href="#1658">1658: </a><span class="php-comment">     * Outputs links to the Servers and Site Settings pages
 </span></span><span id="1659" class="l"><a class="l" href="#1659">1659: </a><span class="php-comment">     */</span>
-</span><span id="1660" class="l"><a class="l" href="#1660">1660: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1660" class="l"><a class="l" href="#1660">1660: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1661" class="l"><a class="l" href="#1661">1661: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_servers&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=servers&quot;&gt;'</span>.
 </span><span id="1662" class="l"><a class="l" href="#1662">1662: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$monitor</span>).
 </span><span id="1663" class="l"><a class="l" href="#1663">1663: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Servers'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>.
 </span><span id="1664" class="l"><a class="l" href="#1664">1664: </a>            <span class="php-quote">'&lt;li class=&quot;menu_settings&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=settings&quot;&gt;'</span>.
 </span><span id="1665" class="l"><a class="l" href="#1665">1665: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$cog</span>).
 </span><span id="1666" class="l"><a class="l" href="#1666">1666: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Site'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="1667" class="l"><a class="l" href="#1667">1667: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1667" class="l"><a class="l" href="#1667">1667: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1668" class="l"><a class="l" href="#1668">1668: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1669" class="l"><a class="l" href="#1669">1669: </a>        }
 </span><span id="1670" class="l"><a class="l" href="#1670">1670: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1939,9 +1939,9 @@
 </span><span id="1679" class="l"><a class="l" href="#1679">1679: </a>    <span class="php-comment">/**
 </span></span><span id="1680" class="l"><a class="l" href="#1680">1680: </a><span class="php-comment">     * Closes the ul tag opened in Hm_Output_settings_menu_start
 </span></span><span id="1681" class="l"><a class="l" href="#1681">1681: </a><span class="php-comment">     */</span>
-</span><span id="1682" class="l"><a class="l" href="#1682">1682: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1682" class="l"><a class="l" href="#1682">1682: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1683" class="l"><a class="l" href="#1683">1683: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/ul&gt;'</span>;
-</span><span id="1684" class="l"><a class="l" href="#1684">1684: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1684" class="l"><a class="l" href="#1684">1684: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1685" class="l"><a class="l" href="#1685">1685: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1686" class="l"><a class="l" href="#1686">1686: </a>        }
 </span><span id="1687" class="l"><a class="l" href="#1687">1687: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1956,11 +1956,11 @@
 </span><span id="1696" class="l"><a class="l" href="#1696">1696: </a>    <span class="php-comment">/**
 </span></span><span id="1697" class="l"><a class="l" href="#1697">1697: </a><span class="php-comment">     * Adds collapse and reload links
 </span></span><span id="1698" class="l"><a class="l" href="#1698">1698: </a><span class="php-comment">     */</span>
-</span><span id="1699" class="l"><a class="l" href="#1699">1699: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1699" class="l"><a class="l" href="#1699">1699: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1700" class="l"><a class="l" href="#1700">1700: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;a href=&quot;#&quot; class=&quot;update_message_list&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'[reload]'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
 </span><span id="1701" class="l"><a class="l" href="#1701">1701: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;#&quot; class=&quot;hide_folders&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$big_caret_left</span>.
 </span><span id="1702" class="l"><a class="l" href="#1702">1702: </a>            <span class="php-quote">'&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Collapse'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;&lt;/a&gt;'</span>;
-</span><span id="1703" class="l"><a class="l" href="#1703">1703: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1703" class="l"><a class="l" href="#1703">1703: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="1704" class="l"><a class="l" href="#1704">1704: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1705" class="l"><a class="l" href="#1705">1705: </a>        }
 </span><span id="1706" class="l"><a class="l" href="#1706">1706: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -1975,7 +1975,7 @@
 </span><span id="1715" class="l"><a class="l" href="#1715">1715: </a>    <span class="php-comment">/**
 </span></span><span id="1716" class="l"><a class="l" href="#1716">1716: </a><span class="php-comment">     * Closes the div and nav tags opened in Hm_Output_folder_list_start
 </span></span><span id="1717" class="l"><a class="l" href="#1717">1717: </a><span class="php-comment">     */</span>
-</span><span id="1718" class="l"><a class="l" href="#1718">1718: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1718" class="l"><a class="l" href="#1718">1718: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1719" class="l"><a class="l" href="#1719">1719: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;&lt;/nav&gt;'</span>;
 </span><span id="1720" class="l"><a class="l" href="#1720">1720: </a>    }
 </span><span id="1721" class="l"><a class="l" href="#1721">1721: </a>}
@@ -1988,7 +1988,7 @@
 </span><span id="1728" class="l"><a class="l" href="#1728">1728: </a>    <span class="php-comment">/**
 </span></span><span id="1729" class="l"><a class="l" href="#1729">1729: </a><span class="php-comment">     * Opens a main tag for the primary content section
 </span></span><span id="1730" class="l"><a class="l" href="#1730">1730: </a><span class="php-comment">     */</span>
-</span><span id="1731" class="l"><a class="l" href="#1731">1731: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1731" class="l"><a class="l" href="#1731">1731: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1732" class="l"><a class="l" href="#1732">1732: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;main class=&quot;content_cell&quot;&gt;'</span>;
 </span><span id="1733" class="l"><a class="l" href="#1733">1733: </a>    }
 </span><span id="1734" class="l"><a class="l" href="#1734">1734: </a>}
@@ -2001,7 +2001,7 @@
 </span><span id="1741" class="l"><a class="l" href="#1741">1741: </a>    <span class="php-comment">/**
 </span></span><span id="1742" class="l"><a class="l" href="#1742">1742: </a><span class="php-comment">     * Closes the main tag opened in Hm_Output_content_section_start
 </span></span><span id="1743" class="l"><a class="l" href="#1743">1743: </a><span class="php-comment">     */</span>
-</span><span id="1744" class="l"><a class="l" href="#1744">1744: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1744" class="l"><a class="l" href="#1744">1744: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1745" class="l"><a class="l" href="#1745">1745: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/main&gt;'</span>;
 </span><span id="1746" class="l"><a class="l" href="#1746">1746: </a>    }
 </span><span id="1747" class="l"><a class="l" href="#1747">1747: </a>}
@@ -2014,7 +2014,7 @@
 </span><span id="1754" class="l"><a class="l" href="#1754">1754: </a>    <span class="php-comment">/**
 </span></span><span id="1755" class="l"><a class="l" href="#1755">1755: </a><span class="php-comment">     * Modules populate this table to run a status check from the home page
 </span></span><span id="1756" class="l"><a class="l" href="#1756">1756: </a><span class="php-comment">     */</span>
-</span><span id="1757" class="l"><a class="l" href="#1757">1757: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1757" class="l"><a class="l" href="#1757">1757: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1758" class="l"><a class="l" href="#1758">1758: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;server_status&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Home'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="1759" class="l"><a class="l" href="#1759">1759: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Type'</span>).<span class="php-quote">'&lt;/th&gt;&lt;th&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Name'</span>).<span class="php-quote">'&lt;/th&gt;&lt;th&gt;'</span>.
 </span><span id="1760" class="l"><a class="l" href="#1760">1760: </a>                <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Status'</span>).<span class="php-quote">'&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;'</span>;
@@ -2030,7 +2030,7 @@
 </span><span id="1770" class="l"><a class="l" href="#1770">1770: </a>    <span class="php-comment">/**
 </span></span><span id="1771" class="l"><a class="l" href="#1771">1771: </a><span class="php-comment">     * Close the table opened in Hm_Output_server_status_start
 </span></span><span id="1772" class="l"><a class="l" href="#1772">1772: </a><span class="php-comment">     */</span>
-</span><span id="1773" class="l"><a class="l" href="#1773">1773: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1773" class="l"><a class="l" href="#1773">1773: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1774" class="l"><a class="l" href="#1774">1774: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;'</span>;
 </span><span id="1775" class="l"><a class="l" href="#1775">1775: </a>    }
 </span><span id="1776" class="l"><a class="l" href="#1776">1776: </a>}
@@ -2043,7 +2043,7 @@
 </span><span id="1783" class="l"><a class="l" href="#1783">1783: </a>    <span class="php-comment">/**
 </span></span><span id="1784" class="l"><a class="l" href="#1784">1784: </a><span class="php-comment">     * @todo this is pretty ugly, clean it up and remove module specific stuff
 </span></span><span id="1785" class="l"><a class="l" href="#1785">1785: </a><span class="php-comment">     */</span>
-</span><span id="1786" class="l"><a class="l" href="#1786">1786: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1786" class="l"><a class="l" href="#1786">1786: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1787" class="l"><a class="l" href="#1787">1787: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;in(<span class="php-quote">'list_parent'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'search'</span>, <span class="php-quote">'flagged'</span>, <span class="php-quote">'combined_inbox'</span>, <span class="php-quote">'unread'</span>, <span class="php-quote">'feeds'</span>, <span class="php-quote">'email'</span>))) {
 </span><span id="1788" class="l"><a class="l" href="#1788">1788: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>) == <span class="php-quote">'combined_inbox'</span>) {
 </span><span id="1789" class="l"><a class="l" href="#1789">1789: </a>                <span class="php-var">$list_name</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Everything'</span>);
@@ -2093,7 +2093,7 @@
 </span><span id="1833" class="l"><a class="l" href="#1833">1833: </a>    <span class="php-comment">/**
 </span></span><span id="1834" class="l"><a class="l" href="#1834">1834: </a><span class="php-comment">     * Closes the div opened in Hm_Output_message_start
 </span></span><span id="1835" class="l"><a class="l" href="#1835">1835: </a><span class="php-comment">     */</span>
-</span><span id="1836" class="l"><a class="l" href="#1836">1836: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1836" class="l"><a class="l" href="#1836">1836: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1837" class="l"><a class="l" href="#1837">1837: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="1838" class="l"><a class="l" href="#1838">1838: </a>    }
 </span><span id="1839" class="l"><a class="l" href="#1839">1839: </a>}
@@ -2106,7 +2106,7 @@
 </span><span id="1846" class="l"><a class="l" href="#1846">1846: </a>    <span class="php-comment">/**
 </span></span><span id="1847" class="l"><a class="l" href="#1847">1847: </a><span class="php-comment">     * Simple &quot;page not found&quot; page content
 </span></span><span id="1848" class="l"><a class="l" href="#1848">1848: </a><span class="php-comment">     */</span>
-</span><span id="1849" class="l"><a class="l" href="#1849">1849: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1849" class="l"><a class="l" href="#1849">1849: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1850" class="l"><a class="l" href="#1850">1850: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Page Not Found!'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="1851" class="l"><a class="l" href="#1851">1851: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;empty_list&quot;&gt;&lt;br /&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Nothingness'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="1852" class="l"><a class="l" href="#1852">1852: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
@@ -2121,7 +2121,7 @@
 </span><span id="1861" class="l"><a class="l" href="#1861">1861: </a>    <span class="php-comment">/**
 </span></span><span id="1862" class="l"><a class="l" href="#1862">1862: </a><span class="php-comment">     * Uses the message_list_fields input to determine the format.
 </span></span><span id="1863" class="l"><a class="l" href="#1863">1863: </a><span class="php-comment">     */</span>
-</span><span id="1864" class="l"><a class="l" href="#1864">1864: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1864" class="l"><a class="l" href="#1864">1864: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1865" class="l"><a class="l" href="#1865">1865: </a>
 </span><span id="1866" class="l"><a class="l" href="#1866">1866: </a>        <span class="php-var">$col_flds</span> = <span class="php-keyword1">array</span>();
 </span><span id="1867" class="l"><a class="l" href="#1867">1867: </a>        <span class="php-var">$header_flds</span> = <span class="php-keyword1">array</span>();
@@ -2158,7 +2158,7 @@
 </span><span id="1898" class="l"><a class="l" href="#1898">1898: </a>    <span class="php-comment">/**
 </span></span><span id="1899" class="l"><a class="l" href="#1899">1899: </a><span class="php-comment">     * @todo remove modle specific stuff
 </span></span><span id="1900" class="l"><a class="l" href="#1900">1900: </a><span class="php-comment">     */</span>
-</span><span id="1901" class="l"><a class="l" href="#1901">1901: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1901" class="l"><a class="l" href="#1901">1901: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1902" class="l"><a class="l" href="#1902">1902: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;in(<span class="php-quote">'list_path'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'unread'</span>, <span class="php-quote">'flagged'</span>, <span class="php-quote">'pop3'</span>, <span class="php-quote">'combined_inbox'</span>, <span class="php-quote">'feeds'</span>, <span class="php-quote">'email'</span>))) {
 </span><span id="1903" class="l"><a class="l" href="#1903">1903: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">'&lt;a href=&quot;#&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Sources'</span>).<span class="php-quote">'&quot; class=&quot;source_link&quot;&gt;&lt;img alt=&quot;Sources&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$folder</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
 </span><span id="1904" class="l"><a class="l" href="#1904">1904: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>) == <span class="php-quote">'combined_inbox'</span>) {
@@ -2197,7 +2197,7 @@
 </span><span id="1937" class="l"><a class="l" href="#1937">1937: </a>    <span class="php-comment">/**
 </span></span><span id="1938" class="l"><a class="l" href="#1938">1938: </a><span class="php-comment">     * Close the table opened in Hm_Output_message_list_start
 </span></span><span id="1939" class="l"><a class="l" href="#1939">1939: </a><span class="php-comment">     */</span>
-</span><span id="1940" class="l"><a class="l" href="#1940">1940: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1940" class="l"><a class="l" href="#1940">1940: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1941" class="l"><a class="l" href="#1941">1941: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/tbody&gt;&lt;/table&gt;&lt;div class=&quot;page_links&quot;&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
 </span><span id="1942" class="l"><a class="l" href="#1942">1942: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="1943" class="l"><a class="l" href="#1943">1943: </a>    }

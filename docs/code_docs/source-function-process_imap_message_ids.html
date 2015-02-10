@@ -902,7 +902,7 @@
 </span></span><span id="657" class="l"><a class="l" href="#657"> 657: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="658" class="l"><a class="l" href="#658"> 658: </a><span class="php-comment"> */</span>
 </span><span id="659" class="l"><a class="l" href="#659"> 659: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_message_body" href="#Hm_Output_filter_message_body">Hm_Output_filter_message_body</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="660" class="l"><a class="l" href="#660"> 660: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="660" class="l"><a class="l" href="#660"> 660: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="661" class="l"><a class="l" href="#661"> 661: </a>        <span class="php-var">$txt</span> = <span class="php-quote">'&lt;div class=&quot;msg_text_inner&quot;&gt;'</span>;
 </span><span id="662" class="l"><a class="l" href="#662"> 662: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'msg_text'</span>)) {
 </span><span id="663" class="l"><a class="l" href="#663"> 663: </a>            <span class="php-var">$struct</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'msg_struct_current'</span>, <span class="php-keyword1">array</span>());
@@ -925,7 +925,7 @@
 </span></span><span id="680" class="l"><a class="l" href="#680"> 680: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="681" class="l"><a class="l" href="#681"> 681: </a><span class="php-comment"> */</span>
 </span><span id="682" class="l"><a class="l" href="#682"> 682: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_message_struct" href="#Hm_Output_filter_message_struct">Hm_Output_filter_message_struct</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="683" class="l"><a class="l" href="#683"> 683: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="683" class="l"><a class="l" href="#683"> 683: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="684" class="l"><a class="l" href="#684"> 684: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'msg_struct'</span>)) {
 </span><span id="685" class="l"><a class="l" href="#685"> 685: </a>            <span class="php-var">$res</span> = <span class="php-quote">'&lt;table class=&quot;msg_parts&quot;&gt;'</span>;
 </span><span id="686" class="l"><a class="l" href="#686"> 686: </a>            <span class="php-var">$part</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_msg_part'</span>, <span class="php-quote">'1'</span>);
@@ -940,7 +940,7 @@
 </span></span><span id="695" class="l"><a class="l" href="#695"> 695: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="696" class="l"><a class="l" href="#696"> 696: </a><span class="php-comment"> */</span>
 </span><span id="697" class="l"><a class="l" href="#697"> 697: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_message_headers" href="#Hm_Output_filter_message_headers">Hm_Output_filter_message_headers</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="698" class="l"><a class="l" href="#698"> 698: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="698" class="l"><a class="l" href="#698"> 698: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="699" class="l"><a class="l" href="#699"> 699: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'msg_headers'</span>)) {
 </span><span id="700" class="l"><a class="l" href="#700"> 700: </a>            <span class="php-var">$txt</span> = <span class="php-quote">''</span>;
 </span><span id="701" class="l"><a class="l" href="#701"> 701: </a>            <span class="php-var">$from</span> = <span class="php-quote">''</span>;
@@ -1000,7 +1000,7 @@
 </span></span><span id="755" class="l"><a class="l" href="#755"> 755: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="756" class="l"><a class="l" href="#756"> 756: </a><span class="php-comment"> */</span>
 </span><span id="757" class="l"><a class="l" href="#757"> 757: </a><span class="php-keyword1">class</span> <a id="Hm_Output_display_configured_imap_servers" href="#Hm_Output_display_configured_imap_servers">Hm_Output_display_configured_imap_servers</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="758" class="l"><a class="l" href="#758"> 758: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="758" class="l"><a class="l" href="#758"> 758: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="759" class="l"><a class="l" href="#759"> 759: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="760" class="l"><a class="l" href="#760"> 760: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_servers'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
 </span><span id="761" class="l"><a class="l" href="#761"> 761: </a>
@@ -1055,7 +1055,7 @@
 </span></span><span id="810" class="l"><a class="l" href="#810"> 810: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="811" class="l"><a class="l" href="#811"> 811: </a><span class="php-comment"> */</span>
 </span><span id="812" class="l"><a class="l" href="#812"> 812: </a><span class="php-keyword1">class</span> <a id="Hm_Output_add_imap_server_dialog" href="#Hm_Output_add_imap_server_dialog">Hm_Output_add_imap_server_dialog</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="813" class="l"><a class="l" href="#813"> 813: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="813" class="l"><a class="l" href="#813"> 813: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="814" class="l"><a class="l" href="#814"> 814: </a>        <span class="php-var">$count</span> = <span class="php-keyword2">count</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_servers'</span>, <span class="php-keyword1">array</span>()));
 </span><span id="815" class="l"><a class="l" href="#815"> 815: </a>        <span class="php-var">$count</span> = <span class="php-keyword2">sprintf</span>(<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'%d configured'</span>), <span class="php-var">$count</span>);
 </span><span id="816" class="l"><a class="l" href="#816"> 816: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;imap_server_setup&quot;&gt;&lt;div data-target=&quot;.imap_section&quot; class=&quot;server_section&quot;&gt;'</span>.
@@ -1079,7 +1079,7 @@
 </span></span><span id="834" class="l"><a class="l" href="#834"> 834: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="835" class="l"><a class="l" href="#835"> 835: </a><span class="php-comment"> */</span>
 </span><span id="836" class="l"><a class="l" href="#836"> 836: </a><span class="php-keyword1">class</span> <a id="Hm_Output_display_imap_status" href="#Hm_Output_display_imap_status">Hm_Output_display_imap_status</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="837" class="l"><a class="l" href="#837"> 837: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="837" class="l"><a class="l" href="#837"> 837: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="838" class="l"><a class="l" href="#838"> 838: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="839" class="l"><a class="l" href="#839"> 839: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_servers'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
 </span><span id="840" class="l"><a class="l" href="#840"> 840: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$vals</span>[<span class="php-quote">'name'</span>] == <span class="php-quote">'Default-Auth-Server'</span>) {
@@ -1096,7 +1096,7 @@
 </span></span><span id="851" class="l"><a class="l" href="#851"> 851: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="852" class="l"><a class="l" href="#852"> 852: </a><span class="php-comment"> */</span>
 </span><span id="853" class="l"><a class="l" href="#853"> 853: </a><span class="php-keyword1">class</span> <a id="Hm_Output_imap_reply_details" href="#Hm_Output_imap_reply_details">Hm_Output_imap_reply_details</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="854" class="l"><a class="l" href="#854"> 854: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="854" class="l"><a class="l" href="#854"> 854: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="855" class="l"><a class="l" href="#855"> 855: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="856" class="l"><a class="l" href="#856"> 856: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_reply_source'</span>)) {
 </span><span id="857" class="l"><a class="l" href="#857"> 857: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; class=&quot;imap_reply_source&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_reply_source'</span>)).<span class="php-quote">'&quot; /&gt;'</span>;
@@ -1112,7 +1112,7 @@
 </span></span><span id="867" class="l"><a class="l" href="#867"> 867: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="868" class="l"><a class="l" href="#868"> 868: </a><span class="php-comment"> */</span>
 </span><span id="869" class="l"><a class="l" href="#869"> 869: </a><span class="php-keyword1">class</span> <a id="Hm_Output_imap_server_ids" href="#Hm_Output_imap_server_ids">Hm_Output_imap_server_ids</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="870" class="l"><a class="l" href="#870"> 870: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="870" class="l"><a class="l" href="#870"> 870: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="871" class="l"><a class="l" href="#871"> 871: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;input type=&quot;hidden&quot; class=&quot;imap_server_ids&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-keyword2">implode</span>(<span class="php-quote">','</span>, <span class="php-keyword2">array_keys</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_servers'</span>, <span class="php-keyword1">array</span> ())))).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="872" class="l"><a class="l" href="#872"> 872: </a>    }
 </span><span id="873" class="l"><a class="l" href="#873"> 873: </a>}
@@ -1121,7 +1121,7 @@
 </span></span><span id="876" class="l"><a class="l" href="#876"> 876: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="877" class="l"><a class="l" href="#877"> 877: </a><span class="php-comment"> */</span>
 </span><span id="878" class="l"><a class="l" href="#878"> 878: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_expanded_folder_data" href="#Hm_Output_filter_expanded_folder_data">Hm_Output_filter_expanded_folder_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="879" class="l"><a class="l" href="#879"> 879: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="879" class="l"><a class="l" href="#879"> 879: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="880" class="l"><a class="l" href="#880"> 880: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="881" class="l"><a class="l" href="#881"> 881: </a>        <span class="php-var">$folder_data</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_expanded_folder_data'</span>, <span class="php-keyword1">array</span>());
 </span><span id="882" class="l"><a class="l" href="#882"> 882: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$folder_data</span>)) {
@@ -1137,7 +1137,7 @@
 </span></span><span id="892" class="l"><a class="l" href="#892"> 892: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="893" class="l"><a class="l" href="#893"> 893: </a><span class="php-comment"> */</span>
 </span><span id="894" class="l"><a class="l" href="#894"> 894: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_imap_status_data" href="#Hm_Output_filter_imap_status_data">Hm_Output_filter_imap_status_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="895" class="l"><a class="l" href="#895"> 895: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="895" class="l"><a class="l" href="#895"> 895: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="896" class="l"><a class="l" href="#896"> 896: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="897" class="l"><a class="l" href="#897"> 897: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_connect_status'</span>) != <span class="php-quote">'disconnected'</span>) {
 </span><span id="898" class="l"><a class="l" href="#898"> 898: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;span class=&quot;online&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-keyword2">ucwords</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_connect_status'</span>))).
@@ -1154,7 +1154,7 @@
 </span></span><span id="909" class="l"><a class="l" href="#909"> 909: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="910" class="l"><a class="l" href="#910"> 910: </a><span class="php-comment"> */</span>
 </span><span id="911" class="l"><a class="l" href="#911"> 911: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_imap_folders" href="#Hm_Output_filter_imap_folders">Hm_Output_filter_imap_folders</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="912" class="l"><a class="l" href="#912"> 912: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="912" class="l"><a class="l" href="#912"> 912: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="913" class="l"><a class="l" href="#913"> 913: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="914" class="l"><a class="l" href="#914"> 914: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_folders'</span>)) {
 </span><span id="915" class="l"><a class="l" href="#915"> 915: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_folders'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$folder</span>) {
@@ -1172,7 +1172,7 @@
 </span></span><span id="927" class="l"><a class="l" href="#927"> 927: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="928" class="l"><a class="l" href="#928"> 928: </a><span class="php-comment"> */</span>
 </span><span id="929" class="l"><a class="l" href="#929"> 929: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_imap_search" href="#Hm_Output_filter_imap_search">Hm_Output_filter_imap_search</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="930" class="l"><a class="l" href="#930"> 930: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="930" class="l"><a class="l" href="#930"> 930: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="931" class="l"><a class="l" href="#931"> 931: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_search_results'</span>)) {
 </span><span id="932" class="l"><a class="l" href="#932"> 932: </a>            prepare_imap_message_list(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_search_results'</span>), <span class="php-var">$this</span>, <span class="php-quote">'search'</span>);
 </span><span id="933" class="l"><a class="l" href="#933"> 933: </a>        }
@@ -1186,7 +1186,7 @@
 </span></span><span id="941" class="l"><a class="l" href="#941"> 941: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="942" class="l"><a class="l" href="#942"> 942: </a><span class="php-comment"> */</span>
 </span><span id="943" class="l"><a class="l" href="#943"> 943: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_flagged_data" href="#Hm_Output_filter_flagged_data">Hm_Output_filter_flagged_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="944" class="l"><a class="l" href="#944"> 944: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="944" class="l"><a class="l" href="#944"> 944: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="945" class="l"><a class="l" href="#945"> 945: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_flagged_data'</span>)) {
 </span><span id="946" class="l"><a class="l" href="#946"> 946: </a>            prepare_imap_message_list(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_flagged_data'</span>), <span class="php-var">$this</span>, <span class="php-quote">'flagged'</span>);
 </span><span id="947" class="l"><a class="l" href="#947"> 947: </a>        }
@@ -1200,7 +1200,7 @@
 </span></span><span id="955" class="l"><a class="l" href="#955"> 955: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="956" class="l"><a class="l" href="#956"> 956: </a><span class="php-comment"> */</span>
 </span><span id="957" class="l"><a class="l" href="#957"> 957: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_unread_data" href="#Hm_Output_filter_unread_data">Hm_Output_filter_unread_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="958" class="l"><a class="l" href="#958"> 958: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="958" class="l"><a class="l" href="#958"> 958: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="959" class="l"><a class="l" href="#959"> 959: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_unread_data'</span>)) {
 </span><span id="960" class="l"><a class="l" href="#960"> 960: </a>            prepare_imap_message_list(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_unread_data'</span>), <span class="php-var">$this</span>, <span class="php-quote">'unread'</span>);
 </span><span id="961" class="l"><a class="l" href="#961"> 961: </a>        }
@@ -1214,7 +1214,7 @@
 </span></span><span id="969" class="l"><a class="l" href="#969"> 969: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="970" class="l"><a class="l" href="#970"> 970: </a><span class="php-comment"> */</span>
 </span><span id="971" class="l"><a class="l" href="#971"> 971: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_all_email" href="#Hm_Output_filter_all_email">Hm_Output_filter_all_email</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="972" class="l"><a class="l" href="#972"> 972: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="972" class="l"><a class="l" href="#972"> 972: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="973" class="l"><a class="l" href="#973"> 973: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_combined_inbox_data'</span>)) {
 </span><span id="974" class="l"><a class="l" href="#974"> 974: </a>            prepare_imap_message_list(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_combined_inbox_data'</span>), <span class="php-var">$this</span>, <span class="php-quote">'email'</span>);
 </span><span id="975" class="l"><a class="l" href="#975"> 975: </a>        }
@@ -1228,7 +1228,7 @@
 </span></span><span id="983" class="l"><a class="l" href="#983"> 983: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="984" class="l"><a class="l" href="#984"> 984: </a><span class="php-comment"> */</span>
 </span><span id="985" class="l"><a class="l" href="#985"> 985: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_combined_inbox" href="#Hm_Output_filter_combined_inbox">Hm_Output_filter_combined_inbox</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="986" class="l"><a class="l" href="#986"> 986: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="986" class="l"><a class="l" href="#986"> 986: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="987" class="l"><a class="l" href="#987"> 987: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_combined_inbox_data'</span>)) {
 </span><span id="988" class="l"><a class="l" href="#988"> 988: </a>            prepare_imap_message_list(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_combined_inbox_data'</span>), <span class="php-var">$this</span>, <span class="php-quote">'combined_inbox'</span>);
 </span><span id="989" class="l"><a class="l" href="#989"> 989: </a>        }
@@ -1242,7 +1242,7 @@
 </span></span><span id="997" class="l"><a class="l" href="#997"> 997: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="998" class="l"><a class="l" href="#998"> 998: </a><span class="php-comment"> */</span>
 </span><span id="999" class="l"><a class="l" href="#999"> 999: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_folder_page" href="#Hm_Output_filter_folder_page">Hm_Output_filter_folder_page</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1000" class="l"><a class="l" href="#1000">1000: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1000" class="l"><a class="l" href="#1000">1000: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1001" class="l"><a class="l" href="#1001">1001: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
 </span><span id="1002" class="l"><a class="l" href="#1002">1002: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_mailbox_page'</span>)) {
 </span><span id="1003" class="l"><a class="l" href="#1003">1003: </a>            prepare_imap_message_list(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_mailbox_page'</span>), <span class="php-var">$this</span>, <span class="php-keyword1">false</span>);
@@ -1258,7 +1258,7 @@
 </span></span><span id="1013" class="l"><a class="l" href="#1013">1013: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="1014" class="l"><a class="l" href="#1014">1014: </a><span class="php-comment"> */</span>
 </span><span id="1015" class="l"><a class="l" href="#1015">1015: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_reply_content" href="#Hm_Output_filter_reply_content">Hm_Output_filter_reply_content</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1016" class="l"><a class="l" href="#1016">1016: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="1016" class="l"><a class="l" href="#1016">1016: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1017" class="l"><a class="l" href="#1017">1017: </a>        <span class="php-var">$reply_subject</span> = <span class="php-quote">'Re: [No Subject]'</span>;
 </span><span id="1018" class="l"><a class="l" href="#1018">1018: </a>        <span class="php-var">$reply_to</span> = <span class="php-quote">''</span>;
 </span><span id="1019" class="l"><a class="l" href="#1019">1019: </a>        <span class="php-var">$reply_body</span> = <span class="php-quote">''</span>;

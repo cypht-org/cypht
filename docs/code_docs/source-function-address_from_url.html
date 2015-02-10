@@ -758,8 +758,8 @@
 </span></span><span id="519" class="l"><a class="l" href="#519">519: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="520" class="l"><a class="l" href="#520">520: </a><span class="php-comment"> */</span>
 </span><span id="521" class="l"><a class="l" href="#521">521: </a><span class="php-keyword1">class</span> <a id="Hm_Output_add_feed_dialog" href="#Hm_Output_add_feed_dialog">Hm_Output_add_feed_dialog</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="522" class="l"><a class="l" href="#522">522: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
-</span><span id="523" class="l"><a class="l" href="#523">523: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="522" class="l"><a class="l" href="#522">522: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
+</span><span id="523" class="l"><a class="l" href="#523">523: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="524" class="l"><a class="l" href="#524">524: </a>            <span class="php-var">$count</span> = <span class="php-keyword2">count</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feeds'</span>, <span class="php-keyword1">array</span>()));
 </span><span id="525" class="l"><a class="l" href="#525">525: </a>            <span class="php-var">$count</span> = <span class="php-keyword2">sprintf</span>(<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'%d configured'</span>), <span class="php-var">$count</span>);
 </span><span id="526" class="l"><a class="l" href="#526">526: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;feed_server_setup&quot;&gt;&lt;div data-target=&quot;.feed_section&quot; class=&quot;server_section&quot;&gt;'</span>.
@@ -781,9 +781,9 @@
 </span></span><span id="542" class="l"><a class="l" href="#542">542: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="543" class="l"><a class="l" href="#543">543: </a><span class="php-comment"> */</span>
 </span><span id="544" class="l"><a class="l" href="#544">544: </a><span class="php-keyword1">class</span> <a id="Hm_Output_display_configured_feeds" href="#Hm_Output_display_configured_feeds">Hm_Output_display_configured_feeds</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="545" class="l"><a class="l" href="#545">545: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="545" class="l"><a class="l" href="#545">545: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="546" class="l"><a class="l" href="#546">546: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="547" class="l"><a class="l" href="#547">547: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="547" class="l"><a class="l" href="#547">547: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="548" class="l"><a class="l" href="#548">548: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feeds'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
 </span><span id="549" class="l"><a class="l" href="#549">549: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;configured_server&quot;&gt;'</span>;
 </span><span id="550" class="l"><a class="l" href="#550">550: </a>                <span class="php-var">$res</span> .= <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;server_title&quot;&gt;%s&lt;/div&gt;&lt;div title=&quot;%s&quot; class=&quot;server_subtitle&quot;&gt;%s&lt;/div&gt;'</span>,
@@ -805,7 +805,7 @@
 </span></span><span id="566" class="l"><a class="l" href="#566">566: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="567" class="l"><a class="l" href="#567">567: </a><span class="php-comment"> */</span>
 </span><span id="568" class="l"><a class="l" href="#568">568: </a><span class="php-keyword1">class</span> <a id="Hm_Output_feed_ids" href="#Hm_Output_feed_ids">Hm_Output_feed_ids</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="569" class="l"><a class="l" href="#569">569: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="569" class="l"><a class="l" href="#569">569: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="570" class="l"><a class="l" href="#570">570: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;input type=&quot;hidden&quot; class=&quot;feed_server_ids&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-keyword2">implode</span>(<span class="php-quote">','</span>, <span class="php-keyword2">array_keys</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feeds'</span>, <span class="php-keyword1">array</span>())))).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="571" class="l"><a class="l" href="#571">571: </a>    }
 </span><span id="572" class="l"><a class="l" href="#572">572: </a>}
@@ -814,7 +814,7 @@
 </span></span><span id="575" class="l"><a class="l" href="#575">575: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="576" class="l"><a class="l" href="#576">576: </a><span class="php-comment"> */</span>
 </span><span id="577" class="l"><a class="l" href="#577">577: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_feed_item_content" href="#Hm_Output_filter_feed_item_content">Hm_Output_filter_feed_item_content</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="578" class="l"><a class="l" href="#578">578: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="578" class="l"><a class="l" href="#578">578: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="579" class="l"><a class="l" href="#579">579: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_message_content'</span>)) {
 </span><span id="580" class="l"><a class="l" href="#580">580: </a>            <span class="php-var">$header_str</span> = <span class="php-quote">'&lt;table class=&quot;msg_headers&quot;&gt;'</span>.
 </span><span id="581" class="l"><a class="l" href="#581">581: </a>                <span class="php-quote">'&lt;col class=&quot;header_name_col&quot;&gt;&lt;col class=&quot;header_val_col&quot;&gt;&lt;/colgroup&gt;'</span>;
@@ -845,7 +845,7 @@
 </span></span><span id="606" class="l"><a class="l" href="#606">606: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="607" class="l"><a class="l" href="#607">607: </a><span class="php-comment"> */</span>
 </span><span id="608" class="l"><a class="l" href="#608">608: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_feed_list_data" href="#Hm_Output_filter_feed_list_data">Hm_Output_filter_feed_list_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="609" class="l"><a class="l" href="#609">609: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="609" class="l"><a class="l" href="#609">609: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="610" class="l"><a class="l" href="#610">610: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
 </span><span id="611" class="l"><a class="l" href="#611">611: </a>        <span class="php-var">$login_time</span> = <span class="php-keyword1">false</span>;
 </span><span id="612" class="l"><a class="l" href="#612">612: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'login_time'</span>)) {
@@ -955,7 +955,7 @@
 </span></span><span id="716" class="l"><a class="l" href="#716">716: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="717" class="l"><a class="l" href="#717">717: </a><span class="php-comment"> */</span>
 </span><span id="718" class="l"><a class="l" href="#718">718: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_feed_folders" href="#Hm_Output_filter_feed_folders">Hm_Output_filter_feed_folders</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="719" class="l"><a class="l" href="#719">719: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="719" class="l"><a class="l" href="#719">719: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="720" class="l"><a class="l" href="#720">720: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="721" class="l"><a class="l" href="#721">721: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_folders'</span>))) {
 </span><span id="722" class="l"><a class="l" href="#722">722: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_feeds&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=feeds&quot;&gt;'</span>.
@@ -976,7 +976,7 @@
 </span></span><span id="737" class="l"><a class="l" href="#737">737: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="738" class="l"><a class="l" href="#738">738: </a><span class="php-comment"> */</span>
 </span><span id="739" class="l"><a class="l" href="#739">739: </a><span class="php-keyword1">class</span> <a id="Hm_Output_display_feeds_status" href="#Hm_Output_display_feeds_status">Hm_Output_display_feeds_status</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="740" class="l"><a class="l" href="#740">740: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="740" class="l"><a class="l" href="#740">740: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="741" class="l"><a class="l" href="#741">741: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="742" class="l"><a class="l" href="#742">742: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feeds'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
 </span><span id="743" class="l"><a class="l" href="#743">743: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr&gt;&lt;td&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'FEED'</span>).<span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'name'</span>].<span class="php-quote">'&lt;/td&gt;&lt;td class=&quot;feeds_status_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;&lt;/td&gt;'</span>.
@@ -990,7 +990,7 @@
 </span></span><span id="751" class="l"><a class="l" href="#751">751: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="752" class="l"><a class="l" href="#752">752: </a><span class="php-comment"> */</span>
 </span><span id="753" class="l"><a class="l" href="#753">753: </a><span class="php-keyword1">class</span> <a id="Hm_Output_unread_feeds_included" href="#Hm_Output_unread_feeds_included">Hm_Output_unread_feeds_included</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="754" class="l"><a class="l" href="#754">754: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="754" class="l"><a class="l" href="#754">754: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="755" class="l"><a class="l" href="#755">755: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
 </span><span id="756" class="l"><a class="l" href="#756">756: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'unread_exclude_feeds'</span>, <span class="php-var">$settings</span>) &amp;&amp; <span class="php-var">$settings</span>[<span class="php-quote">'unread_exclude_feeds'</span>]) {
 </span><span id="757" class="l"><a class="l" href="#757">757: </a>            <span class="php-var">$checked</span> = <span class="php-quote">' checked=&quot;checked&quot;'</span>;
@@ -1007,7 +1007,7 @@
 </span></span><span id="768" class="l"><a class="l" href="#768">768: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="769" class="l"><a class="l" href="#769">769: </a><span class="php-comment"> */</span>
 </span><span id="770" class="l"><a class="l" href="#770">770: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_feed_status_data" href="#Hm_Output_filter_feed_status_data">Hm_Output_filter_feed_status_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="771" class="l"><a class="l" href="#771">771: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="771" class="l"><a class="l" href="#771">771: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="772" class="l"><a class="l" href="#772">772: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_status'</span>) == <span class="php-quote">'Connected'</span>) {
 </span><span id="773" class="l"><a class="l" href="#773">773: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'feed_status_display'</span>, <span class="php-quote">'&lt;span class=&quot;online&quot;&gt;'</span>.
 </span><span id="774" class="l"><a class="l" href="#774">774: </a>                <span class="php-var">$this</span>-&gt;trans(<span class="php-keyword2">ucwords</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_status'</span>))).<span class="php-quote">'&lt;/span&gt; in '</span>.<span class="php-keyword2">round</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_time'</span>), <span class="php-num">3</span>));
@@ -1022,7 +1022,7 @@
 </span></span><span id="783" class="l"><a class="l" href="#783">783: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="784" class="l"><a class="l" href="#784">784: </a><span class="php-comment"> */</span>
 </span><span id="785" class="l"><a class="l" href="#785">785: </a><span class="php-keyword1">class</span> <a id="Hm_Output_start_feed_settings" href="#Hm_Output_start_feed_settings">Hm_Output_start_feed_settings</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="786" class="l"><a class="l" href="#786">786: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="786" class="l"><a class="l" href="#786">786: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="787" class="l"><a class="l" href="#787">787: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot; data-target=&quot;.feeds_setting&quot; class=&quot;settings_subtitle&quot;&gt;'</span>.
 </span><span id="788" class="l"><a class="l" href="#788">788: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$rss</span>.<span class="php-quote">'&quot; /&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Feed Settings'</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
 </span><span id="789" class="l"><a class="l" href="#789">789: </a>    }
@@ -1032,7 +1032,7 @@
 </span></span><span id="793" class="l"><a class="l" href="#793">793: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="794" class="l"><a class="l" href="#794">794: </a><span class="php-comment"> */</span>
 </span><span id="795" class="l"><a class="l" href="#795">795: </a><span class="php-keyword1">class</span> <a id="Hm_Output_feed_since_setting" href="#Hm_Output_feed_since_setting">Hm_Output_feed_since_setting</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="796" class="l"><a class="l" href="#796">796: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="796" class="l"><a class="l" href="#796">796: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="797" class="l"><a class="l" href="#797">797: </a>        <span class="php-var">$since</span> = <span class="php-keyword1">false</span>;
 </span><span id="798" class="l"><a class="l" href="#798">798: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
 </span><span id="799" class="l"><a class="l" href="#799">799: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'feed_since'</span>, <span class="php-var">$settings</span>)) {
@@ -1047,7 +1047,7 @@
 </span></span><span id="808" class="l"><a class="l" href="#808">808: </a><span class="php-comment"> * @subpackage feeds/output
 </span></span><span id="809" class="l"><a class="l" href="#809">809: </a><span class="php-comment"> */</span>
 </span><span id="810" class="l"><a class="l" href="#810">810: </a><span class="php-keyword1">class</span> <a id="Hm_Output_feed_limit_setting" href="#Hm_Output_feed_limit_setting">Hm_Output_feed_limit_setting</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="811" class="l"><a class="l" href="#811">811: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="811" class="l"><a class="l" href="#811">811: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="812" class="l"><a class="l" href="#812">812: </a>        <span class="php-var">$limit</span> = DEFAULT_PER_SOURCE;
 </span><span id="813" class="l"><a class="l" href="#813">813: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
 </span><span id="814" class="l"><a class="l" href="#814">814: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'feed_limit'</span>, <span class="php-var">$settings</span>)) {

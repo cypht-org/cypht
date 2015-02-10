@@ -302,7 +302,7 @@
 </span></span><span id="63" class="l"><a class="l" href="#63"> 63: </a><span class="php-comment"> * @subpackage account/output
 </span></span><span id="64" class="l"><a class="l" href="#64"> 64: </a><span class="php-comment"> */</span>
 </span><span id="65" class="l"><a class="l" href="#65"> 65: </a><span class="php-keyword1">class</span> <a id="Hm_Output_create_account_link" href="#Hm_Output_create_account_link">Hm_Output_create_account_link</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="66" class="l"><a class="l" href="#66"> 66: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="66" class="l"><a class="l" href="#66"> 66: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="67" class="l"><a class="l" href="#67"> 67: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_login_state'</span>) &amp;&amp; <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'internal_users'</span>)) {
 </span><span id="68" class="l"><a class="l" href="#68"> 68: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;a class=&quot;create_account_link&quot; href=&quot;?page=create_account&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Create'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
 </span><span id="69" class="l"><a class="l" href="#69"> 69: </a>        }
@@ -313,7 +313,7 @@
 </span></span><span id="74" class="l"><a class="l" href="#74"> 74: </a><span class="php-comment"> * @subpackage account/output
 </span></span><span id="75" class="l"><a class="l" href="#75"> 75: </a><span class="php-comment"> */</span>
 </span><span id="76" class="l"><a class="l" href="#76"> 76: </a><span class="php-keyword1">class</span> <a id="Hm_Output_no_login" href="#Hm_Output_no_login">Hm_Output_no_login</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="77" class="l"><a class="l" href="#77"> 77: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="77" class="l"><a class="l" href="#77"> 77: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="78" class="l"><a class="l" href="#78"> 78: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
 </span><span id="79" class="l"><a class="l" href="#79"> 79: </a>    }
 </span><span id="80" class="l"><a class="l" href="#80"> 80: </a>}
@@ -322,7 +322,7 @@
 </span></span><span id="83" class="l"><a class="l" href="#83"> 83: </a><span class="php-comment"> * @subpackage account/output
 </span></span><span id="84" class="l"><a class="l" href="#84"> 84: </a><span class="php-comment"> */</span>
 </span><span id="85" class="l"><a class="l" href="#85"> 85: </a><span class="php-keyword1">class</span> <a id="Hm_Output_create_form" href="#Hm_Output_create_form">Hm_Output_create_form</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="86" class="l"><a class="l" href="#86"> 86: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="86" class="l"><a class="l" href="#86"> 86: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="87" class="l"><a class="l" href="#87"> 87: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_login_state'</span>)) {
 </span><span id="88" class="l"><a class="l" href="#88"> 88: </a>            Hm_Router::page_redirect(<span class="php-quote">'?page=home'</span>);
 </span><span id="89" class="l"><a class="l" href="#89"> 89: </a>        }
@@ -347,7 +347,7 @@
 </span></span><span id="108" class="l"><a class="l" href="#108">108: </a><span class="php-comment"> * @subpackage account/output
 </span></span><span id="109" class="l"><a class="l" href="#109">109: </a><span class="php-comment"> */</span>
 </span><span id="110" class="l"><a class="l" href="#110">110: </a><span class="php-keyword1">class</span> <a id="Hm_Output_change_password" href="#Hm_Output_change_password">Hm_Output_change_password</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="111" class="l"><a class="l" href="#111">111: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="111" class="l"><a class="l" href="#111">111: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="112" class="l"><a class="l" href="#112">112: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="113" class="l"><a class="l" href="#113">113: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'internal_users'</span>)) {
 </span><span id="114" class="l"><a class="l" href="#114">114: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr class=&quot;general_setting&quot;&gt;&lt;td&gt;&lt;label for=&quot;new_pass1&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Change password'</span>).

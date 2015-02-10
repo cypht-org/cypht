@@ -249,10 +249,10 @@
 </span></span><span id="12" class="l"><a class="l" href="#12">12: </a><span class="php-comment"> * @subpackage profile/output
 </span></span><span id="13" class="l"><a class="l" href="#13">13: </a><span class="php-comment"> */</span>
 </span><span id="14" class="l"><a class="l" href="#14">14: </a><span class="php-keyword1">class</span> <a id="Hm_Output_profile_page_link" href="#Hm_Output_profile_page_link">Hm_Output_profile_page_link</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="15" class="l"><a class="l" href="#15">15: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="15" class="l"><a class="l" href="#15">15: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="16" class="l"><a class="l" href="#16">16: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_profiles&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=profiles&quot;&gt;'</span>.
 </span><span id="17" class="l"><a class="l" href="#17">17: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$person</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Profiles'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="18" class="l"><a class="l" href="#18">18: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$format</span> == <span class="php-quote">'HTML5'</span>) {
+</span><span id="18" class="l"><a class="l" href="#18">18: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="19" class="l"><a class="l" href="#19">19: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="20" class="l"><a class="l" href="#20">20: </a>        }
 </span><span id="21" class="l"><a class="l" href="#21">21: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
@@ -263,7 +263,7 @@
 </span></span><span id="26" class="l"><a class="l" href="#26">26: </a><span class="php-comment"> * @subpackage profile/output
 </span></span><span id="27" class="l"><a class="l" href="#27">27: </a><span class="php-comment"> */</span>
 </span><span id="28" class="l"><a class="l" href="#28">28: </a><span class="php-keyword1">class</span> <a id="Hm_Output_profile_content" href="#Hm_Output_profile_content">Hm_Output_profile_content</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="29" class="l"><a class="l" href="#29">29: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>(<span class="php-var">$format</span>) {
+</span><span id="29" class="l"><a class="l" href="#29">29: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="30" class="l"><a class="l" href="#30">30: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;profile_content&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Profiles'</span>).<span class="php-quote">'&lt;/div&gt;&lt;/div&gt;'</span>;
 </span><span id="31" class="l"><a class="l" href="#31">31: </a>    }
 </span><span id="32" class="l"><a class="l" href="#32">32: </a>}
