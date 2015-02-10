@@ -20,10 +20,12 @@
     </div>
   </div>
   <div class="para">
-      Sorry for the lack of detail here, this is still being worked on!<br /><br />
+      <h3 class="top">Requirements</h3>
+      Cypht requires at least PHP 5.2, with the <a href="http://php.net/manual/en/book.mcrypt.php">mcrypt</a> and <a href="http://php.net/manual/en/book.curl.php">curl</a> extensions. You will also need <a href="http://php.net/manual/en/book.pdo.php">PDO</a> support if using any databases features. Testing is done on <a href="https://www.debian.org/">Debian</a> and <a href="http://www.ubuntu.com/">Ubuntu</a> platforms with both <a href="http://nginx.com/">Nginx</a> and <a href="http://httpd.apache.org/">Apache</a>.
+      <h3>Steps</h3>
       <ul>
-          <li>Download and extract the program somewhere</li>
-          <li>Edit the hm3.ini file to your liking. Setup the storage directories and DB configuration for your needs. See the comments in the ini file for more information.</li>
+          <li><a href="https://github.com/jasonmunro/hm3/archive/master.zip">Download</a> and extract the program somewhere</li>
+          <li>Edit the <a href="https://github.com/jasonmunro/hm3/blob/master/hm3.ini">hm3.ini</a> file to your liking. Setup the storage directories and DB configuration for your needs. See the comments in the ini file for more information.</li>
           <li>Run "php ./scripts/config_gen.php" from the main directory to generate the production site. If you change the hm3.ini file, you need to re-run this command for your changes to take effect.</li>
           <li>Symlink or move the newly created files in the "site" directory to the web-server where you want to host the software.</li>
           <li>You can enable a debug site by symlinking or moving the main download directory to the web-server document root and accessing it's index.php file. Don't do this in production. It could be bad.</li>
