@@ -700,7 +700,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
             '" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
             '<input type="search" class="search_terms" name="search_terms" placeholder="'.
             $this->trans('Search').'" /></form></li>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1501,7 +1501,7 @@ class Hm_Output_folder_list_content_start extends Hm_Output_Module {
      * Creates a modfiable string called formatted_folder_list other modules append to
      */
     protected function output($format) {
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return '';
         }
         $this->out('formatted_folder_list', '', false);
@@ -1520,7 +1520,7 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
         $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main').
         '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div class="main"><ul class="folders">';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1554,7 +1554,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$this->trans('Flagged').
             '</a> <span class="flagged_count"></span></li>';
 
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1570,7 +1570,7 @@ class Hm_Output_logout_menu_item extends Hm_Output_Module {
         $res =  '<li><a class="unread_link logout_link" href="#"><img class="account_icon" src="'.
             $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a></li>';
 
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1584,7 +1584,7 @@ class Hm_Output_logout_menu_item extends Hm_Output_Module {
 class Hm_Output_main_menu_end extends Hm_Output_Module {
     protected function output($format) {
         $res = '</ul></div>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1623,7 +1623,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             }
             $res .= '</ul></div>';
         }
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1642,7 +1642,7 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
         $res = '<div class="src_name" data-source=".settings">'.$this->trans('Settings').
             '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
             '</div><ul style="display: none;" class="settings folders">';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1664,7 +1664,7 @@ class Hm_Output_settings_menu_content extends Hm_Output_Module {
             '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).
             '" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1681,7 +1681,7 @@ class Hm_Output_settings_menu_end extends Hm_Output_Module {
      */
     protected function output($format) {
         $res = '</ul>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -1700,7 +1700,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
         $res .= '<a href="#" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.
             '" alt="'.$this->trans('Collapse').'" width="16" height="16" /></a>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
