@@ -119,7 +119,7 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
  * @subpackage swipe2fa/output
  */
 class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
 
         /* intercept normal page output for 2fa dialogs. This is fired just
          * after the http_headers core module */

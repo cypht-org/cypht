@@ -224,7 +224,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
  * @subpackage smtp/output
  */
 class Hm_Output_compose_form extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         return '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
@@ -240,7 +240,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
  * @subpackage smtp/output
  */
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $count = $this->get('smtp_servers', array());
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="smtp_server_setup"><div data-target=".smtp_section" class="server_section">'.
@@ -264,7 +264,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
  * @subpackage smtp/output
  */
 class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         foreach ($this->get('smtp_servers', array()) as $index => $vals) {
 
@@ -318,7 +318,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
  * @subpackage smtp/output
  */
 class Hm_Output_compose_page_link extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$this->trans('Compose').'</a></li>';
 

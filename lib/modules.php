@@ -385,12 +385,10 @@ abstract class Hm_Output_Module {
     /**
      * Output modules need to override this method to add to a page or AJAX response
      *
-     * @param string $format either AJAX or HTML5
-     *
-     * @return mixed should return an array if $format == AJAX, or an HTML5 formatted
+     * @return mixed should output with $this->output() if $this->format == AJAX, or return an HTML5 formatted
      *               string if set to HTML5
      */
-    abstract protected function output($format);
+    abstract protected function output();
 }
 
 /**

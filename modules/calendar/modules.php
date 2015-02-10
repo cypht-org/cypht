@@ -32,7 +32,7 @@ class Hm_Handler_get_calendar_date extends Hm_Handler_Module {
  * @subpackage calendar/output
  */
 class Hm_Output_calendar_page_link extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '<li class="menu_calendar"><a class="unread_link" href="?page=calendar">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$calendar).'" alt="" width="16" height="16" /> '.$this->trans('Calendar').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -46,7 +46,7 @@ class Hm_Output_calendar_page_link extends Hm_Output_Module {
  * @subpackage calendar/output
  */
 class Hm_Output_calendar_content extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $date = $this->get('calendar_date', date('r'));
         $view = $this->get('calendar_view', 'month');
         $cal = new Hm_Cal_Data();

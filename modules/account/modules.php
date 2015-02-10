@@ -63,7 +63,7 @@ class Hm_Handler_check_internal_users extends Hm_Handler_Module {
  * @subpackage account/output
  */
 class Hm_Output_create_account_link extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if (!$this->get('router_login_state') && $this->get('internal_users')) {
             return '<a class="create_account_link" href="?page=create_account">'.$this->trans('Create').'</a>';
         }
@@ -74,7 +74,7 @@ class Hm_Output_create_account_link extends Hm_Output_Module {
  * @subpackage account/output
  */
 class Hm_Output_no_login extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         return '';
     }
 }
@@ -83,7 +83,7 @@ class Hm_Output_no_login extends Hm_Output_Module {
  * @subpackage account/output
  */
 class Hm_Output_create_form extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         if ($this->get('router_login_state')) {
             Hm_Router::page_redirect('?page=home');
         }
@@ -108,7 +108,7 @@ class Hm_Output_create_form extends Hm_Output_Module {
  * @subpackage account/output
  */
 class Hm_Output_change_password extends Hm_Output_Module {
-    protected function output($format) {
+    protected function output() {
         $res = '';
         if ($this->get('internal_users')) {
             $res .= '<tr class="general_setting"><td><label for="new_pass1">'.$this->trans('Change password').
