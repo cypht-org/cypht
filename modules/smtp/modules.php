@@ -322,7 +322,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
         $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$this->trans('Compose').'</a></li>';
 
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);

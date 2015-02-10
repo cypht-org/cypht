@@ -35,7 +35,7 @@ class Hm_Output_calendar_page_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_calendar"><a class="unread_link" href="?page=calendar">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$calendar).'" alt="" width="16" height="16" /> '.$this->trans('Calendar').'</a></li>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);

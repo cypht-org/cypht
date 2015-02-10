@@ -520,7 +520,7 @@ class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
  */
 class Hm_Output_add_feed_dialog extends Hm_Output_Module {
     protected function output($format) {
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             $count = count($this->get('feeds', array()));
             $count = sprintf($this->trans('%d configured'), $count);
             return '<div class="feed_server_setup"><div data-target=".feed_section" class="server_section">'.
@@ -544,7 +544,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
 class Hm_Output_display_configured_feeds extends Hm_Output_Module {
     protected function output($format) {
         $res = '';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             foreach ($this->get('feeds', array()) as $index => $vals) {
                 $res .= '<div class="configured_server">';
                 $res .= sprintf('<div class="server_title">%s</div><div title="%s" class="server_subtitle">%s</div>',

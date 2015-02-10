@@ -53,7 +53,7 @@ class Hm_Output_hello_world_page_content extends Hm_Output_Module {
          * modules by handler modules $this->get has an optional second argument to set a default
          * return value if the name is not found.
          */
-        if ($format == 'HTML5' && $this->get('hello_world_data')) {
+        if ($this->format == 'HTML5' && $this->get('hello_world_data')) {
             /**
              * $this->trans() will try to find a translation in the user's current langauge for
              * the supplied string. It also sanitizes output. If you don't want to translate you

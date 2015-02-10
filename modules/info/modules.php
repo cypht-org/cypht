@@ -45,7 +45,7 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> '.$this->trans('Development').'</a></li>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -59,7 +59,7 @@ class Hm_Output_bug_report_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_bug_report"><a class="unread_link" href="?page=bug_report">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> '.$this->trans('Bugs').'</a></li>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
@@ -73,7 +73,7 @@ class Hm_Output_help_page_link extends Hm_Output_Module {
     protected function output($format) {
         $res = '<li class="menu_help"><a class="unread_link" href="?page=help">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$info).'" alt="" width="16" height="16" /> '.$this->trans('Help').'</a></li>';
-        if ($format == 'HTML5') {
+        if ($this->format == 'HTML5') {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
