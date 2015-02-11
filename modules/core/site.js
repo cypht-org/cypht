@@ -673,6 +673,7 @@ var Hm_Message_List = {
         }
         $('.total').text($('.message_table tbody tr').length);
         Hm_Message_List.update_title();
+        Hm_Message_List.set_checkbox_callback();
     },
 
     set_checkbox_callback: function() {
