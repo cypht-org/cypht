@@ -301,7 +301,7 @@ function format_msg_html($str, $external_resources=false) {
     $config->set('HTML.TargetBlank', true);
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
     $purifier = new HTMLPurifier($config);
-    $res = $purifier->purify($str);
+    $res = @$purifier->purify($str);
     return $res;
 }
 
