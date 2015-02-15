@@ -8,7 +8,7 @@
 	<title>File core/functions.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3022528054"></script>
+	<script type="text/javascript" src="elementlist.js?3418021109"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -202,6 +202,7 @@
 				<li><a href="function-human_readable_interval.html">human_readable_interval</a></li>
 				<li><a href="function-icon_callback.html">icon_callback</a></li>
 				<li class="active"><a href="function-interface_langs.html">interface_langs</a></li>
+				<li><a href="function-is_email.html">is_email</a></li>
 				<li><a href="function-list_controls.html">list_controls</a></li>
 				<li><a href="function-list_sources.html">list_sources</a></li>
 				<li><a href="function-message_controls.html">message_controls</a></li>
@@ -214,6 +215,8 @@
 				<li><a href="function-setup_base_page.html">setup_base_page</a></li>
 				<li><a href="function-subject_callback.html">subject_callback</a></li>
 				<li><a href="function-translate_time_str.html">translate_time_str</a></li>
+				<li><a href="function-validate_domain_full.html">validate_domain_full</a></li>
+				<li><a href="function-validate_local_full.html">validate_local_full</a></li>
 				<li><a href="function-validate_search_fld.html">validate_search_fld</a></li>
 				<li><a href="function-validate_search_terms.html">validate_search_terms</a></li>
 			</ul>
@@ -562,7 +565,7 @@
 </span><span id="301" class="l"><a class="l" href="#301">301: </a>    <span class="php-var">$config</span>-&gt;set(<span class="php-quote">'HTML.TargetBlank'</span>, <span class="php-keyword1">true</span>);
 </span><span id="302" class="l"><a class="l" href="#302">302: </a>    <span class="php-var">$config</span>-&gt;set(<span class="php-quote">'Filter.ExtractStyleBlocks.TidyImpl'</span>, <span class="php-keyword1">true</span>);
 </span><span id="303" class="l"><a class="l" href="#303">303: </a>    <span class="php-var">$purifier</span> = <span class="php-keyword1">new</span> HTMLPurifier(<span class="php-var">$config</span>);
-</span><span id="304" class="l"><a class="l" href="#304">304: </a>    <span class="php-var">$res</span> = <span class="php-var">$purifier</span>-&gt;purify(<span class="php-var">$str</span>);
+</span><span id="304" class="l"><a class="l" href="#304">304: </a>    <span class="php-var">$res</span> = @<span class="php-var">$purifier</span>-&gt;purify(<span class="php-var">$str</span>);
 </span><span id="305" class="l"><a class="l" href="#305">305: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="306" class="l"><a class="l" href="#306">306: </a>}
 </span><span id="307" class="l"><a class="l" href="#307">307: </a>
@@ -848,8 +851,80 @@
 </span><span id="587" class="l"><a class="l" href="#587">587: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
 </span><span id="588" class="l"><a class="l" href="#588">588: </a>}
 </span><span id="589" class="l"><a class="l" href="#589">589: </a>
-</span><span id="590" class="l"><a class="l" href="#590">590: </a><span class="xlang">?&gt;</span>
-</span><span id="591" class="l"><a class="l" href="#591">591: </a></span></code></pre>
+</span><span id="590" class="l"><a class="l" href="#590">590: </a><span class="php-comment">/**
+</span></span><span id="591" class="l"><a class="l" href="#591">591: </a><span class="php-comment"> * Validate an E-mail using RFC 3696
+</span></span><span id="592" class="l"><a class="l" href="#592">592: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="593" class="l"><a class="l" href="#593">593: </a><span class="php-comment"> * @param string $val value to check
+</span></span><span id="594" class="l"><a class="l" href="#594">594: </a><span class="php-comment"> * @param bool $allow_local flag to allow local addresses with no domain
+</span></span><span id="595" class="l"><a class="l" href="#595">595: </a><span class="php-comment"> * @return bool
+</span></span><span id="596" class="l"><a class="l" href="#596">596: </a><span class="php-comment"> */</span>
+</span><span id="597" class="l"><a class="l" href="#597">597: </a><span class="php-keyword1">function</span> <a id="_is_email" href="#_is_email">is_email</a>(<span class="php-var">$val</span>, <span class="php-var">$allow_local</span>=<span class="php-keyword1">false</span>) {
+</span><span id="598" class="l"><a class="l" href="#598">598: </a>    <span class="php-var">$domain</span> = <span class="php-keyword1">false</span>;
+</span><span id="599" class="l"><a class="l" href="#599">599: </a>    <span class="php-var">$local</span> = <span class="php-keyword1">false</span>;
+</span><span id="600" class="l"><a class="l" href="#600">600: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">trim</span>(<span class="php-var">$val</span>) || <span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) &gt; <span class="php-num">320</span>) {
+</span><span id="601" class="l"><a class="l" href="#601">601: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="602" class="l"><a class="l" href="#602">602: </a>    }
+</span><span id="603" class="l"><a class="l" href="#603">603: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">strpos</span>(<span class="php-var">$val</span>, <span class="php-quote">'@'</span>) !== <span class="php-keyword1">false</span>) {
+</span><span id="604" class="l"><a class="l" href="#604">604: </a>        <span class="php-var">$local</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$val</span>, <span class="php-num">0</span>, <span class="php-keyword2">strrpos</span>(<span class="php-var">$val</span>, <span class="php-quote">'@'</span>));
+</span><span id="605" class="l"><a class="l" href="#605">605: </a>        <span class="php-var">$domain</span> = <span class="php-keyword2">substr</span>(<span class="php-var">$val</span>, (<span class="php-keyword2">strrpos</span>(<span class="php-var">$val</span>, <span class="php-quote">'@'</span>) + <span class="php-num">1</span>));
+</span><span id="606" class="l"><a class="l" href="#606">606: </a>    }
+</span><span id="607" class="l"><a class="l" href="#607">607: </a>    <span class="php-keyword1">else</span> {
+</span><span id="608" class="l"><a class="l" href="#608">608: </a>        <span class="php-var">$local</span> = <span class="php-var">$val</span>;
+</span><span id="609" class="l"><a class="l" href="#609">609: </a>    }
+</span><span id="610" class="l"><a class="l" href="#610">610: </a>    <span class="php-keyword1">if</span> (!<span class="php-var">$local</span> || (!<span class="php-var">$allow_local</span> &amp;&amp; !<span class="php-var">$domain</span>)) {
+</span><span id="611" class="l"><a class="l" href="#611">611: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="612" class="l"><a class="l" href="#612">612: </a>    }
+</span><span id="613" class="l"><a class="l" href="#613">613: </a>    <span class="php-keyword1">else</span> {
+</span><span id="614" class="l"><a class="l" href="#614">614: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$domain</span> &amp;&amp; !validate_domain_full(<span class="php-var">$domain</span>)) {
+</span><span id="615" class="l"><a class="l" href="#615">615: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="616" class="l"><a class="l" href="#616">616: </a>        }
+</span><span id="617" class="l"><a class="l" href="#617">617: </a>        <span class="php-keyword1">if</span> (!validate_local_full(<span class="php-var">$local</span>)) {
+</span><span id="618" class="l"><a class="l" href="#618">618: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="619" class="l"><a class="l" href="#619">619: </a>        }
+</span><span id="620" class="l"><a class="l" href="#620">620: </a>    }
+</span><span id="621" class="l"><a class="l" href="#621">621: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="622" class="l"><a class="l" href="#622">622: </a>}
+</span><span id="623" class="l"><a class="l" href="#623">623: </a>
+</span><span id="624" class="l"><a class="l" href="#624">624: </a><span class="php-comment">/**
+</span></span><span id="625" class="l"><a class="l" href="#625">625: </a><span class="php-comment"> * Do email domain part checks per RFC 3696 section 2
+</span></span><span id="626" class="l"><a class="l" href="#626">626: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="627" class="l"><a class="l" href="#627">627: </a><span class="php-comment"> * @param string $val value to check
+</span></span><span id="628" class="l"><a class="l" href="#628">628: </a><span class="php-comment"> * @return bool
+</span></span><span id="629" class="l"><a class="l" href="#629">629: </a><span class="php-comment"> */</span>
+</span><span id="630" class="l"><a class="l" href="#630">630: </a><span class="php-keyword1">function</span> <a id="_validate_domain_full" href="#_validate_domain_full">validate_domain_full</a>(<span class="php-var">$val</span>) {
+</span><span id="631" class="l"><a class="l" href="#631">631: </a>    <span class="php-comment">/* check for a dot, max allowed length and standard ASCII characters */</span>
+</span><span id="632" class="l"><a class="l" href="#632">632: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">strpos</span>(<span class="php-var">$val</span>, <span class="php-quote">'.'</span>) === <span class="php-keyword1">false</span> || <span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) &gt; <span class="php-num">255</span> || <span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/[^A-Z0-9\-\.]/i&quot;</span>, <span class="php-var">$val</span>) ||
+</span><span id="633" class="l"><a class="l" href="#633">633: </a>        <span class="php-var">$val</span>{<span class="php-num">0</span>} == <span class="php-quote">'-'</span> || <span class="php-var">$val</span>{(<span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) - <span class="php-num">1</span>)} == <span class="php-quote">'-'</span>) {
+</span><span id="634" class="l"><a class="l" href="#634">634: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="635" class="l"><a class="l" href="#635">635: </a>    }
+</span><span id="636" class="l"><a class="l" href="#636">636: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="637" class="l"><a class="l" href="#637">637: </a>}
+</span><span id="638" class="l"><a class="l" href="#638">638: </a>
+</span><span id="639" class="l"><a class="l" href="#639">639: </a><span class="php-comment">/**
+</span></span><span id="640" class="l"><a class="l" href="#640">640: </a><span class="php-comment"> * Do email local part checks per RFC 3696 section 3
+</span></span><span id="641" class="l"><a class="l" href="#641">641: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="642" class="l"><a class="l" href="#642">642: </a><span class="php-comment"> * @param string $val value to check
+</span></span><span id="643" class="l"><a class="l" href="#643">643: </a><span class="php-comment"> * @return bool
+</span></span><span id="644" class="l"><a class="l" href="#644">644: </a><span class="php-comment"> */</span>
+</span><span id="645" class="l"><a class="l" href="#645">645: </a><span class="php-keyword1">function</span> <a id="_validate_local_full" href="#_validate_local_full">validate_local_full</a>(<span class="php-var">$val</span>) {
+</span><span id="646" class="l"><a class="l" href="#646">646: </a>    <span class="php-comment">/* check length, &quot;.&quot; rules, and for characters &gt; ASCII 127 */</span>
+</span><span id="647" class="l"><a class="l" href="#647">647: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) &gt; <span class="php-num">64</span> || <span class="php-var">$val</span>{<span class="php-num">0</span>} == <span class="php-quote">'.'</span> || <span class="php-var">$val</span>{(<span class="php-keyword2">strlen</span>(<span class="php-var">$val</span>) -<span class="php-num">1</span>)} == <span class="php-quote">'.'</span> || <span class="php-keyword2">strstr</span>(<span class="php-var">$val</span>, <span class="php-quote">'..'</span>) ||
+</span><span id="648" class="l"><a class="l" href="#648">648: </a>        <span class="php-keyword2">preg_match</span>(<span class="php-quote">'/[^\x00-\x7F]/'</span>,<span class="php-var">$val</span>)) {
+</span><span id="649" class="l"><a class="l" href="#649">649: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="650" class="l"><a class="l" href="#650">650: </a>    }
+</span><span id="651" class="l"><a class="l" href="#651">651: </a>    <span class="php-comment">/* remove escaped characters and quoted strings */</span>
+</span><span id="652" class="l"><a class="l" href="#652">652: </a>    <span class="php-var">$local</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/\\\\.{1}/&quot;</span>, <span class="php-quote">''</span>, <span class="php-var">$val</span>);
+</span><span id="653" class="l"><a class="l" href="#653">653: </a>    <span class="php-var">$local</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/\&quot;[^\&quot;]+\&quot;/&quot;</span>, <span class="php-quote">''</span>, <span class="php-var">$local</span>);
+</span><span id="654" class="l"><a class="l" href="#654">654: </a>
+</span><span id="655" class="l"><a class="l" href="#655">655: </a>    <span class="php-comment">/* validate remaining unescaped characters */</span>
+</span><span id="656" class="l"><a class="l" href="#656">656: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/[[:print:]]/&quot;</span>, <span class="php-var">$local</span>) &amp;&amp; !<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/[@\\\&quot;,\[\]]/&quot;</span>, <span class="php-var">$local</span>)) {
+</span><span id="657" class="l"><a class="l" href="#657">657: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="658" class="l"><a class="l" href="#658">658: </a>    }
+</span><span id="659" class="l"><a class="l" href="#659">659: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="660" class="l"><a class="l" href="#660">660: </a>}
+</span><span id="661" class="l"><a class="l" href="#661">661: </a>
+</span><span id="662" class="l"><a class="l" href="#662">662: </a><span class="xlang">?&gt;</span>
+</span><span id="663" class="l"><a class="l" href="#663">663: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
