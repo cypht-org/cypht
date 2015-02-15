@@ -7,7 +7,7 @@
 	<title>Class Hm_Contact_Store | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3418021109"></script>
+	<script type="text/javascript" src="elementlist.js?325629311"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -70,6 +70,8 @@
 							</ul></li>
 				<li class="active"><a href="package-modules.contacts.html">contacts<span></span></a>
 						<ul>
+				<li><a href="package-modules.contacts.handler.html">handler</a>
+						</li>
 				<li class="active"><a href="package-modules.contacts.lib.html">lib</a>
 						</li>
 				<li><a href="package-modules.contacts.output.html">output</a>
@@ -261,7 +263,7 @@
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.contacts.html">contacts</a>\<a href="package-modules.contacts.lib.html">lib</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_Contact_Store.html#11-109" title="Go to source code">contacts/hm-contacts.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_Contact_Store.html#11-144" title="Go to source code">contacts/hm-contacts.php</a><br>
 	</div>
 
 
@@ -279,7 +281,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#20-23" title="Go to source code">__construct</a>( <span>mixed <var>$key</var></span>, <span>mixed <var>$key_validator</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_Contact_Store.html#20-23" title="Go to source code">__construct</a>( <span>mixed <var>$key</var> = <span class="php-num">0</span></span>, <span>mixed <var>$key_validator</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
@@ -297,7 +299,7 @@
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="add_card" id="_add_card">
+	<tr data-order="add_contact" id="_add_contact">
 
 		<td class="attributes"><code>
 			 protected 
@@ -307,8 +309,66 @@
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_add_card">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#25-40" title="Go to source code">add_card</a>( <span>mixed <var>$data</var></span> )</code>
+		<a class="anchor" href="#_add_contact">#</a>
+		<code><a href="source-class-Hm_Contact_Store.html#25-37" title="Go to source code">add_contact</a>( <span>mixed <var>$data</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="check_key" id="_check_key">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_check_key">#</a>
+		<code><a href="source-class-Hm_Contact_Store.html#39-49" title="Go to source code">check_key</a>( <span>mixed <var>$contact</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="validate_key" id="_validate_key">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_validate_key">#</a>
+		<code><a href="source-class-Hm_Contact_Store.html#51-58" title="Go to source code">validate_key</a>( <span>mixed <var>$contact</var></span> )</code>
 
 		<div class="description short">
 			
@@ -337,7 +397,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_load">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#42" title="Go to source code">load</a>( <span>mixed <var>$source</var></span> )</code>
+		<code><a href="source-class-Hm_Contact_Store.html#60" title="Go to source code">load</a>( <span>mixed <var>$source</var></span> )</code>
 
 		<div class="description short">
 			
@@ -366,7 +426,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#44-49" title="Go to source code">get</a>( <span>mixed <var>$id</var></span>, <span>mixed <var>$default</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_Contact_Store.html#62-67" title="Go to source code">get</a>( <span>mixed <var>$id</var></span>, <span>mixed <var>$default</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
@@ -395,7 +455,36 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_search">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#51-64" title="Go to source code">search</a>( <span>mixed <var>$flds</var></span> )</code>
+		<code><a href="source-class-Hm_Contact_Store.html#69-79" title="Go to source code">search</a>( <span>mixed <var>$flds</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="search_contact" id="_search_contact">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_search_contact">#</a>
+		<code><a href="source-class-Hm_Contact_Store.html#81-89" title="Go to source code">search_contact</a>( <span>mixed <var>$contact</var></span>, <span>mixed <var>$fld</var></span>, <span>mixed <var>$id</var></span>, <span>mixed <var>$term</var></span> )</code>
 
 		<div class="description short">
 			
@@ -424,7 +513,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_update">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#66-71" title="Go to source code">update</a>( <span>mixed <var>$id</var></span>, <span>mixed <var>$contact</var></span> )</code>
+		<code><a href="source-class-Hm_Contact_Store.html#91-96" title="Go to source code">update</a>( <span>mixed <var>$id</var></span>, <span>mixed <var>$contact</var></span> )</code>
 
 		<div class="description short">
 			
@@ -442,7 +531,7 @@
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="update_card_fld" id="_update_card_fld">
+	<tr data-order="update_contact_fld" id="_update_contact_fld">
 
 		<td class="attributes"><code>
 			 public 
@@ -452,8 +541,8 @@
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_update_card_fld">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#73-75" title="Go to source code">update_card_fld</a>( <span>mixed <var>$contact</var></span>, <span>mixed <var>$name</var></span>, <span>mixed <var>$value</var></span> )</code>
+		<a class="anchor" href="#_update_contact_fld">#</a>
+		<code><a href="source-class-Hm_Contact_Store.html#98-100" title="Go to source code">update_contact_fld</a>( <span>mixed <var>$contact</var></span>, <span>mixed <var>$name</var></span>, <span>mixed <var>$value</var></span> )</code>
 
 		<div class="description short">
 			
@@ -471,7 +560,7 @@
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="update_card" id="_update_card">
+	<tr data-order="update_contact" id="_update_contact">
 
 		<td class="attributes"><code>
 			 public 
@@ -481,8 +570,8 @@
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_update_card">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#77-89" title="Go to source code">update_card</a>( <span>mixed <var>$id</var></span>, <span>mixed <var>$flds</var></span> )</code>
+		<a class="anchor" href="#_update_contact">#</a>
+		<code><a href="source-class-Hm_Contact_Store.html#102-114" title="Go to source code">update_contact</a>( <span>mixed <var>$id</var></span>, <span>mixed <var>$flds</var></span> )</code>
 
 		<div class="description short">
 			
@@ -511,7 +600,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_delete">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#91-97" title="Go to source code">delete</a>( <span>mixed <var>$id</var></span> )</code>
+		<code><a href="source-class-Hm_Contact_Store.html#116-122" title="Go to source code">delete</a>( <span>mixed <var>$id</var></span> )</code>
 
 		<div class="description short">
 			
@@ -540,7 +629,65 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_dump">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#99-101" title="Go to source code">dump</a>( )</code>
+		<code><a href="source-class-Hm_Contact_Store.html#124-126" title="Go to source code">dump</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="export" id="_export">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_export">#</a>
+		<code><a href="source-class-Hm_Contact_Store.html#128-130" title="Go to source code">export</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="import" id="_import">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_import">#</a>
+		<code><a href="source-class-Hm_Contact_Store.html#132-136" title="Go to source code">import</a>( <span>mixed <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
@@ -569,7 +716,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_page">#</a>
-		<code><a href="source-class-Hm_Contact_Store.html#103-108" title="Go to source code">page</a>( <span>mixed <var>$page</var></span>, <span>mixed <var>$size</var></span> )</code>
+		<code><a href="source-class-Hm_Contact_Store.html#138-143" title="Go to source code">page</a>( <span>mixed <var>$page</var></span>, <span>mixed <var>$size</var></span> )</code>
 
 		<div class="description short">
 			
@@ -602,18 +749,18 @@
 
 	<table class="summary" id="properties">
 	<caption>Properties summary</caption>
-	<tr data-order="cards" id="$cards">
+	<tr data-order="contacts" id="$contacts">
 		<td class="attributes"><code>
 			protected  
 			array
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Contact_Store.html#16" title="Go to source code"><var>$cards</var></a>
+				<a href="source-class-Hm_Contact_Store.html#16" title="Go to source code"><var>$contacts</var></a>
 		</td>
 		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
 		<td class="description"><div>
-			<a href="#$cards" class="anchor">#</a>
+			<a href="#$contacts" class="anchor">#</a>
 
 			<div class="description short">
 				
