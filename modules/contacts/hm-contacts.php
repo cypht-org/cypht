@@ -13,74 +13,99 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 abstract class Hm_Contact_Store {
 
-    protected $cards = array();
+    protected $contacts = array();
     protected $key = false;
-    protected $key_validator =false;
+    protected $key_validator = false;
 
-    public function __construct($key, $key_validator=false) {
+    public function __construct($key = 0, $key_validator=false) {
         $this->key = $key;
         $this->key_validator = $key_validator;
     }
 
-    protected function add_card($data) {
+    protected function add_contact($data) {
         $contact = new Hm_Contact($data);
+        if (!is_int($this->key)) {
+            $this->check_key($contact);
+            $this->contacts[$contact->value($this->key)] = $contact;
+        }
+        else {
+            $this->contacts[$this->key] = $contact;
+            $this->key++;
+        }
+
+        return true;
+    }
+
+    protected function check_key($contact) {
         if (!$contact->value($this->key)) {
             return false;
         }
-        if (array_key_exists($contact->value($this->key), $this->cards)) {
+        if (array_key_exists($contact->value($this->key), $this->contacts)) {
             return false;
         }
+        if (!$this->validate_key($contact)) {
+            return false;
+        }
+    }
+
+    protected function validate_key($contact) {
         if ($this->key_validator !== false) {
             if (!function_exists($this->key_validator) || !call_user_func($this->key_validator, $contact->value($this->key))) {
                 return false;
             }
         }
-        $this->cards[$contact->value($this->key)] = $contact;
         return true;
     }
 
     abstract public function load($source);
 
     public function get($id, $default=false) {
-        if (!array_key_exists($id, $this->cards)) {
+        if (!array_key_exists($id, $this->contacts)) {
             return $default;
         }
-        return $this->cards[$id];
+        return $this->contacts[$id];
     }
 
     public function search($flds) {
         $res = array();
         foreach ($flds as $fld => $term) {
-            foreach ($this->cards as $id => $card) {
-                if ($fld == $this->key && stristr($id, $term)) {
-                    $res[$card->value($this->key)] = $card;
-                }
-                elseif (stristr($card->value($fld, ''), $term)) {
-                    $res[$card->value($this->key)] = $card;
+            foreach ($this->contacts as $id => $contact) {
+                if ($this->search_contact($contact, $fld, $id, $term)) {
+                    $res[$contact->value($this->key)] = $contact;
                 }
             }
         }
         return $res;
     }
 
-    public function update($id, $contact) {
-        if (!array_key_exists($id, $this->cards)) {
-            return false;
+    protected function search_contact($contact, $fld, $id, $term) {
+        if (!is_int($this->key) && $fld == $this->key && stristr($id, $term)) {
+            return true;
         }
-        $this->cards[$id] = $contact;
+        elseif (stristr($contact->value($fld, ''), $term)) {
+            return true;
+        }
+        return false;
     }
 
-    public function update_card_fld($contact, $name, $value)  {
+    public function update($id, $contact) {
+        if (!array_key_exists($id, $this->contacts)) {
+            return false;
+        }
+        $this->contacts[$id] = $contact;
+    }
+
+    public function update_contact_fld($contact, $name, $value)  {
         return $contact->update($name, $value);
     }
 
-    public function update_card($id, $flds) {
+    public function update_contact($id, $flds) {
         if (!$contact = $this->get($id)) {
             return false;
         }
         $failures = 0;
         foreach ($flds as $name => $value) {
-            $failures += (int) !$this->update_card_fld($contact, $name, $value);
+            $failures += (int) !$this->update_contact_fld($contact, $name, $value);
         }
         if ($failures == 0) {
             $this->update($id, $contact);
@@ -89,22 +114,32 @@ abstract class Hm_Contact_Store {
     }
 
     public function delete($id) {
-        if (!array_key_exists($id, $this->cards)) {
+        if (!array_key_exists($id, $this->contacts)) {
             return false;
         }
-        unset($this->cards[$id]);
+        unset($this->contacts[$id]);
         return true;
     }
 
     public function dump() {
-        return $this->cards;
+        return $this->contacts;
+    }
+
+    public function export() {
+        return array_map(function($contact) { return $contact->export(); }, $this->contacts);
+    }
+
+    public function import($data) {
+        foreach ($data as $contact) {
+            $this->add_contact($contact);
+        }
     }
 
     public function page($page, $size) {
         if ($page < 1) {
             return array();
         }
-        return array_slice( $this->cards, (($page - 1)*$size), $size, true);
+        return array_slice( $this->contacts, (($page - 1)*$size), $size, true);
     }
 }
 
@@ -123,22 +158,6 @@ class Hm_Contact_Store_DB extends Hm_Contact_Store {
 class Hm_Contact_Store_File extends Hm_Contact_Store {
 
     public function load($source) {
-    }
-}
-
-/**
- * @subpackage contacts/lib
- */
-class Hm_Contact_Store_Test extends Hm_Contact_Store {
-
-    public function load($source) {
-        $this->add_card(array('email_address' => 'user1@cypht.org', 'display_name' => 'User One'));
-        $this->add_card(array('email_address' => 'user2@cypht.org', 'display_name' => 'User Two'));
-        $this->add_card(array('email_address' => 'user3@cypht.org', 'display_name' => 'User Three'));
-        $this->add_card(array('email_address' => 'user4@cypht.org', 'display_name' => 'User Four'));
-        $this->add_card(array('email_address' => 'user5@cypht.org', 'display_name' => 'User Five'));
-        $this->add_card(array('email_address' => 'user6@cypht.org', 'display_name' => 'User Six'));
-        return true;
     }
 }
 
@@ -175,11 +194,33 @@ class Hm_Contact {
     }
 
     function export() {
+        return $this->data;
     }
 }
 
-//$test = new Hm_Contact_Store_Test('email_address', 'is_email');
+/**
+ * @subpackage contacts/lib
+ * @todo: move to test suite
+ */
+class Hm_Contact_Store_Test extends Hm_Contact_Store {
+
+    public function load($source) {
+        $this->add_contact(array('email_address' => 'user1@cypht.org', 'display_name' => 'User One'));
+        $this->add_contact(array('email_address' => 'user2@cypht.org', 'display_name' => 'User Two'));
+        $this->add_contact(array('email_address' => 'user3@cypht.org', 'display_name' => 'User Three'));
+        $this->add_contact(array('email_address' => 'user4@cypht.org', 'display_name' => 'User Four'));
+        $this->add_contact(array('email_address' => 'user5@cypht.org', 'display_name' => 'User Five'));
+        $this->add_contact(array('email_address' => 'user6@cypht.org', 'display_name' => 'User Six'));
+        return true;
+    }
+}
+
+//$test = new Hm_Contact_Store_Test('email_address');
 //$test->load(false);
-//elog($test->dump());
+//elog($test->search(array('email_address' => 'user1')));
+//$data = $test->export();
+//$new = new Hm_Contact_Store_Test('email_address', 'is_email');
+//$new->import($data);
+//elog($new->dump());
 
 ?>
