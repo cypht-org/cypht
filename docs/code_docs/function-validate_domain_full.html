@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Function validate_domain_full | Cypht Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?3418021109"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.html">account<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.account.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.calendar.html">calendar<span></span></a>
+						<ul>
+				<li><a href="package-modules.calendar.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.calendar.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.calendar.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.contacts.html">contacts<span></span></a>
+						<ul>
+				<li><a href="package-modules.contacts.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.contacts.output.html">output</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li class="active"><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.feeds.html">feeds<span></span></a>
+						<ul>
+				<li><a href="package-modules.feeds.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.feeds.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.feeds.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.feeds.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.hackernews.html">hackernews<span></span></a>
+						<ul>
+				<li><a href="package-modules.hackernews.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.hackernews.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.hackernews.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.helloworld.html">helloworld<span></span></a>
+						<ul>
+				<li><a href="package-modules.helloworld.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.helloworld.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.idletimer.html">idletimer<span></span></a>
+						<ul>
+				<li><a href="package-modules.idletimer.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.idletimer.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.imap.html">imap<span></span></a>
+						<ul>
+				<li><a href="package-modules.imap.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.imap.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.imap.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.imap.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.info.html">info<span></span></a>
+						<ul>
+				<li><a href="package-modules.info.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.pop3.html">pop3<span></span></a>
+						<ul>
+				<li><a href="package-modules.pop3.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.pop3.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.pop3.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.pop3.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.profile.html">profile<span></span></a>
+						<ul>
+				<li><a href="package-modules.profile.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.smtp.html">smtp<span></span></a>
+						<ul>
+				<li><a href="package-modules.smtp.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.smtp.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.smtp.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.smtp.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.swipe2fa.html">swipe2fa<span></span></a>
+						<ul>
+				<li><a href="package-modules.swipe2fa.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.wordpress.html">wordpress<span></span></a>
+						<ul>
+				<li><a href="package-modules.wordpress.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+
+
+
+
+
+			<h3>Functions</h3>
+			<ul>
+				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
+				<li><a href="function-date_callback.html">date_callback</a></li>
+				<li><a href="function-display_value.html">display_value</a></li>
+				<li><a href="function-email_is_active.html">email_is_active</a></li>
+				<li><a href="function-format_data_sources.html">format_data_sources</a></li>
+				<li><a href="function-format_msg_html.html">format_msg_html</a></li>
+				<li><a href="function-format_msg_image.html">format_msg_image</a></li>
+				<li><a href="function-format_msg_text.html">format_msg_text</a></li>
+				<li><a href="function-format_reply_text.html">format_reply_text</a></li>
+				<li><a href="function-human_readable_interval.html">human_readable_interval</a></li>
+				<li><a href="function-icon_callback.html">icon_callback</a></li>
+				<li><a href="function-interface_langs.html">interface_langs</a></li>
+				<li><a href="function-is_email.html">is_email</a></li>
+				<li><a href="function-list_controls.html">list_controls</a></li>
+				<li><a href="function-list_sources.html">list_sources</a></li>
+				<li><a href="function-message_controls.html">message_controls</a></li>
+				<li><a href="function-message_list_meta.html">message_list_meta</a></li>
+				<li><a href="function-message_list_row.html">message_list_row</a></li>
+				<li><a href="function-message_since_dropdown.html">message_since_dropdown</a></li>
+				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
+				<li><a href="function-safe_output_callback.html">safe_output_callback</a></li>
+				<li><a href="function-search_field_selection.html">search_field_selection</a></li>
+				<li><a href="function-setup_base_page.html">setup_base_page</a></li>
+				<li><a href="function-subject_callback.html">subject_callback</a></li>
+				<li><a href="function-translate_time_str.html">translate_time_str</a></li>
+				<li class="active"><a href="function-validate_domain_full.html">validate_domain_full</a></li>
+				<li><a href="function-validate_local_full.html">validate_local_full</a></li>
+				<li><a href="function-validate_search_fld.html">validate_search_fld</a></li>
+				<li><a href="function-validate_search_terms.html">validate_search_terms</a></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-modules.core.functions.html" title="Summary of modules\core\functions"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Function</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="function">
+	<h1>Function validate_domain_full</h1>
+
+
+	<div class="description">
+	
+<p>Do email domain part checks per RFC 3696 section 2</p>
+
+	</div>
+
+	<div class="info">
+		
+		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.core.html">core</a>\<a href="package-modules.core.functions.html">functions</a><br>
+		<b>Located at</b> <a href="source-function-validate_domain_full.html#624-637" title="Go to source code">core/functions.php</a><br>
+	</div>
+
+
+	<table class="summary" id="parameters">
+	<caption>Parameters summary</caption>
+	<tr id="$val">
+		<td class="name"><code>string</code></td>
+		<td class="value"><code><var>$val</var></code></td>
+		<td>
+			 value to check
+		</td>
+	</tr>
+	</table>
+
+	<table class="summary" id="returns">
+	<caption>Return value summary</caption>
+	<tr>
+		<td class="name"><code>
+			boolean
+		</code></td>
+		<td>
+			
+		</td>
+	</tr>
+	</table>
+
+
+</div>
+
+	<div id="footer">
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>
