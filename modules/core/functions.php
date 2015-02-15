@@ -587,4 +587,76 @@ function email_is_active($mod_list) {
     return false;
 }
 
+/**
+ * Validate an E-mail using RFC 3696
+ * @subpackage core/functions
+ * @param string $val value to check
+ * @param bool $allow_local flag to allow local addresses with no domain
+ * @return bool
+ */
+function is_email($val, $allow_local=false) {
+    $domain = false;
+    $local = false;
+    if (!trim($val) || strlen($val) > 320) {
+        return false;
+    }
+    if (strpos($val, '@') !== false) {
+        $local = substr($val, 0, strrpos($val, '@'));
+        $domain = substr($val, (strrpos($val, '@') + 1));
+    }
+    else {
+        $local = $val;
+    }
+    if (!$local || (!$allow_local && !$domain)) {
+        return false;
+    }
+    else {
+        if ($domain && !validate_domain_full($domain)) {
+            return false;
+        }
+        if (!validate_local_full($local)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Do email domain part checks per RFC 3696 section 2
+ * @subpackage core/functions
+ * @param string $val value to check
+ * @return bool
+ */
+function validate_domain_full($val) {
+    /* check for a dot, max allowed length and standard ASCII characters */
+    if (strpos($val, '.') === false || strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
+        $val{0} == '-' || $val{(strlen($val) - 1)} == '-') {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Do email local part checks per RFC 3696 section 3
+ * @subpackage core/functions
+ * @param string $val value to check
+ * @return bool
+ */
+function validate_local_full($val) {
+    /* check length, "." rules, and for characters > ASCII 127 */
+    if (strlen($val) > 64 || $val{0} == '.' || $val{(strlen($val) -1)} == '.' || strstr($val, '..') ||
+        preg_match('/[^\x00-\x7F]/',$val)) {
+        return false;
+    }
+    /* remove escaped characters and quoted strings */
+    $local = preg_replace("/\\\\.{1}/", '', $val);
+    $local = preg_replace("/\"[^\"]+\"/", '', $local);
+
+    /* validate remaining unescaped characters */
+    if (preg_match("/[[:print:]]/", $local) && !preg_match("/[@\\\",\[\]]/", $local)) {
+        return true;
+    }
+    return false;
+}
+
 ?>
