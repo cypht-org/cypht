@@ -8,7 +8,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require APP_PATH.'modules/contacts/hm-vcard.php';
+require APP_PATH.'modules/contacts/hm-contacts.php';
 
 /**
  * @subpackage contacts/output
