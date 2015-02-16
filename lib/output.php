@@ -75,7 +75,6 @@ class Hm_Output_HTTP extends Hm_Output {
 
 /**
  * Data URLs for icons used by the interface.
- * @todo eventually move this to a themes module
  */
 class Hm_Image_Sources {
 
