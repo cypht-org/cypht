@@ -14,3 +14,5 @@ textarea, select, input, .toggle_link { border-color: #ccc !important; color: #6
 .selected_menu a { color: #1d2a46 !important; }
 .icon { color: #aaa !important; }
 .online { color: green; }
+.sys_messages { background-color: #dfeaff !important; }
+.empty_list { color: #bbb !important; }
