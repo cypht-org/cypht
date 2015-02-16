@@ -1,27 +1,30 @@
-html * { font-family: Monospace; font-variant: small-caps; text-transform: uppercase; letter-spacing: .2px; font-size: 101%; color: green !important; border-color: #111 !important; background-color: transparent !important; }
+html * { font-family: Monospace; font-variant: small-caps; text-transform: uppercase; letter-spacing: .2px; font-size: 101%; color: green !important; border-color: #000 !important; background-color: transparent !important; }
 body, .folder_cell { background: none !important; background-color: transparent !important; }
 html { background: linear-gradient(0deg, #050505, #050505) !important; }
 .account_icon, .folder_list img { display: none; }
 a { color: green !important; }
-a:hover { color: #fff !important; }
-textarea, select, input, .toggle_link { border-radius: 0px; border-style: dashed; border-color: #222 !important; color: green; background-color: #000 !important; }
+.nlink:hover, .plink:hover, a:hover { color: #82c885 !important; }
+textarea, select, input, .toggle_link { border-radius: 0px; border-style: solid; border-color: #222 !important; color: green; background-color: #000 !important; }
 .toggle_link img { display: inline-block; }
 .prevnext { display: none; }
-.unseen a { font-weight: bold;  font-size: 102%; }
 ::-webkit-input-placeholder { color: #174214; }
 .checkbox_cell input { display: none; }
-.checkbox_cell label { display: inline-block; width: 12px; height: 12px; border: solid 1px #222; vertical-align: middle; cursor: pointer; }
-input[type="checkbox"]:checked + label span{ background-color: #fff !important; }
+.checkbox_cell label { display: inline-block; width: 12px; height: 12px; border: solid 1px #222 !important; vertical-align: middle; cursor: pointer; }
+input[type="checkbox"]:checked + label span{ background-color: #82c885 !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #050505 !important; }
 .src_name, .content_title { color: green !important; background: linear-gradient(0deg, #050505, #050505) !important; }
 .debug, .subtitle, .settings_subtitle { color: green !important; }
 .settings_subtitle { padding-left: 0px !important; }
 .empty_list, .subject a { font-style: normal; color: green !important; }
-.selected_menu, .selected_menu a { color: green !important; }
+.unseen a { color: #4d774f !important; font-weight: bold;  font-size: 102%; }
+.selected_menu, .selected_menu a { color: #82c885 !important; }
 .icon { color: green !important; }
 .online { color: green !important; }
 .down { color: red !important; }
 .list_meta b { color: #ddd !important; }
-.src_name, .message_table tr td, .content_title, .server_section, .settings_subtitle, .msg_headers, .msg_parts { border-bottom: dashed 1px #222 !important; }
-.msg_parts { border-top: dashed 1px #222 !important; }
+.src_name, .content_title, .server_section, .settings_subtitle, .msg_parts { border-bottom: solid 1px #000 !important; }
+.message_list tr td { border: none !important; }
+.msg_parts { border-top: solid 1px #000 !important; }
+.msg_text_inner, .msg_text_inner * { text-transform: none !important; font-variant: normal !important; }
+.src_name { padding-left: 15px; padding-bottom: 0px; }
