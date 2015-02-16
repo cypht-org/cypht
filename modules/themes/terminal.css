@@ -1,0 +1,27 @@
+html * { font-family: Monospace; font-variant: small-caps; text-transform: uppercase; letter-spacing: .2px; font-size: 101%; color: green !important; border-color: #111 !important; background-color: transparent !important; }
+body, .folder_cell { background: none !important; background-color: transparent !important; }
+html { background: linear-gradient(0deg, #050505, #050505) !important; }
+.account_icon, .folder_list img { display: none; }
+a { color: green !important; }
+a:hover { color: #fff !important; }
+textarea, select, input, .toggle_link { border-radius: 0px; border-style: dashed; border-color: #222 !important; color: green; background-color: #000 !important; }
+.toggle_link img { display: inline-block; }
+.prevnext { display: none; }
+.unseen a { font-weight: bold;  font-size: 102%; }
+::-webkit-input-placeholder { color: #174214; }
+.checkbox_cell input { display: none; }
+.checkbox_cell label { display: inline-block; width: 12px; height: 12px; border: solid 1px #222; vertical-align: middle; cursor: pointer; }
+input[type="checkbox"]:checked + label span{ background-color: #fff !important; }
+.loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
+.folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #050505 !important; }
+.src_name, .content_title { color: green !important; background: linear-gradient(0deg, #050505, #050505) !important; }
+.debug, .subtitle, .settings_subtitle { color: green !important; }
+.settings_subtitle { padding-left: 0px !important; }
+.empty_list, .subject a { font-style: normal; color: green !important; }
+.selected_menu, .selected_menu a { color: green !important; }
+.icon { color: green !important; }
+.online { color: green !important; }
+.down { color: red !important; }
+.list_meta b { color: #ddd !important; }
+.src_name, .message_table tr td, .content_title, .server_section, .settings_subtitle, .msg_headers, .msg_parts { border-bottom: dashed 1px #222 !important; }
+.msg_parts { border-top: dashed 1px #222 !important; }
