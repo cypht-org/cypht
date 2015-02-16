@@ -1,13 +1,14 @@
 div { background-color: transparent !important; }
-html * { border-color: #cfdeff !important; }
-body, html, .folder_cell { background-color: #f5f5f5 !important; }
-img { opacity: .2 !important; }
-a { color: #53648a !important; }
+html * { color: #404a5d !important; border-color: #cfdeff !important; }
+body, .folder_cell { background: none !important; background-color: transparent !important; }
+html { background: linear-gradient(0deg, #dfeaff, #ecf2ff) !important; }
+img { opacity: .3 !important; }
+a { color: #404a5d !important; }
 a:hover { color: #39528c !important; }
-textarea, select, input, .toggle_link { color: #666; background-color: #ecf2ff; }
+textarea, select, input, .toggle_link { border-color: #ccc !important; color: #666; background-color: #dfeaff; }
 
-.folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #fafafa !important; }
-.src_name, .content_title { color: #8391b0 !important; background: linear-gradient(0deg, #c6d7ff, #fff); }
+.folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #dfeaff !important; }
+.src_name, .content_title { color: #8391b0 !important; background: linear-gradient(0deg, #c6d7ff, #dfeaff); }
 .debug, .subtitle { color: #3a5aa4 !important; }
 .subject a { color: #33539d !important; }
 .selected_menu a { color: #1d2a46 !important; }
