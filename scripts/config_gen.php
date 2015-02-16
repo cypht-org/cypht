@@ -175,12 +175,6 @@ function create_production_site($assets, $settings) {
     printf("creating production site\n");
     copy('site.css', 'site/site.css');
     copy('site.js', 'site/site.js');
-    if (array_key_exists('modules', $settings) && in_array('themes', explode(',', $settings['modules']), true)) {
-        foreach (glob('modules/themes/*css') as $name) {
-            $destination = str_replace('modules/themes/', '', $name);
-            copy(sprintf($name), sprintf('site/%s', $destination));
-        }
-    }
     $index_file = file_get_contents('index.php');
     $index_file = preg_replace("/APP_PATH', ''/", "APP_PATH', '".APP_PATH."'", $index_file);
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
