@@ -15,6 +15,9 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_load_theme  extends Hm_Handler_Module {
     public function process() {
+        if ($this->user_config->get('theme_setting') == 'hn') {
+            $this->user_config->set('list_style', 'news_style');
+        }
         $this->out('theme', $this->user_config->get('theme_setting'), 'default');
     }
 }
@@ -99,6 +102,7 @@ function hm_themes($output_mod) {
         'green' => $output_mod->trans('Poison Mist'),
         'tan' => $output_mod->trans('A Bunch Of Browns'),
         'terminal' => $output_mod->trans('VT100'),
+        'hn' => $output_mod->trans('Hacker News'),
     );
 }
 

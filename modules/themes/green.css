@@ -17,6 +17,6 @@ a { color: #222 !important; }
 .icon { color: #aaa !important; }
 .online { color: green !important; }
 .down { color: red !important; }
-.sys_messages { background-color: transparent !important; color: #222 !important; }
+.sys_messages { background-color: #eee !important; color: #222 !important; }
 .message_list tr td { border: none; }
 ::-webkit-input-placeholder { color: #999; }

@@ -17,7 +17,7 @@ input[type="checkbox"]:checked + label span{ background-color: #82c885 !importan
 .debug, .subtitle, .settings_subtitle { color: green !important; }
 .settings_subtitle { padding-left: 0px !important; }
 .empty_list, .subject a { font-style: normal; color: green !important; }
-.unseen a { color: #4d774f !important; font-weight: bold;  font-size: 102%; }
+.unseen a { font-weight: bold;  font-size: 102%; }
 .selected_menu, .selected_menu a { color: #82c885 !important; }
 .icon { color: green !important; }
 .online { color: green !important; }
@@ -28,3 +28,4 @@ input[type="checkbox"]:checked + label span{ background-color: #82c885 !importan
 .msg_parts { border-top: solid 1px #000 !important; }
 .msg_text_inner, .msg_text_inner * { text-transform: none !important; font-variant: normal !important; }
 .src_name { padding-left: 15px; padding-bottom: 0px; }
+.sys_messages { background-color: #000 !important; }
