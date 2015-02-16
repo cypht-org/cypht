@@ -20,3 +20,4 @@ textarea, select, input, .toggle_link { color: #aaa; background-color: #bbb !imp
 .sys_messages { background-color: #000 !important; color: #fff !important; }
 .message_list tr td { border: none; }
 ::-webkit-input-placeholder { color: #ddd; }
+.empty_list { color: #999 !important; }
