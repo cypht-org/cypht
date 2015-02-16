@@ -92,13 +92,12 @@ class Hm_Output_theme_setting extends Hm_Output_Module {
  */
 function hm_themes($output_mod) {
     return array(
-        'default' => $output_mod->trans('Default'),
-        'blue' => $output_mod->trans('Blue'),
-        'dark' => $output_mod->trans('Dark'),
-        'gray' => $output_mod->trans('Gray'),
-        'green' => $output_mod->trans('Green'),
-        'blue' => $output_mod->trans('Blue'),
-        'tan' => $output_mod->trans('Tan'),
+        'default' => $output_mod->trans('White Bread (Default)'),
+        'blue' => $output_mod->trans('Boring Blues'),
+        'dark' => $output_mod->trans('Dark But Not Too Dark'),
+        'gray' => $output_mod->trans('More Gray Than White Bread'),
+        'green' => $output_mod->trans('Poison Mist'),
+        'tan' => $output_mod->trans('A Bunch Of Browns'),
         'terminal' => $output_mod->trans('VT100'),
     );
 }
