@@ -8,7 +8,7 @@
 	<title>File contacts/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?325629311"></script>
+	<script type="text/javascript" src="elementlist.js?4271966860"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -173,6 +173,15 @@
 				<li><a href="package-modules.swipe2fa.output.html">output</a>
 						</li>
 							</ul></li>
+				<li><a href="package-modules.themes.html">themes<span></span></a>
+						<ul>
+				<li><a href="package-modules.themes.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.themes.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.themes.output.html">output</a>
+						</li>
+							</ul></li>
 				<li><a href="package-modules.wordpress.html">wordpress<span></span></a>
 						<ul>
 				<li><a href="package-modules.wordpress.output.html">output</a>
@@ -253,65 +262,66 @@
 </span><span id="12" class="l"><a class="l" href="#12">12: </a>
 </span><span id="13" class="l"><a class="l" href="#13">13: </a><span class="php-comment">/**
 </span></span><span id="14" class="l"><a class="l" href="#14">14: </a><span class="php-comment"> * @subpackage contacts/handler
-</span></span><span id="15" class="l"><a class="l" href="#15">15: </a><span class="php-comment"> */</span>
-</span><span id="16" class="l"><a class="l" href="#16">16: </a><span class="php-keyword1">class</span> <a id="Hm_Handler_process_add_contact" href="#Hm_Handler_process_add_contact">Hm_Handler_process_add_contact</a> <span class="php-keyword1">extends</span> Hm_Handler_Module {
-</span><span id="17" class="l"><a class="l" href="#17">17: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process" href="#_process">process</a>() {
-</span><span id="18" class="l"><a class="l" href="#18">18: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'contact_email'</span>, <span class="php-quote">'contact_name'</span>));
-</span><span id="19" class="l"><a class="l" href="#19">19: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
-</span><span id="20" class="l"><a class="l" href="#20">20: </a>        }
-</span><span id="21" class="l"><a class="l" href="#21">21: </a>    }
-</span><span id="22" class="l"><a class="l" href="#22">22: </a>}
-</span><span id="23" class="l"><a class="l" href="#23">23: </a>
-</span><span id="24" class="l"><a class="l" href="#24">24: </a><span class="php-comment">/**
-</span></span><span id="25" class="l"><a class="l" href="#25">25: </a><span class="php-comment"> * @subpackage contacts/output
-</span></span><span id="26" class="l"><a class="l" href="#26">26: </a><span class="php-comment"> */</span>
-</span><span id="27" class="l"><a class="l" href="#27">27: </a><span class="php-keyword1">class</span> <a id="Hm_Output_contacts_page_link" href="#Hm_Output_contacts_page_link">Hm_Output_contacts_page_link</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="28" class="l"><a class="l" href="#28">28: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
-</span><span id="29" class="l"><a class="l" href="#29">29: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_contacts&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=contacts&quot;&gt;'</span>.
-</span><span id="30" class="l"><a class="l" href="#30">30: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$people</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Contacts'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="31" class="l"><a class="l" href="#31">31: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="32" class="l"><a class="l" href="#32">32: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="33" class="l"><a class="l" href="#33">33: </a>        }
-</span><span id="34" class="l"><a class="l" href="#34">34: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="35" class="l"><a class="l" href="#35">35: </a>    }
-</span><span id="36" class="l"><a class="l" href="#36">36: </a>}
-</span><span id="37" class="l"><a class="l" href="#37">37: </a>
-</span><span id="38" class="l"><a class="l" href="#38">38: </a><span class="php-comment">/**
-</span></span><span id="39" class="l"><a class="l" href="#39">39: </a><span class="php-comment"> * @subpackage contacts/output
-</span></span><span id="40" class="l"><a class="l" href="#40">40: </a><span class="php-comment"> */</span>
-</span><span id="41" class="l"><a class="l" href="#41">41: </a><span class="php-keyword1">class</span> <a id="Hm_Output_contacts_content_start" href="#Hm_Output_contacts_content_start">Hm_Output_contacts_content_start</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="42" class="l"><a class="l" href="#42">42: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
-</span><span id="43" class="l"><a class="l" href="#43">43: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;contacts_content&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Contacts'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="44" class="l"><a class="l" href="#44">44: </a>    }
-</span><span id="45" class="l"><a class="l" href="#45">45: </a>}
-</span><span id="46" class="l"><a class="l" href="#46">46: </a>
-</span><span id="47" class="l"><a class="l" href="#47">47: </a><span class="php-comment">/**
-</span></span><span id="48" class="l"><a class="l" href="#48">48: </a><span class="php-comment"> * @subpackage contacts/output
-</span></span><span id="49" class="l"><a class="l" href="#49">49: </a><span class="php-comment"> */</span>
-</span><span id="50" class="l"><a class="l" href="#50">50: </a><span class="php-keyword1">class</span> <a id="Hm_Output_contacts_content_end" href="#Hm_Output_contacts_content_end">Hm_Output_contacts_content_end</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="51" class="l"><a class="l" href="#51">51: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
-</span><span id="52" class="l"><a class="l" href="#52">52: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="53" class="l"><a class="l" href="#53">53: </a>    }
-</span><span id="54" class="l"><a class="l" href="#54">54: </a>}
-</span><span id="55" class="l"><a class="l" href="#55">55: </a>
-</span><span id="56" class="l"><a class="l" href="#56">56: </a><span class="php-comment">/**
-</span></span><span id="57" class="l"><a class="l" href="#57">57: </a><span class="php-comment"> * @subpackage contacts/output
-</span></span><span id="58" class="l"><a class="l" href="#58">58: </a><span class="php-comment"> */</span>
-</span><span id="59" class="l"><a class="l" href="#59">59: </a><span class="php-keyword1">class</span> <a id="Hm_Output_contacts_content_add_form" href="#Hm_Output_contacts_content_add_form">Hm_Output_contacts_content_add_form</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="60" class="l"><a class="l" href="#60">60: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
-</span><span id="61" class="l"><a class="l" href="#61">61: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;add_server&quot;&gt;&lt;div class=&quot;server_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add Contact'</span>).<span class="php-quote">'&lt;/div&gt;'</span>.
-</span><span id="62" class="l"><a class="l" href="#62">62: </a>            <span class="php-quote">'&lt;form class=&quot;add_contact_form&quot; method=&quot;POST&quot;&gt;'</span>.
-</span><span id="63" class="l"><a class="l" href="#63">63: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="64" class="l"><a class="l" href="#64">64: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;contact_email&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'E-mail Address'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
-</span><span id="65" class="l"><a class="l" href="#65">65: </a>            <span class="php-quote">'&lt;input autofocus required placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'E-mail Address'</span>).<span class="php-quote">'&quot; id=&quot;contact_email&quot; type=&quot;email&quot; name=&quot;contact_email&quot; /&gt;&lt;br /&gt;'</span>.
-</span><span id="66" class="l"><a class="l" href="#66">66: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; class=&quot;screen_reader&quot; for=&quot;contact_name&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Full Name'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
-</span><span id="67" class="l"><a class="l" href="#67">67: </a>            <span class="php-quote">'&lt;input placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Full Name'</span>).<span class="php-quote">'&quot; id=&quot;contact_name&quot; type=&quot;name&quot; name=&quot;contact_name&quot; /&gt;&lt;br /&gt;'</span>.
-</span><span id="68" class="l"><a class="l" href="#68">68: </a>            <span class="php-quote">'&lt;input class=&quot;add_contact_submit&quot; type=&quot;submit&quot; name=&quot;add_contact&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="69" class="l"><a class="l" href="#69">69: </a>            <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;'</span>;
-</span><span id="70" class="l"><a class="l" href="#70">70: </a>    }
-</span><span id="71" class="l"><a class="l" href="#71">71: </a>}
-</span><span id="72" class="l"><a class="l" href="#72">72: </a><span class="xlang">?&gt;</span>
-</span><span id="73" class="l"><a class="l" href="#73">73: </a></span></code></pre>
+</span></span><span id="15" class="l"><a class="l" href="#15">15: </a><span class="php-comment"> * @todo work on persistant contact handling
+</span></span><span id="16" class="l"><a class="l" href="#16">16: </a><span class="php-comment"> */</span>
+</span><span id="17" class="l"><a class="l" href="#17">17: </a><span class="php-keyword1">class</span> <a id="Hm_Handler_process_add_contact" href="#Hm_Handler_process_add_contact">Hm_Handler_process_add_contact</a> <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="18" class="l"><a class="l" href="#18">18: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process" href="#_process">process</a>() {
+</span><span id="19" class="l"><a class="l" href="#19">19: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'contact_email'</span>, <span class="php-quote">'contact_name'</span>));
+</span><span id="20" class="l"><a class="l" href="#20">20: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
+</span><span id="21" class="l"><a class="l" href="#21">21: </a>        }
+</span><span id="22" class="l"><a class="l" href="#22">22: </a>    }
+</span><span id="23" class="l"><a class="l" href="#23">23: </a>}
+</span><span id="24" class="l"><a class="l" href="#24">24: </a>
+</span><span id="25" class="l"><a class="l" href="#25">25: </a><span class="php-comment">/**
+</span></span><span id="26" class="l"><a class="l" href="#26">26: </a><span class="php-comment"> * @subpackage contacts/output
+</span></span><span id="27" class="l"><a class="l" href="#27">27: </a><span class="php-comment"> */</span>
+</span><span id="28" class="l"><a class="l" href="#28">28: </a><span class="php-keyword1">class</span> <a id="Hm_Output_contacts_page_link" href="#Hm_Output_contacts_page_link">Hm_Output_contacts_page_link</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="29" class="l"><a class="l" href="#29">29: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
+</span><span id="30" class="l"><a class="l" href="#30">30: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_contacts&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=contacts&quot;&gt;'</span>.
+</span><span id="31" class="l"><a class="l" href="#31">31: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$people</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Contacts'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="32" class="l"><a class="l" href="#32">32: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="33" class="l"><a class="l" href="#33">33: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="34" class="l"><a class="l" href="#34">34: </a>        }
+</span><span id="35" class="l"><a class="l" href="#35">35: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="36" class="l"><a class="l" href="#36">36: </a>    }
+</span><span id="37" class="l"><a class="l" href="#37">37: </a>}
+</span><span id="38" class="l"><a class="l" href="#38">38: </a>
+</span><span id="39" class="l"><a class="l" href="#39">39: </a><span class="php-comment">/**
+</span></span><span id="40" class="l"><a class="l" href="#40">40: </a><span class="php-comment"> * @subpackage contacts/output
+</span></span><span id="41" class="l"><a class="l" href="#41">41: </a><span class="php-comment"> */</span>
+</span><span id="42" class="l"><a class="l" href="#42">42: </a><span class="php-keyword1">class</span> <a id="Hm_Output_contacts_content_start" href="#Hm_Output_contacts_content_start">Hm_Output_contacts_content_start</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="43" class="l"><a class="l" href="#43">43: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
+</span><span id="44" class="l"><a class="l" href="#44">44: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;contacts_content&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Contacts'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="45" class="l"><a class="l" href="#45">45: </a>    }
+</span><span id="46" class="l"><a class="l" href="#46">46: </a>}
+</span><span id="47" class="l"><a class="l" href="#47">47: </a>
+</span><span id="48" class="l"><a class="l" href="#48">48: </a><span class="php-comment">/**
+</span></span><span id="49" class="l"><a class="l" href="#49">49: </a><span class="php-comment"> * @subpackage contacts/output
+</span></span><span id="50" class="l"><a class="l" href="#50">50: </a><span class="php-comment"> */</span>
+</span><span id="51" class="l"><a class="l" href="#51">51: </a><span class="php-keyword1">class</span> <a id="Hm_Output_contacts_content_end" href="#Hm_Output_contacts_content_end">Hm_Output_contacts_content_end</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="52" class="l"><a class="l" href="#52">52: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
+</span><span id="53" class="l"><a class="l" href="#53">53: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="54" class="l"><a class="l" href="#54">54: </a>    }
+</span><span id="55" class="l"><a class="l" href="#55">55: </a>}
+</span><span id="56" class="l"><a class="l" href="#56">56: </a>
+</span><span id="57" class="l"><a class="l" href="#57">57: </a><span class="php-comment">/**
+</span></span><span id="58" class="l"><a class="l" href="#58">58: </a><span class="php-comment"> * @subpackage contacts/output
+</span></span><span id="59" class="l"><a class="l" href="#59">59: </a><span class="php-comment"> */</span>
+</span><span id="60" class="l"><a class="l" href="#60">60: </a><span class="php-keyword1">class</span> <a id="Hm_Output_contacts_content_add_form" href="#Hm_Output_contacts_content_add_form">Hm_Output_contacts_content_add_form</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="61" class="l"><a class="l" href="#61">61: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
+</span><span id="62" class="l"><a class="l" href="#62">62: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;add_server&quot;&gt;&lt;div class=&quot;server_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add Contact'</span>).<span class="php-quote">'&lt;/div&gt;'</span>.
+</span><span id="63" class="l"><a class="l" href="#63">63: </a>            <span class="php-quote">'&lt;form class=&quot;add_contact_form&quot; method=&quot;POST&quot;&gt;'</span>.
+</span><span id="64" class="l"><a class="l" href="#64">64: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="65" class="l"><a class="l" href="#65">65: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;contact_email&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'E-mail Address'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
+</span><span id="66" class="l"><a class="l" href="#66">66: </a>            <span class="php-quote">'&lt;input autofocus required placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'E-mail Address'</span>).<span class="php-quote">'&quot; id=&quot;contact_email&quot; type=&quot;email&quot; name=&quot;contact_email&quot; /&gt;&lt;br /&gt;'</span>.
+</span><span id="67" class="l"><a class="l" href="#67">67: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; class=&quot;screen_reader&quot; for=&quot;contact_name&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Full Name'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
+</span><span id="68" class="l"><a class="l" href="#68">68: </a>            <span class="php-quote">'&lt;input placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Full Name'</span>).<span class="php-quote">'&quot; id=&quot;contact_name&quot; type=&quot;name&quot; name=&quot;contact_name&quot; /&gt;&lt;br /&gt;'</span>.
+</span><span id="69" class="l"><a class="l" href="#69">69: </a>            <span class="php-quote">'&lt;input class=&quot;add_contact_submit&quot; type=&quot;submit&quot; name=&quot;add_contact&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="70" class="l"><a class="l" href="#70">70: </a>            <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;'</span>;
+</span><span id="71" class="l"><a class="l" href="#71">71: </a>    }
+</span><span id="72" class="l"><a class="l" href="#72">72: </a>}
+</span><span id="73" class="l"><a class="l" href="#73">73: </a><span class="xlang">?&gt;</span>
+</span><span id="74" class="l"><a class="l" href="#74">74: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>

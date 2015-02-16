@@ -8,7 +8,7 @@
 	<title>File core/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?325629311"></script>
+	<script type="text/javascript" src="elementlist.js?4271966860"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -171,6 +171,15 @@
 				<li><a href="package-modules.swipe2fa.handler.html">handler</a>
 						</li>
 				<li><a href="package-modules.swipe2fa.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.themes.html">themes<span></span></a>
+						<ul>
+				<li><a href="package-modules.themes.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.themes.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.themes.output.html">output</a>
 						</li>
 							</ul></li>
 				<li><a href="package-modules.wordpress.html">wordpress<span></span></a>
@@ -1012,7 +1021,7 @@
 </span><span id="750" class="l"><a class="l" href="#750"> 750: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;search_form&quot;&gt;'</span>.
 </span><span id="751" class="l"><a class="l" href="#751"> 751: </a>            <span class="php-quote">'&lt;form method=&quot;get&quot;&gt;&lt;input type=&quot;hidden&quot; name=&quot;page&quot; value=&quot;search&quot; /&gt;'</span>.
 </span><span id="752" class="l"><a class="l" href="#752"> 752: </a>            <span class="php-quote">' &lt;label class=&quot;screen_reader&quot; for=&quot;search_terms&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search Terms'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
-</span><span id="753" class="l"><a class="l" href="#753"> 753: </a>            <span class="php-quote">'&lt;input id=&quot;search_terms&quot; type=&quot;search&quot; class=&quot;search_terms&quot; name=&quot;search_terms&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$terms</span>).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="753" class="l"><a class="l" href="#753"> 753: </a>            <span class="php-quote">'&lt;input placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search Terms'</span>).<span class="php-quote">'&quot; id=&quot;search_terms&quot; type=&quot;search&quot; class=&quot;search_terms&quot; name=&quot;search_terms&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$terms</span>).<span class="php-quote">'&quot; /&gt;'</span>.
 </span><span id="754" class="l"><a class="l" href="#754"> 754: </a>            <span class="php-quote">' &lt;label class=&quot;screen_reader&quot; for=&quot;search_fld&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search Field'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
 </span><span id="755" class="l"><a class="l" href="#755"> 755: </a>            search_field_selection(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'search_fld'</span>, <span class="php-quote">''</span>), <span class="php-var">$this</span>).
 </span><span id="756" class="l"><a class="l" href="#756"> 756: </a>            <span class="php-quote">' &lt;label class=&quot;screen_reader&quot; for=&quot;search_since&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search Since'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
@@ -1676,7 +1685,7 @@
 </span><span id="1414" class="l"><a class="l" href="#1414">1414: </a>        <span class="php-keyword2">asort</span>(<span class="php-var">$translated</span>);
 </span><span id="1415" class="l"><a class="l" href="#1415">1415: </a>        <span class="php-var">$mylang</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'language'</span>, <span class="php-quote">''</span>);
 </span><span id="1416" class="l"><a class="l" href="#1416">1416: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;tr class=&quot;general_setting&quot;&gt;&lt;td&gt;&lt;label for=&quot;language_setting&quot;&gt;'</span>.
-</span><span id="1417" class="l"><a class="l" href="#1417">1417: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Interface language'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
+</span><span id="1417" class="l"><a class="l" href="#1417">1417: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'interface language'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
 </span><span id="1418" class="l"><a class="l" href="#1418">1418: </a>            <span class="php-quote">'&lt;td&gt;&lt;select id=&quot;language_setting&quot; name=&quot;language_setting&quot;&gt;'</span>;
 </span><span id="1419" class="l"><a class="l" href="#1419">1419: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$translated</span> <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$lang</span>) {
 </span><span id="1420" class="l"><a class="l" href="#1420">1420: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
