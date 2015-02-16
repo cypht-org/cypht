@@ -12,6 +12,7 @@ require APP_PATH.'modules/contacts/hm-contacts.php';
 
 /**
  * @subpackage contacts/handler
+ * @todo work on persistant contact handling
  */
 class Hm_Handler_process_add_contact extends Hm_Handler_Module {
     public function process() {
