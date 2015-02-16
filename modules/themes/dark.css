@@ -16,3 +16,4 @@ textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !imp
 .online { color: green !important; }
 .down { color: red !important; }
 .sys_messages { background-color: #000 !important; }
+.unseen a { font-weight: bold; color: #ccc !important; }
