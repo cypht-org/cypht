@@ -4,7 +4,7 @@ html { background: linear-gradient(0deg, #050505, #050505) !important; }
 .account_icon, .folder_list img { display: none; }
 a { color: green !important; }
 a:hover { color: #fff !important; }
-textarea, select, input, .toggle_link { border-radius: 0px; border-style: dashed; border-color: #222 !important; color: green; background-color: #000 !important; }
+textarea, select, input, .toggle_link { border-radius: 0px; border-style: dashed; border-color: #333 !important; color: green; background-color: #000 !important; }
 .toggle_link img { display: inline-block; }
 .prevnext { display: none; }
 .unseen a { font-weight: bold;  font-size: 102%; }
@@ -23,5 +23,6 @@ input[type="checkbox"]:checked + label span{ background-color: #fff !important; 
 .online { color: green !important; }
 .down { color: red !important; }
 .list_meta b { color: #ddd !important; }
-.src_name, .message_table tr td, .content_title, .server_section, .settings_subtitle, .msg_headers, .msg_parts { border-bottom: dashed 1px #222 !important; }
-.msg_parts { border-top: dashed 1px #222 !important; }
+.src_name, .message_table tr td, .content_title, .server_section, .settings_subtitle, .msg_headers, .msg_parts { border-bottom: dashed 1px #333 !important; }
+.msg_parts { border-top: dashed 1px #333 !important; }
+.msg_text_inner, .msg_text_inner * { text-transform: none !important; font-variant: normal !important; }

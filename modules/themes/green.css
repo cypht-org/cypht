@@ -1,7 +1,7 @@
 html * { font-family: Arial; color: #333 !important; border-color: #94b096 !important; background-color: transparent !important; }
 main, div { border-radius: 3px 3px 3px 3px }
 body, .folder_cell { background: none !important; background-color: transparent !important; }
-html { background: linear-gradient(340deg, #eee, #eee, #98ba9a) !important; }
+html { background: linear-gradient(340deg, #98ba9a, #eee, #eee, #98ba9a) !important; }
 img { opacity: .5 !important; }
 a { color: #222 !important; }
 .list_meta, a:hover { color: #000 !important; }
