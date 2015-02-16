@@ -750,7 +750,7 @@ class Hm_Output_search_form extends Hm_Output_Module {
         $res = '<div class="search_form">'.
             '<form method="get"><input type="hidden" name="page" value="search" />'.
             ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
-            '<input id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
+            '<input placeholder="'.$this->trans('Search Terms').'" id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
             ' <label class="screen_reader" for="search_fld">'.$this->trans('Search Field').'</label>'.
             search_field_selection($this->get('search_fld', ''), $this).
             ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
@@ -1414,7 +1414,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         asort($translated);
         $mylang = $this->get('language', '');
         $res = '<tr class="general_setting"><td><label for="language_setting">'.
-            $this->trans('Interface language').'</label></td>'.
+            $this->trans('interface language').'</label></td>'.
             '<td><select id="language_setting" name="language_setting">';
         foreach ($translated as $id => $lang) {
             $res .= '<option ';
