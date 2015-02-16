@@ -1,0 +1,22 @@
+html * { font-family: Arial; color: #333 !important; border-color: #aaa !important; background-color: transparent !important; }
+main, div { border-radius: 3px 3px 3px 3px }
+body, .folder_cell { background: none !important; background-color: transparent !important; }
+html { background: linear-gradient(0deg, #aaa, #ccc) !important; }
+img { opacity: .5 !important; }
+a { color: #222 !important; }
+.list_meta, a:hover { color: #eee !important; }
+textarea, select, input, .toggle_link { color: #aaa; background-color: #bbb !important; }
+.loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
+.folder_list { background-color: #ccc !important; }
+.content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #cfcfcf !important; }
+.src_name, .content_title { color: #666 !important; background: linear-gradient(0deg, #bbb, #ccc) !important; }
+.debug, .subtitle, { color: #999 !important; }
+.settings_subtitle { color: #333 !important; }
+.empty_list, .subject a { color: #333 !important; }
+.selected_menu, .selected_menu a { color: #eee !important; }
+.icon { color: #aaa !important; }
+.online { color: green !important; }
+.down { color: red !important; }
+.sys_messages { background-color: #000 !important; color: #fff !important; }
+.message_list tr td { border: none; }
+::-webkit-input-placeholder { color: #ddd; }

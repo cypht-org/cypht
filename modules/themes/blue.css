@@ -1,0 +1,15 @@
+div { background-color: transparent !important; }
+html * { border-color: #cfdeff !important; }
+body, html, .folder_cell { background-color: #f5f5f5 !important; }
+img { opacity: .2 !important; }
+a { color: #53648a !important; }
+a:hover { color: #39528c !important; }
+textarea, select, input, .toggle_link { color: #666; background-color: #ecf2ff; }
+
+.folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #fafafa !important; }
+.src_name, .content_title { color: #8391b0 !important; background: linear-gradient(0deg, #c6d7ff, #fff); }
+.debug, .subtitle { color: #3a5aa4 !important; }
+.subject a { color: #33539d !important; }
+.selected_menu a { color: #1d2a46 !important; }
+.icon { color: #aaa !important; }
+.online { color: green; }

@@ -1,0 +1,18 @@
+html * { font-family: Verdana; color: #ccc !important; border-color: #413221 !important; background-color: transparent !important; }
+main, div { border-radius: 0px 0px 3px 3px }
+body, .folder_cell { background: none !important; background-color: transparent !important; }
+html { background: linear-gradient(0deg, #33281a, #94734b) !important; }
+img { opacity: .4 !important; }
+a { color: #aaa !important; }
+::-webkit-input-placeholder { color: #ddd; }
+a:hover { color: #fff !important; }
+textarea, select, input, .toggle_link, .msg_controls a { color: #ddd !important; background-color: #8e714b !important; }
+.loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
+.folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #836a4e !important; }
+.src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #79562d, #725a3b) !important; }
+.debug, .subtitle { color: #999 !important; }
+.empty_list, .subject a { color: #ccc !important; }
+.selected_menu, .selected_menu a { color: #eee !important; }
+.icon { color: #aaa !important; }
+.online { color: #1b491b !important; }
+.down { color: #a21d1d !important; }
