@@ -153,7 +153,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .content_title { padding-left: 35px; }
     .checkbox_cell { padding-left: 15px !important; }
     .folder_list { min-width: 150px; }
-    .src_name, .content_title { font-size: 140%; padding-bottom: 15px; padding-top: 15px; max-height: 50px; }
+    .src_name, .content_title { font-size: 140%; padding-bottom: 15px; padding-top: 25px; max-height: 50px; }
     body { font-size: 150%; }
     .list_controls { padding-right: 10px; }
     .msg_text { font-size: 125%; }
@@ -182,7 +182,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
     .folder_list { display: none; width: 340px; }
     .content_cell { min-width: 360px; max-width: 480px; word-break: break-all; word-wrap: break-word;}
-    .content_title { padding-left: 30px; padding-top: 5px; margin-bottom: 5px; }
+    .content_title { padding-left: 30px; padding-top: 20px; margin-bottom: 5px; }
     .folder_toggle { display: block; top: 19px; left: 0px; }
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
     .message_table { padding-left: 10px !important; }
