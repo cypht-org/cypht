@@ -9,6 +9,7 @@ add_module_to_all_pages('handler', 'load_theme', true, 'themes', 'load_user_data
 add_module_to_all_pages('output', 'theme_css', true, 'themes', 'header_css', 'after');
 
 add_handler('ajax_hm_folders', 'load_theme', true, 'themes', 'load_user_data', 'after');
+add_handler('ajax_imap_folder_expand', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('settings', 'process_theme_setting', true, 'themes', 'save_user_settings', 'before'); 
 add_output('settings', 'theme_setting', true, 'feeds', 'language_setting', 'after');
 
