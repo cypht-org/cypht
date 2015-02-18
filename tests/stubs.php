@@ -17,7 +17,7 @@ class Hm_Handler_Test extends Hm_Handler_Module {
 }
 
 class Hm_Output_Test extends Hm_Output_Module {
-    public function output($format) {
+    public function output() {
         return '';
     }
 }
