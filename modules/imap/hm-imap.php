@@ -305,7 +305,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         if ( $authed ) {
             $this->debug[] = 'Logged in successfully as '.$username;
             $this->get_capability();
-            //$this->enable();
+            $this->enable();
             //$this->enable_compression();
         }
         else {
