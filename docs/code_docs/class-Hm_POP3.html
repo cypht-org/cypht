@@ -270,7 +270,7 @@
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.pop3.html">pop3</a>\<a href="package-modules.pop3.lib.html">lib</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_POP3.html#101-440" title="Go to source code">pop3/hm-pop3.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_POP3.html#119-549" title="Go to source code">pop3/hm-pop3.php</a><br>
 	</div>
 
 
@@ -288,14 +288,18 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Hm_POP3.html#121-134" title="Go to source code">__construct</a>( )</code>
+		<code><a href="source-class-Hm_POP3.html#138-155" title="Go to source code">__construct</a>( )</code>
 
 		<div class="description short">
 			
+<p>Set defaults</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Set defaults</p>
+
 
 
 
@@ -309,25 +313,38 @@
 	<tr data-order="get_response" id="_get_response">
 
 		<td class="attributes"><code>
-			 public 
-			
+			 private 
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_response">#</a>
-		<code><a href="source-class-Hm_POP3.html#137-145" title="Go to source code">get_response</a>( <span>mixed <var>$multi_line</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#157-170" title="Go to source code">get_response</a>( <span>boolean <var>$multi_line</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
+<p>Get server response</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Get server response</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$multi_line</var></dt>
+					<dd><code>boolean</code><br>$multi_line multi-line flag</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
 
 
 
@@ -338,25 +355,38 @@
 	<tr data-order="get_multi_line_response" id="_get_multi_line_response">
 
 		<td class="attributes"><code>
-			 public 
-			
+			 private 
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_multi_line_response">#</a>
-		<code><a href="source-class-Hm_POP3.html#148-173" title="Go to source code">get_multi_line_response</a>( <span>mixed <var>$line_length</var> = <span class="php-num">8192</span></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#172-202" title="Go to source code">get_multi_line_response</a>( <span>integer <var>$line_length</var> = <span class="php-num">8192</span></span> )</code>
 
 		<div class="description short">
 			
+<p>Read in a multi-line response</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Read in a multi-line response</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$line_length</var></dt>
+					<dd><code>integer</code><br>$line_length max read length</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
 
 
 
@@ -367,25 +397,38 @@
 	<tr data-order="get_single_line_response" id="_get_single_line_response">
 
 		<td class="attributes"><code>
-			 public 
-			
+			 private 
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_single_line_response">#</a>
-		<code><a href="source-class-Hm_POP3.html#176-185" title="Go to source code">get_single_line_response</a>( <span>mixed <var>$line_length</var> = <span class="php-num">512</span></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#204-218" title="Go to source code">get_single_line_response</a>( <span>integer <var>$line_length</var> = <span class="php-num">512</span></span> )</code>
 
 		<div class="description short">
 			
+<p>Read in a single line response</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Read in a single line response</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$line_length</var></dt>
+					<dd><code>integer</code><br>$line_length max read length</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
 
 
 
@@ -396,7 +439,7 @@
 	<tr data-order="send_command" id="_send_command">
 
 		<td class="attributes"><code>
-			 public 
+			 private 
 			
 			
 			</code>
@@ -404,16 +447,25 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_send_command">#</a>
-		<code><a href="source-class-Hm_POP3.html#188-198" title="Go to source code">send_command</a>( <span>mixed <var>$command</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#220-235" title="Go to source code">send_command</a>( <span>string <var>$command</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Send a command string to the server</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Send a command string to the server</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$command</var></dt>
+					<dd><code>string</code><br>$command POP3 command</dd>
+				</dl></div>
 
 
 
@@ -426,24 +478,32 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_connect">#</a>
-		<code><a href="source-class-Hm_POP3.html#201-222" title="Go to source code">connect</a>( )</code>
+		<code><a href="source-class-Hm_POP3.html#237-262" title="Go to source code">connect</a>( )</code>
 
 		<div class="description short">
 			
+<p>Establish a connection to the server.</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Establish a connection to the server.</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -455,24 +515,32 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_puke">#</a>
-		<code><a href="source-class-Hm_POP3.html#225-227" title="Go to source code">puke</a>( )</code>
+		<code><a href="source-class-Hm_POP3.html#264-270" title="Go to source code">puke</a>( )</code>
 
 		<div class="description short">
 			
+<p>Output debug</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Output debug</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
 
 
 
@@ -483,25 +551,38 @@
 	<tr data-order="is_error" id="_is_error">
 
 		<td class="attributes"><code>
-			 public 
-			
+			 private 
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_is_error">#</a>
-		<code><a href="source-class-Hm_POP3.html#230-248" title="Go to source code">is_error</a>( <span>mixed <var>$response</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#272-295" title="Go to source code">is_error</a>( <span>string <var>$response</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Check the POP3 response code for errors</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Check the POP3 response code for errors</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$response</var></dt>
+					<dd><code>string</code><br>$response POP3 response</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -513,24 +594,32 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_quit">#</a>
-		<code><a href="source-class-Hm_POP3.html#251-254" title="Go to source code">quit</a>( )</code>
+		<code><a href="source-class-Hm_POP3.html#297-304" title="Go to source code">quit</a>( )</code>
 
 		<div class="description short">
 			
+<p>Quit an active pop3 session</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Quit an active pop3 session</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -542,24 +631,32 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			array
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_mstat">#</a>
-		<code><a href="source-class-Hm_POP3.html#257-269" title="Go to source code">mstat</a>( )</code>
+		<code><a href="source-class-Hm_POP3.html#306-322" title="Go to source code">mstat</a>( )</code>
 
 		<div class="description short">
 			
+<p>Stat a mailbox</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Stat a mailbox</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
 
 
 
@@ -571,24 +668,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			array
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_mlist">#</a>
-		<code><a href="source-class-Hm_POP3.html#272-292" title="Go to source code">mlist</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#324-349" title="Go to source code">mlist</a>( <span>integer <var>$id</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
+<p>List message ids in a pop3 account</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>List message ids in a pop3 account</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id message id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
 
 
 
@@ -600,24 +710,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_top">#</a>
-		<code><a href="source-class-Hm_POP3.html#295-298" title="Go to source code">top</a>( <span>mixed <var>$id</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#351-359" title="Go to source code">top</a>( <span>integer <var>$id</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Send the top command for the given message id</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Send the top command for the given message id</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id message id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
 
 
 
@@ -629,24 +752,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			array
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_msg_headers">#</a>
-		<code><a href="source-class-Hm_POP3.html#301-321" title="Go to source code">msg_headers</a>( <span>mixed <var>$id</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#361-386" title="Go to source code">msg_headers</a>( <span>integer <var>$id</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Parse message headers</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Parse message headers</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id message id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
 
 
 
@@ -658,24 +794,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_retr_full">#</a>
-		<code><a href="source-class-Hm_POP3.html#324-328" title="Go to source code">retr_full</a>( <span>mixed <var>$id</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#388-397" title="Go to source code">retr_full</a>( <span>integer <var>$id</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Fetch an entire retr command response</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Fetch an entire retr command response</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id message id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
 
 
 
@@ -687,24 +836,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_retr_start">#</a>
-		<code><a href="source-class-Hm_POP3.html#331-335" title="Go to source code">retr_start</a>( <span>mixed <var>$id</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#399-408" title="Go to source code">retr_start</a>( <span>integer <var>$id</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Start a retr command</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Start a retr command</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id message id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -716,24 +878,32 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			array
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_retr_feed">#</a>
-		<code><a href="source-class-Hm_POP3.html#338-357" title="Go to source code">retr_feed</a>( )</code>
+		<code><a href="source-class-Hm_POP3.html#410-433" title="Go to source code">retr_feed</a>( )</code>
 
 		<div class="description short">
 			
+<p>Feed results from a retr command</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Feed results from a retr command</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
 
 
 
@@ -745,24 +915,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_dele">#</a>
-		<code><a href="source-class-Hm_POP3.html#360-363" title="Go to source code">dele</a>( <span>mixed <var>$id</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#435-443" title="Go to source code">dele</a>( <span>integer <var>$id</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Delete a message</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Delete a message</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id message id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -774,24 +957,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			array
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_uidl">#</a>
-		<code><a href="source-class-Hm_POP3.html#366-386" title="Go to source code">uidl</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#445-470" title="Go to source code">uidl</a>( <span>integer <var>$id</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
+<p>Send the uidl command</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Send the uidl command</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id message id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>
+				</div>
 
 
 
@@ -803,24 +999,32 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_noop">#</a>
-		<code><a href="source-class-Hm_POP3.html#389-392" title="Go to source code">noop</a>( )</code>
+		<code><a href="source-class-Hm_POP3.html#472-479" title="Go to source code">noop</a>( )</code>
 
 		<div class="description short">
 			
+<p>Send a noop command</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Send a noop command</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -832,24 +1036,32 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_rset">#</a>
-		<code><a href="source-class-Hm_POP3.html#395-398" title="Go to source code">rset</a>( )</code>
+		<code><a href="source-class-Hm_POP3.html#481-488" title="Go to source code">rset</a>( )</code>
 
 		<div class="description short">
 			
+<p>Send the rset command</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Send the rset command</p>
 
 
 
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -861,24 +1073,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_user">#</a>
-		<code><a href="source-class-Hm_POP3.html#401-404" title="Go to source code">user</a>( <span>mixed <var>$user</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#490-498" title="Go to source code">user</a>( <span>string <var>$user</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Send the user command</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Send the user command</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$user</var></dt>
+					<dd><code>string</code><br>$user username</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -890,24 +1115,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_pass">#</a>
-		<code><a href="source-class-Hm_POP3.html#407-410" title="Go to source code">pass</a>( <span>mixed <var>$pass</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#500-508" title="Go to source code">pass</a>( <span>string <var>$pass</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Send the password command</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Send the password command</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$pass</var></dt>
+					<dd><code>string</code><br>$pass password</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -919,24 +1157,39 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_auth">#</a>
-		<code><a href="source-class-Hm_POP3.html#413-433" title="Go to source code">auth</a>( <span>mixed <var>$user</var></span>, <span>mixed <var>$pass</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#510-536" title="Go to source code">auth</a>( <span>string <var>$user</var></span>, <span>string <var>$pass</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Authenticate to the pop3 server</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Authenticate to the pop3 server</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$user</var></dt>
+					<dd><code>string</code><br>$user username</dd>
+					<dt><var>$pass</var></dt>
+					<dd><code>string</code><br>$pass password</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -948,24 +1201,41 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_apop">#</a>
-		<code><a href="source-class-Hm_POP3.html#436-439" title="Go to source code">apop</a>( <span>mixed <var>$user</var></span>, <span>mixed <var>$pass</var></span>, <span>mixed <var>$challenge</var></span> )</code>
+		<code><a href="source-class-Hm_POP3.html#538-548" title="Go to source code">apop</a>( <span>string <var>$user</var></span>, <span>string <var>$pass</var></span>, <span>string <var>$challenge</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Send apop command to avoid sending clear text passwords</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Send apop command to avoid sending clear text passwords</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$user</var></dt>
+					<dd><code>string</code><br>$user username</dd>
+					<dt><var>$pass</var></dt>
+					<dd><code>string</code><br>$pass password</dd>
+					<dt><var>$challenge</var></dt>
+					<dd><code>string</code><br>$challenge</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -995,7 +1265,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#106" title="Go to source code"><var>$server</var></a>
+				<a href="source-class-Hm_POP3.html#124" title="Go to source code"><var>$server</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1018,7 +1288,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#107" title="Go to source code"><var>$starttls</var></a>
+				<a href="source-class-Hm_POP3.html#125" title="Go to source code"><var>$starttls</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1041,7 +1311,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#108" title="Go to source code"><var>$port</var></a>
+				<a href="source-class-Hm_POP3.html#126" title="Go to source code"><var>$port</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1064,7 +1334,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#109" title="Go to source code"><var>$ssl</var></a>
+				<a href="source-class-Hm_POP3.html#127" title="Go to source code"><var>$ssl</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1087,7 +1357,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#110" title="Go to source code"><var>$debug</var></a>
+				<a href="source-class-Hm_POP3.html#128" title="Go to source code"><var>$debug</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1110,7 +1380,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#111" title="Go to source code"><var>$command_count</var></a>
+				<a href="source-class-Hm_POP3.html#129" title="Go to source code"><var>$command_count</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1133,7 +1403,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#112" title="Go to source code"><var>$commands</var></a>
+				<a href="source-class-Hm_POP3.html#130" title="Go to source code"><var>$commands</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1156,7 +1426,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#113" title="Go to source code"><var>$responses</var></a>
+				<a href="source-class-Hm_POP3.html#131" title="Go to source code"><var>$responses</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1179,7 +1449,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#114" title="Go to source code"><var>$connected</var></a>
+				<a href="source-class-Hm_POP3.html#132" title="Go to source code"><var>$connected</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1202,7 +1472,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#115" title="Go to source code"><var>$banner</var></a>
+				<a href="source-class-Hm_POP3.html#133" title="Go to source code"><var>$banner</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1225,7 +1495,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#116" title="Go to source code"><var>$state</var></a>
+				<a href="source-class-Hm_POP3.html#134" title="Go to source code"><var>$state</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1248,7 +1518,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#117" title="Go to source code"><var>$no_apop</var></a>
+				<a href="source-class-Hm_POP3.html#135" title="Go to source code"><var>$no_apop</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1271,7 +1541,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_POP3.html#118" title="Go to source code"><var>$handle</var></a>
+				<a href="source-class-Hm_POP3.html#136" title="Go to source code"><var>$handle</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>

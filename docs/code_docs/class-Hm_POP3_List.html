@@ -279,7 +279,7 @@
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.pop3.html">pop3</a>\<a href="package-modules.pop3.lib.html">lib</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_POP3_List.html#11-34" title="Go to source code">pop3/hm-pop3.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_POP3_List.html#11-53" title="Go to source code">pop3/hm-pop3.php</a><br>
 	</div>
 
 
@@ -290,24 +290,45 @@
 
 		<td class="attributes"><code>
 			 public static
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_service_connect">#</a>
-		<code><a href="source-class-Hm_POP3_List.html#19-30" title="Go to source code">service_connect</a>( <span>mixed <var>$id</var></span>, <span>mixed <var>$server</var></span>, <span>mixed <var>$user</var></span>, <span>mixed <var>$pass</var></span>, <span>mixed <var>$cache</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_POP3_List.html#19-40" title="Go to source code">service_connect</a>( <span>integer <var>$id</var></span>, <span>array <var>$server</var></span>, <span>string <var>$user</var></span>, <span>string <var>$pass</var></span>, <span>array <var>$cache</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
+<p>Connect to a POP3 server</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Connect to a POP3 server</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id server id</dd>
+					<dt><var>$server</var></dt>
+					<dd><code>array</code><br>$server server details</dd>
+					<dt><var>$user</var></dt>
+					<dd><code>string</code><br>$user username</dd>
+					<dt><var>$pass</var></dt>
+					<dd><code>string</code><br>$pass password</dd>
+					<dt><var>$cache</var></dt>
+					<dd><code>array</code><br>$cache server cache</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -319,26 +340,45 @@
 
 		<td class="attributes"><code>
 			 public static
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_cache">#</a>
-		<code><a href="source-class-Hm_POP3_List.html#31-33" title="Go to source code">get_cache</a>( <span>mixed <var>$session</var></span>, <span>mixed <var>$id</var></span> )</code>
+		<code><a href="source-class-Hm_POP3_List.html#42-52" title="Go to source code">get_cache</a>( <span>object <var>$session</var></span>, <span>integer <var>$id</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Get a server cache</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Get a server cache</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$session</var></dt>
+					<dd><code>object</code><br>$session session object</dd>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id server id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
+				<h4>Todo</h4>
+				<div class="list">
+						finish this<br>
+				</div>
 
 
 		</div>
