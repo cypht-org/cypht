@@ -10,7 +10,6 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Base class for authentication
- *
  * Creating a new authentication method requires extending this class
  * and overriding the check_credentials method
  * @abstract
@@ -25,9 +24,7 @@ abstract class Hm_Auth {
 
     /**
      * Assign site config
-     *
      * @param object $config site config
-     *
      * @return void
      */
     public function __construct($config) {
@@ -36,10 +33,8 @@ abstract class Hm_Auth {
 
     /**
      * This is the method new auth mechs need to override.
-     *
      * @param string $user username
      * @param string $pass password
-     *
      * @return bool true if the user is authenticated, false otherwise
      */
     abstract public function check_credentials($user, $pass);
@@ -49,9 +44,22 @@ abstract class Hm_Auth {
  * Used for testing
  */
 class Hm_Auth_None extends Hm_Auth {
+    /**
+     * This is the method new auth mechs need to override.
+     * @param string $user username
+     * @param string $pass password
+     * @return bool true if the user is authenticated, false otherwise
+     */
     public function check_credentials($user, $pass) {
         return true;
     }
+
+    /*
+     * Create a new user
+     * @param string $user username
+     * @param string $pass password
+     * @return bool
+     */
     public function create($user, $pass) {
         return true;
     }
@@ -67,10 +75,8 @@ class Hm_Auth_DB extends Hm_Auth {
 
     /**
      * Send the username and password to the configured DB for authentication
-     *
      * @param string $user username
      * @param string $pass password
-     *
      * @return bool true if authentication worked
      */
     public function check_credentials($user, $pass) {
@@ -89,9 +95,7 @@ class Hm_Auth_DB extends Hm_Auth {
 
     /**
      * Delete a user account from the db
-     *
      * @param string $user username
-     *
      * @return bool true if successful
      */
     public function delete($user) {
@@ -106,7 +110,6 @@ class Hm_Auth_DB extends Hm_Auth {
 
     /**
      * Create a new or re-use an existing DB connection
-     *
      * @return bool true if the connection is available
      */
     protected function connect() {
@@ -119,10 +122,8 @@ class Hm_Auth_DB extends Hm_Auth {
 
     /**
      * Change the password for a user in the DB
-     *
      * @param string $user username
      * @param string $pass password
-     *
      * @return bool true on success
      */
     public function change_pass($user, $pass) {
@@ -138,10 +139,10 @@ class Hm_Auth_DB extends Hm_Auth {
 
     /**
      * Create a new user in the DB
-     *
      * @param object $request request details
      * @param string $user username
      * @param string $pass password
+     * @return bool
      */
     public function create($user, $pass) {
         $this->connect();

@@ -24,9 +24,7 @@ class Hm_DB {
 
     /**
      * Load DB configuration from the site config
-     *
      * @param object $site_config site config
-     *
      * @return void
      */
     static private function parse_config($site_config) {
@@ -46,7 +44,6 @@ class Hm_DB {
 
     /**
      * Return a unique key for a DB connection
-     *
      * @return string md5 of the DB settings
      */
     static private function db_key() {
@@ -60,9 +57,7 @@ class Hm_DB {
 
     /**
      * Connect to a DB server
-     *
      * @param object $site_config site settings
-     * 
      * @return object database connection on success
      */
     static public function connect($site_config) {

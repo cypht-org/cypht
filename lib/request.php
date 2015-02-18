@@ -56,9 +56,7 @@ class Hm_Request {
 
     /**
      * Process request details
-     *
      * @param array $filters list of input filters from module sets
-     *
      * @return void
      */
     public function __construct($filters) {
@@ -75,9 +73,7 @@ class Hm_Request {
 
     /**
      * Sanitize and filter user and server input
-     *
      * @param array $filters list of input filters from module sets
-     *
      * @return void
      */
     private function filter_request_input($filters) {
@@ -97,9 +93,7 @@ class Hm_Request {
 
     /**
      * Collect other useful details about a request
-     *
      * @param array $filters list of input filters from module sets
-     *
      * @return void
      */
     private function get_other_request_details($filters) {
@@ -117,7 +111,6 @@ class Hm_Request {
 
     /**
      * Empty out super globals.
-     *
      * @return void
      */
     private function empty_super_globals() {
@@ -134,10 +127,8 @@ class Hm_Request {
 
     /**
      * Filter specified input against module defined filters
-     *
      * @param type string the type of input (POST, GET, COOKIE, etc)
      * @param filters array list of input filters from module sets
-     *
      * @return array filtered input data
      */
     private function filter_input($type, $data, $filters) {
@@ -162,7 +153,6 @@ class Hm_Request {
 
     /**
      * Look at the HTTP_USER_AGENT value and set a mobile OS flag
-     *
      * @return void
      */
     private function is_mobile() {
@@ -175,7 +165,6 @@ class Hm_Request {
 
     /**
      * Determine if a request was done over TLS
-     *
      * @return void
      */
     private function is_tls() {
@@ -189,7 +178,6 @@ class Hm_Request {
 
     /**
      * Determine the request type, either AJAX or HTTP
-     *
      * @return void
      */
     private function get_request_type() {
@@ -205,7 +193,6 @@ class Hm_Request {
 
     /**
      * Determine if a request is an AJAX call
-     *
      * @return bool true if the request is from an AJAX call
      */
     private function is_ajax() {
@@ -214,9 +201,7 @@ class Hm_Request {
 
     /**
      * Make sure a url path is sane
-     *
      * @param string $uri path to check
-     *
      * @return string clean url path
      */
     private function get_clean_url_path($uri) {

@@ -19,10 +19,8 @@ class Hm_Auth_IMAP extends Hm_Auth {
 
     /**
      * Send the username and password to the configured IMAP server for authentication
-     *
      * @param string $user username
      * @param string $pass password
-     *
      * @return bool true if authentication worked
      */
     public function check_credentials($user, $pass) {
@@ -51,7 +49,6 @@ class Hm_Auth_IMAP extends Hm_Auth {
 
     /**
      * Get IMAP server details from the site config
-     *
      * @return array list of required details
      */
     private function get_imap_config() {
@@ -197,9 +194,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * connect to the imap server
-     *
      * @param array $config list of configuration options for this connections
-     *
      * @return bool true on connection sucess
      */
     public function connect( $config ) {
@@ -245,7 +240,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * close the IMAP connection
-     *
      * @return void
      */
     public function disconnect() {
@@ -261,10 +255,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * authenticate the username/password
-     *
      * @param string $username IMAP login name
      * @param string $password IMAP password
-     *
      * @return bool true on sucessful login
      */
     public function authenticate($username, $password) {
@@ -324,7 +316,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * attempt starttls
-     *
      * @return void
      */
     public function starttls() {
@@ -351,7 +342,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * fetch IMAP server capability response
-     *
      * @return string capability response
      */
     public function get_capability() {
@@ -373,9 +363,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * get a list of mailbox folders
-     *
      * @param bool $lsub flag to limit results to subscribed folders only
-     *
      * @return array associative array of folder details
      */
     public function get_mailbox_list($lsub=false, $mailbox='', $keyword='*') {
@@ -534,7 +522,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * get IMAP folder namespaces
-     *
      * @return array list of available namespace details
      */
     public function get_namespaces() {
@@ -587,9 +574,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * select a mailbox
-     *
      * @param string $mailbox the mailbox to attempt to select
-     *
      * @return array list of information about the selected mailbox
      */
     public function select_mailbox($mailbox) {
@@ -647,10 +632,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * issue IMAP status command on a mailbox
-     *
      * @param string $mailbox IMAP mailbox to check
      * @param array $args list of properties to fetch
-     *
      * @return array list of attribute values discovered
      */
     public function get_mailbox_status($mailbox, $args=array('UNSEEN', 'UIDVALIDITY', 'UIDNEXT', 'MESSAGES', 'RECENT')) {
@@ -669,7 +652,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use IMAP NOOP to poll for untagged server messages
-     *
      * @return array list of properties that have changed since SELECT
      */
     public function poll() {
@@ -691,12 +673,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * return a header list for the supplied message uids
-     *
      * @todo refactor. abstract header line continuation parsing for re-use
-     *
      * @param mixed $uids an array of uids or a valid IMAP sequence set as a string
      * @param bool $raw flag to disable decoding header values
-     *
      * @return array list of headers and values for the specified uids
      */
     public function get_message_list($uids, $raw=false) {
@@ -815,9 +794,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * get the IMAP BODYSTRUCTURE of a message
-     *
      * @param int $uid IMAP UID of the message
-     *
      * @return array message structure represented as a nested array
      */
     public function get_message_structure($uid) {
@@ -828,9 +805,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * get the raw IMAP BODYSTRUCTURE response
-     *
      * @param int $uid IMAP UID of the message
-     *
      * @return array low-level parsed message structure 
      */
     private function get_raw_bodystructure($uid) {
@@ -861,9 +836,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * New BODYSTRUCTURE parsing routine
-     *
      * @param array $result low-level IMAP response
-     *
      * @return array
      */
     private function parse_bodystructure_response($result) {
@@ -885,14 +858,12 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * get content for a message part
-     *
      * @param int $uid a single IMAP message UID
      * @param string $message_part the IMAP message part number
      * @param bool $raw flag to enabled fetching the entire message as text
      * @param int $max maximum read length to allow.
      * @param mixed $struct a message part structure array for decoding and
      *                      charset conversion. bool true for auto discovery
-     *
      * @return string message content
      */
     public function get_message_content($uid, $message_part, $max=false, $struct=true) {
@@ -970,12 +941,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * use IMAP SEARCH or ESEARCH
     /**
      * search a field for a keyword
-     *
      * @param string $target message types to search. can be ALL, UNSEEN, ANSWERED, etc
      * @param mixed $uids an array of uids or a valid IMAP sequence set as a string (or false for ALL)
      * @param string $fld optional field to search
      * @param string $term optional search term
-     *
      * @return array list of IMAP message UIDs that match the search
      */
     public function search($target='ALL', $uids=false, $terms=array(), $esearch=array()) {
@@ -1061,10 +1030,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * get the headers for the selected message
-     *
      * @param int $uid IMAP message UID
      * @param string $message_part IMAP message part number
-     *
      * @return array associate array of message headers
      */
     public function get_message_headers($uid, $message_part=false, $raw=false) {
@@ -1158,10 +1125,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * start streaming a message part. returns the number of characters in the message
-     *
      * @param int $uid IMAP message UID
      * @param string $message_part IMAP message part number
-     *
      * @return int the size of the message queued up to stream
      */
     public function start_message_stream($uid, $message_part) {
@@ -1193,9 +1158,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * false will "stream" a message part content one line at a time.
      * useful for avoiding memory consumption when dealing with large
      * attachments
-     *
      * @param int $size chunk size to read using fgets
-     *
      * @return string chunk of the streamed message
      */
     public function read_stream_line($size=1024) {
@@ -1223,12 +1186,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use FETCH to sort a list of uids when SORT is not available
-     *
      * @param string $sort the sort field
      * @param bool $reverse flag to reverse the results
      * @param string $filter IMAP message type (UNSEEN, ANSWERED, DELETED, etc)
      * @param string $uid_str IMAP sequence set string or false
-     *
      * @return array list of UIDs in the sort order
      */
     public function sort_by_fetch($sort, $reverse, $filter, $uid_str=false) {
@@ -1361,7 +1322,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * delete an existing mailbox
-     *
      * @param string $mailbox IMAP mailbox name to delete
      * 
      * @return bool tru if the mailbox was deleted
@@ -1389,10 +1349,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * rename and existing mailbox
-     *
      * @param string $mailbox IMAP mailbox to rename
      * @param string $new_mailbox new name for the mailbox
-     *
      * @return bool true if the rename operation worked
      */
     public function rename_mailbox($mailbox, $new_mailbox) {
@@ -1418,9 +1376,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * create a new mailbox
-     *
      * @param string $mailbox IMAP mailbox name
-     *
      * @return bool true if the mailbox was created
      */
     public function create_mailbox($mailbox) {
@@ -1446,7 +1402,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * perform an IMAP action on a message
-     *
      * @param string $action action to perform, can be one of READ, UNREAD, FLAG,
      *                       UNFLAG, ANSWERED, DELETE, UNDELETE, EXPUNGE, or COPY
      * @param mixed $uids an array of uids or a valid IMAP sequence set as a string
@@ -1534,11 +1489,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * start writing a message to a folder with IMAP APPEND
-     *
      * @param string $mailbox IMAP mailbox name
      * @param int $size size of the message to be written
      * @param bool $seen flag to mark the message seen
-     *
      * $return bool true on success
      */
     public function append_start($mailbox, $size, $seen=true) {
@@ -1563,9 +1516,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * write a line to an active IMAP APPEND operation
-     *
      * @param string $string line to write
-     *
      * @return int length written
      */
     public function append_feed($string) {
@@ -1576,7 +1527,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * finish an IMAP APPEND operation
-     *
      * @return bool true on success
      */
     public function append_end() {
@@ -1588,7 +1538,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * convert a sequence string to an array
-     *
      * @param string $sequence an IMAP sequence string
      * 
      * @return $array list of ids
@@ -1611,7 +1560,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * convert an array into a sequence string
-     *
      * @param array $array list of ids
      * 
      * @return string an IMAP sequence string
@@ -1655,9 +1603,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * decode mail fields to human readable text
-     *
      * @param string $string field to decode
-     *
      * @return string decoded field
      */
     public function decode_fld($string) {
@@ -1682,9 +1628,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * check if an IMAP extension is supported by the server
-     *
      * @param string $extension name of an extension
-     * 
      * @return bool true if the extension is supported
      */
     public function is_supported( $extension ) {
@@ -1693,7 +1637,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * returns current IMAP state
-     *
      * @return string one of:
      *                disconnected  = no IMAP server TCP connection
      *                connected     = an IMAP server TCP connection exists
@@ -1706,10 +1649,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * output IMAP session debug info
-     *
      * @param bool $full flag to enable full IMAP response display
      * @param bool $return flag to return the debug results instead of printing them
-     *
      * @return void/string 
      */
     public function show_debug($full=false, $return=false) {
@@ -1725,11 +1666,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * search a nested BODYSTRUCTURE response for a specific part
-     *
      * @param array $struct the structure to search
      * @param string $search_term the search term
      * @param array $search_flds list of fields to search for the term
-     *
      * @return array array of all matching parts from the message
      */
     public function search_bodystructure($struct, $search_flds, $all=true, $res=array()) {
@@ -1740,9 +1679,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use the IMAP GETQUOTA command to fetch quota information
-     *
      * @param string $quota_root named quota root to fetch
-     * 
      * @return array list of quota details
      */
     public function get_quota($quota_root='') {
@@ -1765,9 +1702,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use the IMAP GETQUOTAROOT command to fetch quota information about a mailbox
-     *
      * @param string $mailbox IMAP folder to check
-     * 
      * @return array list of quota details
      */
     public function get_quota_root($mailbox) {
@@ -1790,7 +1725,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use the ENABLE extension to tell the IMAP server what extensions we support
-     *
      * @return array list of supported extensions that can be enabled
      */
     public function enable() {
@@ -1824,7 +1758,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * unselect the selected mailbox
-     *
      * @return bool true on success
      */
     public function unselect_mailbox() {
@@ -1839,7 +1772,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use the ID extension
-     *
      * @return array list of server properties on success
      */
     public function id() {
@@ -1887,11 +1819,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use the SORT extension to get a sorted UID list
-     *
      * @param string $sort sort order. can be one of ARRIVAL, DATE, CC, TO, SUBJECT, FROM, or SIZE
      * @param bool $reverse flag to reverse the sort order
      * @param string $filter can be one of ALL, SEEN, UNSEEN ANSWERED, UNANSWERED, DELETED, UNDELETED, FLAGGED, or UNFLAGGED
-     *
      * @return array list of IMAP message UIDs
      */
     public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $esort=array()) {
@@ -1953,9 +1883,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * search using the Google X-GM-RAW IMAP extension
-     *
      * @param string $start_str formatted search string like "has:attachment in:unread"
-     * 
      * @return array list of IMAP UIDs that match the search
      */
     public function google_search($search_str) {
@@ -1982,7 +1910,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     /**
      * attempt enable IMAP COMPRESS extension
      * @todo: currently does not work ...
-     *
      * @return void
      */
     public function enable_compression() {
@@ -2001,11 +1928,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * return the formatted message content of the first part that matches the supplied MIME type
-     *
      * @param int $uid IMAP UID value for the message
      * @param string $type Primary MIME type like "text"
      * @param string $subtype Secondary MIME type like "plain"
-     *
      * @return string formatted message content, bool false if no matching part is found
      */
     public function get_first_message_part($uid, $type, $subtype=false, $struct=false) {
@@ -2039,13 +1964,11 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * return a list of headers and UIDs for a page of a mailbox
-     *
      * @param string $mailbox the mailbox to access
      * @param string $sort sort order. can be one of ARRIVAL, DATE, CC, TO, SUBJECT, FROM, or SIZE
      * @param string $filter type of messages to include (UNSEEN, ANSWERED, ALL, etc)
      * @param int $limit max number of messages to return
      * @param int $offset offset from the first message in the list
-     *
      * @return array list of headers
      */
 
@@ -2086,9 +2009,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * return all the folders contained at a hierarchy level, and if possible, if they have sub-folders
-     *
      * @param string $level mailbox name or empty string for the top level
-     *
      * @return array list of matching folders
      */
     public function get_folder_list_by_level($level='') {

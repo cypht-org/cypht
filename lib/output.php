@@ -15,19 +15,15 @@ abstract class Hm_Output {
 
     /**
      * Extended classes must override this method to output content
-     *
      * @param mixed $content data to output
-     *
      * @return void
      */
     abstract protected function output_content($content);
 
     /**
      * Wrapper around extended class output_content() calls
-     *
      * @param mixed $response data to output
      * @param array $input raw module data
-     *
      * @return void
      */
     public function send_response($response, $input=array()) {
@@ -47,9 +43,7 @@ class Hm_Output_HTTP extends Hm_Output {
 
     /**
      * Send HTTP headers
-     *
      * @param array $headers headers to send
-     *
      * @return void
      */
     protected function output_headers($headers) {
@@ -60,10 +54,8 @@ class Hm_Output_HTTP extends Hm_Output {
 
     /**
      * Send response content to the browser
-     *
      * @param mixed $content data to send
      * @param array $headers HTTP headers to set
-     *
      * @return void
      */
     protected function output_content($content, $headers=array()) {
@@ -119,9 +111,7 @@ trait Hm_List {
 
     /**
      * Add a message
-     *
      * @param string $string message to add
-     *
      * @return void
      */
     public static function add($string) {
@@ -130,7 +120,6 @@ trait Hm_List {
 
     /**
      * Return all messages
-     *
      * @return array all messages
      */
     public static function get() {
@@ -139,9 +128,7 @@ trait Hm_List {
 
     /**
      * Stringify a value
-     *
      * @param mixed $mixed value to stringify
-     *
      * @return string
      */
     public static function str($mixed, $return_type=true) {
@@ -160,9 +147,7 @@ trait Hm_List {
 
     /**
      * Show all messages
-     *
      * @param string $type can be one of "print", "log", or "return"
-     *
      * @return mixed
      */
     public static function show($type='print') {
@@ -192,7 +177,6 @@ class Hm_Debug {
 
     /**
      * Add page execution stats to the Hm_Debug list
-     *
      * @return void
      */
     public static function load_page_stats() {
@@ -206,9 +190,7 @@ class Hm_Debug {
 
 /**
  * Easy to use error logging
- *
  * @param mixed $mixed vaule to send to the log
- * 
  * @return void
  */
 function elog($mixed) {

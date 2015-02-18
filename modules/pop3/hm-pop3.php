@@ -16,6 +16,16 @@ class Hm_POP3_List {
     
     use Hm_Server_List;
 
+    /**
+     * Connect to a POP3 server
+     * @subpackage pop3/lib
+     * @param int $id server id
+     * @param array $server server details
+     * @param string $user username
+     * @param string $pass password
+     * @param array $cache server cache
+     * @return bool
+     */
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         self::$server_list[$id]['object'] = new Hm_POP3();
         self::$server_list[$id]['object']->server = $server['server'];
@@ -28,6 +38,15 @@ class Hm_POP3_List {
         }
         return false;
     }
+
+    /**
+     * Get a server cache
+     * @subpackage pop3/lib
+     * @param object $session session object
+     * @param int $id server id
+     * @return bool
+     * @todo finish this
+     */
     public static function get_cache($session, $id) {
         return false;
     }
@@ -44,10 +63,9 @@ class Hm_Auth_POP3 extends Hm_Auth {
 
     /**
      * Send the username and password to the configured POP3 server for authentication
-     *
+     * @subpackage pop3/lib
      * @param $user string username
      * @param $pass string password
-     *
      * @return bool true if authentication worked
      */
     public function check_credentials($user, $pass) {
@@ -79,7 +97,7 @@ class Hm_Auth_POP3 extends Hm_Auth {
 
     /**
      * Get POP3 server details from the site config
-     *
+     * @subpackage pop3/lib
      * @return array list of required details
      */
     private function get_pop3_config() {
@@ -117,8 +135,11 @@ class Hm_POP3 {
     var $no_apop;
     var $handle;
    
-    /* set defaults */ 
-    function __construct() {
+    /**
+     * Set defaults
+     * @return void
+     */
+    public function __construct() {
         $this->debug = array();
         $this->server = 'localhost';
         $this->port = 110; // ssl @ 995
@@ -133,8 +154,12 @@ class Hm_POP3 {
         $this->handle = false;
     }
 
-    /* get server response */
-    function get_response($multi_line=false) {
+    /**
+     * Get server response
+     * @param bool $multi_line multi-line flag
+     * @return string
+     */
+    private function get_response($multi_line=false) {
         if ($multi_line) {
             $res = $this->get_multi_line_response();
         }
@@ -144,8 +169,12 @@ class Hm_POP3 {
         return $res;
     }
 
-    /* read in a multi-line response */
-    function get_multi_line_response($line_length=8192) {
+    /**
+     * Read in a multi-line response
+     * @param int $line_length max read length
+     * @return string
+     */
+    private function get_multi_line_response($line_length=8192) {
         $n = -1;
         $result = array();
         if (!is_resource($this->handle)) {
@@ -172,8 +201,12 @@ class Hm_POP3 {
         return $result;
     }
 
-    /* read in a single line response */
-    function get_single_line_response($line_length=512) {
+    /**
+     * Read in a single line response
+     * @param int $line_length max read length
+     * @return string
+     */
+    private function get_single_line_response($line_length=512) {
         if (!is_resource($this->handle)) {
             $res = '';
         }
@@ -184,8 +217,12 @@ class Hm_POP3 {
         return $res;
     }
 
-    /* send a command string to the server */
-    function send_command($command) {
+    /**
+     * Send a command string to the server
+     * @param string $command POP3 command
+     * @return void
+     */
+    private function send_command($command) {
         if (is_resource($this->handle)) {
             fputs($this->handle, $command."\r\n");
         }
@@ -197,8 +234,11 @@ class Hm_POP3 {
         }
     }
 
-    /* establish a connection to the server. */
-    function connect() {
+    /**
+     * Establish a connection to the server.
+     * @return bool
+     */
+    public function connect() {
         if ($this->ssl) {
             $this->server = 'tls://'.$this->server;
         } 
@@ -221,13 +261,20 @@ class Hm_POP3 {
         return $this->connected;
     }
 
-    /* output debug */
-    function puke() {
+    /**
+     * Output debug
+     * @return string
+     */
+    public function puke() {
         return print_r(array_merge($this->debug, $this->commands), true);
     }
 
-    /* check the POP3 response code for errors */
-    function is_error($response) {
+    /**
+     * Check the POP3 response code for errors
+     * @param string $response POP3 response
+     * @return bool
+     */
+    private function is_error($response) {
         $index = count($response);
         $error = false;
         if ($index && substr($response[($index - 1)], 0, 3) == '+OK') {
@@ -247,14 +294,20 @@ class Hm_POP3 {
         return $error;
     }
 
-    /* quit an active pop3 session */
-    function quit() {
+    /**
+     * Quit an active pop3 session
+     * @return bool
+     */
+    public function quit() {
         $this->send_command('QUIT');
         return $this->is_error($this->get_response());
     }
 
-    /* stat a mailbox */
-    function mstat() {
+    /**
+     * Stat a mailbox
+     * @return array
+     */
+    public function mstat() {
         $cnt = 0;
         $size = 0;
         $this->send_command('STAT');
@@ -268,8 +321,12 @@ class Hm_POP3 {
         return array('count' => $cnt, 'size' => $size);
     }
 
-    /* list message ids in a pop3 account */
-    function mlist($id=false) {
+    /**
+     * List message ids in a pop3 account
+     * @param int $id message id
+     * @return array
+     */
+    public function mlist($id=false) {
         $command = 'LIST';
         $multi = true;
         $mlist = array();
@@ -291,14 +348,22 @@ class Hm_POP3 {
         return $mlist;
     }
 
-    /* send the top command for the given message id */
-    function top($id) {
+    /**
+     * Send the top command for the given message id 
+     * @param int $id message id
+     * @return string
+     */
+    public function top($id) {
         $this->send_command('TOP '.$id.' 0');
         return $this->get_response(true);
     }
 
-    /* parse message headers */
-    function msg_headers($id) {
+    /**
+     * Parse message headers
+     * @param int $id message id
+     * @return array
+     */
+    public function msg_headers($id) {
         $lines = $this->top($id);
         $msg_headers = array();
         $current_header = false;
@@ -320,22 +385,33 @@ class Hm_POP3 {
         return $msg_headers;
     }
 
-    /* fetch an entire retr command response */
-    function retr_full($id) {
+    /**
+     * Fetch an entire retr command response
+     * @param int $id message id
+     * @return string
+     */
+    public function retr_full($id) {
         $this->send_command('RETR '.$id);
         $res = $this->get_response(true);
         return $res;
     }
 
-    /* start a retr command */
-    function retr_start($id) {
+    /**
+     * Start a retr command
+     * @param int $id message id
+     * @return bool
+     */
+    public function retr_start($id) {
         $this->send_command('RETR '.$id);
         $res = $this->get_response();
         return $this->is_error($res) == false;
     }
 
-    /* feed results from a retr command */
-    function retr_feed() {
+    /**
+     * Feed results from a retr command
+     * @return array
+     */
+    public function retr_feed() {
         $result = '';
         $line_length = 8192;
         $continue = true;
@@ -356,14 +432,22 @@ class Hm_POP3 {
         return array($result, $continue);
     }
 
-    /* delete a message */
-    function dele($id) {
+    /**
+     * Delete a message
+     * @param int $id message id
+     * @return bool
+     */
+    public function dele($id) {
         $this->send_command('DELE '.$id);
         return $this->is_error($this->get_response()) == false;
     }
 
-    /* send the uidl command */
-    function uidl($id=false) {
+    /**
+     * Send the uidl command
+     * @param int $id message id
+     * @return array
+     */
+    public function uidl($id=false) {
         $command = 'UIDL';
         $multi = true;
         $uidlist = array();
@@ -385,32 +469,51 @@ class Hm_POP3 {
         return $uidlist;
     }
 
-    /* send a noop command */
-    function noop() {
+    /**
+     * Send a noop command
+     * @return bool
+     */
+    public function noop() {
         $this->send_command('NOOP');
         return $this->is_error($this->get_response()) == false;
     }
 
-    /* send the rset command */
-    function rset() {
+    /**
+     * Send the rset command
+     * @return bool
+     */
+    public function rset() {
         $this->send_command('RSET');
         return $this->is_error($this->get_response()) == false;
     }
 
-    /* send the user command */
-    function user($user) {
+    /**
+     * Send the user command
+     * @param string $user username
+     * @return bool
+     */
+    public function user($user) {
         $this->send_command('USER '.$user);
         return $this->is_error($this->get_response()) == false;
     }
 
-    /* send the password command */
-    function pass($pass) {
+    /**
+     * Send the password command
+     * @param string $pass password
+     * @return bool
+     */
+    public function pass($pass) {
         $this->send_command('PASS '.$pass);
         return $this->is_error($this->get_response()) == false;
     }
 
-    /* authenticate to the pop3 server */
-    function auth($user, $pass) {
+    /**
+     * Authenticate to the pop3 server
+     * @param string $user username
+     * @param string $pass password
+     * @return bool
+     */
+    public function auth($user, $pass) {
         $res = false;
         if ($this->starttls) {
             $this->send_command('STLS');
@@ -432,8 +535,14 @@ class Hm_POP3 {
         return $res;
     }
 
-    /* send apop command to avoid sending clear text passwords */
-    function apop($user, $pass, $challenge) {
+    /**
+     * Send apop command to avoid sending clear text passwords
+     * @param string $user username
+     * @param string $pass password
+     * @param string $challenge
+     * @return bool
+     */
+    public function apop($user, $pass, $challenge) {
         $this->send_command('APOP '.$user.' '.md5($challenge.$pass));
         return $this->is_error($this->get_response()) == false;
     }

@@ -17,26 +17,22 @@ trait Hm_Server_List {
 
     /**
      * Server lists must override this method to connect
-     *
      * @param int $id server id
      * @param string $server server hostname or ip
      * @param string $user username for authentication
      * @param string $pass password for authentication
      * @param mixed $cache cached connection data
-     *
      * @return bool true on success
      */
     abstract public function service_connect($id, $server, $user, $pass, $cache);
 
     /**
      * Connect to a server
-     *
      * @param int $id server id
      * @param mixed $cache cached server data
      * @param string $user username
      * @param string $pass password
      * @param bool $save_credentials true to save the username and password
-     *
      * @return mixed connection object on success, otherwise false
      */
     public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
@@ -69,9 +65,7 @@ trait Hm_Server_List {
 
     /**
      * Remove the username and password from a connection
-     *
      * @param int $id server id
-     *
      * @return void
      */
     public static function forget_credentials($id) {
@@ -83,10 +77,8 @@ trait Hm_Server_List {
 
     /**
      * Add a server definition
-     *
      * @param array $atts server details
      * @param int $id server id
-     *
      * @return void
      */
     public static function add($atts, $id=false) {
@@ -102,9 +94,7 @@ trait Hm_Server_List {
 
     /**
      * Remove a server
-     *
      * @param int $id server id
-     *
      * @return bool true on success
      */
     public static function del($id) {
@@ -117,10 +107,8 @@ trait Hm_Server_List {
 
     /**
      * Return all server details
-     *
      * @param int $id if not false, return details for this server only
      * @param bool $full true to return passwords for server connections. CAREFUL!
-     *
      * @return array server details
      */
     public static function dump($id=false, $full=false) {
@@ -152,9 +140,7 @@ trait Hm_Server_List {
 
     /**
      * Try to disconnect cleanly
-     *
      * @param int $id server id
-     *
      * @return void
      */
     public static function clean_up($id=false) {
@@ -170,9 +156,7 @@ trait Hm_Server_List {
 
     /**
      * Disconnect from a server
-     *
      * @param int $id the server id to disconnect
-     *
      * @return void
      */
     public static function disconnect($id) {

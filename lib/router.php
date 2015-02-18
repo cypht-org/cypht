@@ -20,10 +20,8 @@ class Hm_Router {
     /**
      * Main entry point to the router. All the work of processing input and sending output to and from
      * the browser happens here.
-     *
      * @param object $config site configuration object
      * @param bool $debug_mode true to use debug modules
-     *
      * @return array list of the response array, the session object, and the allowed output filters
      *               for ajax responses
      */
@@ -71,10 +69,8 @@ class Hm_Router {
 
     /**
      * Format result of output modules
-     *
      * @param mixed $response_data data from output modules
      * @param array $allowed_output filters applied to JSON formatted output
-     *
      * @return mixed formatted content
      */
     private function format_response_content($response_data, $allowed_output) {
@@ -84,10 +80,8 @@ class Hm_Router {
 
     /**
      * Send the formatted content to the user
-     *
      * @param mixed $output data to send to the user
      * @param mixed $response_data router details
-     *
      * @return void
      */
     private function render_output($output, $response_data) {
@@ -97,9 +91,7 @@ class Hm_Router {
 
     /**
      * Build a list of module properties
-     *
      * @param object $config site config object
-     *
      * @return array list of filters, input, and output modules
      */
     private function process_module_setup($config, $debug_mode) {
@@ -113,9 +105,7 @@ class Hm_Router {
 
     /**
      * Get module data when in debug mode
-     *
      * @param object $config site config object
-     *
      * @return array list of filters, input, and output modules
      */
     private function get_debug_modules($config) {
@@ -135,9 +125,7 @@ class Hm_Router {
 
     /**
      * Get module data when in production mode
-     *
      * @param object $config site config object
-     *
      * @return array list of filters, input, and output modules
      */
     public function get_production_modules($config) {
@@ -149,10 +137,8 @@ class Hm_Router {
 
     /**
      * Force TLS connections unless the site config has it disabled
-     *
      * @param object $config site config object
      * @param object $request request object
-     *
      * @return void
      */
     public function check_for_tls($config, $request) {
@@ -166,9 +152,7 @@ class Hm_Router {
     /**
      * Start the correct session and auth objects. This only initiates the objects
      * and does not process any session values yet
-     *
      * @param object $config site config object
-     *
      * @return object new session object
      */
     private function setup_session($config) {
@@ -197,9 +181,7 @@ class Hm_Router {
 
     /**
      * Return the subset of active modules from a supplied list
-     *
      * @param array $mod_list list of modules
-     *
      * @return array filter list
      */
     public function get_active_mods($mod_list) {
@@ -208,10 +190,8 @@ class Hm_Router {
 
     /**
      * Load modules into a module manager
-     *
      * @param string $class name of the module manager to use
      * @param array $module_sets list of modules by page
-     *
      * @return void
      */
     public function load_modules($class, $module_sets) {
@@ -228,11 +208,9 @@ class Hm_Router {
 
     /**
      * Load all module sets and include required modules.php files
-     *
      * @param object $config site config object
      * @param array $handlers list of handler modules
      * @param array $output list of output modules
-     *
      * @return void
      */
     private function load_module_sets($config, $handlers=array(), $output=array()) {
@@ -250,10 +228,8 @@ class Hm_Router {
 
     /**
      * Load module set definition files
-     *
      * @param array $mods modules to load
      * @param array $active_mods list of active modules
-     *
      * @return void
      */
     public function load_module_set_files($mods, $active_mods) {
@@ -266,10 +242,8 @@ class Hm_Router {
 
     /**
      * Collect pending user notices from a cookie after a redirect
-     *
      * @param object $session session interface
      * @param object $request request details
-     *
      * @return void
      */
     public function check_for_redirected_msgs($session, $request) {
@@ -284,10 +258,8 @@ class Hm_Router {
 
     /**
      * Redirect the page after a POST form is submitted and forward any user notices
-     *
      * @param object $request request details
      * @param object $session session interface
-     *
      * @return void
      */
     public function check_for_redirect($request, $session, $result) {
@@ -308,10 +280,8 @@ class Hm_Router {
 
     /**
      * Determine the page id
-     *
      * @param object $request request details
      * @param array $filters list of filters
-     *
      * @return void
      */
     public function get_page($request, $filters) {
@@ -340,11 +310,9 @@ class Hm_Router {
 
     /**
      * Process all the data handler modules for this page
-     *
      * @param object $request request details
      * @param object $session session interface
      * @param object $config site config
-     *
      * @return array combined handler module output
      */
     private function process_page($request, $session, $config) {
@@ -357,12 +325,10 @@ class Hm_Router {
 
     /**
      * Merge the combined response from the handler modules with some default values
-     *
      * @param array $response combined result of the handler modules
      * @param object $config site config
      * @param object $request request details
      * @param object $session session interface
-     *
      * @return void
      */
     private function merge_response($response, $config, $request, $session) {
@@ -380,10 +346,8 @@ class Hm_Router {
 
     /**
      * Merge input filters from module sets
-     *
      * @param array $existing already collected filters
      * @param array $new new filters to merge
-     *
      * @return array merged list
      */
     static public function merge_filters($existing, $new) {
@@ -402,9 +366,7 @@ class Hm_Router {
 
     /**
      * Perform an HTTP redirect
-     *
      * @param string $url url to redirect to
-     *
      * @return void
      */
     static public function page_redirect($url, $status=false) {
