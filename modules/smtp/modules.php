@@ -13,12 +13,25 @@ require APP_PATH.'modules/smtp/hm-smtp.php';
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('draft_to', 'draft_body', 'draft_subject'));
+        if ($success) {
+            $this->session->set('compose_draft', $form);
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('smtp_servers', array());
         foreach ($servers as $index => $server) {
             Hm_SMTP_List::add( $server, $index );
         }
+        $this->out('compose_draft', $this->session->get('compose_draft', array()));
     }
 }
 
@@ -225,12 +238,21 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
  */
 class Hm_Output_compose_form extends Hm_Output_Module {
     protected function output() {
+        $to = '';
+        $subject = '';
+        $body = '';
+        $draft = $this->get('compose_draft', array());
+        if (!empty($draft)) {
+            $to = $this->html_safe($draft['draft_to']);
+            $subject = $this->html_safe($draft['draft_subject']);
+            $body= $this->html_safe($draft['draft_body']);
+        }
         return '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
-            '<input required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
-            '<input required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
-            '<textarea required name="compose_body" class="compose_body"></textarea>'.
+            '<input value="'.$to.'" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<input value="'.$subject.'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
+            '<textarea required name="compose_body" class="compose_body">'.$body.'</textarea>'.
             smtp_server_dropdown($this->module_output(), $this).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" /></form></div>';
     }

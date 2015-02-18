@@ -71,6 +71,20 @@ var smtp_delete_action = function() {
     );
 };
 
+var save_compose_state = function() {
+    if ($('.compose_body').text().length > 0) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
+            {'name': 'draft_body', 'value': $('.compose_body').text()},
+            {'name': 'draft_subject', 'value': $('.compose_subject').val()},
+            {'name': 'draft_to', 'value': $('.compose_to').val()}],
+            function(res) { console.log(res); },
+            [],
+            true
+        );
+    }
+};
+
 if (hm_page_name() == 'servers') {
     $('.test_smtp_connect').on('click', smtp_test_action);
     $('.save_smtp_connection').on('click', smtp_save_action);
@@ -80,4 +94,8 @@ if (hm_page_name() == 'servers') {
     if (dsp == 'block' || dsp == 'none') {
         $('.smtp_section').css('display', dsp);
     }
+}
+
+if (hm_page_name() == 'compose') {
+    Hm_Timer.add_job(save_compose_state, 30, true);
 }
