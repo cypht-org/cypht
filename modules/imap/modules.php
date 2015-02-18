@@ -11,9 +11,13 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/imap/hm-imap.php';
 
 /**
+ * Process reply field values
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_process_reply_fields extends Hm_Handler_Module {
+    /**
+     * Output reply field values if found in the request arguments
+     */
     public function process() {
         if (array_key_exists('reply_source', $this->request->get) && preg_match("/^imap_(\d+)_(.+)$/", $this->request->get['reply_source'])) {
             if (array_key_exists('reply_uid', $this->request->get)) {
@@ -25,9 +29,13 @@ class Hm_Handler_imap_process_reply_fields extends Hm_Handler_Module {
 }
 
 /**
+ * Process the list_path input argument
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
+    /**
+     * Output a list title
+     */
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
@@ -45,9 +53,13 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
 }
 
 /**
+ * Expand an IMAP folder section
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
+    /**
+     * Return cached subfolder contents or query the IMAP server for it
+     */
     public function process() {
 
         list($success, $form) = $this->process_form(array('imap_server_id'));
@@ -80,9 +92,14 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
 }
 
 /**
+ * Fetch the message headers for a an IMAP folder page
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
+
+    /**
+     * Use IMAP FETCH to get a page of headers
+     */
     public function process() {
 
         $sort = 'ARRIVAL';
@@ -128,9 +145,13 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
 }
 
 /**
+ * Build a list of IMAP servers as the top level folders
  * @subpackage imap/handler
  */
 class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
+    /**
+     * Used by the folder list
+     */
     public function process() {
         $servers = Hm_IMAP_List::dump();
         $folders = array();
@@ -147,9 +168,13 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
 }
 
 /**
+ * Flag a message
  * @subpackage imap/handler
  */
 class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
+    /**
+     * Use IMAP to flag the selected message uid
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_flag_state', 'imap_msg_uid', 'imap_server_id', 'folder'));
         if ($success) {
@@ -177,9 +202,13 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
 }
 
 /**
+ * Perform an IMAP message action 
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
+    /**
+     * Read, unread, delete, flag, or unflag a set of message uids
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
@@ -215,9 +244,13 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
 }
 
 /**
+ * Search for a message
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_search extends Hm_Handler_Module {
+    /**
+     * Use IMAP SEARCH to find matching messages
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
@@ -234,9 +267,13 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
 }
 
 /**
+ * Get message headers for the Everthing page
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
+    /**
+     * Returns list of message data for the Everthing page
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
@@ -257,9 +294,13 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
 }
 
 /**
+ * Get message headers for the Flagged page
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_flagged extends Hm_Handler_Module {
+    /**
+     * Fetch flagged messages from an IMAP server
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
@@ -274,9 +315,13 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
 }
 
 /**
+ * Check the status of an IMAP server connection
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_status extends Hm_Handler_Module {
+    /**
+     * Output used on the home page to display the server status
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
@@ -300,9 +345,13 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
 }
 
 /**
+ * Fetch messages for the Unread page
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_unread extends Hm_Handler_Module {
+    /**
+     * Returns UNSEEN messages for an IMAP server
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
@@ -318,10 +367,14 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
 }
 
 /**
+ * Add a new IMAP server
  * @subpackage imap/handler
  */
 class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
     public function process() {
+        /**
+         * Used on the servers page to add a new IMAP server
+         */
         if (isset($this->request->post['submit_imap_server'])) {
             list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_address', 'new_imap_port'));
             if (!$success) {
@@ -351,9 +404,13 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
 }
 
 /**
+ * Save IMAP caches in the session
  * @subpackage imap/handler
  */
 class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
+    /**
+     * Save IMAP cache data for re-use
+     */
     public function process() {
         $servers = Hm_IMAP_List::dump(false, true);
         $cache = $this->session->get('imap_cache', array());
@@ -370,9 +427,13 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
 }
 
 /**
+ * Save IMAP servers
  * @subpackage imap/handler
  */
 class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
+    /**
+     * Save IMAP servers in the user config
+     */
     public function process() {
         $servers = Hm_IMAP_List::dump(false, true);
         $this->user_config->set('imap_servers', $servers);
@@ -381,9 +442,13 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
 }
 
 /**
+ * Load IMAP servers for the search page
  * @subpackage imap/handler
  */
 class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
+    /**
+     * Output IMAP server array used on the search page
+     */
     public function process() {
         foreach (Hm_IMAP_List::dump() as $index => $vals) {
             $this->append('data_sources', array('callback' => 'imap_search_page_content', 'type' => 'imap', 'name' => $vals['name'], 'id' => $index));
@@ -392,9 +457,13 @@ class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
 }
 
 /**
+ * Load IMAP servers for message list pages
  * @subpackage imap/handler
  */
 class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
+    /**
+     * Used by combined views excluding normal folder view and search pages
+     */
     public function process() {
         $callback = false;
         if (array_key_exists('list_path', $this->request->get)) {
@@ -437,9 +506,13 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
 }
 
 /**
+ * Load IMAP servers for the user config object
  * @subpackage imap/handler
  */
 class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
+    /**
+     * This list is cached in the session between page loads
+     */
     public function process() {
         $servers = $this->user_config->get('imap_servers', array());
         $added = false;
@@ -467,9 +540,13 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
 }
 
 /**
+ * Output IMAP server data for other modules to use
  * @subpackage imap/handler
  */
 class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
+    /**
+     * Creates folder source for the folder list and outputs IMAP server details
+     */
     public function process() {
         $servers = Hm_IMAP_List::dump();
         if (!empty($servers)) {
@@ -480,18 +557,26 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
 }
 
 /**
+ * Delete IMAP cache
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
+    /**
+     * Deletes all the saved IMAP cache data
+     */
     public function process() {
         $this->session->set('imap_cache', array());
     }
 }
 
 /**
+ * Test a connection to an IMAP server
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_connect extends Hm_Handler_Module {
+    /**
+     * Used by the servers page to test/authenticate with an IMAP server
+     */
     public function process() {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
@@ -520,9 +605,13 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
 }
 
 /**
+ * Forget IMAP server credentials
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_forget extends Hm_Handler_Module {
+    /**
+     * Used on the servers page to forget login information for an IMAP server
+     */
     public function process() {
         $just_forgot_credentials = false;
         if (isset($this->request->post['imap_forget'])) {
@@ -543,9 +632,13 @@ class Hm_Handler_imap_forget extends Hm_Handler_Module {
 }
 
 /**
+ * Save a user/pass combination for an IMAP server
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_save extends Hm_Handler_Module {
+    /**
+     * Authenticate then save the username and password for an IMAP server
+     */
     public function process() {
         $just_saved_credentials = false;
         if (isset($this->request->post['imap_save'])) {
@@ -572,9 +665,13 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
 }
 
 /**
+ * Get message content from an IMAP server
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_message_content extends Hm_Handler_Module {
+    /**
+     * Fetch the content, message parts, and headers for the supplied message
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
         if ($success) {
@@ -631,9 +728,13 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
 }
 
 /**
+ * Delete an IMAP server
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_delete extends Hm_Handler_Module {
+    /**
+     * Remove an IMAP server completely, used on the servers page
+     */
     public function process() {
         if (isset($this->request->post['imap_delete'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
@@ -654,9 +755,13 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
 }
 
 /**
+ * Format a message part body for display
  * @subpackage imap/output
  */
 class Hm_Output_filter_message_body extends Hm_Output_Module {
+    /**
+     * Format html, text, or image content
+     */
     protected function output() {
         $txt = '<div class="msg_text_inner">';
         if ($this->get('msg_text')) {
@@ -677,9 +782,13 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
 }
 
 /**
+ * Format the message part section of the message view
  * @subpackage imap/output
  */
 class Hm_Output_filter_message_struct extends Hm_Output_Module {
+    /**
+     * Build message part section HTML
+     */
     protected function output() {
         if ($this->get('msg_struct')) {
             $res = '<table class="msg_parts">';
@@ -692,9 +801,13 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
 }
 
 /**
+ * Format the message headers section of the message view
  * @subpackage imap/output
  */
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
+    /**
+     * Build message header HTML
+     */
     protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
@@ -752,9 +865,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 }
 
 /**
+ * Format configured IMAP servers for the servers page
  * @subpackage imap/output
  */
 class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
+    /**
+     * Build HTML for configured IMAP servers
+     */
     protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
@@ -807,9 +924,13 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 }
 
 /**
+ * Format the add IMAP server dialog for the servers page
  * @subpackage imap/output
  */
 class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
+    /**
+     * Build the HTML for the add server dialog
+     */
     protected function output() {
         $count = count($this->get('imap_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
@@ -831,9 +952,13 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
 }
 
 /**
+ * Format the IMAP status output on the home page
  * @subpackage imap/output
  */
 class Hm_Output_display_imap_status extends Hm_Output_Module {
+    /**
+     * Build the HTML for the status rows. Will be populated by an ajax call per server
+     */
     protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
@@ -848,9 +973,13 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
 }
 
 /**
+ * Build HTML for reply to hidden fields
  * @subpackage imap/output
  */
 class Hm_Output_imap_reply_details extends Hm_Output_Module {
+    /**
+     * Used on the message view page to pass reply to information to the compose page
+     */
     protected function output() {
         $res = '';
         if ($this->get('imap_reply_source')) {
@@ -864,18 +993,26 @@ class Hm_Output_imap_reply_details extends Hm_Output_Module {
 }
 
 /**
+ * Output a hidden field with all the IMAP server ids
  * @subpackage imap/output
  */
 class Hm_Output_imap_server_ids extends Hm_Output_Module {
+    /**
+     * Build HTML for the IMAP server ids
+     */
     protected function output() {
         return '<input type="hidden" class="imap_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('imap_servers', array ())))).'" />';
     }
 }
 
 /**
+ * Format a list of subfolders
  * @subpackage imap/output
  */
 class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
+    /**
+     * Build the HTML for a list of subfolders. The page cache is used to pass this to the folder list.
+     */
     protected function output() {
         $res = '';
         $folder_data = $this->get('imap_expanded_folder_data', array());
@@ -889,9 +1026,13 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 }
 
 /**
+ * Format the status of an IMAP connection used on the home page
  * @subpackage imap/output
  */
 class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
+    /**
+     * Build AJAX response for an IMAP server status
+     */
     protected function output() {
         $res = '';
         if ($this->get('imap_connect_status') != 'disconnected') {
@@ -906,9 +1047,13 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
 }
 
 /**
+ * Format the top level IMAP folders for the folder list
  * @subpackage imap/output
  */
 class Hm_Output_filter_imap_folders extends Hm_Output_Module {
+    /**
+     * Build HTML for the Email section of the folder list
+     */
     protected function output() {
         $res = '';
         if ($this->get('imap_folders')) {
@@ -924,9 +1069,13 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
 }
 
 /**
+ * Format search results row
  * @subpackage imap/output
  */
 class Hm_Output_filter_imap_search extends Hm_Output_Module {
+    /**
+     * Build ajax response from an IMAP server for a search
+     */
     protected function output() {
         if ($this->get('imap_search_results')) {
             prepare_imap_message_list($this->get('imap_search_results'), $this, 'search');
@@ -938,9 +1087,13 @@ class Hm_Output_filter_imap_search extends Hm_Output_Module {
 }
 
 /**
+ * Format message headers for the Flagged page
  * @subpackage imap/output
  */
 class Hm_Output_filter_flagged_data extends Hm_Output_Module {
+    /**
+     * Build ajax response for the Flagged message list
+     */
     protected function output() {
         if ($this->get('imap_flagged_data')) {
             prepare_imap_message_list($this->get('imap_flagged_data'), $this, 'flagged');
@@ -952,9 +1105,13 @@ class Hm_Output_filter_flagged_data extends Hm_Output_Module {
 }
 
 /**
+ * Format message headers for the Unread page
  * @subpackage imap/output
  */
 class Hm_Output_filter_unread_data extends Hm_Output_Module {
+    /**
+     * Build ajax response for the Unread message list
+     */
     protected function output() {
         if ($this->get('imap_unread_data')) {
             prepare_imap_message_list($this->get('imap_unread_data'), $this, 'unread');
@@ -966,9 +1123,13 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
 }
 
 /**
+ * Format message headers for the All E-mail page
  * @subpackage imap/output
  */
 class Hm_Output_filter_all_email extends Hm_Output_Module {
+    /**
+     * Build ajax response for the All E-mail message list
+     */
     protected function output() {
         if ($this->get('imap_combined_inbox_data')) {
             prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'email');
@@ -980,9 +1141,13 @@ class Hm_Output_filter_all_email extends Hm_Output_Module {
 }
 
 /**
+ * Format message headers for the Everthing page
  * @subpackage imap/output
  */
 class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
+    /**
+     * Build ajax response for the Everthing message list
+     */
     protected function output() {
         if ($this->get('imap_combined_inbox_data')) {
             prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox');
@@ -994,9 +1159,13 @@ class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
 }
 
 /**
+ * Normal IMAP folder view
  * @subpackage imap/output
  */
 class Hm_Output_filter_folder_page extends Hm_Output_Module {
+    /**
+     * Build ajax response for a folder page
+     */
     protected function output() {
         $res = array();
         if ($this->get('imap_mailbox_page')) {
@@ -1010,9 +1179,13 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
 }
 
 /**
+ * Format reply content for the compose page
  * @subpackage imap/output
  */
 class Hm_Output_filter_reply_content extends Hm_Output_Module {
+    /**
+     * Build data to be used when replying a message
+     */
     protected function output() {
         $reply_subject = 'Re: [No Subject]';
         $reply_to = '';
@@ -1056,7 +1229,11 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
 }
 
 /**
+ * Prepare and format message list data 
  * @subpackage imap/functions
+ * @param array $msgs list of message headers to format
+ * @param object $mod Hm_Output_Module
+ * @return void
  */
 function prepare_imap_message_list($msgs, $mod, $type) {
     $style = $mod->get('news_list_style') ? 'news' : 'email';
@@ -1068,7 +1245,12 @@ function prepare_imap_message_list($msgs, $mod, $type) {
 }
 
 /**
+ * Build HTML for a list of IMAP folders
  * @subpackage imap/functions
+ * @param array $folders list of folder data
+ * @param mixed $id IMAP server id
+ * @param object $mod Hm_Output_Module
+ * @return string
  */
 function format_imap_folder_section($folders, $id, $output_mod) {
     $results = '<ul class="inner_list">';
@@ -1096,7 +1278,13 @@ function format_imap_folder_section($folders, $id, $output_mod) {
 }
 
 /**
+ * Format a list of message headers
  * @subpackage imap/functions
+ * @param array $msg_list list of message headers
+ * @param object $mod Hm_Output_Module
+ * @param mixed $parent_list parent list id
+ * @param string $style list style (email or news)
+ * @return array
  */
 function format_imap_message_list($msg_list, $output_module, $parent_list=false, $style='email') {
     $res = array();
@@ -1166,7 +1354,10 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
 }
 
 /**
+ * Process message ids
  * @subpackage imap/functions
+ * @param array $ids list of ids
+ * @return array
  */
 function process_imap_message_ids($ids) {
     $res = array();
@@ -1188,7 +1379,11 @@ function process_imap_message_ids($ids) {
 }
 
 /**
+ * Build pagination links for an IMAP folder page
  * @subpackage imap/functions
+ * @param array $detail folder details
+ * @param string $path list path
+ * @return string
  */
 function build_page_links($detail, $path) {
     $links = '';
@@ -1238,7 +1433,14 @@ function build_page_links($detail, $path) {
 }
 
 /**
+ * Format a message part row
  * @subpackage imap/functions
+ * @param string $id message identifier
+ * @param array $vals details of the message
+ * @param object $mod Hm_Output_Module
+ * @param int $level indention level
+ * @param string $part currently selected part
+ * @return string
  */
 function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     $allowed = array(
@@ -1306,7 +1508,13 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
 }
 
 /**
+ * Format the message part section of the message view page
  * @subpackage imap/functions
+ * @param array $struct message structure
+ * @param object $mod Hm_Output_Module
+ * @param string $part currently selected message part id
+ * @param int $level indention level
+ * @return string
  */
 function format_msg_part_section($struct, $output_mod, $part, $level=0) {
     $res = '';
@@ -1327,7 +1535,11 @@ function format_msg_part_section($struct, $output_mod, $part, $level=0) {
 }
 
 /**
+ * Sort callback to sort by internal date
  * @subpackage imap/functions
+ * @param array $a first message detail
+ * @param array $b second message detail
+ * @return int
  */
 function sort_by_internal_date($a, $b) {
     if ($a['internal_date'] == $b['internal_date']) return 0;
@@ -1335,7 +1547,15 @@ function sort_by_internal_date($a, $b) {
 }
 
 /**
+ * Merge IMAP search results
  * @subpackage imap/functions
+ * @param array $ids IMAP server ids
+ * @param string $search_type
+ * @param object $session session object
+ * @param array $folders list of folders to search
+ * @param int $limit max results
+ * @param array $terms list of search terms
+ * @return array
  */
 function merge_imap_search_results($ids, $search_type, $session, $folders = array('INBOX'), $limit=0, $terms=array()) {
     $msg_list = array();
@@ -1377,7 +1597,12 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
 }
 
 /**
+ * Replace inline images in an HTML message part
  * @subpackage imap/functions
+ * @param string $txt HTML
+ * @param string $uid message id
+ * @param array $struct message structure array
+ * @param object $imap IMAP server object
  */
 function add_attached_images($txt, $uid, $struct, $imap) {
     if (preg_match_all("/src=('|\"|)cid:([^@]+@[^\s'\"]+)/", $txt, $matches)) {
