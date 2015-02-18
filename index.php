@@ -12,6 +12,7 @@
 define('APP_PATH', '');
 define('DEBUG_MODE', true);
 define('CACHE_ID', '');
+define('SITE_ID', '');
 
 /* show all warnings in debug mode */
 if (DEBUG_MODE) {

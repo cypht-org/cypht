@@ -78,6 +78,7 @@ class Hm_Crypt {
 
 /**
  * Manage nonces easily for modules
+ * @todo fix this system to work with multiple instances (!)
  */
 class Hm_Nonce {
 
@@ -100,7 +101,7 @@ class Hm_Nonce {
      */
     public static function load($session, $config, $request) {
         self::$nonce_list = $session->get('nonce_list', array());
-        self::$site_hash = $session->build_fingerprint($request, $config->get('site_key', ''));
+        self::$site_hash = $session->build_fingerprint($request, SITE_ID);
     }
 
     /**

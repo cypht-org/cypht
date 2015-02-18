@@ -178,6 +178,7 @@ function create_production_site($assets, $settings) {
     $index_file = file_get_contents('index.php');
     $index_file = preg_replace("/APP_PATH', ''/", "APP_PATH', '".APP_PATH."'", $index_file);
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
+    $index_file = preg_replace("/SITE_ID', ''/", "SITE_ID', '".urlencode(Hm_Crypt::unique_id(64))."'", $index_file);
     $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
     file_put_contents('site/index.php', $index_file);
     foreach ($assets as $path) {
