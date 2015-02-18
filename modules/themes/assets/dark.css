@@ -2,7 +2,7 @@ html * { font-family: Arial; color: #999 !important; border-color: #282828 !impo
 main, div { border-radius: 0px 0px 8px 8px }
 body, .folder_cell { background: none !important; background-color: transparent !important; }
 html { background: linear-gradient(0deg, #111, #333) !important; }
-img { opacity: .6 !important; }
+img { opacity: .4 !important; }
 a { color: #aaa !important; }
 a:hover { color: #fff !important; }
 textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !important; }
