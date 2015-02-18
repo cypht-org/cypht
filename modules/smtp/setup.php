@@ -32,12 +32,21 @@ add_handler('ajax_smtp_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_smtp_debug', 'date', true, 'core');
 add_handler('ajax_smtp_debug', 'http_headers', true, 'core');
 
+/* save draft ajax request */
+add_handler('ajax_smtp_save_draft', 'login', false, 'core');
+add_handler('ajax_smtp_save_draft', 'load_user_data',  true, 'core');
+add_handler('ajax_smtp_save_draft', 'smtp_save_draft',  true);
+add_handler('ajax_smtp_save_draft', 'save_user_data',  true, 'core');
+add_handler('ajax_smtp_save_draft', 'date', true, 'core');
+add_handler('ajax_smtp_save_draft', 'http_headers', true, 'core');
+
 /* folder list link */
 add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'logout_menu_item', 'before');
 
 return array(
     'allowed_pages' => array(
-        'ajax_smtp_debug'
+        'ajax_smtp_debug',
+        'ajax_smtp_save_draft',
     ),
     'allowed_post' => array(
         'new_smtp_name' => FILTER_SANITIZE_STRING,
@@ -55,6 +64,9 @@ return array(
         'compose_to' => FILTER_UNSAFE_RAW,
         'compose_body' => FILTER_UNSAFE_RAW,
         'compose_subject' => FILTER_SANITIZE_STRING,
+        'draft_body' => FILTER_UNSAFE_RAW,
+        'draft_subject' => FILTER_SANITIZE_STRING,
+        'draft_to' => FILTER_UNSAFE_RAW
     )
 );
 ?>
