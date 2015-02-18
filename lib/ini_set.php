@@ -64,7 +64,9 @@ if ($config->get('app_data_dir', false) && is_readable($config->get('app_data_di
 if ($config->get('user_settings_dir', false) && is_readable($config->get('user_settings_dir', false))) {
     $base .= PATH_SEPARATOR.$config->get('user_settings_dir', false);
 }
-ini_set('open_basedir', $base);
+if (!defined('HHVM_VERSION')) {
+    ini_set('open_basedir', $base);
+}
 
 ignore_user_abort(true);
 
