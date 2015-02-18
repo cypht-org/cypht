@@ -18,7 +18,6 @@ class Hm_POP3_List {
 
     /**
      * Connect to a POP3 server
-     * @subpackage pop3/lib
      * @param int $id server id
      * @param array $server server details
      * @param string $user username
@@ -41,7 +40,6 @@ class Hm_POP3_List {
 
     /**
      * Get a server cache
-     * @subpackage pop3/lib
      * @param object $session session object
      * @param int $id server id
      * @return bool
@@ -63,7 +61,6 @@ class Hm_Auth_POP3 extends Hm_Auth {
 
     /**
      * Send the username and password to the configured POP3 server for authentication
-     * @subpackage pop3/lib
      * @param $user string username
      * @param $pass string password
      * @return bool true if authentication worked
@@ -97,7 +94,6 @@ class Hm_Auth_POP3 extends Hm_Auth {
 
     /**
      * Get POP3 server details from the site config
-     * @subpackage pop3/lib
      * @return array list of required details
      */
     private function get_pop3_config() {

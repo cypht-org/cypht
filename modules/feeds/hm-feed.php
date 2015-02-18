@@ -16,10 +16,27 @@ class Hm_Feed_List {
 
     use Hm_Server_List;
 
+    /*
+     * Connect to an RSS/ATOM feed
+     * @param int $id server id
+     * @param array $server server details
+     * @param string $user username
+     * @param string $pass password
+     * @param array $cache server cache
+     * @return bool
+     */
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         self::$server_list[$id]['object'] = new Hm_Feed();
         return self::$server_list[$id]['object'];
     }
+
+    /**
+     * Get a server cache
+     * @param object $session session object
+     * @param int $id server id
+     * @return bool
+     * @todo finish this
+     */
     public static function get_cache($session, $id) {
         return false;
     }
@@ -38,6 +55,7 @@ class Hm_Feed_Seen_Cache {
  * @subpackage feeds/lib
  */
 class Hm_Feed {
+
     var $url;
     var $id;
     var $xml_data;
@@ -55,6 +73,10 @@ class Hm_Feed {
     var $cache_limit;
     var $sort;
 
+    /**
+     * Setup defaults
+     * @return void
+     */
     function __construct() {
         $this->sort = true;
         $this->limit = 20;
@@ -73,6 +95,12 @@ class Hm_Feed {
         $this->init_cache = false;
         $this->item_count = 0;
     }
+
+    /**
+     * Get data from a feed url
+     * @param string $url location of the feed
+     * @return string
+     */
     function get_feed_data($url) {
         $buffer = '';
         if (!preg_match("?^http(|s)://?", ltrim($url))) {
@@ -102,6 +130,13 @@ class Hm_Feed {
         $this->xml_data = $buffer;
         return $buffer;
     }
+
+    /**
+     * Sort feed items by date
+     * @param array $a first item
+     * @param array $b second item
+     * return int
+     */
     function sort_by_time($a, $b) {
         if (isset($a['dc:date']) && isset($b['dc:date'])) {
             $adate = $a['dc:date'];
@@ -126,6 +161,11 @@ class Hm_Feed {
             return -1;
         }
     }
+
+    /**
+     * Sort a list using sort_by_time
+     * @return void
+     */
     function sort_parsed_data() {
         $data = $this->parsed_data;
         $title = array_shift($data);
@@ -142,6 +182,12 @@ class Hm_Feed {
         array_unshift($final_list, $title);
         $this->parsed_data = $final_list;
     }
+
+    /**
+     * Parse feed content
+     * @param string $url feed location
+     * @return bool
+     */
     function parse_feed($url) {
         $this->get_feed_data($url);
         if (!empty($this->parsed_data)) {
@@ -171,7 +217,13 @@ class Hm_Feed {
             return false;
         }
     }
-    /* ATOM FEED FUNCTIONS */
+
+    /**
+     * ATOM specific parsing
+     * @param object $parser xml parser
+     * @param string $tagname xml tag name
+     * @param array $attrs tag attributes
+     */
     function atom_start_element($parser, $tagname, $attrs) {
         if ($tagname == 'FEED') {
             $this->heading_block = true;
@@ -225,6 +277,12 @@ class Hm_Feed {
         }
         $this->depth++;
     }
+
+    /**
+     * ATOM end tag check
+     * @param object $parser xml parser
+     * @param string $tagname xml tag
+     */
     function atom_end_element($parser, $tagname) {
         $this->collect = false;
         if ($tagname == 'ENTRY') {
@@ -232,6 +290,12 @@ class Hm_Feed {
         }
         $this->depth--;
     }
+
+    /**
+     * Collect atom character data
+     * @param object $parser xml parser
+     * @param string $data xml data
+     */
     function atom_character_data($parser, $data) {
         if ($this->heading_block && $this->collect) {
             $this->parsed_data[0][$this->collect] = trim($data);
@@ -248,7 +312,12 @@ class Hm_Feed {
             }
         }
     }
-    /* RSS FEED FUNCTIONS */
+    /**
+     * Parse an RSS feed element
+     * @param object $parser xml parser
+     * @param string $tagname xml tag name
+     * @param array $attrs tag attributes
+     */
     function rss_start_element($parser, $tagname, $attrs) {
         if ($tagname == 'FEED') {
             $this->heading_block = true;
@@ -286,6 +355,12 @@ class Hm_Feed {
         }
         $this->depth++;
     }
+
+    /**
+     * RSS end tag check
+     * @param object $parser xml parser
+     * @param string $tagname xml tag
+     */
     function rss_end_element($parser, $tagname) {
         $this->collect = false;
         if ($tagname == 'ITEM') {
@@ -293,6 +368,12 @@ class Hm_Feed {
         }
         $this->depth--;
     }
+
+    /**
+     * Collect RSS character data
+     * @param object $parser xml parser
+     * @param string $data xml data
+     */
     function rss_character_data($parser, $data) {
         if ($this->heading_block && $this->collect) {
             $this->parsed_data[0][$this->collect] = $data;
