@@ -7,7 +7,7 @@
 	<title>Class Hm_Feed | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?589042484"></script>
+	<script type="text/javascript" src="elementlist.js?2103743580"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -269,7 +269,7 @@
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.feeds.html">feeds</a>\<a href="package-modules.feeds.lib.html">lib</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_Feed.html#36-313" title="Go to source code">feeds/hm-feed.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_Feed.html#53-394" title="Go to source code">feeds/hm-feed.php</a><br>
 	</div>
 
 
@@ -287,14 +287,18 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Hm_Feed.html#58-75" title="Go to source code">__construct</a>( )</code>
+		<code><a href="source-class-Hm_Feed.html#76-97" title="Go to source code">__construct</a>( )</code>
 
 		<div class="description short">
 			
+<p>Setup defaults</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Setup defaults</p>
+
 
 
 
@@ -309,24 +313,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_feed_data">#</a>
-		<code><a href="source-class-Hm_Feed.html#76-104" title="Go to source code">get_feed_data</a>( <span>mixed <var>$url</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#99-132" title="Go to source code">get_feed_data</a>( <span>string <var>$url</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Get data from a feed url</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Get data from a feed url</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$url</var></dt>
+					<dd><code>string</code><br>$url location of the feed</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>
+				</div>
 
 
 
@@ -345,16 +362,27 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_sort_by_time">#</a>
-		<code><a href="source-class-Hm_Feed.html#105-128" title="Go to source code">sort_by_time</a>( <span>mixed <var>$a</var></span>, <span>mixed <var>$b</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#134-163" title="Go to source code">sort_by_time</a>( <span>array <var>$a</var></span>, <span>array <var>$b</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Sort feed items by date</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Sort feed items by date</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$a</var></dt>
+					<dd><code>array</code><br>$a first item</dd>
+					<dt><var>$b</var></dt>
+					<dd><code>array</code><br>$b second item return int</dd>
+				</dl></div>
 
 
 
@@ -374,14 +402,18 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_sort_parsed_data">#</a>
-		<code><a href="source-class-Hm_Feed.html#129-144" title="Go to source code">sort_parsed_data</a>( )</code>
+		<code><a href="source-class-Hm_Feed.html#165-184" title="Go to source code">sort_parsed_data</a>( )</code>
 
 		<div class="description short">
 			
+<p>Sort a list using sort_by_time</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Sort a list using sort_by_time</p>
+
 
 
 
@@ -396,24 +428,37 @@
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_parse_feed">#</a>
-		<code><a href="source-class-Hm_Feed.html#145-173" title="Go to source code">parse_feed</a>( <span>mixed <var>$url</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#186-219" title="Go to source code">parse_feed</a>( <span>string <var>$url</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Parse feed content</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Parse feed content</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$url</var></dt>
+					<dd><code>string</code><br>$url feed location</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br>
+				</div>
 
 
 
@@ -432,16 +477,29 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_atom_start_element">#</a>
-		<code><a href="source-class-Hm_Feed.html#175-227" title="Go to source code">atom_start_element</a>( <span>mixed <var>$parser</var></span>, <span>mixed <var>$tagname</var></span>, <span>mixed <var>$attrs</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#221-279" title="Go to source code">atom_start_element</a>( <span>object <var>$parser</var></span>, <span>string <var>$tagname</var></span>, <span>array <var>$attrs</var></span> )</code>
 
 		<div class="description short">
 			
+<p>ATOM specific parsing</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>ATOM specific parsing</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$parser</var></dt>
+					<dd><code>object</code><br>$parser xml parser</dd>
+					<dt><var>$tagname</var></dt>
+					<dd><code>string</code><br>$tagname xml tag name</dd>
+					<dt><var>$attrs</var></dt>
+					<dd><code>array</code><br>$attrs tag attributes</dd>
+				</dl></div>
 
 
 
@@ -461,16 +519,27 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_atom_end_element">#</a>
-		<code><a href="source-class-Hm_Feed.html#228-234" title="Go to source code">atom_end_element</a>( <span>mixed <var>$parser</var></span>, <span>mixed <var>$tagname</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#281-292" title="Go to source code">atom_end_element</a>( <span>object <var>$parser</var></span>, <span>string <var>$tagname</var></span> )</code>
 
 		<div class="description short">
 			
+<p>ATOM end tag check</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>ATOM end tag check</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$parser</var></dt>
+					<dd><code>object</code><br>$parser xml parser</dd>
+					<dt><var>$tagname</var></dt>
+					<dd><code>string</code><br>$tagname xml tag</dd>
+				</dl></div>
 
 
 
@@ -490,16 +559,27 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_atom_character_data">#</a>
-		<code><a href="source-class-Hm_Feed.html#235-250" title="Go to source code">atom_character_data</a>( <span>mixed <var>$parser</var></span>, <span>mixed <var>$data</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#294-314" title="Go to source code">atom_character_data</a>( <span>object <var>$parser</var></span>, <span>string <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Collect atom character data</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Collect atom character data</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$parser</var></dt>
+					<dd><code>object</code><br>$parser xml parser</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>string</code><br>$data xml data</dd>
+				</dl></div>
 
 
 
@@ -519,16 +599,29 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_rss_start_element">#</a>
-		<code><a href="source-class-Hm_Feed.html#252-288" title="Go to source code">rss_start_element</a>( <span>mixed <var>$parser</var></span>, <span>mixed <var>$tagname</var></span>, <span>mixed <var>$attrs</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#315-357" title="Go to source code">rss_start_element</a>( <span>object <var>$parser</var></span>, <span>string <var>$tagname</var></span>, <span>array <var>$attrs</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Parse an RSS feed element</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Parse an RSS feed element</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$parser</var></dt>
+					<dd><code>object</code><br>$parser xml parser</dd>
+					<dt><var>$tagname</var></dt>
+					<dd><code>string</code><br>$tagname xml tag name</dd>
+					<dt><var>$attrs</var></dt>
+					<dd><code>array</code><br>$attrs tag attributes</dd>
+				</dl></div>
 
 
 
@@ -548,16 +641,27 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_rss_end_element">#</a>
-		<code><a href="source-class-Hm_Feed.html#289-295" title="Go to source code">rss_end_element</a>( <span>mixed <var>$parser</var></span>, <span>mixed <var>$tagname</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#359-370" title="Go to source code">rss_end_element</a>( <span>object <var>$parser</var></span>, <span>string <var>$tagname</var></span> )</code>
 
 		<div class="description short">
 			
+<p>RSS end tag check</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>RSS end tag check</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$parser</var></dt>
+					<dd><code>object</code><br>$parser xml parser</dd>
+					<dt><var>$tagname</var></dt>
+					<dd><code>string</code><br>$tagname xml tag</dd>
+				</dl></div>
 
 
 
@@ -577,16 +681,27 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_rss_character_data">#</a>
-		<code><a href="source-class-Hm_Feed.html#296-312" title="Go to source code">rss_character_data</a>( <span>mixed <var>$parser</var></span>, <span>mixed <var>$data</var></span> )</code>
+		<code><a href="source-class-Hm_Feed.html#372-393" title="Go to source code">rss_character_data</a>( <span>object <var>$parser</var></span>, <span>string <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Collect RSS character data</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Collect RSS character data</p>
 
 
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$parser</var></dt>
+					<dd><code>object</code><br>$parser xml parser</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>string</code><br>$data xml data</dd>
+				</dl></div>
 
 
 
@@ -617,7 +732,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#41" title="Go to source code"><var>$url</var></a>
+				<a href="source-class-Hm_Feed.html#59" title="Go to source code"><var>$url</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -640,7 +755,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#42" title="Go to source code"><var>$id</var></a>
+				<a href="source-class-Hm_Feed.html#60" title="Go to source code"><var>$id</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -663,7 +778,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#43" title="Go to source code"><var>$xml_data</var></a>
+				<a href="source-class-Hm_Feed.html#61" title="Go to source code"><var>$xml_data</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -686,7 +801,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#44" title="Go to source code"><var>$parsed_data</var></a>
+				<a href="source-class-Hm_Feed.html#62" title="Go to source code"><var>$parsed_data</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -709,7 +824,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#45" title="Go to source code"><var>$depth</var></a>
+				<a href="source-class-Hm_Feed.html#63" title="Go to source code"><var>$depth</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -732,7 +847,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#46" title="Go to source code"><var>$type</var></a>
+				<a href="source-class-Hm_Feed.html#64" title="Go to source code"><var>$type</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -755,7 +870,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#47" title="Go to source code"><var>$limit</var></a>
+				<a href="source-class-Hm_Feed.html#65" title="Go to source code"><var>$limit</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -778,7 +893,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#48" title="Go to source code"><var>$heading_block</var></a>
+				<a href="source-class-Hm_Feed.html#66" title="Go to source code"><var>$heading_block</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -801,7 +916,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#49" title="Go to source code"><var>$data_block</var></a>
+				<a href="source-class-Hm_Feed.html#67" title="Go to source code"><var>$data_block</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -824,7 +939,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#50" title="Go to source code"><var>$update_cache</var></a>
+				<a href="source-class-Hm_Feed.html#68" title="Go to source code"><var>$update_cache</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -847,7 +962,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#51" title="Go to source code"><var>$collect</var></a>
+				<a href="source-class-Hm_Feed.html#69" title="Go to source code"><var>$collect</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -870,7 +985,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#52" title="Go to source code"><var>$item_count</var></a>
+				<a href="source-class-Hm_Feed.html#70" title="Go to source code"><var>$item_count</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -893,7 +1008,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#53" title="Go to source code"><var>$refresh_cache</var></a>
+				<a href="source-class-Hm_Feed.html#71" title="Go to source code"><var>$refresh_cache</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -916,7 +1031,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#54" title="Go to source code"><var>$init_cache</var></a>
+				<a href="source-class-Hm_Feed.html#72" title="Go to source code"><var>$init_cache</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -939,7 +1054,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#55" title="Go to source code"><var>$cache_limit</var></a>
+				<a href="source-class-Hm_Feed.html#73" title="Go to source code"><var>$cache_limit</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -962,7 +1077,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Feed.html#56" title="Go to source code"><var>$sort</var></a>
+				<a href="source-class-Hm_Feed.html#74" title="Go to source code"><var>$sort</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
