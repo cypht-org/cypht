@@ -11,9 +11,13 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/pop3/hm-pop3.php';
 
 /**
+ * Setup the list type
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
+    /**
+     * Build meta information about the message list type
+     */
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
@@ -37,9 +41,13 @@ class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
 }
 
 /**
+ * Process the setting for the max number of POP3 messages per server
  * @subpackage pop3/handler
  */
 class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
+    /**
+     * Called when submitting settings
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'pop3_limit'));
         $new_settings = $this->get('new_user_settings', array());
@@ -63,9 +71,13 @@ class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process the message since setting per POP3 account
  * @subpackage pop3/handler
  */
 class Hm_Handler_process_pop3_since_setting extends Hm_Handler_Module {
+    /**
+     * Called when submitting settings
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'pop3_since'));
         $new_settings = $this->get('new_user_settings', array());
@@ -83,9 +95,13 @@ class Hm_Handler_process_pop3_since_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Check the status of a POP3 connection
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_status extends Hm_Handler_Module {
+    /**
+     * Used in an ajax request on the home page to determine a POP3 server status
+     */
     public function process() {
         list($success, $form) = $this->process_form(array('pop3_server_ids'));
         if ($success) {
@@ -104,11 +120,15 @@ class Hm_Handler_pop3_status extends Hm_Handler_Module {
 }
 
 /**
+ * Perform a message action on a POP3 message
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
+    /**
+     * read or unread a POP3 message
+     * @todo add support for more message actions
+     */
     public function process() {
-
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
             $id_list = explode(',', $form['message_ids']);
@@ -129,9 +149,14 @@ class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
 }
 
 /**
+ * Build the data for a POP3 folder page
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
+    /**
+     * Connect to a POP3 server and fetch message headers
+     * @todo see if this can be broken up into smaller functions
+     */
     public function process() {
 
         $msgs = array();
@@ -211,9 +236,13 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
 }
 
 /**
+ * Fetch a message from a POP3 server
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
+    /**
+     * Connect to a POP3 server and download a message
+     */
     public function process() {
 
         list($success, $form) = $this->process_form(array('pop3_uid', 'pop3_list_path'));
@@ -259,9 +288,13 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
 }
 
 /**
+ * Save a POP3 server on the servers page
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_save extends Hm_Handler_Module {
+    /**
+     * Authenticate and save a POP3 server on the settings page
+     */
     public function process() {
         $just_saved_credentials = false;
         if (isset($this->request->post['pop3_save'])) {
@@ -286,9 +319,13 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
 }
 
 /**
+ * Forget the username and password for a POP3 server
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_forget extends Hm_Handler_Module {
+    /**
+     * Used on the settings page to forget the username/password of a POP3 server
+     */
     public function process() {
         $just_forgot_credentials = false;
         if (isset($this->request->post['pop3_forget'])) {
@@ -308,9 +345,13 @@ class Hm_Handler_pop3_forget extends Hm_Handler_Module {
 }
 
 /**
+ * Delete a POP3 server from the settings page
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_delete extends Hm_Handler_Module {
+    /**
+     * Delete a POP3 server
+     */
     public function process() {
         if (isset($this->request->post['pop3_delete'])) {
             list($success, $form) = $this->process_form(array('pop3_server_id'));
@@ -330,9 +371,13 @@ class Hm_Handler_pop3_delete extends Hm_Handler_Module {
 }
 
 /**
+ * Test a connection to a POP3 server
  * @subpackage pop3/handler
  */
 class Hm_Handler_pop3_connect extends Hm_Handler_Module {
+    /**
+     * Used on the servers page to test a POP3 connection
+     */
     public function process() {
         $pop3 = false;
         if (isset($this->request->post['pop3_connect'])) {
@@ -354,9 +399,14 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
 }
 
 /**
+ * Load a POP3 cache
  * @subpackage pop3/handler
  */
 class Hm_Handler_load_pop3_cache extends Hm_Handler_Module {
+    /**
+     * Load POP3 cache data from the session
+     * @todo finish this
+     */
     public function process() {
         $servers = Hm_POP3_List::dump();
         $cache = $this->session->get('pop3_cache', array()); 
@@ -368,17 +418,27 @@ class Hm_Handler_load_pop3_cache extends Hm_Handler_Module {
 }
 
 /**
+ * Save a POP3 server cache
  * @subpackage pop3/handler
  */
 class Hm_Handler_save_pop3_cache extends Hm_Handler_Module {
+    /**
+     * Save a POP3 server cache in the session
+     * @todo finish this
+     *
+     */
     public function process() {
     }
 }
 
 /**
+ * Load POP3 servers up for the search page
  * @subpackage pop3/handler
  */
 class Hm_Handler_load_pop3_servers_for_search extends Hm_Handler_Module {
+    /**
+     * Add POP3 servers to the data sources list for the search page
+     */
     public function process() {
         foreach (Hm_POP3_List::dump() as $index => $vals) {
             $this->append('data_sources', array('callback' => 'pop3_search_page_content', 'type' => 'pop3', 'name' => $vals['name'], 'id' => $index));
@@ -387,9 +447,13 @@ class Hm_Handler_load_pop3_servers_for_search extends Hm_Handler_Module {
 }
 
 /**
+ * Load POP3 server for combined message views
  * @subpackage pop3/handler
  */
 class Hm_Handler_load_pop3_servers_for_message_list extends Hm_Handler_Module {
+    /**
+     * Load POP3 servers for a combined message list
+     */
     public function process() {
         $server_id = false;
         $callback = false;
@@ -428,9 +492,13 @@ class Hm_Handler_load_pop3_servers_for_message_list extends Hm_Handler_Module {
 }
 
 /**
+ * Load POP3 servers from the user config
  * @subpackage pop3/handler
  */
 class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
+    /**
+     * Setup the POP3 server list
+     */
     public function process() {
         $servers = $this->user_config->get('pop3_servers', array());
         $added = false;
@@ -459,9 +527,13 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
 }
 
 /**
+ * Add a new POP3 server
  * @subpackage pop3/handler
  */
 class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
+    /**
+     * Used on the servers page to process adding a new POP3 server
+     */
     public function process() {
         if (isset($this->request->post['submit_pop3_server'])) {
             list($success, $form) = $this->process_form(array('new_pop3_name', 'new_pop3_address', 'new_pop3_port'));
@@ -492,9 +564,13 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
 }
 
 /**
+ * Add a list of POP3 servers for the output modules
  * @subpackage pop3/handler
  */
 class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
+    /**
+     * Used to add POP3 server ids to an output page
+     */
     public function process() {
         $servers = Hm_POP3_List::dump();
         $this->out('pop3_servers', $servers);
@@ -505,9 +581,13 @@ class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
 }
 
 /**
+ * Load POP3 folder data used by the folder list
  * @subpackage pop3/handler
  */
 class Hm_Handler_load_pop3_folders extends Hm_Handler_Module {
+    /**
+     * Add POP3 folders to the folder list E-mail section
+     */
     public function process() {
         $servers = Hm_POP3_List::dump();
         $folders = array();
@@ -524,9 +604,13 @@ class Hm_Handler_load_pop3_folders extends Hm_Handler_Module {
 }
 
 /**
+ * Save POP3 server list
  * @subpackage pop3/handler
  */
 class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
+    /**
+     * Save POP3 servers in the session
+     */
     public function process() {
         $servers = Hm_POP3_List::dump(false, true);
         $this->user_config->set('pop3_servers', $servers);
@@ -536,9 +620,13 @@ class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
 }
 
 /**
+ * Format the add POP3 server dialog
  * @subpackage pop3/output
  */
 class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
+    /**
+     * Build the HTML for the add server dialog
+     */
     protected function output() {
         $count = count($this->get('pop3_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
@@ -560,9 +648,13 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
 }
 
 /**
+ * Format a list of configured POP3 servers
  * @subpackage pop3/output
  */
 class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
+    /**
+     * Build HTML for configured POP3 servers on the servers page
+     */
     protected function output() {
         $res = '';
         foreach ($this->get('pop3_servers', array()) as $index => $vals) {
@@ -614,9 +706,13 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
 }
 
 /**
+ * Format POP3 folders for the folder list
  * @subpackage pop3/output
  */
 class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
+    /**
+     * Build the HTML for POP3 accounts in the folder list
+     */
     protected function output() {
         $res = '';
         foreach ($this->get('pop3_folders', array()) as $id => $folder) {
@@ -631,9 +727,13 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
 }
 
 /**
+ * Format a POP3 message for display
  * @subpackage pop3/output
  */
 class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
+    /**
+     * Build the HTML for a POP3 message view
+     */
     protected function output() {
         if ($this->get('pop3_message_headers')) {
             $txt = '';
@@ -689,9 +789,13 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
 }
 
 /**
+ * Format a list of POP3 messages
  * @subpackage pop3/output
  */
 class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
+    /**
+     * Build the HTML for a set of POP3 messages
+     */
     protected function output() {
         $formatted_message_list = array();
         if ($this->get('pop3_mailbox_page')) {
@@ -712,18 +816,26 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
 }
 
 /**
+ * Output POP3 server ids
  * @subpackage pop3/output
  */
 class Hm_Output_pop3_server_ids extends Hm_Output_Module {
+    /**
+     * Put a list of POP3 server ids in a hidden page element
+     */
     protected function output() {
         return '<input type="hidden" class="pop3_server_ids" value="'.$this->html_safe(implode(',', array_keys($this->get('pop3_servers', array())))).'" />';
     }
 }
 
 /**
+ * Format a POP3 status response row
  * @subpackage pop3/output
  */
 class Hm_Output_display_pop3_status extends Hm_Output_Module {
+    /**
+     * Build the HTML for a POP3 status row on the home page
+     */
     protected function output() {
         $res = '';
         foreach ($this->get('pop3_servers', array()) as $index => $vals) {
@@ -738,9 +850,13 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
 }
 
 /**
+ * Format the start of the POP3 section of the settings page
  * @subpackage pop3/output
  */
 class Hm_Output_start_pop3_settings extends Hm_Output_Module {
+    /**
+     * Build the HTML for the heading of the POP3 settings section
+     */
     protected function output() {
         return '<tr><td data-target=".pop3_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" />'.$this->trans('POP3 Settings').'</td></tr>';
@@ -748,9 +864,13 @@ class Hm_Output_start_pop3_settings extends Hm_Output_Module {
 }
 
 /**
+ * Format the message since setting on the settings page
  * @subpackage pop3/output
  */
 class Hm_Output_pop3_since_setting extends Hm_Output_Module {
+    /**
+     * Build the HTML for the message since setting
+     */
     protected function output() {
         $since = false;
         $settings = $this->get('user_settings', array());
@@ -763,9 +883,13 @@ class Hm_Output_pop3_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Format the message limit setting
  * @subpackage pop3/output
  */
 class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
+    /**
+     * Build the HTML for the message limit setting
+     */
     protected function output() {
         $limit = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
@@ -778,9 +902,13 @@ class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
 }
 
 /**
+ * Format POP3 status response data
  * @subpackage pop3/output
  */
 class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
+    /**
+     * Build ajax response for a status row on the home page
+     */
     protected function output() {
         if ($this->get('pop3_connect_status') == 'Authenticated') {
             $this->out('pop3_status_display', '<span class="online">'.
@@ -792,9 +920,15 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
     }
 }
 
-
 /**
+ * Format a list of POP3 messages
  * @subpackage pop3/functions
+ * @param array $msg_list list of message data
+ * @param object $mod Hm_Output_Module
+ * @param string $style list style
+ * @param string $login_time timestamp of last login
+ * @param string $list_parent list type
+ * @return array
  */
 function format_pop3_message_list($msg_list, $output_module, $style, $login_time, $list_parent) {
     $res = array();
@@ -856,7 +990,13 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
 }
 
 /**
+ * Search a POP3 message
  * @subpackage pop3/functions
+ * @param string $body message body
+ * @param array $headers message headers
+ * @param string $terms search terms
+ * @param string $fld field to search
+ * @return bool
  */
 function search_pop3_msg($body, $headers, $terms, $fld) {
     if ($fld == 'TEXT') {

@@ -20,11 +20,9 @@ class Hm_Page_Cache {
 
     /**
      * Add a page
-     *
      * @param string $key key to access the page data
      * @param string $page data to cache
      * @param bool $save flag used to cache between logins
-     *
      * @return void
      */
     public static function add($key, $page, $save=false) {
@@ -33,12 +31,10 @@ class Hm_Page_Cache {
 
     /**
      * Concatenate new cache data to an existing page
-     *
      * @param string $key key to access the page data
      * @param string $page data to cache
      * @param bool $save flag used to cache between logins
      * @param string $delim delimiter used between values
-     *
      * @return void
      */
     public static function concat($key, $page, $save = false, $delim=false) {
@@ -57,9 +53,7 @@ class Hm_Page_Cache {
 
     /**
      * Delete a page from the cache
-     *
      * @param string $key key name of the data to delete
-     *
      * @return bool true on success
      */
     public static function del($key) {
@@ -72,9 +66,7 @@ class Hm_Page_Cache {
 
     /**
      * Fetch a cached value from the list
-     *
      * @param string $key key name of the data to fetch
-     *
      * @return mixed string value on success, bool false on failure
      */
     public static function get($key) {
@@ -87,7 +79,6 @@ class Hm_Page_Cache {
 
     /**
      * Return all cached values
-     *
      * @return array list of cached values
      */
     public static function dump() {
@@ -96,9 +87,7 @@ class Hm_Page_Cache {
 
     /**
      * Remove all cached values
-     *
      * @param object $session session interface
-     *
      * @return void
      */
     public static function flush($session) {
@@ -109,9 +98,7 @@ class Hm_Page_Cache {
 
     /**
      * Load cached pages from session data
-     *
      * @param object $session session interface
-     *
      * @return void
      */
     public static function load($session) {
@@ -121,9 +108,7 @@ class Hm_Page_Cache {
 
     /**
      * Save the page cache in the session
-     *
      * @param object $session session interface
-     *
      * @return void
      */
     public static function save($session) {
@@ -152,9 +137,7 @@ trait Hm_Uid_Cache {
     private static $uids;
 
     /* Load UIDs from an outside source
-     *
      * @param list $uid_array of uids
-     *
      * @return void
      */
     public static function load($uid_array) {
@@ -168,9 +151,7 @@ trait Hm_Uid_Cache {
 
     /**
      * Determine if a UID is present
-     *
      * @param string $uid UID to search for
-     *
      * @return bool true if te UID exists
      */
     public static function is_present($uid) {
@@ -179,7 +160,6 @@ trait Hm_Uid_Cache {
 
     /**
      * Return all the UIDs
-     *
      * @return array list of known UIDs
      */
     public static function dump() {
@@ -188,7 +168,6 @@ trait Hm_Uid_Cache {
 
     /**
      * Add a UID to the list
-     *
      * @param string $uid uid to add
      */
     public static function add($uid) {
@@ -197,9 +176,7 @@ trait Hm_Uid_Cache {
 
     /**
      * Remove a UID from the list
-     *
      * @param string $uid uid to remove
-     *
      * @return bool true on success
      */
     public static function remove($uid) {

@@ -26,7 +26,6 @@ abstract class Hm_Config {
 
     /**
      * Return all config values
-     *
      * @return array list of config values
      */
     public function dump() {
@@ -35,10 +34,8 @@ abstract class Hm_Config {
 
     /**
      * Set a config value
-     *
      * @param string $name config value name
      * @param string $value config value
-     *
      * @return void
      */
     public function set($name, $value) {
@@ -47,10 +44,8 @@ abstract class Hm_Config {
 
     /**
      * Return a config value if it exists
-     *
      * @param string $name config value name
      * @param mixed $default value to return if the name is not found
-     *
      * @return mixed found value, otherwise $default
      */
     public function get($name, $default=false) {
@@ -59,7 +54,6 @@ abstract class Hm_Config {
 
     /**
      * Set the timezone
-     *
      * @return void
      */
     public function set_tz() {
@@ -77,9 +71,7 @@ class Hm_User_Config_File extends Hm_Config {
 
     /**
      * Load site configuration
-     *
      * @param object $config site config
-     *
      * @return void
      */
     public function __construct($config) {
@@ -88,9 +80,7 @@ class Hm_User_Config_File extends Hm_Config {
 
     /**
      * Get the filesystem path for a user settings file
-     *
      * @param string $username username
-     * 
      * @return string filepath to the user config file
      */
     public function get_path($username) {
@@ -100,10 +90,8 @@ class Hm_User_Config_File extends Hm_Config {
 
     /**
      * Load the settings for a user
-     *
      * @param string $username username
      * @param string $key key to decrypt the user data
-     *
      * @return void
      */
     public function load($username, $key) {
@@ -122,9 +110,7 @@ class Hm_User_Config_File extends Hm_Config {
 
     /**
      * Reload from outside input
-     *
      * @param array $data new user data
-     *
      * @return void
      */
     public function reload($data) {
@@ -134,10 +120,8 @@ class Hm_User_Config_File extends Hm_Config {
 
     /**
      * Save user settings to a file
-     *
      * @param string $username username
      * @param string $key encryption key
-     *
      * @return void
      */
     public function save($username, $key) {
@@ -160,9 +144,7 @@ class Hm_User_Config_DB extends Hm_Config {
 
     /**
      * Load site config
-     *
      * @param object $config site config
-     *
      * @return void
      */
     public function __construct($config) {
@@ -171,10 +153,8 @@ class Hm_User_Config_DB extends Hm_Config {
 
     /**
      * Load the user settings from the DB
-     *
      * @param string $username username
      * @param string $key encryption key
-     *
      * @return void
      */
     public function load($username, $key) {
@@ -202,9 +182,7 @@ class Hm_User_Config_DB extends Hm_Config {
 
     /**
      * Reload from outside input
-     *
      * @param array $data new user data
-     *
      * @return void
      */
     public function reload($data) {
@@ -214,7 +192,6 @@ class Hm_User_Config_DB extends Hm_Config {
 
     /**
      * Connect to a configured DB
-     *
      * @return bool true on success
      */
     public function connect() {
@@ -227,10 +204,8 @@ class Hm_User_Config_DB extends Hm_Config {
 
     /**
      * Save user settings to the DB
-     *
      * @param string $username username
      * @param string $key encryption key
-     *
      * @return void
      */
     public function save($username, $key) {
@@ -253,9 +228,7 @@ class Hm_Site_Config_File extends Hm_Config {
 
     /**
      * Load data based on source
-     *
      * @param string $source source location for site configuration
-     *
      * @return void
      */
     public function __construct($source) {
@@ -264,10 +237,8 @@ class Hm_Site_Config_File extends Hm_Config {
 
     /**
      * Load user data from a file
-     *
      * @param string $source file path to the site configuration
      * @param string $key encryption key (unsued in this class)
-     *
      * @return void
      */
     public function load($source, $key) {

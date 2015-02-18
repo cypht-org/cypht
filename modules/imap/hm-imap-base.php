@@ -50,7 +50,6 @@ class Hm_IMAP_Base {
     /**
      * increment the imap command prefix such that it counts
      * up on each command sent. ('A1', 'A2', ...)
-     *
      * @return int new command count
      */
     private function command_number() {
@@ -60,12 +59,10 @@ class Hm_IMAP_Base {
 
     /**
      * Read IMAP literal found during parse_line().
-     *
      * @param int $size size of the IMAP literal to read
      * @param int $max max size to allow
      * @param int $current current size read
      * @param int $line_length amount to read in using fgets()
-     *
      * @return array the data read and any "left over" data
      *               that was inadvertantly on the same line as
      *               the last fgets result
@@ -102,12 +99,10 @@ class Hm_IMAP_Base {
     /**
      * break up a "line" response from imap. If we find
      * a literal we read ahead on the stream and include it.
-     *
      * @param string $line data read from the IMAP server
      * @param int $current_size size of current read operation
      * @param int $max maximum input size to allow
      * @param int $line_length chunk size to read literals with
-     *
      * @return array a line continuation marker and the parsed data
      *               from the IMAP server
      */
@@ -205,9 +200,7 @@ class Hm_IMAP_Base {
 
     /**
      * wrapper around fgets using $this->handle
-     *
      * @param int $len max read length for fgets
-     *
      * @return string data read from the IMAP server
      */
     protected function fgets($len=false) {
@@ -226,12 +219,10 @@ class Hm_IMAP_Base {
      * loop through "lines" returned from imap and parse them with parse_line() and read_literal.
      * it can return the lines in a raw format, or parsed into atoms. It also supports a maximum
      * number of lines to return, in case we did something stupid like list a loaded unix homedir
-     *
      * @param int $max max size of response allowed
      * @param bool $chunked flag to parse the data into IMAP "atoms"
      * @param int $line_length chunk size to read in literals using fgets
      * @param bool $sort flag for non-compliant sort result parsing speed up
-     *
      * @return array of parsed or raw results
      */
     protected function get_response($max=false, $chunked=false, $line_length=8192, $sort=false) {
@@ -359,10 +350,8 @@ class Hm_IMAP_Base {
 
     /**
      * put a prefix on a command and send it to the server
-     *
      * @param mixed $command IMAP command
      * @param bool $piped if true builds a command set out of $command
-     *
      * @return void
      */
     protected function send_command($command) {
@@ -387,10 +376,8 @@ class Hm_IMAP_Base {
 
     /**
      * determine if an imap response returned an "OK", returns true or false
-     *
      * @param array $data parsed IMAP response
      * @param bool $chunked flag defining the type of $data
-     *
      * @return bool true to indicate a success response from the IMAP server
      */
     protected function check_response($data, $chunked=false, $log_failures=true) {
@@ -423,9 +410,7 @@ class Hm_IMAP_Base {
 
     /**
      * convert UTF-7 encoded forlder names to UTF-8
-     *
      * @param string $string mailbox name to encode
-     * 
      * @return encoded mailbox
      */
     protected function utf7_decode($string) {
@@ -437,9 +422,7 @@ class Hm_IMAP_Base {
 
     /**
      * convert UTF-8 encoded forlder names to UTF-7
-     *
      * @param string $string mailbox name to decode
-     * 
      * @return decoded mailbox
      */
     protected function utf7_encode($string) {
@@ -451,10 +434,8 @@ class Hm_IMAP_Base {
 
     /**
      * type checks
-     *
      * @param string $val value to check
      * @param string $type type of value to check against
-     *
      * @return bool true if the type check passed
      */
     protected function input_validate($val, $type) {
@@ -513,10 +494,8 @@ class Hm_IMAP_Base {
 
     /*
      * check for hacky stuff
-     *
      * @param string $val value to check
      * @param string $type type the value should match
-     *
      * @return bool true if the value matches the type spec
      */
     protected function is_clean($val, $type) {
@@ -529,9 +508,7 @@ class Hm_IMAP_Base {
 
     /**
      * overwrite defaults with supplied config array
-     *
      * @param array $config associative array of configuration options
-     *
      * @return void
      */
     protected function apply_config( $config ) {
@@ -552,11 +529,9 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * helper method to grab values from the SELECT response
-     *
      * @param array $vals low level parsed select response segment
      * @param int $offset offset in the list to search for a value
      * @param string $key value in the array to start from
-     *
      * @return int the adjacent value
      */
     protected function get_adjacent_response_value($vals, $offset, $key) {
@@ -571,9 +546,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * helper function to cllect flags from the SELECT response
-     *
      * @param array $vals low level parsed select response segment
-     *
      * @return array list of flags
      */
     protected function get_flag_values($vals) {
@@ -595,10 +568,8 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * compare filter keywords against message flags
-     *
      * @param string $filter message type to filter by
      * @param string $flags IMAP flag value string
-     *
      * @return bool true if the message matches the filter
      */ 
     protected function flag_match($filter, $flags) {
@@ -623,7 +594,6 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * build a list of IMAP extensions from the capability response
-     *
      * @return void
      */
     protected function parse_extensions_from_capability() {
@@ -638,7 +608,6 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * build a QRESYNC IMAP extension paramater for a SELECT statement
-     *
      * @return string param to use
      */
     protected function build_qresync_params() {
@@ -656,9 +625,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * parse GETQUOTAROOT and GETQUOTA responses
-     *
      * @param array $data low level parsed IMAP response segment
-     *
      * @return array list of properties
      */
     protected function parse_quota_response($vals) {
@@ -680,9 +647,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * collect useful untagged responses about mailbox state from certain command responses
-     *
      * @param array $data low level parsed IMAP response segment
-     *
      * @return array list of properties
      */
     protected function parse_untagged_responses($data) {
@@ -744,9 +709,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * parse untagged ESEARCH/ESORT responses
-     *
      * @param array $vals low level parsed IMAP response segment
-     *
      * @return array list of ESEARCH response values
      */
     protected function parse_esearch_response($vals) {
@@ -768,9 +731,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * examine NOOP/SELECT/EXAMINE untagged responses to determine if the mailbox state changed
-     *
      * @param array $attributes list of attribute name/value pairs
-     *
      * @return void
      */
     protected function check_mailbox_state_change($attributes, $cached_state=false, $mailbox=false) {
@@ -807,9 +768,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * helper function to build IMAP LIST commands
-     *
      * @param bool $lsub flag to use LSUB
-     *
      * @return array IMAP LIST/LSUB commands
      */
     protected function build_list_commands($lsub, $mailbox, $keyword) {
@@ -855,9 +814,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
 
     /**
      * parse an untagged STATUS response
-     *
      * @param array $response low level parsed IMAP response segment
-     *
      * @return array list of mailbox attributes
      */
     protected function parse_status_response($response) {
@@ -912,9 +869,7 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
      * update the cache untagged QRESYNC FETCH responses
-     *
      * @param array $data low level parsed IMAP response segment
-     *
      * @return int 1 if the cache was updated
      */
     protected function update_cache_data($data) {
@@ -991,9 +946,7 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
      * cache certain IMAP command return values for re-use
-     *
      * @param array $res low level parsed IMAP response
-     * 
      * @return array initial low level parsed IMAP response argument
      */
     protected function cache_return_val($res, $command) {
@@ -1032,10 +985,8 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
      * search for cache entries to prune
-     *
      * @param int $count current number of cache entries
      * @param array $exclude list of cache keys to skip
-     *
      * @return array list of key tuples of cache entries to prune
      */
     protected function collect_cache_entries_to_prune($count, $exclude) {
@@ -1059,7 +1010,6 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
      * prune the IMAP cache if it needs it
-     *
      * @return void
      */
     protected function prune_cache($count) {
@@ -1090,10 +1040,8 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
      * determine if the current command can be served from cache
-     *
      * @param string $command IMAP command to check
      * @param bool $check_only flag to avoid double logging
-     *
      * @return mixed cached result or false if there is no cached data to use
      */
     protected function check_cache($command, $check_only=false) {
@@ -1144,9 +1092,7 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
      * invalidate parts of the data cache
-     *
      * @param string $type can be one of LIST, LSUB, ALL, or a mailbox name
-     *
      * @return void
      */
     public function bust_cache($type, $full=true) {
@@ -1191,7 +1137,6 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
      * output a string version of the cache that can be re-used
-     *
      * @return string serialized version of the cache data
      */
     public function dump_cache( $type = 'string') {
@@ -1208,7 +1153,6 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
      * load cache data from the output of dump_cache()
-     *
      * @param string $data serialized cache data from dump_cache()
      * @return void
      */
@@ -1291,9 +1235,7 @@ class Hm_IMAP_Struct {
 
     /**
      * Constructor. Takes the BODYSTRUCTURE response and builds a data representation
-     *
      * @param array $struct_response low-level parsed IMAP response
-     *
      * @return void
      */
     public function __construct($struct_response, $imap)  {
@@ -1304,10 +1246,8 @@ class Hm_IMAP_Struct {
 
     /**
      * Builds a nested array based on parens in the input
-     *
      * @param array $array low-level parsed IMAP response
      * @param int $index position in the list
-     *
      * @return array tuple of the parsed result and index
      */
     private function build($array, $index=0) {
@@ -1331,7 +1271,6 @@ class Hm_IMAP_Struct {
     }
     /**
      * Create a name => value attribute set
-     *
      * @param array $vals set of attributes
      * 
      * @return array
@@ -1350,9 +1289,7 @@ class Hm_IMAP_Struct {
 
     /**
      * Parse an ENVELOPE address
-     *
      * @param array $vals parts of an address
-     *
      * @return string
      */
     private function envelope_address($vals) {
@@ -1381,10 +1318,8 @@ class Hm_IMAP_Struct {
 
     /**
      * Prepare a value to be added to the structure
-     *
      * @param mixed $val value to add
      * @param string $type optional value type
-     *
      * @return prepared value
      */
     private function set_value($val, $type=false) {
@@ -1410,9 +1345,7 @@ class Hm_IMAP_Struct {
 
     /**
      * Parse an RFC822 ENVELOPE section
-     *
      * @param array $vals low-level IMAP response
-     *
      * @return array
      */
     private function envelope($vals) {
@@ -1427,9 +1360,7 @@ class Hm_IMAP_Struct {
 
     /**
      * Determine if this is a multipart, rfc822 message, or single part type
-     *
      * @param array $vals low-level IMAP response
-     *
      * @return string
      */
     private function get_part_type($vals) {
@@ -1451,9 +1382,7 @@ class Hm_IMAP_Struct {
 
     /**
      * Parse an RFC822 message part
-     *
      * @param array $vals low-level IMAP response
-     *
      * @return array
      */
     private function id_rfc822_part($vals) {
@@ -1484,10 +1413,8 @@ class Hm_IMAP_Struct {
 
     /**
      * Parse multipart message part
-     *
      * @param array $vals low-level IMAP response
      * @param bool $increment flag to control part ids
-     *
      * @return array
      */
     private function id_multi_part($vals, $increment=false) {
@@ -1506,9 +1433,7 @@ class Hm_IMAP_Struct {
 
     /**
      * Parse multipart message parts
-     *
      * @param array $vals low-level IMAP response
-     *
      * @return array last index and subs array
      */
     private function parse_multi_part_subs($vals) {
@@ -1528,10 +1453,8 @@ class Hm_IMAP_Struct {
 
     /**
      * Parse multipart message fields
-     *
      * @param int $index position in the array
      * @param array $vals low-level parsed IMAP response
-     *
      * @return array
      */
     private function parse_multi_part_flds($index, $vals) {
@@ -1552,9 +1475,7 @@ class Hm_IMAP_Struct {
 
     /**
      * Parse single message part
-     *
      * @param array $vals low-level IMAP response
-     *
      * @return array
      */
     private function id_single_part($vals) {
@@ -1578,9 +1499,7 @@ class Hm_IMAP_Struct {
 
     /**
      * parse the message parts at the current "level"
-     *
      * @param array $struct low-level IMAP response
-     *
      * @return array
      */
     private function id_parts($struct) {
@@ -1612,7 +1531,6 @@ class Hm_IMAP_Struct {
 
     /**
      * Increment the message part number in the weird way IMAP does.
-     *
      * @return string
      */
     private function increment_part_number() {
@@ -1632,12 +1550,10 @@ class Hm_IMAP_Struct {
 
     /**
      * Search a parsed BODYSTRUCTURE response
-     *
      * @param array $struct the response to search
      * @param array $flds key => value list of fields and values to search for
      * @param bool $all true to return all matching parts
      * @param array $res holds results during recursive iterations
-     *
      * @return array list of matching parts
      */
     public function recursive_search($struct, $flds, $all, $res) {
@@ -1673,7 +1589,6 @@ class Hm_IMAP_Struct {
 
     /**
      * Return structure
-     *
      * @return array
      */
     public function data () {
@@ -1682,14 +1597,13 @@ class Hm_IMAP_Struct {
 
     /**
      * Public search function, returns a list of matching parts
-     *
      * @param array $flds key => value pairs of fields and values to search on
      * @param bool $all true to return all matches
-     *
      * @return array
      */
     public function search($flds, $all=true) {
         return $this->recursive_search($this->struct, $flds, $all, $res=array());
     }
 }
+
 ?>

@@ -22,21 +22,17 @@ abstract class HM_Format {
     /**
      * Return combined output from all modules. Must be overridden by specific
      * output classes
-     *
      * @param array $input data from the handler modules
      * @param array $lang_str language definitions
      * @param array $allowed_output allowed fields for JSON responses
-     *
      * @return mixed combined output
      */
     abstract protected function content($input, $lang_str, $allowed_output);
 
     /**
      * Setup and run the abstract content() function
-     *
      * @param array $input data from the handler modules
      * @param array $allowed_output allowed fields for JSON responses
-     *
      * @return mixed formatted content
      */
     public function format_content($input, $allowed_output) {
@@ -51,9 +47,7 @@ abstract class HM_Format {
 
     /**
      * Load language translation strings
-     *
      * @param string $lang langauge name
-     *
      * @return array list of translated strings
      */
     public function get_language($lang) {
@@ -66,11 +60,9 @@ abstract class HM_Format {
 
     /**
      * Run output modules and collect the results
-     *
      * @param array $input data from the handler modules
      * @param string $format output format type, either JSON or HTML5
      * @param array $lang_str langauge strings
-     *
      * @return mixed module results
      */
     protected function run_modules($input, $format, $lang_str) {
@@ -109,11 +101,9 @@ class Hm_Format_JSON extends HM_Format {
 
     /**
      * Run modules and merge + filter the result array
-     *
      * @param array $input data from the handler modules
      * @param array $lang_str langauge strings
      * @param array $allowed_output allowed fields for JSON responses
-     *
      * @return JSON encoded data to be sent to the browser
      */
     public function content($input, $lang_str, $allowed_output) {
@@ -125,10 +115,8 @@ class Hm_Format_JSON extends HM_Format {
 
     /**
      * Filter data against module set white lists before sending it to the browser
-     *
      * @param array $data output module data to filter
      * @param array $allowed set of white list filters
-     *
      * @return array filtered data
      */
     public function filter_output($data, $allowed) {
@@ -162,11 +150,9 @@ class Hm_Format_HTML5 extends HM_Format {
 
     /**
      * Collect and return content from modules for HTTP requests
-     *
      * @param array $input data from the handler modules
      * @param array $lang_str langauge strings
      * @param array $allowed_output allowed fields for JSON responses
-     *
      * @return string HTML5 content
      */
     public function content($input, $lang_str, $allowed_output) {

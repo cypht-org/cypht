@@ -59,10 +59,8 @@ abstract class Hm_Session {
 
     /**
      * Setup initial data
-     *
      * @param object $config site config
      * @param string $auth_type authentication class
-     *
      * @return void
      */
     public function __construct($config, $auth_type='Hm_Auth_DB') {
@@ -74,7 +72,6 @@ abstract class Hm_Session {
     /**
      * Lazy loader for the auth mech so modules can define their own
      * overrides
-     *
      * @return void
      */
     protected function load_auth_mech() {
@@ -85,7 +82,6 @@ abstract class Hm_Session {
 
     /**
      * Method called on a new login
-     *
      * @return void
      */
     protected function just_started() {
@@ -94,9 +90,7 @@ abstract class Hm_Session {
 
     /**
      * Check HTTP header "fingerprint" against the session value
-     *
      * @param object $request request details
-     *
      * @return void
      */
     public function check_fingerprint($request) {
@@ -110,9 +104,7 @@ abstract class Hm_Session {
 
     /**
      * Build HTTP header "fingerprint"
-     *
      * @param object $request request details
-     *
      * @return string fingerprint value
      */
     public function build_fingerprint($request, $input='') {
@@ -129,9 +121,7 @@ abstract class Hm_Session {
 
     /**
      * Save a fingerprint in the session
-     *
      * @param object $request request details
-     *
      * @return void
      */
     protected function set_fingerprint($request) {
@@ -141,9 +131,7 @@ abstract class Hm_Session {
 
     /**
      * Record session level changes not yet saved in persistant storage
-     *
      * @param string $vaue short description of the unsaved value
-     *
      * @return void
      */
     public function record_unsaved($value) {
@@ -152,7 +140,6 @@ abstract class Hm_Session {
 
     /**
      * Returns bool true if the session is active
-     *
      * @return bool
      */
     public function is_active() {
@@ -161,9 +148,7 @@ abstract class Hm_Session {
 
     /**
      * Encrypt session data
-     *
      * @param array $data session data to encrypt
-     *
      * @return string encrypted session data
      */
     public function ciphertext($data) {
@@ -172,9 +157,7 @@ abstract class Hm_Session {
 
     /**
      * Decrypt session data
-     *
      * @param array $data encrypted session data
-     *
      * @return array decrpted session data
      */
     public function plaintext($data) {
@@ -183,9 +166,7 @@ abstract class Hm_Session {
 
     /**
      * Set the session level encryption key
-     *
      * @param object $request request details
-     *
      * @return void
      */
     protected function set_key($request) {
@@ -195,9 +176,7 @@ abstract class Hm_Session {
 
     /**
      * Fetch the current encryption key
-     *
      * @param object $request request details
-     *
      * @return void
      */
     public function get_key($request) {
@@ -209,7 +188,6 @@ abstract class Hm_Session {
 
     /**
      * Set a cookie, secure if possible
-     *
      * @param object $request request details
      * @param string $name cookie name
      * @param string $value cookie value
@@ -217,7 +195,6 @@ abstract class Hm_Session {
      * @param string $path cookie path
      * @param string $domain cookie domain
      * @param string $html_only set html only cookie flag
-     *
      * @return void
      */
     public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='', $html_only=true) {
@@ -250,11 +227,9 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Check for an existing session or a new user/pass login request
-     *
      * @param object $request request details
      * @param string $user username
      * @param string $pass password
-     *
      * @return void
      */
     public function check($request, $user=false, $pass=false) {
@@ -283,10 +258,8 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Call the configured authentication method to check user credentials
-     *
      * @param string $user username
      * @param string $pass password
-     *
      * @return bool true if the authentication was successful
      */
     public function auth($user, $pass) {
@@ -296,10 +269,8 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Call the configuration authentication method to change the user password
-     *
      * @param string $user username
      * @param string $pass password
-     *
      * @return bool true if the password was changed
      */
     public function change_pass($user, $pass) {
@@ -309,11 +280,9 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Call the configuration authentication method to create an account
-     *
      * @param object $request request details
      * @param string $user username
      * @param string $pass password
-     *
      * @return bool true if the account was created
      */
     public function create($request, $user, $pass) {
@@ -325,9 +294,7 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Start the session. This could be an existing session or a new login
-     *
      * @param object $request request details
-     *
      * @return void
      */
     public function start($request) {
@@ -357,9 +324,7 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Setup the cookie params for a session cookie
-     *
      * @param object $request request details
-     *
      * @return array list of cookie fields
      */
     public function set_session_params($request) {
@@ -382,11 +347,9 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Return a session value, or a user settings value stored in the session
-     *
      * @param string $name session value name to return
      * @param mixed $default value to return if $name is not found
      * @param bool $user if true, only search the user_data section of the session
-     *
      * @return mixed the value if found, otherwise $default
      */
     public function get($name, $default=false, $user=false) {
@@ -400,11 +363,9 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Save a value in the session
-     *
      * @param string $name the name to save
      * @param string $value the value to save
      * @param bool $user if true, save in the user_data section of the session
-     *
      * @return void
      */
     public function set($name, $value, $user=false) {
@@ -418,9 +379,7 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Delete a value from the session
-     *
      * @param string $name name of value to delete
-     *
      * @return void
      */
     public function del($name) {
@@ -432,7 +391,6 @@ class Hm_PHP_Session extends Hm_Session {
     /**
      * End a session after a page request is complete. This only closes the session and
      * does not destroy it
-     *
      * @return void
      */
     public function end() {
@@ -446,7 +404,6 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Write session data to avoid locking, keep session active, but don't allow writing
-     *
      * @return void
      */
     public function close_early() {
@@ -456,7 +413,6 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Save session data
-     *
      * @return void
      */
     public function save_data() {
@@ -468,9 +424,7 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Destroy a session for good
-     *
      * @param object $request request details
-     *
      * @return void
      */
     public function destroy($request) {
@@ -501,7 +455,6 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Create a new session
-     *
      * @return bool true on success
      */
     public function insert_session_row() {
@@ -515,7 +468,6 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Connect to the configured DB
-     *
      * @return bool true on success
      */
     public function connect() {
@@ -528,9 +480,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Start the session. This could be an existing session or a new login
-     *
      * @param object $request request details
-     *
      * @return void
      */
     public function start($request) {
@@ -549,9 +499,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Start a new session
-     *
      * @param object $request request details
-     *
      * @return void
      */
     public function start_new_session($request) {
@@ -564,10 +512,8 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Continue an existing session
-     *
      * @param object $request request details
      * @param string $key session key
-     *
      * @return void
      */
     public function start_existing_session($request, $key) {
@@ -588,7 +534,6 @@ class Hm_DB_Session extends Hm_PHP_Session {
     /**
      * End a session after a page request is complete. This only closes the session and
      * does not destroy it
-     *
      * @return void
      */
     public function end() {
@@ -600,7 +545,6 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Write session data to the db
-     *
      * @return void
      */
     public function save_data() {
@@ -614,7 +558,6 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Close a session early, but don't destroy it
-     *
      * @return void
      */
     public function close_early() {
@@ -624,9 +567,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Destroy a session for good
-     *
      * @param object $request request details
-     *
      * @return void
      */
     public function destroy($request) {

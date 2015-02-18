@@ -33,10 +33,8 @@ class Hm_Crypt {
 
     /**
      * Convert ciphertext to plaintext
-     *
      * @param string $string ciphertext to decrypt
      * @param string $key encryption key
-     *
      * @return string decrypted text
      */
     public static function plaintext($string, $key) {
@@ -50,10 +48,8 @@ class Hm_Crypt {
 
     /**
      * Convert plaintext into ciphertext
-     *
      * @param string $string plaintext to encrypt
      * @param string $key encryption key
-     *
      * @return string encrypted text
      */
     public static function ciphertext($string, $key) {
@@ -65,7 +61,6 @@ class Hm_Crypt {
 
     /**
      * Calculate iv size
-     *
      * @return int "Initialization Vector" size for the selected cipher/mode
      */
     public static function iv_size() {
@@ -74,7 +69,6 @@ class Hm_Crypt {
 
     /**
      * Return a unique-enough-key for session cookie ids
-     *
      * @return string
      */
     public static function unique_id($size=128) {
@@ -101,9 +95,7 @@ class Hm_Nonce {
 
     /**
      * Load a saved list from the session
-     *
      * @param object $session session interface
-     * 
      * @return void
      */
     public static function load($session, $config, $request) {
@@ -113,7 +105,6 @@ class Hm_Nonce {
 
     /**
      * Return the site key, used for logged out page nonce
-     *
      * @return string site key
      */
     public static function site_key() {
@@ -122,9 +113,7 @@ class Hm_Nonce {
 
     /**
      * Validate the site key
-     *
      * @param string $key key to validate
-     *
      * @return bool
      */
     public static function validate_site_key($key) {
@@ -133,7 +122,6 @@ class Hm_Nonce {
 
     /**
      * Generate a new nonce, and trim the list if need be
-     *
      * @return string new random string
      */
     public static function generate() {
@@ -147,7 +135,6 @@ class Hm_Nonce {
 
     /**
      * Keep the list tidy
-     *
      * @return void
      */
     private static function trim_list() {
@@ -158,9 +145,7 @@ class Hm_Nonce {
 
     /**
      * Save the list into the session
-     *
      * @param object $session session interface
-     *
      * @return void
      */
     public static function save($session) {
@@ -169,9 +154,7 @@ class Hm_Nonce {
 
     /**
      * Validate a nonce
-     *
      * @param string $nonce value to check
-     *
      * @return bool true on success
      */
     public static function validate($nonce) {

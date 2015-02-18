@@ -10,7 +10,6 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Setup commonly used modules for a page
- *
  * @param $name string the page id
  * @param $source string the module set name
  * @return void
