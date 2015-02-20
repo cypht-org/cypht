@@ -14,7 +14,15 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Output_dev_content extends Hm_Output_Module {
     protected function output() {
         return '<div class="dev_content"><div class="content_title">'.$this->trans('Developer Documentation').'</div>'.
-            '<div class="long_text"></div></div>';
+            '<div class="long_text">'.
+            'There is not a lot of documentation yet, but there are a few resources available online. First is the module overview page at our website intended for developers interested in creating module sets.'.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/modules.html">http://cypht.org/modules.html</a>'.
+            '<br /><br />Code Documentation for Cypht is auto-generated using <a href="http://www.apigen.org/">Apigen</a> and while '.
+            'not yet complete, has a lot of useful information'.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/docs/code_docs/index.html">http://cypht.org/docs/code_docs/index.html</a>'.
+            '<br /><br />Finally there is a "hello world" module with lots of comments included in the project download and browsable at github'.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/jasonmunro/hm3/tree/master/modules/hello_world">https://github.com/jasonmunro/hm3/tree/master/modules/hello_world</a>'.
+            '</div></div>';
     }
 }
 
@@ -24,7 +32,12 @@ class Hm_Output_dev_content extends Hm_Output_Module {
 class Hm_Output_bug_report_form extends Hm_Output_Module {
     protected function output() {
         return '<div class="bug_report"><div class="content_title">'.$this->trans('Report a bug').'</div>'.
-            '<div class="long_text">'.$this->trans('If you found a bug or want a feature we want to hear from you!').'</div></div>';
+            '<div class="long_text">'.
+            'If you found a bug or want to request a feature - we want to hear from you!'.
+            '<br /><br />Please file an issue report at github with the following form'.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/jasonmunro/hm3/issues/new">https://github.com/jasonmunro/hm3/issues/new</a>'.
+            '<br /><br />Thanks for your help making Cypht better!'.
+            '</div></div>';
     }
 }
 

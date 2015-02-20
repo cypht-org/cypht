@@ -110,7 +110,6 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .hide_folders img { opacity: .4; }
 .section_caret { opacity: .15; vertical-align: 4px; padding-right: 10px; }
 .server_count { float: right; margin-right: 120px; font-size: 90%; }
-.long_text { margin-left: 30px; margin-top: 20px; max-width: 60%; color: #666; }
 .email_setting, .all_setting, .unread_setting, .flagged_setting, .general_setting { display: none; }
 .configured_server, .add_server { margin-top: 10px; color: #666; background-color: #fff; margin-bottom: 20px; padding: 10px; width: 200px; }
 .message_list { min-height: 600px; background-color: #fff; height: 100%; padding-bottom: 20px; }
