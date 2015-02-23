@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Hm_Oauth2 | Cypht Documentation</title>
+
+	<script type="text/javascript" src="resources/combined.js?117538352"></script>
+	<script type="text/javascript" src="elementlist.js?3177527013"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Packages</h3>
+			<ul>
+				<li class="active"><a href="package-framework.html">framework<span></span></a>
+						<ul>
+				<li><a href="package-framework.auth.html">auth</a>
+						</li>
+				<li><a href="package-framework.cache.html">cache</a>
+						</li>
+				<li><a href="package-framework.config.html">config</a>
+						</li>
+				<li><a href="package-framework.crypt.html">crypt</a>
+						</li>
+				<li><a href="package-framework.db.html">db</a>
+						</li>
+				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li class="active"><a href="package-framework.oauth2.html">oauth2</a>
+						</li>
+				<li><a href="package-framework.output.html">output</a>
+						</li>
+				<li><a href="package-framework.request.html">request</a>
+						</li>
+				<li><a href="package-framework.router.html">router</a>
+						</li>
+				<li><a href="package-framework.servers.html">servers</a>
+						</li>
+				<li><a href="package-framework.session.html">session</a>
+						</li>
+				<li><a href="package-framework.setup.html">setup</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.html">modules<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.html">account<span></span></a>
+						<ul>
+				<li><a href="package-modules.account.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.account.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.calendar.html">calendar<span></span></a>
+						<ul>
+				<li><a href="package-modules.calendar.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.calendar.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.calendar.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.contacts.html">contacts<span></span></a>
+						<ul>
+				<li><a href="package-modules.contacts.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.contacts.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.contacts.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.core.html">core<span></span></a>
+						<ul>
+				<li><a href="package-modules.core.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.core.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.core.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.feeds.html">feeds<span></span></a>
+						<ul>
+				<li><a href="package-modules.feeds.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.feeds.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.feeds.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.feeds.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.hackernews.html">hackernews<span></span></a>
+						<ul>
+				<li><a href="package-modules.hackernews.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.hackernews.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.hackernews.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.helloworld.html">helloworld<span></span></a>
+						<ul>
+				<li><a href="package-modules.helloworld.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.helloworld.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.idletimer.html">idletimer<span></span></a>
+						<ul>
+				<li><a href="package-modules.idletimer.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.idletimer.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.imap.html">imap<span></span></a>
+						<ul>
+				<li><a href="package-modules.imap.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.imap.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.imap.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.imap.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.info.html">info<span></span></a>
+						<ul>
+				<li><a href="package-modules.info.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.nux.html">nux<span></span></a>
+						<ul>
+				<li><a href="package-modules.nux.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.nux.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.nux.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.nux.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.pop3.html">pop3<span></span></a>
+						<ul>
+				<li><a href="package-modules.pop3.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.pop3.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.pop3.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.pop3.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.profile.html">profile<span></span></a>
+						<ul>
+				<li><a href="package-modules.profile.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.smtp.html">smtp<span></span></a>
+						<ul>
+				<li><a href="package-modules.smtp.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.smtp.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.smtp.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.smtp.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.swipe2fa.html">swipe2fa<span></span></a>
+						<ul>
+				<li><a href="package-modules.swipe2fa.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.swipe2fa.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.themes.html">themes<span></span></a>
+						<ul>
+				<li><a href="package-modules.themes.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.themes.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.themes.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.wordpress.html">wordpress<span></span></a>
+						<ul>
+				<li><a href="package-modules.wordpress.output.html">output</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Hm_Oauth2.html">Hm_Oauth2</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="package-framework.oauth2.html" title="Summary of framework\oauth2"><span>Package</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Hm_Oauth2</h1>
+
+
+	<div class="description">
+	
+<p>Class for deailing with Oauth2</p>
+
+	</div>
+
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		
+		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.oauth2.html">oauth2</a><br>
+
+		<b>Located at</b> <a href="source-class-Hm_Oauth2.html#11-52" title="Go to source code">oauth2.php</a><br>
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			object
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Hm_Oauth2.html#20-32" title="Go to source code">__construct</a>( <span>string <var>$id</var></span>, <span>string <var>$secret</var></span>, <span>string <var>$uri</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Load default settings</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Load default settings</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>string</code><br>$id Oath2 client id</dd>
+					<dt><var>$secret</var></dt>
+					<dd><code>string</code><br>$secret Oath2 client secret</dd>
+					<dt><var>$uri</var></dt>
+					<dd><code>string</code><br>$redirect_uri URI to redirect to from the remote site</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>object</code><br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="request_authorization_url" id="_request_authorization_url">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_request_authorization_url">#</a>
+		<code><a href="source-class-Hm_Oauth2.html#34-41" title="Go to source code">request_authorization_url</a>( <span>mixed <var>$url</var></span>, <span>mixed <var>$scope</var></span>, <span>mixed <var>$state</var></span>, <span>mixed <var>$login_hint</var> = <span class="php-keyword1">false</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="process_authorization" id="_process_authorization">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_process_authorization">#</a>
+		<code><a href="source-class-Hm_Oauth2.html#43-44" title="Go to source code">process_authorization</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="request_token" id="_request_token">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_request_token">#</a>
+		<code><a href="source-class-Hm_Oauth2.html#46-47" title="Go to source code">request_token</a>( <span>mixed <var>$authorization_code</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="process_token" id="_process_token">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_process_token">#</a>
+		<code><a href="source-class-Hm_Oauth2.html#49-50" title="Go to source code">process_token</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="client_id" id="$client_id">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Oauth2.html#16" title="Go to source code"><var>$client_id</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$client_id" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="client_secret" id="$client_secret">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Oauth2.html#17" title="Go to source code"><var>$client_secret</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$client_secret" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="redirect_uri" id="$redirect_uri">
+		<td class="attributes"><code>
+			private  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Oauth2.html#18" title="Go to source code"><var>$redirect_uri</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$redirect_uri" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

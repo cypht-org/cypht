@@ -8,7 +8,7 @@
 	<title>File themes/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?2103743580"></script>
+	<script type="text/javascript" src="elementlist.js?3177527013"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -37,6 +37,8 @@
 				<li><a href="package-framework.format.html">format</a>
 						</li>
 				<li><a href="package-framework.modules.html">modules</a>
+						</li>
+				<li><a href="package-framework.oauth2.html">oauth2</a>
 						</li>
 				<li><a href="package-framework.output.html">output</a>
 						</li>
@@ -135,6 +137,17 @@
 				<li><a href="package-modules.info.html">info<span></span></a>
 						<ul>
 				<li><a href="package-modules.info.output.html">output</a>
+						</li>
+							</ul></li>
+				<li><a href="package-modules.nux.html">nux<span></span></a>
+						<ul>
+				<li><a href="package-modules.nux.functions.html">functions</a>
+						</li>
+				<li><a href="package-modules.nux.handler.html">handler</a>
+						</li>
+				<li><a href="package-modules.nux.lib.html">lib</a>
+						</li>
+				<li><a href="package-modules.nux.output.html">output</a>
 						</li>
 							</ul></li>
 				<li><a href="package-modules.pop3.html">pop3<span></span></a>
@@ -306,10 +319,10 @@
 </span><span id="58" class="l"><a class="l" href="#58"> 58: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="59" class="l"><a class="l" href="#59"> 59: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'theme'</span>) &amp;&amp; <span class="php-keyword2">in_array</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'theme'</span>), <span class="php-keyword2">array_keys</span>(hm_themes(<span class="php-var">$this</span>)), <span class="php-keyword1">true</span>) &amp;&amp; <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'theme'</span>) != <span class="php-quote">'default'</span>) {
 </span><span id="60" class="l"><a class="l" href="#60"> 60: </a>            <span class="php-keyword1">if</span> (DEBUG_MODE) {
-</span><span id="61" class="l"><a class="l" href="#61"> 61: </a>                <span class="php-keyword1">return</span> <span class="php-quote">'&lt;link href=&quot;modules/themes/assets/'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'theme'</span>)).<span class="php-quote">'.css&quot; css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;'</span>;
+</span><span id="61" class="l"><a class="l" href="#61"> 61: </a>                <span class="php-keyword1">return</span> <span class="php-quote">'&lt;link href=&quot;modules/themes/assets/'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'theme'</span>)).<span class="php-quote">'.css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;'</span>;
 </span><span id="62" class="l"><a class="l" href="#62"> 62: </a>            }
 </span><span id="63" class="l"><a class="l" href="#63"> 63: </a>            <span class="php-keyword1">else</span> {
-</span><span id="64" class="l"><a class="l" href="#64"> 64: </a>                <span class="php-keyword1">return</span> <span class="php-quote">'&lt;link href=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'theme'</span>)).<span class="php-quote">'.css&quot; css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;'</span>;
+</span><span id="64" class="l"><a class="l" href="#64"> 64: </a>                <span class="php-keyword1">return</span> <span class="php-quote">'&lt;link href=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'theme'</span>)).<span class="php-quote">'.css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;'</span>;
 </span><span id="65" class="l"><a class="l" href="#65"> 65: </a>            }
 </span><span id="66" class="l"><a class="l" href="#66"> 66: </a>        }
 </span><span id="67" class="l"><a class="l" href="#67"> 67: </a>    }
@@ -384,15 +397,17 @@
 </span><span id="136" class="l"><a class="l" href="#136">136: </a>        <span class="php-quote">'bug'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQEg0kk2rtJwAAARlJREFUOMuVkzFLA0EQhd9cTomIP0Cs7LX2J6S3SKEggoKVla3gzwqIpk2qFObAg4CdnRYWEeQSP5tdGZNdNdMt8+bNm3mz0kIABtwAr8ALcK1VArhiOS5XIXhOEExyeAPMzAjFLUmNJFvAvZvZZoqgkDQGxkBX0qek2wSuBxTAEVADAy954KRWwCQxQg08uve9JyiALvDA3zECDgFLLe/iHwSnqcKnDHgPOMjkhrG+lDRLLG1uZhVQZtybf9sYry/Y13IEZSBoXOGHmbV/2Bi8P8koWeoMHAOF30GdmHEWcmVmBxWwFQ9pW1Il6VzSNPImur9JOpNUS9qRtB4VbERfg8cNcOcU9oEp0HF30/7tM+17ALAG7ObwXxBErsUZoqtGAAAAAElFTkSuQmCC'</span>,
 </span><span id="137" class="l"><a class="l" href="#137">137: </a>        <span class="php-quote">'code'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQEg4lz0COcgAAAFZJREFUOMvVkjEOACAIA4sf06fjy3DQSYla46BdSe4IFPgiZpasRk8B2gCJNvQzFzYz9LNBxthdKGP3wGF2eQARQBYRpV9EbbY81Eq49aobnbjTuudSAJWIFxhNJ9xxAAAAAElFTkSuQmCC'</span>,
 </span><span id="138" class="l"><a class="l" href="#138">138: </a>        <span class="php-quote">'refresh'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQEhAT1LskNAAAAOhJREFUOMul00tKQ2EMBeBQKnbgOgSpVXBScCniLlyAoEgHIviWLqa4DHUginuQWq39nOTC9ae1cD0QSEhy8iIRBbCNOzxhgk884gobRexR3ehgiJnfqNvfOMMKTqCefJ9B7xigh3bKDm7xlTHPFWNFMEz7BeuxANjFuN5eNfMsKy9MToLjYjyRC4PBkuRDTEuJ3Db0ognyVNBukt+Kf6IVEa+pd5sSjFLfb7qDrTzjGN2mJDe5yDdsLil2MM+xilGSfOACfayl9HGePtibR9LJTspnqmOK0z9Pnk90jYesOEn9snzniIgfZ+Kj5XvXk6YAAAAASUVORK5CYII='</span>,
-</span><span id="139" class="l"><a class="l" href="#139">139: </a>
-</span><span id="140" class="l"><a class="l" href="#140">140: </a>    );
-</span><span id="141" class="l"><a class="l" href="#141">141: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$icons</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
-</span><span id="142" class="l"><a class="l" href="#142">142: </a>        Hm_Image_Sources::<span class="php-var">$$name</span> = <span class="php-var">$value</span>;
-</span><span id="143" class="l"><a class="l" href="#143">143: </a>    }
-</span><span id="144" class="l"><a class="l" href="#144">144: </a>}
-</span><span id="145" class="l"><a class="l" href="#145">145: </a>
-</span><span id="146" class="l"><a class="l" href="#146">146: </a><span class="xlang">?&gt;</span>
-</span><span id="147" class="l"><a class="l" href="#147">147: </a></span></code></pre>
+</span><span id="139" class="l"><a class="l" href="#139">139: </a>        <span class="php-quote">'chevron'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wITFjIwxNIUVAAAAD5JREFUGNOVjcEJADAIAzNK9p/CUdzk+rHQilCa15ELKr0CGAjAY1cAkCVcDBBqRTb2eXKLW7a/Oco2sn6yAG+SeRX0vYSzAAAAAElFTkSuQmCC'</span>,
+</span><span id="140" class="l"><a class="l" href="#140">140: </a>        <span class="php-quote">'circle_check'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIXARYef+fanwAAAP5JREFUOMuVk01uwjAUhMdRpYYLsOiaBohURT0Cl4EDQQULrgJUvUB3IOiy5e8GsOFj86iMSUL4JEtxkhk/j5+lAOAdGAEr4GhjCQyBTEUANWBMOSczj/PEX1Tn88qkwsoX1sDGnof+nqvwB7wCTWBr28kiST3dZy2p45z7kRTZOyepK0s7XGkbzBtWbRvYed8WsmPy99gAWmbyWyIGOOQZJCZoeeI0R/xvsMxJOvFOKAX2BcHOI0nTILAXSTMgAVJJM0n1gnAnztrz21L12Uh6KhEjKbuUOeJxBn4nxtaeVZkCz+F9iK2S053LNLgRB0YZ8AEsgIONOdAH3sL/z413lqgszXfqAAAAAElFTkSuQmCC'</span>,
+</span><span id="141" class="l"><a class="l" href="#141">141: </a>
+</span><span id="142" class="l"><a class="l" href="#142">142: </a>    );
+</span><span id="143" class="l"><a class="l" href="#143">143: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$icons</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
+</span><span id="144" class="l"><a class="l" href="#144">144: </a>        Hm_Image_Sources::<span class="php-var">$$name</span> = <span class="php-var">$value</span>;
+</span><span id="145" class="l"><a class="l" href="#145">145: </a>    }
+</span><span id="146" class="l"><a class="l" href="#146">146: </a>}
+</span><span id="147" class="l"><a class="l" href="#147">147: </a>
+</span><span id="148" class="l"><a class="l" href="#148">148: </a><span class="xlang">?&gt;</span>
+</span><span id="149" class="l"><a class="l" href="#149">149: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
