@@ -45,13 +45,13 @@ class Hm_Handler_process_nux_service extends Hm_Handler_Module {
 class Hm_Output_quick_add_dialog extends Hm_Output_Module {
     protected function output() {
         return '<div class="quick_add_section">'.
-            '<form method="post">'.
+            '<div class="nux_step_one">'.
             '<label class="screen_reader" for="service_select">'.$this->trans('Select an E-mail provider').'</label>'.
             ' <select id="service_select" name="service_select"><option value="">'.$this->trans('Select an E-mail provider').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>'.
             '<label class="screen_reader" for="nux_username">'.$this->trans('Username').'</label>'.
-            '<br /><input type="email" class="nux_username" placeholder="'.$this->trans('Enter Your E-mail address').'" />'.
+            '<br /><input type="email" id="nux_username" class="nux_username" placeholder="'.$this->trans('Enter Your E-mail address').'" />'.
             '<br /><input type="button" class="nux_next_button" value="'.$this->trans('Next').'" />'.
-            '</form></div><div class="nux_step_two"></div></div>';
+            '</div><div class="nux_step_two"></div></div></div>';
     }
 }
 
@@ -79,7 +79,7 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
             '<img src="'.Hm_Image_Sources::$circle_check.'" alt="" width="16" height="16" /> '.
-            $this->trans('Quick Add').'</div>';
+            $this->trans('Quickly Add An E-mail Account').'</div>';
     }
 }
 
@@ -192,8 +192,7 @@ Nux_Quick_Services::add('zoho', array(
 function oauth2_form($details, $mod) {
     $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
     $url = $oauth2->request_authorization_url($details['oauth2_authorization'], $details['scope'], 'authorization', $details['email']);
-    $res = '<form method="post">';
-    $res .= '<input type="hidden" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
+    $res = '<input type="hidden" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
     $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div><div>';
     if (array_key_exists('2fa', $details)) {
         $res .= $mod->trans('This service supports 2 factor authentication. If you have 2 factor authentication enabled, you will need an application password to access your account');
@@ -204,10 +203,9 @@ function oauth2_form($details, $mod) {
     else {
         $res .= $mod->trans('This provider supports Oauth2 access to your account.');
     }
-    $res .= $mod->trans(' This is the most secure way to access your E-mail. Click "Enable" to be reidrected to the provider site to allow access.');
+    $res .= $mod->trans(' This is the most secure way to access your E-mail. Click "Enable" to be redirected to the provider site to allow access.');
     $res .= '</div><a class="enable_auth2" href="'.$url.'">'.$mod->trans('Enable').'</a>';
     $res .= '<a href="" class="reset_nux_form">Reset</a>';
-    $res .= '</form>';
     return $res;
 }
 
@@ -215,15 +213,13 @@ function oauth2_form($details, $mod) {
  * @subpackage nux/functions
  */
 function credentials_form($details, $mod) {
-    $res = '<form method="post">';
-    $res .= '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
+    $res = '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
     $res .= '<input type="hidden" id="nux_email" name="nux_email" value="'.$mod->html_safe($details['email']).'" />';
     $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div>';
     $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
     $res .= '<br /><br /><input type="password" placeholder="'.$mod->trans('E-Mail Password').'" name="nux_password" class="nux_password" />';
     $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
     $res .= '<a href="" class="reset_nux_form">Reset</a>';
-    $res .= '</form>';
     return $res;
 }
 ?>

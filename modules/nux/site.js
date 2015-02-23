@@ -1,9 +1,9 @@
 var display_next_nux_step = function(res) {
     $('.nux_step_two').html(res.nux_service_step_two);
-    $('.quick_add_section').hide();
+    $('.nux_step_one').hide();
     $('.nux_submit').click(nux_add_account);
     $('.reset_nux_form').click(function() {
-        $('.quick_add_section').show();
+        $('.nux_step_one').show();
         $('.nux_step_two').html('');
         document.getElementById('service_select').getElementsByTagName('option')[0].selected = 'selected';
         $('.nux_username').val('');
