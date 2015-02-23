@@ -128,8 +128,6 @@ Nux_Quick_Services::add('gmail', array(
     'auth' => 'oauth2',
     '2fa' => 'https://www.google.com/landing/2step/',
     'oauth2_authorization' => 'https://accounts.google.com/o/oauth2/auth',
-    'client_id' => '163910415595-atnjhgf4h4sp0fegll6s4jcdn5ssgu55.apps.googleusercontent.com',
-    'client_secret' => 'r98hAAYlpm6KGhgsQX00J1z3', 'redirect_uri' => 'http://localhost/hm3/',
     'scope' => ' https://mail.google.com/'
 ));
 
