@@ -31,7 +31,13 @@ class Hm_Oauth2 {
         $this->redirect_uri = $uri;
     }
 
-    public function request_authorization($scope, $state) {
+    public function request_authorization_url($url, $scope, $state, $login_hint=false) {
+        $res = sprintf('%s?response_type=code&amp;scope=%s&amp;state=%s&amp;client_id=%s&amp;redirect_uri=%s',
+            $url, $scope, $state, $this->client_id, $this->redirect_uri);
+        if ($login_hint) {
+            $res .= '&amp;login_hint='.$login_hint;
+        }
+        return $res;
     }
 
     public function process_authorization() {
