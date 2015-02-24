@@ -19,7 +19,6 @@ class Hm_Oauth2 {
 
     /**
      * Load default settings
-     * @subpackage oath2/lib
      * @param string $id Oath2 client id
      * @param string $secret Oath2 client secret
      * @param string $redirect_uri URI to redirect to from the remote site
@@ -31,6 +30,14 @@ class Hm_Oauth2 {
         $this->redirect_uri = $uri;
     }
 
+    /**
+     * Build a URL to request an authorization
+     * @param string $url host to request authorization from
+     * @param string $scope oauth2 scope
+     * @param string $state current state of the oauth2 flow
+     * @param string $login_hint optional username
+     * @return string
+     */
     public function request_authorization_url($url, $scope, $state, $login_hint=false) {
         $res = sprintf('%s?response_type=code&amp;scope=%s&amp;state=%s&amp;client_id=%s&amp;redirect_uri=%s',
             $url, $scope, $state, $this->client_id, $this->redirect_uri);
@@ -40,15 +47,27 @@ class Hm_Oauth2 {
         return $res;
     }
 
-    public function process_authorization() {
+    /**
+     * Use curl to exchange an authorization code for a token
+     * @param string $url url to post to
+     * @param string $authorization_code oauth2 auth code
+     * @return array
+     */
+    public function request_token($url, $authorization_code) {
+        $result = array();
+        $flds = sprintf('code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code',
+            urlencode($authorization_code), urlencode($this->client_id), urlencode($this->client_secret), urlencode($this->redirect_uri ));
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 5);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $flds);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $curl_result = curl_exec($ch);
+        if (substr($curl_result, 0, 1) == '{') {
+            $result = @json_decode($curl_result, true);
+        }
+        return $result;
     }
-
-    public function request_token($authorization_code) {
-    }
-
-    public function process_token() {
-    }
-
 }
 
 ?>
