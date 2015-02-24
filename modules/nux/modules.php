@@ -247,4 +247,13 @@ Nux_Quick_Services::add('zoho', array(
     'auth' => 'login'
 ));
 
+Nux_Quick_Services::add('fastmail', array(
+    'server' => 'mail.messagingengine.com',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Fastmail',
+    'auth' => 'login'
+));
+
 ?>
