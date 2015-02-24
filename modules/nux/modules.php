@@ -16,6 +16,54 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage nux/handler
  */
+class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('state', $this->request->get) && $this->request->get['state'] == 'authorization') {
+            if (array_key_exists('code', $this->request->get)) {
+                $details = $this->session->get('nux_add_service_details');
+                $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
+                $result = $oauth2->request_token($details['oauth2_token'], $this->request->get['code']);
+                if (!empty($result) && array_key_exists('access_token', $result)) {
+                    Hm_IMAP_List::add(array(
+                        'name' => $details['name'],
+                        'server' => $details['server'],
+                        'port' => $details['port'],
+                        'tls' => $details['tls'],
+                        'user' => $details['email'],
+                        'pass' => $result['access_token'],
+                        'auth' => 'xoauth2'));
+                    Hm_Msgs::add('E-mail account successfully added');
+                    $servers = Hm_IMAP_List::dump(false, true);
+                    $this->user_config->set('imap_servers', $servers);
+                    Hm_IMAP_List::clean_up();
+                    $user_data = $this->user_config->dump();
+                    if (!empty($user_data)) {
+                        $this->session->set('user_data', $user_data);
+                    }
+                    $this->session->record_unsaved('IMAP server added');
+                    $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
+                    $this->session->close_early();
+                }
+                else {
+                    Hm_Msgs::add('ERRAn Error Occured');
+                }
+            }
+            elseif (array_key_exists('error', $this->request->get)) {
+                Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
+            }
+            else {
+                Hm_Msgs::add('ERRAn Error Occured');
+            }
+            $msgs = Hm_Msgs::get();
+            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
+            Hm_Router::page_redirect('?page=servers');
+        }
+    }
+}
+
+/**
+ * @subpackage nux/handler
+ */
 class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('nux_pass', 'nux_service', 'nux_email'));
@@ -48,6 +96,7 @@ class Hm_Handler_process_nux_service extends Hm_Handler_Module {
                 $details['id'] = $form['nux_service'];
                 $details['email'] = $form['nux_email'];
                 $this->out('nux_add_service_details', $details);
+                $this->session->set('nux_add_service_details', $details);
             }
         }
     }
@@ -145,7 +194,6 @@ class Nux_Quick_Services {
             $settings = parse_ini_file($ini_file, true);
             if (!empty($settings)) {
                 foreach ($settings as $service => $vals) {
-                    elog($service);
                     self::$services[$service]['client_id'] = $vals['client_id'];
                     self::$services[$service]['client_secret'] = $vals['client_secret'];
                     self::$services[$service]['redirect_uri'] = $vals['client_uri'];
@@ -155,6 +203,9 @@ class Nux_Quick_Services {
         self::$oauth2 = $settings;
     }
 
+    /**
+     * @todo uasort
+     */
     static public function option_list($current, $mod) {
         $res = '';
         foreach(self::$services as $id => $details) {
@@ -189,6 +240,7 @@ Nux_Quick_Services::add('gmail', array(
     'name' => 'Gmail',
     'auth' => 'oauth2',
     'oauth2_authorization' => 'https://accounts.google.com/o/oauth2/auth',
+    'oauth2_token' => 'https://www.googleapis.com/oauth2/v3/token',
     'scope' => ' https://mail.google.com/'
 ));
 
@@ -253,6 +305,15 @@ Nux_Quick_Services::add('fastmail', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Fastmail',
+    'auth' => 'login'
+));
+
+Nux_Quick_Services::add('yandex', array(
+    'server' => 'imap.yandex.com',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Yandex',
     'auth' => 'login'
 ));
 
