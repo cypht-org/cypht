@@ -4,6 +4,11 @@
  * NUX modules
  * @package modules
  * @subpackage nux
+ * @todo filter/disable features depending on imap/pop3 module sets
+ * @todo add links to the home page when no E-mail is set
+ * @todo quick add for 20(?) or so top rss feeds
+ * @todo figure out how move service definitions to a better place
+ * @todo add client_id/client_secret/redirect url configs for oauth2 enabled providers
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
@@ -19,6 +24,15 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 $details = Nux_Quick_Services::details($form['nux_service']);
             }
         }
+    }
+}
+
+/**
+ * @subpackage nux/handler
+ */
+class Hm_Handler_setup_nux extends Hm_Handler_Module {
+    public function process() {
+        Nux_Quick_Services::oauth2_setup($this->config);
     }
 }
 
@@ -46,7 +60,8 @@ class Hm_Output_quick_add_dialog extends Hm_Output_Module {
     protected function output() {
         return '<div class="quick_add_section">'.
             '<div class="nux_step_one">'.
-            '<label class="screen_reader" for="service_select">'.$this->trans('Select an E-mail provider').'</label>'.
+            $this->trans('Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP/POP3 sections below.').
+            '<br /><br /><label class="screen_reader" for="service_select">'.$this->trans('Select an E-mail provider').'</label>'.
             ' <select id="service_select" name="service_select"><option value="">'.$this->trans('Select an E-mail provider').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>'.
             '<label class="screen_reader" for="nux_username">'.$this->trans('Username').'</label>'.
             '<br /><input type="email" id="nux_username" class="nux_username" placeholder="'.$this->trans('Enter Your E-mail address').'" />'.
@@ -79,8 +94,37 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
             '<img src="'.Hm_Image_Sources::$circle_check.'" alt="" width="16" height="16" /> '.
-            $this->trans('Quickly Add An E-mail Account').'</div>';
+            $this->trans('Add An E-mail Account').'</div>';
     }
+}
+
+/**
+ * @subpackage nux/functions
+ */
+function oauth2_form($details, $mod) {
+    $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
+    $url = $oauth2->request_authorization_url($details['oauth2_authorization'], $details['scope'], 'authorization', $details['email']);
+    $res = '<input type="hidden" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
+    $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div><div>';
+    $res .= $mod->trans('This provider supports Oauth2 access to your account.');
+    $res .= $mod->trans(' This is the most secure way to access your E-mail. Click "Enable" to be redirected to the provider site to allow access.');
+    $res .= '</div><a class="enable_auth2" href="'.$url.'">'.$mod->trans('Enable').'</a>';
+    $res .= '<a href="" class="reset_nux_form">Reset</a>';
+    return $res;
+}
+
+/**
+ * @subpackage nux/functions
+ */
+function credentials_form($details, $mod) {
+    $res = '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
+    $res .= '<input type="hidden" id="nux_email" name="nux_email" value="'.$mod->html_safe($details['email']).'" />';
+    $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div>';
+    $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
+    $res .= '<br /><br /><input type="password" placeholder="'.$mod->trans('E-Mail Password').'" name="nux_password" class="nux_password" />';
+    $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
+    $res .= '<a href="" class="reset_nux_form">Reset</a>';
+    return $res;
 }
 
 /**
@@ -89,9 +133,26 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
 class Nux_Quick_Services {
 
     static private $services = array();
+    static private $oauth2 = array();
 
     static public function add($id, $details) {
         self::$services[$id] = $details;
+    }
+    static public function oauth2_setup($config) {
+        $settings = array();
+        $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/oauth2.ini';
+        if (is_readable($ini_file)) {
+            $settings = parse_ini_file($ini_file, true);
+            if (!empty($settings)) {
+                foreach ($settings as $service => $vals) {
+                    elog($service);
+                    self::$services[$service]['client_id'] = $vals['client_id'];
+                    self::$services[$service]['client_secret'] = $vals['client_secret'];
+                    self::$services[$service]['redirect_uri'] = $vals['client_uri'];
+                }
+            }
+        }
+        self::$oauth2 = $settings;
     }
 
     static public function option_list($current, $mod) {
@@ -119,6 +180,7 @@ class Nux_Quick_Services {
     }
 }
 
+
 Nux_Quick_Services::add('gmail', array(
     'server' => 'imap.gmail.com',
     'type' => 'imap',
@@ -126,7 +188,6 @@ Nux_Quick_Services::add('gmail', array(
     'port' => 993,
     'name' => 'Gmail',
     'auth' => 'oauth2',
-    '2fa' => 'https://www.google.com/landing/2step/',
     'oauth2_authorization' => 'https://accounts.google.com/o/oauth2/auth',
     'scope' => ' https://mail.google.com/'
 ));
@@ -186,40 +247,4 @@ Nux_Quick_Services::add('zoho', array(
     'auth' => 'login'
 ));
 
-/**
- * @subpackage nux/functions
- */
-function oauth2_form($details, $mod) {
-    $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
-    $url = $oauth2->request_authorization_url($details['oauth2_authorization'], $details['scope'], 'authorization', $details['email']);
-    $res = '<input type="hidden" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
-    $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div><div>';
-    if (array_key_exists('2fa', $details)) {
-        $res .= $mod->trans('This service supports 2 factor authentication. If you have 2 factor authentication enabled, you will need an application password to access your account');
-        $res .= '<br /><br /><input type="password" placeholder="'.$mod->trans('Application Password').'" name="application_password" class="app_password" />';
-        $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
-        $res .= $mod->trans('If you do NOT have 2 factor authentication enabled, follow the link below to allow access to your E-mail account using Oauth2.');
-    }
-    else {
-        $res .= $mod->trans('This provider supports Oauth2 access to your account.');
-    }
-    $res .= $mod->trans(' This is the most secure way to access your E-mail. Click "Enable" to be redirected to the provider site to allow access.');
-    $res .= '</div><a class="enable_auth2" href="'.$url.'">'.$mod->trans('Enable').'</a>';
-    $res .= '<a href="" class="reset_nux_form">Reset</a>';
-    return $res;
-}
-
-/**
- * @subpackage nux/functions
- */
-function credentials_form($details, $mod) {
-    $res = '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
-    $res .= '<input type="hidden" id="nux_email" name="nux_email" value="'.$mod->html_safe($details['email']).'" />';
-    $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div>';
-    $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
-    $res .= '<br /><br /><input type="password" placeholder="'.$mod->trans('E-Mail Password').'" name="nux_password" class="nux_password" />';
-    $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
-    $res .= '<a href="" class="reset_nux_form">Reset</a>';
-    return $res;
-}
 ?>

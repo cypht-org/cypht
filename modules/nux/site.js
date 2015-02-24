@@ -11,6 +11,7 @@ var display_next_nux_step = function(res) {
     });
 }
 var nux_add_account = function() {
+    $('.nux_password').css('border', nux_border);
     var service = $('#nux_service').val();
     var email = $('#nux_email').val();
     var pass = $('.nux_password').val();
@@ -26,7 +27,9 @@ var nux_add_account = function() {
         );
     }
     else {
-        Hm_Msgs.show({0: 'An error occurred'});
+        if (!pass.length) {
+            $('.nux_password').css('border', 'solid red 1px');
+        }
     }
     return false;
 };
@@ -47,8 +50,23 @@ var nux_service_select = function() {
             false
         );
     }
+    else {
+        if (!email.length) {
+            $('.nux_username').css('border', 'solid 1px red');
+        }
+        else {
+            $('.nux_username').css('border', nux_border);
+        }
+        if (!service.length) {
+            $('#service_select').css('border', 'solid 1px red');
+        }
+        else {
+            $('#service_select').css('border', nux_border);
+        }
+    }
 };
 
 if (hm_page_name() == 'servers') {
+    var nux_border = $('.nux_username').css('border');
     $('.nux_next_button').click(nux_service_select);
 }
