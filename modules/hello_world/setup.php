@@ -7,6 +7,7 @@
  * the module system. Most of what it does is silly and consists of printing "Hello
  * World" in different ways. You can enable this module by adding it to the modules
  * value in the hm3.ini file, and rebuilding the site config.
+ */
 
 /**
  * All requests should flow through the main index.php file of the program. The following
