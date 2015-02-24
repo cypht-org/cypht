@@ -2,7 +2,7 @@
 .nux_subtitle { font-size: 80%; margin-left: 40px; display: inline; }
 .quick_add_section { padding: 20px; padding-bottom: 40px; display: none; padding-left: 40px; }
 .nux_step_two_title { padding-top: 20px; font-size: 110%; padding-bottom: 10px; }
-.nux_step_two { padding-left: 40px; max-width: 600px; }
+.nux_step_one, .nux_step_two { padding-left: 40px; max-width: 600px; }
 .enable_auth2 { float: left; padding: 20px; padding-left: 0px; padding-bottom: 40px; font-size: 110%; }
 .nux_password, .app_password { margin: 10px; margin-left: 0px; margin-top: 0px; width: 280px; }
 .reset_nux_form { float: right; padding: 20px; padding-bottom: 40px; font-size: 110%; }
