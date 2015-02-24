@@ -23,16 +23,23 @@ add_handler('ajax_nux_add_service', 'load_user_data', true, 'core');
 add_handler('ajax_nux_add_service', 'setup_nux', true);
 add_handler('ajax_nux_add_service', 'load_imap_servers_from_config',  true);
 add_handler('ajax_nux_add_service', 'process_nux_add_service', true, 'core');
-add_handler('ajax_nux_add_service', 'save_imap_servers',  true, 'imap');
 add_handler('ajax_nux_add_service', 'save_user_data',  true, 'core');
 add_handler('ajax_nux_add_service', 'language',  true, 'core');
 add_handler('ajax_nux_add_service', 'date', true, 'core');
 add_handler('ajax_nux_add_service', 'http_headers', true, 'core');
 
+add_handler('home', 'process_oauth2_authorization', true, 'nux', 'load_imap_servers_from_config', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_nux_service_select',
         'ajax_nux_add_service',
+    ),
+    'allowed_get' => array(
+        'code' => FILTER_SANITIZE_STRING,
+        'state' => FILTER_SANITIZE_STRING,
+        'error' => FILTER_SANITIZE_STRING,
+        'security_token' => FILTER_SANITIZE_STRING
     ),
     'allowed_output' => array(
         'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false)
