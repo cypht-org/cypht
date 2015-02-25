@@ -11,6 +11,22 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage wordpress/handler
  */
+class Hm_Handler_wp_notification_data extends Hm_Handler_Module {
+    public function process() {
+        $res = array();
+        $wp_details = $this->user_config->get('wp_connect_details', array());
+        $details = wp_get_notifications($wp_details);
+        if (array_key_exists('notes', $details)) {
+            $res = $details['notes'];
+        }
+        $this->out('wp_notice_data', $res);
+        $this->out('list_path', 'wp_notifications');
+    }
+}
+
+/**
+ * @subpackage wordpress/handler
+ */
 class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('state', $this->request->get) && $this->request->get['state'] == 'wp_authorization') {
@@ -75,6 +91,55 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
 /**
  * @subpackage wordpress/output
  */
+class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
+    protected function output() {
+        $res = array();
+        foreach ($this->get('wp_notice_data', array()) as $vals) {
+            if (array_key_exists('id', $vals)) {
+                $url = '';
+                $style = 'email';
+                $subject = str_replace('&#8230;', '', $vals['subject']['text']);
+                $id = $vals['id'];
+                $from = $vals['type'];
+                $ts = $vals['timestamp'];
+                $date = date('r', $ts);
+                if ($style == 'news') {
+                    $res[$id] = message_list_row(array(
+                            array('checkbox_callback', $id),
+                            array('icon_callback', array()),
+                            array('subject_callback', $subject, $url, array()),
+                            array('safe_output_callback', 'source', 'WordPress'),
+                            array('safe_output_callback', 'from', $from),
+                            array('date_callback', human_readable_interval($date), $ts),
+                        ),
+                        $id,
+                        $style,
+                        $this
+                    );
+                }
+                else {
+                    $res[$id] = message_list_row(array(
+                            array('checkbox_callback', $id),
+                            array('safe_output_callback', 'source', 'WordPress'),
+                            array('safe_output_callback', 'from', $from),
+                            array('subject_callback', $subject, $url, array()),
+                            array('date_callback', human_readable_interval($date), $ts),
+                            array('icon_callback', array())
+                        ),
+                        $id,
+                        $style,
+                        $this
+                    );
+                }
+            }
+        }
+        $this->out('formatted_message_list', $res);
+    }
+}
+
+/**
+ * @subpackage wordpress/output
+ */
 class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('wp_connect_details', array());
@@ -89,6 +154,24 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
             $res .= 'Already connected</div></div>';
         }
         return $res;
+    }
+}
+
+/**
+ * @subpackage wordpress/output
+ */
+class Hm_Output_wp_notice_heading extends Hm_Output_Module {
+    protected function output() {
+        return '<div class="content_title">'.$this->trans('WordPress.com Notifications').'</div>';
+    }
+}
+
+/**
+ * @subpackage wordpress/output
+ */
+class Hm_Output_wp_notice_end extends Hm_Output_Module {
+    protected function output() {
+        return '</tbody></table>';
     }
 }
 
@@ -116,7 +199,6 @@ function wp_connect_details($config) {
  * @subpackage wordpress/functions
  */
 function wp_get_notifications($details) {
-    //$details = $this->user_config->get('wp_connect_details', array());
     $result = array();
     $url = 'https://public-api.wordpress.com/rest/v1/notifications/?number=20';
     $headers = array('Authorization: Bearer ' . $details['access_token']);
