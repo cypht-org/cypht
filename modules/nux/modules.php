@@ -7,8 +7,7 @@
  * @todo filter/disable features depending on imap/pop3 module sets
  * @todo add links to the home page when no E-mail is set
  * @todo quick add for 20(?) or so top rss feeds
- * @todo figure out how move service definitions to a better place
- * @todo add client_id/client_secret/redirect url configs for oauth2 enabled providers
+ * @todo add refresh token support
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
@@ -18,7 +17,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
     public function process() {
-        if (array_key_exists('state', $this->request->get) && $this->request->get['state'] == 'authorization') {
+        if (array_key_exists('state', $this->request->get) && $this->request->get['state'] == 'nux_authorization') {
             if (array_key_exists('code', $this->request->get)) {
                 $details = $this->session->get('nux_add_service_details');
                 $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
@@ -152,7 +151,7 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
  */
 function oauth2_form($details, $mod) {
     $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
-    $url = $oauth2->request_authorization_url($details['oauth2_authorization'], $details['scope'], 'authorization', $details['email']);
+    $url = $oauth2->request_authorization_url($details['oauth2_authorization'], $details['scope'], 'nux_authorization', $details['email']);
     $res = '<input type="hidden" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
     $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div><div>';
     $res .= $mod->trans('This provider supports Oauth2 access to your account.');
@@ -251,7 +250,9 @@ Nux_Quick_Services::add('outlook', array(
     'port' => 993,
     'name' => 'Outlook',
     'auth' => 'oauth2',
-    'oauth2_authorization' => ''
+    'oauth2_authorization' => 'https://login.live.com/oauth20_authorize.srf',
+    'oauth2_token' => 'https://login.live.com/oauth20_token.srf',
+    'scope' => 'wl.imap'
 ));
 
 Nux_Quick_Services::add('yahoo', array(
