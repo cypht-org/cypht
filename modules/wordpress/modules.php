@@ -98,9 +98,9 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
             if (array_key_exists('id', $vals)) {
                 $url = '';
                 $style = 'email';
-                $subject = str_replace('&#8230;', '', $vals['subject']['text']);
+                $subject = html_entity_decode($vals['subject']['text']);
                 $id = $vals['id'];
-                $from = $vals['type'];
+                $from = ucfirst(str_replace('_', ' ', $vals['type']));
                 $ts = $vals['timestamp'];
                 $date = date('r', $ts);
                 if ($style == 'news') {
