@@ -6,7 +6,6 @@ handler_source('wordpress');
 output_source('wordpress');
 
 setup_base_page('wordpress_notifications', 'core');
-add_handler('wordpress_notifications', 'wp_get_notifications', true, 'wordpress', 'load_user_data', 'after');
 
 add_output('ajax_hm_folders', 'wordpress_folders',  true, 'wordpress', 'folder_list_content_start', 'before');
 
