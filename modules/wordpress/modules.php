@@ -1,12 +1,16 @@
-_notifications<?php
+<?php
 
 /**
  * WordPress modules
  * @package modules
  * @subpackage wordpress
  */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage wordpress/handler
+ */
 class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('state', $this->request->get) && $this->request->get['state'] == 'wp_authorization') {
@@ -42,12 +46,9 @@ class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
     }
 }
 
-class Hm_Handler_wp_get_notifications extends Hm_Handler_Module {
-    public function process() {
-        $this->user_config->get('wp_connect_details
-    }
-}
-
+/**
+ * @subpackage wordpress/handler
+ */
 class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
     public function process() {
         $details = wp_connect_details($this->config);
@@ -71,6 +72,9 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage wordpress/output
+ */
 class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('wp_connect_details', array());
@@ -88,6 +92,9 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage wordpress/functions
+ */
 function wp_connect_details($config) {
     $details = array (
         'auth_url' => 'https://public-api.wordpress.com/oauth2/authorize',
@@ -103,6 +110,25 @@ function wp_connect_details($config) {
         }
     }
     return $details;
+}
+
+/**
+ * @subpackage wordpress/functions
+ */
+function wp_get_notifications($details) {
+    //$details = $this->user_config->get('wp_connect_details', array());
+    $result = array();
+    $url = 'https://public-api.wordpress.com/rest/v1/notifications/?number=20';
+    $headers = array('Authorization: Bearer ' . $details['access_token']);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $curl_result = curl_exec($ch);
+    if (substr($curl_result, 0, 1) == '{') {
+        $result = @json_decode($curl_result, true);
+    }
+    return $result;
 }
 
 ?>
