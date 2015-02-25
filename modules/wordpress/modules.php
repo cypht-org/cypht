@@ -1,4 +1,4 @@
-<?php
+_notifications<?php
 
 /**
  * WordPress modules
@@ -42,6 +42,12 @@ class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_wp_get_notifications extends Hm_Handler_Module {
+    public function process() {
+        $this->user_config->get('wp_connect_details
+    }
+}
+
 class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
     public function process() {
         $details = wp_connect_details($this->config);
@@ -56,7 +62,7 @@ class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
  */
 class Hm_Output_wordpress_folders extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=wordpress&list_path=wp_notifications">'.
+        $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=wordpress_notifications&list_path=wp_notifications">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
             '" alt="" width="16" height="16" /> '.$this->trans('Notifications').'</a></li>';
         $this->append('folder_sources', 'wordPress_folders');
@@ -67,12 +73,18 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
 
 class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
     protected function output() {
-        elog($this->get('wp_connect_details', array()));
-        return '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section">'.
+        $details = $this->get('wp_connect_details', array());
+        $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section">'.
             '<img src="'.Hm_Image_Sources::$key.'" alt="" width="16" height="16" /> '.
             $this->trans('WordPress.com Connect').'</div><div class="wordpress_connect_section">'.
-            'Connect to WordPress.com to view your notifications.<br /><a href="'.$this->get('wp_auth_url', '').
-            '">Enable</a></div></div>';
+            'Connect to WordPress.com to view your notifications.<br /><br />';
+        if (empty($details)) {
+            $res .= '<a href="'.$this->get('wp_auth_url', '').'">Enable</a></div></div>';
+        }
+        else {
+            $res .= 'Already connected</div></div>';
+        }
+        return $res;
     }
 }
 
