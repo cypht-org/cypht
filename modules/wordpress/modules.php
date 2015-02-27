@@ -59,6 +59,13 @@ class Hm_Handler_wordpress_list_type extends Hm_Handler_Module {
                 $this->out('mailbox_list_title', array('WordPress.com Freshly Pressed'));
                 $this->append('data_sources', array('callback' => 'load_freshly_pressed', 'type' => 'wordpress', 'name' => 'WordPress.com Freshly Pressed', 'id' => 0));
             }
+            $list_style = $this->user_config->get('list_style', false);
+            if ($this->get('is_mobile', false)) {
+                $list_style = 'news_style';
+            }
+            if ($list_style == 'news_style') {
+                $this->out('news_list_style', true);
+            }
             $this->out('message_list_fields', array(
                 array('chkbox_col', false, false),
                 array('source_col', 'source', 'Source'),
@@ -155,10 +162,10 @@ class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
  */
 class Hm_Output_wordpress_folders extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=wordpress&list_path=wp_notifications">'.
+        $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
             '" alt="" width="16" height="16" /> '.$this->trans('Notifications').'</a></li>';
-        $res .= '<li class="menu_wp_freshly_pressed"><a class="unread_link" href="?page=wordpress&list_path=wp_freshly_pressed">'.
+        $res .= '<li class="menu_wp_freshly_pressed"><a class="unread_link" href="?page=message_list&list_path=wp_freshly_pressed">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
             '" alt="" width="16" height="16" /> '.$this->trans('Freshly Pressed').'</a></li>';
         $this->append('folder_sources', 'wordPress_folders');
@@ -188,9 +195,13 @@ class Hm_Output_filter_wp_freshly_pressed_data extends Hm_Output_Module {
     protected function output() {
         $res = array();
         foreach ($this->get('wp_freshly_pressed_data') as $vals) {
-            $id = $vals['ID'].'_'.$vals['Site_ID'];
+            $id = $vals['ID'].'_'.$vals['site_ID'];
             $url = '?page=message&list_path=wp_freshly_pressed&uid='.$this->html_safe($id);
             $style = 'email';
+            $style = $this->get('news_list_style') ? 'news' : 'email';
+            if ($this->get('is_mobile')) {
+                $style = 'news';
+            }
             $subject = html_entity_decode($vals['title']);
             $from = $vals['author']['name'];
             $ts = strtotime($vals['date']);
@@ -239,15 +250,23 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 $id = $vals['id'];
                 $url = '?page=message&list_path=wp_notifications&uid='.$this->html_safe($id);;
                 $style = 'email';
+                $style = $this->get('news_list_style') ? 'news' : 'email';
+                if ($this->get('is_mobile')) {
+                    $style = 'news';
+                }
                 $subject = html_entity_decode($vals['subject']['text']);
                 $from = ucfirst(str_replace('_', ' ', $vals['type']));
                 $ts = $vals['timestamp'];
+                $flags = array();
+                if ($vals['unread'] === "0") {
+                    $flags[] = 'unseen';
+                }
                 $date = date('r', $ts);
                 if ($style == 'news') {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
-                            array('icon_callback', array()),
-                            array('subject_callback', $subject, $url, array()),
+                            array('icon_callback', $flags),
+                            array('subject_callback', $subject, $url,$flags),
                             array('safe_output_callback', 'source', 'WordPress'),
                             array('safe_output_callback', 'from', $from),
                             array('date_callback', human_readable_interval($date), $ts),
@@ -262,9 +281,9 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                             array('checkbox_callback', $id),
                             array('safe_output_callback', 'source', 'WordPress'),
                             array('safe_output_callback', 'from', $from),
-                            array('subject_callback', $subject, $url, array()),
+                            array('subject_callback', $subject, $url, $flags),
                             array('date_callback', human_readable_interval($date), $ts),
-                            array('icon_callback', array())
+                            array('icon_callback', $flags)
                         ),
                         $id,
                         $style,
@@ -294,24 +313,6 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
             $res .= 'Already connected</div></div>';
         }
         return $res;
-    }
-}
-
-/**
- * @subpackage wordpress/output
- */
-class Hm_Output_wp_notice_heading extends Hm_Output_Module {
-    protected function output() {
-        return '<div class="content_title">'.$this->trans(implode(' ', $this->get('mailbox_list_title', array()))).'</div>';
-    }
-}
-
-/**
- * @subpackage wordpress/output
- */
-class Hm_Output_wp_notice_end extends Hm_Output_Module {
-    protected function output() {
-        return '</tbody></table>';
     }
 }
 
@@ -356,7 +357,7 @@ function wp_build_notice_text($type, $data) {
     $res = array();
     if ($type == 'comment') {
         foreach ($data['items'] as $vals) {
-            $res[] = $vals['html'];
+            $res[] = $vals['header_text'].'<br />'.$vals['html'];
         }
     }
     return '<div class="msg_text_inner">'.format_msg_html(implode('<div class="hr"></div>', $res)).'</div>';
@@ -384,7 +385,7 @@ function wp_get_notice_detail($details, $uid) {
  * @subpackage wordpress/functions
  */
 function wp_get_freshly_pressed($details) {
-    $url = 'https://public-api.wordpress.com/rest/v1.1/freshly-pressed/?number=20&fields=ID,Site_ID,author,date,title';
+    $url = 'https://public-api.wordpress.com/rest/v1.1/freshly-pressed/?number=20&fields=ID,site_ID,author,date,title';
     return wp_fetch_content($details, $url);
 }
 

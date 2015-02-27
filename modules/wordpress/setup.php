@@ -5,17 +5,12 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('wordpress');
 output_source('wordpress');
 
-setup_base_page('wordpress', 'core');
-
-replace_module('handler', 'message_list_type', 'wordpress_list_type', 'wordpress');
-add_output('wordpress', 'wp_notice_heading', true, 'core', 'content_section_start', 'after');
-add_output('wordpress', 'message_list_start', true, 'core', 'wp_notice_heading', 'after');
-add_output('wordpress', 'wp_notice_end', true, 'core', 'message_list_start', 'after');
+add_handler('message', 'wordpress_list_type', true, 'wordpress', 'message_list_type', 'after');
 
 add_handler('message_list', 'wp_load_sources', true, 'wordpress', 'load_user_data', 'after');
-add_output('ajax_hm_folders', 'wordpress_folders',  true, 'wordpress', 'folder_list_content_start', 'before');
+add_handler('message_list', 'wordpress_list_type', true, 'wordpress', 'message_list_type', 'after');
 
-add_handler('message', 'wordpress_list_type', true, 'wordpress', 'load_user_data', 'after');
+add_output('ajax_hm_folders', 'wordpress_folders',  true, 'wordpress', 'folder_list_content_start', 'before');
 
 add_handler('servers', 'setup_wordpress_connect', true, 'wordpress', 'load_user_data', 'after');
 add_output('servers', 'wordpress_connect_section', true, 'wordpress', 'server_content_end', 'before');
@@ -51,7 +46,6 @@ add_output('ajax_wordpess_freshly_pressed', 'filter_wp_freshly_pressed_data', tr
 
 return array(
     'allowed_pages' => array(
-        'wordpress',
         'ajax_wordpess_freshly_pressed',
         'ajax_wordpess_notifications',
         'ajax_wp_notice_display',
