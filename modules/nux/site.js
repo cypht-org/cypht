@@ -40,10 +40,12 @@ var nux_service_select = function() {
     var el = document.getElementById('service_select');
     var service = el.options[el.selectedIndex].value;
     var email = $('.nux_username').val();
+    var account = $('.nux_account_name').val();
     if (email.length && service.length) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_nux_service_select'},
             {'name': 'nux_service', 'value': service},
+            {'name': 'nux_account_name', 'value': account},
             {'name': 'nux_email', 'value': email}],
             display_next_nux_step,
             [],
