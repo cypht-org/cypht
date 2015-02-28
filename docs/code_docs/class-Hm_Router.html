@@ -7,7 +7,7 @@
 	<title>Class Hm_Router | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3111399871"></script>
+	<script type="text/javascript" src="elementlist.js?3493280290"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -216,6 +216,10 @@
 			</ul>
 
 
+			<h3>Traits</h3>
+			<ul>
+				<li><a href="class-Hm_Router_Modules.html">Hm_Router_Modules</a></li>
+			</ul>
 
 
 
@@ -272,6 +276,15 @@ possibly do an HTTP redirect</p>
 
 	</div>
 
+	<dl class="tree">
+		<dd style="padding-left:0px">
+<b><span>Hm_Router</span></b>			
+			
+			 uses 
+				<a href="class-Hm_Router_Modules.html"><span>Hm_Router_Modules</span></a>
+			
+		</dd>
+	</dl>
 
 
 
@@ -286,7 +299,7 @@ possibly do an HTTP redirect</p>
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.router.html">router</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_Router.html#10-386" title="Go to source code">router.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_Router.html#180-387" title="Go to source code">router.php</a><br>
 	</div>
 
 
@@ -304,7 +317,7 @@ possibly do an HTTP redirect</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_process_request">#</a>
-		<code><a href="source-class-Hm_Router.html#20-68" title="Go to source code">process_request</a>( <span>object <var>$config</var></span>, <span>boolean <var>$debug_mode</var></span> )</code>
+		<code><a href="source-class-Hm_Router.html#193-243" title="Go to source code">process_request</a>( <span>object <var>$config</var></span>, <span>boolean <var>$debug_mode</var></span> )</code>
 
 		<div class="description short">
 			
@@ -340,50 +353,6 @@ for ajax responses<br>
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="format_response_content" id="_format_response_content">
-
-		<td class="attributes"><code>
-			 private 
-			mixed
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_format_response_content">#</a>
-		<code><a href="source-class-Hm_Router.html#70-79" title="Go to source code">format_response_content</a>( <span>mixed <var>$response_data</var></span>, <span>array <var>$allowed_output</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Format result of output modules</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Format result of output modules</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$response_data</var></dt>
-					<dd><code>mixed</code><br>$response_data data from output modules</dd>
-					<dt><var>$allowed_output</var></dt>
-					<dd><code>array</code><br>$allowed_output filters applied to JSON formatted output</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>mixed</code><br>formatted content<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
 	<tr data-order="render_output" id="_render_output">
 
 		<td class="attributes"><code>
@@ -395,7 +364,7 @@ for ajax responses<br>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_render_output">#</a>
-		<code><a href="source-class-Hm_Router.html#81-90" title="Go to source code">render_output</a>( <span>mixed <var>$output</var></span>, <span>mixed <var>$response_data</var></span> )</code>
+		<code><a href="source-class-Hm_Router.html#245-254" title="Go to source code">render_output</a>( <span>mixed <var>$output</var></span>, <span>mixed <var>$response_data</var></span> )</code>
 
 		<div class="description short">
 			
@@ -424,134 +393,6 @@ for ajax responses<br>
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="process_module_setup" id="_process_module_setup">
-
-		<td class="attributes"><code>
-			 private 
-			array
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_process_module_setup">#</a>
-		<code><a href="source-class-Hm_Router.html#92-104" title="Go to source code">process_module_setup</a>( <span>object <var>$config</var></span>, <span>mixed <var>$debug_mode</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Build a list of module properties</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Build a list of module properties</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$config</var></dt>
-					<dd><code>object</code><br>$config site config object</dd>
-					<dt><var>$debug_mode</var></dt>
-					<dd></dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>array</code><br>list of filters, input, and output modules<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="get_debug_modules" id="_get_debug_modules">
-
-		<td class="attributes"><code>
-			 private 
-			array
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_get_debug_modules">#</a>
-		<code><a href="source-class-Hm_Router.html#106-124" title="Go to source code">get_debug_modules</a>( <span>object <var>$config</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Get module data when in debug mode</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Get module data when in debug mode</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$config</var></dt>
-					<dd><code>object</code><br>$config site config object</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>array</code><br>list of filters, input, and output modules<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="get_production_modules" id="_get_production_modules">
-
-		<td class="attributes"><code>
-			 public 
-			array
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_get_production_modules">#</a>
-		<code><a href="source-class-Hm_Router.html#126-136" title="Go to source code">get_production_modules</a>( <span>object <var>$config</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Get module data when in production mode</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Get module data when in production mode</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$config</var></dt>
-					<dd><code>object</code><br>$config site config object</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>array</code><br>list of filters, input, and output modules<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
 	<tr data-order="check_for_tls" id="_check_for_tls">
 
 		<td class="attributes"><code>
@@ -563,7 +404,7 @@ for ajax responses<br>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_check_for_tls">#</a>
-		<code><a href="source-class-Hm_Router.html#138-150" title="Go to source code">check_for_tls</a>( <span>object <var>$config</var></span>, <span>object <var>$request</var></span> )</code>
+		<code><a href="source-class-Hm_Router.html#256-268" title="Go to source code">check_for_tls</a>( <span>object <var>$config</var></span>, <span>object <var>$request</var></span> )</code>
 
 		<div class="description short">
 			
@@ -603,7 +444,7 @@ for ajax responses<br>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setup_session">#</a>
-		<code><a href="source-class-Hm_Router.html#152-180" title="Go to source code">setup_session</a>( <span>object <var>$config</var></span> )</code>
+		<code><a href="source-class-Hm_Router.html#270-298" title="Go to source code">setup_session</a>( <span>object <var>$config</var></span> )</code>
 
 		<div class="description short">
 			
@@ -636,170 +477,6 @@ and does not process any session values yet</p>
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="get_active_mods" id="_get_active_mods">
-
-		<td class="attributes"><code>
-			 public 
-			array
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_get_active_mods">#</a>
-		<code><a href="source-class-Hm_Router.html#182-189" title="Go to source code">get_active_mods</a>( <span>array <var>$mod_list</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Return the subset of active modules from a supplied list</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Return the subset of active modules from a supplied list</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$mod_list</var></dt>
-					<dd><code>array</code><br>$mod_list list of modules</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>array</code><br>filter list<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="load_modules" id="_load_modules">
-
-		<td class="attributes"><code>
-			 public 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_load_modules">#</a>
-		<code><a href="source-class-Hm_Router.html#191-207" title="Go to source code">load_modules</a>( <span>string <var>$class</var></span>, <span>array <var>$module_sets</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Load modules into a module manager</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Load modules into a module manager</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$class</var></dt>
-					<dd><code>string</code><br>$class name of the module manager to use</dd>
-					<dt><var>$module_sets</var></dt>
-					<dd><code>array</code><br>$module_sets list of modules by page</dd>
-				</dl></div>
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="load_module_sets" id="_load_module_sets">
-
-		<td class="attributes"><code>
-			 private 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_load_module_sets">#</a>
-		<code><a href="source-class-Hm_Router.html#209-227" title="Go to source code">load_module_sets</a>( <span>object <var>$config</var></span>, <span>array <var>$handlers</var> = <span class="php-keyword1">array</span>()</span>, <span>array <var>$output</var> = <span class="php-keyword1">array</span>()</span> )</code>
-
-		<div class="description short">
-			
-<p>Load all module sets and include required modules.php files</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Load all module sets and include required modules.php files</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$config</var></dt>
-					<dd><code>object</code><br>$config site config object</dd>
-					<dt><var>$handlers</var></dt>
-					<dd><code>array</code><br>$handlers list of handler modules</dd>
-					<dt><var>$output</var></dt>
-					<dd><code>array</code><br>$output list of output modules</dd>
-				</dl></div>
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="load_module_set_files" id="_load_module_set_files">
-
-		<td class="attributes"><code>
-			 public 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_load_module_set_files">#</a>
-		<code><a href="source-class-Hm_Router.html#229-241" title="Go to source code">load_module_set_files</a>( <span>array <var>$mods</var></span>, <span>array <var>$active_mods</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Load module set definition files</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Load module set definition files</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$mods</var></dt>
-					<dd><code>array</code><br>$mods modules to load</dd>
-					<dt><var>$active_mods</var></dt>
-					<dd><code>array</code><br>$active_mods list of active modules</dd>
-				</dl></div>
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
 	<tr data-order="check_for_redirected_msgs" id="_check_for_redirected_msgs">
 
 		<td class="attributes"><code>
@@ -811,7 +488,7 @@ and does not process any session values yet</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_check_for_redirected_msgs">#</a>
-		<code><a href="source-class-Hm_Router.html#243-257" title="Go to source code">check_for_redirected_msgs</a>( <span>object <var>$session</var></span>, <span>object <var>$request</var></span> )</code>
+		<code><a href="source-class-Hm_Router.html#300-314" title="Go to source code">check_for_redirected_msgs</a>( <span>object <var>$session</var></span>, <span>object <var>$request</var></span> )</code>
 
 		<div class="description short">
 			
@@ -851,7 +528,7 @@ and does not process any session values yet</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_check_for_redirect">#</a>
-		<code><a href="source-class-Hm_Router.html#259-279" title="Go to source code">check_for_redirect</a>( <span>object <var>$request</var></span>, <span>object <var>$session</var></span>, <span>mixed <var>$result</var></span> )</code>
+		<code><a href="source-class-Hm_Router.html#316-336" title="Go to source code">check_for_redirect</a>( <span>object <var>$request</var></span>, <span>object <var>$session</var></span>, <span>mixed <var>$result</var></span> )</code>
 
 		<div class="description short">
 			
@@ -895,7 +572,7 @@ notices</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_page">#</a>
-		<code><a href="source-class-Hm_Router.html#281-309" title="Go to source code">get_page</a>( <span>object <var>$request</var></span>, <span>array <var>$filters</var></span> )</code>
+		<code><a href="source-class-Hm_Router.html#338-366" title="Go to source code">get_page</a>( <span>object <var>$request</var></span>, <span>array <var>$filters</var></span> )</code>
 
 		<div class="description short">
 			
@@ -924,142 +601,6 @@ notices</p>
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="process_page" id="_process_page">
-
-		<td class="attributes"><code>
-			 private 
-			array
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_process_page">#</a>
-		<code><a href="source-class-Hm_Router.html#311-324" title="Go to source code">process_page</a>( <span>object <var>$request</var></span>, <span>object <var>$session</var></span>, <span>object <var>$config</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Process all the data handler modules for this page</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Process all the data handler modules for this page</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$request</var></dt>
-					<dd><code>object</code><br>$request request details</dd>
-					<dt><var>$session</var></dt>
-					<dd><code>object</code><br>$session session interface</dd>
-					<dt><var>$config</var></dt>
-					<dd><code>object</code><br>$config site config</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>array</code><br>combined handler module output<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="merge_response" id="_merge_response">
-
-		<td class="attributes"><code>
-			 private 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_merge_response">#</a>
-		<code><a href="source-class-Hm_Router.html#326-345" title="Go to source code">merge_response</a>( <span>array <var>$response</var></span>, <span>object <var>$config</var></span>, <span>object <var>$request</var></span>, <span>object <var>$session</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Merge the combined response from the handler modules with some default
-values</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Merge the combined response from the handler modules with some default
-values</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$response</var></dt>
-					<dd><code>array</code><br>$response combined result of the handler modules</dd>
-					<dt><var>$config</var></dt>
-					<dd><code>object</code><br>$config site config</dd>
-					<dt><var>$request</var></dt>
-					<dd><code>object</code><br>$request request details</dd>
-					<dt><var>$session</var></dt>
-					<dd><code>object</code><br>$session session interface</dd>
-				</dl></div>
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="merge_filters" id="_merge_filters">
-
-		<td class="attributes"><code>
-			 public static
-			array
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_merge_filters">#</a>
-		<code><a href="source-class-Hm_Router.html#347-365" title="Go to source code">merge_filters</a>( <span>array <var>$existing</var></span>, <span>array <var>$new</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Merge input filters from module sets</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Merge input filters from module sets</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$existing</var></dt>
-					<dd><code>array</code><br>$existing already collected filters</dd>
-					<dt><var>$new</var></dt>
-					<dd><code>array</code><br>$new new filters to merge</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>array</code><br>merged list<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
 	<tr data-order="page_redirect" id="_page_redirect">
 
 		<td class="attributes"><code>
@@ -1071,7 +612,7 @@ values</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_page_redirect">#</a>
-		<code><a href="source-class-Hm_Router.html#367-385" title="Go to source code">page_redirect</a>( <span>string <var>$url</var></span>, <span>mixed <var>$status</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_Router.html#368-386" title="Go to source code">page_redirect</a>( <span>string <var>$url</var></span>, <span>mixed <var>$status</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1103,6 +644,23 @@ values</p>
 	</table>
 
 
+	<table class="summary used">
+	<caption>Methods used from <a href="class-Hm_Router_Modules.html#methods">Hm_Router_Modules</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Hm_Router_Modules.html#_get_active_mods">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_get_debug_modules">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_get_production_modules">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_load_module_set_files">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_load_module_sets">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_load_modules">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_merge_filters">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_merge_response">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_process_module_setup">()</a>, 
+			<a href="class-Hm_Router_Modules.html#_process_page">()</a>
+		</code></td>
+	</tr>
+	</table>
 
 
 
@@ -1122,7 +680,7 @@ values</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Router.html#18" title="Go to source code"><var>$page</var></a>
+				<a href="source-class-Hm_Router.html#191" title="Go to source code"><var>$page</var></a>
 		</td>
 		<td class="value"><code><span class="php-quote">'home'</span></code></td>
 		<td class="description"><div>

@@ -8,7 +8,7 @@
 	<title>File oauth2.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3111399871"></script>
+	<script type="text/javascript" src="elementlist.js?3493280290"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -321,12 +321,12 @@
 </span><span id="57" class="l"><a class="l" href="#57">57: </a>        <span class="php-var">$result</span> = <span class="php-keyword1">array</span>();
 </span><span id="58" class="l"><a class="l" href="#58">58: </a>        <span class="php-var">$flds</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'code=%s&amp;client_id=%s&amp;client_secret=%s&amp;redirect_uri=%s&amp;grant_type=authorization_code'</span>,
 </span><span id="59" class="l"><a class="l" href="#59">59: </a>            <span class="php-keyword2">urlencode</span>(<span class="php-var">$authorization_code</span>), <span class="php-keyword2">urlencode</span>(<span class="php-var">$this</span>-&gt;client_id), <span class="php-keyword2">urlencode</span>(<span class="php-var">$this</span>-&gt;client_secret), <span class="php-keyword2">urlencode</span>(<span class="php-var">$this</span>-&gt;redirect_uri ));
-</span><span id="60" class="l"><a class="l" href="#60">60: </a>        <span class="php-var">$ch</span> = <span class="php-keyword2">curl_init</span>();
-</span><span id="61" class="l"><a class="l" href="#61">61: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_URL, <span class="php-var">$url</span>);
-</span><span id="62" class="l"><a class="l" href="#62">62: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_POST, <span class="php-num">5</span>);
-</span><span id="63" class="l"><a class="l" href="#63">63: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_POSTFIELDS, <span class="php-var">$flds</span>);
-</span><span id="64" class="l"><a class="l" href="#64">64: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="php-num">1</span>);
-</span><span id="65" class="l"><a class="l" href="#65">65: </a>        <span class="php-var">$curl_result</span> = <span class="php-keyword2">curl_exec</span>(<span class="php-var">$ch</span>);
+</span><span id="60" class="l"><a class="l" href="#60">60: </a>        <span class="php-var">$ch</span> = Hm_Functions::c_init();
+</span><span id="61" class="l"><a class="l" href="#61">61: </a>        Hm_Functions::c_setopt(<span class="php-var">$ch</span>, CURLOPT_URL, <span class="php-var">$url</span>);
+</span><span id="62" class="l"><a class="l" href="#62">62: </a>        Hm_Functions::c_setopt(<span class="php-var">$ch</span>, CURLOPT_POST, <span class="php-num">5</span>);
+</span><span id="63" class="l"><a class="l" href="#63">63: </a>        Hm_Functions::c_setopt(<span class="php-var">$ch</span>, CURLOPT_POSTFIELDS, <span class="php-var">$flds</span>);
+</span><span id="64" class="l"><a class="l" href="#64">64: </a>        Hm_Functions::c_setopt(<span class="php-var">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="php-num">1</span>);
+</span><span id="65" class="l"><a class="l" href="#65">65: </a>        <span class="php-var">$curl_result</span> = Hm_Functions::c_exec(<span class="php-var">$ch</span>);
 </span><span id="66" class="l"><a class="l" href="#66">66: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">substr</span>(<span class="php-var">$curl_result</span>, <span class="php-num">0</span>, <span class="php-num">1</span>) == <span class="php-quote">'{'</span>) {
 </span><span id="67" class="l"><a class="l" href="#67">67: </a>            <span class="php-var">$result</span> = @<span class="php-keyword2">json_decode</span>(<span class="php-var">$curl_result</span>, <span class="php-keyword1">true</span>);
 </span><span id="68" class="l"><a class="l" href="#68">68: </a>        }
