@@ -8,7 +8,7 @@
 	<title>File core/setup.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?480355068"></script>
+	<script type="text/javascript" src="elementlist.js?3111399871"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -355,195 +355,202 @@
 </span><span id="63" class="l"><a class="l" href="#63"> 63: </a><span class="php-comment">/* compose */</span>
 </span><span id="64" class="l"><a class="l" href="#64"> 64: </a>setup_base_page(<span class="php-quote">'compose'</span>);
 </span><span id="65" class="l"><a class="l" href="#65"> 65: </a>
-</span><span id="66" class="l"><a class="l" href="#66"> 66: </a><span class="php-comment">/* settings */</span>
-</span><span id="67" class="l"><a class="l" href="#67"> 67: </a>setup_base_page(<span class="php-quote">'settings'</span>);
-</span><span id="68" class="l"><a class="l" href="#68"> 68: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_language_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="69" class="l"><a class="l" href="#69"> 69: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_list_style_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="70" class="l"><a class="l" href="#70"> 70: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_timezone_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="71" class="l"><a class="l" href="#71"> 71: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_unread_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="72" class="l"><a class="l" href="#72"> 72: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_flagged_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="73" class="l"><a class="l" href="#73"> 73: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_flagged_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="74" class="l"><a class="l" href="#74"> 74: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_unread_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="75" class="l"><a class="l" href="#75"> 75: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_all_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="76" class="l"><a class="l" href="#76"> 76: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_all_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="77" class="l"><a class="l" href="#77"> 77: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_all_email_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="78" class="l"><a class="l" href="#78"> 78: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_all_email_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
-</span><span id="79" class="l"><a class="l" href="#79"> 79: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'save_user_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'save_user_data'</span>, <span class="php-quote">'before'</span>);
-</span><span id="80" class="l"><a class="l" href="#80"> 80: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'reload_folder_cookie'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'save_user_settings'</span>, <span class="php-quote">'after'</span>);
-</span><span id="81" class="l"><a class="l" href="#81"> 81: </a>
-</span><span id="82" class="l"><a class="l" href="#82"> 82: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_settings_form'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
-</span><span id="83" class="l"><a class="l" href="#83"> 83: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_general_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_settings_form'</span>, <span class="php-quote">'after'</span>);
-</span><span id="84" class="l"><a class="l" href="#84"> 84: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'language_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_general_settings'</span>, <span class="php-quote">'after'</span>);
-</span><span id="85" class="l"><a class="l" href="#85"> 85: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'timezone_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'language_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="86" class="l"><a class="l" href="#86"> 86: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'list_style_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'timezone_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="87" class="l"><a class="l" href="#87"> 87: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_unread_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'list_style_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="88" class="l"><a class="l" href="#88"> 88: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'unread_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_unread_settings'</span>, <span class="php-quote">'after'</span>);
-</span><span id="89" class="l"><a class="l" href="#89"> 89: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'unread_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'unread_since_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="90" class="l"><a class="l" href="#90"> 90: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_flagged_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'unread_source_max_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="91" class="l"><a class="l" href="#91"> 91: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'flagged_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_flagged_settings'</span>, <span class="php-quote">'after'</span>);
-</span><span id="92" class="l"><a class="l" href="#92"> 92: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'flagged_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'flagged_since_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="93" class="l"><a class="l" href="#93"> 93: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_everything_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'flagged_source_max_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="94" class="l"><a class="l" href="#94"> 94: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'all_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_everything_settings'</span>, <span class="php-quote">'after'</span>);
-</span><span id="95" class="l"><a class="l" href="#95"> 95: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'all_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'all_since_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="96" class="l"><a class="l" href="#96"> 96: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_all_email_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'all_source_max_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="97" class="l"><a class="l" href="#97"> 97: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'all_email_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_all_email_settings'</span>, <span class="php-quote">'after'</span>);
-</span><span id="98" class="l"><a class="l" href="#98"> 98: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'all_email_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'all_email_since_setting'</span>, <span class="php-quote">'after'</span>);
-</span><span id="99" class="l"><a class="l" href="#99"> 99: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'end_settings_form'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_end'</span>, <span class="php-quote">'before'</span>);
-</span><span id="100" class="l"><a class="l" href="#100">100: </a>
-</span><span id="101" class="l"><a class="l" href="#101">101: </a><span class="php-comment">/* message list page */</span>
-</span><span id="102" class="l"><a class="l" href="#102">102: </a>setup_base_page(<span class="php-quote">'message_list'</span>);
-</span><span id="103" class="l"><a class="l" href="#103">103: </a>add_output(<span class="php-quote">'message_list'</span>, <span class="php-quote">'message_list_heading'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
-</span><span id="104" class="l"><a class="l" href="#104">104: </a>add_output(<span class="php-quote">'message_list'</span>, <span class="php-quote">'message_list_start'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'message_list_heading'</span>, <span class="php-quote">'after'</span>);
-</span><span id="105" class="l"><a class="l" href="#105">105: </a>add_output(<span class="php-quote">'message_list'</span>, <span class="php-quote">'message_list_end'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'message_list_start'</span>, <span class="php-quote">'after'</span>);
-</span><span id="106" class="l"><a class="l" href="#106">106: </a>
-</span><span id="107" class="l"><a class="l" href="#107">107: </a><span class="php-comment">/* search page */</span>
-</span><span id="108" class="l"><a class="l" href="#108">108: </a>setup_base_page(<span class="php-quote">'search'</span>);
-</span><span id="109" class="l"><a class="l" href="#109">109: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'search_content_start'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
-</span><span id="110" class="l"><a class="l" href="#110">110: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'search_form'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'search_content_start'</span>, <span class="php-quote">'after'</span>);
-</span><span id="111" class="l"><a class="l" href="#111">111: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'message_list_start'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'search_form'</span>, <span class="php-quote">'after'</span>);
-</span><span id="112" class="l"><a class="l" href="#112">112: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'search_results_table_end'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'message_list_start'</span>, <span class="php-quote">'after'</span>);
-</span><span id="113" class="l"><a class="l" href="#113">113: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'search_content_end'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'search_results_table_end'</span>, <span class="php-quote">'after'</span>);
-</span><span id="114" class="l"><a class="l" href="#114">114: </a>
-</span><span id="115" class="l"><a class="l" href="#115">115: </a>
-</span><span id="116" class="l"><a class="l" href="#116">116: </a><span class="php-comment">/* message view page */</span>
-</span><span id="117" class="l"><a class="l" href="#117">117: </a>setup_base_page(<span class="php-quote">'message'</span>);
-</span><span id="118" class="l"><a class="l" href="#118">118: </a>add_output(<span class="php-quote">'message'</span>, <span class="php-quote">'message_start'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
-</span><span id="119" class="l"><a class="l" href="#119">119: </a>add_output(<span class="php-quote">'message'</span>, <span class="php-quote">'message_end'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'message_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="66" class="l"><a class="l" href="#66"> 66: </a><span class="php-comment">/* save settings */</span>
+</span><span id="67" class="l"><a class="l" href="#67"> 67: </a>setup_base_page(<span class="php-quote">'save'</span>);
+</span><span id="68" class="l"><a class="l" href="#68"> 68: </a>add_handler(<span class="php-quote">'save'</span>, <span class="php-quote">'process_save_form'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'load_user_data'</span>, <span class="php-quote">'after'</span>);
+</span><span id="69" class="l"><a class="l" href="#69"> 69: </a>add_output(<span class="php-quote">'save'</span>, <span class="php-quote">'save_form'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="70" class="l"><a class="l" href="#70"> 70: </a>
+</span><span id="71" class="l"><a class="l" href="#71"> 71: </a><span class="php-comment">/* settings */</span>
+</span><span id="72" class="l"><a class="l" href="#72"> 72: </a>setup_base_page(<span class="php-quote">'settings'</span>);
+</span><span id="73" class="l"><a class="l" href="#73"> 73: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_language_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="74" class="l"><a class="l" href="#74"> 74: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_list_style_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="75" class="l"><a class="l" href="#75"> 75: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_timezone_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="76" class="l"><a class="l" href="#76"> 76: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_unread_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="77" class="l"><a class="l" href="#77"> 77: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_flagged_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="78" class="l"><a class="l" href="#78"> 78: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_flagged_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="79" class="l"><a class="l" href="#79"> 79: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_unread_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="80" class="l"><a class="l" href="#80"> 80: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_all_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="81" class="l"><a class="l" href="#81"> 81: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_all_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="82" class="l"><a class="l" href="#82"> 82: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_all_email_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="83" class="l"><a class="l" href="#83"> 83: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'process_all_email_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'date'</span>, <span class="php-quote">'after'</span>);
+</span><span id="84" class="l"><a class="l" href="#84"> 84: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'save_user_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'save_user_data'</span>, <span class="php-quote">'before'</span>);
+</span><span id="85" class="l"><a class="l" href="#85"> 85: </a>add_handler(<span class="php-quote">'settings'</span>, <span class="php-quote">'reload_folder_cookie'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'save_user_settings'</span>, <span class="php-quote">'after'</span>);
+</span><span id="86" class="l"><a class="l" href="#86"> 86: </a>
+</span><span id="87" class="l"><a class="l" href="#87"> 87: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_settings_form'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="88" class="l"><a class="l" href="#88"> 88: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_general_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_settings_form'</span>, <span class="php-quote">'after'</span>);
+</span><span id="89" class="l"><a class="l" href="#89"> 89: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'language_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_general_settings'</span>, <span class="php-quote">'after'</span>);
+</span><span id="90" class="l"><a class="l" href="#90"> 90: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'timezone_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'language_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="91" class="l"><a class="l" href="#91"> 91: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'list_style_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'timezone_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="92" class="l"><a class="l" href="#92"> 92: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_unread_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'list_style_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="93" class="l"><a class="l" href="#93"> 93: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'unread_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_unread_settings'</span>, <span class="php-quote">'after'</span>);
+</span><span id="94" class="l"><a class="l" href="#94"> 94: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'unread_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'unread_since_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="95" class="l"><a class="l" href="#95"> 95: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_flagged_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'unread_source_max_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="96" class="l"><a class="l" href="#96"> 96: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'flagged_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_flagged_settings'</span>, <span class="php-quote">'after'</span>);
+</span><span id="97" class="l"><a class="l" href="#97"> 97: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'flagged_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'flagged_since_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="98" class="l"><a class="l" href="#98"> 98: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_everything_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'flagged_source_max_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="99" class="l"><a class="l" href="#99"> 99: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'all_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_everything_settings'</span>, <span class="php-quote">'after'</span>);
+</span><span id="100" class="l"><a class="l" href="#100">100: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'all_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'all_since_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="101" class="l"><a class="l" href="#101">101: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'start_all_email_settings'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'all_source_max_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="102" class="l"><a class="l" href="#102">102: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'all_email_since_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'start_all_email_settings'</span>, <span class="php-quote">'after'</span>);
+</span><span id="103" class="l"><a class="l" href="#103">103: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'all_email_source_max_setting'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'all_email_since_setting'</span>, <span class="php-quote">'after'</span>);
+</span><span id="104" class="l"><a class="l" href="#104">104: </a>add_output(<span class="php-quote">'settings'</span>, <span class="php-quote">'end_settings_form'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_end'</span>, <span class="php-quote">'before'</span>);
+</span><span id="105" class="l"><a class="l" href="#105">105: </a>
+</span><span id="106" class="l"><a class="l" href="#106">106: </a><span class="php-comment">/* message list page */</span>
+</span><span id="107" class="l"><a class="l" href="#107">107: </a>setup_base_page(<span class="php-quote">'message_list'</span>);
+</span><span id="108" class="l"><a class="l" href="#108">108: </a>add_output(<span class="php-quote">'message_list'</span>, <span class="php-quote">'message_list_heading'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="109" class="l"><a class="l" href="#109">109: </a>add_output(<span class="php-quote">'message_list'</span>, <span class="php-quote">'message_list_start'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'message_list_heading'</span>, <span class="php-quote">'after'</span>);
+</span><span id="110" class="l"><a class="l" href="#110">110: </a>add_output(<span class="php-quote">'message_list'</span>, <span class="php-quote">'message_list_end'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'message_list_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="111" class="l"><a class="l" href="#111">111: </a>
+</span><span id="112" class="l"><a class="l" href="#112">112: </a><span class="php-comment">/* search page */</span>
+</span><span id="113" class="l"><a class="l" href="#113">113: </a>setup_base_page(<span class="php-quote">'search'</span>);
+</span><span id="114" class="l"><a class="l" href="#114">114: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'search_content_start'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="115" class="l"><a class="l" href="#115">115: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'search_form'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'search_content_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="116" class="l"><a class="l" href="#116">116: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'message_list_start'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'search_form'</span>, <span class="php-quote">'after'</span>);
+</span><span id="117" class="l"><a class="l" href="#117">117: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'search_results_table_end'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'message_list_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="118" class="l"><a class="l" href="#118">118: </a>add_output(<span class="php-quote">'search'</span>, <span class="php-quote">'search_content_end'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'search_results_table_end'</span>, <span class="php-quote">'after'</span>);
+</span><span id="119" class="l"><a class="l" href="#119">119: </a>
 </span><span id="120" class="l"><a class="l" href="#120">120: </a>
-</span><span id="121" class="l"><a class="l" href="#121">121: </a><span class="php-comment">/* not-found page data and output */</span>
-</span><span id="122" class="l"><a class="l" href="#122">122: </a>setup_base_page(<span class="php-quote">'notfound'</span>);
-</span><span id="123" class="l"><a class="l" href="#123">123: </a>add_output(<span class="php-quote">'notfound'</span>, <span class="php-quote">'notfound_content'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
-</span><span id="124" class="l"><a class="l" href="#124">124: </a>
-</span><span id="125" class="l"><a class="l" href="#125">125: </a><span class="php-comment">/* message action ajax request */</span>
-</span><span id="126" class="l"><a class="l" href="#126">126: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'login'</span>, <span class="php-keyword1">false</span>);
-</span><span id="127" class="l"><a class="l" href="#127">127: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'load_user_data'</span>, <span class="php-keyword1">true</span>);
-</span><span id="128" class="l"><a class="l" href="#128">128: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'language'</span>,  <span class="php-keyword1">true</span>);
-</span><span id="129" class="l"><a class="l" href="#129">129: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'date'</span>, <span class="php-keyword1">true</span>);
-</span><span id="130" class="l"><a class="l" href="#130">130: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'http_headers'</span>, <span class="php-keyword1">true</span>);
-</span><span id="131" class="l"><a class="l" href="#131">131: </a>
-</span><span id="132" class="l"><a class="l" href="#132">132: </a><span class="php-comment">/* folder list update ajax request */</span>
-</span><span id="133" class="l"><a class="l" href="#133">133: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'login'</span>, <span class="php-keyword1">false</span>);
-</span><span id="134" class="l"><a class="l" href="#134">134: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'load_user_data'</span>, <span class="php-keyword1">true</span>);
-</span><span id="135" class="l"><a class="l" href="#135">135: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'language'</span>,  <span class="php-keyword1">true</span>);
-</span><span id="136" class="l"><a class="l" href="#136">136: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'date'</span>, <span class="php-keyword1">true</span>);
-</span><span id="137" class="l"><a class="l" href="#137">137: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'http_headers'</span>, <span class="php-keyword1">true</span>);
-</span><span id="138" class="l"><a class="l" href="#138">138: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'folder_list_content_start'</span>, <span class="php-keyword1">true</span>);
-</span><span id="139" class="l"><a class="l" href="#139">139: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'main_menu_start'</span>, <span class="php-keyword1">true</span>);
-</span><span id="140" class="l"><a class="l" href="#140">140: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'search_from_folder_list'</span>, <span class="php-keyword1">true</span>);
-</span><span id="141" class="l"><a class="l" href="#141">141: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'main_menu_content'</span>, <span class="php-keyword1">true</span>);
-</span><span id="142" class="l"><a class="l" href="#142">142: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'logout_menu_item'</span>, <span class="php-keyword1">true</span>);
-</span><span id="143" class="l"><a class="l" href="#143">143: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'main_menu_end'</span>, <span class="php-keyword1">true</span>);
-</span><span id="144" class="l"><a class="l" href="#144">144: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'email_menu_content'</span>, <span class="php-keyword1">true</span>);
-</span><span id="145" class="l"><a class="l" href="#145">145: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'settings_menu_start'</span>, <span class="php-keyword1">true</span>);
-</span><span id="146" class="l"><a class="l" href="#146">146: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'settings_menu_content'</span>, <span class="php-keyword1">true</span>);
-</span><span id="147" class="l"><a class="l" href="#147">147: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'settings_menu_end'</span>, <span class="php-keyword1">true</span>);
-</span><span id="148" class="l"><a class="l" href="#148">148: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'folder_list_content_end'</span>, <span class="php-keyword1">true</span>);
-</span><span id="149" class="l"><a class="l" href="#149">149: </a>
-</span><span id="150" class="l"><a class="l" href="#150">150: </a>
-</span><span id="151" class="l"><a class="l" href="#151">151: </a><span class="php-comment">/* allowed input */</span>
-</span><span id="152" class="l"><a class="l" href="#152">152: </a><span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(
-</span><span id="153" class="l"><a class="l" href="#153">153: </a>    <span class="php-quote">'allowed_pages'</span> =&gt; <span class="php-keyword1">array</span>(
-</span><span id="154" class="l"><a class="l" href="#154">154: </a>        <span class="php-quote">'home'</span>,
-</span><span id="155" class="l"><a class="l" href="#155">155: </a>        <span class="php-quote">'compose'</span>,
-</span><span id="156" class="l"><a class="l" href="#156">156: </a>        <span class="php-quote">'message_list'</span>,
-</span><span id="157" class="l"><a class="l" href="#157">157: </a>        <span class="php-quote">'message'</span>,
-</span><span id="158" class="l"><a class="l" href="#158">158: </a>        <span class="php-quote">'settings'</span>,
-</span><span id="159" class="l"><a class="l" href="#159">159: </a>        <span class="php-quote">'servers'</span>,
-</span><span id="160" class="l"><a class="l" href="#160">160: </a>        <span class="php-quote">'ajax_hm_folders'</span>,
-</span><span id="161" class="l"><a class="l" href="#161">161: </a>        <span class="php-quote">'ajax_message_action'</span>,
-</span><span id="162" class="l"><a class="l" href="#162">162: </a>        <span class="php-quote">'notfound'</span>,
-</span><span id="163" class="l"><a class="l" href="#163">163: </a>        <span class="php-quote">'help'</span>,
-</span><span id="164" class="l"><a class="l" href="#164">164: </a>        <span class="php-quote">'bug_report'</span>,
-</span><span id="165" class="l"><a class="l" href="#165">165: </a>        <span class="php-quote">'dev'</span>,
-</span><span id="166" class="l"><a class="l" href="#166">166: </a>        <span class="php-quote">'search'</span>
-</span><span id="167" class="l"><a class="l" href="#167">167: </a>    ),
-</span><span id="168" class="l"><a class="l" href="#168">168: </a>    <span class="php-quote">'allowed_output'</span> =&gt; <span class="php-keyword1">array</span>(
-</span><span id="169" class="l"><a class="l" href="#169">169: </a>        <span class="php-quote">'date'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_SANITIZE_STRING, <span class="php-keyword1">false</span>),
-</span><span id="170" class="l"><a class="l" href="#170">170: </a>        <span class="php-quote">'formatted_folder_list'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
-</span><span id="171" class="l"><a class="l" href="#171">171: </a>        <span class="php-quote">'router_user_msgs'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
-</span><span id="172" class="l"><a class="l" href="#172">172: </a>        <span class="php-quote">'router_login_state'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_VALIDATE_BOOLEAN, <span class="php-keyword1">false</span>),
-</span><span id="173" class="l"><a class="l" href="#173">173: </a>        <span class="php-quote">'formatted_message_list'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
-</span><span id="174" class="l"><a class="l" href="#174">174: </a>        <span class="php-quote">'just_saved_credentials'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_VALIDATE_BOOLEAN, <span class="php-keyword1">false</span>),
-</span><span id="175" class="l"><a class="l" href="#175">175: </a>        <span class="php-quote">'just_forgot_credentials'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_VALIDATE_BOOLEAN, <span class="php-keyword1">false</span>),
-</span><span id="176" class="l"><a class="l" href="#176">176: </a>        <span class="php-quote">'deleted_server_id'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_VALIDATE_INT, <span class="php-keyword1">false</span>),
-</span><span id="177" class="l"><a class="l" href="#177">177: </a>        <span class="php-quote">'msg_headers'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
-</span><span id="178" class="l"><a class="l" href="#178">178: </a>        <span class="php-quote">'msg_text'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
-</span><span id="179" class="l"><a class="l" href="#179">179: </a>        <span class="php-quote">'msg_parts'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
-</span><span id="180" class="l"><a class="l" href="#180">180: </a>        <span class="php-quote">'reply_body'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
-</span><span id="181" class="l"><a class="l" href="#181">181: </a>        <span class="php-quote">'reply_subject'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_SANITIZE_STRING, <span class="php-keyword1">false</span>),
-</span><span id="182" class="l"><a class="l" href="#182">182: </a>        <span class="php-quote">'reply_to'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
-</span><span id="183" class="l"><a class="l" href="#183">183: </a>
-</span><span id="184" class="l"><a class="l" href="#184">184: </a>    ),
-</span><span id="185" class="l"><a class="l" href="#185">185: </a>    <span class="php-quote">'allowed_cookie'</span> =&gt; <span class="php-keyword1">array</span>(
-</span><span id="186" class="l"><a class="l" href="#186">186: </a>        <span class="php-quote">'PHPSESSID'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="187" class="l"><a class="l" href="#187">187: </a>        <span class="php-quote">'hm_id'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="188" class="l"><a class="l" href="#188">188: </a>        <span class="php-quote">'hm_session'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="189" class="l"><a class="l" href="#189">189: </a>        <span class="php-quote">'hm_msgs'</span>    =&gt; FILTER_SANITIZE_STRING
+</span><span id="121" class="l"><a class="l" href="#121">121: </a><span class="php-comment">/* message view page */</span>
+</span><span id="122" class="l"><a class="l" href="#122">122: </a>setup_base_page(<span class="php-quote">'message'</span>);
+</span><span id="123" class="l"><a class="l" href="#123">123: </a>add_output(<span class="php-quote">'message'</span>, <span class="php-quote">'message_start'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="124" class="l"><a class="l" href="#124">124: </a>add_output(<span class="php-quote">'message'</span>, <span class="php-quote">'message_end'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'message_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="125" class="l"><a class="l" href="#125">125: </a>
+</span><span id="126" class="l"><a class="l" href="#126">126: </a><span class="php-comment">/* not-found page data and output */</span>
+</span><span id="127" class="l"><a class="l" href="#127">127: </a>setup_base_page(<span class="php-quote">'notfound'</span>);
+</span><span id="128" class="l"><a class="l" href="#128">128: </a>add_output(<span class="php-quote">'notfound'</span>, <span class="php-quote">'notfound_content'</span>, <span class="php-keyword1">true</span>, <span class="php-quote">'core'</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-quote">'after'</span>);
+</span><span id="129" class="l"><a class="l" href="#129">129: </a>
+</span><span id="130" class="l"><a class="l" href="#130">130: </a><span class="php-comment">/* message action ajax request */</span>
+</span><span id="131" class="l"><a class="l" href="#131">131: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'login'</span>, <span class="php-keyword1">false</span>);
+</span><span id="132" class="l"><a class="l" href="#132">132: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'load_user_data'</span>, <span class="php-keyword1">true</span>);
+</span><span id="133" class="l"><a class="l" href="#133">133: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'language'</span>,  <span class="php-keyword1">true</span>);
+</span><span id="134" class="l"><a class="l" href="#134">134: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'date'</span>, <span class="php-keyword1">true</span>);
+</span><span id="135" class="l"><a class="l" href="#135">135: </a>add_handler(<span class="php-quote">'ajax_message_action'</span>, <span class="php-quote">'http_headers'</span>, <span class="php-keyword1">true</span>);
+</span><span id="136" class="l"><a class="l" href="#136">136: </a>
+</span><span id="137" class="l"><a class="l" href="#137">137: </a><span class="php-comment">/* folder list update ajax request */</span>
+</span><span id="138" class="l"><a class="l" href="#138">138: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'login'</span>, <span class="php-keyword1">false</span>);
+</span><span id="139" class="l"><a class="l" href="#139">139: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'load_user_data'</span>, <span class="php-keyword1">true</span>);
+</span><span id="140" class="l"><a class="l" href="#140">140: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'language'</span>,  <span class="php-keyword1">true</span>);
+</span><span id="141" class="l"><a class="l" href="#141">141: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'date'</span>, <span class="php-keyword1">true</span>);
+</span><span id="142" class="l"><a class="l" href="#142">142: </a>add_handler(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'http_headers'</span>, <span class="php-keyword1">true</span>);
+</span><span id="143" class="l"><a class="l" href="#143">143: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'folder_list_content_start'</span>, <span class="php-keyword1">true</span>);
+</span><span id="144" class="l"><a class="l" href="#144">144: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'main_menu_start'</span>, <span class="php-keyword1">true</span>);
+</span><span id="145" class="l"><a class="l" href="#145">145: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'search_from_folder_list'</span>, <span class="php-keyword1">true</span>);
+</span><span id="146" class="l"><a class="l" href="#146">146: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'main_menu_content'</span>, <span class="php-keyword1">true</span>);
+</span><span id="147" class="l"><a class="l" href="#147">147: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'logout_menu_item'</span>, <span class="php-keyword1">true</span>);
+</span><span id="148" class="l"><a class="l" href="#148">148: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'main_menu_end'</span>, <span class="php-keyword1">true</span>);
+</span><span id="149" class="l"><a class="l" href="#149">149: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'email_menu_content'</span>, <span class="php-keyword1">true</span>);
+</span><span id="150" class="l"><a class="l" href="#150">150: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'settings_menu_start'</span>, <span class="php-keyword1">true</span>);
+</span><span id="151" class="l"><a class="l" href="#151">151: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'settings_menu_content'</span>, <span class="php-keyword1">true</span>);
+</span><span id="152" class="l"><a class="l" href="#152">152: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'settings_menu_end'</span>, <span class="php-keyword1">true</span>);
+</span><span id="153" class="l"><a class="l" href="#153">153: </a>add_output(<span class="php-quote">'ajax_hm_folders'</span>, <span class="php-quote">'folder_list_content_end'</span>, <span class="php-keyword1">true</span>);
+</span><span id="154" class="l"><a class="l" href="#154">154: </a>
+</span><span id="155" class="l"><a class="l" href="#155">155: </a>
+</span><span id="156" class="l"><a class="l" href="#156">156: </a><span class="php-comment">/* allowed input */</span>
+</span><span id="157" class="l"><a class="l" href="#157">157: </a><span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(
+</span><span id="158" class="l"><a class="l" href="#158">158: </a>    <span class="php-quote">'allowed_pages'</span> =&gt; <span class="php-keyword1">array</span>(
+</span><span id="159" class="l"><a class="l" href="#159">159: </a>        <span class="php-quote">'save'</span>,
+</span><span id="160" class="l"><a class="l" href="#160">160: </a>        <span class="php-quote">'home'</span>,
+</span><span id="161" class="l"><a class="l" href="#161">161: </a>        <span class="php-quote">'compose'</span>,
+</span><span id="162" class="l"><a class="l" href="#162">162: </a>        <span class="php-quote">'message_list'</span>,
+</span><span id="163" class="l"><a class="l" href="#163">163: </a>        <span class="php-quote">'message'</span>,
+</span><span id="164" class="l"><a class="l" href="#164">164: </a>        <span class="php-quote">'settings'</span>,
+</span><span id="165" class="l"><a class="l" href="#165">165: </a>        <span class="php-quote">'servers'</span>,
+</span><span id="166" class="l"><a class="l" href="#166">166: </a>        <span class="php-quote">'ajax_hm_folders'</span>,
+</span><span id="167" class="l"><a class="l" href="#167">167: </a>        <span class="php-quote">'ajax_message_action'</span>,
+</span><span id="168" class="l"><a class="l" href="#168">168: </a>        <span class="php-quote">'notfound'</span>,
+</span><span id="169" class="l"><a class="l" href="#169">169: </a>        <span class="php-quote">'help'</span>,
+</span><span id="170" class="l"><a class="l" href="#170">170: </a>        <span class="php-quote">'bug_report'</span>,
+</span><span id="171" class="l"><a class="l" href="#171">171: </a>        <span class="php-quote">'dev'</span>,
+</span><span id="172" class="l"><a class="l" href="#172">172: </a>        <span class="php-quote">'search'</span>
+</span><span id="173" class="l"><a class="l" href="#173">173: </a>    ),
+</span><span id="174" class="l"><a class="l" href="#174">174: </a>    <span class="php-quote">'allowed_output'</span> =&gt; <span class="php-keyword1">array</span>(
+</span><span id="175" class="l"><a class="l" href="#175">175: </a>        <span class="php-quote">'date'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_SANITIZE_STRING, <span class="php-keyword1">false</span>),
+</span><span id="176" class="l"><a class="l" href="#176">176: </a>        <span class="php-quote">'formatted_folder_list'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
+</span><span id="177" class="l"><a class="l" href="#177">177: </a>        <span class="php-quote">'router_user_msgs'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
+</span><span id="178" class="l"><a class="l" href="#178">178: </a>        <span class="php-quote">'router_login_state'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_VALIDATE_BOOLEAN, <span class="php-keyword1">false</span>),
+</span><span id="179" class="l"><a class="l" href="#179">179: </a>        <span class="php-quote">'formatted_message_list'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+</span><span id="180" class="l"><a class="l" href="#180">180: </a>        <span class="php-quote">'just_saved_credentials'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_VALIDATE_BOOLEAN, <span class="php-keyword1">false</span>),
+</span><span id="181" class="l"><a class="l" href="#181">181: </a>        <span class="php-quote">'just_forgot_credentials'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_VALIDATE_BOOLEAN, <span class="php-keyword1">false</span>),
+</span><span id="182" class="l"><a class="l" href="#182">182: </a>        <span class="php-quote">'deleted_server_id'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_VALIDATE_INT, <span class="php-keyword1">false</span>),
+</span><span id="183" class="l"><a class="l" href="#183">183: </a>        <span class="php-quote">'msg_headers'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
+</span><span id="184" class="l"><a class="l" href="#184">184: </a>        <span class="php-quote">'msg_text'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
+</span><span id="185" class="l"><a class="l" href="#185">185: </a>        <span class="php-quote">'msg_parts'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
+</span><span id="186" class="l"><a class="l" href="#186">186: </a>        <span class="php-quote">'reply_body'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
+</span><span id="187" class="l"><a class="l" href="#187">187: </a>        <span class="php-quote">'reply_subject'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_SANITIZE_STRING, <span class="php-keyword1">false</span>),
+</span><span id="188" class="l"><a class="l" href="#188">188: </a>        <span class="php-quote">'reply_to'</span> =&gt; <span class="php-keyword1">array</span>(FILTER_UNSAFE_RAW, <span class="php-keyword1">false</span>),
+</span><span id="189" class="l"><a class="l" href="#189">189: </a>
 </span><span id="190" class="l"><a class="l" href="#190">190: </a>    ),
-</span><span id="191" class="l"><a class="l" href="#191">191: </a>    <span class="php-quote">'allowed_server'</span> =&gt; <span class="php-keyword1">array</span>(
-</span><span id="192" class="l"><a class="l" href="#192">192: </a>        <span class="php-quote">'REQUEST_URI'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="193" class="l"><a class="l" href="#193">193: </a>        <span class="php-quote">'SERVER_ADDR'</span> =&gt; FILTER_VALIDATE_IP,
-</span><span id="194" class="l"><a class="l" href="#194">194: </a>        <span class="php-quote">'REMOTE_ADDR'</span> =&gt; FILTER_VALIDATE_IP,
-</span><span id="195" class="l"><a class="l" href="#195">195: </a>        <span class="php-quote">'SERVER_PORT'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="196" class="l"><a class="l" href="#196">196: </a>        <span class="php-quote">'SERVER_PROTOCOL'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="197" class="l"><a class="l" href="#197">197: </a>        <span class="php-quote">'PHP_SELF'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="198" class="l"><a class="l" href="#198">198: </a>        <span class="php-quote">'REQUEST_SCHEME'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="199" class="l"><a class="l" href="#199">199: </a>        <span class="php-quote">'HTTP_HOST'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="200" class="l"><a class="l" href="#200">200: </a>        <span class="php-quote">'HTTP_ACCEPT_LANGUAGE'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="201" class="l"><a class="l" href="#201">201: </a>        <span class="php-quote">'HTTP_ACCEPT_ENCODING'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="202" class="l"><a class="l" href="#202">202: </a>        <span class="php-quote">'HTTP_ACCEPT_CHARSET'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="203" class="l"><a class="l" href="#203">203: </a>        <span class="php-quote">'HTTP_ACCEPT'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="204" class="l"><a class="l" href="#204">204: </a>        <span class="php-quote">'HTTP_USER_AGENT'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="205" class="l"><a class="l" href="#205">205: </a>        <span class="php-quote">'HTTPS'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="206" class="l"><a class="l" href="#206">206: </a>        <span class="php-quote">'SERVER_NAME'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="207" class="l"><a class="l" href="#207">207: </a>        <span class="php-quote">'HTTP_X_REQUESTED_WITH'</span> =&gt; FILTER_SANITIZE_STRING
-</span><span id="208" class="l"><a class="l" href="#208">208: </a>    ),
-</span><span id="209" class="l"><a class="l" href="#209">209: </a>
-</span><span id="210" class="l"><a class="l" href="#210">210: </a>    <span class="php-quote">'allowed_get'</span> =&gt; <span class="php-keyword1">array</span>(
-</span><span id="211" class="l"><a class="l" href="#211">211: </a>        <span class="php-quote">'page'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="212" class="l"><a class="l" href="#212">212: </a>        <span class="php-quote">'msgs'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="213" class="l"><a class="l" href="#213">213: </a>        <span class="php-quote">'list_path'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="214" class="l"><a class="l" href="#214">214: </a>        <span class="php-quote">'list_parent'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="215" class="l"><a class="l" href="#215">215: </a>        <span class="php-quote">'list_page'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="216" class="l"><a class="l" href="#216">216: </a>        <span class="php-quote">'uid'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="217" class="l"><a class="l" href="#217">217: </a>        <span class="php-quote">'search_terms'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="218" class="l"><a class="l" href="#218">218: </a>        <span class="php-quote">'search_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="219" class="l"><a class="l" href="#219">219: </a>        <span class="php-quote">'search_fld'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="220" class="l"><a class="l" href="#220">220: </a>        <span class="php-quote">'reply_uid'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="221" class="l"><a class="l" href="#221">221: </a>        <span class="php-quote">'reply_source'</span> =&gt; FILTER_SANITIZE_STRING
-</span><span id="222" class="l"><a class="l" href="#222">222: </a>    ),
-</span><span id="223" class="l"><a class="l" href="#223">223: </a>
-</span><span id="224" class="l"><a class="l" href="#224">224: </a>    <span class="php-quote">'allowed_post'</span> =&gt; <span class="php-keyword1">array</span>(
-</span><span id="225" class="l"><a class="l" href="#225">225: </a>        <span class="php-quote">'hm_nonce'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="226" class="l"><a class="l" href="#226">226: </a>        <span class="php-quote">'logout'</span> =&gt; FILTER_VALIDATE_BOOLEAN,
-</span><span id="227" class="l"><a class="l" href="#227">227: </a>        <span class="php-quote">'save_and_logout'</span> =&gt; FILTER_VALIDATE_BOOLEAN,
-</span><span id="228" class="l"><a class="l" href="#228">228: </a>        <span class="php-quote">'limit'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="229" class="l"><a class="l" href="#229">229: </a>        <span class="php-quote">'username'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="230" class="l"><a class="l" href="#230">230: </a>        <span class="php-quote">'password'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="231" class="l"><a class="l" href="#231">231: </a>        <span class="php-quote">'hm_ajax_hook'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="232" class="l"><a class="l" href="#232">232: </a>        <span class="php-quote">'save_settings'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="233" class="l"><a class="l" href="#233">233: </a>        <span class="php-quote">'language_setting'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="234" class="l"><a class="l" href="#234">234: </a>        <span class="php-quote">'flagged_per_source'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="235" class="l"><a class="l" href="#235">235: </a>        <span class="php-quote">'flagged_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="236" class="l"><a class="l" href="#236">236: </a>        <span class="php-quote">'unread_per_source'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="237" class="l"><a class="l" href="#237">237: </a>        <span class="php-quote">'unread_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="238" class="l"><a class="l" href="#238">238: </a>        <span class="php-quote">'all_email_per_source'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="239" class="l"><a class="l" href="#239">239: </a>        <span class="php-quote">'all_email_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="240" class="l"><a class="l" href="#240">240: </a>        <span class="php-quote">'all_per_source'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="241" class="l"><a class="l" href="#241">241: </a>        <span class="php-quote">'all_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="242" class="l"><a class="l" href="#242">242: </a>        <span class="php-quote">'list_style'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="243" class="l"><a class="l" href="#243">243: </a>        <span class="php-quote">'timezone_setting'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="244" class="l"><a class="l" href="#244">244: </a>        <span class="php-quote">'section_state'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="245" class="l"><a class="l" href="#245">245: </a>        <span class="php-quote">'section_class'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="246" class="l"><a class="l" href="#246">246: </a>        <span class="php-quote">'message_ids'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="247" class="l"><a class="l" href="#247">247: </a>        <span class="php-quote">'action_type'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="248" class="l"><a class="l" href="#248">248: </a>        <span class="php-quote">'message_list_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="249" class="l"><a class="l" href="#249">249: </a>        <span class="php-quote">'reply_format'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="250" class="l"><a class="l" href="#250">250: </a>    )
-</span><span id="251" class="l"><a class="l" href="#251">251: </a>);
-</span><span id="252" class="l"><a class="l" href="#252">252: </a>
-</span><span id="253" class="l"><a class="l" href="#253">253: </a><span class="xlang">?&gt;</span>
-</span><span id="254" class="l"><a class="l" href="#254">254: </a></span></code></pre>
+</span><span id="191" class="l"><a class="l" href="#191">191: </a>    <span class="php-quote">'allowed_cookie'</span> =&gt; <span class="php-keyword1">array</span>(
+</span><span id="192" class="l"><a class="l" href="#192">192: </a>        <span class="php-quote">'PHPSESSID'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="193" class="l"><a class="l" href="#193">193: </a>        <span class="php-quote">'hm_id'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="194" class="l"><a class="l" href="#194">194: </a>        <span class="php-quote">'hm_session'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="195" class="l"><a class="l" href="#195">195: </a>        <span class="php-quote">'hm_msgs'</span>    =&gt; FILTER_SANITIZE_STRING
+</span><span id="196" class="l"><a class="l" href="#196">196: </a>    ),
+</span><span id="197" class="l"><a class="l" href="#197">197: </a>    <span class="php-quote">'allowed_server'</span> =&gt; <span class="php-keyword1">array</span>(
+</span><span id="198" class="l"><a class="l" href="#198">198: </a>        <span class="php-quote">'REQUEST_URI'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="199" class="l"><a class="l" href="#199">199: </a>        <span class="php-quote">'SERVER_ADDR'</span> =&gt; FILTER_VALIDATE_IP,
+</span><span id="200" class="l"><a class="l" href="#200">200: </a>        <span class="php-quote">'REMOTE_ADDR'</span> =&gt; FILTER_VALIDATE_IP,
+</span><span id="201" class="l"><a class="l" href="#201">201: </a>        <span class="php-quote">'SERVER_PORT'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="202" class="l"><a class="l" href="#202">202: </a>        <span class="php-quote">'SERVER_PROTOCOL'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="203" class="l"><a class="l" href="#203">203: </a>        <span class="php-quote">'PHP_SELF'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="204" class="l"><a class="l" href="#204">204: </a>        <span class="php-quote">'REQUEST_SCHEME'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="205" class="l"><a class="l" href="#205">205: </a>        <span class="php-quote">'HTTP_HOST'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="206" class="l"><a class="l" href="#206">206: </a>        <span class="php-quote">'HTTP_ACCEPT_LANGUAGE'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="207" class="l"><a class="l" href="#207">207: </a>        <span class="php-quote">'HTTP_ACCEPT_ENCODING'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="208" class="l"><a class="l" href="#208">208: </a>        <span class="php-quote">'HTTP_ACCEPT_CHARSET'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="209" class="l"><a class="l" href="#209">209: </a>        <span class="php-quote">'HTTP_ACCEPT'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="210" class="l"><a class="l" href="#210">210: </a>        <span class="php-quote">'HTTP_USER_AGENT'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="211" class="l"><a class="l" href="#211">211: </a>        <span class="php-quote">'HTTPS'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="212" class="l"><a class="l" href="#212">212: </a>        <span class="php-quote">'SERVER_NAME'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="213" class="l"><a class="l" href="#213">213: </a>        <span class="php-quote">'HTTP_X_REQUESTED_WITH'</span> =&gt; FILTER_SANITIZE_STRING
+</span><span id="214" class="l"><a class="l" href="#214">214: </a>    ),
+</span><span id="215" class="l"><a class="l" href="#215">215: </a>
+</span><span id="216" class="l"><a class="l" href="#216">216: </a>    <span class="php-quote">'allowed_get'</span> =&gt; <span class="php-keyword1">array</span>(
+</span><span id="217" class="l"><a class="l" href="#217">217: </a>        <span class="php-quote">'page'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="218" class="l"><a class="l" href="#218">218: </a>        <span class="php-quote">'msgs'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="219" class="l"><a class="l" href="#219">219: </a>        <span class="php-quote">'list_path'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="220" class="l"><a class="l" href="#220">220: </a>        <span class="php-quote">'list_parent'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="221" class="l"><a class="l" href="#221">221: </a>        <span class="php-quote">'list_page'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="222" class="l"><a class="l" href="#222">222: </a>        <span class="php-quote">'uid'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="223" class="l"><a class="l" href="#223">223: </a>        <span class="php-quote">'search_terms'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="224" class="l"><a class="l" href="#224">224: </a>        <span class="php-quote">'search_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="225" class="l"><a class="l" href="#225">225: </a>        <span class="php-quote">'search_fld'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="226" class="l"><a class="l" href="#226">226: </a>        <span class="php-quote">'reply_uid'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="227" class="l"><a class="l" href="#227">227: </a>        <span class="php-quote">'reply_source'</span> =&gt; FILTER_SANITIZE_STRING
+</span><span id="228" class="l"><a class="l" href="#228">228: </a>    ),
+</span><span id="229" class="l"><a class="l" href="#229">229: </a>
+</span><span id="230" class="l"><a class="l" href="#230">230: </a>    <span class="php-quote">'allowed_post'</span> =&gt; <span class="php-keyword1">array</span>(
+</span><span id="231" class="l"><a class="l" href="#231">231: </a>        <span class="php-quote">'hm_nonce'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="232" class="l"><a class="l" href="#232">232: </a>        <span class="php-quote">'logout'</span> =&gt; FILTER_VALIDATE_BOOLEAN,
+</span><span id="233" class="l"><a class="l" href="#233">233: </a>        <span class="php-quote">'save_and_logout'</span> =&gt; FILTER_VALIDATE_BOOLEAN,
+</span><span id="234" class="l"><a class="l" href="#234">234: </a>        <span class="php-quote">'limit'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="235" class="l"><a class="l" href="#235">235: </a>        <span class="php-quote">'username'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="236" class="l"><a class="l" href="#236">236: </a>        <span class="php-quote">'password'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="237" class="l"><a class="l" href="#237">237: </a>        <span class="php-quote">'hm_ajax_hook'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="238" class="l"><a class="l" href="#238">238: </a>        <span class="php-quote">'save_settings'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="239" class="l"><a class="l" href="#239">239: </a>        <span class="php-quote">'save_settings_permanently'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="240" class="l"><a class="l" href="#240">240: </a>        <span class="php-quote">'language_setting'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="241" class="l"><a class="l" href="#241">241: </a>        <span class="php-quote">'flagged_per_source'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="242" class="l"><a class="l" href="#242">242: </a>        <span class="php-quote">'flagged_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="243" class="l"><a class="l" href="#243">243: </a>        <span class="php-quote">'unread_per_source'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="244" class="l"><a class="l" href="#244">244: </a>        <span class="php-quote">'unread_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="245" class="l"><a class="l" href="#245">245: </a>        <span class="php-quote">'all_email_per_source'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="246" class="l"><a class="l" href="#246">246: </a>        <span class="php-quote">'all_email_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="247" class="l"><a class="l" href="#247">247: </a>        <span class="php-quote">'all_per_source'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="248" class="l"><a class="l" href="#248">248: </a>        <span class="php-quote">'all_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="249" class="l"><a class="l" href="#249">249: </a>        <span class="php-quote">'list_style'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="250" class="l"><a class="l" href="#250">250: </a>        <span class="php-quote">'timezone_setting'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="251" class="l"><a class="l" href="#251">251: </a>        <span class="php-quote">'section_state'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="252" class="l"><a class="l" href="#252">252: </a>        <span class="php-quote">'section_class'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="253" class="l"><a class="l" href="#253">253: </a>        <span class="php-quote">'message_ids'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="254" class="l"><a class="l" href="#254">254: </a>        <span class="php-quote">'action_type'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="255" class="l"><a class="l" href="#255">255: </a>        <span class="php-quote">'message_list_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="256" class="l"><a class="l" href="#256">256: </a>        <span class="php-quote">'reply_format'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="257" class="l"><a class="l" href="#257">257: </a>    )
+</span><span id="258" class="l"><a class="l" href="#258">258: </a>);
+</span><span id="259" class="l"><a class="l" href="#259">259: </a>
+</span><span id="260" class="l"><a class="l" href="#260">260: </a><span class="xlang">?&gt;</span>
+</span><span id="261" class="l"><a class="l" href="#261">261: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
