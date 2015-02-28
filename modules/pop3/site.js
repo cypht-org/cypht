@@ -79,9 +79,7 @@ var load_pop3_list = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
         {'name': 'pop3_server_id', 'value': id}],
-        display_pop3_mailbox,
-        [],
-        false
+        display_pop3_mailbox
     );
     return false;
 };
@@ -92,9 +90,7 @@ var pop3_message_view = function() {
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_message_display'},
         {'name': 'pop3_list_path', 'value': hm_list_path()},
         {'name': 'pop3_uid', 'value': hm_msg_uid()}],
-        display_pop3_message,
-        [],
-        false
+        display_pop3_message
     );
     return false;
 };
@@ -163,9 +159,7 @@ var pop3_status_update = function() {
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_status'},
                     {'name': 'pop3_server_ids', 'value': id}],
-                    update_pop3_status_display,
-                    [],
-                    false
+                    update_pop3_status_display
                 );
             }
         }
