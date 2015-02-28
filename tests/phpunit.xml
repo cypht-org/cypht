@@ -20,6 +20,9 @@
     <testsuite name="auth">
         <file>./auth.php</file>
     </testsuite>
+    <testsuite name="oauth2">
+        <file>./oauth2.php</file>
+    </testsuite>
     <testsuite name="modules">
         <file>./modules.php</file>
     </testsuite>
