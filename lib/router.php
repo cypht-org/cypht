@@ -358,6 +358,9 @@ class Hm_Router {
         elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $pages, true)) {
             $this->page = $request->get['page'];
         }
+        elseif (!array_key_exists('page', $request->get)) {
+            $this->page = 'home';
+        }
     }
 
     /**
