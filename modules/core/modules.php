@@ -1714,7 +1714,7 @@ class Hm_Output_settings_menu_content extends Hm_Output_Module {
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).
             '" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>'.
             '<li class="menu_save"><a class="unread_link" href="?page=save">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$save).
             '" alt="" width="16" height="16" /> '.$this->trans('Save').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
