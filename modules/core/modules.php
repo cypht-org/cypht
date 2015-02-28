@@ -349,45 +349,59 @@ class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
 }
 
 /**
- * Save settings from the settings page to persistant storage
+ * Save user settings permanently
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_save_form extends Hm_Handler_Module {
+    /**
+     * save any changes since login to permanent storage
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('save_settings_permanently', 'password'));
+        if ($success) {
+            $user = $this->session->get('username', false);
+            $path = $this->config->get('user_settings_dir', false);
+
+            if ($this->session->auth($user, $form['password'])) {
+                $pass = $form['password'];
+            }
+            else {
+                Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
+                $pass = false;
+            }
+            if ($user && $path && $pass) {
+                $this->user_config->save($user, $pass);
+                $this->session->set('changed_settings', array());
+                Hm_Msgs::add('Settings saved');
+            }
+        }
+    }
+}
+
+/**
+ * Save settings from the settings page to the session
  * @subpackage core/handler
  */
 class Hm_Handler_save_user_settings extends Hm_Handler_Module {
     /**
-     * validate the supplied password and save the settings if possible
-     * @todo save current settings in session when saving fails
+     * save new site settings to the session
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'password'));
+        list($success, $form) = $this->process_form(array('save_settings'));
         if ($success) {
             if ($new_settings = $this->get('new_user_settings', array())) {
                 foreach ($new_settings as $name => $value) {
                     $this->user_config->set($name, $value);
                 }
-                $user = $this->session->get('username', false);
-                $path = $this->config->get('user_settings_dir', false);
-
-                if ($this->get('new_password', false)) {
-                    $pass = $this->get('new_password');
-                }
-                elseif ($this->session->auth($user, $form['password'])) {
-                    $pass = $form['password'];
-                }
-                else {
-                    Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
-                    $pass = false;
-                }
-                if ($user && $path && $pass) {
-                    $this->user_config->save($user, $pass);
-                    Hm_Msgs::add('Settings saved');
-                    $this->out('reload_folders', true, false);
-                }
                 Hm_Page_Cache::flush($this->session);
+                Hm_Msgs::add('Settings saved');
+                $this->session->record_unsaved('Site settings updated');
+                $this->out('reload_folders', true, false);
             }
         }
-        elseif (array_key_exists('save_settings', $this->request->post)) {
+        /*elseif (array_key_exists('save_settings', $this->request->post)) {
             Hm_Msgs::add('ERRYour password is required to save your settings to the server');
-        }
+        }*/
     }
 }
 
@@ -1469,11 +1483,8 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
      */
     protected function output() {
         return '<tr><td class="submit_cell" colspan="2">'.
-            '<label class="screen_reader" for="password">Password</label><input required id="password" '.
-            'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
             '<input class="save_settings" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
-            '<div class="password_notice">* '.$this->trans('You must enter your password to save your settings on the server').
-            '</div></td></tr></table></form></div>';
+            '</td></tr></table></form></div>';
     }
 }
 
@@ -1650,6 +1661,43 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
 }
 
 /**
+ * Save settings page content
+ * @subpackage core/output
+ */
+class Hm_Output_save_form extends Hm_Output_Module {
+    /**
+     * Outputs save form
+     */
+    protected function output() {
+        $changed = $this->get('changed_settings', array());
+        $res = '<div class="save_settings_page"><div class="content_title">'.$this->trans('Save Settings').'</div>';
+        $res .= '<div class="save_details">'.$this->trans('Settings are not saved permanently on the server unless you explicitly allow it. '.
+            'If you don\'t save your settings, any changes made since you last logged in will be deleted when your '.
+            'session expires or you logout. You must re-enter your password for security purposes to save your settings '.
+            'permanently.');
+        $res .= '<div class="save_subtitle">'.$this->trans('Unsaved Changes').'</div>';
+        $res .= '<ul class="unsaved_settings">';
+        if (!empty($changed)) {
+            foreach ($changed as $change) {
+                $res .= '<li>'.$this->trans($change).'</li>';
+            }
+        }
+        else {
+            $res .= '<li>'.$this->trans('No changes need to be saved').'</li>';
+        }
+        $res .= '</ul></div><div class="save_perm_form"><form method="post">'.
+            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<label class="screen_reader" for="password">Password</label><input required id="password" '.
+            'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
+            '<input class="save_settings" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
+            '</form></div>';
+
+        $res .= '</div>';
+        return $res;
+    }
+}
+
+/**
  * Content for the Settings menu section of the folder list
  * @subpackage core/output
  */
@@ -1663,7 +1711,10 @@ class Hm_Output_settings_menu_content extends Hm_Output_Module {
             '" alt="" width="16" height="16" /> '.$this->trans('Servers').'</a></li>'.
             '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).
-            '" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>';
+            '" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>'.
+            '<li class="menu_save"><a class="unread_link" href="?page=save">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).
+            '" alt="" width="16" height="16" /> '.$this->trans('Save').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
