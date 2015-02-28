@@ -50,11 +50,15 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
             /* if the user has not registered a phone number yet look for one in POST */
             if ($state == NEED_REGISTER_SMS && array_key_exists('sms_number', $this->request->post)) {
 
-                if (preg_match("/^\d{8,15}$/", $this->request->post['sms_number'])) {
-                    $sms_number = $this->request->post['sms_number'];
+                /* remove non numeric delimiters */
+                $sms_number = preg_replace("/[^\d]/", "", $this->request->post['sms_number']);
+
+                /* US phone numbers only for now */
+                if (preg_match("/^1\d{10}$/", $sms_number)) {
+                    $submit_number = $sms_number;
 
                     /* set the phone number using the api */
-                    $api->setUserSmsNumber($swipe_username, $api_config["com.swipeidentity.api.appcode"], $sms_number);
+                    $api->setUserSmsNumber($swipe_username, $api_config["com.swipeidentity.api.appcode"], $submit_number);
 
                     /* refecth the status */
                     $state = get_secondfactor_state($api, $api_config, $swipe_username, $swipe_address);
@@ -156,7 +160,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
                     '<h1 class="title">'.$this->html_safe($this->get('router_app_name')).'</h1>'.
                     $error.
                     '<div class="swipe_txt">'.$this->trans('Register your number for Swipeidentity two factor authentication. '.
-                    'The number must include a country code. Only enter numbers and no spaces or delimiters').'</div>'.
+                    'The number must include a US country code prefix of 1. Only enter numbers, no spaces or delimiters').'</div>'.
                     '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
                     '<label class="screen_reader" for="sms_number">'.$this->trans('Phone number to send SMS codes to').'</label>'.
                     '<input id="sms_number" autofocus required type="tel" name="sms_number" value="" placeholder="'.$this->trans('Phone number to send SMS cods to').'" />'.
