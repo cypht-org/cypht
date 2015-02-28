@@ -830,7 +830,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').' &nbsp;'.
-                '<a href="?page=save">'.$this->trans('More info').'</div>'.
+                '<a href="?page=save">'.$this->trans('More info').'</a></div>'.
                 '<label class="screen_reader" for="logout_password">'.$this->trans('Password').'</label>'.
                 '<input id="logout_password" name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
                 '<input class="save_settings" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />'.
