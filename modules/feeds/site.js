@@ -112,9 +112,7 @@ var feed_item_view = function() {
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_item_content'},
         {'name': 'feed_list_path', 'value': hm_list_path()},
         {'name': 'feed_uid', 'value': hm_msg_uid()}],
-        display_feed_item_content,
-        [],
-        false
+        display_feed_item_content
     );
     return false;
 };
@@ -143,9 +141,7 @@ var load_feed_list = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_list_display'},
         {'name': 'feed_server_ids', 'value': id}],
-        display_feed_list,
-        [],
-        false
+        display_feed_list
     );
     return false;
 };
@@ -170,9 +166,7 @@ var feed_status_update = function() {
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_status'},
                     {'name': 'feed_server_ids', 'value': id}],
-                    update_feed_status_display,
-                    [],
-                    false
+                    update_feed_status_display
                 );
             }
         }
