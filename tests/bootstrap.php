@@ -11,6 +11,9 @@ if (!defined('DEBUG_MODE')) {
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 
+/* random id */
+define('SITE_ID', 'randomid');
+
 /* get mock objects */
 require APP_PATH.'tests/mocks.php';
 
