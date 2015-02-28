@@ -98,9 +98,7 @@ var imap_flag_message = function(state) {
                     $('#unflag_msg').show();
                 }
                 set_message_content();
-            },
-            [],
-            false
+            }
         );
     }
     return false;
@@ -121,9 +119,7 @@ var imap_status_update = function() {
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
                     {'name': 'imap_server_ids', 'value': id}],
-                    process_result,
-                    [],
-                    false
+                    process_result
                 );
             }
         }
@@ -205,9 +201,7 @@ var select_imap_folder = function(path) {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_display'},
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
-            display_imap_mailbox,
-            [],
-            false
+            display_imap_mailbox
         );
     }
     return false;
@@ -292,9 +286,7 @@ var get_message_content = function(msg_part) {
             {'name': 'imap_msg_part', 'value': msg_part},
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
-            display_msg_content,
-            [],
-            false
+            display_msg_content
         );
     }
     return false;
@@ -410,9 +402,7 @@ var imap_setup_compose_page = function() {
                 {'name': 'reply_format', 'value': 1},
                 {'name': 'imap_server_id', 'value': detail.server_id},
                 {'name': 'folder', 'value': detail.folder}],
-                display_reply_content,
-                [],
-                false
+                display_reply_content
             );
         }
     }
