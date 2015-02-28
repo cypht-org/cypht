@@ -63,6 +63,11 @@ add_output('servers', 'server_content_end', true, 'core', 'content_section_end',
 /* compose */
 setup_base_page('compose');
 
+/* save settings */
+setup_base_page('save');
+add_handler('save', 'process_save_form', true, 'core', 'load_user_data', 'after');
+add_output('save', 'save_form', true, 'core', 'content_section_start', 'after');
+
 /* settings */
 setup_base_page('settings');
 add_handler('settings', 'process_language_setting', true, 'core', 'date', 'after');
@@ -151,6 +156,7 @@ add_output('ajax_hm_folders', 'folder_list_content_end', true);
 /* allowed input */
 return array(
     'allowed_pages' => array(
+        'save',
         'home',
         'compose',
         'message_list',
@@ -230,6 +236,7 @@ return array(
         'password' => FILTER_SANITIZE_STRING,
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'save_settings' => FILTER_SANITIZE_STRING,
+        'save_settings_permanently' => FILTER_SANITIZE_STRING,
         'language_setting' => FILTER_SANITIZE_STRING,
         'flagged_per_source' => FILTER_VALIDATE_INT,
         'flagged_since' => FILTER_SANITIZE_STRING,

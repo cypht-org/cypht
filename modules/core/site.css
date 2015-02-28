@@ -127,6 +127,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .search_terms { padding-left: 5px; }
 .folder_list .search_terms { width: 80%; }
 .search_content { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
+.save_perm_form, .save_details { max-width: 600px; margin-left: 30px; margin-top: 20px; max-width: 60%; color: #666; }
+.save_subtitle { font-size: 110%; padding-top: 20px; }
+.unsaved_settings { margin-bottom: 30px; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
