@@ -68,6 +68,4 @@ if (!defined('HHVM_VERSION')) {
     ini_set('open_basedir', $base);
 }
 
-ignore_user_abort(true);
-
 ?>
