@@ -5,7 +5,7 @@ html { background: rgba(0,0,0,.08) !important; }
 img { opacity: .5 !important; }
 a { color: #222 !important; }
 .list_meta, a:hover { color: #000 !important; }
-.msg_controls a, textarea, select, input, .toggle_link { border-style: outset; color: #aaa; background-color: #fff !important; }
+.confirm_logout, .msg_controls a, textarea, select, input, .toggle_link { border-style: outset; color: #aaa; background-color: #fff !important; }
 .folder_list img { display: none; }
 .folder_list a { font-size: 90%; }
 .folder_list li { padding-top: 0px; }

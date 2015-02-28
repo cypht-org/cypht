@@ -7,7 +7,7 @@ a { color: #aaa !important; }
 a:hover { color: #fff !important; }
 textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
-.folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #363636 !important; }
+.confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #363636 !important; }
 .src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #333, #383838) !important; }
 .debug, .subtitle { color: #999 !important; }
 .subject, .subject a { font-weight: normal !important; font-size: 99% !important; color: #999 !important; }

@@ -4,7 +4,7 @@ html { background: linear-gradient(0deg, #050505, #050505) !important; }
 .account_icon, .folder_list img { display: none; }
 a { color: green !important; }
 .nlink:hover, .plink:hover, a:hover { color: #82c885 !important; }
-textarea, select, input, .toggle_link { border-radius: 0px; border-style: solid; border-color: #222 !important; color: green; background-color: #000 !important; }
+.confirm_logout, textarea, select, input, .toggle_link { border-radius: 0px; border-style: solid; border-color: #222 !important; color: green; background-color: #000 !important; }
 .toggle_link img { display: inline-block; }
 .prevnext { display: none; }
 ::-webkit-input-placeholder { color: #174214; }
