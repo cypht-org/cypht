@@ -47,7 +47,8 @@ return array(
     'allowed_post' => array(
         'nux_service' => FILTER_SANITIZE_STRING,
         'nux_email' => FILTER_SANITIZE_STRING,
-        'nux_pass' => FILTER_UNSAFE_RAW
+        'nux_pass' => FILTER_UNSAFE_RAW,
+        'nux_account_name' => FILTER_SANITIZE_STRING
     )
 );
 
