@@ -1,10 +1,5 @@
 var load_freshly_pressed = function() {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_wordpess_freshly_pressed'}],
-        display_wordpress_freshly_pressed,
-        [],
-        false
-    );
+    Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_wordpess_freshly_pressed'}], display_wordpress_freshly_pressed);
 };
 
 var display_wordpress_freshly_pressed = function(res) {
@@ -13,21 +8,11 @@ var display_wordpress_freshly_pressed = function(res) {
 };
 
 var load_wp_notices_for_combined_list = function() {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_wordpess_notifications'}],
-        display_combined_wp_notices,
-        [],
-        false
-    );
+    Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_wordpess_notifications'}], display_combined_wp_notices);
 };
 
 var load_wp_notices = function() {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_wordpess_notifications'}],
-        display_wordpress_notices,
-        [],
-        false
-    );
+    Hm_Ajax.request( [{'name': 'hm_ajax_hook', 'value': 'ajax_wordpess_notifications'}], display_wordpress_notices);
 };
 
 var display_combined_wp_notices = function(res) {
@@ -41,12 +26,7 @@ var display_wordpress_notices = function(res) {
 
 var wp_notice_view = function() {
     $('.msg_text_inner').html('');
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_wp_notice_display'}],
-        display_wp_notice,
-        [],
-        false
-    );
+    Hm_Ajax.request( [{'name': 'hm_ajax_hook', 'value': 'ajax_wp_notice_display'}], display_wp_notice);
     return false;
 };
 
@@ -56,13 +36,13 @@ var display_wp_notice = function(res) {
     $('.msg_text').append(res.wp_notice_text);
 };
 
-if (hm_page_name() == 'message_list' && hm_list_path() == 'wp_notifications') {
-    Hm_Message_List.page_caches.wp_notifications = 'formatted_wp_notice_data';
-    Hm_Message_List.select_combined_view();
-}
-else if (hm_page_name() == 'message_list' && hm_list_path() == 'wp_freshly_pressed') {
-    Hm_Message_List.page_caches.wp_freshly_pressed = 'formatted_wp_freshly_pressed';
-    Hm_Message_List.select_combined_view();
+if (hm_page_name() == 'message_list') {
+    if (hm_list_path() == 'wp_notifications') {
+        Hm_Message_List.page_caches.wp_notifications = 'formatted_wp_notice_data';
+    }
+    if (hm_list_path() == 'wp_freshly_pressed') {
+        Hm_Message_List.page_caches.wp_freshly_pressed = 'formatted_wp_freshly_pressed';
+    }
 }
 else if (hm_page_name() == 'message' && hm_list_path() == 'wp_notifications') {
     wp_notice_view();
