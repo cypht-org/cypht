@@ -57,12 +57,12 @@ class Hm_Oauth2 {
         $result = array();
         $flds = sprintf('code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code',
             urlencode($authorization_code), urlencode($this->client_id), urlencode($this->client_secret), urlencode($this->redirect_uri ));
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 5);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $flds);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $curl_result = curl_exec($ch);
+        $ch = Hm_Functions::c_init();
+        Hm_Functions::c_setopt($ch, CURLOPT_URL, $url);
+        Hm_Functions::c_setopt($ch, CURLOPT_POST, 5);
+        Hm_Functions::c_setopt($ch, CURLOPT_POSTFIELDS, $flds);
+        Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $curl_result = Hm_Functions::c_exec($ch);
         if (substr($curl_result, 0, 1) == '{') {
             $result = @json_decode($curl_result, true);
         }
