@@ -121,7 +121,7 @@ class Hm_Test_Router extends PHPUnit_Framework_TestCase {
         $request = new Hm_Mock_Request('AJAX');
         $request->post['hm_ajax_hook'] = 'test';
         $router->get_page($request, array('allowed_pages' => array()));
-        $this->assertEquals('home', $router->page);
+        $this->assertEquals('notfound', $router->page);
         $router->get_page($request, array('allowed_pages' => array('test')));
         $this->assertEquals('test', $router->page);
         $request = new Hm_Mock_Request('HTML5');
