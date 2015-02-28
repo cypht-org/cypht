@@ -159,11 +159,13 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
                 echo '<form class="login_form" method="POST">'.
                     '<h1 class="title">'.$this->html_safe($this->get('router_app_name')).'</h1>'.
                     $error.
-                    '<div class="swipe_txt">'.$this->trans('Register your number for Swipeidentity two factor authentication. '.
-                    'The number must include a US country code prefix of 1. Only enter numbers, no spaces or delimiters').'</div>'.
+                    '<div class="swipe_txt">'.$this->trans('Register your phone number for two factor authentication. '.
+                    'You will receive an SMS code at this number anytime you try to access your account. '.
+                    'The number must be 11 digits including a US country code prefix of 1. This is a service of ').
+                    '<br /><a target="_blank" href="https://www.swipeidentity.com/">Swipeidentity.com</a></div>'.
                     '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
                     '<label class="screen_reader" for="sms_number">'.$this->trans('Phone number to send SMS codes to').'</label>'.
-                    '<input id="sms_number" autofocus required type="tel" name="sms_number" value="" placeholder="'.$this->trans('Phone number to send SMS cods to').'" />'.
+                    '<input id="sms_number" autofocus required type="tel" name="sms_number" value="" placeholder="'.$this->trans('1-222-333-4444').'" />'.
                     '<input type="submit" name="submit_swipe_number" value="'.$this->trans('Submit').'" />'.
                     '</form>';
             }
