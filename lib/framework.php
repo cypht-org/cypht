@@ -44,6 +44,15 @@ if (!class_exists('Hm_Functions')) {
         public static function error_log($str) {
             error_log($str);
         }
+        public static function c_setopt($handle, $name, $value) {
+            curl_setopt($handle, $name, $value);
+        }
+        public static function c_init() {
+            return curl_init();
+        }
+        public static function c_exec($handle) {
+            return curl_exec($handle);
+        }
     }
 }
 ?>
