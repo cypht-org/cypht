@@ -8,11 +8,60 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * Use for browser fingerprinting
+ */
+trait Hm_Session_Fingerprint {
+
+    /**
+     * Check HTTP header "fingerprint" against the session value
+     * @param object $request request details
+     * @return void
+     */
+    public function check_fingerprint($request) {
+        $id = $this->build_fingerprint($request);
+        $fingerprint = $this->get('fingerprint', false);
+        if (!$fingerprint || $fingerprint !== $id) {
+            $this->destroy($request);
+            Hm_Debug::add('HTTP header fingerprint check failed');
+        }
+    }
+
+    /**
+     * Build HTTP header "fingerprint"
+     * @param object $request request details
+     * @return string fingerprint value
+     */
+    public function build_fingerprint($request, $input='') {
+        $env = $request->server;
+        $id = $input;
+        $id .= (array_key_exists('REMOTE_ADDR', $env)) ? $env['REMOTE_ADDR'] : '';
+        $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
+        $id .= (array_key_exists('REQUEST_SCHEME', $env)) ? $env['REQUEST_SCHEME'] : '';
+        $id .= (array_key_exists('HTTP_ACCEPT_LANGUAGE', $env)) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
+        $id .= (array_key_exists('HTTP_ACCEPT_CHARSET', $env)) ? $env['HTTP_ACCEPT_CHARSET'] : '';
+        $id .= (array_key_exists('HTTP_HOST', $env)) ? $env['HTTP_HOST'] : '';
+        return hash('sha256', $id);
+    }
+
+    /**
+     * Save a fingerprint in the session
+     * @param object $request request details
+     * @return void
+     */
+    protected function set_fingerprint($request) {
+        $id = $this->build_fingerprint($request);
+        $this->set('fingerprint', $id);
+    }
+}
+
+/**
  * Base class for session management. All session interaction happens through
  * classes that extend this.
  * @abstract
  */
 abstract class Hm_Session {
+
+    use Hm_Session_Fingerprint;
 
     /* set to true if the session was just loaded on this request */
     public $loaded = false;
@@ -86,47 +135,6 @@ abstract class Hm_Session {
      */
     protected function just_started() {
         $this->set('login_time', time());
-    }
-
-    /**
-     * Check HTTP header "fingerprint" against the session value
-     * @param object $request request details
-     * @return void
-     */
-    public function check_fingerprint($request) {
-        $id = $this->build_fingerprint($request);
-        $fingerprint = $this->get('fingerprint', false);
-        if (!$fingerprint || $fingerprint !== $id) {
-            $this->destroy($request);
-            Hm_Debug::add('HTTP header fingerprint check failed');
-        }
-    }
-
-    /**
-     * Build HTTP header "fingerprint"
-     * @param object $request request details
-     * @return string fingerprint value
-     */
-    public function build_fingerprint($request, $input='') {
-        $env = $request->server;
-        $id = $input;
-        $id .= (array_key_exists('REMOTE_ADDR', $env)) ? $env['REMOTE_ADDR'] : '';
-        $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
-        $id .= (array_key_exists('REQUEST_SCHEME', $env)) ? $env['REQUEST_SCHEME'] : '';
-        $id .= (array_key_exists('HTTP_ACCEPT_LANGUAGE', $env)) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
-        $id .= (array_key_exists('HTTP_ACCEPT_CHARSET', $env)) ? $env['HTTP_ACCEPT_CHARSET'] : '';
-        $id .= (array_key_exists('HTTP_HOST', $env)) ? $env['HTTP_HOST'] : '';
-        return hash('sha256', $id);
-    }
-
-    /**
-     * Save a fingerprint in the session
-     * @param object $request request details
-     * @return void
-     */
-    protected function set_fingerprint($request) {
-        $id = $this->build_fingerprint($request);
-        $this->set('fingerprint', $id);
     }
 
     /**
