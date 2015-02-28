@@ -736,7 +736,7 @@ var Hm_Folders = {
         $('.folder_list').html(res.formatted_folder_list);
         Hm_Folders.sort_list('email_folders', 'menu_email');
         Hm_Folders.sort_list('feeds_folders', 'menu_feeds');
-        Hm_Utils.save_to_local_storage('formatted_folder_list', res.formatted_folder_list);
+        Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         Hm_Folders.hl_selected_menu();
         Hm_Folders.folder_list_events();
     },
