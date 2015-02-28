@@ -57,12 +57,7 @@ class Hm_Output_theme_css extends Hm_Output_Module {
      */
     protected function output() {
         if ($this->get('theme') && in_array($this->get('theme'), array_keys(hm_themes($this)), true) && $this->get('theme') != 'default') {
-            if (DEBUG_MODE) {
-                return '<link href="modules/themes/assets/'.$this->html_safe($this->get('theme')).'.css" media="all" rel="stylesheet" type="text/css" />';
-            }
-            else {
-                return '<link href="'.$this->html_safe($this->get('theme')).'.css" media="all" rel="stylesheet" type="text/css" />';
-            }
+            return '<link href="modules/themes/assets/'.$this->html_safe($this->get('theme')).'.css" media="all" rel="stylesheet" type="text/css" />';
         }
     }
 }
