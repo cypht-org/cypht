@@ -5,7 +5,7 @@ html { background: linear-gradient(340deg, #ddd, #ddd, #ddd, #9bb39d) !important
 img { opacity: .5 !important; }
 a { color: #222 !important; }
 .list_meta, a:hover { color: #000 !important; }
-.msg_controls a, textarea, select, input, .toggle_link { color: #aaa; background-color: #c7dcc8 !important; }
+.confirm_logout, .msg_controls a, textarea, select, input, .toggle_link { color: #aaa; background-color: #c7dcc8 !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list { background-color: transparent !important; }
 .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: transparent !important; }

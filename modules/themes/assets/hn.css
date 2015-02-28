@@ -8,7 +8,7 @@ a { color: #222 !important; }
 .msg_controls a, textarea, select, input, .toggle_link { color: #aaa; background-color: #fff !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list { background-color: #f6f6ef !important; }
-.content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #f6f6ef !important; }
+.confirm_logout, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #f6f6ef !important; }
 .src_name { color: #666 !important; background: none !important; background-color: #f6f6ef !important; }
 .content_title { color: #333; background: none !important; background-color: rgb(255, 102, 0) !important; font-size: 140%; font-weight: bold; padding-bottom: 5px; padding-top: 5px; }
 .content_title span { color: #333; }
