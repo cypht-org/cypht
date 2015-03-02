@@ -64,6 +64,28 @@ trait Hm_Server_List {
     }
 
     /**
+     * Update the oauth2 password and password expiration
+     * @param int $id server id
+     * @param string $pass new password
+     * @param int $expiry new password expiration timestamp
+     * @return bool
+     */
+    public static function update_oauth2_token($id, $pass, $expiry) {
+        if (!array_key_exists($id, self::$server_list)) {
+            return false;
+        }
+        if (!array_key_exists('auth', self::$server_list[$id])) {
+            return false;
+        }
+        if (self::$server_list[$id]['auth'] != 'xoauth2') {
+            return false;
+        }
+        self::$server_list[$id]['pass'] = $pass;
+        self::$server_list[$id]['expiration'] = $expiry;
+        return true;
+    }
+
+    /**
      * Remove the username and password from a connection
      * @param int $id server id
      * @return void
