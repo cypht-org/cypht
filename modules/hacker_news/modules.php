@@ -198,21 +198,4 @@ function score_callback($score, $style, $output_mod) {
     return sprintf('<td>%d</td>', $score[0]);
 }
 
-/**
- * @subpackage hackernews/functions
- */
-function curl_fetch_json($url) {
-    $curl_handle=curl_init();
-    curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 '.
-        '(KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36");
-    curl_setopt($curl_handle, CURLOPT_URL, $url);
-    curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT,15);
-    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER,1);
-    curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
-    $buffer = curl_exec($curl_handle);
-    curl_close($curl_handle);
-    unset($curl_handle);
-    return @json_decode($buffer);
-}
-
 ?>
