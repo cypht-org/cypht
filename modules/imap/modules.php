@@ -511,7 +511,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
  */
 class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     /**
-     * This list is cached in the session between page loads
+     * This list is cached in the session between page loads by Hm_Handler_save_imap_servers
      */
     public function process() {
         $servers = $this->user_config->get('imap_servers', array());
@@ -535,6 +535,42 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 count($servers));
                 $this->session->del('imap_auth_server_settings');
             }
+        }
+    }
+}
+
+/**
+ * Check for IMAP server oauth2 token refresh
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
+    public function process() {
+        $active = array();
+        if (array_key_exists('imap_server_ids', $this->request->post)) {
+            $active = explode(',', $this->request->post['imap_server_ids']);
+        }
+        if (array_key_exists('imap_server_id', $this->request->post)) {
+            $active[] = $this->request->post['imap_server_id'];
+        }
+        $updated = 0;
+        foreach ($active as $server_id) {
+            $server = Hm_IMAP_List::dump($server_id, true);
+            if (array_key_exists('auth', $server) && $server['auth'] == 'xoauth2') {
+                $results = imap_refresh_oauth2_token($server, $this->config);
+                if (!empty($results)) {
+                    if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
+                        Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $server_id));
+                        Hm_Msgs::add('Oauth2 access token updated'); 
+                        $this->session->record_unsaved('Oauth2 access token updated');
+                        $updated++;
+                    }
+                }
+            }
+        }
+        if ($updated > 0) {
+            $servers = Hm_IMAP_List::dump(false, true);
+            $this->user_config->set('imap_servers', $servers);
+            $this->session->set('user_data', $this->user_config->dump());
         }
     }
 }
@@ -1616,6 +1652,49 @@ function add_attached_images($txt, $uid, $struct, $imap) {
         }
     }
     return $txt;
+}
+
+/**
+ * Get Oauth2 server info
+ * @subpackage imap/functions
+ * @param object $config site config object
+ * @return array
+ */
+function imap_get_oauth2_data($config) {
+    $settings = array();
+    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/oauth2.ini';
+    if (is_readable($ini_file)) {
+        $settings = parse_ini_file($ini_file, true);
+    }
+    return $settings;
+}
+
+/**
+ * Check for and do an Oauth2 token reset if needed
+ * @param array $server imap server data
+ * @param object $config site config object
+ * @return mixed
+ */
+function imap_refresh_oauth2_token($server, $config) {
+
+    if ((int) $server['expiration'] <= time()) {
+        $oauth2_data = imap_get_oauth2_data($config);
+        $details = array();
+        if ($server['server'] == 'imap.gmail.com') {
+            $details = $oauth2_data['gmail'];
+        }
+        elseif ($server['server'] == 'imap-mail.outlook.com') {
+            $details = $oauth2_data['outlook'];
+        }
+        if (!empty($details)) {
+            $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['client_uri']);
+            $result = $oauth2->refresh_token($server['refresh_url'], $server['refresh_token']);
+            if (array_key_exists('access_token', $result)) {
+                return array(strtotime(sprintf('+%d seconds', $result['expires_in'])), $result['access_token']);
+            }
+        }
+    }
+    return array();
 }
 
 ?>
