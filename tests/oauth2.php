@@ -19,6 +19,14 @@ class Hm_Test_Oauth2 extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_refresh_token() {
+        $res = $this->oauth2->refresh_token('url', 'refresh_token');
+        $this->assertEquals(array('unit' => 'test'), $res);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_request_token() {
         $res = $this->oauth2->request_token('url', 'auth_code');
         $this->assertEquals(array('unit' => 'test'), $res);

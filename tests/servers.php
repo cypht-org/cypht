@@ -59,6 +59,22 @@ class Hm_Test_Server_List extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_update_oauth2_token() {
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), 0);
+        $this->assertFalse(Hm_Server_Wrapper::update_oauth2_token(0, 'testpass', 3600));
+        $this->assertFalse(Hm_Server_Wrapper::update_oauth2_token(9, 'testpass', 3600));
+
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'auth' => 'test', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), 1);
+        $this->assertFalse(Hm_Server_Wrapper::update_oauth2_token(1, 'testpass', 3600));
+
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'auth' => 'xoauth2', 'expiration' => 10, 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), 2);
+        $this->assertTrue(Hm_Server_Wrapper::update_oauth2_token(2, 'testpass', 3600));
+
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_connect() {
         $this->assertTrue(Hm_Server_Wrapper::connect(0) !== false);
         Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 1);
