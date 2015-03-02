@@ -441,5 +441,5 @@ $(function() {
         Hm_Message_List.add_sources(hm_data_sources());
         Hm_Timer.add_job(Hm_Message_List.load_sources, 40, true);
     }
-    Hm_Timer.add_job(imap_prefetch_msgs, 12, true);
+    Hm_Timer.add_job(imap_prefetch_msgs, 16, true);
 });
