@@ -516,11 +516,23 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('imap_servers', array());
         $added = false;
+        $updated = false;
+        $new_servers = array();
         foreach ($servers as $index => $server) {
+            if ($this->session->loaded) {
+                if (array_key_exists('expiration', $server)) {
+                    $updated = true;
+                    $server['expiration'] = 1;
+                }
+            }
+            $new_servers[] = $server;
             Hm_IMAP_List::add($server, $index);
             if ($server['name'] == 'Default-Auth-Server') {
                 $added = true;
             }
+        }
+        if ($updated) {
+            $this->user_config->set('imap_servers', $new_servers);
         }
         if (!$added) {
             $auth_server = $this->session->get('imap_auth_server_settings', array());
@@ -560,7 +572,6 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
                 if (!empty($results)) {
                     if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
                         Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $server_id));
-                        Hm_Msgs::add('Oauth2 access token updated'); 
                         $this->session->record_unsaved('Oauth2 access token updated');
                         $updated++;
                     }
