@@ -39,7 +39,8 @@ class Hm_Oauth2 {
      * @return string
      */
     public function request_authorization_url($url, $scope, $state, $login_hint=false) {
-        $res = sprintf('%s?response_type=code&amp;scope=%s&amp;state=%s&amp;client_id=%s&amp;redirect_uri=%s',
+        $res = sprintf('%s?response_type=code&amp;scope=%s&amp;state=%s&amp;'.
+            'approval_prompt=force&amp;access_type=offline&amp;client_id=%s&amp;redirect_uri=%s',
             $url, $scope, $state, $this->client_id, $this->redirect_uri);
         if ($login_hint) {
             $res .= '&amp;login_hint='.$login_hint;
@@ -54,9 +55,34 @@ class Hm_Oauth2 {
      * @return array
      */
     public function request_token($url, $authorization_code) {
-        $result = array();
         $flds = sprintf('code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code',
-            urlencode($authorization_code), urlencode($this->client_id), urlencode($this->client_secret), urlencode($this->redirect_uri ));
+            urlencode($authorization_code), urlencode($this->client_id), urlencode($this->client_secret),
+            urlencode($this->redirect_uri));
+
+        return $this->curl_post($url, $flds);
+    }
+
+    /**
+     * Use curl to refresh an access token
+     * @param string $url url to to post to
+     * @param string $refresh_token oauth2 refresh token
+     * @return array
+     */
+    public function refresh_token($url, $refresh_token) {
+        $flds = sprintf('client_id=%s&client_secret=%s&refresh_token=%s&grant_type=refresh_token',
+            urlencode($this->client_id), urlencode($this->client_secret), urlencode($refresh_token));
+
+        return $this->curl_post($url, $flds);
+    }
+
+    /**
+     * post to an oauth2 endpoint
+     * @param string $url url to post to
+     * @param array $flds post data
+     * @return array
+     */
+    private function curl_post($url, $flds) {
+        $result = array();
         $ch = Hm_Functions::c_init();
         Hm_Functions::c_setopt($ch, CURLOPT_URL, $url);
         Hm_Functions::c_setopt($ch, CURLOPT_POST, 5);
@@ -66,6 +92,7 @@ class Hm_Oauth2 {
         if (substr($curl_result, 0, 1) == '{') {
             $result = @json_decode($curl_result, true);
         }
+        elog($result);
         return $result;
     }
 }
