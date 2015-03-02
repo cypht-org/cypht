@@ -193,7 +193,6 @@ abstract class Hm_Session {
         }
     }
 
-
     /**
      * Set a cookie, secure if possible
      * @param object $request request details
