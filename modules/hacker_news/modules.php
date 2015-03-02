@@ -8,6 +8,8 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+require APP_PATH.'third_party/simple_html_dom.php';
+
 /**
  * @subpackage hackernews/handler
  */
@@ -31,35 +33,55 @@ class Hm_Handler_hacker_news_fields extends Hm_Handler_Module {
     }
 }
 
+function hn_parse_subtext($text) {
+    if (preg_match("/<span class=\"score\" id=\"score_(\d+)\">(\d+) point(s|)<\/span> by <a href=\"user\?id=([^\"]+)\">[^<]+<\/a> <a href=\"item\?id=(\d+)\">([^<]+)<\/a>  \| <a href=\"item\?id=\d+\">(.+)<\/a>/", $text, $matches)) {
+        return array(
+            'id' => $matches[1],
+            'votes' => $matches[2],
+            'user' => $matches[4],
+            'timestamp' => strtotime(sprintf('-%s', trim(str_replace('ago', '', $matches[6])))),
+            'comment' => (int) trim(str_replace('comments', '', $matches[7]))
+        );
+    }
+    else {
+        elog($text);
+    }
+    return array();
+}
 /**
  * @subpackage hackernews/handler
  */
 class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
     public function process() {
         $list_type = 'top20';
+        $html = false;
         if (array_key_exists('list_path', $this->request->get)) {
             $list_type = $this->request->get['list_path'];
         }
         if ($list_type == 'top20') {
-            $data = array_slice(curl_fetch_json('https://hacker-news.firebaseio.com/v0/topstories.json'), 0, 20);
+            $html = file_get_html('https://news.ycombinator.com/');
         }
         elseif ($list_type == 'newest') {
-            $data = array();
-            $max_id = curl_fetch_json('https://hacker-news.firebaseio.com/v0/maxitem.json');
-            for ($i = 0; $i < 20; $i++) {
-                $data[] = $max_id - $i;
-            }
+            $html = file_get_html('https://news.ycombinator.com/newest');
         }
-        $output = array();
-        if (is_array($data)) {
-            foreach ($data as $id) {
-                $item = curl_fetch_json('https://hacker-news.firebaseio.com/v0/item/'.$id.'.json');
-                if (is_object($item)) {
-                    $output[] = $item;
+        $news = array();
+        $title = false;
+        $url = false;
+        if ($html) {
+            foreach ($html->find('.title a, .subtext') as $index => $el) {
+                if ($title !== false) {
+                    $subtext = hn_parse_subtext($el->innertext);
+                    $news[] = array_merge(array('title' => trim($title), 'url' => $url), $subtext);
+                    $title = false;
+                    $url = false;
+                    continue;
                 }
+                $title = $el->plaintext;
+                $url = $el->href;
             }
         }
-        $this->out('hacker_news_data', $output);
+        elog($news);
+        $this->out('hacker_news_data', $news);
     }
 }
 
@@ -110,58 +132,48 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
                 $style = 'news';
             }
             foreach ($this->get('hacker_news_data', array()) as $index => $item) {
-                if (!property_exists($item, 'id')) {
+                if (!array_key_exists('id', $item)) {
                     continue;
                 }
-                $url = '';
-                $host = 'news.ycombinator.com';
-                if ($item->type == 'story') {
-                    $url = $item->url;
-                    $url_parts = parse_url($item->url);
-                    if (array_key_exists('host', $url_parts)) {
-                        $host = $url_parts['host'];
-                    }
+                $url = $item['url'];
+                $parts = parse_url($url);
+                $host = '';
+                if (array_key_exists('host', $parts)) {
+                    $host = $parts['host'];
                 }
-                if (!$url) {
-                    $url = sprintf('https://%s/item?id=%d', $host, $item->id);
-                }
-                $comments = 0;
-                if (property_exists($item, 'kids')) {
-                    $comments = count($item->kids);
-                }
-                if ($item->type == 'comment') {
-                    $subject = substr(mb_convert_encoding(strip_tags($item->text), 'UTF-8', 'HTML-ENTITIES'), 0, 120);
-                }
-                else {
-                    $subject = $item->title;
-                }
-                $date = date('r', $item->time);
+                $user = array_key_exists('user', $item) ? $item['user'] : '';
+                $timestamp = array_key_exists('timestamp', $item) ? $item['timestamp'] : 0;
+                $comments = array_key_exists('comment', $item) ? $item['comment'] : 0;
+                $subject = $this->html_safe(html_entity_decode($item['title']));
+                $date = $timestamp != 0 ? date('r', $timestamp) : date('r');
+                $votes = array_key_exists('votes', $item) ? $item['votes'] : 0;
+
                 if ($style == 'news') {
-                    $res[$item->id] = message_list_row(array(
-                            array('checkbox_callback', $item->id),
+                    $res[$item['id']] = message_list_row(array(
+                            array('checkbox_callback', $item['id']),
                             array('icon_callback', array()),
                             array('subject_callback', $subject, $url, array()),
                             array('safe_output_callback', 'source', $host),
-                            array('safe_output_callback', 'from', $item->by),
-                            array('date_callback', human_readable_interval($date), ($len - $index)),
+                            array('safe_output_callback', 'from', $user),
+                            array('date_callback', human_readable_interval($date), $timestamp)
                         ),
-                        $item->id,
+                        $item['id'],
                         $style,
                         $this
                     );
                 }
                 else {
-                    $res[$item->id] = message_list_row(array(
-                            array('checkbox_callback', $item->id),
+                    $res[$item['id']] = message_list_row(array(
+                            array('checkbox_callback', $item['id']),
                             array('safe_output_callback', 'source', $host),
-                            array('safe_output_callback', 'from', $item->by),
+                            array('safe_output_callback', 'from', $user),
                             array('subject_callback', $subject, $url, array()),
-                            array('score_callback', $item),
-                            array('comment_callback', $item),
-                            array('date_callback', human_readable_interval($date), ($len - $index)),
+                            array('score_callback', $votes),
+                            array('comment_callback', $comments),
+                            array('date_callback', human_readable_interval($date), $timestamp),
                             array('icon_callback', array()),
                         ),
-                        $item->id,
+                        $item['id'],
                         $style,
                         $this
                     );
@@ -175,25 +187,15 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
 /**
  * @subpackage hackernews/functions
  */
-function comment_callback($vals, $style, $output_mod) {
-    $item = $vals[0];
-    $comments = 0;
-    if (property_exists($item, 'kids')) {
-        $comments = count($item->kids);
-    }
-    return sprintf('<td>%d</td>', $comments);
+function comment_callback($comments, $style, $output_mod) {
+    return sprintf('<td>%d</td>', $comments[0]);
 }
 
 /**
  * @subpackage hackernews/functions
  */
-function score_callback($vals, $style, $output_mod) {
-    $item = $vals[0];
-    $score = 0;
-    if (property_exists($item, 'score')) {
-        $score = $item->score;
-    }
-    return sprintf('<td>%d</td>', $score);
+function score_callback($score, $style, $output_mod) {
+    return sprintf('<td>%d</td>', $score[0]);
 }
 
 /**
