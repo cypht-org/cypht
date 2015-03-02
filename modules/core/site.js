@@ -545,7 +545,12 @@ var Hm_Message_List = {
             Hm_Timer.add_job(Hm_Message_List.load_sources, 60, true);
         }
         else {
-            Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
+            if ($('.message_table tbody tr').length > 0) {
+                Hm_Timer.add_job(Hm_Message_List.load_sources, 60, true);
+            }
+            else {
+                Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
+            }
         }
     },
 
