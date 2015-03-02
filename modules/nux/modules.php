@@ -14,6 +14,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * @subpackage nux/handler
+ * @todo unset nux_add_service_details
  */
 class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
     public function process() {
@@ -30,7 +31,11 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         'tls' => $details['tls'],
                         'user' => $details['email'],
                         'pass' => $result['access_token'],
+                        'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
+                        'refresh_token' => $result['refresh_token'],
+                        'refresh_url' => $details['refresh_token'],
                         'auth' => 'xoauth2'));
+
                     Hm_Msgs::add('E-mail account successfully added');
                     $servers = Hm_IMAP_List::dump(false, true);
                     $this->user_config->set('imap_servers', $servers);
@@ -97,7 +102,6 @@ class Hm_Handler_process_nux_service extends Hm_Handler_Module {
                 if (array_key_exists('nux_account_name', $this->request->post) && trim($this->request->post['nux_account_name'])) {
                     $details['name'] = $this->request->post['nux_account_name'];
                 }
-                elog($details);
                 $this->out('nux_add_service_details', $details);
                 $this->session->set('nux_add_service_details', $details);
             }
@@ -236,7 +240,9 @@ class Nux_Quick_Services {
     }
 }
 
-
+/**
+ * todo move the urls to the oauth2 file
+ */
 Nux_Quick_Services::add('gmail', array(
     'server' => 'imap.gmail.com',
     'type' => 'imap',
@@ -246,6 +252,7 @@ Nux_Quick_Services::add('gmail', array(
     'auth' => 'oauth2',
     'oauth2_authorization' => 'https://accounts.google.com/o/oauth2/auth',
     'oauth2_token' => 'https://www.googleapis.com/oauth2/v3/token',
+    'refresh_token' => 'https://www.googleapis.com/oauth2/v3/token',
     'scope' => ' https://mail.google.com/'
 ));
 
