@@ -13,7 +13,7 @@ class Hm_Test_Oauth2 extends PHPUnit_Framework_TestCase {
      */
     public function test_request_authorization_url() {
         $res = $this->oauth2->request_authorization_url('url', 'scope', 'state', 'hint');
-        $this->assertEquals('url?response_type=code&amp;scope=scope&amp;state=state&amp;client_id=client_id&amp;redirect_uri=uri&amp;login_hint=hint', $res);
+        $this->assertEquals('url?response_type=code&amp;scope=scope&amp;state=state&amp;approval_prompt=force&amp;access_type=offline&amp;client_id=client_id&amp;redirect_uri=uri&amp;login_hint=hint', $res);
     }
     /**
      * @preserveGlobalState disabled
