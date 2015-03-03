@@ -2,6 +2,8 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+if (DEBUG_MODE) {
+
 handler_source('developer');
 output_source('developer');
 
@@ -26,5 +28,8 @@ return array(
         'dev',
     )
 );
+
+}
+return array();
 
 ?>
