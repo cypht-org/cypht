@@ -329,4 +329,13 @@ Nux_Quick_Services::add('yandex', array(
     'auth' => 'login'
 ));
 
+Nux_Quick_Services::add('inbox', array(
+    'server' => 'imap.inbox.com',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Inbox.com',
+    'auth' => 'login'
+));
+
 ?>
