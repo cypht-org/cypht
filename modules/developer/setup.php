@@ -10,9 +10,12 @@ output_source('developer');
 
 /* info page */
 setup_base_page('info', 'core');
+add_handler('info', 'process_server_info', true, 'developer', 'load_user_data', 'after');
 add_output('info', 'info_heading', true, 'developer', 'content_section_start', 'after');
-add_output('info', 'server_status_start', true, 'developer', 'info_heading', 'after');
+add_output('info', 'server_information', true, 'developer', 'info_heading', 'after');
+add_output('info', 'server_status_start', true, 'developer', 'server_information', 'after');
 add_output('info', 'server_status_end', true, 'developer', 'server_status_start', 'after');
+add_output('info', 'config_map', true, 'developer', 'server_status_end', 'after');
 
 /* folder list */
 add_output('ajax_hm_folders', 'info_page_link', true, 'developer', 'settings_menu_end', 'before');
