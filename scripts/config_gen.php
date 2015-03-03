@@ -160,64 +160,8 @@ function write_config_file($settings, $filters) {
     $settings['handler_modules'] = Hm_Handler_Modules::dump();
     $settings['output_modules'] = Hm_Output_Modules::dump();
     $settings['input_filters'] = $filters;
-    //build_config_map($settings);
     file_put_contents('hm3.rc', serialize($settings));
     printf("hm3.rc file written\n");
-}
-
-function build_config_map($settings) {
-    $res = '<!DOCTYPE html><html dir="ltr" class="ltr_page" lang=en><head><title>Config Map</title>';
-    $res .= '<style type="text/css">.page { padding: 10px; font-size: 120%; } .mod { padding-right: '.
-        '10px; padding-left: 40px; }</style>';
-    $res .= '</head><body><table>';
-    $handlers = $settings['handler_modules'];
-    $outputs = $settings['output_modules'];
-    $filters = $settings['input_filters'];
-    foreach ($handlers as $page => $mods) {
-        $res .= '<tr><td colspan="2" class="page">'.$page.'</td></tr>';
-        foreach ($mods as $name => $vals) {
-            $res .= '<tr><td class="mod">handler</td><td>'.$name.'</td></tr>';
-        }
-        if (array_key_exists($page, $outputs)) {
-            foreach($outputs[$page] as $name => $vals) {
-                $res .= '<tr><td class="mod">output</td><td>'.$name.'</td></tr>';
-            }
-        }
-    }
-    $res .= '</table></body></html>';
-    file_put_contents('config_map.html', $res);
-}
-
-/**
- * Copies the site.js and site.css files to the site/ directory, and creates
- * a production version of the index.php file.
- *
- * @return void
- */
-function create_production_site($assets, $settings) {
-    if (!is_readable('site/')) {
-        mkdir('site', 0755);
-    }
-    printf("creating production site\n");
-    copy('site.css', 'site/site.css');
-    copy('site.js', 'site/site.js');
-    $index_file = file_get_contents('index.php');
-    $index_file = preg_replace("/APP_PATH', ''/", "APP_PATH', '".APP_PATH."'", $index_file);
-    $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
-    $index_file = preg_replace("/SITE_ID', ''/", "SITE_ID', '".urlencode(Hm_Crypt::unique_id(64))."'", $index_file);
-    $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
-    file_put_contents('site/index.php', $index_file);
-    foreach ($assets as $path) {
-        if (!is_readable('site/'.$path)) {
-            mkdir('site/'.$path, 0755, true);
-        }
-        foreach (scandir($path) as $file) {
-            if (in_array($file, array('.', '..'), true)) {
-                continue;
-            }
-            copy($path.$file, 'site/'.$path.$file);
-        }
-    }
 }
 
 ?>
