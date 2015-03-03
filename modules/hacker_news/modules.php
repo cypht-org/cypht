@@ -15,21 +15,25 @@ require APP_PATH.'third_party/simple_html_dom.php';
  */
 class Hm_Handler_hacker_news_fields extends Hm_Handler_Module {
     public function process() {
-        $this->out('message_list_fields', array(
-            array('chkbox_col', false, false),
-            array('source_col', 'source', 'Source'),
-            array('from_col', 'from', 'From'),
-            array('subject_col', 'subject', 'Subject'),
-            array('score_col', 'score', 'Score'),
-            array('comment_col', 'comment', 'Comments'),
-            array('date_col', 'msg_date', 'Date'),
-            array('icon_col', false, false)), false);
+        if (array_key_exists('list_path', $this->request->get) && in_array($this->request->get['list_path'], array('hn_top20', 'hn_newest'))) {
+            $this->out('message_list_fields', array(
+                array('chkbox_col', false, false),
+                array('source_col', 'source', 'Source'),
+                array('from_col', 'from', 'From'),
+                array('subject_col', 'subject', 'Subject'),
+                array('score_col', 'score', 'Score'),
+                array('comment_col', 'comment', 'Comments'),
+                array('date_col', 'msg_date', 'Date'),
+                array('icon_col', false, false)), false);
 
-        $list_type = 'top20';
-        if (array_key_exists('list_path', $this->request->get)) {
-            $list_type = $this->request->get['list_path'];
+            $list_type = 'top20';
+            if (array_key_exists('list_path', $this->request->get)) {
+                $list_type = $this->request->get['list_path'];
+            }
+            $this->out('mailbox_list_title', array('Hacker News'), false);
+            $this->out('list_path', $list_type, false);
+            $this->append('data_sources', array('callback' => 'load_hacker_news', 'type' => 'hacker_news', 'name' => 'Hacker News', 'id' => 0));
         }
-        $this->out('list_path', $list_type);
     }
 }
 
@@ -43,9 +47,6 @@ function hn_parse_subtext($text) {
             'comment' => (int) trim(str_replace('comments', '', $matches[7]))
         );
     }
-    else {
-        elog($text);
-    }
     return array();
 }
 /**
@@ -53,15 +54,15 @@ function hn_parse_subtext($text) {
  */
 class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
     public function process() {
-        $list_type = 'top20';
+        $list_type = 'hn_top20';
         $html = false;
         if (array_key_exists('list_path', $this->request->get)) {
             $list_type = $this->request->get['list_path'];
         }
-        if ($list_type == 'top20') {
+        if ($list_type == 'hn_top20') {
             $html = file_get_html('https://news.ycombinator.com/');
         }
-        elseif ($list_type == 'newest') {
+        elseif ($list_type == 'hn_newest') {
             $html = file_get_html('https://news.ycombinator.com/newest');
         }
         $news = array();
@@ -80,7 +81,6 @@ class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
                 $url = $el->href;
             }
         }
-        elog($news);
         $this->out('hacker_news_data', $news);
     }
 }
@@ -90,33 +90,15 @@ class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
  */
 class Hm_Output_hacker_news_folders extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_top20"><a class="unread_link" href="?page=hacker_news&list_path=top20">'.
+        $res = '<li class="menu_top20"><a class="unread_link" href="?page=message_list&list_path=hn_top20">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$spreadsheet).
             '" alt="" width="16" height="16" /> '.$this->trans('Top 20').'</a></li>';
-        $res .= '<li class="menu_newest"><a class="unread_link" href="?page=hacker_news&list_path=newest">'.
+        $res .= '<li class="menu_newest"><a class="unread_link" href="?page=message_list&list_path=hn_newest">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$spreadsheet).
             '" alt="" width="16" height="16" /> '.$this->trans('Latest').'</a></li>';
         $this->append('folder_sources', 'hacker_news_folders');
         Hm_Page_Cache::add('hacker_news_folders', $res, true);
         return '';
-    }
-}
-
-/**
- * @subpackage hackernews/output
- */
-class Hm_Output_hacker_news_heading extends Hm_Output_Module {
-    protected function output() {
-        return '<div class="content_title">'.$this->trans('Hacker News').'</div>';
-    }
-}
-
-/**
- * @subpackage hackernews/output
- */
-class Hm_Output_hacker_news_table_end extends Hm_Output_Module {
-    protected function output() {
-        return '</tbody></table>';
     }
 }
 
