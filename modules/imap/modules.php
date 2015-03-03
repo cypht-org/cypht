@@ -320,7 +320,7 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
  */
 class Hm_Handler_imap_status extends Hm_Handler_Module {
     /**
-     * Output used on the home page to display the server status
+     * Output used on the info page to display the server status
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -999,7 +999,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
 }
 
 /**
- * Format the IMAP status output on the home page
+ * Format the IMAP status output on the info page
  * @subpackage imap/output
  */
 class Hm_Output_display_imap_status extends Hm_Output_Module {
@@ -1073,7 +1073,7 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 }
 
 /**
- * Format the status of an IMAP connection used on the home page
+ * Format the status of an IMAP connection used on the info page
  * @subpackage imap/output
  */
 class Hm_Output_filter_imap_status_data extends Hm_Output_Module {

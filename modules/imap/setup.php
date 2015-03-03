@@ -5,13 +5,13 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('imap');
 output_source('imap');
 
-/* add stuff to the home page */
-add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('home', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('home', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('home', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
-add_output('home', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
-add_output('home', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+/* add stuff to the info page */
+add_handler('info', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('info', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('info', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('info', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
+add_output('info', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
+add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
 add_handler('servers', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');

@@ -5,11 +5,11 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('feeds');
 output_source('feeds');
 
-/* add stuff to the home page */
-add_handler('home', 'load_feeds_from_config', true, 'feeds', 'language', 'after');
-add_handler('home', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
-add_output('home', 'display_feeds_status', true, 'feeds', 'server_status_start', 'after');
-add_output('home', 'feed_ids', true, 'feeds', 'page_js', 'before');
+/* add stuff to the info page */
+add_handler('info', 'load_feeds_from_config', true, 'feeds', 'language', 'after');
+add_handler('info', 'add_feeds_to_page_data', true, 'feeds', 'load_feeds_from_config', 'after');
+add_output('info', 'display_feeds_status', true, 'feeds', 'server_status_start', 'after');
+add_output('info', 'feed_ids', true, 'feeds', 'page_js', 'before');
 
 /* servers page data */
 add_handler('servers', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');

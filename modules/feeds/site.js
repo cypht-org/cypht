@@ -197,7 +197,7 @@ else if (hm_page_name() == 'servers') {
         $('.feed_section').css('display', dsp);
     }
 }
-else if (hm_page_name() == 'home') {
+else if (hm_page_name() == 'info') {
     setTimeout(feed_status_update, 100);
 }
 else if (hm_page_name() == 'settings') {

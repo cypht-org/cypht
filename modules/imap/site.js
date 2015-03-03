@@ -432,7 +432,7 @@ else if (hm_page_name() == 'message' && hm_list_path().substr(0, 4) == 'imap') {
 else if (hm_page_name() == 'servers') {
     imap_setup_server_page();
 }
-else if (hm_page_name() == 'home') {
+else if (hm_page_name() == 'info') {
     setTimeout(imap_status_update, 100);
 }
 

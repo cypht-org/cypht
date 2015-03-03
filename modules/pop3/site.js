@@ -230,7 +230,7 @@ if (hm_page_name() == 'servers') {
 else if (hm_page_name() == 'message' && hm_list_path().substr(0, 4) == 'pop3') {
     pop3_message_view();
 }
-else if (hm_page_name() == 'home') {
+else if (hm_page_name() == 'info') {
     setTimeout(pop3_status_update, 100);
 }
 else if (hm_page_name() == 'settings') {
