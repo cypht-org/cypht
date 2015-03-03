@@ -8,7 +8,7 @@
 	<title>File nux/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3712059728"></script>
+	<script type="text/javascript" src="elementlist.js?2825542085"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -89,6 +89,11 @@
 				<li><a href="package-modules.core.output.html">output</a>
 						</li>
 							</ul></li>
+				<li><a href="package-modules.developer.html">developer<span></span></a>
+						<ul>
+				<li><a href="package-modules.developer.output.html">output</a>
+						</li>
+							</ul></li>
 				<li><a href="package-modules.feeds.html">feeds<span></span></a>
 						<ul>
 				<li><a href="package-modules.feeds.functions.html">functions</a>
@@ -132,11 +137,6 @@
 				<li><a href="package-modules.imap.lib.html">lib</a>
 						</li>
 				<li><a href="package-modules.imap.output.html">output</a>
-						</li>
-							</ul></li>
-				<li><a href="package-modules.info.html">info<span></span></a>
-						<ul>
-				<li><a href="package-modules.info.output.html">output</a>
 						</li>
 							</ul></li>
 				<li class="active"><a href="package-modules.nux.html">nux<span></span></a>
@@ -476,127 +476,134 @@
 </span><span id="212" class="l"><a class="l" href="#212">212: </a>        self::<span class="php-var">$oauth2</span> = <span class="php-var">$settings</span>;
 </span><span id="213" class="l"><a class="l" href="#213">213: </a>    }
 </span><span id="214" class="l"><a class="l" href="#214">214: </a>
-</span><span id="215" class="l"><a class="l" href="#215">215: </a>    <span class="php-comment">/**
-</span></span><span id="216" class="l"><a class="l" href="#216">216: </a><span class="php-comment">     * @todo uasort
-</span></span><span id="217" class="l"><a class="l" href="#217">217: </a><span class="php-comment">     */</span>
-</span><span id="218" class="l"><a class="l" href="#218">218: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_option_list" href="#_option_list">option_list</a>(<span class="php-var">$current</span>, <span class="php-var">$mod</span>) {
-</span><span id="219" class="l"><a class="l" href="#219">219: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="220" class="l"><a class="l" href="#220">220: </a>        <span class="php-keyword1">foreach</span>(self::<span class="php-var">$services</span> <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$details</span>) {
-</span><span id="221" class="l"><a class="l" href="#221">221: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option value=&quot;'</span>.<span class="php-var">$mod</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;'</span>;
-</span><span id="222" class="l"><a class="l" href="#222">222: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$id</span> == <span class="php-var">$current</span>) {
-</span><span id="223" class="l"><a class="l" href="#223">223: </a>                <span class="php-var">$res</span> .= <span class="php-quote">' selected=&quot;selected&quot;'</span>;
-</span><span id="224" class="l"><a class="l" href="#224">224: </a>            }
-</span><span id="225" class="l"><a class="l" href="#225">225: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&gt;'</span>.<span class="php-var">$mod</span>-&gt;trans(<span class="php-var">$details</span>[<span class="php-quote">'name'</span>]);
-</span><span id="226" class="l"><a class="l" href="#226">226: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/option&gt;'</span>;
-</span><span id="227" class="l"><a class="l" href="#227">227: </a>        }
-</span><span id="228" class="l"><a class="l" href="#228">228: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="229" class="l"><a class="l" href="#229">229: </a>    }
-</span><span id="230" class="l"><a class="l" href="#230">230: </a>
-</span><span id="231" class="l"><a class="l" href="#231">231: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_exists" href="#_exists">exists</a>(<span class="php-var">$id</span>) {
-</span><span id="232" class="l"><a class="l" href="#232">232: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">array_key_exists</span>(<span class="php-var">$id</span>, self::<span class="php-var">$services</span>);
-</span><span id="233" class="l"><a class="l" href="#233">233: </a>    }
-</span><span id="234" class="l"><a class="l" href="#234">234: </a>
-</span><span id="235" class="l"><a class="l" href="#235">235: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_details" href="#_details">details</a>(<span class="php-var">$id</span>) {
-</span><span id="236" class="l"><a class="l" href="#236">236: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$id</span>, self::<span class="php-var">$services</span>)) {
-</span><span id="237" class="l"><a class="l" href="#237">237: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$services</span>[<span class="php-var">$id</span>];
-</span><span id="238" class="l"><a class="l" href="#238">238: </a>        }
-</span><span id="239" class="l"><a class="l" href="#239">239: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>();
-</span><span id="240" class="l"><a class="l" href="#240">240: </a>    }
-</span><span id="241" class="l"><a class="l" href="#241">241: </a>}
-</span><span id="242" class="l"><a class="l" href="#242">242: </a>
-</span><span id="243" class="l"><a class="l" href="#243">243: </a><span class="php-comment">/**
-</span></span><span id="244" class="l"><a class="l" href="#244">244: </a><span class="php-comment"> * todo move the urls to the oauth2 file
-</span></span><span id="245" class="l"><a class="l" href="#245">245: </a><span class="php-comment"> */</span>
-</span><span id="246" class="l"><a class="l" href="#246">246: </a>Nux_Quick_Services::add(<span class="php-quote">'gmail'</span>, <span class="php-keyword1">array</span>(
-</span><span id="247" class="l"><a class="l" href="#247">247: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.gmail.com'</span>,
-</span><span id="248" class="l"><a class="l" href="#248">248: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="249" class="l"><a class="l" href="#249">249: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="250" class="l"><a class="l" href="#250">250: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
-</span><span id="251" class="l"><a class="l" href="#251">251: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Gmail'</span>,
-</span><span id="252" class="l"><a class="l" href="#252">252: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'oauth2'</span>,
-</span><span id="253" class="l"><a class="l" href="#253">253: </a>    <span class="php-quote">'oauth2_authorization'</span> =&gt; <span class="php-quote">'https://accounts.google.com/o/oauth2/auth'</span>,
-</span><span id="254" class="l"><a class="l" href="#254">254: </a>    <span class="php-quote">'oauth2_token'</span> =&gt; <span class="php-quote">'https://www.googleapis.com/oauth2/v3/token'</span>,
-</span><span id="255" class="l"><a class="l" href="#255">255: </a>    <span class="php-quote">'refresh_token'</span> =&gt; <span class="php-quote">'https://www.googleapis.com/oauth2/v3/token'</span>,
-</span><span id="256" class="l"><a class="l" href="#256">256: </a>    <span class="php-quote">'scope'</span> =&gt; <span class="php-quote">' https://mail.google.com/'</span>
-</span><span id="257" class="l"><a class="l" href="#257">257: </a>));
-</span><span id="258" class="l"><a class="l" href="#258">258: </a>
-</span><span id="259" class="l"><a class="l" href="#259">259: </a>Nux_Quick_Services::add(<span class="php-quote">'outlook'</span>, <span class="php-keyword1">array</span>(
-</span><span id="260" class="l"><a class="l" href="#260">260: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap-mail.outlook.com'</span>,
-</span><span id="261" class="l"><a class="l" href="#261">261: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="262" class="l"><a class="l" href="#262">262: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="263" class="l"><a class="l" href="#263">263: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
-</span><span id="264" class="l"><a class="l" href="#264">264: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Outlook'</span>,
-</span><span id="265" class="l"><a class="l" href="#265">265: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'oauth2'</span>,
-</span><span id="266" class="l"><a class="l" href="#266">266: </a>    <span class="php-quote">'oauth2_authorization'</span> =&gt; <span class="php-quote">'https://login.live.com/oauth20_authorize.srf'</span>,
-</span><span id="267" class="l"><a class="l" href="#267">267: </a>    <span class="php-quote">'oauth2_token'</span> =&gt; <span class="php-quote">'https://login.live.com/oauth20_token.srf'</span>,
-</span><span id="268" class="l"><a class="l" href="#268">268: </a>    <span class="php-quote">'scope'</span> =&gt; <span class="php-quote">'wl.imap'</span>
-</span><span id="269" class="l"><a class="l" href="#269">269: </a>));
-</span><span id="270" class="l"><a class="l" href="#270">270: </a>
-</span><span id="271" class="l"><a class="l" href="#271">271: </a>Nux_Quick_Services::add(<span class="php-quote">'yahoo'</span>, <span class="php-keyword1">array</span>(
-</span><span id="272" class="l"><a class="l" href="#272">272: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.mail.yahoo.com'</span>,
-</span><span id="273" class="l"><a class="l" href="#273">273: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="274" class="l"><a class="l" href="#274">274: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="275" class="l"><a class="l" href="#275">275: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
-</span><span id="276" class="l"><a class="l" href="#276">276: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Yahoo'</span>,
-</span><span id="277" class="l"><a class="l" href="#277">277: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
-</span><span id="278" class="l"><a class="l" href="#278">278: </a>));
-</span><span id="279" class="l"><a class="l" href="#279">279: </a>
-</span><span id="280" class="l"><a class="l" href="#280">280: </a>Nux_Quick_Services::add(<span class="php-quote">'mailcom'</span>, <span class="php-keyword1">array</span>(
-</span><span id="281" class="l"><a class="l" href="#281">281: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.mail.com'</span>,
-</span><span id="282" class="l"><a class="l" href="#282">282: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="283" class="l"><a class="l" href="#283">283: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="284" class="l"><a class="l" href="#284">284: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
-</span><span id="285" class="l"><a class="l" href="#285">285: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Mail.com'</span>,
-</span><span id="286" class="l"><a class="l" href="#286">286: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
-</span><span id="287" class="l"><a class="l" href="#287">287: </a>));
-</span><span id="288" class="l"><a class="l" href="#288">288: </a>
-</span><span id="289" class="l"><a class="l" href="#289">289: </a>Nux_Quick_Services::add(<span class="php-quote">'aol'</span>, <span class="php-keyword1">array</span>(
-</span><span id="290" class="l"><a class="l" href="#290">290: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.aol.com'</span>,
-</span><span id="291" class="l"><a class="l" href="#291">291: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="292" class="l"><a class="l" href="#292">292: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="293" class="l"><a class="l" href="#293">293: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
-</span><span id="294" class="l"><a class="l" href="#294">294: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'AOL'</span>,
-</span><span id="295" class="l"><a class="l" href="#295">295: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
-</span><span id="296" class="l"><a class="l" href="#296">296: </a>));
-</span><span id="297" class="l"><a class="l" href="#297">297: </a>
-</span><span id="298" class="l"><a class="l" href="#298">298: </a>Nux_Quick_Services::add(<span class="php-quote">'gmx'</span>, <span class="php-keyword1">array</span>(
-</span><span id="299" class="l"><a class="l" href="#299">299: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.gmx.com'</span>,
-</span><span id="300" class="l"><a class="l" href="#300">300: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="301" class="l"><a class="l" href="#301">301: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="302" class="l"><a class="l" href="#302">302: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">143</span>,
-</span><span id="303" class="l"><a class="l" href="#303">303: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'GMX'</span>,
-</span><span id="304" class="l"><a class="l" href="#304">304: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
-</span><span id="305" class="l"><a class="l" href="#305">305: </a>));
-</span><span id="306" class="l"><a class="l" href="#306">306: </a>
-</span><span id="307" class="l"><a class="l" href="#307">307: </a>Nux_Quick_Services::add(<span class="php-quote">'zoho'</span>, <span class="php-keyword1">array</span>(
-</span><span id="308" class="l"><a class="l" href="#308">308: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.zoho.com'</span>,
-</span><span id="309" class="l"><a class="l" href="#309">309: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="310" class="l"><a class="l" href="#310">310: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="311" class="l"><a class="l" href="#311">311: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
-</span><span id="312" class="l"><a class="l" href="#312">312: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Zoho'</span>,
-</span><span id="313" class="l"><a class="l" href="#313">313: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
-</span><span id="314" class="l"><a class="l" href="#314">314: </a>));
-</span><span id="315" class="l"><a class="l" href="#315">315: </a>
-</span><span id="316" class="l"><a class="l" href="#316">316: </a>Nux_Quick_Services::add(<span class="php-quote">'fastmail'</span>, <span class="php-keyword1">array</span>(
-</span><span id="317" class="l"><a class="l" href="#317">317: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'mail.messagingengine.com'</span>,
-</span><span id="318" class="l"><a class="l" href="#318">318: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="319" class="l"><a class="l" href="#319">319: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="320" class="l"><a class="l" href="#320">320: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
-</span><span id="321" class="l"><a class="l" href="#321">321: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Fastmail'</span>,
-</span><span id="322" class="l"><a class="l" href="#322">322: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
-</span><span id="323" class="l"><a class="l" href="#323">323: </a>));
-</span><span id="324" class="l"><a class="l" href="#324">324: </a>
-</span><span id="325" class="l"><a class="l" href="#325">325: </a>Nux_Quick_Services::add(<span class="php-quote">'yandex'</span>, <span class="php-keyword1">array</span>(
-</span><span id="326" class="l"><a class="l" href="#326">326: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.yandex.com'</span>,
-</span><span id="327" class="l"><a class="l" href="#327">327: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
-</span><span id="328" class="l"><a class="l" href="#328">328: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
-</span><span id="329" class="l"><a class="l" href="#329">329: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
-</span><span id="330" class="l"><a class="l" href="#330">330: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Yandex'</span>,
-</span><span id="331" class="l"><a class="l" href="#331">331: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
-</span><span id="332" class="l"><a class="l" href="#332">332: </a>));
-</span><span id="333" class="l"><a class="l" href="#333">333: </a>
-</span><span id="334" class="l"><a class="l" href="#334">334: </a><span class="xlang">?&gt;</span>
-</span><span id="335" class="l"><a class="l" href="#335">335: </a></span></code></pre>
+</span><span id="215" class="l"><a class="l" href="#215">215: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_option_list" href="#_option_list">option_list</a>(<span class="php-var">$current</span>, <span class="php-var">$mod</span>) {
+</span><span id="216" class="l"><a class="l" href="#216">216: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="217" class="l"><a class="l" href="#217">217: </a>        <span class="php-keyword2">uasort</span>(self::<span class="php-var">$services</span>, <span class="php-keyword1">function</span>(<span class="php-var">$a</span>, <span class="php-var">$b</span>) { <span class="php-keyword1">return</span> <span class="php-keyword2">strcmp</span>(<span class="php-var">$a</span>[<span class="php-quote">'name'</span>], <span class="php-var">$b</span>[<span class="php-quote">'name'</span>]); });
+</span><span id="218" class="l"><a class="l" href="#218">218: </a>        <span class="php-keyword1">foreach</span>(self::<span class="php-var">$services</span> <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$details</span>) {
+</span><span id="219" class="l"><a class="l" href="#219">219: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option value=&quot;'</span>.<span class="php-var">$mod</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;'</span>;
+</span><span id="220" class="l"><a class="l" href="#220">220: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$id</span> == <span class="php-var">$current</span>) {
+</span><span id="221" class="l"><a class="l" href="#221">221: </a>                <span class="php-var">$res</span> .= <span class="php-quote">' selected=&quot;selected&quot;'</span>;
+</span><span id="222" class="l"><a class="l" href="#222">222: </a>            }
+</span><span id="223" class="l"><a class="l" href="#223">223: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&gt;'</span>.<span class="php-var">$mod</span>-&gt;trans(<span class="php-var">$details</span>[<span class="php-quote">'name'</span>]);
+</span><span id="224" class="l"><a class="l" href="#224">224: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/option&gt;'</span>;
+</span><span id="225" class="l"><a class="l" href="#225">225: </a>        }
+</span><span id="226" class="l"><a class="l" href="#226">226: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="227" class="l"><a class="l" href="#227">227: </a>    }
+</span><span id="228" class="l"><a class="l" href="#228">228: </a>
+</span><span id="229" class="l"><a class="l" href="#229">229: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_exists" href="#_exists">exists</a>(<span class="php-var">$id</span>) {
+</span><span id="230" class="l"><a class="l" href="#230">230: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">array_key_exists</span>(<span class="php-var">$id</span>, self::<span class="php-var">$services</span>);
+</span><span id="231" class="l"><a class="l" href="#231">231: </a>    }
+</span><span id="232" class="l"><a class="l" href="#232">232: </a>
+</span><span id="233" class="l"><a class="l" href="#233">233: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_details" href="#_details">details</a>(<span class="php-var">$id</span>) {
+</span><span id="234" class="l"><a class="l" href="#234">234: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$id</span>, self::<span class="php-var">$services</span>)) {
+</span><span id="235" class="l"><a class="l" href="#235">235: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$services</span>[<span class="php-var">$id</span>];
+</span><span id="236" class="l"><a class="l" href="#236">236: </a>        }
+</span><span id="237" class="l"><a class="l" href="#237">237: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>();
+</span><span id="238" class="l"><a class="l" href="#238">238: </a>    }
+</span><span id="239" class="l"><a class="l" href="#239">239: </a>}
+</span><span id="240" class="l"><a class="l" href="#240">240: </a>
+</span><span id="241" class="l"><a class="l" href="#241">241: </a><span class="php-comment">/**
+</span></span><span id="242" class="l"><a class="l" href="#242">242: </a><span class="php-comment"> * todo move the urls to the oauth2 file
+</span></span><span id="243" class="l"><a class="l" href="#243">243: </a><span class="php-comment"> */</span>
+</span><span id="244" class="l"><a class="l" href="#244">244: </a>Nux_Quick_Services::add(<span class="php-quote">'gmail'</span>, <span class="php-keyword1">array</span>(
+</span><span id="245" class="l"><a class="l" href="#245">245: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.gmail.com'</span>,
+</span><span id="246" class="l"><a class="l" href="#246">246: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="247" class="l"><a class="l" href="#247">247: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="248" class="l"><a class="l" href="#248">248: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="249" class="l"><a class="l" href="#249">249: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Gmail'</span>,
+</span><span id="250" class="l"><a class="l" href="#250">250: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'oauth2'</span>,
+</span><span id="251" class="l"><a class="l" href="#251">251: </a>    <span class="php-quote">'oauth2_authorization'</span> =&gt; <span class="php-quote">'https://accounts.google.com/o/oauth2/auth'</span>,
+</span><span id="252" class="l"><a class="l" href="#252">252: </a>    <span class="php-quote">'oauth2_token'</span> =&gt; <span class="php-quote">'https://www.googleapis.com/oauth2/v3/token'</span>,
+</span><span id="253" class="l"><a class="l" href="#253">253: </a>    <span class="php-quote">'refresh_token'</span> =&gt; <span class="php-quote">'https://www.googleapis.com/oauth2/v3/token'</span>,
+</span><span id="254" class="l"><a class="l" href="#254">254: </a>    <span class="php-quote">'scope'</span> =&gt; <span class="php-quote">' https://mail.google.com/'</span>
+</span><span id="255" class="l"><a class="l" href="#255">255: </a>));
+</span><span id="256" class="l"><a class="l" href="#256">256: </a>
+</span><span id="257" class="l"><a class="l" href="#257">257: </a>Nux_Quick_Services::add(<span class="php-quote">'outlook'</span>, <span class="php-keyword1">array</span>(
+</span><span id="258" class="l"><a class="l" href="#258">258: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap-mail.outlook.com'</span>,
+</span><span id="259" class="l"><a class="l" href="#259">259: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="260" class="l"><a class="l" href="#260">260: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="261" class="l"><a class="l" href="#261">261: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="262" class="l"><a class="l" href="#262">262: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Outlook'</span>,
+</span><span id="263" class="l"><a class="l" href="#263">263: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'oauth2'</span>,
+</span><span id="264" class="l"><a class="l" href="#264">264: </a>    <span class="php-quote">'oauth2_authorization'</span> =&gt; <span class="php-quote">'https://login.live.com/oauth20_authorize.srf'</span>,
+</span><span id="265" class="l"><a class="l" href="#265">265: </a>    <span class="php-quote">'oauth2_token'</span> =&gt; <span class="php-quote">'https://login.live.com/oauth20_token.srf'</span>,
+</span><span id="266" class="l"><a class="l" href="#266">266: </a>    <span class="php-quote">'scope'</span> =&gt; <span class="php-quote">'wl.imap'</span>
+</span><span id="267" class="l"><a class="l" href="#267">267: </a>));
+</span><span id="268" class="l"><a class="l" href="#268">268: </a>
+</span><span id="269" class="l"><a class="l" href="#269">269: </a>Nux_Quick_Services::add(<span class="php-quote">'yahoo'</span>, <span class="php-keyword1">array</span>(
+</span><span id="270" class="l"><a class="l" href="#270">270: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.mail.yahoo.com'</span>,
+</span><span id="271" class="l"><a class="l" href="#271">271: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="272" class="l"><a class="l" href="#272">272: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="273" class="l"><a class="l" href="#273">273: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="274" class="l"><a class="l" href="#274">274: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Yahoo'</span>,
+</span><span id="275" class="l"><a class="l" href="#275">275: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
+</span><span id="276" class="l"><a class="l" href="#276">276: </a>));
+</span><span id="277" class="l"><a class="l" href="#277">277: </a>
+</span><span id="278" class="l"><a class="l" href="#278">278: </a>Nux_Quick_Services::add(<span class="php-quote">'mailcom'</span>, <span class="php-keyword1">array</span>(
+</span><span id="279" class="l"><a class="l" href="#279">279: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.mail.com'</span>,
+</span><span id="280" class="l"><a class="l" href="#280">280: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="281" class="l"><a class="l" href="#281">281: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="282" class="l"><a class="l" href="#282">282: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="283" class="l"><a class="l" href="#283">283: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Mail.com'</span>,
+</span><span id="284" class="l"><a class="l" href="#284">284: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
+</span><span id="285" class="l"><a class="l" href="#285">285: </a>));
+</span><span id="286" class="l"><a class="l" href="#286">286: </a>
+</span><span id="287" class="l"><a class="l" href="#287">287: </a>Nux_Quick_Services::add(<span class="php-quote">'aol'</span>, <span class="php-keyword1">array</span>(
+</span><span id="288" class="l"><a class="l" href="#288">288: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.aol.com'</span>,
+</span><span id="289" class="l"><a class="l" href="#289">289: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="290" class="l"><a class="l" href="#290">290: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="291" class="l"><a class="l" href="#291">291: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="292" class="l"><a class="l" href="#292">292: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'AOL'</span>,
+</span><span id="293" class="l"><a class="l" href="#293">293: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
+</span><span id="294" class="l"><a class="l" href="#294">294: </a>));
+</span><span id="295" class="l"><a class="l" href="#295">295: </a>
+</span><span id="296" class="l"><a class="l" href="#296">296: </a>Nux_Quick_Services::add(<span class="php-quote">'gmx'</span>, <span class="php-keyword1">array</span>(
+</span><span id="297" class="l"><a class="l" href="#297">297: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.gmx.com'</span>,
+</span><span id="298" class="l"><a class="l" href="#298">298: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="299" class="l"><a class="l" href="#299">299: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="300" class="l"><a class="l" href="#300">300: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">143</span>,
+</span><span id="301" class="l"><a class="l" href="#301">301: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'GMX'</span>,
+</span><span id="302" class="l"><a class="l" href="#302">302: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
+</span><span id="303" class="l"><a class="l" href="#303">303: </a>));
+</span><span id="304" class="l"><a class="l" href="#304">304: </a>
+</span><span id="305" class="l"><a class="l" href="#305">305: </a>Nux_Quick_Services::add(<span class="php-quote">'zoho'</span>, <span class="php-keyword1">array</span>(
+</span><span id="306" class="l"><a class="l" href="#306">306: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.zoho.com'</span>,
+</span><span id="307" class="l"><a class="l" href="#307">307: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="308" class="l"><a class="l" href="#308">308: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="309" class="l"><a class="l" href="#309">309: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="310" class="l"><a class="l" href="#310">310: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Zoho'</span>,
+</span><span id="311" class="l"><a class="l" href="#311">311: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
+</span><span id="312" class="l"><a class="l" href="#312">312: </a>));
+</span><span id="313" class="l"><a class="l" href="#313">313: </a>
+</span><span id="314" class="l"><a class="l" href="#314">314: </a>Nux_Quick_Services::add(<span class="php-quote">'fastmail'</span>, <span class="php-keyword1">array</span>(
+</span><span id="315" class="l"><a class="l" href="#315">315: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'mail.messagingengine.com'</span>,
+</span><span id="316" class="l"><a class="l" href="#316">316: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="317" class="l"><a class="l" href="#317">317: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="318" class="l"><a class="l" href="#318">318: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="319" class="l"><a class="l" href="#319">319: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Fastmail'</span>,
+</span><span id="320" class="l"><a class="l" href="#320">320: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
+</span><span id="321" class="l"><a class="l" href="#321">321: </a>));
+</span><span id="322" class="l"><a class="l" href="#322">322: </a>
+</span><span id="323" class="l"><a class="l" href="#323">323: </a>Nux_Quick_Services::add(<span class="php-quote">'yandex'</span>, <span class="php-keyword1">array</span>(
+</span><span id="324" class="l"><a class="l" href="#324">324: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.yandex.com'</span>,
+</span><span id="325" class="l"><a class="l" href="#325">325: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="326" class="l"><a class="l" href="#326">326: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="327" class="l"><a class="l" href="#327">327: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="328" class="l"><a class="l" href="#328">328: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Yandex'</span>,
+</span><span id="329" class="l"><a class="l" href="#329">329: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
+</span><span id="330" class="l"><a class="l" href="#330">330: </a>));
+</span><span id="331" class="l"><a class="l" href="#331">331: </a>
+</span><span id="332" class="l"><a class="l" href="#332">332: </a>Nux_Quick_Services::add(<span class="php-quote">'inbox'</span>, <span class="php-keyword1">array</span>(
+</span><span id="333" class="l"><a class="l" href="#333">333: </a>    <span class="php-quote">'server'</span> =&gt; <span class="php-quote">'imap.inbox.com'</span>,
+</span><span id="334" class="l"><a class="l" href="#334">334: </a>    <span class="php-quote">'type'</span> =&gt; <span class="php-quote">'imap'</span>,
+</span><span id="335" class="l"><a class="l" href="#335">335: </a>    <span class="php-quote">'tls'</span> =&gt; <span class="php-keyword1">true</span>,
+</span><span id="336" class="l"><a class="l" href="#336">336: </a>    <span class="php-quote">'port'</span> =&gt; <span class="php-num">993</span>,
+</span><span id="337" class="l"><a class="l" href="#337">337: </a>    <span class="php-quote">'name'</span> =&gt; <span class="php-quote">'Inbox.com'</span>,
+</span><span id="338" class="l"><a class="l" href="#338">338: </a>    <span class="php-quote">'auth'</span> =&gt; <span class="php-quote">'login'</span>
+</span><span id="339" class="l"><a class="l" href="#339">339: </a>));
+</span><span id="340" class="l"><a class="l" href="#340">340: </a>
+</span><span id="341" class="l"><a class="l" href="#341">341: </a><span class="xlang">?&gt;</span>
+</span><span id="342" class="l"><a class="l" href="#342">342: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>

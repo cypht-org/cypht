@@ -8,7 +8,7 @@
 	<title>File imap/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3712059728"></script>
+	<script type="text/javascript" src="elementlist.js?2825542085"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -89,6 +89,11 @@
 				<li><a href="package-modules.core.output.html">output</a>
 						</li>
 							</ul></li>
+				<li><a href="package-modules.developer.html">developer<span></span></a>
+						<ul>
+				<li><a href="package-modules.developer.output.html">output</a>
+						</li>
+							</ul></li>
 				<li><a href="package-modules.feeds.html">feeds<span></span></a>
 						<ul>
 				<li><a href="package-modules.feeds.functions.html">functions</a>
@@ -132,11 +137,6 @@
 				<li><a href="package-modules.imap.lib.html">lib</a>
 						</li>
 				<li><a href="package-modules.imap.output.html">output</a>
-						</li>
-							</ul></li>
-				<li><a href="package-modules.info.html">info<span></span></a>
-						<ul>
-				<li><a href="package-modules.info.output.html">output</a>
 						</li>
 							</ul></li>
 				<li><a href="package-modules.nux.html">nux<span></span></a>
@@ -609,7 +609,7 @@
 </span></span><span id="320" class="l"><a class="l" href="#320"> 320: </a><span class="php-comment"> */</span>
 </span><span id="321" class="l"><a class="l" href="#321"> 321: </a><span class="php-keyword1">class</span> <a id="Hm_Handler_imap_status" href="#Hm_Handler_imap_status">Hm_Handler_imap_status</a> <span class="php-keyword1">extends</span> Hm_Handler_Module {
 </span><span id="322" class="l"><a class="l" href="#322"> 322: </a>    <span class="php-comment">/**
-</span></span><span id="323" class="l"><a class="l" href="#323"> 323: </a><span class="php-comment">     * Output used on the home page to display the server status
+</span></span><span id="323" class="l"><a class="l" href="#323"> 323: </a><span class="php-comment">     * Output used on the info page to display the server status
 </span></span><span id="324" class="l"><a class="l" href="#324"> 324: </a><span class="php-comment">     */</span>
 </span><span id="325" class="l"><a class="l" href="#325"> 325: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process" href="#_process">process</a>() {
 </span><span id="326" class="l"><a class="l" href="#326"> 326: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'imap_server_ids'</span>));
@@ -1288,7 +1288,7 @@
 </span><span id="999" class="l"><a class="l" href="#999"> 999: </a>}
 </span><span id="1000" class="l"><a class="l" href="#1000">1000: </a>
 </span><span id="1001" class="l"><a class="l" href="#1001">1001: </a><span class="php-comment">/**
-</span></span><span id="1002" class="l"><a class="l" href="#1002">1002: </a><span class="php-comment"> * Format the IMAP status output on the home page
+</span></span><span id="1002" class="l"><a class="l" href="#1002">1002: </a><span class="php-comment"> * Format the IMAP status output on the info page
 </span></span><span id="1003" class="l"><a class="l" href="#1003">1003: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="1004" class="l"><a class="l" href="#1004">1004: </a><span class="php-comment"> */</span>
 </span><span id="1005" class="l"><a class="l" href="#1005">1005: </a><span class="php-keyword1">class</span> <a id="Hm_Output_display_imap_status" href="#Hm_Output_display_imap_status">Hm_Output_display_imap_status</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
@@ -1362,7 +1362,7 @@
 </span><span id="1073" class="l"><a class="l" href="#1073">1073: </a>}
 </span><span id="1074" class="l"><a class="l" href="#1074">1074: </a>
 </span><span id="1075" class="l"><a class="l" href="#1075">1075: </a><span class="php-comment">/**
-</span></span><span id="1076" class="l"><a class="l" href="#1076">1076: </a><span class="php-comment"> * Format the status of an IMAP connection used on the home page
+</span></span><span id="1076" class="l"><a class="l" href="#1076">1076: </a><span class="php-comment"> * Format the status of an IMAP connection used on the info page
 </span></span><span id="1077" class="l"><a class="l" href="#1077">1077: </a><span class="php-comment"> * @subpackage imap/output
 </span></span><span id="1078" class="l"><a class="l" href="#1078">1078: </a><span class="php-comment"> */</span>
 </span><span id="1079" class="l"><a class="l" href="#1079">1079: </a><span class="php-keyword1">class</span> <a id="Hm_Output_filter_imap_status_data" href="#Hm_Output_filter_imap_status_data">Hm_Output_filter_imap_status_data</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
