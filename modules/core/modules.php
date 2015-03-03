@@ -1679,8 +1679,9 @@ class Hm_Output_save_form extends Hm_Output_Module {
         $res .= '<div class="save_subtitle">'.$this->trans('Unsaved Changes').'</div>';
         $res .= '<ul class="unsaved_settings">';
         if (!empty($changed)) {
-            foreach ($changed as $change) {
-                $res .= '<li>'.$this->trans($change).'</li>';
+            $changed = array_count_values($changed);
+            foreach ($changed as $change => $num) {
+                $res .= '<li>'.$this->trans($change).' ('.$this->html_safe($num).'X)</li>';
             }
         }
         else {
@@ -1691,6 +1692,7 @@ class Hm_Output_save_form extends Hm_Output_Module {
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
             'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
             '<input class="save_settings" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
+            '<input class="save_settings" type="submit" name="save_settings_permanently_then_logout" value="'.$this->trans('Save and Logout').'" />'.
             '</form></div>';
 
         $res .= '</div>';
