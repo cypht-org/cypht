@@ -51,8 +51,7 @@ output_source('core');
 
 /* homepage */
 setup_base_page('home');
-add_output('home', 'server_status_start', true, 'core', 'content_section_start', 'after');
-add_output('home', 'server_status_end', true, 'core', 'server_status_start', 'after');
+add_output('home', 'home_heading', true, 'core', 'content_section_start', 'after');
 
 /* servers page */
 setup_base_page('servers');
@@ -166,9 +165,6 @@ return array(
         'ajax_hm_folders',
         'ajax_message_action',
         'notfound',
-        'help',
-        'bug_report',
-        'dev',
         'search'
     ),
     'allowed_output' => array(

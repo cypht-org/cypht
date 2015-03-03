@@ -35,11 +35,6 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .err { color: red; }
 .debug { color: teal; font-size: 75%; float: right; clear: both; margin: 20px; }
-.server_status, .server_summary { width: 100%; height: 100%; background-color: #fff; }
-.server_status table, .server_summary table { table-layout: fixed; width: 100%; padding: 20px; padding-bottom: 40px; padding-left: 30px; }
-.server_status table th, .server_summary table th, .message_table th { font-style: normal; padding: 5px; padding-left: 10px; cursor: pointer; text-align: left; color: #aaa; font-size: 75%; font-weight: normal; border-bottom: solid 1px #ddd; }
-.message_table th { display: none; }
-.server_status table td, .server_summary table td { white-space: nowrap; padding: 5px; overflow: hidden; text-overflow: ellipsis; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
 .inner_list { margin-bottom: 10px; } 

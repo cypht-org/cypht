@@ -5,11 +5,11 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('pop3');
 output_source('pop3');
 
-/* add stuff to the home page */
-add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('home', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_output('home', 'display_pop3_status', true, 'pop3', 'server_status_start', 'after');
-add_output('home', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
+/* add stuff to the info page */
+add_handler('info', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
+add_handler('info', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+add_output('info', 'display_pop3_status', true, 'pop3', 'server_status_start', 'after');
+add_output('info', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
 /* message list page */
 add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');

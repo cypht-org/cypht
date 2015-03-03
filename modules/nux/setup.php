@@ -28,7 +28,7 @@ add_handler('ajax_nux_add_service', 'language',  true, 'core');
 add_handler('ajax_nux_add_service', 'date', true, 'core');
 add_handler('ajax_nux_add_service', 'http_headers', true, 'core');
 
-add_handler('home', 'process_oauth2_authorization', true, 'nux', 'load_imap_servers_from_config', 'after');
+add_handler('info', 'process_oauth2_authorization', true, 'nux', 'load_imap_servers_from_config', 'after');
 
 return array(
     'allowed_pages' => array(

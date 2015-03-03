@@ -1799,35 +1799,6 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
 }
 
 /**
- * Starts a status table used on the home page
- * @subpackage core/output
- */
-class Hm_Output_server_status_start extends Hm_Output_Module {
-    /**
-     * Modules populate this table to run a status check from the home page
-     */
-    protected function output() {
-        $res = '<div class="server_status"><div class="content_title">'.$this->trans('Home').'</div>';
-        $res .= '<table><thead><tr><th>'.$this->trans('Type').'</th><th>'.$this->trans('Name').'</th><th>'.
-                $this->trans('Status').'</th></tr></thead><tbody>';
-        return $res;
-    }
-}
-
-/**
- * Close the status table used on the home page
- * @subpackage core/output
- */
-class Hm_Output_server_status_end extends Hm_Output_Module {
-    /**
-     * Close the table opened in Hm_Output_server_status_start
-     */
-    protected function output() {
-        return '</tbody></table></div>';
-    }
-}
-
-/**
  * Starts the message view page
  * @subpackage core/output
  */
@@ -1942,6 +1913,17 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
     }
 }
 
+/**
+ * Output the heading for the home page
+ * @subpackage core/output
+ */
+class Hm_Output_home_heading extends Hm_Output_Module {
+    /**
+     */
+    protected function output() {
+        return '<div class="content_title">'.$this->trans('Home').'</div>';
+    }
+}
 /**
  * Output the heading for a message list
  * @subpackage core/output
