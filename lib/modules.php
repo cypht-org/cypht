@@ -589,8 +589,7 @@ trait Hm_Modules {
         }
         if (!$inserted) {
             if ($queue) {
-                Hm_Debug::add(sprintf('queueing module %s', $module));
-                self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement);
+                self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement, $source);
             }
             else {
                 Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
@@ -647,7 +646,7 @@ trait Hm_Modules {
      */
     public static function try_queued_modules() {
         foreach (self::$module_queue as $vals) {
-            self::add($vals[0], $vals[1], $vals[2], $vals[3], $vals[4], false);
+            self::add($vals[0], $vals[1], $vals[2], $vals[3], $vals[4], false, $vals[5]);
         }
     }
 
