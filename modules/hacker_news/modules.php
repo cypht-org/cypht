@@ -115,7 +115,7 @@ class Hm_Output_filter_hacker_news_data extends Hm_Output_Module {
                 $user = array_key_exists('user', $item) ? $item['user'] : '';
                 $timestamp = array_key_exists('timestamp', $item) ? $item['timestamp'] : 0;
                 $comments = array_key_exists('comment', $item) ? $item['comment'] : 0;
-                $subject = $this->html_safe(html_entity_decode($item['title']));
+                $subject = $item['title'];
                 $date = $timestamp != 0 ? date('r', $timestamp) : date('r');
                 $votes = array_key_exists('votes', $item) ? $item['votes'] : 0;
 
