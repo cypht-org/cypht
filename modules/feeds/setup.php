@@ -109,7 +109,7 @@ add_handler('message', 'add_feeds_to_page_data',  true, 'feeds', 'load_feeds_fro
 /* message view */
 add_handler('ajax_feed_item_content', 'login', false, 'core');
 add_handler('ajax_feed_item_content', 'load_user_data', true, 'core');
-add_handler('ajax_feed_list_content', 'language', true, 'core');
+add_handler('ajax_feed_item_content', 'language', true, 'core');
 add_handler('ajax_feed_item_content', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_item_content', 'feed_item_content',  true);
 add_handler('ajax_feed_item_content', 'save_feeds',  true);
