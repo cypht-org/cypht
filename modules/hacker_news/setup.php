@@ -6,7 +6,6 @@ handler_source('hacker_news');
 output_source('hacker_news');
 
 add_handler('message_list', 'hacker_news_fields', true, 'hacker_news', 'message_list_type', 'after');
-
 add_output('ajax_hm_folders', 'hacker_news_folders',  true, 'hacker_news', 'folder_list_content_start', 'before');
 
 add_handler('ajax_hacker_news_data', 'login', false, 'core');
