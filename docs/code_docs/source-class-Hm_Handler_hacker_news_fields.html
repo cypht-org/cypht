@@ -8,7 +8,7 @@
 	<title>File hacker_news/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?2825542085"></script>
+	<script type="text/javascript" src="elementlist.js?4259504956"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -91,6 +91,8 @@
 							</ul></li>
 				<li><a href="package-modules.developer.html">developer<span></span></a>
 						<ul>
+				<li><a href="package-modules.developer.handler.html">handler</a>
+						</li>
 				<li><a href="package-modules.developer.output.html">output</a>
 						</li>
 							</ul></li>
@@ -380,7 +382,7 @@
 </span><span id="115" class="l"><a class="l" href="#115">115: </a>                <span class="php-var">$user</span> = <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'user'</span>, <span class="php-var">$item</span>) ? <span class="php-var">$item</span>[<span class="php-quote">'user'</span>] : <span class="php-quote">''</span>;
 </span><span id="116" class="l"><a class="l" href="#116">116: </a>                <span class="php-var">$timestamp</span> = <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'timestamp'</span>, <span class="php-var">$item</span>) ? <span class="php-var">$item</span>[<span class="php-quote">'timestamp'</span>] : <span class="php-num">0</span>;
 </span><span id="117" class="l"><a class="l" href="#117">117: </a>                <span class="php-var">$comments</span> = <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'comment'</span>, <span class="php-var">$item</span>) ? <span class="php-var">$item</span>[<span class="php-quote">'comment'</span>] : <span class="php-num">0</span>;
-</span><span id="118" class="l"><a class="l" href="#118">118: </a>                <span class="php-var">$subject</span> = <span class="php-var">$this</span>-&gt;html_safe(<span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]));
+</span><span id="118" class="l"><a class="l" href="#118">118: </a>                <span class="php-var">$subject</span> = <span class="php-var">$item</span>[<span class="php-quote">'title'</span>];
 </span><span id="119" class="l"><a class="l" href="#119">119: </a>                <span class="php-var">$date</span> = <span class="php-var">$timestamp</span> != <span class="php-num">0</span> ? <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$timestamp</span>) : <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>);
 </span><span id="120" class="l"><a class="l" href="#120">120: </a>                <span class="php-var">$votes</span> = <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'votes'</span>, <span class="php-var">$item</span>) ? <span class="php-var">$item</span>[<span class="php-quote">'votes'</span>] : <span class="php-num">0</span>;
 </span><span id="121" class="l"><a class="l" href="#121">121: </a>
