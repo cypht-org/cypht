@@ -164,4 +164,35 @@ function write_config_file($settings, $filters) {
     printf("hm3.rc file written\n");
 }
 
+/**
+ * Copies the site.js and site.css files to the site/ directory, and creates
+ * a production version of the index.php file.
+ *
+ * @return void
+ */
+function create_production_site($assets, $settings) {
+    if (!is_readable('site/')) {
+        mkdir('site', 0755);
+    }
+    printf("creating production site\n");
+    copy('site.css', 'site/site.css');
+    copy('site.js', 'site/site.js');
+    $index_file = file_get_contents('index.php');
+    $index_file = preg_replace("/APP_PATH', ''/", "APP_PATH', '".APP_PATH."'", $index_file);
+    $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
+    $index_file = preg_replace("/SITE_ID', ''/", "SITE_ID', '".urlencode(Hm_Crypt::unique_id(64))."'", $index_file);
+    $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
+    file_put_contents('site/index.php', $index_file);
+    foreach ($assets as $path) {
+        if (!is_readable('site/'.$path)) {
+            mkdir('site/'.$path, 0755, true);
+        }
+        foreach (scandir($path) as $file) {
+            if (in_array($file, array('.', '..'), true)) {
+                continue;
+            }
+            copy($path.$file, 'site/'.$path.$file);
+        }
+    }
+}
 ?>
