@@ -15,58 +15,47 @@ require APP_PATH.'third_party/simple_html_dom.php';
  */
 class Hm_Handler_hacker_news_fields extends Hm_Handler_Module {
     public function process() {
-        $this->out('message_list_fields', array(
-            array('chkbox_col', false, false),
-            array('source_col', 'source', 'Source'),
-            array('from_col', 'from', 'From'),
-            array('subject_col', 'subject', 'Subject'),
-            array('score_col', 'score', 'Score'),
-            array('comment_col', 'comment', 'Comments'),
-            array('date_col', 'msg_date', 'Date'),
-            array('icon_col', false, false)), false);
+        if (array_key_exists('list_path', $this->request->get) && in_array($this->request->get['list_path'], array('hn_trending', 'hn_newest'))) {
+            $this->out('message_list_fields', array(
+                array('chkbox_col', false, false),
+                array('source_col', 'source', 'Source'),
+                array('from_col', 'from', 'From'),
+                array('subject_col', 'subject', 'Subject'),
+                array('score_col', 'score', 'Score'),
+                array('comment_col', 'comment', 'Comments'),
+                array('date_col', 'msg_date', 'Date'),
+                array('icon_col', false, false)), false);
 
-        $list_type = 'top20';
-        if (array_key_exists('list_path', $this->request->get)) {
-            $list_type = $this->request->get['list_path'];
+            $list_type = 'hn_trending';
+            if (array_key_exists('list_path', $this->request->get)) {
+                $list_type = $this->request->get['list_path'];
+            }
+            $this->out('mailbox_list_title', array('Hacker News'), false);
+            $this->out('list_path', $list_type, false);
+            $this->append('data_sources', array('callback' => 'load_hacker_news', 'type' => 'hacker_news', 'name' => 'Hacker News', 'id' => 0));
         }
-        $this->out('list_path', $list_type);
     }
 }
 
-function hn_parse_subtext($text) {
-    if (preg_match("/<span class=\"score\" id=\"score_(\d+)\">(\d+) point(s|)<\/span> by <a href=\"user\?id=([^\"]+)\">[^<]+<\/a> <a href=\"item\?id=(\d+)\">([^<]+)<\/a>  \| <a href=\"item\?id=\d+\">(.+)<\/a>/", $text, $matches)) {
-        return array(
-            'id' => $matches[1],
-            'votes' => $matches[2],
-            'user' => $matches[4],
-            'timestamp' => strtotime(sprintf('-%s', trim(str_replace('ago', '', $matches[6])))),
-            'comment' => (int) trim(str_replace('comments', '', $matches[7]))
-        );
-    }
-    else {
-        elog($text);
-    }
-    return array();
-}
 /**
  * @subpackage hackernews/handler
  */
 class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
     public function process() {
-        $list_type = 'top20';
+        $news = array();
+        $title = false;
+        $url = false;
+        $list_type = 'hn_trending';
         $html = false;
         if (array_key_exists('list_path', $this->request->get)) {
             $list_type = $this->request->get['list_path'];
         }
-        if ($list_type == 'top20') {
+        if ($list_type == 'hn_trending') {
             $html = file_get_html('https://news.ycombinator.com/');
         }
-        elseif ($list_type == 'newest') {
+        elseif ($list_type == 'hn_newest') {
             $html = file_get_html('https://news.ycombinator.com/newest');
         }
-        $news = array();
-        $title = false;
-        $url = false;
         if ($html) {
             foreach ($html->find('.title a, .subtext') as $index => $el) {
                 if ($title !== false) {
@@ -80,7 +69,6 @@ class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
                 $url = $el->href;
             }
         }
-        elog($news);
         $this->out('hacker_news_data', $news);
     }
 }
@@ -90,33 +78,16 @@ class Hm_Handler_hacker_news_data extends Hm_Handler_Module {
  */
 class Hm_Output_hacker_news_folders extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_top20"><a class="unread_link" href="?page=hacker_news&list_path=top20">'.
+        $res = '<li class="menu_hn_trending"><a class="unread_link" href="?page=message_list&list_path=hn_trending">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$spreadsheet).
-            '" alt="" width="16" height="16" /> '.$this->trans('Top 20').'</a></li>';
-        $res .= '<li class="menu_newest"><a class="unread_link" href="?page=hacker_news&list_path=newest">'.
+            '" alt="" width="16" height="16" /> '.$this->trans('Trending').'</a></li>'.
+            '<li class="menu_hn_newest"><a class="unread_link" href="?page=message_list&list_path=hn_newest">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$spreadsheet).
             '" alt="" width="16" height="16" /> '.$this->trans('Latest').'</a></li>';
+
         $this->append('folder_sources', 'hacker_news_folders');
         Hm_Page_Cache::add('hacker_news_folders', $res, true);
         return '';
-    }
-}
-
-/**
- * @subpackage hackernews/output
- */
-class Hm_Output_hacker_news_heading extends Hm_Output_Module {
-    protected function output() {
-        return '<div class="content_title">'.$this->trans('Hacker News').'</div>';
-    }
-}
-
-/**
- * @subpackage hackernews/output
- */
-class Hm_Output_hacker_news_table_end extends Hm_Output_Module {
-    protected function output() {
-        return '</tbody></table>';
     }
 }
 
@@ -196,6 +167,23 @@ function comment_callback($comments, $style, $output_mod) {
  */
 function score_callback($score, $style, $output_mod) {
     return sprintf('<td>%d</td>', $score[0]);
+}
+
+/**
+ * @subpackage hackernews/functions
+ */
+function hn_parse_subtext($text) {
+    if (preg_match("/<span class=\"score\" id=\"score_(\d+)\">(\d+) point(s|)<\/span> by <a href=\"user\?id=([^\"]+)\">[^<]+<\/a> ".
+        "<a href=\"item\?id=(\d+)\">([^<]+)<\/a>  \| <a href=\"item\?id=\d+\">(.+)<\/a>/", $text, $matches)) {
+        return array(
+            'id' => $matches[1],
+            'votes' => $matches[2],
+            'user' => $matches[4],
+            'timestamp' => strtotime(sprintf('-%s', trim(str_replace('ago', '', $matches[6])))),
+            'comment' => (int) trim(str_replace('comments', '', $matches[7]))
+        );
+    }
+    return array();
 }
 
 ?>

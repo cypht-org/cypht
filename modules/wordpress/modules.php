@@ -59,20 +59,6 @@ class Hm_Handler_wordpress_list_type extends Hm_Handler_Module {
                 $this->out('mailbox_list_title', array('WordPress.com Freshly Pressed'));
                 $this->append('data_sources', array('callback' => 'load_freshly_pressed', 'type' => 'wordpress', 'name' => 'WordPress.com Freshly Pressed', 'id' => 0));
             }
-            $list_style = $this->user_config->get('list_style', false);
-            if ($this->get('is_mobile', false)) {
-                $list_style = 'news_style';
-            }
-            if ($list_style == 'news_style') {
-                $this->out('news_list_style', true);
-            }
-            $this->out('message_list_fields', array(
-                array('chkbox_col', false, false),
-                array('source_col', 'source', 'Source'),
-                array('from_col', 'from', 'From'),
-                array('subject_col', 'subject', 'Subject'),
-                array('date_col', 'msg_date', 'Date'),
-                array('icon_col', false, false)), false);
         }
     }
 }
