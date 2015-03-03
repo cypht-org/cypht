@@ -9,6 +9,25 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * Build server information data
+ * @subpackage developer/handler
+ */
+class Hm_Handler_process_server_info extends Hm_Handler_Module {
+    /***
+     * Collect environment info
+     */
+    public function process() {
+        $res = $this->request->server;
+        $res['phpversion'] = phpversion();
+        $res['zend_version'] = zend_version();
+        $res['sapi'] = php_sapi_name();
+        $res['handlers'] = Hm_Handler_Modules::dump();
+        $res['output'] = Hm_Output_Modules::dump();
+        $this->out('server_info', $res);
+    }
+}
+
+/**
  * @subpackage developer/output
  */
 class Hm_Output_dev_content extends Hm_Output_Module {
@@ -65,6 +84,68 @@ class Hm_Output_info_page_link extends Hm_Output_Module {
 }
 
 /**
+ * Outputs server information
+ * @subpackage developer/output
+ */
+class Hm_Output_server_information extends Hm_Output_Module {
+    /**
+     * Information about the running instance
+     */
+    protected function output() {
+        $server_info = $this->get('server_info', array());
+        if (!empty($server_info)) {
+            return '<div class="server_info"><table class="info">'.
+                '<tr><th>Server Name</th><td>'.$server_info['HTTP_HOST'].'</td></tr>'.
+                '<tr><th>Server Scheme</th><td>'.$server_info['REQUEST_SCHEME'].'</td></tr>'.
+                '<tr><th>Server Address</th><td>'.$server_info['SERVER_ADDR'].'</td></tr>'.
+                '<tr><th>Client Address</th><td>'.$server_info['REMOTE_ADDR'].'</td></tr>'.
+                '<tr><th>PHP version</th><td>'.$server_info['phpversion'].'</td></tr>'.
+                '<tr><th>Zend version</th><td>'.$server_info['zend_version'].'</td></tr>'.
+                '<tr><th>SAPI</th><td>'.$server_info['sapi'].'</td></tr>'.
+                '<tr><th>Enabled Modules</th><td>'.str_replace(',', ', ', $this->get('router_module_list')).'</td></tr>'.
+                '</table></div>';
+        }
+        return '';
+    }
+}
+
+/**
+ * Output the current configuration setup
+ * @subpackage developer/output
+ */
+class Hm_Output_config_map extends Hm_Output_Module {
+    /**
+     * Show pages, module assignments, and input filters
+     */
+    protected function output() {
+    $res = '<div class="content_title">'.$this->trans('Configuration Map').'</div><table class="config_map">';
+    $handlers = array();
+    $outputs = array();
+    $server_info = $this->get('server_info', array());
+    if (!empty($server_info)) {
+        $handlers = $server_info['handlers'];
+        ksort($handlers);
+        $outputs = $server_info['output'];
+    }
+    foreach ($handlers as $page => $mods) {
+        $res .= '<tr><td colspan="2" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';
+        $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >Source</th></tr>';
+        foreach ($mods as $name => $vals) {
+            $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td></tr>';
+        }
+        if (array_key_exists($page, $outputs)) {
+            $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >Source</th></tr>';
+            foreach($outputs[$page] as $name => $vals) {
+                $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td></tr>';
+            }
+        }
+    }
+    $res .= '</table>';
+    return $res;
+    }
+}
+
+/**
  * Starts a status table used on the info page
  * @subpackage developer/output
  */
@@ -73,7 +154,7 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
      * Modules populate this table to run a status check from the info page
      */
     protected function output() {
-        $res = '<table><thead><tr><th>'.$this->trans('Type').'</th><th>'.$this->trans('Name').'</th><th>'.
+        $res = '<div class="content_title">Status</div><table><thead><tr><th>'.$this->trans('Type').'</th><th>'.$this->trans('Name').'</th><th>'.
                 $this->trans('Status').'</th></tr></thead><tbody>';
         return $res;
     }
