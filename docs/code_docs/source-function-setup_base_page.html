@@ -527,28 +527,29 @@
 </span><span id="233" class="l"><a class="l" href="#233">233: </a>        <span class="php-quote">'hm_ajax_hook'</span> =&gt; FILTER_SANITIZE_STRING,
 </span><span id="234" class="l"><a class="l" href="#234">234: </a>        <span class="php-quote">'save_settings'</span> =&gt; FILTER_SANITIZE_STRING,
 </span><span id="235" class="l"><a class="l" href="#235">235: </a>        <span class="php-quote">'save_settings_permanently'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="236" class="l"><a class="l" href="#236">236: </a>        <span class="php-quote">'language_setting'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="237" class="l"><a class="l" href="#237">237: </a>        <span class="php-quote">'flagged_per_source'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="238" class="l"><a class="l" href="#238">238: </a>        <span class="php-quote">'flagged_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="239" class="l"><a class="l" href="#239">239: </a>        <span class="php-quote">'unread_per_source'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="240" class="l"><a class="l" href="#240">240: </a>        <span class="php-quote">'unread_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="241" class="l"><a class="l" href="#241">241: </a>        <span class="php-quote">'all_email_per_source'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="242" class="l"><a class="l" href="#242">242: </a>        <span class="php-quote">'all_email_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="243" class="l"><a class="l" href="#243">243: </a>        <span class="php-quote">'all_per_source'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="244" class="l"><a class="l" href="#244">244: </a>        <span class="php-quote">'all_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="245" class="l"><a class="l" href="#245">245: </a>        <span class="php-quote">'list_style'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="246" class="l"><a class="l" href="#246">246: </a>        <span class="php-quote">'timezone_setting'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="247" class="l"><a class="l" href="#247">247: </a>        <span class="php-quote">'section_state'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="248" class="l"><a class="l" href="#248">248: </a>        <span class="php-quote">'section_class'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="249" class="l"><a class="l" href="#249">249: </a>        <span class="php-quote">'message_ids'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="250" class="l"><a class="l" href="#250">250: </a>        <span class="php-quote">'action_type'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="251" class="l"><a class="l" href="#251">251: </a>        <span class="php-quote">'message_list_since'</span> =&gt; FILTER_SANITIZE_STRING,
-</span><span id="252" class="l"><a class="l" href="#252">252: </a>        <span class="php-quote">'reply_format'</span> =&gt; FILTER_VALIDATE_INT,
-</span><span id="253" class="l"><a class="l" href="#253">253: </a>    )
-</span><span id="254" class="l"><a class="l" href="#254">254: </a>);
-</span><span id="255" class="l"><a class="l" href="#255">255: </a>
-</span><span id="256" class="l"><a class="l" href="#256">256: </a><span class="xlang">?&gt;</span>
-</span><span id="257" class="l"><a class="l" href="#257">257: </a></span></code></pre>
+</span><span id="236" class="l"><a class="l" href="#236">236: </a>        <span class="php-quote">'save_settings_permanently_then_logout'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="237" class="l"><a class="l" href="#237">237: </a>        <span class="php-quote">'language_setting'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="238" class="l"><a class="l" href="#238">238: </a>        <span class="php-quote">'flagged_per_source'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="239" class="l"><a class="l" href="#239">239: </a>        <span class="php-quote">'flagged_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="240" class="l"><a class="l" href="#240">240: </a>        <span class="php-quote">'unread_per_source'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="241" class="l"><a class="l" href="#241">241: </a>        <span class="php-quote">'unread_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="242" class="l"><a class="l" href="#242">242: </a>        <span class="php-quote">'all_email_per_source'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="243" class="l"><a class="l" href="#243">243: </a>        <span class="php-quote">'all_email_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="244" class="l"><a class="l" href="#244">244: </a>        <span class="php-quote">'all_per_source'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="245" class="l"><a class="l" href="#245">245: </a>        <span class="php-quote">'all_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="246" class="l"><a class="l" href="#246">246: </a>        <span class="php-quote">'list_style'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="247" class="l"><a class="l" href="#247">247: </a>        <span class="php-quote">'timezone_setting'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="248" class="l"><a class="l" href="#248">248: </a>        <span class="php-quote">'section_state'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="249" class="l"><a class="l" href="#249">249: </a>        <span class="php-quote">'section_class'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="250" class="l"><a class="l" href="#250">250: </a>        <span class="php-quote">'message_ids'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="251" class="l"><a class="l" href="#251">251: </a>        <span class="php-quote">'action_type'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="252" class="l"><a class="l" href="#252">252: </a>        <span class="php-quote">'message_list_since'</span> =&gt; FILTER_SANITIZE_STRING,
+</span><span id="253" class="l"><a class="l" href="#253">253: </a>        <span class="php-quote">'reply_format'</span> =&gt; FILTER_VALIDATE_INT,
+</span><span id="254" class="l"><a class="l" href="#254">254: </a>    )
+</span><span id="255" class="l"><a class="l" href="#255">255: </a>);
+</span><span id="256" class="l"><a class="l" href="#256">256: </a>
+</span><span id="257" class="l"><a class="l" href="#257">257: </a><span class="xlang">?&gt;</span>
+</span><span id="258" class="l"><a class="l" href="#258">258: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
