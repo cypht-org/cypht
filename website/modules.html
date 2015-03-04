@@ -31,16 +31,19 @@
           <li><b>calendar</b><br /> Basic calendar with no event support yet.</li>
           <li><b>contacts</b><br /> Contact management. Currently unwritten.</li>
           <li><b>core</b><br /> Handles basic page layout, logging in and out, and the default settings pages.</li>
+          <li><b>developer</b><br /> For development, provides resources and installation details. Only available in "debug mode".</li>
           <li><b>feeds</b><br /> Allows users to add RSS/ATOM feeds to their content sources.</li>
-          <li><b>hello_world</b><br /> Example module set with lots of comments</li>
+          <li><b>hacker_news</b><br /> Scrapes Hacker News and adds internal pages to Cypht for Treding and newest items.</li>
+          <li><b>hello_world</b><br /> Example module set with lots of comments.</li>
           <li><b>idle_timer</b><br /> Uses a polling mechanism to keep the PHP session alive, and to end it at the designated time.</li>
           <li><b>imap</b><br /> Allows users to add IMAP accounts to their content sources.</li>
-          <li><b>info</b><br /> Adds support pages like "Help", "Bugs", and "Development" to the Settings menu.</li>
+          <li><b>nux</b><br /> Provides a more pleasant new user experience. Still being worked on.</li>
           <li><b>pop3</b><br /> Allows users to add POP3 accounts to their content sources.</li>
           <li><b>profiles</b><br /> Create profiles with specific user information and associated IMAP/POP3/SMTP servers. Currently unwritten.</li>
           <li><b>smtp</b><br /> Send outbound E-mail. This module is functional but buggy.</li>
           <li><b>swipe_2fa</b><br /> Really cool 2-factor authentication module set using the SwipeIdentify free 2FA service.</li>
           <li><b>themes</b><br /> Adds support for changing the UI using CSS.</li>
+          <li><b>wordpress</b><br /> Uses Oauth2 to connect to WordPress.com and displays notifications and freshly pressed lists</li>
         </ul>
         Module sets are setup in the hm3.ini file. With the exception of the core module, they can all be enabled or disabled independently. When the site build process is run, module assignments are calculated and saved in the configuration file (so they don't need to be re-calculated at run-time). There is also a debug mode in which modules are activated dynamically (for the most part) to make development easier.
         <h3>File Structure</h3>
