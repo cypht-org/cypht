@@ -233,6 +233,7 @@ return array(
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'save_settings' => FILTER_SANITIZE_STRING,
         'save_settings_permanently' => FILTER_SANITIZE_STRING,
+        'save_settings_permanently_then_logout' => FILTER_SANITIZE_STRING,
         'language_setting' => FILTER_SANITIZE_STRING,
         'flagged_per_source' => FILTER_VALIDATE_INT,
         'flagged_since' => FILTER_SANITIZE_STRING,
