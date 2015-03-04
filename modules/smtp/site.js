@@ -78,7 +78,7 @@ var save_compose_state = function() {
             {'name': 'draft_body', 'value': $('.compose_body').text()},
             {'name': 'draft_subject', 'value': $('.compose_subject').val()},
             {'name': 'draft_to', 'value': $('.compose_to').val()}],
-            function(res) { console.log(res); },
+            function(res) { },
             [],
             true
         );

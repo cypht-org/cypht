@@ -34,7 +34,6 @@ var nux_add_account = function() {
     return false;
 };
 var display_final_nux_step = function(res) {
-    console.log(res);
 }
 var nux_service_select = function() {
     var el = document.getElementById('service_select');
