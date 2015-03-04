@@ -28,9 +28,13 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
 }
 
 /**
+ * Output links to developer resources
  * @subpackage developer/output
  */
 class Hm_Output_dev_content extends Hm_Output_Module {
+    /**
+     * Dev resources
+     */
     protected function output() {
         return '<div class="dev_content"><div class="content_title">'.$this->trans('Developer Documentation').'</div>'.
             '<div class="long_text">'.
@@ -46,18 +50,26 @@ class Hm_Output_dev_content extends Hm_Output_Module {
 }
 
 /**
+ * Start the info section on the dev page
  * @subpackage developer/output
  */
 class Hm_Output_info_heading extends Hm_Output_Module {
+    /**
+     * Leaves an open div
+     */
     protected function output() {
         return '<div class="info_content"><div class="content_title">'.$this->trans('Info').'</div>';
     }
 }
 
 /**
+ * Adds a link to the dev resources page to the folder list
  * @subpackage developer/output
  */
 class Hm_Output_developer_doc_link extends Hm_Output_Module {
+    /**
+     * Link to the dev page
+     */
     protected function output() {
         $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> '.$this->trans('Dev').'</a></li>';
@@ -70,9 +82,13 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
 
 
 /**
+ * Adds a link to the info page to the folder list
  * @subpackage developer/output
  */
 class Hm_Output_info_page_link extends Hm_Output_Module {
+    /**
+     * Info page link
+     */
     protected function output() {
         $res = '<li class="menu_info"><a class="unread_link" href="?page=info">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$info).'" alt="" width="16" height="16" /> '.$this->trans('Info').'</a></li>';
