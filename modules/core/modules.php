@@ -775,8 +775,9 @@ class Hm_Output_search_form extends Hm_Output_Module {
      */
     protected function output() {
         $terms = $this->get('search_terms', '');
-        $source_link = '<a href="#" title="Sources" class="source_link"><img alt="'.$this->trans('Sources').
-            '" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+        $source_link = false;
+        //$source_link = '<a href="#" title="Sources" class="source_link"><img alt="'.$this->trans('Sources').
+            //'" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
         $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
             $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
         $res = '<div class="search_form">'.
@@ -1954,7 +1955,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
      */
     protected function output() {
         if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds', 'email'))) {
-            $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+            $source_link = false; //'<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';
             }
