@@ -75,7 +75,7 @@ var Hm_Ajax_Request = function() { return {
             return;
         }
         else {
-            if (!res.router_login_state) {
+            if ((res.state && res.state == 'not callable') || !res.router_login_state) {
                 window.location.href = "?page=home";
             }
             if (res.date) {
