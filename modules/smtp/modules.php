@@ -263,7 +263,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
  */
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
     protected function output() {
-        $count = $this->get('smtp_servers', array());
+        $count = count($this->get('smtp_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="smtp_server_setup"><div data-target=".smtp_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" />'.

@@ -89,7 +89,7 @@ if (hm_page_name() == 'servers') {
     $('.test_smtp_connect').on('click', smtp_test_action);
     $('.save_smtp_connection').on('click', smtp_save_action);
     $('.forget_smtp_connection').on('click', smtp_forget_action);
-    $('.smtp_delete').on('click', smtp_delete_action);
+    $('.delete_smtp_connection').on('click', smtp_delete_action);
     var dsp = Hm_Utils.get_from_local_storage('.smtp_section');
     if (dsp == 'block' || dsp == 'none') {
         $('.smtp_section').css('display', dsp);
