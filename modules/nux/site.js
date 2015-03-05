@@ -13,13 +13,15 @@ var display_next_nux_step = function(res) {
 var nux_add_account = function() {
     $('.nux_password').css('border', nux_border);
     var service = $('#nux_service').val();
+    var name = $('.nux_name').val();
     var email = $('#nux_email').val();
     var pass = $('.nux_password').val();
-    if (service.length && email.length && pass.length) {
+    if (name.length && service.length && email.length && pass.length) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_nux_add_service'},
             {'name': 'nux_service', 'value': service},
             {'name': 'nux_email', 'value': email},
+            {'name': 'nux_name', 'value': name},
             {'name': 'nux_pass', 'value': pass}],
             display_final_nux_step,
             [],
