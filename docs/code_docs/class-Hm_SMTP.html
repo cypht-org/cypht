@@ -288,7 +288,7 @@
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.smtp.html">smtp</a>\<a href="package-modules.smtp.lib.html">lib</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_SMTP.html#39-576" title="Go to source code">smtp/hm-smtp.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_SMTP.html#41-590" title="Go to source code">smtp/hm-smtp.php</a><br>
 	</div>
 
 
@@ -306,7 +306,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Hm_SMTP.html#66-111" title="Go to source code">__construct</a>( <span>mixed <var>$conf</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#69-118" title="Go to source code">__construct</a>( <span>mixed <var>$conf</var></span> )</code>
 
 		<div class="description short">
 			
@@ -335,7 +335,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_send_command">#</a>
-		<code><a href="source-class-Hm_SMTP.html#114-119" title="Go to source code">send_command</a>( <span>mixed <var>$command</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#121-126" title="Go to source code">send_command</a>( <span>mixed <var>$command</var></span> )</code>
 
 		<div class="description short">
 			
@@ -364,7 +364,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_response">#</a>
-		<code><a href="source-class-Hm_SMTP.html#125-153" title="Go to source code">get_response</a>( <span>mixed <var>$chunked</var> = <span class="php-keyword1">true</span></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#132-160" title="Go to source code">get_response</a>( <span>mixed <var>$chunked</var> = <span class="php-keyword1">true</span></span> )</code>
 
 		<div class="description short">
 			
@@ -393,7 +393,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_parse_line">#</a>
-		<code><a href="source-class-Hm_SMTP.html#156-167" title="Go to source code">parse_line</a>( <span>mixed <var>$line</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#163-174" title="Go to source code">parse_line</a>( <span>mixed <var>$line</var></span> )</code>
 
 		<div class="description short">
 			
@@ -422,7 +422,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_compare_response">#</a>
-		<code><a href="source-class-Hm_SMTP.html#174-190" title="Go to source code">compare_response</a>( <span>mixed <var>$chunked_response</var></span>, <span>mixed <var>$check</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#181-197" title="Go to source code">compare_response</a>( <span>mixed <var>$chunked_response</var></span>, <span>mixed <var>$check</var></span> )</code>
 
 		<div class="description short">
 			
@@ -451,7 +451,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_capabilities">#</a>
-		<code><a href="source-class-Hm_SMTP.html#194-213" title="Go to source code">capabilities</a>( <span>mixed <var>$ehlo_response</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#201-220" title="Go to source code">capabilities</a>( <span>mixed <var>$ehlo_response</var></span> )</code>
 
 		<div class="description short">
 			
@@ -480,7 +480,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_connect">#</a>
-		<code><a href="source-class-Hm_SMTP.html#216-278" title="Go to source code">connect</a>( )</code>
+		<code><a href="source-class-Hm_SMTP.html#223-285" title="Go to source code">connect</a>( )</code>
 
 		<div class="description short">
 			
@@ -509,7 +509,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_choose_auth">#</a>
-		<code><a href="source-class-Hm_SMTP.html#280-290" title="Go to source code">choose_auth</a>( )</code>
+		<code><a href="source-class-Hm_SMTP.html#287-296" title="Go to source code">choose_auth</a>( )</code>
 
 		<div class="description short">
 			
@@ -538,19 +538,27 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_authenticate">#</a>
-		<code><a href="source-class-Hm_SMTP.html#293-371" title="Go to source code">authenticate</a>( <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span>, <span>mixed <var>$mech</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#298-385" title="Go to source code">authenticate</a>( <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span>, <span>mixed <var>$mech</var></span> )</code>
 
 		<div class="description short">
 			
+<p>authenticate the username and password to the server</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>authenticate the username and password to the server</p>
 
 
 
 
 
+
+				<h4>Todo</h4>
+				<div class="list">
+						fix xoauth2 error handling<br>
+				</div>
 
 
 		</div>
@@ -567,7 +575,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_parse_ntlm_type_two">#</a>
-		<code><a href="source-class-Hm_SMTP.html#374-394" title="Go to source code">parse_ntlm_type_two</a>( <span>mixed <var>$bin_str</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#388-408" title="Go to source code">parse_ntlm_type_two</a>( <span>mixed <var>$bin_str</var></span> )</code>
 
 		<div class="description short">
 			
@@ -596,7 +604,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_build_ntlm_type_one">#</a>
-		<code><a href="source-class-Hm_SMTP.html#397-402" title="Go to source code">build_ntlm_type_one</a>( )</code>
+		<code><a href="source-class-Hm_SMTP.html#411-416" title="Go to source code">build_ntlm_type_one</a>( )</code>
 
 		<div class="description short">
 			
@@ -625,7 +633,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_build_ntlm_type_three">#</a>
-		<code><a href="source-class-Hm_SMTP.html#405-427" title="Go to source code">build_ntlm_type_three</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#419-441" title="Go to source code">build_ntlm_type_three</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
 
 		<div class="description short">
 			
@@ -654,7 +662,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_ntlm_security_buffer">#</a>
-		<code><a href="source-class-Hm_SMTP.html#430-432" title="Go to source code">ntlm_security_buffer</a>( <span>mixed <var>$len</var></span>, <span>mixed <var>$offset</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#444-446" title="Go to source code">ntlm_security_buffer</a>( <span>mixed <var>$len</var></span>, <span>mixed <var>$offset</var></span> )</code>
 
 		<div class="description short">
 			
@@ -683,7 +691,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_build_lm_response">#</a>
-		<code><a href="source-class-Hm_SMTP.html#435-450" title="Go to source code">build_lm_response</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#449-464" title="Go to source code">build_lm_response</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
 
 		<div class="description short">
 			
@@ -712,7 +720,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_build_ntlm_response">#</a>
-		<code><a href="source-class-Hm_SMTP.html#453-460" title="Go to source code">build_ntlm_response</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#467-474" title="Go to source code">build_ntlm_response</a>( <span>mixed <var>$msg_data</var></span>, <span>mixed <var>$username</var></span>, <span>mixed <var>$password</var></span> )</code>
 
 		<div class="description short">
 			
@@ -741,7 +749,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_apply_ntlm_hash">#</a>
-		<code><a href="source-class-Hm_SMTP.html#463-470" title="Go to source code">apply_ntlm_hash</a>( <span>mixed <var>$challenge</var></span>, <span>mixed <var>$hash</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#477-484" title="Go to source code">apply_ntlm_hash</a>( <span>mixed <var>$challenge</var></span>, <span>mixed <var>$hash</var></span> )</code>
 
 		<div class="description short">
 			
@@ -770,7 +778,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_des_encrypt">#</a>
-		<code><a href="source-class-Hm_SMTP.html#473-494" title="Go to source code">des_encrypt</a>( <span>mixed <var>$string</var></span>, <span>mixed <var>$challenge</var> = <span class="php-quote">'KGS!@#$%'</span></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#487-508" title="Go to source code">des_encrypt</a>( <span>mixed <var>$string</var></span>, <span>mixed <var>$challenge</var> = <span class="php-quote">'KGS!@#$%'</span></span> )</code>
 
 		<div class="description short">
 			
@@ -799,7 +807,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_send_message">#</a>
-		<code><a href="source-class-Hm_SMTP.html#497-550" title="Go to source code">send_message</a>( <span>mixed <var>$from</var></span>, <span>mixed <var>$recipients</var></span>, <span>mixed <var>$message</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#511-564" title="Go to source code">send_message</a>( <span>mixed <var>$from</var></span>, <span>mixed <var>$recipients</var></span>, <span>mixed <var>$message</var></span> )</code>
 
 		<div class="description short">
 			
@@ -828,7 +836,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_puke">#</a>
-		<code><a href="source-class-Hm_SMTP.html#552-557" title="Go to source code">puke</a>( )</code>
+		<code><a href="source-class-Hm_SMTP.html#566-571" title="Go to source code">puke</a>( )</code>
 
 		<div class="description short">
 			
@@ -857,7 +865,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_disconnect">#</a>
-		<code><a href="source-class-Hm_SMTP.html#560-568" title="Go to source code">disconnect</a>( )</code>
+		<code><a href="source-class-Hm_SMTP.html#574-582" title="Go to source code">disconnect</a>( )</code>
 
 		<div class="description short">
 			
@@ -886,7 +894,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_clean">#</a>
-		<code><a href="source-class-Hm_SMTP.html#570-575" title="Go to source code">clean</a>( <span>mixed <var>$val</var></span> )</code>
+		<code><a href="source-class-Hm_SMTP.html#584-589" title="Go to source code">clean</a>( <span>mixed <var>$val</var></span> )</code>
 
 		<div class="description short">
 			
@@ -926,7 +934,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#44" title="Go to source code"><var>$config</var></a>
+				<a href="source-class-Hm_SMTP.html#46" title="Go to source code"><var>$config</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -949,7 +957,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#45" title="Go to source code"><var>$server</var></a>
+				<a href="source-class-Hm_SMTP.html#47" title="Go to source code"><var>$server</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -972,7 +980,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#46" title="Go to source code"><var>$starttls</var></a>
+				<a href="source-class-Hm_SMTP.html#48" title="Go to source code"><var>$starttls</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -995,7 +1003,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#47" title="Go to source code"><var>$port</var></a>
+				<a href="source-class-Hm_SMTP.html#49" title="Go to source code"><var>$port</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1018,7 +1026,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#48" title="Go to source code"><var>$tls</var></a>
+				<a href="source-class-Hm_SMTP.html#50" title="Go to source code"><var>$tls</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1041,7 +1049,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#49" title="Go to source code"><var>$auth</var></a>
+				<a href="source-class-Hm_SMTP.html#51" title="Go to source code"><var>$auth</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1064,7 +1072,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#50" title="Go to source code"><var>$handle</var></a>
+				<a href="source-class-Hm_SMTP.html#52" title="Go to source code"><var>$handle</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1087,7 +1095,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#51" title="Go to source code"><var>$debug</var></a>
+				<a href="source-class-Hm_SMTP.html#53" title="Go to source code"><var>$debug</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1110,7 +1118,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#52" title="Go to source code"><var>$hostname</var></a>
+				<a href="source-class-Hm_SMTP.html#54" title="Go to source code"><var>$hostname</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1133,7 +1141,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#53" title="Go to source code"><var>$command_count</var></a>
+				<a href="source-class-Hm_SMTP.html#55" title="Go to source code"><var>$command_count</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1156,7 +1164,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#54" title="Go to source code"><var>$commands</var></a>
+				<a href="source-class-Hm_SMTP.html#56" title="Go to source code"><var>$commands</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1179,7 +1187,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#55" title="Go to source code"><var>$responses</var></a>
+				<a href="source-class-Hm_SMTP.html#57" title="Go to source code"><var>$responses</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1202,7 +1210,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#56" title="Go to source code"><var>$smtp_err</var></a>
+				<a href="source-class-Hm_SMTP.html#58" title="Go to source code"><var>$smtp_err</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1225,7 +1233,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#57" title="Go to source code"><var>$banner</var></a>
+				<a href="source-class-Hm_SMTP.html#59" title="Go to source code"><var>$banner</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1248,7 +1256,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#58" title="Go to source code"><var>$capability</var></a>
+				<a href="source-class-Hm_SMTP.html#60" title="Go to source code"><var>$capability</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1271,7 +1279,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#59" title="Go to source code"><var>$connected</var></a>
+				<a href="source-class-Hm_SMTP.html#61" title="Go to source code"><var>$connected</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1294,7 +1302,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#60" title="Go to source code"><var>$crlf</var></a>
+				<a href="source-class-Hm_SMTP.html#62" title="Go to source code"><var>$crlf</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1317,7 +1325,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#61" title="Go to source code"><var>$line_length</var></a>
+				<a href="source-class-Hm_SMTP.html#63" title="Go to source code"><var>$line_length</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1340,7 +1348,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#62" title="Go to source code"><var>$username</var></a>
+				<a href="source-class-Hm_SMTP.html#64" title="Go to source code"><var>$username</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1363,7 +1371,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#63" title="Go to source code"><var>$password</var></a>
+				<a href="source-class-Hm_SMTP.html#65" title="Go to source code"><var>$password</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -1386,11 +1394,34 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_SMTP.html#64" title="Go to source code"><var>$state</var></a>
+				<a href="source-class-Hm_SMTP.html#66" title="Go to source code"><var>$state</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
 			<a href="#$state" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="request_auths" id="$request_auths">
+		<td class="attributes"><code>
+			private  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_SMTP.html#67" title="Go to source code"><var>$request_auths</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$request_auths" class="anchor">#</a>
 
 			<div class="description short">
 				
