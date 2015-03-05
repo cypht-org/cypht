@@ -234,13 +234,18 @@ abstract class Hm_Handler_Module {
         }
         if (!$valid) {
             if ($this->request->type == 'AJAX') {
+                if (DEBUG_MODE) {
+                    Hm_Debug::add('NONCE check failed');
+                    Hm_Debug::load_page_stats();
+                    Hm_Debug::show('log');
+                }
                 Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
             }
             else {
                 if ($this->session->loaded) {
                     $this->session->destroy($this->request);
                 }
-                Hm_Debug::add('nonce check failed');
+                Hm_Debug::add('NONCE check failed');
                 Hm_Router::page_redirect('?page=home');
             }
         }
