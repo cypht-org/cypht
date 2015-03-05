@@ -8,3 +8,4 @@
 .reset_nux_form { float: right; padding: 20px; padding-bottom: 40px; font-size: 110%; }
 .nux_submit { margin-bottom: 20px; }
 .nux_account_name, .nux_username, #service_select { margin-bottom: 10px; width: 280px; padding: 3px; }
+#nux_email { margin-bottom: 10px; }

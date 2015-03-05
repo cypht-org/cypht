@@ -6,6 +6,8 @@
  * @subpackage nux
  * @todo filter/disable features depending on imap/pop3 module sets
  * @todo add links to the home page when no E-mail is set
+ * @todo add SMTP support
+ * @todo finish normal imap setup
  * @todo quick add for 20(?) or so top rss feeds
  * @todo add refresh token support
  */
@@ -36,6 +38,19 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         'refresh_url' => $details['refresh_token'],
                         'auth' => 'xoauth2'));
 
+                    if (isset($details['smtp'])) {
+                        Hm_SMTP_List::add(array(
+                            'name' => $details['name'],
+                            'server' => $details['smtp']['server'],
+                            'port' => $details['smtp']['port'],
+                            'tls' => $details['smtp']['tls'],
+                            'auth' => 'xoauth2',
+                            'user' => $details['email'],
+                            'pass' => $result['access_token']
+                        ));
+                        $smtp_servers = Hm_SMTP_List::dump(false, true);
+                        $this->user_config->set('smtp_servers', $smtp_servers);
+                    }
                     Hm_Msgs::add('E-mail account successfully added');
                     $servers = Hm_IMAP_List::dump(false, true);
                     $this->user_config->set('imap_servers', $servers);
@@ -70,10 +85,44 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
  */
 class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('nux_pass', 'nux_service', 'nux_email'));
+        list($success, $form) = $this->process_form(array('nux_pass', 'nux_service', 'nux_email', 'nux_name'));
         if ($success) {
             if (Nux_Quick_Services::exists($form['nux_service'])) {
                 $details = Nux_Quick_Services::details($form['nux_service']);
+                $details['name'] = $form['nux_name'];
+                Hm_IMAP_List::add(array(
+                    'name' => $details['name'],
+                    'server' => $details['server'],
+                    'port' => $details['port'],
+                    'tls' => $details['tls'],
+                    'user' => $form['nux_email'],
+                    'pass' => $form['nux_pass'],
+                ));
+                $servers = Hm_IMAP_List::dump(false, true);
+                $ids = array_keys($servers);
+                $new_id = array_pop($ids);
+                $imap = Hm_IMAP_List::connect($new_id, false);
+                if ($imap && $imap->get_state() == 'authenticated') {
+                    Hm_Msgs::add('Added E-mail account');
+                    $this->user_config->set('imap_servers', $servers);
+                    Hm_IMAP_List::clean_up();
+                    $user_data = $this->user_config->dump();
+                    if (!empty($user_data)) {
+                        $this->session->set('user_data', $user_data);
+                    }
+                    $this->session->record_unsaved('IMAP server added');
+                    $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
+                    $this->session->close_early();
+                    $msgs = Hm_Msgs::get();
+                    if (!empty($msgs)) {
+                        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
+                    }
+                    Hm_Router::page_redirect('?page=servers');
+                }
+                else {
+                    Hm_IMAP_List::del($new_id);
+                    Hm_Msgs::add('ERRAuthentication failed');
+                }
             }
         }
     }
@@ -176,10 +225,13 @@ function oauth2_form($details, $mod) {
  */
 function credentials_form($details, $mod) {
     $res = '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
-    $res .= '<input type="hidden" id="nux_email" name="nux_email" value="'.$mod->html_safe($details['email']).'" />';
+    $res .= '<input type="hidden" name="nux_name" class="nux_name" value="'.$mod->html_safe($details['name']).'" />';
     $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div>';
     $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
-    $res .= '<br /><br /><input type="password" placeholder="'.$mod->trans('E-Mail Password').'" name="nux_password" class="nux_password" />';
+    $res .= '<br /><br /><label class="screen_reader" for="nux_email">';
+    $res .= $mod->trans('E-mail Address').'</label><input type="email" id="nux_email" name="nux_email" value="'.$mod->html_safe($details['email']).'" />';
+    $res .= '<br /><label class="screen_reader" for="nux_password">'.$mod->trans('E-mail Password').'</label>';
+    $res .= '<input type="password" placeholder="'.$mod->trans('E-Mail Password').'" name="nux_password" class="nux_password" />';
     $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
     $res .= '<a href="" class="reset_nux_form">Reset</a>';
     return $res;
@@ -251,7 +303,12 @@ Nux_Quick_Services::add('gmail', array(
     'oauth2_authorization' => 'https://accounts.google.com/o/oauth2/auth',
     'oauth2_token' => 'https://www.googleapis.com/oauth2/v3/token',
     'refresh_token' => 'https://www.googleapis.com/oauth2/v3/token',
-    'scope' => ' https://mail.google.com/'
+    'scope' => ' https://mail.google.com/',
+    'smtp' => array(
+        'server' => 'smtp.gmail.com',
+        'port' => 465,
+        'tls' => true
+    )
 ));
 
 Nux_Quick_Services::add('outlook', array(

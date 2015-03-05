@@ -21,14 +21,16 @@ add_output('ajax_nux_service_select', 'filter_service_select', true);
 add_handler('ajax_nux_add_service', 'login', false, 'core');
 add_handler('ajax_nux_add_service', 'load_user_data', true, 'core');
 add_handler('ajax_nux_add_service', 'setup_nux', true);
-add_handler('ajax_nux_add_service', 'load_imap_servers_from_config',  true);
+add_handler('ajax_nux_add_service', 'load_imap_servers_from_config',  true, 'imap');
 add_handler('ajax_nux_add_service', 'process_nux_add_service', true, 'core');
 add_handler('ajax_nux_add_service', 'save_user_data',  true, 'core');
 add_handler('ajax_nux_add_service', 'language',  true, 'core');
 add_handler('ajax_nux_add_service', 'date', true, 'core');
 add_handler('ajax_nux_add_service', 'http_headers', true, 'core');
 
-add_handler('info', 'process_oauth2_authorization', true, 'nux', 'load_imap_servers_from_config', 'after');
+add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('home', 'load_smtp_servers_from_config', true, 'smtp', 'load_imap_servers_from_config', 'after');
+add_handler('home', 'process_oauth2_authorization', true, 'nux', 'load_smtp_servers_from_config', 'after');
 
 return array(
     'allowed_pages' => array(
@@ -47,6 +49,7 @@ return array(
     'allowed_post' => array(
         'nux_service' => FILTER_SANITIZE_STRING,
         'nux_email' => FILTER_SANITIZE_STRING,
+        'nux_name' => FILTER_SANITIZE_STRING,
         'nux_pass' => FILTER_UNSAFE_RAW,
         'nux_account_name' => FILTER_SANITIZE_STRING
     )
