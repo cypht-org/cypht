@@ -40,6 +40,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if (preg_match("/^imap_\d+_.+$/", $path)) {
+                $this->out('no_list_controls', true);
                 $this->out('list_meta', false, false);
                 $this->out('list_path', $path);
                 $parts = explode('_', $path, 3);
