@@ -1951,10 +1951,10 @@ class Hm_Output_home_heading extends Hm_Output_Module {
  */
 class Hm_Output_message_list_heading extends Hm_Output_Module {
     /**
-     * @todo remove modle specific stuff
+     * Title, list controls, and message controls
      */
     protected function output() {
-        if ($this->in('list_path', array('unread', 'flagged', 'pop3', 'combined_inbox', 'feeds', 'email'))) {
+        if (!$this->get('no_list_controls', false)) {
             $source_link = false; //'<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';
