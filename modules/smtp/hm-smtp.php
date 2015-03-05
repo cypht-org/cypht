@@ -295,7 +295,10 @@ class Hm_SMTP {
         return $requested[ count($requested) - 1 ];
     }
 
-    /* authenticate the username and password to the server */
+    /**
+     * authenticate the username and password to the server
+     * @todo fix xoauth2 error handling
+     */
     function authenticate($username, $password, $mech) {
         $result = false;
         switch (strtolower($mech)) {

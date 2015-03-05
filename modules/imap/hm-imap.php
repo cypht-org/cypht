@@ -262,6 +262,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param string $username IMAP login name
      * @param string $password IMAP password
      * @return bool true on sucessful login
+     * @todo fix xoauth2 failure state handling
      */
     public function authenticate($username, $password) {
         if (!$this->tls) {
