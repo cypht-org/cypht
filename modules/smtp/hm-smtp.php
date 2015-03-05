@@ -17,15 +17,17 @@ class Hm_SMTP_List {
     use Hm_Server_List;
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        self::$server_list[$id]['object'] = new Hm_SMTP(
-            array(
-                'server'    => $server['server'],
-                'port'      => $server['port'],
-                'tls'       => $server['tls'],
-                'username'  => $user,
-                'password'  => $pass
-            )
+        $config = array(
+            'server'    => $server['server'],
+            'port'      => $server['port'],
+            'tls'       => $server['tls'],
+            'username'  => $user,
+            'password'  => $pass
         );
+        if (array_key_exists('auth', $server)) {
+            $config['auth'] = $server['auth'];
+        }
+        self::$server_list[$id]['object'] = new Hm_SMTP($config);
         if (!self::$server_list[$id]['object']->connect()) {
             return self::$server_list[$id]['object'];
         }
@@ -62,6 +64,7 @@ class Hm_SMTP {
     private $username;
     private $password;
     public $state;
+    private $request_auths = array();
 
     function __construct($conf) {
 
@@ -90,6 +93,10 @@ class Hm_SMTP {
         }
         if (!$this->tls) {
             $this->starttls = true;
+        }
+        $this->request_auths = array('cram-md5', 'login', 'plain');
+        if (isset($conf['auth'])) {
+            array_unshift($this->request_auths, $conf['auth']);
         }
         $this->smtp_err = '';
         $this->supports_tls = false;
@@ -200,7 +207,7 @@ class Hm_SMTP {
                     break;
                 case 'auth': // supported auth mechanisims
                     $auth_mecs = array_slice($line[1], 1);
-                    $this->supports_auth = $auth_mecs;
+                    $this->supports_auth = array_map(function($v) { return strtolower($v); }, $auth_mecs);
                     break;
                 case 'size': // advisary maximum message size
                     if(isset($line[1][1]) && is_numeric($line[1][1])) {
@@ -281,10 +288,9 @@ class Hm_SMTP {
         if (empty($this->supports_auth)) {
             return false;
         }
-        $requested = array('cram-md5','login','plain');
-        $intersect = array_intersect($requested,$this->supports_auth);
+        $intersect = array_intersect($this->request_auths, $this->supports_auth);
         if(count($intersect) > 0) {
-            return $intersect[0];
+            return array_shift($intersect);
         }
         return $requested[ count($requested) - 1 ];
     }
@@ -295,6 +301,11 @@ class Hm_SMTP {
         switch (strtolower($mech)) {
             case 'external':
                 $command = 'AUTH EXTERNAL '.base64_encode($username);
+                $this->send_command($command);
+                break;
+            case 'xoauth2':
+                $challenge = 'user='.$username.chr(1).'auth=Bearer '.$password.chr(1).chr(1);
+                $command = 'AUTH XOAUTH2 '.base64_encode($challenge);
                 $this->send_command($command);
                 break;
             case 'cram-md5':
