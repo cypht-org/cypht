@@ -64,7 +64,7 @@ var smtp_delete_action = function() {
             if (res.deleted_server_id > -1 ) {
                 form.parent().remove();
                 Hm_Utils.set_unsaved_changes(1);
-                reload_folders(true);
+                Hm_Folders.reload_folders(true);
             }
         },
         {'smtp_delete': 1}
