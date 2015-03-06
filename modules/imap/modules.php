@@ -196,7 +196,7 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
                 }
             }
             if (!$flag_result) {
-                Hm_Msgs::add('ERRAn error occured trying to flag this message');
+                Hm_Msgs::add('ERRAn error occurred trying to flag this message');
             }
         }
     }
@@ -237,7 +237,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                     }
                 }
                 if ($errs > 0) {
-                    Hm_Msgs::add(sprintf('ERRAn error occured trying to %s some messages!', $form['imap_action_type'], $server));
+                    Hm_Msgs::add(sprintf('ERRAn error occurred trying to %s some messages!', $form['imap_action_type'], $server));
                 }
             }
         }
