@@ -68,8 +68,30 @@ var nux_service_select = function() {
         }
     }
 };
+var expand_server_settings = function() {
+    var dsp;
+    var i;
+    var hash = window.location.hash;
+    var sections = ['.quick_add_section', '.smtp_section', '.imap_section', '.pop3_section'];
+    for (i=0;i<sections.length;i++) {
+        dsp = Hm_Utils.get_from_local_storage(sections[i]);
+        if (hash) {
+            if (hash.replace('#', '.') != sections[i]) {
+                dsp = 'none';
+            }
+            else {
+                dsp = 'block';
+            }
+        }
+        if (dsp == 'block' || dsp == 'none') {
+            $(sections[i]).css('display', dsp);
+            Hm_Utils.save_to_local_storage(sections[i], dsp);
+        }
+    }
+};
 
 if (hm_page_name() == 'servers') {
+    expand_server_settings();
     var nux_border = $('.nux_username').css('border');
     $('.nux_next_button').click(nux_service_select);
 }
