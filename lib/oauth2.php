@@ -92,7 +92,6 @@ class Hm_Oauth2 {
         if (substr($curl_result, 0, 1) == '{') {
             $result = @json_decode($curl_result, true);
         }
-        elog($result);
         return $result;
     }
 }
