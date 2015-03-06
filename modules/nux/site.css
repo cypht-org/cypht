@@ -9,3 +9,6 @@
 .nux_submit { margin-bottom: 20px; }
 .nux_account_name, .nux_username, #service_select { margin-bottom: 10px; width: 280px; padding: 3px; }
 #nux_email { margin-bottom: 10px; }
+.nux_welcome { margin: 40px; }
+.nux_title { font-size: 120%; margin-bottom: 20px; }
+.nux_imap, .nux_pop3, .nux_smtp { margin-bottom: 10px; }

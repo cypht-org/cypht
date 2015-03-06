@@ -5,15 +5,40 @@
  * @package modules
  * @subpackage nux
  * @todo filter/disable features depending on imap/pop3 module sets
- * @todo add links to the home page when no E-mail is set
- * @todo add SMTP support
- * @todo finish normal imap setup
- * @todo quick add for 20(?) or so top rss feeds
- * @todo add refresh token support
+ * @todo add SMTP support to provider defs
+ * @todo homepage dialog
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * @subpackage nux/handler
+ * @todo unset nux_add_service_details
+ */
+class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
+    public function process() {
+
+        $imap_servers = NULL;
+        $pop3_servers = NULL;
+        $smtp_servers = NULL;
+
+        if (email_services_available('imap')) {
+            $imap_servers = count( Hm_IMAP_List::dump(false) );
+        }
+        if (email_services_available('pop3')) {
+            $pop3_servers = count( Hm_POP3_List::dump(false) );
+        }
+        if (email_services_available('smtp')) {
+            $smtp_servers = count( Hm_SMTP_List::dump(false) );
+        }
+
+        $this->out('nux_server_setup', array(
+            'imap' => $imap_servers,
+            'pop3' => $pop3_servers,
+            'smtp' => $smtp_servers
+        ));
+    }
+}
 /**
  * @subpackage nux/handler
  * @todo unset nux_add_service_details
@@ -197,6 +222,33 @@ class Hm_Output_filter_service_select extends Hm_Output_Module {
 /**
  * @subpackage nux/output
  */
+class Hm_Output_welcome_dialog extends Hm_Output_Module {
+    protected function output() {
+        $server_data = $this->get('nux_server_setup', array());
+        $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
+        $res .= '<div class="nux_imap">';
+        $protos = array('imap', 'pop3', 'smtp');
+        foreach ($protos as $proto) {
+            $res .= '<div class="nux_'.$proto.'">';
+            if ($server_data[$proto] === NULL) {
+                $res .= sprintf($this->trans('%s services are not enabled for this site'), strtoupper($proto));
+            }
+            elseif ($server_data[$proto] === 0) {
+                $res .= sprintf($this->trans('You don\'t have any %s servers configured, you should add one!'), strtoupper($proto));
+            }
+            else {
+                $res .= sprintf($this->trans('You have %d %s servers configured.'), $server_data['imap'], strtoupper($proto));
+            }
+            $res .= '</div>';
+        }
+        $res .= '</div>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage nux/output
+ */
 class Hm_Output_quick_add_section extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
@@ -235,6 +287,22 @@ function credentials_form($details, $mod) {
     $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
     $res .= '<a href="" class="reset_nux_form">Reset</a>';
     return $res;
+}
+
+/**
+ * @subpackage nux/functions
+ */
+function email_services_available($types) {
+    if (!is_array($types)) {
+        $types = array($types);
+    }
+    $mods = array();
+    foreach(array('imap' => 'Hm_IMAP_List', 'smtp' => 'Hm_SMTP_List', 'pop3' => 'Hm_POP3_List') as $type => $class) {
+        if (class_exists($class)) {
+            $mods[] = $type;
+        }
+    }
+    return count( array_intersect($types, $mods) ) == count( $types );
 }
 
 /**
