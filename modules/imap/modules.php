@@ -1700,7 +1700,7 @@ function imap_refresh_oauth2_token($server, $config) {
         }
         if (!empty($details)) {
             $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['client_uri']);
-            $result = $oauth2->refresh_token($server['refresh_url'], $server['refresh_token']);
+            $result = $oauth2->refresh_token($details['refresh_uri'], $server['refresh_token']);
             if (array_key_exists('access_token', $result)) {
                 return array(strtotime(sprintf('+%d seconds', $result['expires_in'])), $result['access_token']);
             }
