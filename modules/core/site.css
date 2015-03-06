@@ -14,6 +14,7 @@ td { vertical-align: top; }
 .sys_messages { cursor: pointer; display: none; position: absolute; opacity: .6; background-color: #fff; color: teal; left: 0px; right: 0px; margin-top: 0px; text-align: center; background-color: #efefef; padding: 8px; white-space: nowrap; border: solid 1px #ddd; }
 .logged_out { display: block !important; }
 #theme_setting, #timezone_setting { max-width: 200px; }
+.message_table th { display: none; }
 .logout_form { white-space: nowrap; padding: 0px; margin: 0px; }
 .logout_form a {}
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
