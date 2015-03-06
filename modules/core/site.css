@@ -126,6 +126,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .save_perm_form, .save_details { max-width: 600px; margin-left: 30px; margin-top: 20px; max-width: 60%; color: #666; }
 .save_subtitle { font-size: 110%; padding-top: 20px; }
 .unsaved_settings { margin-bottom: 30px; }
+.msg_text_inner p { padding: 5px; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
