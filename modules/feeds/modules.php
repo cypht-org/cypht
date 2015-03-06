@@ -523,9 +523,9 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
         if ($this->format == 'HTML5') {
             $count = count($this->get('feeds', array()));
             $count = sprintf($this->trans('%d configured'), $count);
-            return '<div class="feed_server_setup"><div data-target=".feed_section" class="server_section">'.
+            return '<div class="feed_server_setup"><div data-target=".feeds_section" class="server_section">'.
                 '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.
-                ' '.$this->trans('Feeds').' <div class="server_count">'.$count.'</div></div><div class="feed_section"><form class="add_server" method="POST">'.
+                ' '.$this->trans('Feeds').' <div class="server_count">'.$count.'</div></div><div class="feeds_section"><form class="add_server" method="POST">'.
                 '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
                 '<div class="subtitle">'.$this->trans('Add an RSS/ATOM Feed').'</div><table>'.
                 '<tr><td><label class="screen_reader" for="new_feed_name">'.$this->trans('Feed name').'</label>'.
