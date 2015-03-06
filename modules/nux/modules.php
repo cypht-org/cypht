@@ -13,7 +13,36 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * @subpackage nux/handler
- * @todo unset nux_add_service_details
+ */
+class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
+    public function process() {
+        if (Hm_Page_Cache::get('nux_dev_news')) {
+            return;
+        }
+        $ch = Hm_Functions::c_init();
+        $res = array();
+        Hm_Functions::c_setopt($ch, CURLOPT_URL, 'http://cypht.org/git.txt');
+        Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $curl_result = Hm_Functions::c_exec($ch);
+        if (trim($curl_result)) {
+            foreach (explode("\n", $curl_result) as $line) {
+                if (preg_match("/^([a-z0-9]{40})\|([a-z0-9]{7})\|([^\|]+)\|([^\|]+)\|([^\|]+)$/", $line, $matches)) {
+                    $res[] = array(
+                        'hash' => $matches[1],
+                        'shash' => $matches[2],
+                        'name' => $matches[3],
+                        'age' => $matches[4],
+                        'note' => $matches[5]
+                    );
+                }
+            }
+        }
+        $this->out('nux_dev_news', $res);
+    }
+}
+
+/**
+ * @subpackage nux/handler
  */
 class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
     public function process() {
@@ -41,7 +70,6 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
 }
 /**
  * @subpackage nux/handler
- * @todo unset nux_add_service_details
  */
 class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
     public function process() {
@@ -84,6 +112,7 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                     if (!empty($user_data)) {
                         $this->session->set('user_data', $user_data);
                     }
+                    $this->session->del('nux_add_service_details');
                     $this->session->record_unsaved('IMAP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
                     $this->session->close_early();
@@ -222,22 +251,59 @@ class Hm_Output_filter_service_select extends Hm_Output_Module {
 /**
  * @subpackage nux/output
  */
+class Hm_Output_nux_dev_news extends Hm_Output_Module {
+    protected function output() {
+        $page_cache =  Hm_Page_Cache::get('nux_dev_news');
+        if ($page_cache) {
+            return $page_cache;
+        }
+        $res = '<div class="nux_dev_news"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
+        foreach ($this->get('nux_dev_news', array()) as $vals) {
+            $res .= sprintf('<tr><td><a target="_blank" href="https://github.com/jasonmunro/hm3/commit/%s">%s</a>'.
+                '</td><td>%s</td><td class="msg_date">%s</td><td>%s</td></tr>',
+                $this->html_safe($vals['hash']),
+                $this->html_safe($vals['shash']),
+                $this->html_safe($vals['name']),
+                $this->html_safe($vals['age']),
+                $this->html_safe($vals['note'])
+            );
+        }
+        $res .= '</table></div>';
+        Hm_Page_Cache::add('nux_dev_news', $res);
+        return $res;
+    }
+}
+
+/**
+ * @subpackage nux/output
+ */
 class Hm_Output_welcome_dialog extends Hm_Output_Module {
     protected function output() {
         $server_data = $this->get('nux_server_setup', array());
-        $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
-        $res .= '<div class="nux_imap">';
         $protos = array('imap', 'pop3', 'smtp');
+
+        $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
+        $res .= '<div class="nux_qa">'.$this->trans('Want to add a popular E-mail provider quickly and easily?');
+        $res .= ' <a href="?page=servers#quick_add_section">'.$this->trans('Try it out here!').'</a>';
+        $res .= '</div>';
         foreach ($protos as $proto) {
             $res .= '<div class="nux_'.$proto.'">';
             if ($server_data[$proto] === NULL) {
-                $res .= sprintf($this->trans('%s services are not enabled for this site'), strtoupper($proto));
+                $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), strtoupper($proto));
             }
             elseif ($server_data[$proto] === 0) {
-                $res .= sprintf($this->trans('You don\'t have any %s servers configured, you should add one!'), strtoupper($proto));
+                $res .= sprintf($this->trans('You don\'t have any %s servers configured.'), strtoupper($proto));
+                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Add'));
             }
             else {
-                $res .= sprintf($this->trans('You have %d %s servers configured.'), $server_data['imap'], strtoupper($proto));
+                if ($server_data[$proto] > 1) {
+                    $res .= sprintf($this->trans('You have %d %s servers configured.'), $server_data[$proto], strtoupper($proto));
+                    $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
+                }
+                else {
+                    $res .= sprintf($this->trans('You have %d %s server configured.'), $server_data[$proto], strtoupper($proto));
+                    $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
+                }
             }
             $res .= '</div>';
         }
@@ -283,7 +349,7 @@ function credentials_form($details, $mod) {
     $res .= '<br /><br /><label class="screen_reader" for="nux_email">';
     $res .= $mod->trans('E-mail Address').'</label><input type="email" id="nux_email" name="nux_email" value="'.$mod->html_safe($details['email']).'" />';
     $res .= '<br /><label class="screen_reader" for="nux_password">'.$mod->trans('E-mail Password').'</label>';
-    $res .= '<input type="password" placeholder="'.$mod->trans('E-Mail Password').'" name="nux_password" class="nux_password" />';
+    $res .= '<input type="password" id="nux_password" placeholder="'.$mod->trans('E-Mail Password').'" name="nux_password" class="nux_password" />';
     $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
     $res .= '<a href="" class="reset_nux_form">Reset</a>';
     return $res;

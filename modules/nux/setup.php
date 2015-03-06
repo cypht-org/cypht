@@ -8,7 +8,6 @@ output_source('nux');
 /* servers page */
 add_output('servers', 'quick_add_section', true, 'nux', 'server_content_start', 'after');
 add_output('servers', 'quick_add_dialog', true, 'nux', 'quick_add_section', 'after');
-add_output('home', 'welcome_dialog', true, 'nux', 'home_heading', 'after');
 
 add_handler('ajax_nux_service_select', 'login', false, 'core');
 add_handler('ajax_nux_service_select', 'load_user_data', true, 'core');
@@ -34,6 +33,9 @@ add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'load_imap_se
 add_handler('home', 'load_smtp_servers_from_config', true, 'smtp', 'load_imap_servers_from_config', 'after');
 add_handler('home', 'process_oauth2_authorization', true, 'nux', 'load_smtp_servers_from_config', 'after');
 add_handler('home', 'nux_homepage_data', true, 'nux', 'load_smtp_servers_from_config', 'after');
+add_handler('home', 'nux_dev_news', true, 'nux', 'nux_homepage_data', 'after');
+add_output('home', 'welcome_dialog', true, 'nux', 'home_heading', 'after');
+add_output('home', 'nux_dev_news', true, 'nux', 'welcome_dialog', 'after');
 
 return array(
     'allowed_pages' => array(
