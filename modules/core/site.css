@@ -19,7 +19,7 @@ td { vertical-align: top; }
 .logout_form a {}
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .placeholder { width: 100px !important; }
-.loading_icon { background-position: 0px 0px; background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==') repeat-x top left; opacity: .25; text-align: center; display: none; position: absolute; right: 16px; top: 7px; width: 70px; height: 5px; }
+.loading_icon { background-position: 0px 0px; background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==') repeat-x top left; opacity: .25; text-align: center; display: none; position: absolute; right: 20px; top: 8px; width: 60px; height: 5px; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
 .logout:hover { background-color: #eee; }
 .logout { cursor: pointer; background: #fff; font-size: 100%; }
@@ -84,7 +84,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .msg_controls { display: none; padding-left: 0px; margin-right: 20px; }
 .msg_controls_visible { display: inline; }
 .msg_controls a, .toggle_link { font-size: .6em; letter-spacing: 0px; color: #666; margin-right: 5px; background-color: #fff; border: solid 1px #ccc; padding: 3px; width: 30px; border-radius: 3px; vertical-align: 3px; }
-.refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 0px; vertical-align: -10px; }
+.refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 0px; vertical-align: -13px; }
 .list_settings_dialog { display: none; padding: 10px; position: absolute; top: 0px; right: 0px; width: 600px; background-color: #efefef; border: solid 1px #ccc; }
 .list_controls { margin-top: -20px; padding: 10px; padding-right: 20px; float: right; }
 .list_controls a { padding-right: 5px; }
