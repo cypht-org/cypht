@@ -32,6 +32,7 @@ add_handler('ajax_nux_add_service', 'http_headers', true, 'core');
 add_handler('home', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'load_imap_servers_from_config', 'after');
 add_handler('home', 'load_smtp_servers_from_config', true, 'smtp', 'load_imap_servers_from_config', 'after');
+add_handler('home', 'load_feeds_from_config', true, 'feeds', 'load_imap_servers_from_config', 'after');
 add_handler('home', 'process_oauth2_authorization', true, 'nux', 'load_smtp_servers_from_config', 'after');
 add_handler('home', 'nux_homepage_data', true, 'nux', 'load_smtp_servers_from_config', 'after');
 add_handler('home', 'nux_dev_news', true, 'nux', 'nux_homepage_data', 'after');

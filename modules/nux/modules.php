@@ -31,7 +31,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
                         'hash' => $matches[1],
                         'shash' => $matches[2],
                         'name' => $matches[3],
-                        'age' => $matches[4],
+                        'age' => date('D, M d', strtotime($matches[4])),
                         'note' => $matches[5]
                     );
                 }
@@ -50,20 +50,27 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         $imap_servers = NULL;
         $pop3_servers = NULL;
         $smtp_servers = NULL;
+        $feed_servers = NULL;
 
-        if (email_services_available('imap')) {
+        $modules = $this->config->get('modules', '');
+
+        if (data_source_available($modules, 'imap')) {
             $imap_servers = count( Hm_IMAP_List::dump(false) );
         }
-        if (email_services_available('pop3')) {
+        if (data_source_available($modules, 'pop3')) {
             $pop3_servers = count( Hm_POP3_List::dump(false) );
         }
-        if (email_services_available('smtp')) {
+        if (data_source_available($modules, 'feeds')) {
+            $feed_servers = count( Hm_Feed_List::dump(false) );
+        }
+        if (data_source_available($modules, 'smtp')) {
             $smtp_servers = count( Hm_SMTP_List::dump(false) );
         }
 
         $this->out('nux_server_setup', array(
             'imap' => $imap_servers,
             'pop3' => $pop3_servers,
+            'feeds' => $feed_servers,
             'smtp' => $smtp_servers
         ));
     }
@@ -294,34 +301,37 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
 class Hm_Output_welcome_dialog extends Hm_Output_Module {
     protected function output() {
         $server_data = $this->get('nux_server_setup', array());
-        $protos = array('imap', 'pop3', 'smtp');
+        $protos = array('imap', 'pop3', 'smtp', 'feeds');
 
         $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
         $res .= '<div class="nux_qa">'.$this->trans('Want to add a popular E-mail provider quickly and easily?');
         $res .= ' <a href="?page=servers#quick_add_section">'.$this->trans('Try it out here!').'</a>';
-        $res .= '</div>';
+        $res .= '</div><ul>';
         foreach ($protos as $proto) {
-            $res .= '<div class="nux_'.$proto.'">';
+            $proto_dsp = $proto;
+            if ($proto == 'feeds') {
+                $proto_dsp = 'RSS/ATOM';
+            }
+            $res .= '<li class="nux_'.$proto.'">';
             if ($server_data[$proto] === NULL) {
-                $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), strtoupper($proto));
+                $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), strtoupper($proto_dsp));
             }
             elseif ($server_data[$proto] === 0) {
-                $res .= sprintf($this->trans('You don\'t have any %s servers configured.'), strtoupper($proto));
+                $res .= sprintf($this->trans('You don\'t have any %s sources configured'), strtoupper($proto_dsp));
                 $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Add'));
             }
             else {
                 if ($server_data[$proto] > 1) {
-                    $res .= sprintf($this->trans('You have %d %s servers configured.'), $server_data[$proto], strtoupper($proto));
-                    $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
+                    $res .= sprintf($this->trans('You have %d %s sources configured'), $server_data[$proto], strtoupper($proto_dsp));
                 }
                 else {
-                    $res .= sprintf($this->trans('You have %d %s server configured.'), $server_data[$proto], strtoupper($proto));
-                    $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
+                    $res .= sprintf($this->trans('You have %d %s source configured'), $server_data[$proto], strtoupper($proto_dsp));
                 }
+                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
             }
-            $res .= '</div>';
+            $res .= '</li>';
         }
-        $res .= '</div>';
+        $res .= '</ul></div>';
         return $res;
     }
 }
@@ -372,16 +382,12 @@ function credentials_form($details, $mod) {
 /**
  * @subpackage nux/functions
  */
-function email_services_available($types) {
+function data_source_available($mod_str, $types) {
     if (!is_array($types)) {
         $types = array($types);
     }
-    $mods = array();
-    foreach(array('imap' => 'Hm_IMAP_List', 'smtp' => 'Hm_SMTP_List', 'pop3' => 'Hm_POP3_List') as $type => $class) {
-        if (class_exists($class)) {
-            $mods[] = $type;
-        }
-    }
+    $mods = explode(',', $mod_str);
+
     return count( array_intersect($types, $mods) ) == count( $types );
 }
 
