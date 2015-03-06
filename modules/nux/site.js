@@ -79,7 +79,7 @@ var expand_server_settings = function() {
     var dsp;
     var i;
     var hash = window.location.hash;
-    var sections = ['.quick_add_section', '.smtp_section', '.imap_section', '.pop3_section'];
+    var sections = ['.feeds_section', '.quick_add_section', '.smtp_section', '.imap_section', '.pop3_section'];
     for (i=0;i<sections.length;i++) {
         dsp = Hm_Utils.get_from_local_storage(sections[i]);
         if (hash) {
