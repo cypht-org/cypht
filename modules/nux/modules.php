@@ -76,8 +76,9 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
         if (array_key_exists('state', $this->request->get) && $this->request->get['state'] == 'nux_authorization') {
             if (array_key_exists('code', $this->request->get)) {
                 $details = $this->session->get('nux_add_service_details');
+                elog($details);
                 $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
-                $result = $oauth2->request_token($details['oauth2_token'], $this->request->get['code']);
+                $result = $oauth2->request_token($details['token_uri'], $this->request->get['code']);
                 if (!empty($result) && array_key_exists('access_token', $result)) {
                     Hm_IMAP_List::add(array(
                         'name' => $details['name'],
@@ -88,9 +89,8 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         'pass' => $result['access_token'],
                         'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
                         'refresh_token' => $result['refresh_token'],
-                        'refresh_url' => $details['refresh_token'],
-                        'auth' => 'xoauth2'));
-
+                        'auth' => 'xoauth2'
+                    ));
                     if (isset($details['smtp'])) {
                         Hm_SMTP_List::add(array(
                             'name' => $details['name'],
@@ -101,6 +101,7 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                             'user' => $details['email'],
                             'pass' => $result['access_token']
                         ));
+                        $this->session->record_unsaved('SMTP server added');
                         $smtp_servers = Hm_SMTP_List::dump(false, true);
                         $this->user_config->set('smtp_servers', $smtp_servers);
                     }
@@ -157,7 +158,19 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 $new_id = array_pop($ids);
                 $imap = Hm_IMAP_List::connect($new_id, false);
                 if ($imap && $imap->get_state() == 'authenticated') {
-                    Hm_Msgs::add('Added E-mail account');
+                    if (isset($details['smtp'])) {
+                        Hm_SMTP_List::add(array(
+                            'name' => $details['name'],
+                            'server' => $details['smtp']['server'],
+                            'port' => $details['smtp']['port'],
+                            'tls' => $details['smtp']['tls'],
+                            'user' => $form['nux_email'],
+                            'pass' => $form['nux_pass']
+                        ));
+                        $this->session->record_unsaved('SMTP server added');
+                        $smtp_servers = Hm_SMTP_List::dump(false, true);
+                        $this->user_config->set('smtp_servers', $smtp_servers);
+                    }
                     $this->user_config->set('imap_servers', $servers);
                     Hm_IMAP_List::clean_up();
                     $user_data = $this->user_config->dump();
@@ -165,13 +178,15 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                         $this->session->set('user_data', $user_data);
                     }
                     $this->session->record_unsaved('IMAP server added');
+                    $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
-                    $this->session->close_early();
+                    Hm_Msgs::add('E-mail account successfully added');
                     $msgs = Hm_Msgs::get();
                     if (!empty($msgs)) {
                         $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
                     }
-                    Hm_Router::page_redirect('?page=servers');
+                    $this->session->close_early();
+                    $this->out('nux_account_added', true);
                 }
                 else {
                     Hm_IMAP_List::del($new_id);
@@ -260,10 +275,9 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
         $res = '<div class="nux_dev_news"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
             $res .= sprintf('<tr><td><a target="_blank" href="https://github.com/jasonmunro/hm3/commit/%s">%s</a>'.
-                '</td><td>%s</td><td class="msg_date">%s</td><td>%s</td></tr>',
+                '</td><td class="msg_date">%s</td><td>%s</td></tr>',
                 $this->html_safe($vals['hash']),
                 $this->html_safe($vals['shash']),
-                $this->html_safe($vals['name']),
                 $this->html_safe($vals['age']),
                 $this->html_safe($vals['note'])
             );
@@ -328,7 +342,7 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
  */
 function oauth2_form($details, $mod) {
     $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
-    $url = $oauth2->request_authorization_url($details['oauth2_authorization'], $details['scope'], 'nux_authorization', $details['email']);
+    $url = $oauth2->request_authorization_url($details['auth_uri'], $details['scope'], 'nux_authorization', $details['email']);
     $res = '<input type="hidden" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
     $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div><div>';
     $res .= $mod->trans('This provider supports Oauth2 access to your account.');
@@ -392,6 +406,9 @@ class Nux_Quick_Services {
                     self::$services[$service]['client_id'] = $vals['client_id'];
                     self::$services[$service]['client_secret'] = $vals['client_secret'];
                     self::$services[$service]['redirect_uri'] = $vals['client_uri'];
+                    self::$services[$service]['auth_uri'] = $vals['auth_uri'];
+                    self::$services[$service]['token_uri'] = $vals['token_uri'];
+                    self::$services[$service]['refresh_uri'] = $vals['refresh_uri'];
                 }
             }
         }
@@ -434,9 +451,6 @@ Nux_Quick_Services::add('gmail', array(
     'port' => 993,
     'name' => 'Gmail',
     'auth' => 'oauth2',
-    'oauth2_authorization' => 'https://accounts.google.com/o/oauth2/auth',
-    'oauth2_token' => 'https://www.googleapis.com/oauth2/v3/token',
-    'refresh_token' => 'https://www.googleapis.com/oauth2/v3/token',
     'scope' => ' https://mail.google.com/',
     'smtp' => array(
         'server' => 'smtp.gmail.com',
@@ -446,15 +460,13 @@ Nux_Quick_Services::add('gmail', array(
 ));
 
 Nux_Quick_Services::add('outlook', array(
-    'server' => 'imap-mail.outlook.com',
+    'server' => 'imap.live.com',
     'type' => 'imap',
     'tls' => true,
     'port' => 993,
     'name' => 'Outlook',
     'auth' => 'oauth2',
-    'oauth2_authorization' => 'https://login.live.com/oauth20_authorize.srf',
-    'oauth2_token' => 'https://login.live.com/oauth20_token.srf',
-    'scope' => 'wl.imap'
+    'scope' => 'wl.imap',
 ));
 
 Nux_Quick_Services::add('yahoo', array(
@@ -463,7 +475,12 @@ Nux_Quick_Services::add('yahoo', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Yahoo',
-    'auth' => 'login'
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.mail.yahoo.com',
+        'port' => 587,
+        'tls' => true
+    )
 ));
 
 Nux_Quick_Services::add('mailcom', array(
@@ -472,7 +489,12 @@ Nux_Quick_Services::add('mailcom', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Mail.com',
-    'auth' => 'login'
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.mail.com',
+        'port' => 587,
+        'tls' => true
+    )
 ));
 
 Nux_Quick_Services::add('aol', array(
@@ -481,7 +503,12 @@ Nux_Quick_Services::add('aol', array(
     'tls' => true,
     'port' => 993,
     'name' => 'AOL',
-    'auth' => 'login'
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.aol.com',
+        'port' => 587,
+        'tls' => true
+    )
 ));
 
 Nux_Quick_Services::add('gmx', array(
@@ -490,7 +517,12 @@ Nux_Quick_Services::add('gmx', array(
     'tls' => true,
     'port' => 143,
     'name' => 'GMX',
-    'auth' => 'login'
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.gmx.com',
+        'port' => 465,
+        'tls' => true
+    )
 ));
 
 Nux_Quick_Services::add('zoho', array(
@@ -499,7 +531,12 @@ Nux_Quick_Services::add('zoho', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Zoho',
-    'auth' => 'login'
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.zoho.com',
+        'port' => 465,
+        'tls' => true
+    )
 ));
 
 Nux_Quick_Services::add('fastmail', array(
@@ -508,7 +545,12 @@ Nux_Quick_Services::add('fastmail', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Fastmail',
-    'auth' => 'login'
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'mail.messagingengine.com',
+        'port' => 465,
+        'tls' => true
+    )
 ));
 
 Nux_Quick_Services::add('yandex', array(
@@ -517,7 +559,12 @@ Nux_Quick_Services::add('yandex', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Yandex',
-    'auth' => 'login'
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.yandex.com',
+        'port' => 465,
+        'tls' => true
+    )
 ));
 
 Nux_Quick_Services::add('inbox', array(
@@ -526,7 +573,12 @@ Nux_Quick_Services::add('inbox', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Inbox.com',
-    'auth' => 'login'
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'my.inbox.com',
+        'port' => 465,
+        'tls' => true
+    )
 ));
 
 ?>

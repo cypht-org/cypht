@@ -9,7 +9,8 @@ var display_next_nux_step = function(res) {
         $('.nux_username').val('');
         return false;
     });
-}
+};
+
 var nux_add_account = function() {
     $('.nux_password').css('border', nux_border);
     var service = $('#nux_service').val();
@@ -35,8 +36,13 @@ var nux_add_account = function() {
     }
     return false;
 };
+
 var display_final_nux_step = function(res) {
-}
+    if (res.nux_account_added) {
+        window.location.href = "?page=servers";
+    }
+};
+
 var nux_service_select = function() {
     var el = document.getElementById('service_select');
     var service = el.options[el.selectedIndex].value;
@@ -68,6 +74,7 @@ var nux_service_select = function() {
         }
     }
 };
+
 var expand_server_settings = function() {
     var dsp;
     var i;

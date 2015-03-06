@@ -21,8 +21,9 @@ add_output('ajax_nux_service_select', 'filter_service_select', true);
 add_handler('ajax_nux_add_service', 'login', false, 'core');
 add_handler('ajax_nux_add_service', 'load_user_data', true, 'core');
 add_handler('ajax_nux_add_service', 'setup_nux', true);
+add_handler('ajax_nux_add_service', 'load_smtp_servers_from_config',  true, 'smtp');
 add_handler('ajax_nux_add_service', 'load_imap_servers_from_config',  true, 'imap');
-add_handler('ajax_nux_add_service', 'process_nux_add_service', true, 'core');
+add_handler('ajax_nux_add_service', 'process_nux_add_service', true, 'nux');
 add_handler('ajax_nux_add_service', 'save_user_data',  true, 'core');
 add_handler('ajax_nux_add_service', 'language',  true, 'core');
 add_handler('ajax_nux_add_service', 'date', true, 'core');
@@ -49,7 +50,8 @@ return array(
         'security_token' => FILTER_SANITIZE_STRING
     ),
     'allowed_output' => array(
-        'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false)
+        'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false),
+        'nux_account_added' => array(FILTER_VALIDATE_BOOLEAN, false)
     ),
     'allowed_post' => array(
         'nux_service' => FILTER_SANITIZE_STRING,
