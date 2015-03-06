@@ -9,9 +9,14 @@
 .nux_submit { margin-bottom: 20px; }
 .nux_account_name, .nux_username, #service_select { margin-bottom: 10px; width: 280px; padding: 3px; }
 #nux_email { margin-bottom: 10px; }
-.nux_dev_news, .nux_welcome { padding: 20px; margin: 20px; margin-right: 0px; float: left; border: solid 1px #eee; }
-.nux_dev_news { clear: left; }
+.nux_help, .nux_dev_news, .nux_welcome { padding: 20px; margin: 20px; margin-right: 0px; float: left; border: solid 1px #eee; }
+.nux_welcome, .nux_help { min-width: 480px; max-width: 480px; min-height: 400px; }
+.nux_help { overflow-y: scroll; }
 .nux_title { font-size: 120%; margin-bottom: 20px; }
 .nux_qa, .nux_imap, .nux_pop3, .nux_smtp { margin-bottom: 10px; }
 .nux_dev_news table td { padding-right: 10px; }
 .nux_welcome ul li a { float: right; padding-right: 10px; }
+.nux_help ul li { margin-bottom: 30px; }
+.nux_help ul { margin-top: 30px; }
+.nux_welcome ul { margin-top: 30px; }
+.nux_try_out { display: block; text-align: center; margin: auto; margin-top: 10px; }

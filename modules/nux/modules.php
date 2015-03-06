@@ -126,14 +126,14 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('ERRAn Error Occured');
+                    Hm_Msgs::add('ERRAn Error Occurred');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
                 Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
             }
             else {
-                Hm_Msgs::add('ERRAn Error Occured');
+                Hm_Msgs::add('ERRAn Error Occurred');
             }
             $msgs = Hm_Msgs::get();
             $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
@@ -245,7 +245,7 @@ class Hm_Output_quick_add_dialog extends Hm_Output_Module {
             '<br /><br /><label class="screen_reader" for="service_select">'.$this->trans('Select an E-mail provider').'</label>'.
             ' <select id="service_select" name="service_select"><option value="">'.$this->trans('Select an E-mail provider').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>'.
             '<label class="screen_reader" for="nux_username">'.$this->trans('Username').'</label>'.
-            '<br /><input type="email" id="nux_username" class="nux_username" placeholder="'.$this->trans('Enter Your E-mail address').'" />'.
+            '<br /><input type="email" id="nux_username" class="nux_username" placeholder="'.$this->trans('Your E-mail address').'" />'.
             '<label class="screen_reader" for="nux_account_name">'.$this->trans('Account Name').'</label>'.
             '<br /><input type="text" id="nux_account_name" class="nux_account_name" placeholder="'.$this->trans('Account Name [optional]').'" />'.
             '<br /><input type="button" class="nux_next_button" value="'.$this->trans('Next').'" />'.
@@ -298,14 +298,32 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
 /**
  * @subpackage nux/output
  */
+class Hm_Output_nux_help extends Hm_Output_Module {
+    protected function output() {
+        return '<div class="nux_help"><div class="nux_title">'.$this->trans('Help').'</div>'.
+            $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, POP3, or SMTP access - which most do.').' '.
+            $this->trans('Cypht can aggregate all your messages, from multiple accounts, into single pages.').' '.
+            $this->trans('Have you ever wanted to see all your unread messages from the last week from 3 different E-mail accounts at once? Then you are in the right place.').
+            '<ul>'.
+            '<li><b>Is it safe?</b><br /><br />We put a heavy emphasis on security. You can read about our security features at <a target="_blank" href="http://cypht.org/security.html">cypht.org</a></li>'.
+            '<li><b>Is it private?</b><br /><br />Cypht uses only session level caching on the server and in the browser. You must re-enter your password for ANY sensitive information to be saved between logins.</li>'.
+            '<li><b>Is it fast?</b><br /><br />The server-side framework of Cypht is very light-weight, and pages rarely exceed 100Kb in size.</li>'.
+            '</ul>'.
+        '</div>';
+    }
+}
+
+/**
+ * @subpackage nux/output
+ */
 class Hm_Output_welcome_dialog extends Hm_Output_Module {
     protected function output() {
         $server_data = $this->get('nux_server_setup', array());
         $protos = array('imap', 'pop3', 'smtp', 'feeds');
 
         $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
-        $res .= '<div class="nux_qa">'.$this->trans('Want to add a popular E-mail provider quickly and easily?');
-        $res .= ' <a href="?page=servers#quick_add_section">'.$this->trans('Try it out here!').'</a>';
+        $res .= '<div class="nux_qa">'.$this->trans('Add a popular E-mail source quickly and easily');
+        $res .= ' <a class="nux_try_out" href="?page=servers#quick_add_section">'.$this->trans('Add An E-Mail account').'</a>';
         $res .= '</div><ul>';
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
@@ -317,15 +335,15 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
                 $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), strtoupper($proto_dsp));
             }
             elseif ($server_data[$proto] === 0) {
-                $res .= sprintf($this->trans('You don\'t have any %s sources configured'), strtoupper($proto_dsp));
+                $res .= sprintf($this->trans('You don\'t have any %s sources'), strtoupper($proto_dsp));
                 $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Add'));
             }
             else {
                 if ($server_data[$proto] > 1) {
-                    $res .= sprintf($this->trans('You have %d %s sources configured'), $server_data[$proto], strtoupper($proto_dsp));
+                    $res .= sprintf($this->trans('You have %d %s sources'), $server_data[$proto], strtoupper($proto_dsp));
                 }
                 else {
-                    $res .= sprintf($this->trans('You have %d %s source configured'), $server_data[$proto], strtoupper($proto_dsp));
+                    $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], strtoupper($proto_dsp));
                 }
                 $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
             }
