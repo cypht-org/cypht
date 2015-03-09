@@ -213,11 +213,13 @@ class Hm_Handler_feed_message_action extends Hm_Handler_Module {
 class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
+        $search = false;
         if ($success) {
             if (array_key_exists('feed_search', $this->request->post)) {
                 $terms = $this->session->get('search_terms', false);
                 $since = $this->session->get('search_since', DEFAULT_SINCE);
                 $fld = $this->session->get('search_fld', 'TEXT');
+                $search = true;
             }
             else {
                 $terms = false;
@@ -248,28 +250,30 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 $date = process_since_argument($this->user_config->get('feed_since', DEFAULT_SINCE)); 
                 $cutoff_timestamp = strtotime($date);
             }
-            foreach($ids as $id) {
-                $feed_data = Hm_Feed_List::dump($id);
-                if ($feed_data) {
-                    $feed = is_feed($feed_data['server'], $limit);
-                    if ($feed && $feed->parsed_data) {
-                        foreach ($feed->parsed_data as $item) {
-                            if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
-                                continue;
-                            }
-                            elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
-                                continue;
-                            }
-                            if (isset($item['guid']) && $unread_only && Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
-                                continue;
-                            }
-                            if ($terms && !search_feed_item($item, $terms, $since, $fld)) {
-                                continue;
-                            }
-                            else {
-                                $item['server_id'] = $id;
-                                $item['server_name'] = $feed_data['name'];
-                                $res[] = $item;
+            if (!$search || ($search && $terms)) {
+                foreach($ids as $id) {
+                    $feed_data = Hm_Feed_List::dump($id);
+                    if ($feed_data) {
+                        $feed = is_feed($feed_data['server'], $limit);
+                        if ($feed && $feed->parsed_data) {
+                            foreach ($feed->parsed_data as $item) {
+                                if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
+                                    continue;
+                                }
+                                elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
+                                    continue;
+                                }
+                                if (isset($item['guid']) && $unread_only && Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
+                                    continue;
+                                }
+                                if ($terms && !search_feed_item($item, $terms, $since, $fld)) {
+                                    continue;
+                                }
+                                else {
+                                    $item['server_id'] = $id;
+                                    $item['server_name'] = $feed_data['name'];
+                                    $res[] = $item;
+                                }
                             }
                         }
                     }
