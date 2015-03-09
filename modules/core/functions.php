@@ -60,9 +60,8 @@ function message_list_meta($input, $output_mod) {
 function human_readable_interval($date_str) {
     $precision     = 2;
     $interval_time = array();
-    $now           = time();
     $date          = strtotime($date_str);
-    $interval      = $now - $date;
+    $interval      = time() - $date;
     $res           = array();
 
     $t['second'] = 1;
@@ -74,23 +73,17 @@ function human_readable_interval($date_str) {
     $t['year']   = $t['week']*52;
 
     if ($interval < 0) {
-        $interval += $t['hour'];
-        if ($interval < 0) {
-            return 'From the future!';
-        }
+        return 'From the future!';
     }
     elseif ($interval == 0) {
         return 'Just now';
     }
-
     foreach (array_reverse($t) as $name => $val) {
         if ($interval_time[$name] = ($interval/$val > 0) ? floor($interval/$val) : false) {
             $interval -= $val*$interval_time[$name];
         }
     }
-
     $interval_time = array_slice(array_filter($interval_time, function($v) { return $v > 0; }), 0, $precision);
-
     foreach($interval_time as $name => $val) {
         if ($val > 1) {
             $res[] = sprintf('%d %ss', $val, $name);
