@@ -88,6 +88,9 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
             }
+            else {
+                Hm_Msgs::add('ERRCould not authenticate to the selected IMAP server');
+            }
         }
     }
 }
