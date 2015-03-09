@@ -262,7 +262,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param string $username IMAP login name
      * @param string $password IMAP password
      * @return bool true on sucessful login
-     * @todo fix xoauth2 failure state handling
      */
     public function authenticate($username, $password) {
         if (!$this->tls) {
@@ -308,6 +307,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             if (stristr($response, 'A'.$this->command_count.' OK')) {
                 $authed = true;
                 $this->state = 'authenticated';
+            }
+            elseif (strtolower($this->auth) == 'xoauth2' && preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $response, $matches)) {
+                $this->send_command("\r\n", true);
+                $this->get_response();
             }
         }
         if ( $authed ) {
