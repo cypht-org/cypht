@@ -7,7 +7,7 @@
 	<title>Class Hm_IMAP_Base | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?2814274225"></script>
+	<script type="text/javascript" src="elementlist.js?3095274399"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -304,7 +304,7 @@ same license restrictions (GPL2)</p>
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.imap.html">imap</a>\<a href="package-modules.imap.lib.html">lib</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_IMAP_Base.html#11-522" title="Go to source code">imap/hm-imap-base.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_IMAP_Base.html#11-531" title="Go to source code">imap/hm-imap-base.php</a><br>
 	</div>
 
 
@@ -502,7 +502,7 @@ the stream and include it.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_response">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#218-349" title="Go to source code">get_response</a>( <span>integer <var>$max</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$chunked</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$line_length</var> = <span class="php-num">8192</span></span>, <span>boolean <var>$sort</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#218-356" title="Go to source code">get_response</a>( <span>integer <var>$max</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$chunked</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$line_length</var> = <span class="php-num">8192</span></span>, <span>boolean <var>$sort</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
@@ -556,7 +556,7 @@ stupid like list a loaded unix homedir</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_send_command">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#351-375" title="Go to source code">send_command</a>( <span>mixed <var>$command</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#358-384" title="Go to source code">send_command</a>( <span>mixed <var>$command</var></span>, <span>boolean <var>$no_prefix</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
@@ -574,6 +574,8 @@ stupid like list a loaded unix homedir</p>
 				<div class="list"><dl>
 					<dt><var>$command</var></dt>
 					<dd><code>mixed</code><br>$command IMAP command</dd>
+					<dt><var>$no_prefix</var></dt>
+					<dd><code>boolean</code><br>$no_prefix flag to skip adding the prefix</dd>
 				</dl></div>
 
 
@@ -594,7 +596,7 @@ stupid like list a loaded unix homedir</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_check_response">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#377-409" title="Go to source code">check_response</a>( <span>array <var>$data</var></span>, <span>boolean <var>$chunked</var> = <span class="php-keyword1">false</span></span>, <span>mixed <var>$log_failures</var> = <span class="php-keyword1">true</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#386-418" title="Go to source code">check_response</a>( <span>array <var>$data</var></span>, <span>boolean <var>$chunked</var> = <span class="php-keyword1">false</span></span>, <span>mixed <var>$log_failures</var> = <span class="php-keyword1">true</span></span> )</code>
 
 		<div class="description short">
 			
@@ -640,7 +642,7 @@ stupid like list a loaded unix homedir</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_utf7_decode">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#411-421" title="Go to source code">utf7_decode</a>( <span>string <var>$string</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#420-430" title="Go to source code">utf7_decode</a>( <span>string <var>$string</var></span> )</code>
 
 		<div class="description short">
 			
@@ -682,7 +684,7 @@ stupid like list a loaded unix homedir</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_utf7_encode">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#423-433" title="Go to source code">utf7_encode</a>( <span>string <var>$string</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#432-442" title="Go to source code">utf7_encode</a>( <span>string <var>$string</var></span> )</code>
 
 		<div class="description short">
 			
@@ -724,7 +726,7 @@ stupid like list a loaded unix homedir</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_input_validate">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#435-493" title="Go to source code">input_validate</a>( <span>string <var>$val</var></span>, <span>string <var>$type</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#444-502" title="Go to source code">input_validate</a>( <span>string <var>$val</var></span>, <span>string <var>$type</var></span> )</code>
 
 		<div class="description short">
 			
@@ -768,7 +770,7 @@ stupid like list a loaded unix homedir</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_is_clean">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#501-507" title="Go to source code">is_clean</a>( <span>mixed <var>$val</var></span>, <span>mixed <var>$type</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#510-516" title="Go to source code">is_clean</a>( <span>mixed <var>$val</var></span>, <span>mixed <var>$type</var></span> )</code>
 
 		<div class="description short">
 			
@@ -797,7 +799,7 @@ stupid like list a loaded unix homedir</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_apply_config">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#509-520" title="Go to source code">apply_config</a>( <span>array <var>$config</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#518-529" title="Go to source code">apply_config</a>( <span>array <var>$config</var></span> )</code>
 
 		<div class="description short">
 			
