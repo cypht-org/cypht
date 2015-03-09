@@ -302,13 +302,6 @@ class Hm_Output_nux_help extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_help"><div class="nux_title">'.$this->trans('Help').'</div>'.
             $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, POP3, or SMTP access - which most do.').' '.
-            $this->trans('Cypht can aggregate all your messages, from multiple accounts, into single pages.').' '.
-            $this->trans('Have you ever wanted to see all your unread messages from the last week from 3 different E-mail accounts at once? Then you are in the right place.').
-            '<ul>'.
-            '<li><b>Is it safe?</b><br /><br />We put a heavy emphasis on security. You can read about our security features at <a target="_blank" href="http://cypht.org/security.html">cypht.org</a></li>'.
-            '<li><b>Is it private?</b><br /><br />Cypht uses only session level caching on the server and in the browser. You must re-enter your password for ANY sensitive information to be saved between logins.</li>'.
-            '<li><b>Is it fast?</b><br /><br />The server-side framework of Cypht is very light-weight, and pages rarely exceed 100Kb in size.</li>'.
-            '</ul>'.
         '</div>';
     }
 }
