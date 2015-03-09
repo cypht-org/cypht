@@ -83,7 +83,6 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
         if (array_key_exists('state', $this->request->get) && $this->request->get['state'] == 'nux_authorization') {
             if (array_key_exists('code', $this->request->get)) {
                 $details = $this->session->get('nux_add_service_details');
-                elog($details);
                 $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
                 $result = $oauth2->request_token($details['token_uri'], $this->request->get['code']);
                 if (!empty($result) && array_key_exists('access_token', $result)) {
