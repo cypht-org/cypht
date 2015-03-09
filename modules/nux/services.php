@@ -32,7 +32,7 @@ Nux_Quick_Services::add('outlook', array(
     'type' => 'imap',
     'tls' => true,
     'port' => 993,
-    'name' => 'Outlook',
+    'name' => 'Outlook.com',
     'auth' => 'oauth2',
     'scope' => 'wl.imap',
 ));
