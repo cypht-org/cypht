@@ -287,6 +287,9 @@ var Hm_Message_List = {
         else {
             msg_rows = cache;
         }
+        if (Object.keys(msgs).length) {
+            $('.empty_list').remove();
+        }
         var msg_ids = Hm_Message_List.add_rows(msgs, msg_rows);
         var count = Hm_Message_List.remove_rows(ids, msg_ids, type, msg_rows);
         return count;
@@ -500,7 +503,7 @@ var Hm_Message_List = {
     load_sources: function() {
         var index;
         var source;
-        $('.empty_list').remove();
+        Hm_Message_List.check_empty_list();
         $('.src_count').text(Hm_Message_List.sources.length);
         $('.total').text($('.message_table tbody tr').length);
         for (index in Hm_Message_List.sources) {
@@ -641,6 +644,9 @@ var Hm_Message_List = {
             if (!$('.empty_list').length) {
                 $('.message_list').append('<div class="empty_list">So alone</div>');
             }
+        }
+        else {
+            $('.empty_list').remove();
         }
         return count === 0;
     },
