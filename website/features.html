@@ -55,7 +55,7 @@ IMAP, or an included database schema. Sessions and Authentication were built to
 be overridden for site specific needs without breaking module sets.
       </li>
       <li>
-On the server, page request processing peaks at around 2-4MB of memory. The module system
+On the server, page request processing peaks at around 2-4MB of memory (less than 1 MB with HHVM). The module system
 only includes PHP files required to process the current request, so time is not
 wasted parsing unused code paths.
       </li>
@@ -69,7 +69,7 @@ included directly for easy debugging and module development.
 The HTML5 Page structure is semantic and simple, with attention paid to accessibility best-practices.
       </li>
       <li>
-The application framework weighs in at about 1800 lines (SLOC) and
+The application framework weighs in at ~1850 lines (SLOC) and
 has <a href="docs/test_coverage/index.html" title="Test coverage report from PHPUnit">100% unit test coverage</a> with PHPUnit
 (there are still a few missing assertions).
       </li>
