@@ -92,7 +92,7 @@ class Hm_Nonce {
     private static $current_nonce = false;
 
     /* max number to allow as valid */
-    private static $max = 5;
+    private static $max = 25;
 
     /**
      * Load a saved list from the session
