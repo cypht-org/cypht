@@ -1,5 +1,4 @@
-HM3 AKA Cypht
-===
+#### HM3 AKA Cypht
 
 Cypht is a new Open Source webmail project from the developers of Hastymail
 and Hastymail2. Cypht was built with security, speed, and the ability to
