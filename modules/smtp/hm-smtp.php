@@ -297,7 +297,6 @@ class Hm_SMTP {
 
     /**
      * authenticate the username and password to the server
-     * @todo fix xoauth2 error handling
      */
     function authenticate($username, $password, $mech) {
         $result = false;
