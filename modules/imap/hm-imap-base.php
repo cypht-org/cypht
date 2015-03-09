@@ -329,6 +329,13 @@ class Hm_IMAP_Base {
                 break;
             }
 
+            /* check for challenge strings */
+            if (substr($result[$n], 0, 1) == '+') {
+                if (preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $result[$n], $matches)) {
+                    break;
+                }
+            }
+
         /* end outer loop when we receive the tagged response line */
         } while (substr($result[$n], 0, strlen('A'.$this->command_count)) != 'A'.$this->command_count);
 
@@ -351,12 +358,14 @@ class Hm_IMAP_Base {
     /**
      * put a prefix on a command and send it to the server
      * @param mixed $command IMAP command
-     * @param bool $piped if true builds a command set out of $command
+     * @param bool $no_prefix flag to skip adding the prefix
      * @return void
      */
-    protected function send_command($command) {
+    protected function send_command($command, $no_prefix=false) {
         $this->cached_response = false;
-        $command = 'A'.$this->command_number().' '.$command;
+        if (!$no_prefix) {
+            $command = 'A'.$this->command_number().' '.$command;
+        }
 
         /* send the command out to the server */
         if (is_resource($this->handle)) {
