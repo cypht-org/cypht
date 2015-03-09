@@ -503,7 +503,6 @@ var Hm_Message_List = {
     load_sources: function() {
         var index;
         var source;
-        Hm_Message_List.check_empty_list();
         $('.src_count').text(Hm_Message_List.sources.length);
         $('.total').text($('.message_table tbody tr').length);
         for (index in Hm_Message_List.sources) {
