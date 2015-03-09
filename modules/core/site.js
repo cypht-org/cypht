@@ -287,7 +287,7 @@ var Hm_Message_List = {
         else {
             msg_rows = cache;
         }
-        if (Object.keys(msgs).length) {
+        if (!$.isEmptyObject(msgs)) {
             $('.empty_list').remove();
         }
         var msg_ids = Hm_Message_List.add_rows(msgs, msg_rows);
