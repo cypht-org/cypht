@@ -103,7 +103,7 @@ class Hm_Test_Nonce extends PHPUnit_Framework_TestCase {
      */
     public function test_nonce_trim_list() {
         $this->assertTrue($this->nonce->validate('asdf'));
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 24; $i++) {
             $this->nonce->generate();
         }
         $this->assertEquals(false, $this->nonce->validate('asdf'));

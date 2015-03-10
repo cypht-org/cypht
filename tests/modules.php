@@ -137,6 +137,28 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
 }
 
 /**
+ * DEBUG_MODE tests for the Hm_Handler_Module class
+ */
+class Hm_Test_Handler_Module_Debug extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        define('DEBUG_MODE', true);
+        require 'bootstrap.php';
+        $this->parent = build_parent_mock();
+        $this->handler_mod = new Hm_Handler_Test($this->parent, false);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_process_nonce_debug() {
+        /* TODO: fix assertions */
+        $this->handler_mod->request->type = 'AJAX';
+        $this->assertNull($this->handler_mod->process_nonce());
+    }
+}
+
+/**
  * tests for the Hm_Output_Module class
  */
 class Hm_Test_Output_Module extends PHPUnit_Framework_TestCase {
