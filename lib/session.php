@@ -588,4 +588,33 @@ class Hm_DB_Session extends Hm_PHP_Session {
     }
 }
 
+/**
+ * Start up the selected session type
+ * @param object $config site configuration
+ * @return object
+ */
+function setup_session($config) {
+
+    $session_type = $config->get('session_type', false);
+    $auth_type = $config->get('auth_type', false);
+    if ($auth_type) {
+        if ($auth_type == 'DB') {
+            require_once APP_PATH.'third_party/pbkdf2.php';
+        }
+        $auth_class = sprintf('Hm_Auth_%s', $auth_type);
+    }
+    else {
+        $auth_class = 'Hm_Auth_None';
+    }
+    if ($session_type == 'DB') {
+        $session_class = 'Hm_DB_Session';
+    }
+    else {
+        $session_class = 'Hm_PHP_Session';
+    }
+    Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
+    $session = new $session_class($config, $auth_class);
+    return $session;
+}
+
 ?>

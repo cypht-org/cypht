@@ -251,4 +251,24 @@ class Hm_Site_Config_File extends Hm_Config {
     }
 }
 
+/**
+ * Load a user config object
+ * @param object $config site configuration
+ * @return object
+ */
+function load_user_config_object($config) {
+    $type = $config->get('user_config_type', 'file');
+    switch ($type) {
+        case 'DB':
+            $user_config = new Hm_User_Config_DB($config);
+            Hm_Debug::add("Using DB user configuration");
+            break;
+        default:
+            $user_config = new Hm_User_Config_File($config);
+            Hm_Debug::add("Using file based user configuration");
+            break;
+    }
+    return $user_config;
+}
+
 ?>

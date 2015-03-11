@@ -1,476 +1,11 @@
 <?php
 
 /**
- * Modules and module runners
+ * Module management classes
  * @package framework
  * @subpackage modules
  */
 if (!defined('DEBUG_MODE')) { die(); }
-
-/**
- * Module data management. These functions provide an interface for modules (both handler and output)
- * to fetch data set by other modules and to return their own output. Handler modules must use these
- * methods to set a response, output modules must if the format is AJAX, otherwise they should return
- * an HTML5 string
- */ 
-trait Hm_Module_Output {
-
-    /* module output */
-    protected $output = array();
-
-    /* protected output keys */
-    protected $protected = array();
-
-    /* list of appendable keys */
-    protected $appendable = array();
-
-    /**
-     * Add a name value pair to the output array
-     * @param string $name name of value to store
-     * @param mixed $value value
-     * @param bool $protected true disallows overwriting
-     * @return bool true on success
-     */
-    public function out($name, $value, $protected=true) {
-        if (in_array($name, $this->protected, true)) {
-            Hm_Debug::add(sprintf('MODULES: Cannot overwrite protected %s with %s', $name, print_r($value,true)));
-            return false;
-        }
-        if (in_array($name, $this->appendable, true)) {
-            Hm_Debug::add(sprintf('MODULES: Cannot overwrite appendable %s with %s', $name, print_r($value,true)));
-            return false;
-        }
-        if ($protected) {
-            $this->protected[] = $name;
-        }
-        $this->output[$name] = $value;
-        return true;
-    }
-
-    /**
-     * append a value to an array, create it if does not exist
-     * @param string $name array name
-     * @param string $value value to add
-     * @return bool true on success
-     */
-    public function append($name, $value) {
-        if (in_array($name, $this->protected, true)) {
-            Hm_Debug::add(sprintf('MODULES: Cannot overwrite %s with %s', $name, print_r($value,true)));
-            return false;
-        }
-        if (array_key_exists($name, $this->output)) {
-            if (is_array($this->output[$name])) {
-                $this->output[$name][] = $value;
-                return true;
-            }
-            else {
-                Hm_Debug::add(sprintf('Tried to append %s to scaler %s', $value, $name));
-                return false;
-            }
-        }
-        else {
-            $this->output[$name] = array($value);
-            $this->appendable[] = $name;
-            return true;
-        }
-    }
-
-    /**
-     * Concatenate a value
-     * @param string $name name to add to
-     * @param string $value value to add
-     * @return bool true on success
-     */
-    public function concat($name, $value) {
-        if (array_key_exists($name, $this->output)) {
-            if (is_string($this->output[$name])) {
-                $this->output[$name] .= $value;
-                return true;
-            }
-            else {
-                Hm_Debug::add('Could not append %s to %s', print_r($value,true), $name);
-                return false;
-            }
-        }
-        else {
-            $this->output[$name] = $value;
-            return true;
-        }
-    }
-
-    /**
-     * Return module output from process()
-     * @return array
-     */
-    public function module_output() {
-        return $this->output;
-    }
-
-    /**
-     * Return protected output field list
-     * @return array
-     */
-    public function output_protected() {
-        return $this->protected;
-    }
-
-    /**
-     * Fetch an output value
-     * @param string $name key to fetch the value for
-     * @param mixed $default default return value if not found
-     * @param string $typed if a default value is given, typecast the result to it's type
-     * @return mixed value if found or default
-     */
-    public function get($name, $default=NULL, $typed=true) {
-        if (array_key_exists($name, $this->output)) {
-            $val = $this->output[$name];
-            if (!is_null($default) && $typed) {
-                if (gettype($default) != gettype($val)) {
-                    Hm_Debug::add(sprintf('TYPE CONVERSION: %s to %s for %s', gettype($val), gettype($default), $name));
-                    settype($val, gettype($default));
-                }
-            }
-            return $val;
-        }
-        return $default;
-    }
-
-    /**
-     * Check for a key
-     * @param string $name key name
-     * @return bool true if found
-     */
-    public function exists($name) {
-        return array_key_exists($name, $this->output);
-    }
-
-    /**
-     * Check to see if a value matches a list
-     * @param string $name name to check
-     * @param array $values list to check against
-     * @return bool true if found
-     */
-    public function in($name, $values) {
-        if (array_key_exists($name, $this->output) && in_array($this->output[$name], $values, true)) {
-            return true;
-        }
-        return false;
-    }
-
-}
-
-/**
- * Base class for data input processing modules, called "handler modules"
- *
- * All modules that deal with processing input data extend from this class.
- * It provides access to input and state through the following member variables:
- *
- * $session      The session interface object
- * $request      The HTTP request details object
- * $config       The site config object
- * $user_config  The user settings object for the current user
- *
- * Modules that extend this class need to override the process function
- * Modules can pass information to the output modules using the out() and append() methods,
- * and see data from other modules with the get() method
- * @abstract
- */
-abstract class Hm_Handler_Module {
-
-    use Hm_Module_Output;
-
-    /* session object */
-    public $session = false;
-
-    /* request object */
-    public $request = false;
-
-    /* site configuration object */
-    public $config = false;
-
-    /* current request id */
-    protected $page = false;
-
-    /* user settings */
-    protected $user_config = false;
-
-    /**
-     * Assign input and state sources
-     * @param object $parent instance of the Hm_Request_Handler class
-     * @param bool $logged_in true if currently logged in
-     * @param array $output data from handler modules
-     * @param array $protected list of protected output names
-     * @return void
-     */
-    public function __construct($parent, $logged_in, $output=array(), $protected=array() ) {
-        $this->session = $parent->session;
-        $this->request = $parent->request;
-        $this->config = $parent->config;
-        $this->user_config = $parent->user_config;
-        $this->output = $output;
-        $this->protected = $protected;
-    }
-
-    /**
-     * Validate a form nonce. If this is a non-empty POST form from an
-     * HTTP request or AJAX update, it will take the user to the home
-     * page if the hm_nonce value is either not present or not valid
-     * @return void
-     */
-    public function process_nonce() {
-
-        Hm_Nonce::load($this->session, $this->config, $this->request);
-
-        if (empty($this->request->post)) {
-            return;
-        }
-
-        $nonce = array_key_exists('hm_nonce', $this->request->post) ? $this->request->post['hm_nonce'] : false;
-        if (!$this->session->is_active() || $this->session->loaded) {
-            $valid = Hm_Nonce::validate_site_key($nonce);
-        }
-        else {
-            $valid = Hm_Nonce::validate($nonce);
-        }
-        if (!$valid) {
-            if ($this->request->type == 'AJAX') {
-                if (DEBUG_MODE) {
-                    Hm_Debug::add('NONCE check failed');
-                    Hm_Debug::load_page_stats();
-                    Hm_Debug::show('log');
-                }
-                Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
-            }
-            else {
-                if ($this->session->loaded) {
-                    $this->session->destroy($this->request);
-                }
-                Hm_Debug::add('NONCE check failed');
-                Hm_Router::page_redirect('?page=home');
-            }
-        }
-    }
-
-    /**
-     * Process an HTTP POST form
-     * @param array $form list of required field names in the form
-     * @return array tuple with a bool indicating success, and an array of valid form values
-     */
-    public function process_form($form) {
-        $post = $this->request->post;
-        $success = false;
-        $new_form = array();
-        foreach($form as $name) {
-            if (array_key_exists($name, $post) && (trim($post[$name]) || (($post[$name] === '0' ||  $post[$name] === 0 )))) {
-                $new_form[$name] = $post[$name];
-            }
-        }
-        if (count($form) == count($new_form)) {
-            $success = true;
-        }
-        return array($success, $new_form);
-    }
-
-    /**
-     * Handler modules need to override this method to do work
-     */
-    abstract public function process();
-}
-
-/**
- * Base class for output modules
- * All modules that output data to a request must extend this class and define
- * an output() method. It provides form validation, html sanitizing,
- * and string translation services to modules
- * @abstract
- */
-abstract class Hm_Output_Module {
-
-    use Hm_Module_Output;
-
-    /* translated language strings */
-    protected $lstr = array();
-
-    /* langauge name */
-    protected $lang = false;
-
-    /* UI layout direction */
-    protected $dir = 'ltr';
-
-    /* Output format (AJAX or HTML5) */
-    protected $format = false;
-
-    /**
-     * Constructor
-     * @param array $input data from handler modules
-     * @param array $protected list of protected keys
-     * @return void
-     */
-    function __construct($input, $protected) {
-        $this->output = $input;
-        $this->protected = $protected;
-    }
-
-    /**
-     * Return a translated string if possible
-     * @param the $string string to be translated
-     * @return string translated string
-     */
-    public function trans($string) {
-        if (array_key_exists($string, $this->lstr)) {
-            if ($this->lstr[$string] === false) {
-                return $this->html_safe($string);
-            }
-            else {
-                return $this->html_safe($this->lstr[$string]);
-            }
-        }
-        else {
-            Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string));
-        }
-        return $this->html_safe($string);
-    }
-
-    /**
-     * Build output by calling module specific output functions
-     * @param string $formt output type, either HTML5 or AJAX
-     * @param array $lang_str list of language translation strings
-     * @return mixed module output, a string for HTML5 format,
-     *               and an array for AJAX
-     */
-    public function output_content($format, $lang_str, $protected) {
-        $this->lstr = $lang_str;
-        $this->format = $format;
-        if (array_key_exists('interface_lang', $lang_str)) {
-            $this->lang = $lang_str['interface_lang'];
-        }
-        if (array_key_exists('interface_direction', $lang_str)) {
-            $this->dir = $lang_str['interface_direction'];
-        }
-        return $this->output($format);
-    }
-
-    /**
-     * Sanitize input string
-     * @param string $string text to sanitize
-     * @return string sanitized value
-     */
-    public function html_safe($string) {
-        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    }
-
-    /**
-     * Output modules need to override this method to add to a page or AJAX response
-     * @return mixed should output with $this->output() if $this->format == AJAX, or return an HTML5 formatted
-     *               string if set to HTML5
-     */
-    abstract protected function output();
-}
-
-/**
- * Input processing module "runner"
- *
- * This is a wrapper around input or "handler" module execution.
- * It is called by the Hm_Router object to run all the handler modules
- * for the current page
- */
-class Hm_Request_Handler {
-
-    /* request details object */
-    public $request = false;
-
-    /* session interface object */
-    public $session = false;
-
-    /* site config object */
-    public $config = false;
-
-    /* user settings object */
-    public $user_config = false;
-
-    /* response details array */
-    public $response = array();
-
-    /* handler modules to execute */
-    private $modules = array();
-
-    /**
-     * Process the modules for a given page id
-     * @param string $page page id
-     * @param object $request request details
-     * @param object $session session interface
-     * @param object $config site settings
-     * @param array $modules list of modules for this page
-     * @return array combined array of module results
-     */
-    public function process_request($page, $request, $session, $config, $modules) {
-        $this->request = $request;
-        $this->session = $session;
-        $this->config = $config;
-        $this->modules = $modules;
-        $this->load_user_config_object();
-        $this->run_modules();
-        $this->default_language();
-        return $this->response;
-    }
-
-    /**
-     * Load user settings so they can be passed to a module class
-     * @return void
-     */
-    public function load_user_config_object() {
-        $type = $this->config->get('user_config_type', 'file');
-        switch ($type) {
-            case 'DB':
-                $this->user_config = new Hm_User_Config_DB($this->config);
-                Hm_Debug::add("Using DB user configuration");
-                break;
-            case 'file':
-            default:
-                $this->user_config = new Hm_User_Config_File($this->config);
-                Hm_Debug::add("Using file based user configuration");
-                break; }
-    }
-
-    /**
-     * Setup a default language translation
-     * @return void
-     */
-    public function default_language() {
-        if (!array_key_exists('language', $this->response)) {
-            $default_lang = $this->config->get('default_language', false);
-            if ($default_lang) {
-                $this->response['language'] = $default_lang;
-            }
-        }
-    }
-
-    /**
-     * Execute input processing, or "handler" modules, and combine the results
-     * @return void
-     */
-    public function run_modules() {
-        $input = array();
-        $protected = array();
-        foreach ($this->modules as $name => $args) {
-            $name = "Hm_Handler_$name";
-            if (class_exists($name)) {
-                if (!$args[1] || ($args[1] && $this->session->is_active())) {
-                    $mod = new $name( $this, $args[1], $input, $protected);
-                    $mod->process($input);
-                    $input = $mod->module_output();
-                    $protected = $mod->output_protected();
-                }
-            }
-            else {
-                Hm_Debug::add(sprintf('Handler module %s activated but not found', $name));
-            }
-        }
-        if ($input) {
-            $this->response = $input;
-        }
-    }
-}
 
 /**
  * Trait used as the basic logic for module management
@@ -698,6 +233,326 @@ class Hm_Handler_Modules { use Hm_Modules; }
  * Class to manage all the output modules
  */
 class Hm_Output_Modules { use Hm_Modules; }
+
+/**
+ * Handler module execution methods
+ */
+trait Hm_Output_Module_Exec {
+
+    /**
+     * Run all the handler modules for a page and merge the results
+     * @param object $request details about the request
+     * @param object $session session interface
+     * @return void
+     */
+    public function run_output_modules($request, $session, $page) {
+        $input = $this->handler_response;
+        $protected = array();
+        $modules = Hm_Output_Modules::get_for_page($page);
+        $list_output = array();
+        $lang_str = $this->get_current_language();
+        foreach ($modules as $name => $args) {
+            list($output, $protected, $type) = $this->run_output_module($input, $protected, $name, $args, $session, $request->format, $lang_str);
+            if ($type != 'JSON') {
+                $list_output[] = $output;
+            }
+            else {
+                $input = $output;
+            }
+        }
+        if (!empty($list_output)) {
+            $this->output_response = $list_output;
+        }
+        else {
+            $this->output_response = $input;
+        }
+    }
+
+    /**
+     * Run a single output modules and return the results
+     * @param array $input handler output 
+     * @param array $protected list of protected output
+     * @param string $name handler module name
+     * @param array $args module arguments
+     * @param object $session session interface
+     * @param string $format HTML5 or JSON format
+     * @param array $lang_str translation lookup array
+     */
+    public function run_output_module($input, $protected, $name, $args, $session, $format, $lang_str) {
+        $name = "Hm_Output_$name";
+        $mod_output = false;
+        if (class_exists($name)) {
+            if (!$args[1] || ($args[1] && $session->is_active())) {
+                $mod = new $name($input, $protected);
+                if ($format == 'Hm_Format_JSON') {
+                    $mod->output_content($format, $lang_str, $protected);
+                    $input = $mod->module_output();
+                    $protected = $mod->output_protected();
+                }
+                else {
+                    $mod_output = $mod->output_content($format, $lang_str, array());
+                }
+            }
+        }
+        else {
+            Hm_Debug::add(sprintf('Output module %s activated but not found', $name));
+        }
+        if (!$mod_output) {
+            return array($input, $protected, 'JSON');
+        }
+        return array($mod_output, $protected, 'HTML5');
+    }
+
+}
+/**
+ * Output module execution methods
+ */
+trait Hm_Handler_Module_Exec {
+
+    /**
+     * Run all the handler modules for a page and merge the results
+     * @param object $request details about the request
+     * @param object $session session interface
+     * @param string $page page id
+     * @return void
+     */
+    public function run_handler_modules($request, $session, $page) {
+        $input = array();
+        $protected = array();
+        $this->request = $request;
+        $this->session = $session;
+        $modules = Hm_Handler_Modules::get_for_page($page);
+        foreach ($modules as $name => $args) {
+            list($input, $protected) = $this->run_handler_module($input, $protected, $name, $args, $session);
+        }
+        if ($input) {
+            $this->handler_response = $input;
+        }
+        $this->default_language();
+        $this->merge_response($request, $session, $page);
+    }
+
+    /**
+     * Run a single handler and return the results
+     * @param array $input handler output so far for this page
+     * @param array $protected list of protected output
+     * @param string $name handler module name
+     * @param array $args module arguments
+     * @param object $session session interface
+     */
+    public function run_handler_module($input, $protected, $name, $args, $session) {
+        $name = "Hm_Handler_$name";
+        if (class_exists($name)) {
+            if (!$args[1] || ($args[1] && $session->is_active())) {
+                $mod = new $name( $this, $args[1], $input, $protected);
+                $mod->process($input);
+                $input = $mod->module_output();
+                $protected = $mod->output_protected();
+            }
+        }
+        else {
+            Hm_Debug::add(sprintf('Handler module %s activated but not found', $name));
+        }
+        return array($input, $protected);
+    }
+
+    /**
+     * Merge the combined response from the handler modules with some default values
+     * @param object $request request details
+     * @param object $session session interface
+     * @param string $page page id
+     * @return void
+     */
+    public function merge_response($request, $session, $page) {
+        $this->handler_response = array_merge($this->handler_response, array(
+            'router_page_name'    => $page,
+            'router_request_type' => $request->type,
+            'router_sapi_name'    => $request->sapi,
+            'router_format_name'  => $request->format,
+            'router_login_state'  => $session->is_active(),
+            'router_url_path'     => $request->path,
+            'router_module_list'  => $this->site_config->get('modules', ''),
+            'router_app_name'     => $this->site_config->get('app_name', 'HM3')
+        ));
+    }
+}
+
+/**
+ * Class to setup, load, and execute module sets
+ */
+class Hm_Module_Exec {
+
+    use Hm_Output_Module_Exec;
+    use Hm_Handler_Module_Exec;
+
+    public $page = false;
+    public $site_config = false;
+    public $user_config = false;
+    public $handler_response = array();
+    public $output_response = false;
+    public $filters = array();
+    public $session = false;
+    public $request = false;
+    private $handlers = array();
+    private $outputs = array();
+
+    public function __construct($config) {
+        $this->site_config = $config;
+        $this->user_config = load_user_config_object($config);
+        $this->process_module_setup();
+    }
+
+    /**
+     * Build a list of module properties
+     * @return void
+     */
+    public function process_module_setup() {
+        if (DEBUG_MODE) {
+            $this->setup_debug_modules();
+        }
+        else {
+            $this->setup_production_modules();
+        }
+    }
+
+    /**
+     * Look for translation strings based on the current language setting
+     * return array
+     */
+    public function get_current_language() {
+        if (array_key_exists('language', $this->handler_response)) {
+            $lang = $this->handler_response['language'];
+        }
+        else {
+            $lang = 'en';
+        }
+        $strings = array();
+        if (file_exists(APP_PATH.'language/'.$lang.'.php')) {
+            $strings = require APP_PATH.'language/'.$lang.'.php';
+        }
+        return $strings;
+    }
+
+    /**
+     * Setup a default language translation
+     * @return void
+     */
+    public function default_language() {
+        if (!array_key_exists('language', $this->handler_response)) {
+            $default_lang = $this->site_config->get('default_language', false);
+            if ($default_lang) {
+                $this->handler_response['language'] = $default_lang;
+            }
+        }
+    }
+
+    /**
+     * Get module data when in production mode
+     * @return void
+     */
+    public function setup_production_modules() {
+        $this->filters = $this->site_config->get('input_filters', array());
+        $this->handlers = $this->site_config->get('handler_modules', array());
+        $this->outputs = $this->site_config->get('output_modules', array());
+    }
+
+    /**
+     * Get module data when in debug mode
+     * @return array list of filters, input, and output modules
+     */
+    public function setup_debug_modules() {
+        $filters = array();
+        $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
+            'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
+        $modules = explode(',', $this->site_config->get('modules', ''));
+        foreach ($modules as $name) {
+            if (is_readable(sprintf(APP_PATH."modules/%s/setup.php", $name))) {
+                $filters = self::merge_filters($filters, require sprintf(APP_PATH."modules/%s/setup.php", $name));
+            }
+        }
+        $this->filters = $filters;
+    }
+
+    /**
+     * Merge input filters from module sets
+     * @param array $existing already collected filters
+     * @param array $new new filters to merge
+     * @return array merged list
+     */
+    static public function merge_filters($existing, $new) {
+        foreach (array('allowed_output', 'allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
+            if (array_key_exists($v, $new)) {
+                if ($v == 'allowed_pages' || $v == 'allowed_output') {
+                    $existing[$v] = array_merge($existing[$v], $new[$v]);
+                }
+                else {
+                    $existing[$v] += $new[$v];
+                }
+            }
+        }
+        return $existing;
+    }
+
+    /**
+     * Return the subset of active modules from a supplied list
+     * @param array $mod_list list of modules
+     * @return array filter list
+     */
+    public function get_active_mods($mod_list) {
+        return array_unique(array_values(array_map(function($v) { return $v[0]; }, $mod_list)));
+    }
+
+    /**
+     * Load modules into a module manager
+     * @param string $class name of the module manager to use
+     * @param array $module_sets list of modules by page
+     * @param string $page page id
+     * @return void
+     */
+    public function load_modules($class, $module_sets, $page) {
+        foreach ($module_sets as $mod_page => $modlist) {
+            foreach ($modlist as $name => $vals) {
+                if ($page == $mod_page) {
+                    $class::add($mod_page, $name, $vals[1], false, 'after', true, $vals[0]);
+                }
+            }
+        }
+        $class::try_queued_modules();
+        $class::process_all_page_queue();
+    }
+
+    /**
+     * Load all module sets and include required modules.php files
+     * @param string $page page id
+     * @return void
+     */
+    public function load_module_sets($page) {
+
+        $this->load_modules('Hm_Handler_Modules', $this->handlers, $page);
+        $this->load_modules('Hm_Output_Modules', $this->outputs, $page);
+        $active_mods = array_unique(array_merge($this->get_active_mods(Hm_Output_Modules::get_for_page($page)),
+            $this->get_active_mods(Hm_Handler_Modules::get_for_page($page))));
+        if (!count($active_mods)) {
+            Hm_Functions::cease('No module assignments found');
+        }
+        $mods = explode(',', $this->site_config->get('modules', '')); 
+        $this->load_module_set_files($mods, $active_mods);
+    }
+
+    /**
+     * Load module set definition files
+     * @param array $mods modules to load
+     * @param array $active_mods list of active modules
+     * @return void
+     */
+    public function load_module_set_files($mods, $active_mods) {
+        foreach ($mods as $name) {
+            if (in_array($name, $active_mods, true) && is_readable(sprintf(APP_PATH.'modules/%s/modules.php', $name))) {
+                require sprintf(APP_PATH.'modules/%s/modules.php', $name);
+            }
+        }
+    }
+}
 
 /**
  * MODULE SET FUNCTIONS
