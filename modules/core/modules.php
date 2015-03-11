@@ -1448,7 +1448,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         asort($translated);
         $mylang = $this->get('language', '');
         $res = '<tr class="general_setting"><td><label for="language_setting">'.
-            $this->trans('interface language').'</label></td>'.
+            $this->trans('Language').'</label></td>'.
             '<td><select id="language_setting" name="language_setting">';
         foreach ($translated as $id => $lang) {
             $res .= '<option ';
