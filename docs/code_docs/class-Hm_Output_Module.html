@@ -7,7 +7,7 @@
 	<title>Class Hm_Output_Module | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3095274399"></script>
+	<script type="text/javascript" src="elementlist.js?3226520433"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -33,17 +33,19 @@
 						</li>
 				<li><a href="package-framework.db.html">db</a>
 						</li>
+				<li><a href="package-framework.dispatch.html">dispatch</a>
+						</li>
 				<li><a href="package-framework.format.html">format</a>
 						</li>
-				<li class="active"><a href="package-framework.modules.html">modules</a>
+				<li class="active"><a href="package-framework.module.html">module</a>
+						</li>
+				<li><a href="package-framework.modules.html">modules</a>
 						</li>
 				<li><a href="package-framework.oauth2.html">oauth2</a>
 						</li>
 				<li><a href="package-framework.output.html">output</a>
 						</li>
 				<li><a href="package-framework.request.html">request</a>
-						</li>
-				<li><a href="package-framework.router.html">router</a>
 						</li>
 				<li><a href="package-framework.servers.html">servers</a>
 						</li>
@@ -215,30 +217,17 @@
 			<h3>Classes</h3>
 			<ul>
 				<li><a href="class-Hm_Handler_Module.html">Hm_Handler_Module</a></li>
-				<li><a href="class-Hm_Handler_Modules.html">Hm_Handler_Modules</a></li>
 				<li class="active"><a href="class-Hm_Output_Module.html">Hm_Output_Module</a></li>
-				<li><a href="class-Hm_Output_Modules.html">Hm_Output_Modules</a></li>
-				<li><a href="class-Hm_Request_Handler.html">Hm_Request_Handler</a></li>
 			</ul>
 
 
 			<h3>Traits</h3>
 			<ul>
 				<li><a href="class-Hm_Module_Output.html">Hm_Module_Output</a></li>
-				<li><a href="class-Hm_Modules.html">Hm_Modules</a></li>
 			</ul>
 
 
 
-			<h3>Functions</h3>
-			<ul>
-				<li><a href="function-add_handler.html">add_handler</a></li>
-				<li><a href="function-add_module_to_all_pages.html">add_module_to_all_pages</a></li>
-				<li><a href="function-add_output.html">add_output</a></li>
-				<li><a href="function-handler_source.html">handler_source</a></li>
-				<li><a href="function-output_source.html">output_source</a></li>
-				<li><a href="function-replace_module.html">replace_module</a></li>
-			</ul>
 		</div>
 	</div>
 </div>
@@ -260,7 +249,7 @@
 				<a href="index.html" title="Overview"><span>Overview</span></a>
 			</li>
 			<li>
-				<a href="package-framework.modules.html" title="Summary of framework\modules"><span>Package</span></a>
+				<a href="package-framework.module.html" title="Summary of framework\module"><span>Package</span></a>
 			</li>
 			<li class="active">
 <span>Class</span>			</li>
@@ -461,9 +450,9 @@ html sanitizing, and string translation services to modules</p>
 		<b>Abstract</b><br>
 		
 		
-		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.modules.html">modules</a><br>
+		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.module.html">module</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_Output_Module.html#280-368" title="Go to source code">modules.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_Output_Module.html#279-367" title="Go to source code">module.php</a><br>
 	</div>
 
 
@@ -481,7 +470,7 @@ html sanitizing, and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#303-312" title="Go to source code">__construct</a>( <span>array <var>$input</var></span>, <span>array <var>$protected</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module.html#302-311" title="Go to source code">__construct</a>( <span>array <var>$input</var></span>, <span>array <var>$protected</var></span> )</code>
 
 		<div class="description short">
 			
@@ -521,7 +510,7 @@ html sanitizing, and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_trans">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#314-332" title="Go to source code">trans</a>( <span>the <var>$string</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module.html#313-331" title="Go to source code">trans</a>( <span>the <var>$string</var></span> )</code>
 
 		<div class="description short">
 			
@@ -563,7 +552,7 @@ html sanitizing, and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output_content">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#334-351" title="Go to source code">output_content</a>( <span>string <var>$format</var></span>, <span>array <var>$lang_str</var></span>, <span>mixed <var>$protected</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module.html#333-350" title="Go to source code">output_content</a>( <span>string <var>$format</var></span>, <span>array <var>$lang_str</var></span>, <span>mixed <var>$protected</var></span> )</code>
 
 		<div class="description short">
 			
@@ -609,7 +598,7 @@ html sanitizing, and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_html_safe">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#353-360" title="Go to source code">html_safe</a>( <span>string <var>$string</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module.html#352-359" title="Go to source code">html_safe</a>( <span>string <var>$string</var></span> )</code>
 
 		<div class="description short">
 			
@@ -651,7 +640,7 @@ html sanitizing, and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#362-367" title="Go to source code">output</a>( )</code>
+		<code><a href="source-class-Hm_Output_Module.html#361-366" title="Go to source code">output</a>( )</code>
 
 		<div class="description short">
 			
@@ -717,7 +706,7 @@ HTML5 formatted string if set to HTML5<br>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Output_Module.html#292" title="Go to source code"><var>$lstr</var></a>
+				<a href="source-class-Hm_Output_Module.html#291" title="Go to source code"><var>$lstr</var></a>
 		</td>
 		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
 		<td class="description"><div>
@@ -740,7 +729,7 @@ HTML5 formatted string if set to HTML5<br>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Output_Module.html#295" title="Go to source code"><var>$lang</var></a>
+				<a href="source-class-Hm_Output_Module.html#294" title="Go to source code"><var>$lang</var></a>
 		</td>
 		<td class="value"><code><span class="php-keyword1">false</span></code></td>
 		<td class="description"><div>
@@ -763,7 +752,7 @@ HTML5 formatted string if set to HTML5<br>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Output_Module.html#298" title="Go to source code"><var>$dir</var></a>
+				<a href="source-class-Hm_Output_Module.html#297" title="Go to source code"><var>$dir</var></a>
 		</td>
 		<td class="value"><code><span class="php-quote">'ltr'</span></code></td>
 		<td class="description"><div>
@@ -786,7 +775,7 @@ HTML5 formatted string if set to HTML5<br>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Output_Module.html#301" title="Go to source code"><var>$format</var></a>
+				<a href="source-class-Hm_Output_Module.html#300" title="Go to source code"><var>$format</var></a>
 		</td>
 		<td class="value"><code><span class="php-keyword1">false</span></code></td>
 		<td class="description"><div>

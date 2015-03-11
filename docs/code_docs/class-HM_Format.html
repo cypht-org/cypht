@@ -7,7 +7,7 @@
 	<title>Class HM_Format | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3095274399"></script>
+	<script type="text/javascript" src="elementlist.js?3226520433"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -33,7 +33,11 @@
 						</li>
 				<li><a href="package-framework.db.html">db</a>
 						</li>
+				<li><a href="package-framework.dispatch.html">dispatch</a>
+						</li>
 				<li class="active"><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.module.html">module</a>
 						</li>
 				<li><a href="package-framework.modules.html">modules</a>
 						</li>
@@ -42,8 +46,6 @@
 				<li><a href="package-framework.output.html">output</a>
 						</li>
 				<li><a href="package-framework.request.html">request</a>
-						</li>
-				<li><a href="package-framework.router.html">router</a>
 						</li>
 				<li><a href="package-framework.servers.html">servers</a>
 						</li>
@@ -295,7 +297,7 @@ content method needs to be overridden.</p>
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.format.html">format</a><br>
 
-		<b>Located at</b> <a href="source-class-HM_Format.html#11-95" title="Go to source code">format.php</a><br>
+		<b>Located at</b> <a href="source-class-HM_Format.html#11-27" title="Go to source code">format.php</a><br>
 	</div>
 
 
@@ -313,7 +315,7 @@ content method needs to be overridden.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_content">#</a>
-		<code><a href="source-class-HM_Format.html#22-30" title="Go to source code">content</a>( <span>array <var>$input</var></span>, <span>array <var>$lang_str</var></span>, <span>array <var>$allowed_output</var></span> )</code>
+		<code><a href="source-class-HM_Format.html#19-26" title="Go to source code">content</a>( <span>array <var>$input</var></span>, <span>array <var>$allowed_output</var></span> )</code>
 
 		<div class="description short">
 			
@@ -332,9 +334,7 @@ output classes</p>
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$input</var></dt>
-					<dd><code>array</code><br>$input data from the handler modules</dd>
-					<dt><var>$lang_str</var></dt>
-					<dd><code>array</code><br>$lang_str language definitions</dd>
+					<dd><code>array</code><br>$output data from the output modules</dd>
 					<dt><var>$allowed_output</var></dt>
 					<dd><code>array</code><br>$allowed_output allowed fields for JSON responses</dd>
 				</dl></div>
@@ -350,138 +350,6 @@ output classes</p>
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="format_content" id="_format_content">
-
-		<td class="attributes"><code>
-			 public 
-			mixed
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_format_content">#</a>
-		<code><a href="source-class-HM_Format.html#32-46" title="Go to source code">format_content</a>( <span>array <var>$input</var></span>, <span>array <var>$allowed_output</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Setup and run the abstract content() function</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Setup and run the abstract content() function</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$input</var></dt>
-					<dd><code>array</code><br>$input data from the handler modules</dd>
-					<dt><var>$allowed_output</var></dt>
-					<dd><code>array</code><br>$allowed_output allowed fields for JSON responses</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>mixed</code><br>formatted content<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="get_language" id="_get_language">
-
-		<td class="attributes"><code>
-			 public 
-			array
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_get_language">#</a>
-		<code><a href="source-class-HM_Format.html#48-59" title="Go to source code">get_language</a>( <span>string <var>$lang</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Load language translation strings</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Load language translation strings</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$lang</var></dt>
-					<dd><code>string</code><br>$lang langauge name</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>array</code><br>list of translated strings<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="run_modules" id="_run_modules">
-
-		<td class="attributes"><code>
-			 protected 
-			mixed
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_run_modules">#</a>
-		<code><a href="source-class-HM_Format.html#61-94" title="Go to source code">run_modules</a>( <span>array <var>$input</var></span>, <span>string <var>$format</var></span>, <span>array <var>$lang_str</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Run output modules and collect the results</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Run output modules and collect the results</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$input</var></dt>
-					<dd><code>array</code><br>$input data from the handler modules</dd>
-					<dt><var>$format</var></dt>
-					<dd><code>string</code><br>$format output format type, either JSON or HTML5</dd>
-					<dt><var>$lang_str</var></dt>
-					<dd><code>array</code><br>$lang_str langauge strings</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code>mixed</code><br>module results<br>
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
 	</table>
 
 
@@ -495,32 +363,6 @@ output classes</p>
 
 
 
-	<table class="summary" id="properties">
-	<caption>Properties summary</caption>
-	<tr data-order="modules" id="$modules">
-		<td class="attributes"><code>
-			protected  
-			array
-		</code></td>
-
-		<td class="name">
-				<a href="source-class-HM_Format.html#20" title="Go to source code"><var>$modules</var></a>
-		</td>
-		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
-		<td class="description"><div>
-			<a href="#$modules" class="anchor">#</a>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-			</div>
-		</div></td>
-	</tr>
-	</table>
 
 
 

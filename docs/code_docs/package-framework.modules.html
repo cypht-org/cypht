@@ -7,7 +7,7 @@
 	<title>Package framework\modules | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3095274399"></script>
+	<script type="text/javascript" src="elementlist.js?3226520433"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -33,7 +33,11 @@
 						</li>
 				<li><a href="package-framework.db.html">db</a>
 						</li>
+				<li><a href="package-framework.dispatch.html">dispatch</a>
+						</li>
 				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.module.html">module</a>
 						</li>
 				<li class="active"><a href="package-framework.modules.html">modules</a>
 						</li>
@@ -42,8 +46,6 @@
 				<li><a href="package-framework.output.html">output</a>
 						</li>
 				<li><a href="package-framework.request.html">request</a>
-						</li>
-				<li><a href="package-framework.router.html">router</a>
 						</li>
 				<li><a href="package-framework.servers.html">servers</a>
 						</li>
@@ -214,18 +216,17 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
-				<li><a href="class-Hm_Handler_Module.html">Hm_Handler_Module</a></li>
 				<li><a href="class-Hm_Handler_Modules.html">Hm_Handler_Modules</a></li>
-				<li><a href="class-Hm_Output_Module.html">Hm_Output_Module</a></li>
+				<li><a href="class-Hm_Module_Exec.html">Hm_Module_Exec</a></li>
 				<li><a href="class-Hm_Output_Modules.html">Hm_Output_Modules</a></li>
-				<li><a href="class-Hm_Request_Handler.html">Hm_Request_Handler</a></li>
 			</ul>
 
 
 			<h3>Traits</h3>
 			<ul>
-				<li><a href="class-Hm_Module_Output.html">Hm_Module_Output</a></li>
+				<li><a href="class-Hm_Handler_Module_Exec.html">Hm_Handler_Module_Exec</a></li>
 				<li><a href="class-Hm_Modules.html">Hm_Modules</a></li>
+				<li><a href="class-Hm_Output_Module_Exec.html">Hm_Output_Module_Exec</a></li>
 			</ul>
 
 
@@ -287,26 +288,16 @@
 <table class="summary" id="classes">
 <caption>Classes summary</caption>
 <tr>
-	<td class="name"><a href="class-Hm_Handler_Module.html">Hm_Handler_Module</a></td>
-	<td>Base class for data input processing modules, called "handler modules"</td>
-</tr>
-<tr>
 	<td class="name"><a href="class-Hm_Handler_Modules.html">Hm_Handler_Modules</a></td>
 	<td>Class to manage all the input processing modules</td>
 </tr>
 <tr>
-	<td class="name"><a href="class-Hm_Output_Module.html">Hm_Output_Module</a></td>
-	<td>Base class for output modules All modules that output data to a request must
-extend this class and define an output() method. It provides form validation,
-html sanitizing, and string translation services to modules</td>
+	<td class="name"><a href="class-Hm_Module_Exec.html">Hm_Module_Exec</a></td>
+	<td>Class to setup, load, and execute module sets</td>
 </tr>
 <tr>
 	<td class="name"><a href="class-Hm_Output_Modules.html">Hm_Output_Modules</a></td>
 	<td>Class to manage all the output modules</td>
-</tr>
-<tr>
-	<td class="name"><a href="class-Hm_Request_Handler.html">Hm_Request_Handler</a></td>
-	<td>Input processing module "runner"</td>
 </tr>
 </table>
 
@@ -314,15 +305,16 @@ html sanitizing, and string translation services to modules</td>
 <table class="summary" id="traits">
 <caption>Traits summary</caption>
 <tr>
-	<td class="name"><a href="class-Hm_Module_Output.html">Hm_Module_Output</a></td>
-	<td>Module data management. These functions provide an interface for modules (both
-handler and output) to fetch data set by other modules and to return their own
-output. Handler modules must use these methods to set a response, output modules
-must if the format is AJAX, otherwise they should return an HTML5 string</td>
+	<td class="name"><a href="class-Hm_Handler_Module_Exec.html">Hm_Handler_Module_Exec</a></td>
+	<td>Handler module execution methods</td>
 </tr>
 <tr>
 	<td class="name"><a href="class-Hm_Modules.html">Hm_Modules</a></td>
 	<td>Trait used as the basic logic for module management</td>
+</tr>
+<tr>
+	<td class="name"><a href="class-Hm_Output_Module_Exec.html">Hm_Output_Module_Exec</a></td>
+	<td>Output module execution methods</td>
 </tr>
 </table>
 

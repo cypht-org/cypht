@@ -8,7 +8,7 @@
 	<title>File session.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3095274399"></script>
+	<script type="text/javascript" src="elementlist.js?3226520433"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -34,7 +34,11 @@
 						</li>
 				<li><a href="package-framework.db.html">db</a>
 						</li>
+				<li><a href="package-framework.dispatch.html">dispatch</a>
+						</li>
 				<li><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.module.html">module</a>
 						</li>
 				<li><a href="package-framework.modules.html">modules</a>
 						</li>
@@ -43,8 +47,6 @@
 				<li><a href="package-framework.output.html">output</a>
 						</li>
 				<li><a href="package-framework.request.html">request</a>
-						</li>
-				<li><a href="package-framework.router.html">router</a>
 						</li>
 				<li><a href="package-framework.servers.html">servers</a>
 						</li>
@@ -228,6 +230,10 @@
 
 
 
+			<h3>Functions</h3>
+			<ul>
+				<li><a href="function-setup_session.html">setup_session</a></li>
+			</ul>
 		</div>
 	</div>
 </div>
@@ -860,8 +866,37 @@
 </span><span id="588" class="l"><a class="l" href="#588">588: </a>    }
 </span><span id="589" class="l"><a class="l" href="#589">589: </a>}
 </span><span id="590" class="l"><a class="l" href="#590">590: </a>
-</span><span id="591" class="l"><a class="l" href="#591">591: </a><span class="xlang">?&gt;</span>
-</span><span id="592" class="l"><a class="l" href="#592">592: </a></span></code></pre>
+</span><span id="591" class="l"><a class="l" href="#591">591: </a><span class="php-comment">/**
+</span></span><span id="592" class="l"><a class="l" href="#592">592: </a><span class="php-comment"> * Start up the selected session type
+</span></span><span id="593" class="l"><a class="l" href="#593">593: </a><span class="php-comment"> * @param object $config site configuration
+</span></span><span id="594" class="l"><a class="l" href="#594">594: </a><span class="php-comment"> * @return object
+</span></span><span id="595" class="l"><a class="l" href="#595">595: </a><span class="php-comment"> */</span>
+</span><span id="596" class="l"><a class="l" href="#596">596: </a><span class="php-keyword1">function</span> <a id="_setup_session" href="#_setup_session">setup_session</a>(<span class="php-var">$config</span>) {
+</span><span id="597" class="l"><a class="l" href="#597">597: </a>
+</span><span id="598" class="l"><a class="l" href="#598">598: </a>    <span class="php-var">$session_type</span> = <span class="php-var">$config</span>-&gt;get(<span class="php-quote">'session_type'</span>, <span class="php-keyword1">false</span>);
+</span><span id="599" class="l"><a class="l" href="#599">599: </a>    <span class="php-var">$auth_type</span> = <span class="php-var">$config</span>-&gt;get(<span class="php-quote">'auth_type'</span>, <span class="php-keyword1">false</span>);
+</span><span id="600" class="l"><a class="l" href="#600">600: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$auth_type</span>) {
+</span><span id="601" class="l"><a class="l" href="#601">601: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$auth_type</span> == <span class="php-quote">'DB'</span>) {
+</span><span id="602" class="l"><a class="l" href="#602">602: </a>            <span class="php-keyword1">require_once</span> APP_PATH.<span class="php-quote">'third_party/pbkdf2.php'</span>;
+</span><span id="603" class="l"><a class="l" href="#603">603: </a>        }
+</span><span id="604" class="l"><a class="l" href="#604">604: </a>        <span class="php-var">$auth_class</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'Hm_Auth_%s'</span>, <span class="php-var">$auth_type</span>);
+</span><span id="605" class="l"><a class="l" href="#605">605: </a>    }
+</span><span id="606" class="l"><a class="l" href="#606">606: </a>    <span class="php-keyword1">else</span> {
+</span><span id="607" class="l"><a class="l" href="#607">607: </a>        <span class="php-var">$auth_class</span> = <span class="php-quote">'Hm_Auth_None'</span>;
+</span><span id="608" class="l"><a class="l" href="#608">608: </a>    }
+</span><span id="609" class="l"><a class="l" href="#609">609: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$session_type</span> == <span class="php-quote">'DB'</span>) {
+</span><span id="610" class="l"><a class="l" href="#610">610: </a>        <span class="php-var">$session_class</span> = <span class="php-quote">'Hm_DB_Session'</span>;
+</span><span id="611" class="l"><a class="l" href="#611">611: </a>    }
+</span><span id="612" class="l"><a class="l" href="#612">612: </a>    <span class="php-keyword1">else</span> {
+</span><span id="613" class="l"><a class="l" href="#613">613: </a>        <span class="php-var">$session_class</span> = <span class="php-quote">'Hm_PHP_Session'</span>;
+</span><span id="614" class="l"><a class="l" href="#614">614: </a>    }
+</span><span id="615" class="l"><a class="l" href="#615">615: </a>    Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Using %s with %s'</span>, <span class="php-var">$session_class</span>, <span class="php-var">$auth_class</span>));
+</span><span id="616" class="l"><a class="l" href="#616">616: </a>    <span class="php-var">$session</span> = <span class="php-keyword1">new</span> <span class="php-var">$session_class</span>(<span class="php-var">$config</span>, <span class="php-var">$auth_class</span>);
+</span><span id="617" class="l"><a class="l" href="#617">617: </a>    <span class="php-keyword1">return</span> <span class="php-var">$session</span>;
+</span><span id="618" class="l"><a class="l" href="#618">618: </a>}
+</span><span id="619" class="l"><a class="l" href="#619">619: </a>
+</span><span id="620" class="l"><a class="l" href="#620">620: </a><span class="xlang">?&gt;</span>
+</span><span id="621" class="l"><a class="l" href="#621">621: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>

@@ -7,7 +7,7 @@
 	<title>Class Hm_Format_HTML5 | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?3095274399"></script>
+	<script type="text/javascript" src="elementlist.js?3226520433"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -33,7 +33,11 @@
 						</li>
 				<li><a href="package-framework.db.html">db</a>
 						</li>
+				<li><a href="package-framework.dispatch.html">dispatch</a>
+						</li>
 				<li class="active"><a href="package-framework.format.html">format</a>
+						</li>
+				<li><a href="package-framework.module.html">module</a>
 						</li>
 				<li><a href="package-framework.modules.html">modules</a>
 						</li>
@@ -42,8 +46,6 @@
 				<li><a href="package-framework.output.html">output</a>
 						</li>
 				<li><a href="package-framework.request.html">request</a>
-						</li>
-				<li><a href="package-framework.router.html">router</a>
 						</li>
 				<li><a href="package-framework.servers.html">servers</a>
 						</li>
@@ -302,7 +304,7 @@
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.format.html">format</a><br>
 
-		<b>Located at</b> <a href="source-class-Hm_Format_HTML5.html#146-162" title="Go to source code">format.php</a><br>
+		<b>Located at</b> <a href="source-class-Hm_Format_HTML5.html#77-91" title="Go to source code">format.php</a><br>
 	</div>
 
 
@@ -320,7 +322,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_content">#</a>
-		<code><a href="source-class-Hm_Format_HTML5.html#151-161" title="Go to source code">content</a>( <span>array <var>$input</var></span>, <span>array <var>$lang_str</var></span>, <span>array <var>$allowed_output</var></span> )</code>
+		<code><a href="source-class-Hm_Format_HTML5.html#82-90" title="Go to source code">content</a>( <span>array <var>$output</var></span>, <span>array <var>$allowed_output</var></span> )</code>
 
 		<div class="description short">
 			
@@ -336,10 +338,8 @@
 
 				<h4>Parameters</h4>
 				<div class="list"><dl>
-					<dt><var>$input</var></dt>
-					<dd><code>array</code><br>$input data from the handler modules</dd>
-					<dt><var>$lang_str</var></dt>
-					<dd><code>array</code><br>$lang_str langauge strings</dd>
+					<dt><var>$output</var></dt>
+					<dd><code>array</code><br>$output data from the output modules</dd>
 					<dt><var>$allowed_output</var></dt>
 					<dd><code>array</code><br>$allowed_output allowed fields for JSON responses</dd>
 				</dl></div>
@@ -357,16 +357,6 @@
 	</tr>
 	</table>
 
-	<table class="summary inherited">
-	<caption>Methods inherited from <a href="class-HM_Format.html#methods">HM_Format</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-HM_Format.html#_format_content">format_content()</a>, 
-			<a href="class-HM_Format.html#_get_language">get_language()</a>, 
-			<a href="class-HM_Format.html#_run_modules">run_modules()</a>
-		</code></td>
-	</tr>
-	</table>
 
 
 
@@ -379,14 +369,6 @@
 
 
 
-	<table class="summary inherited">
-	<caption>Properties inherited from <a href="class-HM_Format.html#properties">HM_Format</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-HM_Format.html#$modules"><var>$modules</var></a>
-		</code></td>
-	</tr>
-	</table>
 
 
 
