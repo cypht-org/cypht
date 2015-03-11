@@ -3,7 +3,7 @@
 /**
  * Module classes
  * @package framework
- * @subpackage modules
+ * @subpackage module
  */
 if (!defined('DEBUG_MODE')) { die(); }
 

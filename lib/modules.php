@@ -235,7 +235,7 @@ class Hm_Handler_Modules { use Hm_Modules; }
 class Hm_Output_Modules { use Hm_Modules; }
 
 /**
- * Handler module execution methods
+ * Output module execution methods
  */
 trait Hm_Output_Module_Exec {
 
@@ -305,7 +305,7 @@ trait Hm_Output_Module_Exec {
 
 }
 /**
- * Output module execution methods
+ * Handler module execution methods
  */
 trait Hm_Handler_Module_Exec {
 
