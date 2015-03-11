@@ -142,7 +142,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
     public function test_session_params() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
-        $this->assertEquals(array(false, false, 'test'), $session->set_session_params($request));
+        $this->assertEquals(array(false, 'asdf', 'test'), $session->set_session_params($request));
         $request->tls = true;
         $request->path = 'test';
         $this->assertEquals(array(true, 'test', 'test'), $session->set_session_params($request));

@@ -19,19 +19,9 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_format_content() {
-        $this->assertEquals('{"date":"today"}', $this->json->format_content(array('router_page_name' => 'test', 'language' => 'en', 'date' => 'today'), array('date' => array(FILTER_UNSAFE_RAW, false))));
-        $this->assertEquals('<div class="date">today</div>', $this->html5->format_content(array('router_page_name' => 'test', 'date' => 'today'), array()));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_get_language() {
-        $this->assertTrue(count($this->html5->get_language('en')) > 0);
-        $this->assertEquals(0, count($this->html5->get_language('blah')));
-        $this->assertTrue(count($this->json->get_language('en')) > 0);
-        $this->assertEquals(0, count($this->json->get_language('blah')));
+    public function test_content() {
+        $this->assertEquals('{"date":"today"}', $this->json->content(array('router_page_name' => 'test', 'language' => 'en', 'date' => 'today'), array('date' => array(FILTER_UNSAFE_RAW, false))));
+        $this->assertEquals('testtoday', $this->html5->content(array('router_page_name' => 'test', 'date' => 'today'), array()));
     }
     /**
      * @preserveGlobalState disabled

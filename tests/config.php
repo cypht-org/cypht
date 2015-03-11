@@ -181,4 +181,27 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
     }
 }
 
+class Hm_Test_User_Config_Functions extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        require 'bootstrap.php'; 
+        $mock_config = new Hm_Mock_Config();
+        $this->config = new Hm_User_Config_File($mock_config);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_load_user_config_object() {
+        /* TODO assertions */
+        load_user_config_object($this->config);
+        $this->config->set('user_config_type', 'DB');
+        load_user_config_object($this->config);
+   }
+    public function tearDown() {
+        unset($this->config);
+    }
+}
+
+
 ?>
