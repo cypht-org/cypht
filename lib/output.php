@@ -201,7 +201,7 @@ function elog($mixed) {
         $bt = debug_backtrace();
         $caller = array_shift($bt);
         Hm_Debug::add(sprintf('ELOG called in %s at line %d', $caller['file'], $caller['line']));
-        Hm_Functions::error_log(Hm_Debug::str($mixed));
+        return Hm_Functions::error_log(Hm_Debug::str($mixed));
     }
 }
 

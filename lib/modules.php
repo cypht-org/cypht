@@ -393,8 +393,8 @@ class Hm_Module_Exec {
     public $filters = array();
     public $session = false;
     public $request = false;
-    private $handlers = array();
-    private $outputs = array();
+    public $handlers = array();
+    public $outputs = array();
 
     public function __construct($config) {
         $this->site_config = $config;

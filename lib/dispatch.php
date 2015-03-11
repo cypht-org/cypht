@@ -13,7 +13,7 @@ class Hm_Dispatch {
     public $request;
     public $session;
     public $module_exec;
-    private $page;
+    public $page;
 
     /**
      * Setup object needed to process a request
@@ -45,23 +45,22 @@ class Hm_Dispatch {
 
     /**
      * Force TLS connections unless the site config has it disabled
-     * @return void
+     * @return bool
      */
     public function check_for_tls_redirect() {
-        if (!$this->request->tls && !$this->site_config->get('disable_tls', false)) {
-            if (array_key_exists('SERVER_NAME', $this->request->server) && array_key_exists('REQUEST_URI', $this->request->server)) {
-                Hm_Dispatch::page_redirect('https://'.$this->request->server['SERVER_NAME'].$this->request->server['REQUEST_URI']);
-            }
+        if (!$this->request->tls && !$this->site_config->get('disable_tls', false) &&array_key_exists('SERVER_NAME', $this->request->server) && array_key_exists('REQUEST_URI', $this->request->server)) {
+            return Hm_Dispatch::page_redirect('https://'.$this->request->server['SERVER_NAME'].$this->request->server['REQUEST_URI']);
         }
+        return false;
     }
 
     /**
      * Redirect the page after a POST form is submitted and forward any user notices
-     * @return void
+     * @return mixed
      */
     public function check_for_redirect() {
         if (array_key_exists('no_redirect', $this->module_exec->handler_response) && $this->module_exec->handler_response['no_redirect']) {
-            return;
+            return 'noredirect';
         }
         if (!empty($this->request->post) && $this->request->type == 'HTTP') {
             $msgs = Hm_Msgs::get();
@@ -72,6 +71,7 @@ class Hm_Dispatch {
             if (array_key_exists('REQUEST_URI', $this->request->server)) {
                 Hm_Dispatch::page_redirect($this->request->server['REQUEST_URI']);
             }
+            return 'redirect';
         }
         elseif (array_key_exists('hm_msgs', $this->request->cookie) && trim($this->request->cookie['hm_msgs'])) {
             $msgs = @unserialize(base64_decode($this->request->cookie['hm_msgs']));
@@ -79,7 +79,9 @@ class Hm_Dispatch {
                 array_walk($msgs, function($v) { Hm_Msgs::add($v); });
             }
             $this->session->secure_cookie($this->request, 'hm_msgs', '', 0);
+            return 'msg_forward';
         }
+        return false;
     }
 
     /**
@@ -148,7 +150,7 @@ class Hm_Dispatch {
         }
         Hm_Functions::header('HTTP/1.1 303 Found');
         Hm_Functions::header('Location: '.$url);
-        Hm_Functions::cease();
+        return Hm_Functions::cease();
     }
 }
 

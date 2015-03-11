@@ -220,7 +220,7 @@ abstract class Hm_Session {
         if (!$domain && array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
             $domain = $request->server['SERVER_NAME'];
         }
-        Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
+        return Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
     }
 }
 
@@ -237,7 +237,7 @@ class Hm_PHP_Session extends Hm_Session {
      * @param object $request request details
      * @param string $user username
      * @param string $pass password
-     * @return void
+     * @return bool
      */
     public function check($request, $user=false, $pass=false) {
         if ($user && $pass) {
@@ -261,6 +261,7 @@ class Hm_PHP_Session extends Hm_Session {
             Hm_Debug::add(sprintf('Invalid input fields: %s', implode(',', $request->invalid_input_fields)));
             $this->destroy($request);
         }
+        return $this->is_active();
     }
 
     /**
@@ -297,6 +298,7 @@ class Hm_PHP_Session extends Hm_Session {
         if ($this->auth_mech->create($user, $pass)) {
             return $this->check($request, $user, $pass);
         }
+        return false;
     }
 
     /**
