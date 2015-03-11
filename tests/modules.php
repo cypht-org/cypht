@@ -1,256 +1,5 @@
 <?php
 
-
-/**
- * tests for the Hm_Module_Output trait
- */
-class Hm_Test_Modules_Output extends PHPUnit_Framework_TestCase {
-
-    public function setUp() {
-        require 'bootstrap.php';
-        $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_out() {
-        $this->assertTrue($this->handler_mod->out('foo', 'bar'));
-        $this->assertFalse($this->handler_mod->out('foo', 'foo'));
-        $this->assertTrue($this->handler_mod->append('name', 'value'));
-        $this->assertFalse($this->handler_mod->out('name', 'value2'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_get() {
-        $this->handler_mod->out('foo', 'bar');
-        $this->assertEquals('bar', $this->handler_mod->get('foo'));
-        $this->assertEquals('bar', $this->handler_mod->get('foo', ''));
-        $this->assertEquals(0, $this->handler_mod->get('foo', 3));
-        $this->assertEquals(array('bar'), $this->handler_mod->get('foo', array()));
-        $this->assertEquals('default', $this->handler_mod->get('bar', 'default'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_append() {
-        $this->assertTrue($this->handler_mod->append('test', 'value'));
-        $this->assertTrue($this->handler_mod->append('test', 'value'));
-        $this->assertEquals(array('value', 'value'), $this->handler_mod->get('test'));
-        $this->assertTrue($this->handler_mod->out('no_append', 'blah', true));
-        $this->assertFalse($this->handler_mod->append('no_append', 'blah'));
-        $this->assertTrue($this->handler_mod->out('scaler', 'blah', false));
-        $this->assertFalse($this->handler_mod->append('scaler', 'blah'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_concat() {
-        $this->assertTrue($this->handler_mod->out('concat_test', array()));
-        $this->assertFalse($this->handler_mod->concat('concat_test', 'test'));
-        $this->assertTrue($this->handler_mod->concat('concat', 'start'));
-        $this->assertTrue($this->handler_mod->concat('concat', 'start'));
-        $this->assertEquals('startstart', $this->handler_mod->get('concat'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_module_output() {
-        $this->handler_mod->out('foo', 'bar');
-        $this->assertEquals(array('foo' => 'bar'), $this->handler_mod->module_output());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_output_protected() {
-        $this->handler_mod->out('foo', 'bar', true);
-        $this->handler_mod->out('bar', 'foo', false);
-        $this->assertEquals(array('foo'), $this->handler_mod->output_protected());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_exists() {
-        $this->handler_mod->out('foo', 'bar');
-        $this->assertTrue($this->handler_mod->exists('foo'));
-        $this->assertFalse($this->handler_mod->exists('blah'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_in() {
-        $this->handler_mod->out('foo', 'bar');
-        $this->assertTrue($this->handler_mod->in('foo', array('bar', 'baz')));
-        $this->assertFalse($this->handler_mod->in('foo', array('baz', 'blah')));
-    }
-}
-
-/**
- * tests for the Hm_Handler_Module class
- */
-class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
-
-    public function setUp() {
-        require 'bootstrap.php';
-        $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_nonce() {
-        /* TODO: fix assertions */
-        $this->assertNull($this->handler_mod->process_nonce());
-        $this->handler_mod->session->set('nonce_list', array('asdf'));
-        $this->handler_mod->session->loaded = false;
-        $this->handler_mod->session->set('nonce_list', array('sdfg'));
-        $this->assertNull($this->handler_mod->process_nonce());
-        $this->handler_mod->request->type = 'AJAX';
-        $this->assertNull($this->handler_mod->process_nonce());
-        $this->handler_mod->session->set('nonce_list', array('asdf'));
-        $this->parent->request->post = array();
-        $handler_mod = new Hm_Handler_Test($this->parent, false);
-        $this->assertNull($handler_mod->process_nonce());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_form() {
-        list($success, $form) = $this->handler_mod->process_form(array('fld1', 'fld2'));
-        $this->assertTrue($success);
-        $this->assertEquals(array('fld1' => '0', 'fld2' => '1'), $form);
-        list($success, $form) = $this->handler_mod->process_form(array('blah'));
-        $this->assertFalse($success);
-        $this->assertEquals(array(), $form);
-    }
-}
-
-/**
- * DEBUG_MODE tests for the Hm_Handler_Module class
- */
-class Hm_Test_Handler_Module_Debug extends PHPUnit_Framework_TestCase {
-
-    public function setUp() {
-        define('DEBUG_MODE', true);
-        require 'bootstrap.php';
-        $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_nonce_debug() {
-        /* TODO: fix assertions */
-        $this->handler_mod->request->type = 'AJAX';
-        $this->assertNull($this->handler_mod->process_nonce());
-    }
-}
-
-/**
- * tests for the Hm_Output_Module class
- */
-class Hm_Test_Output_Module extends PHPUnit_Framework_TestCase {
-
-    public function setUp() {
-        require 'bootstrap.php';
-        $this->output_mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_output_content() {
-        $this->output_mod->output_content('HTML5', array('Main' => false, 'Test' => 'Translated', 'interface_lang' => 'en', 'interface_direction' => 'ltr'), array());
-        $this->assertEquals('Main', $this->output_mod->trans('Main'));
-        $this->assertEquals('Translated', $this->output_mod->trans('Test'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_trans() {
-        $this->assertEquals('inbox', $this->output_mod->trans('inbox'));
-        $this->assertEquals('Main', $this->output_mod->trans('Main'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_html_safe() {
-        $this->assertEquals('&lt;script&gt;', $this->output_mod->html_safe('<script>'));
-        $this->assertEquals('nohtml', $this->output_mod->html_safe('nohtml'));
-    }
-    public function tearDown() {
-        unset($this->output_mod);
-    }
-}
-
-/**
- * tests for the Hm_Request_Handler class
- */
-class Hm_Test_Request_Handler extends PHPUnit_Framework_TestCase {
-
-    public function setUp() {
-        require 'bootstrap.php';
-        $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false);
-        $this->output_mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->request_handler = new Hm_Request_Handler();
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_request() {
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('test_mod' => array('core', false)));
-        $this->assertEquals('es', $res['language']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_load_user_config_object() {
-        /* TODO assertions */
-        $this->parent->config->set('user_config_type', 'DB');
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('nope' => array('core', false), 'test_mod' => array('core', false)));
-        $this->request_handler->load_user_config_object();
-
-        $this->parent->config->set('user_config_type', 'file');
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('test_mod' => array('core', false)));
-        $this->request_handler->load_user_config_object();
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_default_language() {
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('test_mod' => array('core', false)));
-        $this->request_handler->default_language();
-        $this->assertEquals('es', $this->request_handler->response['language']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_run_modules() {
-        $res = $this->request_handler->process_request('test', $this->parent->request, $this->parent->session, $this->parent->config, array('test_mod' => array('core', false)));
-        $this->request_handler->run_modules();
-        $this->assertEquals(array('test' => 'foo'), $this->request_handler->response);
-    }
-}
-
 /**
  * tests for the Hm_Modules trait
  */
@@ -363,6 +112,172 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         Hm_Test_Module_List::add('test', 'queued', false, 'never_added', 'after', false, 'core');
         Hm_Test_Module_List::try_queued_modules();
         $this->assertEquals(3, count(Hm_Test_Module_List::get_for_page('test')));
+    }
+}
+
+/**
+ * tests for the module runner
+ */
+class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        require 'bootstrap.php';
+        $config = new Hm_Mock_Config();
+        $this->module_exec = new Hm_Module_Exec($config);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_process_module_setup() {
+        /* TODO: fix assertion */
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_default_langauge() {
+        /* TODO: fix assertion */
+        $this->module_exec->default_language();
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_current_language() {
+        /* TODO: fix assertion */
+        $this->module_exec->handler_response['language'] = 'en';
+        $this->module_exec->get_current_language();
+
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_run_output_modules() {
+        /* TODO: fix assertion */
+        $request = new Hm_Mock_Request('HTTP');
+        $session = new Hm_Mock_Session();
+        $this->module_exec->run_output_modules($request, $session, 'home');
+        $request = new Hm_Mock_Request('AJAX');
+        $this->module_exec->run_output_modules($request, $session, 'ajax_test');
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_run_output_module() {
+        /* TODO: fix assertion */
+        require '../modules/core/setup.php';
+        require '../modules/core/modules.php';
+        $request = new Hm_Mock_Request('HTTP');
+        $session = new Hm_Mock_Session();
+        Hm_Output_Modules::add('test', 'date', false, false, false, true, 'core');
+        Hm_Output_Modules::add('test', 'blah', false, false, false, true, 'core');
+        $this->module_exec->run_output_modules($request, $session, 'test');
+        $request->format = 'Hm_Format_JSON';
+        $this->module_exec->run_output_modules($request, $session, 'test');
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_run_handler_modules() {
+        /* TODO: fix assertion */
+        require '../modules/core/setup.php';
+        require '../modules/core/modules.php';
+        $request = new Hm_Mock_Request('HTTP');
+        $session = new Hm_Mock_Session();
+        Hm_Handler_Modules::add('test', 'date', false, false, false, true, 'core');
+        Hm_Handler_Modules::add('test', 'blah', false, false, false, true, 'core');
+        $this->module_exec->run_handler_modules($request, $session, 'test');
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_run_handler_module() {
+        /* TODO: fix assertion */
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_merge_response() {
+        /* TODO: fix assertion */
+        $request = new Hm_Mock_Request('HTTP');
+        $session = new Hm_Mock_Session();
+        $this->module_exec->merge_response($request, $session, 'home');
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_setup_production_modules() {
+        /* TODO: fix assertion */
+        $this->module_exec->setup_production_modules();
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_merge_filters() {
+        $res = $this->module_exec->merge_filters(filters(), array('allowed_get' => array('new' => 'thing')));
+        $this->assertEquals('thing', $res['allowed_get']['new']);
+        $res = $this->module_exec->merge_filters(filters(), array('allowed_pages' => array('new')));
+        $this->assertTrue(in_array('new', $res['allowed_pages'], true));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_active_mods() {
+        $this->assertEquals(array('test_mod'), $this->module_exec->get_active_mods(array('test_page' => array('test_mod'))));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_load_modules() {
+        $modules = array('home' => array('test_mod' => array('source', false)));
+        $this->module_exec->load_modules('Hm_Handler_Modules', $modules, 'home');
+        $mods = Hm_Handler_Modules::get_for_page('home');
+        $this->assertTrue(isset($mods['test_mod']));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_load_module_sets() {
+        $this->module_exec->load_module_sets('home');
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_load_module_set_files() {
+        /* TODO: add assertions */
+        $this->module_exec->load_module_set_files(array('core'), array('core'));
+    }
+}
+
+class Hm_Test_Module_Exec_Debug extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        define('DEBUG_MODE', true);
+        require 'bootstrap.php';
+        $config = new Hm_Mock_Config();
+        $this->module_exec = new Hm_Module_Exec($config);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_process_module_setup() {
+    }
+    public function test_setup_debug_modules() {
+        $this->module_exec->site_config->set('modules', 'core');
+        $this->module_exec->setup_debug_modules();
     }
 }
 

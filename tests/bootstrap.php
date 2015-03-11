@@ -14,6 +14,9 @@ define('APP_PATH', dirname(dirname(__FILE__)).'/');
 /* random id */
 define('SITE_ID', 'randomid');
 
+/* cache id */
+define('CACHE_ID', 'asdf');
+
 /* get mock objects */
 require APP_PATH.'tests/mocks.php';
 

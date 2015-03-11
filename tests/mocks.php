@@ -57,6 +57,9 @@ class Hm_Mock_Request {
     public $server = array('SERVER_NAME' => 'test', 'REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');
     public $tls = false;
     public $type;
+    public $sapi = 'test';
+    public $format = 'Hm_Format_HTML5';
+    public $path = 'asdf';
     public function __construct($type) {
         $this->type = $type;
     }
@@ -96,7 +99,7 @@ function build_parent_mock($request_type='HTML5') {
     $parent = new stdClass();
     $parent->session = new Hm_Mock_Session();
     $parent->request = new Hm_Mock_Request($request_type);
-    $parent->config = new Hm_Mock_Config();
+    $parent->site_config = new Hm_Mock_Config();
     $parent->user_config = new Hm_Mock_Config();
     return $parent;
 }
