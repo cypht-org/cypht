@@ -29,6 +29,7 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $this->assertTrue($auth->check_credentials('unittestuser', 'unittestpass'));
         $auth = new Hm_Auth_None($this->config);
         $this->assertTrue($auth->check_credentials('any', 'thing'));
+        $this->assertTrue($auth->create('any', 'thing'));
     }
     /**
      * @preserveGlobalState disabled

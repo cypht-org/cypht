@@ -124,8 +124,7 @@ class Hm_Test_Elog extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_elog() {
-        /* TODO: assertions */
-        elog('test');
+        $this->assertTrue(elog('test'));
     }
 }
 

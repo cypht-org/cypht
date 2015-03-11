@@ -106,16 +106,15 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_create() {
-        /* TODO: assertions */
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
-        $session->create($request, 'unittestuser', 'unittestpass');
+        $this->assertFalse($session->create($request, 'unittestuser', 'unittestpass'));
         $session->destroy($request);
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_None');
-        $session->create($request, 'unittestuser', 'unittestpass');
+        $this->assertTrue($session->create($request, 'unittestuser', 'unittestpass'));
         $session->destroy($request);
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_None');
-        $session->create($request, 'unittestuser', 'unittestpass');
+        $this->assertTrue($session->create($request, 'unittestuser', 'unittestpass'));
         $session->destroy($request);
     }
     /**
@@ -310,12 +309,11 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_db_save_data() {
-        /* TODO: assertions */
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
         $session->loaded = true;
         $session->start($request);
-        $session->save_data();
+        $this->assertTrue($session->save_data());
         $session->destroy($request);
     }
     /**
@@ -333,11 +331,11 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get_key() {
-        /* TODO: assertions */
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
         $request->cookie['hm_id'] = 'test';
         $session->get_key($request);
+        $this->assertEquals('test', $session->enc_key);
         $session->destroy($request);
     }
     /**
@@ -345,12 +343,11 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_secure_cookie() {
-        /* TODO: assertions */
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
         $request->tls = true;
         $request->path = 'test';
-        $session->secure_cookie($request, 'name', 'value');
+        $this->assertTrue($session->secure_cookie($request, 'name', 'value'));
         $session->destroy($request);
     }
     /**
@@ -372,10 +369,27 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $session->destroy($request);
 
     }
+    public function tearDown() {
+        unset($this->config);
+    }
+}
+
+class Hm_Test_Session_Functions extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        require 'bootstrap.php'; 
+        $this->config = new Hm_Mock_Config();
+    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_setup_session() {
+        $this->assertEquals('Hm_PHP_Session', get_class((setup_session($this->config))));
+        $this->config->set('session_type', 'DB');
+        $this->config->set('auth_type', 'DB');
+        $this->assertEquals('Hm_DB_Session', get_class((setup_session($this->config))));
+    }
     public function tearDown() {
         unset($this->config);
     }

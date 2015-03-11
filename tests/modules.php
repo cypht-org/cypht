@@ -130,24 +130,24 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_process_module_setup() {
-        /* TODO: fix assertion */
+        $this->module_exec->process_module_setup();
+        $this->assertEquals(array(), $this->module_exec->filters);
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_default_langauge() {
-        /* TODO: fix assertion */
         $this->module_exec->default_language();
+        $this->assertEquals('es', $this->module_exec->handler_response['language']);
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_get_current_language() {
-        /* TODO: fix assertion */
         $this->module_exec->handler_response['language'] = 'en';
-        $this->module_exec->get_current_language();
+        $this->assertTrue(!empty($this->module_exec->get_current_language()));
 
     }
     /**
@@ -155,35 +155,39 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_run_output_modules() {
-        /* TODO: fix assertion */
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         $this->module_exec->run_output_modules($request, $session, 'home');
         $request = new Hm_Mock_Request('AJAX');
         $this->module_exec->run_output_modules($request, $session, 'ajax_test');
+        Hm_Output_Modules::add('test', 'date', false, false, false, true, 'core');
+        Hm_Output_Modules::add('test', 'blah', false, false, false, true, 'core');
+        $request = new Hm_Mock_Request('HTTP');
+        $this->module_exec->load_module_set_files(array('core'), array('core'));
+        $this->module_exec->run_output_modules($request, $session, 'test');
+        $this->assertEquals(array('<div class="date"></div>'), $this->module_exec->output_response);
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_run_output_module() {
-        /* TODO: fix assertion */
         require '../modules/core/setup.php';
         require '../modules/core/modules.php';
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         Hm_Output_Modules::add('test', 'date', false, false, false, true, 'core');
         Hm_Output_Modules::add('test', 'blah', false, false, false, true, 'core');
-        $this->module_exec->run_output_modules($request, $session, 'test');
-        $request->format = 'Hm_Format_JSON';
-        $this->module_exec->run_output_modules($request, $session, 'test');
+        $this->assertEquals(array('<div class="date"></div>', array(), 'HTML5'), $this->module_exec->run_output_module(array('test' => 'foo'), array(), 'date', array(false, true), $session, 'HTML5', array()));
+        $this->assertEquals(array(array('test' => 'foo'), array(), 'JSON'), $this->module_exec->run_output_module(array('test' => 'foo'), array(), 'blah', array(false, true), $session, 'Hm_Format_JSON', array()));
+        $this->assertEquals(array(array('test' => 'foo'), array(), 'JSON'), $this->module_exec->run_output_module(array('test' => 'foo'), array(), 'date', array(false, true), $session, 'Hm_Format_JSON', array()));
+
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_run_handler_modules() {
-        /* TODO: fix assertion */
         require '../modules/core/setup.php';
         require '../modules/core/modules.php';
         $request = new Hm_Mock_Request('HTTP');
@@ -191,31 +195,37 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
         Hm_Handler_Modules::add('test', 'date', false, false, false, true, 'core');
         Hm_Handler_Modules::add('test', 'blah', false, false, false, true, 'core');
         $this->module_exec->run_handler_modules($request, $session, 'test');
+        $this->assertEquals('asdf', $this->module_exec->handler_response['router_url_path']);
+        $this->assertEquals('test', $this->module_exec->handler_response['router_page_name']);
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_run_handler_module() {
-        /* TODO: fix assertion */
+        $request = new Hm_Mock_Request('HTTP');
+        $session = new Hm_Mock_Session();
+        $this->assertEquals(array(array('test' => 'foo'), array()), $this->module_exec->run_handler_module(array('test' => 'foo'), array(), 'date', array(false, true), $session));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_merge_response() {
-        /* TODO: fix assertion */
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         $this->module_exec->merge_response($request, $session, 'home');
+        $this->assertEquals('asdf', $this->module_exec->handler_response['router_url_path']);
+        $this->assertEquals('home', $this->module_exec->handler_response['router_page_name']);
+        $this->assertEquals('HTTP', $this->module_exec->handler_response['router_request_type']);
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_setup_production_modules() {
-        /* TODO: fix assertion */
         $this->module_exec->setup_production_modules();
+        $this->assertEquals(array(), $this->module_exec->filters);
     }
     /**
      * @preserveGlobalState disabled
@@ -249,15 +259,19 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_load_module_sets() {
+        $this->module_exec->site_config->set('modules', 'core');
         $this->module_exec->load_module_sets('home');
+        $this->module_exec->handlers['home'] = array('date' => array('core', false));
+        $this->module_exec->load_module_sets('home');
+        $this->assertTrue(class_exists('Hm_Handler_date'));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_load_module_set_files() {
-        /* TODO: add assertions */
         $this->module_exec->load_module_set_files(array('core'), array('core'));
+        $this->assertTrue(class_exists('Hm_Handler_date'));
     }
 }
 
@@ -274,10 +288,17 @@ class Hm_Test_Module_Exec_Debug extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_process_module_setup() {
+        $this->module_exec->process_module_setup();
+        $this->assertEquals(array('allowed_output' => array(), 'allowed_post' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_server' => array(), 'allowed_pages' => array ()), $this->module_exec->filters);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_setup_debug_modules() {
         $this->module_exec->site_config->set('modules', 'core');
         $this->module_exec->setup_debug_modules();
+        $this->assertTrue(!empty($this->module_exec->filters['allowed_pages']));
     }
 }
 
@@ -348,6 +369,8 @@ class Hm_Test_Module_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_add_module_to_all_pages() {
+        add_handler('test', 'test_mod', false);
+        add_output('test', 'test_mod', false);
         add_module_to_all_pages('output', 'all_pages', false, 'test', false, false);
         add_module_to_all_pages('handler', 'all_pages', false, 'test', false, false);
         Hm_Output_Modules::process_all_page_queue();

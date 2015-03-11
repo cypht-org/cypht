@@ -17,6 +17,7 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
         $this->assertFalse(Hm_DB::connect($this->config));
         setup_db($this->config);
         $this->assertEquals('object', gettype(Hm_DB::connect($this->config)));
+        $this->assertEquals('object', gettype(Hm_DB::connect($this->config)));
     }
     public function tearDown() {
         unset($this->config);
