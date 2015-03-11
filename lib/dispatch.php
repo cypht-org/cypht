@@ -36,19 +36,11 @@ class Hm_Dispatch {
         $this->get_page($this->module_exec->filters, $this->request);
         $this->module_exec->load_module_sets($this->page);
         $this->check_for_tls_redirect();
-        $this->process_request_input();
+        $this->module_exec->run_handler_modules($this->request, $this->session, $this->page);
         $this->check_for_redirect();
-        $this->process_request_output();
+        $this->module_exec->run_output_modules($this->request, $this->session, $this->page);
         $this->render_output();
         $this->save_session();
-    }
-
-    /**
-     * Process input handler modules
-     * @return void
-     */
-    private function process_request_input() {
-        $this->module_exec->run_handler_modules($this->request, $this->session, $this->page);
     }
 
     /**
@@ -88,14 +80,6 @@ class Hm_Dispatch {
             }
             $this->session->secure_cookie($this->request, 'hm_msgs', '', 0);
         }
-    }
-
-    /**
-     * Process output modules
-     * @return void
-     */
-    private function process_request_output() {
-        $this->module_exec->run_output_modules($this->request, $this->session, $this->page);
     }
 
     /**
