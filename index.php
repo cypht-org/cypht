@@ -37,9 +37,8 @@ $config = new Hm_Site_Config_File(CONFIG_FILE);
 /* setup ini settings */
 require APP_PATH.'lib/ini_set.php';
 
-/* process request and send output to the browser */
-$router = new Hm_Router();
-$router->process_request($config, DEBUG_MODE);
+/* process the request */
+new Hm_Dispatch($config);
 
 /* log some debug stats about the page */
 if (DEBUG_MODE) {
