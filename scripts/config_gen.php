@@ -111,7 +111,7 @@ function get_module_assignments($settings) {
                $css .= file_get_contents(sprintf("modules/%s/site.css", $mod));
             }
             if (is_readable(sprintf("modules/%s/setup.php", $mod))) {
-                $filters = Hm_Router::merge_filters($filters, require sprintf("modules/%s/setup.php", $mod));
+                $filters = Hm_Module_Exec::merge_filters($filters, require sprintf("modules/%s/setup.php", $mod));
             }
             if (is_readable(sprintf("modules/%s/assets/", $mod))) {
                 $assets[] = sprintf("modules/%s/assets/", $mod);
