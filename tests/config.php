@@ -196,7 +196,7 @@ class Hm_Test_User_Config_Functions extends PHPUnit_Framework_TestCase {
         /* TODO assertions */
         load_user_config_object($this->config);
         $this->config->set('user_config_type', 'DB');
-        load_user_config_object($this->config);
+        $this->assertEquals('Hm_User_Config_DB', get_class(load_user_config_object($this->config)));
    }
     public function tearDown() {
         unset($this->config);
