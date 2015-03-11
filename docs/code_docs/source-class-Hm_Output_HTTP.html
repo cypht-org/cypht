@@ -481,7 +481,7 @@
 </span><span id="201" class="l"><a class="l" href="#201">201: </a>        <span class="php-var">$bt</span> = <span class="php-keyword2">debug_backtrace</span>();
 </span><span id="202" class="l"><a class="l" href="#202">202: </a>        <span class="php-var">$caller</span> = <span class="php-keyword2">array_shift</span>(<span class="php-var">$bt</span>);
 </span><span id="203" class="l"><a class="l" href="#203">203: </a>        Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'ELOG called in %s at line %d'</span>, <span class="php-var">$caller</span>[<span class="php-quote">'file'</span>], <span class="php-var">$caller</span>[<span class="php-quote">'line'</span>]));
-</span><span id="204" class="l"><a class="l" href="#204">204: </a>        Hm_Functions::<span class="php-keyword2">error_log</span>(Hm_Debug::str(<span class="php-var">$mixed</span>));
+</span><span id="204" class="l"><a class="l" href="#204">204: </a>        <span class="php-keyword1">return</span> Hm_Functions::<span class="php-keyword2">error_log</span>(Hm_Debug::str(<span class="php-var">$mixed</span>));
 </span><span id="205" class="l"><a class="l" href="#205">205: </a>    }
 </span><span id="206" class="l"><a class="l" href="#206">206: </a>}
 </span><span id="207" class="l"><a class="l" href="#207">207: </a>
