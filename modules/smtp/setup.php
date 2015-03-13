@@ -36,7 +36,7 @@ add_handler('ajax_smtp_debug', 'http_headers', true, 'core');
 add_handler('ajax_smtp_save_draft', 'login', false, 'core');
 add_handler('ajax_smtp_save_draft', 'load_user_data',  true, 'core');
 add_handler('ajax_smtp_save_draft', 'smtp_save_draft',  true);
-add_handler('ajax_smtp_save_draft', 'save_user_data',  true, 'core');
+add_handler('ajax_smtp_save_draft', 'close_session_early',  true, 'core');
 add_handler('ajax_smtp_save_draft', 'date', true, 'core');
 add_handler('ajax_smtp_save_draft', 'http_headers', true, 'core');
 

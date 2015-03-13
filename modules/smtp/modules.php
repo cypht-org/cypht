@@ -15,10 +15,10 @@ require APP_PATH.'modules/smtp/hm-smtp.php';
  */
 class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('draft_to', 'draft_body', 'draft_subject'));
-        if ($success) {
-            $this->session->set('compose_draft', $form);
-        }
+        $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
+        $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
+        $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
+        $this->session->set('compose_draft', array('draft_to' => $to, 'draft_body' => $body, 'draft_subject' => $subject));
     }
 }
 
@@ -194,12 +194,18 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         if (array_key_exists('smtp_send', $this->request->post)) {
             list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'smtp_server_id'));
             if ($success) {
+                $draft = array(
+                    'draft_to' => $form['compose_to'],
+                    'draft_body' => '',
+                    'draft_subject' => $form['compose_subject']
+                );
                 $to = $form['compose_to'];
                 $subject = $form['compose_subject'];
                 $body = '';
                 $from = '';
                 if (array_key_exists('compose_body', $this->request->post)) {
                     $body = $this->request->post['compose_body'];
+                    $draft['draft_body'] = $this->request->post['compose_body'];
                 }
                 $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id']);
                 if ($smtp_details) {
@@ -217,6 +223,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                                 Hm_Msgs::add(sprintf("ERR%s", $err_msg));
                             }
                             else {
+                                $draft = array();
                                 Hm_Msgs::add("Message Sent");
                             }
                         }
@@ -225,6 +232,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                         Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
                     }
                 }
+                $this->session->set('compose_draft', $draft);
             }
             else {
                 Hm_Msgs::add('ERRRequired field missing');
@@ -254,7 +262,8 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '<input value="'.$subject.'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
             '<textarea required name="compose_body" class="compose_body">'.$body.'</textarea>'.
             smtp_server_dropdown($this->module_output(), $this).
-            '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" /></form></div>';
+            '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
+            '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" /></form></div>';
     }
 }
 
