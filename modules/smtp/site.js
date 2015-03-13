@@ -72,17 +72,18 @@ var smtp_delete_action = function() {
 };
 
 var save_compose_state = function() {
-    if ($('.compose_body').text().length > 0) {
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
-            {'name': 'draft_body', 'value': $('.compose_body').text()},
-            {'name': 'draft_subject', 'value': $('.compose_subject').val()},
-            {'name': 'draft_to', 'value': $('.compose_to').val()}],
-            function(res) { },
-            [],
-            true
-        );
-    }
+    var body = $('.compose_body').val();
+    var subject = $('.compose_subject').val();
+    var to = $('.compose_to').val();
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
+        {'name': 'draft_body', 'value': body},
+        {'name': 'draft_subject', 'value': subject},
+        {'name': 'draft_to', 'value': to}],
+        function(res) { },
+        [],
+        true
+    );
 };
 
 if (hm_page_name() == 'servers') {
@@ -98,4 +99,9 @@ if (hm_page_name() == 'servers') {
 
 if (hm_page_name() == 'compose') {
     Hm_Timer.add_job(save_compose_state, 30, true);
+    $('.smtp_reset').click(function() {
+        $('.compose_body').val('');
+        $('.compose_subject').val('');
+        $('.compose_to').val('');
+    });
 }

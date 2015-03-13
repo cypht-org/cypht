@@ -6,3 +6,4 @@
 .smtp_section { display: none; }
 .smtp_server_setup .content_title { cursor: pointer; }
 .compose_server, .compose_server option { width: 100%; padding: 5px; margin: 5px; }
+.smtp_reset { float: right; margin-top: 10px; }
