@@ -39,7 +39,7 @@ class Hm_Format_JSON extends HM_Format {
      * @return JSON encoded data to be sent to the browser
      */
     public function content($output, $allowed_output) {
-        $input['router_user_msgs'] = Hm_Msgs::get();
+        $output['router_user_msgs'] = Hm_Msgs::get();
         $output = $this->filter_output($output, $allowed_output);
         return json_encode($output, JSON_FORCE_OBJECT);
     }
