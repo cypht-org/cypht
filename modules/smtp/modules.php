@@ -147,7 +147,7 @@ class Hm_Handler_smtp_delete extends Hm_Handler_Module {
             if ($success) {
                 $res = Hm_SMTP_List::del($form['smtp_server_id']);
                 if ($res) {
-                    $this->out(deleted_server_id, $form['smtp_server_id']);
+                    $this->out('deleted_server_id', $form['smtp_server_id']);
                     Hm_Msgs::add('Server deleted');
                     $this->session->record_unsaved('SMTP server deleted');
                 }
