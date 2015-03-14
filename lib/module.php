@@ -339,7 +339,7 @@ abstract class Hm_Output_Module {
      */
     public function output_content($format, $lang_str, $protected) {
         $this->lstr = $lang_str;
-        $this->format = $format;
+        $this->format = str_replace('Hm_Format_', '', $format);
         if (array_key_exists('interface_lang', $lang_str)) {
             $this->lang = $lang_str['interface_lang'];
         }
