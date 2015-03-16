@@ -619,7 +619,7 @@
 </span></span><span id="339" class="l"><a class="l" href="#339">339: </a><span class="php-comment">     */</span>
 </span><span id="340" class="l"><a class="l" href="#340">340: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_output_content" href="#_output_content">output_content</a>(<span class="php-var">$format</span>, <span class="php-var">$lang_str</span>, <span class="php-var">$protected</span>) {
 </span><span id="341" class="l"><a class="l" href="#341">341: </a>        <span class="php-var">$this</span>-&gt;lstr = <span class="php-var">$lang_str</span>;
-</span><span id="342" class="l"><a class="l" href="#342">342: </a>        <span class="php-var">$this</span>-&gt;format = <span class="php-var">$format</span>;
+</span><span id="342" class="l"><a class="l" href="#342">342: </a>        <span class="php-var">$this</span>-&gt;format = <span class="php-keyword2">str_replace</span>(<span class="php-quote">'Hm_Format_'</span>, <span class="php-quote">''</span>, <span class="php-var">$format</span>);
 </span><span id="343" class="l"><a class="l" href="#343">343: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_lang'</span>, <span class="php-var">$lang_str</span>)) {
 </span><span id="344" class="l"><a class="l" href="#344">344: </a>            <span class="php-var">$this</span>-&gt;lang = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_lang'</span>];
 </span><span id="345" class="l"><a class="l" href="#345">345: </a>        }
