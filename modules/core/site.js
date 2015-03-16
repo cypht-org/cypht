@@ -678,10 +678,10 @@ var Hm_Message_List = {
         }
         $('.total').text($('.message_table tbody tr').length);
         Hm_Message_List.update_title();
-        Hm_Message_List.set_checkbox_callback();
     },
 
     set_checkbox_callback: function() {
+        $('input[type=checkbox]').unbind('click');
         $('input[type=checkbox]').click(function(e) {
             Hm_Message_List.toggle_msg_controls();
             Hm_Message_List.check_select_range(e);
