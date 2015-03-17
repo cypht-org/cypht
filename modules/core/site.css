@@ -64,7 +64,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .label_col { width: 20%; }
 .submit_cell { padding-top: 30px !important; }
 .password_notice { float: left; margin-left: 10px; font-size: .9em; color: #666; padding-top: 5px; }
-.checkbox_cell label { display: none; }
+.checkbox_cell label { display: block; width: 16px; height: 16px; background-color: #eee; border: solid 1px #ddd; }
+.checkbox_cell input[type="checkbox"] { display: none; }
+.checkbox_cell input[type="checkbox"]:checked + label { background-color: #aaa; }
 .confirm_logout { display: none; background-color: #eee; padding: 20px; position: absolute; left: 0px; top: 0px; border: solid 1px #ccc; z-index: 100; }
 .confirm_text {  padding-left: 10px; padding-bottom: 10px; }
 .folder_list .update_unread { float: right; margin-top: 20px; }

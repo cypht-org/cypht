@@ -149,11 +149,16 @@ function safe_output_callback($vals, $style, $output_mod) {
  */
 function checkbox_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
-        return sprintf('<td class="checkbox_cell"><label for="'.$output_mod->html_safe($vals[0]).'">'.
-            '</label><input id="'.$output_mod->html_safe($vals[0]).'" type="checkbox" value="%s" /></td>', $output_mod->html_safe($vals[0]));
+        return sprintf('<td class="checkbox_cell">'.
+            '<input id="'.$output_mod->html_safe($vals[0]).'" type="checkbox" value="%s" />'.
+            '<label class="checkbox_label" for="'.$output_mod->html_safe($vals[0]).'"></label>'.
+            '</td>', $output_mod->html_safe($vals[0]));
     }
     elseif ($style == 'news') {
-        return sprintf('<input type="checkbox" value="%s" /></td><td class="news_cell">', $output_mod->html_safe($vals[0]));
+        return sprintf('<input type="checkbox" id="%s" value="%s" />'.
+            '<label class="checkbox_label" for="%s"></label>'.
+            '</td><td class="news_cell">', $output_mod->html_safe($vals[0]),
+            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[0]));
     }
 }
 

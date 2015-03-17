@@ -31,3 +31,5 @@ a { color: #222 !important; }
 .message_table td { padding-bottom: 15px !important; padding-top: 0px !important; }
 .unseen a { font-weight: normal !important; }
 nav { padding-top: 0px !important; }
+.checkbox_cell label { border: solid 1px rgb(255,102,0) !important; }
+.news_cell input[type="checkbox"]:checked + label { background-color: rgb(255,102,0) !important; }

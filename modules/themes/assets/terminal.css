@@ -8,9 +8,8 @@ a { color: green !important; }
 .toggle_link img { display: inline-block; }
 .prevnext { display: none; }
 ::-webkit-input-placeholder { color: #174214; }
-.checkbox_cell input { display: none; }
-.checkbox_cell label { display: inline-block; width: 12px; height: 12px; border: solid 1px #222 !important; vertical-align: middle; cursor: pointer; }
-input[type="checkbox"]:checked + label span{ background-color: #82c885 !important; }
+.checkbox_cell label { border: solid 1px green !important; }
+.checkbox_cell input[type="checkbox"]:checked + label { background-color: green !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #050505 !important; }
 .src_name, .content_title { color: green !important; background: linear-gradient(0deg, #050505, #050505) !important; }
