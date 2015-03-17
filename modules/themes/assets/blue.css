@@ -16,3 +16,4 @@ textarea, select, input, .toggle_link { border-color: #ccc !important; color: #6
 .online { color: green; }
 .sys_messages { background-color: #dfeaff !important; }
 .empty_list { color: #bbb !important; }
+.checkbox_cell input[type="checkbox"]:checked + label { background-color: #c6d7ff !important; }
