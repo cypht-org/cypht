@@ -56,7 +56,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .folder_list .update_message_list{ font-size: 80%; padding-top: 10px; float: right; }
 .src_name { max-height: 25px; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; color: #777; padding-top: 10px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
 .main_menu { padding-top: 20px; }
-.content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 30px; }
+.content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fafafa); border-bottom: solid 1px #ddd; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px; }
 .header_subject .content_title { color: #555; }
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
@@ -85,7 +85,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .wait { }
 .msg_controls { display: none; padding-left: 0px; margin-right: 20px; }
 .msg_controls_visible { display: inline; }
-.msg_controls a, .toggle_link { font-size: .6em; letter-spacing: 0px; color: #666; margin-right: 5px; background-color: #fff; border: solid 1px #ccc; padding: 3px; width: 30px; border-radius: 3px; vertical-align: 3px; }
+.msg_controls a, .toggle_link { font-size: .6em; letter-spacing: 0px; color: #666; background-color: #fff; border: solid 1px #ccc; padding: 3px; width: 30px; border-radius: 3px; vertical-align: 3px; }
+.msg_controls a { margin-right: 3px; }
+.toggle_link { padding-left: 4px !important; padding-right: 4px !important; }
 .refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 0px; vertical-align: -13px; }
 .list_settings_dialog { display: none; padding: 10px; position: absolute; top: 0px; right: 0px; width: 600px; background-color: #efefef; border: solid 1px #ccc; }
 .list_controls { margin-top: -20px; padding: 10px; padding-right: 20px; float: right; }
