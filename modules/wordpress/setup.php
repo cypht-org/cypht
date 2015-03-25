@@ -10,9 +10,11 @@ add_handler('message', 'wordpress_list_type', true, 'wordpress', 'message_list_t
 add_handler('message_list', 'wp_load_sources', true, 'wordpress', 'load_user_data', 'after');
 add_handler('message_list', 'wordpress_list_type', true, 'wordpress', 'message_list_type', 'after');
 
+add_handler('ajax_hm_folders', 'wordpress_folders_data',  true, 'wordpress', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'wordpress_folders',  true, 'wordpress', 'folder_list_content_start', 'before');
 
 add_handler('servers', 'setup_wordpress_connect', true, 'wordpress', 'load_user_data', 'after');
+add_handler('servers', 'wordpress_disconnect', true, 'wordpress', 'setup_wordpress_connect', 'after');
 add_output('servers', 'wordpress_connect_section', true, 'wordpress', 'server_content_end', 'before');
 
 add_handler('home', 'process_wordpress_authorization', true, 'wordpress', 'load_user_data', 'after');
@@ -49,6 +51,9 @@ return array(
         'ajax_wordpess_freshly_pressed',
         'ajax_wordpess_notifications',
         'ajax_wp_notice_display',
+    ),
+    'allowed_post' => array(
+        'wp_disconnect' => FILTER_SANITIZE_STRING
     ),
     'allowed_output' => array(
         'wp_notice_text' => array(FILTER_UNSAFE_RAW, false),

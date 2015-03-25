@@ -28,6 +28,15 @@ class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
 /**
  * @subpackage wordpress/handler
  */
+class Hm_Handler_wordpress_folders_data extends Hm_Handler_Module {
+    public function process() {
+        $this->out('wp_connect_details', $this->user_config->get('wp_connect_details', array()));
+    }
+}
+
+/**
+ * @subpackage wordpress/handler
+ */
 class Hm_Handler_get_wp_notice_data extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('uid', $this->request->get)) {
@@ -134,6 +143,25 @@ class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
 /**
  * @subpackage wordpress/handler
  */
+class Hm_Handler_wordpress_disconnect extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('wp_disconnect', $this->request->post)) {
+            $this->user_config->set('wp_connect_details', array());
+            $user_data = $this->user_config->dump();
+            if (!empty($user_data)) {
+                $this->session->set('user_data', $user_data);
+            }
+            $this->out('reload_folders', true, false);
+            $this->session->record_unsaved('WordPress connection deleted');
+            Hm_Msgs::add('Wordpress connection deleted');
+            Hm_Page_Cache::flush($this->session);
+        }
+    }
+}
+
+/**
+ * @subpackage wordpress/handler
+ */
 class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
     public function process() {
         $details = wp_connect_details($this->config);
@@ -148,14 +176,16 @@ class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
  */
 class Hm_Output_wordpress_folders extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
-            '" alt="" width="16" height="16" /> '.$this->trans('Notifications').'</a></li>';
-        $res .= '<li class="menu_wp_freshly_pressed"><a class="unread_link" href="?page=message_list&list_path=wp_freshly_pressed">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
-            '" alt="" width="16" height="16" /> '.$this->trans('Freshly Pressed').'</a></li>';
-        $this->append('folder_sources', 'wordPress_folders');
-        Hm_Page_Cache::add('wordPress_folders', $res, true);
+        if (!empty($this->get('wp_connect_details', array()))) {
+            $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">'.
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
+                '" alt="" width="16" height="16" /> '.$this->trans('Notifications').'</a></li>';
+            $res .= '<li class="menu_wp_freshly_pressed"><a class="unread_link" href="?page=message_list&list_path=wp_freshly_pressed">'.
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
+                '" alt="" width="16" height="16" /> '.$this->trans('Freshly Pressed').'</a></li>';
+            $this->append('folder_sources', 'wordPress_folders');
+            Hm_Page_Cache::add('wordPress_folders', $res, true);
+        }
         return '';
     }
 }
@@ -293,10 +323,14 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
             $this->trans('WordPress.com Connect').'</div><div class="wordpress_connect_section">'.
             'Connect to WordPress.com to view notifications and posts.<br /><br />';
         if (empty($details)) {
-            $res .= '<a href="'.$this->get('wp_auth_url', '').'">Enable</a></div></div>';
+            $res .= '<a href="'.$this->get('wp_auth_url', '').'">'.$this->trans('Enable').'</a></div></div>';
         }
         else {
-            $res .= 'Already connected</div></div>';
+            $res .= $this->trans('Already connected');
+            $res .= '<br /><form method="POST">';
+            $res .= '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
+            $res .= '<input type="submit" name="wp_disconnect" class="wp_disconnect" value="'.$this->trans('Disconnect').'" />';
+            $res .= '</form></div></div>';
         }
         return $res;
     }
