@@ -8,7 +8,7 @@
 	<title>File feeds/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?4096077112"></script>
+	<script type="text/javascript" src="elementlist.js?1960482379"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -821,7 +821,7 @@
 </span><span id="530" class="l"><a class="l" href="#530">530: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;feed_server_setup&quot;&gt;&lt;div data-target=&quot;.feeds_section&quot; class=&quot;server_section&quot;&gt;'</span>.
 </span><span id="531" class="l"><a class="l" href="#531">531: </a>                <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$rss</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
 </span><span id="532" class="l"><a class="l" href="#532">532: </a>                <span class="php-quote">' '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Feeds'</span>).<span class="php-quote">' &lt;div class=&quot;server_count&quot;&gt;'</span>.<span class="php-var">$count</span>.<span class="php-quote">'&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;feeds_section&quot;&gt;&lt;form class=&quot;add_server&quot; method=&quot;POST&quot;&gt;'</span>.
-</span><span id="533" class="l"><a class="l" href="#533">533: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="533" class="l"><a class="l" href="#533">533: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
 </span><span id="534" class="l"><a class="l" href="#534">534: </a>                <span class="php-quote">'&lt;div class=&quot;subtitle&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add an RSS/ATOM Feed'</span>).<span class="php-quote">'&lt;/div&gt;&lt;table&gt;'</span>.
 </span><span id="535" class="l"><a class="l" href="#535">535: </a>                <span class="php-quote">'&lt;tr&gt;&lt;td&gt;&lt;label class=&quot;screen_reader&quot; for=&quot;new_feed_name&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Feed name'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
 </span><span id="536" class="l"><a class="l" href="#536">536: </a>                <span class="php-quote">'&lt;input required type=&quot;text&quot; id=&quot;new_feed_name&quot; name=&quot;new_feed_name&quot; class=&quot;txt_fld&quot; value=&quot;&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Feed name'</span>).<span class="php-quote">'&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.

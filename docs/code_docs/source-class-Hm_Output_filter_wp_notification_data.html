@@ -8,7 +8,7 @@
 	<title>File wordpress/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?4096077112"></script>
+	<script type="text/javascript" src="elementlist.js?1960482379"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -607,7 +607,7 @@
 </span><span id="328" class="l"><a class="l" href="#328">328: </a>        <span class="php-keyword1">else</span> {
 </span><span id="329" class="l"><a class="l" href="#329">329: </a>            <span class="php-var">$res</span> .= <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Already connected'</span>);
 </span><span id="330" class="l"><a class="l" href="#330">330: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;br /&gt;&lt;form method=&quot;POST&quot;&gt;'</span>;
-</span><span id="331" class="l"><a class="l" href="#331">331: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="331" class="l"><a class="l" href="#331">331: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="332" class="l"><a class="l" href="#332">332: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; name=&quot;wp_disconnect&quot; class=&quot;wp_disconnect&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Disconnect'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="333" class="l"><a class="l" href="#333">333: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
 </span><span id="334" class="l"><a class="l" href="#334">334: </a>        }

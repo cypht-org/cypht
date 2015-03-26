@@ -8,7 +8,7 @@
 	<title>File core/modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?4096077112"></script>
+	<script type="text/javascript" src="elementlist.js?1960482379"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -819,7 +819,7 @@
 </span><span id="485" class="l"><a class="l" href="#485"> 485: </a>                <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'changed_settings'</span>, <span class="php-var">$this</span>-&gt;session-&gt;get(<span class="php-quote">'changed_settings'</span>, <span class="php-keyword1">array</span>()), <span class="php-keyword1">false</span>);
 </span><span id="486" class="l"><a class="l" href="#486"> 486: </a>            }
 </span><span id="487" class="l"><a class="l" href="#487"> 487: </a>        }
-</span><span id="488" class="l"><a class="l" href="#488"> 488: </a>        <span class="php-var">$this</span>-&gt;process_nonce();
+</span><span id="488" class="l"><a class="l" href="#488"> 488: </a>        <span class="php-var">$this</span>-&gt;process_key();
 </span><span id="489" class="l"><a class="l" href="#489"> 489: </a>    }
 </span><span id="490" class="l"><a class="l" href="#490"> 490: </a>}
 </span><span id="491" class="l"><a class="l" href="#491"> 491: </a>
@@ -1169,7 +1169,7 @@
 </span><span id="835" class="l"><a class="l" href="#835"> 835: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_login_state'</span>)) {
 </span><span id="836" class="l"><a class="l" href="#836"> 836: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;form class=&quot;login_form&quot; method=&quot;POST&quot;&gt;'</span>.
 </span><span id="837" class="l"><a class="l" href="#837"> 837: </a>                <span class="php-quote">'&lt;h1 class=&quot;title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_app_name'</span>, <span class="php-quote">''</span>)).<span class="php-quote">'&lt;/h1&gt;'</span>.
-</span><span id="838" class="l"><a class="l" href="#838"> 838: </a>                <span class="php-quote">' &lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.Hm_Nonce::site_key().<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="838" class="l"><a class="l" href="#838"> 838: </a>                <span class="php-quote">' &lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.Hm_Request_Key::generate().<span class="php-quote">'&quot; /&gt;'</span>.
 </span><span id="839" class="l"><a class="l" href="#839"> 839: </a>                <span class="php-quote">' &lt;label class=&quot;screen_reader&quot; for=&quot;username&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Username'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
 </span><span id="840" class="l"><a class="l" href="#840"> 840: </a>                <span class="php-quote">'&lt;input autofocus required type=&quot;text&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Username'</span>).<span class="php-quote">'&quot; id=&quot;username&quot; name=&quot;username&quot; value=&quot;&quot;&gt;'</span>.
 </span><span id="841" class="l"><a class="l" href="#841"> 841: </a>                <span class="php-quote">' &lt;label class=&quot;screen_reader&quot; for=&quot;password&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
@@ -1180,7 +1180,7 @@
 </span><span id="846" class="l"><a class="l" href="#846"> 846: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;form class=&quot;logout_form&quot; method=&quot;POST&quot;&gt;'</span>.
 </span><span id="847" class="l"><a class="l" href="#847"> 847: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; id=&quot;unsaved_changes&quot; value=&quot;'</span>.
 </span><span id="848" class="l"><a class="l" href="#848"> 848: </a>                (!<span class="php-keyword1">empty</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'changed_settings'</span>, <span class="php-keyword1">array</span>())) ? <span class="php-quote">'1'</span> : <span class="php-quote">'0'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="849" class="l"><a class="l" href="#849"> 849: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="849" class="l"><a class="l" href="#849"> 849: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
 </span><span id="850" class="l"><a class="l" href="#850"> 850: </a>                <span class="php-quote">'&lt;div class=&quot;confirm_logout&quot;&gt;&lt;div class=&quot;confirm_text&quot;&gt;'</span>.
 </span><span id="851" class="l"><a class="l" href="#851"> 851: </a>                <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Unsaved changes will be lost! Re-neter your password to save and exit.'</span>).<span class="php-quote">' &amp;nbsp;'</span>.
 </span><span id="852" class="l"><a class="l" href="#852"> 852: </a>                <span class="php-quote">'&lt;a href=&quot;?page=save&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'More info'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/div&gt;'</span>.
@@ -1307,7 +1307,7 @@
 </span><span id="973" class="l"><a class="l" href="#973"> 973: </a><span class="php-keyword1">class</span> <a id="Hm_Output_content_start" href="#Hm_Output_content_start">Hm_Output_content_start</a> <span class="php-keyword1">extends</span> Hm_Output_Module {
 </span><span id="974" class="l"><a class="l" href="#974"> 974: </a>    <span class="php-comment">/**
 </span></span><span id="975" class="l"><a class="l" href="#975"> 975: </a><span class="php-comment">     * Outputs the starting body tag and a noscript warning. Clears the local session cache
-</span></span><span id="976" class="l"><a class="l" href="#976"> 976: </a><span class="php-comment">     * if not logged in, or adds a page wide nonce used by ajax requests
+</span></span><span id="976" class="l"><a class="l" href="#976"> 976: </a><span class="php-comment">     * if not logged in, or adds a page wide key used by ajax requests
 </span></span><span id="977" class="l"><a class="l" href="#977"> 977: </a><span class="php-comment">     */</span>
 </span><span id="978" class="l"><a class="l" href="#978"> 978: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="979" class="l"><a class="l" href="#979"> 979: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;body&gt;&lt;noscript class=&quot;noscript&quot;&gt;'</span>.
@@ -1317,7 +1317,7 @@
 </span><span id="983" class="l"><a class="l" href="#983"> 983: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;script type=&quot;text/javascript&quot;&gt;sessionStorage.clear();&lt;/script&gt;'</span>;
 </span><span id="984" class="l"><a class="l" href="#984"> 984: </a>        }
 </span><span id="985" class="l"><a class="l" href="#985"> 985: </a>        <span class="php-keyword1">else</span> {
-</span><span id="986" class="l"><a class="l" href="#986"> 986: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; id=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="986" class="l"><a class="l" href="#986"> 986: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; id=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="987" class="l"><a class="l" href="#987"> 987: </a>        }
 </span><span id="988" class="l"><a class="l" href="#988"> 988: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="989" class="l"><a class="l" href="#989"> 989: </a>    }
@@ -1481,7 +1481,7 @@
 </span></span><span id="1147" class="l"><a class="l" href="#1147">1147: </a><span class="php-comment">     */</span>
 </span><span id="1148" class="l"><a class="l" href="#1148">1148: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>() {
 </span><span id="1149" class="l"><a class="l" href="#1149">1149: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;user_settings&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Site Settings'</span>).<span class="php-quote">'&lt;/div&gt;'</span>.
-</span><span id="1150" class="l"><a class="l" href="#1150">1150: </a>            <span class="php-quote">'&lt;form method=&quot;POST&quot;&gt;&lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="1150" class="l"><a class="l" href="#1150">1150: </a>            <span class="php-quote">'&lt;form method=&quot;POST&quot;&gt;&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
 </span><span id="1151" class="l"><a class="l" href="#1151">1151: </a>            <span class="php-quote">'&lt;table class=&quot;settings_table&quot;&gt;&lt;colgroup&gt;'</span>.
 </span><span id="1152" class="l"><a class="l" href="#1152">1152: </a>            <span class="php-quote">'&lt;col class=&quot;label_col&quot;&gt;&lt;col class=&quot;setting_col&quot;&gt;&lt;/colgroup&gt;'</span>;
 </span><span id="1153" class="l"><a class="l" href="#1153">1153: </a>    }
@@ -2041,7 +2041,7 @@
 </span><span id="1707" class="l"><a class="l" href="#1707">1707: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'No changes need to be saved'</span>).<span class="php-quote">'&lt;/li&gt;'</span>;
 </span><span id="1708" class="l"><a class="l" href="#1708">1708: </a>        }
 </span><span id="1709" class="l"><a class="l" href="#1709">1709: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;&lt;div class=&quot;save_perm_form&quot;&gt;&lt;form method=&quot;post&quot;&gt;'</span>.
-</span><span id="1710" class="l"><a class="l" href="#1710">1710: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_nonce&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Nonce::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="1710" class="l"><a class="l" href="#1710">1710: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
 </span><span id="1711" class="l"><a class="l" href="#1711">1711: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;password&quot;&gt;Password&lt;/label&gt;&lt;input required id=&quot;password&quot; '</span>.
 </span><span id="1712" class="l"><a class="l" href="#1712">1712: </a>            <span class="php-quote">'name=&quot;password&quot; class=&quot;save_settings_password&quot; type=&quot;password&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
 </span><span id="1713" class="l"><a class="l" href="#1713">1713: </a>            <span class="php-quote">'&lt;input class=&quot;save_settings&quot; type=&quot;submit&quot; name=&quot;save_settings_permanently&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
