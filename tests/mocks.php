@@ -51,7 +51,7 @@ class Hm_Mock_Config {
 class Hm_Mock_Request {
 
     public $invalid_input_detected;
-    public $post = array('hm_nonce' => 'asdf', 'fld1' => '0', 'fld2' => '1');
+    public $post = array('hm_page_key' => 'asdf', 'fld1' => '0', 'fld2' => '1');
     public $get = array();
     public $cookie = array();
     public $server = array('SERVER_NAME' => 'test', 'REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');

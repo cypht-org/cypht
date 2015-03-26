@@ -48,81 +48,38 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
 }
 
 /**
- * tests for Hm_Nonce
+ * tests for Hm_Request_Key
  */
-class Hm_Test_Nonce extends PHPUnit_Framework_TestCase {
+class Hm_Test_Request_Key extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        $this->nonce = new Hm_Nonce();
-        $this->session = new Hm_Mock_Session();
-        $config = new Hm_Mock_Config();
-        $this->session->set('nonce_list', array('asdf'));
-        $this->nonce->load($this->session, $config, false);
+        $session = new Hm_Mock_Session();
+        $request = new Hm_Mock_Request('AJAX');
+        Hm_Request_Key::load($session, $request);
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_nonce_load() {
-        $this->assertTrue($this->nonce->validate('asdf'));
+    public function test_key_load() {
+        $this->assertEquals('fakefingerprint', Hm_Request_Key::generate());
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_nonce_validate() {
-        $this->assertTrue($this->nonce->validate('asdf'));
-        $this->assertEquals(false, $this->nonce->validate('qwer'));
+    public function test_key_generate() {
+        $this->assertEquals('fakefingerprint', Hm_Request_Key::generate());
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_nonce_site_key() {
-        $this->assertEquals('fakefingerprint', $this->nonce->site_key());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_nonce_validate_site_key() {
-        $this->assertTrue($this->nonce->validate_site_key('fakefingerprint'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_nonce_generate() {
-        $nonce = $this->nonce->generate();
-        $this->assertTrue($this->nonce->validate($nonce));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_nonce_trim_list() {
-        $this->assertTrue($this->nonce->validate('asdf'));
-        for ($i = 0; $i < 24; $i++) {
-            $this->nonce->generate();
-        }
-        $this->assertEquals(false, $this->nonce->validate('asdf'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_nonce_save() {
-        $this->session = new Hm_Mock_Session();
-        $this->nonce->save($this->session);
-        $this->assertEquals(1, count($this->session->get('nonce_list', array())));
-        $this->nonce->generate();
-        $this->nonce->save($this->session);
-        $this->assertEquals(2, count($this->session->get('nonce_list', array())));
+    public function test_key_validate() {
+        $this->assertTrue(Hm_Request_Key::validate('fakefingerprint'));
     }
     public function tearDown() {
-        unset($this->nonce);
-        unset($this->session);
     }
 }
 

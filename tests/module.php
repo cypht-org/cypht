@@ -107,19 +107,26 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_process_nonce() {
+    public function test_process_key() {
         /* TODO: fix assertions */
-        $this->assertNull($this->handler_mod->process_nonce());
-        $this->handler_mod->session->set('nonce_list', array('asdf'));
-        $this->handler_mod->session->loaded = false;
-        $this->handler_mod->session->set('nonce_list', array('sdfg'));
-        $this->assertNull($this->handler_mod->process_nonce());
+        $session = new Hm_Mock_Session();
+        $request = new Hm_Mock_Request('AJAX');
+        Hm_Request_Key::load($session, $request);
+
+        $request->post = array();
+        $this->handler_mod->request->post = array();
+        $this->assertFalse($this->handler_mod->process_key());
+
+        $request->post['hm_page_key'] = 'asdf';
+        $this->handler_mod->request->post['hm_page_key'] = 'asdf';
+        Hm_Request_Key::load($session, $request);
+        $this->assertEquals('redirect', $this->handler_mod->process_key());
+
         $this->handler_mod->request->type = 'AJAX';
-        $this->assertNull($this->handler_mod->process_nonce());
-        $this->handler_mod->session->set('nonce_list', array('asdf'));
-        $this->parent->request->post = array();
-        $handler_mod = new Hm_Handler_Test($this->parent, false);
-        $this->assertNull($handler_mod->process_nonce());
+        $this->assertEquals('exit', $this->handler_mod->process_key());
+
+        $this->handler_mod->request->post['hm_page_key'] = 'fakefingerprint';
+        $this->assertFalse($this->handler_mod->process_key());
     }
     /**
      * @preserveGlobalState disabled
@@ -150,10 +157,9 @@ class Hm_Test_Handler_Module_Debug extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_process_nonce_debug() {
-        /* TODO: fix assertions */
+    public function test_process_key_debug() {
         $this->handler_mod->request->type = 'AJAX';
-        $this->assertNull($this->handler_mod->process_nonce());
+        $this->assertEquals('exit', $this->handler_mod->process_key());
     }
 }
 
