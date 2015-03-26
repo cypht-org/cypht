@@ -85,13 +85,19 @@ class Hm_Request_Key {
     private static $site_hash = false;
 
     /**
-     * Load a saved list from the session
+     * Load the request key
      * @param object $session session interface
      * @param object $request request object
      * @return void
      */
     public static function load($session, $request) {
-        self::$site_hash = $session->build_fingerprint($request, SITE_ID);
+        if ($session->is_active() && !$session->loaded) {
+            $user = $session->get('username', false);
+        }
+        else {
+            $user = '';
+        }
+        self::$site_hash = $session->build_fingerprint($request, $user.SITE_ID);
     }
 
     /**
