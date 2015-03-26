@@ -91,7 +91,7 @@ class Hm_Output_create_form extends Hm_Output_Module {
             return '<div class="create_user">'.
                 '<h1 class="title">'.$this->trans('Create Account').'</h1>'.
                 '<form method="POST" autocomplete="off" >'.
-                '<input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
+                '<input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                 '<input style="display:none" type="text" name="fake_username" />'.
                 '<input style="display:none" type="password" name="fake_password" />'.
                 ' <input required type="text" placeholder="'.$this->trans('Username').'" name="create_username" value="">'.

@@ -485,7 +485,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
                 $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
             }
         }
-        $this->process_nonce();
+        $this->process_key();
     }
 }
 
@@ -835,7 +835,7 @@ class Hm_Output_login extends Hm_Output_Module {
         if (!$this->get('router_login_state')) {
             return '<form class="login_form" method="POST">'.
                 '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
-                ' <input type="hidden" name="hm_nonce" value="'.Hm_Nonce::site_key().'" />'.
+                ' <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                 ' <label class="screen_reader" for="username">'.$this->trans('Username').'</label>'.
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
                 ' <label class="screen_reader" for="password">'.$this->trans('Password').'</label>'.
@@ -846,7 +846,7 @@ class Hm_Output_login extends Hm_Output_Module {
             return '<form class="logout_form" method="POST">'.
                 '<input type="hidden" id="unsaved_changes" value="'.
                 (!empty($this->get('changed_settings', array())) ? '1' : '0').'" />'.
-                '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').' &nbsp;'.
                 '<a href="?page=save">'.$this->trans('More info').'</a></div>'.
@@ -973,7 +973,7 @@ class Hm_Output_header_end extends Hm_Output_Module {
 class Hm_Output_content_start extends Hm_Output_Module {
     /**
      * Outputs the starting body tag and a noscript warning. Clears the local session cache
-     * if not logged in, or adds a page wide nonce used by ajax requests
+     * if not logged in, or adds a page wide key used by ajax requests
      */
     protected function output() {
         $res = '<body><noscript class="noscript">'.
@@ -983,7 +983,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
         }
         else {
-            $res .= '<input type="hidden" id="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
+            $res .= '<input type="hidden" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         }
         return $res;
     }
@@ -1147,7 +1147,7 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
      */
     protected function output() {
         return '<div class="user_settings"><div class="content_title">'.$this->trans('Site Settings').'</div>'.
-            '<form method="POST"><input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<form method="POST"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<table class="settings_table"><colgroup>'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
     }
@@ -1707,7 +1707,7 @@ class Hm_Output_save_form extends Hm_Output_Module {
             $res .= '<li>'.$this->trans('No changes need to be saved').'</li>';
         }
         $res .= '</ul></div><div class="save_perm_form"><form method="post">'.
-            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
             'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
             '<input class="save_settings" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.

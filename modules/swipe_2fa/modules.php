@@ -40,9 +40,9 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
                 $state = RC_SMS_DELIVERED;
             }
 
-            /* pass a nonce and no redirect flag to the output modules */
+            /* pass a key and no redirect flag to the output modules */
             $this->out('no_redirect', true);
-            $this->out('2fa_nonce', Hm_Nonce::generate());
+            $this->out('2fa_key', Hm_Request_Key::generate());
 
             $sms_number = false;
             $sms_response = false;
@@ -106,7 +106,6 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
                 $this->out('2fa_state', $state);
 
                 /* close the session early */
-                Hm_Nonce::save($this->session);
                 $this->session->close_early();
             }
             else {
@@ -163,7 +162,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
                     'You will receive an SMS code at this number anytime you try to access your account. '.
                     'The number must be 11 digits including a US country code prefix of 1. This is a service of ').
                     '<br /><a target="_blank" href="https://www.swipeidentity.com/">Swipeidentity.com</a></div>'.
-                    '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
+                    '<input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'" />'.
                     '<label class="screen_reader" for="sms_number">'.$this->trans('Phone number to send SMS codes to').'</label>'.
                     '<input id="sms_number" autofocus required type="tel" name="sms_number" value="" placeholder="'.$this->trans('1-222-333-4444').'" />'.
                     '<input type="submit" name="submit_swipe_number" value="'.$this->trans('Submit').'" />'.
@@ -175,7 +174,7 @@ class Hm_Output_swipe_2fa_dialog extends Hm_Output_Module {
                     '<h1 class="title">'.$this->html_safe($this->get('router_app_name')).'</h1>'.
                     $error.
                     '<div class="swipe_txt"><label for="sms_response">'.$this->trans('Enter the 5 digit SMS code you just received below').'</label></div>'.
-                    '<input type="hidden" name="hm_nonce" value="'.$this->get('2fa_nonce').'" />'.
+                    '<input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'" />'.
                     '<input autofocus required id="sms_response" type="number" name="2fa_sms_response" value="" placeholder="'.$this->trans('Login code').'" />'.
                     '<input type="submit" value="'.$this->trans('Submit').'" />'.
                     '</form>';
