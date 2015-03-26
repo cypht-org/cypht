@@ -211,43 +211,41 @@ abstract class Hm_Handler_Module {
     }
 
     /**
-     * Validate a form nonce. If this is a non-empty POST form from an
+     * Validate a form key. If this is a non-empty POST form from an
      * HTTP request or AJAX update, it will take the user to the home
-     * page if the hm_nonce value is either not present or not valid
+     * page if the page_key value is either not present or not valid
      * @return void
      */
-    public function process_nonce() {
+    public function process_key() {
 
-        Hm_Nonce::load($this->session, $this->config, $this->request);
+        Hm_Request_Key::load($this->session, $this->request);
 
         if (empty($this->request->post)) {
-            return;
+            return false;
         }
 
-        $nonce = array_key_exists('hm_nonce', $this->request->post) ? $this->request->post['hm_nonce'] : false;
-        if (!$this->session->is_active() || $this->session->loaded) {
-            $valid = Hm_Nonce::validate_site_key($nonce);
-        }
-        else {
-            $valid = Hm_Nonce::validate($nonce);
-        }
+        $key = array_key_exists('hm_page_key', $this->request->post) ? $this->request->post['hm_page_key'] : false;
+        $valid = Hm_Request_Key::validate($key);
         if (!$valid) {
             if ($this->request->type == 'AJAX') {
                 if (DEBUG_MODE) {
-                    Hm_Debug::add('NONCE check failed');
+                    Hm_Debug::add('REQUEST KEY check failed');
                     Hm_Debug::load_page_stats();
                     Hm_Debug::show('log');
                 }
                 Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
+                return 'exit';
             }
             else {
                 if ($this->session->loaded) {
                     $this->session->destroy($this->request);
                 }
-                Hm_Debug::add('NONCE check failed');
+                Hm_Debug::add('REQUEST KEY check failed');
                 Hm_Dispatch::page_redirect('?page=home');
+                return 'redirect';
             }
         }
+        return false;
     }
 
     /**
