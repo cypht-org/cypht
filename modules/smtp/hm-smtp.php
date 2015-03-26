@@ -223,7 +223,7 @@ class Hm_SMTP {
     function connect() {
         $certfile = false;
         $certpass = false;
-        $result = 'An error occured connecting to the SMTP server';
+        $result = 'An error occurred connecting to the SMTP server';
         $server = $this->server;
 
         if ($this->tls) {
@@ -251,7 +251,7 @@ class Hm_SMTP {
             $this->send_command($command);
             $response = $this->get_response();
             if ($this->compare_response($response, '220') != 0) {
-                $result = 'An error occured during the STARTTLS command';
+                $result = 'An error occurred during the STARTTLS command';
             }
             if(isset($certfile) && $certfile) {
                 stream_context_set_option($this->handle, 'tls', 'local_cert', $certfile);
@@ -266,7 +266,7 @@ class Hm_SMTP {
             $this->capabilities($response);
         }
         if($this->compare_response($response,'250') != 0) {
-            $result = 'An error occured during the EHLO command';
+            $result = 'An error occurred during the EHLO command';
         }
         else {
             if($this->auth) {
@@ -367,7 +367,7 @@ class Hm_SMTP {
                 exit;
         }
         if (!$result) {
-            $result = 'An error occured authenticating to the SMTP server';
+            $result = 'An error occurred authenticating to the SMTP server';
             $res = $this->get_response();
             if ($this->compare_response($res, '235') == 0) {
                 $this->state = 'authed';
@@ -513,7 +513,7 @@ class Hm_SMTP {
         $this->send_command($command);
         $res = $this->get_response();
         $bail = false;
-        $result = 'An error occured sending the message';
+        $result = 'An error occurred sending the message';
         if(is_array($recipients)) {
             foreach($recipients as $rcpt) {
                 $this->clean($rcpt);
@@ -540,7 +540,7 @@ class Hm_SMTP {
             $this->send_command($command);
             $res = $this->get_response();
             if ($this->compare_response($res, '354') != 0) {
-                $result = 'An error occured during the DATA command';
+                $result = 'An error occurred during the DATA command';
             }
             else {
                 $this->send_command($message);
@@ -552,12 +552,12 @@ class Hm_SMTP {
                     $result = false;
                 }
                 else {
-                    $result = 'An error occured sending the message DATA';
+                    $result = 'An error occurred sending the message DATA';
                 }
             }
         }
         else {
-            $result = 'An error occured during the RCPT command';
+            $result = 'An error occurred during the RCPT command';
         }
         return $result;
     }
