@@ -44,7 +44,6 @@ class Hm_Handler_get_wp_notice_data extends Hm_Handler_Module {
             if ($wp_details) {
                 $this->out('wp_notice_details', wp_get_notice_detail($wp_details, $this->request->get['uid']));
             }
-
         }
     }
 }
@@ -165,9 +164,11 @@ class Hm_Handler_wordpress_disconnect extends Hm_Handler_Module {
 class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
     public function process() {
         $details = wp_connect_details($this->config);
-        $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
-        $this->out('wp_auth_url', $oauth2->request_authorization_url($details['auth_url'], 'global', 'wp_authorization'));
-        $this->out('wp_connect_details', $this->user_config->get('wp_connect_details', array()));
+        if (!empty($details)) {
+            $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
+            $this->out('wp_auth_url', $oauth2->request_authorization_url($details['auth_url'], 'global', 'wp_authorization'));
+            $this->out('wp_connect_details', $this->user_config->get('wp_connect_details', array()));
+        }
     }
 }
 
@@ -320,9 +321,9 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
         $details = $this->get('wp_connect_details', array());
         $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section">'.
             '<img src="'.Hm_Image_Sources::$key.'" alt="" width="16" height="16" /> '.
-            $this->trans('WordPress.com Connect').'</div><div class="wordpress_connect_section">'.
-            'Connect to WordPress.com to view notifications and posts.<br /><br />';
+            $this->trans('WordPress.com Connect').'</div><div class="wordpress_connect_section">';
         if (empty($details)) {
+            $res .= 'Connect to WordPress.com to view notifications and posts.<br /><br />';
             $res .= '<a href="'.$this->get('wp_auth_url', '').'">'.$this->trans('Enable').'</a></div></div>';
         }
         else {
@@ -340,17 +341,12 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
  * @subpackage wordpress/functions
  */
 function wp_connect_details($config) {
-    $details = array (
-        'auth_url' => 'https://public-api.wordpress.com/oauth2/authorize',
-        'token_url' => 'https://public-api.wordpress.com/oauth2/token',
-    );
+    $details = array();
     $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/wordpress.ini';
     if (is_readable($ini_file)) {
         $settings = parse_ini_file($ini_file);
         if (!empty($settings)) {
-            $details['client_id'] = $settings['client_id'];
-            $details['client_secret'] = $settings['client_secret'];
-            $details['redirect_uri'] = $settings['client_uri'];
+            $details = $settings;
         }
     }
     return $details;
