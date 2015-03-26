@@ -328,7 +328,7 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
         else {
             $res .= $this->trans('Already connected');
             $res .= '<br /><form method="POST">';
-            $res .= '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />';
+            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="submit" name="wp_disconnect" class="wp_disconnect" value="'.$this->trans('Disconnect').'" />';
             $res .= '</form></div></div>';
         }

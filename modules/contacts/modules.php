@@ -61,7 +61,7 @@ class Hm_Output_contacts_content_add_form extends Hm_Output_Module {
     protected function output() {
         return '<div class="add_server"><div class="server_title">'.$this->trans('Add Contact').'</div>'.
             '<form class="add_contact_form" method="POST">'.
-            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="screen_reader" for="contact_email">'.$this->trans('E-mail Address').'</label>'.
             '<input autofocus required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" /><br />'.
             '<label class="screen_reader" class="screen_reader" for="contact_name">'.$this->trans('Full Name').'</label>'.

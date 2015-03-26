@@ -633,7 +633,7 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
         return '<div class="pop3_server_setup"><div data-target=".pop3_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
             ' '.$this->trans('POP3 Servers').' <div class="server_count">'.$count.'</div></div><div class="pop3_section"><form class="add_server" method="POST">'.
-            '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="subtitle">'.$this->trans('Add a POP3 Server').'</div>'.
             '<table><tr><td colspan="2"><label class="screen_reader" for="new_pop3_name">'.$this->trans('POP3 account name').'</label>'.
             '<input required type="text" id="new_pop3_name" name="new_pop3_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
@@ -680,7 +680,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
             $res .= 
                 '<form class="pop3_connect" method="POST">'.
-                '<input type="hidden" name="hm_nonce" value="'.$this->html_safe(Hm_Nonce::generate()).'" />'.
+                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<label class="screen_reader" for="pop3_user_'.$index.'">'.$this->trans('POP3 username').'</label>'.
                 '<input '.$disabled.' id="pop3_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').'" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.

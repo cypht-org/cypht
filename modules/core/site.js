@@ -48,7 +48,7 @@ var Hm_Ajax_Request = function() { return {
                 args.push({'name': name, 'value': extra[name]});
             }
         }
-        args.push({'name': 'hm_nonce', 'value': $('#hm_nonce').val()});
+        args.push({'name': 'hm_page_key', 'value': $('#hm_page_key').val()});
 
         var dt = new Date();
         this.start_time = dt.getTime();
