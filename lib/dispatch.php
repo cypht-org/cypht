@@ -90,7 +90,6 @@ class Hm_Dispatch {
      */
     private function save_session() {
         Hm_Page_Cache::save($this->session);
-        hm_nonce::save($this->session);
         $this->session->end();
     }
 
