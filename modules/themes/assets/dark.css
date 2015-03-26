@@ -12,7 +12,7 @@ textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !imp
 .debug, .subtitle { color: #999 !important; }
 .subject, .subject a { font-weight: normal !important; font-size: 99% !important; color: #999 !important; }
 .empty_list { color: #666 !important; }
-.selected_menu, .selected_menu a { color: #eee !important; }
+.selected_part a, .selected_menu, .selected_menu a { color: #eee !important; }
 .icon { color: #aaa !important; }
 .online { color: green !important; }
 .down { color: red !important; }
