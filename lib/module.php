@@ -199,11 +199,13 @@ abstract class Hm_Handler_Module {
      * @param bool $logged_in true if currently logged in
      * @param array $output data from handler modules
      * @param array $protected list of protected output names
+     * @param string $page page id
      * @return void
      */
-    public function __construct($parent, $logged_in, $output=array(), $protected=array() ) {
+    public function __construct($parent, $logged_in, $output=array(), $protected=array(), $page) {
         $this->session = $parent->session;
         $this->request = $parent->request;
+        $this->page = $page;
         $this->config = $parent->site_config;
         $this->user_config = $parent->user_config;
         $this->output = $output;

@@ -130,6 +130,7 @@ class Hm_Dispatch {
         elseif (!array_key_exists('page', $request->get)) {
             $this->page = 'home';
         }
+        $this->module_exec->page = $this->page;
     }
 
     /**
