@@ -1,1 +1,2 @@
-.github_connect_section { display: none; }
+.github_connect_section { padding: 20px; padding-bottom: 40px; display: none; padding-left: 40px; }
+.github_disconnect { margin-left: 20px; margin-top: 20px; }
