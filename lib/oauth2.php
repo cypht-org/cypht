@@ -88,6 +88,10 @@ class Hm_Oauth2 {
         Hm_Functions::c_setopt($ch, CURLOPT_POST, 5);
         Hm_Functions::c_setopt($ch, CURLOPT_POSTFIELDS, $flds);
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        Hm_Functions::c_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Accept: application/json'
+        ));
+
         $curl_result = Hm_Functions::c_exec($ch);
         if (substr($curl_result, 0, 1) == '{') {
             $result = @json_decode($curl_result, true);
