@@ -6,6 +6,7 @@ img { opacity: .4 !important; }
 a { color: #aaa !important; }
 a:hover { color: #fff !important; }
 textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !important; }
+textarea { font-size: 100%; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #363636 !important; }
 .src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #333, #383838) !important; }
