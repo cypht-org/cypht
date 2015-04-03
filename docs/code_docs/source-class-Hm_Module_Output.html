@@ -8,7 +8,7 @@
 	<title>File module.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?1960482379"></script>
+	<script type="text/javascript" src="elementlist.js?1520757493"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -111,6 +111,8 @@
 							</ul></li>
 				<li><a href="package-modules.github.html">github<span></span></a>
 						<ul>
+				<li><a href="package-modules.github.functions.html">functions</a>
+						</li>
 				<li><a href="package-modules.github.handler.html">handler</a>
 						</li>
 				<li><a href="package-modules.github.output.html">output</a>
@@ -479,173 +481,175 @@
 </span></span><span id="199" class="l"><a class="l" href="#199">199: </a><span class="php-comment">     * @param bool $logged_in true if currently logged in
 </span></span><span id="200" class="l"><a class="l" href="#200">200: </a><span class="php-comment">     * @param array $output data from handler modules
 </span></span><span id="201" class="l"><a class="l" href="#201">201: </a><span class="php-comment">     * @param array $protected list of protected output names
-</span></span><span id="202" class="l"><a class="l" href="#202">202: </a><span class="php-comment">     * @return void
-</span></span><span id="203" class="l"><a class="l" href="#203">203: </a><span class="php-comment">     */</span>
-</span><span id="204" class="l"><a class="l" href="#204">204: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="___construct" href="#___construct">__construct</a>(<span class="php-var">$parent</span>, <span class="php-var">$logged_in</span>, <span class="php-var">$output</span>=<span class="php-keyword1">array</span>(), <span class="php-var">$protected</span>=<span class="php-keyword1">array</span>() ) {
-</span><span id="205" class="l"><a class="l" href="#205">205: </a>        <span class="php-var">$this</span>-&gt;session = <span class="php-var">$parent</span>-&gt;session;
-</span><span id="206" class="l"><a class="l" href="#206">206: </a>        <span class="php-var">$this</span>-&gt;request = <span class="php-var">$parent</span>-&gt;request;
-</span><span id="207" class="l"><a class="l" href="#207">207: </a>        <span class="php-var">$this</span>-&gt;config = <span class="php-var">$parent</span>-&gt;site_config;
-</span><span id="208" class="l"><a class="l" href="#208">208: </a>        <span class="php-var">$this</span>-&gt;user_config = <span class="php-var">$parent</span>-&gt;user_config;
-</span><span id="209" class="l"><a class="l" href="#209">209: </a>        <span class="php-var">$this</span>-&gt;output = <span class="php-var">$output</span>;
-</span><span id="210" class="l"><a class="l" href="#210">210: </a>        <span class="php-var">$this</span>-&gt;<span class="php-keyword1">protected</span> = <span class="php-var">$protected</span>;
-</span><span id="211" class="l"><a class="l" href="#211">211: </a>    }
-</span><span id="212" class="l"><a class="l" href="#212">212: </a>
-</span><span id="213" class="l"><a class="l" href="#213">213: </a>    <span class="php-comment">/**
-</span></span><span id="214" class="l"><a class="l" href="#214">214: </a><span class="php-comment">     * Validate a form key. If this is a non-empty POST form from an
-</span></span><span id="215" class="l"><a class="l" href="#215">215: </a><span class="php-comment">     * HTTP request or AJAX update, it will take the user to the home
-</span></span><span id="216" class="l"><a class="l" href="#216">216: </a><span class="php-comment">     * page if the page_key value is either not present or not valid
-</span></span><span id="217" class="l"><a class="l" href="#217">217: </a><span class="php-comment">     * @return void
-</span></span><span id="218" class="l"><a class="l" href="#218">218: </a><span class="php-comment">     */</span>
-</span><span id="219" class="l"><a class="l" href="#219">219: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process_key" href="#_process_key">process_key</a>() {
-</span><span id="220" class="l"><a class="l" href="#220">220: </a>
-</span><span id="221" class="l"><a class="l" href="#221">221: </a>        Hm_Request_Key::load(<span class="php-var">$this</span>-&gt;session, <span class="php-var">$this</span>-&gt;request);
+</span></span><span id="202" class="l"><a class="l" href="#202">202: </a><span class="php-comment">     * @param string $page page id
+</span></span><span id="203" class="l"><a class="l" href="#203">203: </a><span class="php-comment">     * @return void
+</span></span><span id="204" class="l"><a class="l" href="#204">204: </a><span class="php-comment">     */</span>
+</span><span id="205" class="l"><a class="l" href="#205">205: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="___construct" href="#___construct">__construct</a>(<span class="php-var">$parent</span>, <span class="php-var">$logged_in</span>, <span class="php-var">$output</span>=<span class="php-keyword1">array</span>(), <span class="php-var">$protected</span>=<span class="php-keyword1">array</span>(), <span class="php-var">$page</span>) {
+</span><span id="206" class="l"><a class="l" href="#206">206: </a>        <span class="php-var">$this</span>-&gt;session = <span class="php-var">$parent</span>-&gt;session;
+</span><span id="207" class="l"><a class="l" href="#207">207: </a>        <span class="php-var">$this</span>-&gt;request = <span class="php-var">$parent</span>-&gt;request;
+</span><span id="208" class="l"><a class="l" href="#208">208: </a>        <span class="php-var">$this</span>-&gt;page = <span class="php-var">$page</span>;
+</span><span id="209" class="l"><a class="l" href="#209">209: </a>        <span class="php-var">$this</span>-&gt;config = <span class="php-var">$parent</span>-&gt;site_config;
+</span><span id="210" class="l"><a class="l" href="#210">210: </a>        <span class="php-var">$this</span>-&gt;user_config = <span class="php-var">$parent</span>-&gt;user_config;
+</span><span id="211" class="l"><a class="l" href="#211">211: </a>        <span class="php-var">$this</span>-&gt;output = <span class="php-var">$output</span>;
+</span><span id="212" class="l"><a class="l" href="#212">212: </a>        <span class="php-var">$this</span>-&gt;<span class="php-keyword1">protected</span> = <span class="php-var">$protected</span>;
+</span><span id="213" class="l"><a class="l" href="#213">213: </a>    }
+</span><span id="214" class="l"><a class="l" href="#214">214: </a>
+</span><span id="215" class="l"><a class="l" href="#215">215: </a>    <span class="php-comment">/**
+</span></span><span id="216" class="l"><a class="l" href="#216">216: </a><span class="php-comment">     * Validate a form key. If this is a non-empty POST form from an
+</span></span><span id="217" class="l"><a class="l" href="#217">217: </a><span class="php-comment">     * HTTP request or AJAX update, it will take the user to the home
+</span></span><span id="218" class="l"><a class="l" href="#218">218: </a><span class="php-comment">     * page if the page_key value is either not present or not valid
+</span></span><span id="219" class="l"><a class="l" href="#219">219: </a><span class="php-comment">     * @return void
+</span></span><span id="220" class="l"><a class="l" href="#220">220: </a><span class="php-comment">     */</span>
+</span><span id="221" class="l"><a class="l" href="#221">221: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process_key" href="#_process_key">process_key</a>() {
 </span><span id="222" class="l"><a class="l" href="#222">222: </a>
-</span><span id="223" class="l"><a class="l" href="#223">223: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$this</span>-&gt;request-&gt;post)) {
-</span><span id="224" class="l"><a class="l" href="#224">224: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="225" class="l"><a class="l" href="#225">225: </a>        }
-</span><span id="226" class="l"><a class="l" href="#226">226: </a>
-</span><span id="227" class="l"><a class="l" href="#227">227: </a>        <span class="php-var">$key</span> = <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'hm_page_key'</span>, <span class="php-var">$this</span>-&gt;request-&gt;post) ? <span class="php-var">$this</span>-&gt;request-&gt;post[<span class="php-quote">'hm_page_key'</span>] : <span class="php-keyword1">false</span>;
-</span><span id="228" class="l"><a class="l" href="#228">228: </a>        <span class="php-var">$valid</span> = Hm_Request_Key::validate(<span class="php-var">$key</span>);
-</span><span id="229" class="l"><a class="l" href="#229">229: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$valid</span>) {
-</span><span id="230" class="l"><a class="l" href="#230">230: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;request-&gt;type == <span class="php-quote">'AJAX'</span>) {
-</span><span id="231" class="l"><a class="l" href="#231">231: </a>                <span class="php-keyword1">if</span> (DEBUG_MODE) {
-</span><span id="232" class="l"><a class="l" href="#232">232: </a>                    Hm_Debug::add(<span class="php-quote">'REQUEST KEY check failed'</span>);
-</span><span id="233" class="l"><a class="l" href="#233">233: </a>                    Hm_Debug::load_page_stats();
-</span><span id="234" class="l"><a class="l" href="#234">234: </a>                    Hm_Debug::show(<span class="php-quote">'log'</span>);
-</span><span id="235" class="l"><a class="l" href="#235">235: </a>                }
-</span><span id="236" class="l"><a class="l" href="#236">236: </a>                Hm_Functions::cease(<span class="php-keyword2">json_encode</span>(<span class="php-keyword1">array</span>(<span class="php-quote">'status'</span> =&gt; <span class="php-quote">'not callable'</span>)));;
-</span><span id="237" class="l"><a class="l" href="#237">237: </a>                <span class="php-keyword1">return</span> <span class="php-quote">'exit'</span>;
-</span><span id="238" class="l"><a class="l" href="#238">238: </a>            }
-</span><span id="239" class="l"><a class="l" href="#239">239: </a>            <span class="php-keyword1">else</span> {
-</span><span id="240" class="l"><a class="l" href="#240">240: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;session-&gt;loaded) {
-</span><span id="241" class="l"><a class="l" href="#241">241: </a>                    <span class="php-var">$this</span>-&gt;session-&gt;destroy(<span class="php-var">$this</span>-&gt;request);
-</span><span id="242" class="l"><a class="l" href="#242">242: </a>                }
-</span><span id="243" class="l"><a class="l" href="#243">243: </a>                Hm_Debug::add(<span class="php-quote">'REQUEST KEY check failed'</span>);
-</span><span id="244" class="l"><a class="l" href="#244">244: </a>                Hm_Dispatch::page_redirect(<span class="php-quote">'?page=home'</span>);
-</span><span id="245" class="l"><a class="l" href="#245">245: </a>                <span class="php-keyword1">return</span> <span class="php-quote">'redirect'</span>;
-</span><span id="246" class="l"><a class="l" href="#246">246: </a>            }
-</span><span id="247" class="l"><a class="l" href="#247">247: </a>        }
-</span><span id="248" class="l"><a class="l" href="#248">248: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="249" class="l"><a class="l" href="#249">249: </a>    }
-</span><span id="250" class="l"><a class="l" href="#250">250: </a>
-</span><span id="251" class="l"><a class="l" href="#251">251: </a>    <span class="php-comment">/**
-</span></span><span id="252" class="l"><a class="l" href="#252">252: </a><span class="php-comment">     * Process an HTTP POST form
-</span></span><span id="253" class="l"><a class="l" href="#253">253: </a><span class="php-comment">     * @param array $form list of required field names in the form
-</span></span><span id="254" class="l"><a class="l" href="#254">254: </a><span class="php-comment">     * @return array tuple with a bool indicating success, and an array of valid form values
-</span></span><span id="255" class="l"><a class="l" href="#255">255: </a><span class="php-comment">     */</span>
-</span><span id="256" class="l"><a class="l" href="#256">256: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process_form" href="#_process_form">process_form</a>(<span class="php-var">$form</span>) {
-</span><span id="257" class="l"><a class="l" href="#257">257: </a>        <span class="php-var">$post</span> = <span class="php-var">$this</span>-&gt;request-&gt;post;
-</span><span id="258" class="l"><a class="l" href="#258">258: </a>        <span class="php-var">$success</span> = <span class="php-keyword1">false</span>;
-</span><span id="259" class="l"><a class="l" href="#259">259: </a>        <span class="php-var">$new_form</span> = <span class="php-keyword1">array</span>();
-</span><span id="260" class="l"><a class="l" href="#260">260: </a>        <span class="php-keyword1">foreach</span>(<span class="php-var">$form</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span>) {
-</span><span id="261" class="l"><a class="l" href="#261">261: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$name</span>, <span class="php-var">$post</span>) &amp;&amp; (<span class="php-keyword2">trim</span>(<span class="php-var">$post</span>[<span class="php-var">$name</span>]) || ((<span class="php-var">$post</span>[<span class="php-var">$name</span>] === <span class="php-quote">'0'</span> ||  <span class="php-var">$post</span>[<span class="php-var">$name</span>] === <span class="php-num">0</span> )))) {
-</span><span id="262" class="l"><a class="l" href="#262">262: </a>                <span class="php-var">$new_form</span>[<span class="php-var">$name</span>] = <span class="php-var">$post</span>[<span class="php-var">$name</span>];
-</span><span id="263" class="l"><a class="l" href="#263">263: </a>            }
-</span><span id="264" class="l"><a class="l" href="#264">264: </a>        }
-</span><span id="265" class="l"><a class="l" href="#265">265: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$form</span>) == <span class="php-keyword2">count</span>(<span class="php-var">$new_form</span>)) {
-</span><span id="266" class="l"><a class="l" href="#266">266: </a>            <span class="php-var">$success</span> = <span class="php-keyword1">true</span>;
-</span><span id="267" class="l"><a class="l" href="#267">267: </a>        }
-</span><span id="268" class="l"><a class="l" href="#268">268: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(<span class="php-var">$success</span>, <span class="php-var">$new_form</span>);
-</span><span id="269" class="l"><a class="l" href="#269">269: </a>    }
-</span><span id="270" class="l"><a class="l" href="#270">270: </a>
-</span><span id="271" class="l"><a class="l" href="#271">271: </a>    <span class="php-comment">/**
-</span></span><span id="272" class="l"><a class="l" href="#272">272: </a><span class="php-comment">     * Handler modules need to override this method to do work
-</span></span><span id="273" class="l"><a class="l" href="#273">273: </a><span class="php-comment">     */</span>
-</span><span id="274" class="l"><a class="l" href="#274">274: </a>    <span class="php-keyword1">abstract</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process" href="#_process">process</a>();
-</span><span id="275" class="l"><a class="l" href="#275">275: </a>}
-</span><span id="276" class="l"><a class="l" href="#276">276: </a>
-</span><span id="277" class="l"><a class="l" href="#277">277: </a><span class="php-comment">/**
-</span></span><span id="278" class="l"><a class="l" href="#278">278: </a><span class="php-comment"> * Base class for output modules
-</span></span><span id="279" class="l"><a class="l" href="#279">279: </a><span class="php-comment"> * All modules that output data to a request must extend this class and define
-</span></span><span id="280" class="l"><a class="l" href="#280">280: </a><span class="php-comment"> * an output() method. It provides form validation, html sanitizing,
-</span></span><span id="281" class="l"><a class="l" href="#281">281: </a><span class="php-comment"> * and string translation services to modules
-</span></span><span id="282" class="l"><a class="l" href="#282">282: </a><span class="php-comment"> * @abstract
-</span></span><span id="283" class="l"><a class="l" href="#283">283: </a><span class="php-comment"> */</span>
-</span><span id="284" class="l"><a class="l" href="#284">284: </a><span class="php-keyword1">abstract</span> <span class="php-keyword1">class</span> <a id="Hm_Output_Module" href="#Hm_Output_Module">Hm_Output_Module</a> {
-</span><span id="285" class="l"><a class="l" href="#285">285: </a>
-</span><span id="286" class="l"><a class="l" href="#286">286: </a>    <span class="php-keyword1">use</span> Hm_Module_Output;
+</span><span id="223" class="l"><a class="l" href="#223">223: </a>        Hm_Request_Key::load(<span class="php-var">$this</span>-&gt;session, <span class="php-var">$this</span>-&gt;request);
+</span><span id="224" class="l"><a class="l" href="#224">224: </a>
+</span><span id="225" class="l"><a class="l" href="#225">225: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$this</span>-&gt;request-&gt;post)) {
+</span><span id="226" class="l"><a class="l" href="#226">226: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="227" class="l"><a class="l" href="#227">227: </a>        }
+</span><span id="228" class="l"><a class="l" href="#228">228: </a>
+</span><span id="229" class="l"><a class="l" href="#229">229: </a>        <span class="php-var">$key</span> = <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'hm_page_key'</span>, <span class="php-var">$this</span>-&gt;request-&gt;post) ? <span class="php-var">$this</span>-&gt;request-&gt;post[<span class="php-quote">'hm_page_key'</span>] : <span class="php-keyword1">false</span>;
+</span><span id="230" class="l"><a class="l" href="#230">230: </a>        <span class="php-var">$valid</span> = Hm_Request_Key::validate(<span class="php-var">$key</span>);
+</span><span id="231" class="l"><a class="l" href="#231">231: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$valid</span>) {
+</span><span id="232" class="l"><a class="l" href="#232">232: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;request-&gt;type == <span class="php-quote">'AJAX'</span>) {
+</span><span id="233" class="l"><a class="l" href="#233">233: </a>                <span class="php-keyword1">if</span> (DEBUG_MODE) {
+</span><span id="234" class="l"><a class="l" href="#234">234: </a>                    Hm_Debug::add(<span class="php-quote">'REQUEST KEY check failed'</span>);
+</span><span id="235" class="l"><a class="l" href="#235">235: </a>                    Hm_Debug::load_page_stats();
+</span><span id="236" class="l"><a class="l" href="#236">236: </a>                    Hm_Debug::show(<span class="php-quote">'log'</span>);
+</span><span id="237" class="l"><a class="l" href="#237">237: </a>                }
+</span><span id="238" class="l"><a class="l" href="#238">238: </a>                Hm_Functions::cease(<span class="php-keyword2">json_encode</span>(<span class="php-keyword1">array</span>(<span class="php-quote">'status'</span> =&gt; <span class="php-quote">'not callable'</span>)));;
+</span><span id="239" class="l"><a class="l" href="#239">239: </a>                <span class="php-keyword1">return</span> <span class="php-quote">'exit'</span>;
+</span><span id="240" class="l"><a class="l" href="#240">240: </a>            }
+</span><span id="241" class="l"><a class="l" href="#241">241: </a>            <span class="php-keyword1">else</span> {
+</span><span id="242" class="l"><a class="l" href="#242">242: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;session-&gt;loaded) {
+</span><span id="243" class="l"><a class="l" href="#243">243: </a>                    <span class="php-var">$this</span>-&gt;session-&gt;destroy(<span class="php-var">$this</span>-&gt;request);
+</span><span id="244" class="l"><a class="l" href="#244">244: </a>                }
+</span><span id="245" class="l"><a class="l" href="#245">245: </a>                Hm_Debug::add(<span class="php-quote">'REQUEST KEY check failed'</span>);
+</span><span id="246" class="l"><a class="l" href="#246">246: </a>                Hm_Dispatch::page_redirect(<span class="php-quote">'?page=home'</span>);
+</span><span id="247" class="l"><a class="l" href="#247">247: </a>                <span class="php-keyword1">return</span> <span class="php-quote">'redirect'</span>;
+</span><span id="248" class="l"><a class="l" href="#248">248: </a>            }
+</span><span id="249" class="l"><a class="l" href="#249">249: </a>        }
+</span><span id="250" class="l"><a class="l" href="#250">250: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="251" class="l"><a class="l" href="#251">251: </a>    }
+</span><span id="252" class="l"><a class="l" href="#252">252: </a>
+</span><span id="253" class="l"><a class="l" href="#253">253: </a>    <span class="php-comment">/**
+</span></span><span id="254" class="l"><a class="l" href="#254">254: </a><span class="php-comment">     * Process an HTTP POST form
+</span></span><span id="255" class="l"><a class="l" href="#255">255: </a><span class="php-comment">     * @param array $form list of required field names in the form
+</span></span><span id="256" class="l"><a class="l" href="#256">256: </a><span class="php-comment">     * @return array tuple with a bool indicating success, and an array of valid form values
+</span></span><span id="257" class="l"><a class="l" href="#257">257: </a><span class="php-comment">     */</span>
+</span><span id="258" class="l"><a class="l" href="#258">258: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process_form" href="#_process_form">process_form</a>(<span class="php-var">$form</span>) {
+</span><span id="259" class="l"><a class="l" href="#259">259: </a>        <span class="php-var">$post</span> = <span class="php-var">$this</span>-&gt;request-&gt;post;
+</span><span id="260" class="l"><a class="l" href="#260">260: </a>        <span class="php-var">$success</span> = <span class="php-keyword1">false</span>;
+</span><span id="261" class="l"><a class="l" href="#261">261: </a>        <span class="php-var">$new_form</span> = <span class="php-keyword1">array</span>();
+</span><span id="262" class="l"><a class="l" href="#262">262: </a>        <span class="php-keyword1">foreach</span>(<span class="php-var">$form</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span>) {
+</span><span id="263" class="l"><a class="l" href="#263">263: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$name</span>, <span class="php-var">$post</span>) &amp;&amp; (<span class="php-keyword2">trim</span>(<span class="php-var">$post</span>[<span class="php-var">$name</span>]) || ((<span class="php-var">$post</span>[<span class="php-var">$name</span>] === <span class="php-quote">'0'</span> ||  <span class="php-var">$post</span>[<span class="php-var">$name</span>] === <span class="php-num">0</span> )))) {
+</span><span id="264" class="l"><a class="l" href="#264">264: </a>                <span class="php-var">$new_form</span>[<span class="php-var">$name</span>] = <span class="php-var">$post</span>[<span class="php-var">$name</span>];
+</span><span id="265" class="l"><a class="l" href="#265">265: </a>            }
+</span><span id="266" class="l"><a class="l" href="#266">266: </a>        }
+</span><span id="267" class="l"><a class="l" href="#267">267: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$form</span>) == <span class="php-keyword2">count</span>(<span class="php-var">$new_form</span>)) {
+</span><span id="268" class="l"><a class="l" href="#268">268: </a>            <span class="php-var">$success</span> = <span class="php-keyword1">true</span>;
+</span><span id="269" class="l"><a class="l" href="#269">269: </a>        }
+</span><span id="270" class="l"><a class="l" href="#270">270: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(<span class="php-var">$success</span>, <span class="php-var">$new_form</span>);
+</span><span id="271" class="l"><a class="l" href="#271">271: </a>    }
+</span><span id="272" class="l"><a class="l" href="#272">272: </a>
+</span><span id="273" class="l"><a class="l" href="#273">273: </a>    <span class="php-comment">/**
+</span></span><span id="274" class="l"><a class="l" href="#274">274: </a><span class="php-comment">     * Handler modules need to override this method to do work
+</span></span><span id="275" class="l"><a class="l" href="#275">275: </a><span class="php-comment">     */</span>
+</span><span id="276" class="l"><a class="l" href="#276">276: </a>    <span class="php-keyword1">abstract</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_process" href="#_process">process</a>();
+</span><span id="277" class="l"><a class="l" href="#277">277: </a>}
+</span><span id="278" class="l"><a class="l" href="#278">278: </a>
+</span><span id="279" class="l"><a class="l" href="#279">279: </a><span class="php-comment">/**
+</span></span><span id="280" class="l"><a class="l" href="#280">280: </a><span class="php-comment"> * Base class for output modules
+</span></span><span id="281" class="l"><a class="l" href="#281">281: </a><span class="php-comment"> * All modules that output data to a request must extend this class and define
+</span></span><span id="282" class="l"><a class="l" href="#282">282: </a><span class="php-comment"> * an output() method. It provides form validation, html sanitizing,
+</span></span><span id="283" class="l"><a class="l" href="#283">283: </a><span class="php-comment"> * and string translation services to modules
+</span></span><span id="284" class="l"><a class="l" href="#284">284: </a><span class="php-comment"> * @abstract
+</span></span><span id="285" class="l"><a class="l" href="#285">285: </a><span class="php-comment"> */</span>
+</span><span id="286" class="l"><a class="l" href="#286">286: </a><span class="php-keyword1">abstract</span> <span class="php-keyword1">class</span> <a id="Hm_Output_Module" href="#Hm_Output_Module">Hm_Output_Module</a> {
 </span><span id="287" class="l"><a class="l" href="#287">287: </a>
-</span><span id="288" class="l"><a class="l" href="#288">288: </a>    <span class="php-comment">/* translated language strings */</span>
-</span><span id="289" class="l"><a class="l" href="#289">289: </a>    <span class="php-keyword1">protected</span> <span class="php-var"><a id="$lstr" href="#$lstr">$lstr</a></span> = <span class="php-keyword1">array</span>();
-</span><span id="290" class="l"><a class="l" href="#290">290: </a>
-</span><span id="291" class="l"><a class="l" href="#291">291: </a>    <span class="php-comment">/* langauge name */</span>
-</span><span id="292" class="l"><a class="l" href="#292">292: </a>    <span class="php-keyword1">protected</span> <span class="php-var"><a id="$lang" href="#$lang">$lang</a></span> = <span class="php-keyword1">false</span>;
-</span><span id="293" class="l"><a class="l" href="#293">293: </a>
-</span><span id="294" class="l"><a class="l" href="#294">294: </a>    <span class="php-comment">/* UI layout direction */</span>
-</span><span id="295" class="l"><a class="l" href="#295">295: </a>    <span class="php-keyword1">protected</span> <span class="php-var"><a id="$dir" href="#$dir">$dir</a></span> = <span class="php-quote">'ltr'</span>;
-</span><span id="296" class="l"><a class="l" href="#296">296: </a>
-</span><span id="297" class="l"><a class="l" href="#297">297: </a>    <span class="php-comment">/* Output format (AJAX or HTML5) */</span>
-</span><span id="298" class="l"><a class="l" href="#298">298: </a>    <span class="php-keyword1">protected</span> <span class="php-var"><a id="$format" href="#$format">$format</a></span> = <span class="php-keyword1">false</span>;
-</span><span id="299" class="l"><a class="l" href="#299">299: </a>
-</span><span id="300" class="l"><a class="l" href="#300">300: </a>    <span class="php-comment">/**
-</span></span><span id="301" class="l"><a class="l" href="#301">301: </a><span class="php-comment">     * Constructor
-</span></span><span id="302" class="l"><a class="l" href="#302">302: </a><span class="php-comment">     * @param array $input data from handler modules
-</span></span><span id="303" class="l"><a class="l" href="#303">303: </a><span class="php-comment">     * @param array $protected list of protected keys
-</span></span><span id="304" class="l"><a class="l" href="#304">304: </a><span class="php-comment">     * @return void
-</span></span><span id="305" class="l"><a class="l" href="#305">305: </a><span class="php-comment">     */</span>
-</span><span id="306" class="l"><a class="l" href="#306">306: </a>    <span class="php-keyword1">function</span> <a id="___construct" href="#___construct">__construct</a>(<span class="php-var">$input</span>, <span class="php-var">$protected</span>) {
-</span><span id="307" class="l"><a class="l" href="#307">307: </a>        <span class="php-var">$this</span>-&gt;output = <span class="php-var">$input</span>;
-</span><span id="308" class="l"><a class="l" href="#308">308: </a>        <span class="php-var">$this</span>-&gt;<span class="php-keyword1">protected</span> = <span class="php-var">$protected</span>;
-</span><span id="309" class="l"><a class="l" href="#309">309: </a>    }
-</span><span id="310" class="l"><a class="l" href="#310">310: </a>
-</span><span id="311" class="l"><a class="l" href="#311">311: </a>    <span class="php-comment">/**
-</span></span><span id="312" class="l"><a class="l" href="#312">312: </a><span class="php-comment">     * Return a translated string if possible
-</span></span><span id="313" class="l"><a class="l" href="#313">313: </a><span class="php-comment">     * @param the $string string to be translated
-</span></span><span id="314" class="l"><a class="l" href="#314">314: </a><span class="php-comment">     * @return string translated string
-</span></span><span id="315" class="l"><a class="l" href="#315">315: </a><span class="php-comment">     */</span>
-</span><span id="316" class="l"><a class="l" href="#316">316: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_trans" href="#_trans">trans</a>(<span class="php-var">$string</span>) {
-</span><span id="317" class="l"><a class="l" href="#317">317: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$string</span>, <span class="php-var">$this</span>-&gt;lstr)) {
-</span><span id="318" class="l"><a class="l" href="#318">318: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;lstr[<span class="php-var">$string</span>] === <span class="php-keyword1">false</span>) {
-</span><span id="319" class="l"><a class="l" href="#319">319: </a>                <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$string</span>);
-</span><span id="320" class="l"><a class="l" href="#320">320: </a>            }
-</span><span id="321" class="l"><a class="l" href="#321">321: </a>            <span class="php-keyword1">else</span> {
-</span><span id="322" class="l"><a class="l" href="#322">322: </a>                <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;lstr[<span class="php-var">$string</span>]);
-</span><span id="323" class="l"><a class="l" href="#323">323: </a>            }
-</span><span id="324" class="l"><a class="l" href="#324">324: </a>        }
-</span><span id="325" class="l"><a class="l" href="#325">325: </a>        <span class="php-keyword1">else</span> {
-</span><span id="326" class="l"><a class="l" href="#326">326: </a>            Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'TRANSLATION NOT FOUND :%s:'</span>, <span class="php-var">$string</span>));
-</span><span id="327" class="l"><a class="l" href="#327">327: </a>        }
-</span><span id="328" class="l"><a class="l" href="#328">328: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$string</span>);
-</span><span id="329" class="l"><a class="l" href="#329">329: </a>    }
-</span><span id="330" class="l"><a class="l" href="#330">330: </a>
-</span><span id="331" class="l"><a class="l" href="#331">331: </a>    <span class="php-comment">/**
-</span></span><span id="332" class="l"><a class="l" href="#332">332: </a><span class="php-comment">     * Build output by calling module specific output functions
-</span></span><span id="333" class="l"><a class="l" href="#333">333: </a><span class="php-comment">     * @param string $formt output type, either HTML5 or AJAX
-</span></span><span id="334" class="l"><a class="l" href="#334">334: </a><span class="php-comment">     * @param array $lang_str list of language translation strings
-</span></span><span id="335" class="l"><a class="l" href="#335">335: </a><span class="php-comment">     * @return mixed module output, a string for HTML5 format,
-</span></span><span id="336" class="l"><a class="l" href="#336">336: </a><span class="php-comment">     *               and an array for AJAX
-</span></span><span id="337" class="l"><a class="l" href="#337">337: </a><span class="php-comment">     */</span>
-</span><span id="338" class="l"><a class="l" href="#338">338: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_output_content" href="#_output_content">output_content</a>(<span class="php-var">$format</span>, <span class="php-var">$lang_str</span>, <span class="php-var">$protected</span>) {
-</span><span id="339" class="l"><a class="l" href="#339">339: </a>        <span class="php-var">$this</span>-&gt;lstr = <span class="php-var">$lang_str</span>;
-</span><span id="340" class="l"><a class="l" href="#340">340: </a>        <span class="php-var">$this</span>-&gt;format = <span class="php-keyword2">str_replace</span>(<span class="php-quote">'Hm_Format_'</span>, <span class="php-quote">''</span>, <span class="php-var">$format</span>);
-</span><span id="341" class="l"><a class="l" href="#341">341: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_lang'</span>, <span class="php-var">$lang_str</span>)) {
-</span><span id="342" class="l"><a class="l" href="#342">342: </a>            <span class="php-var">$this</span>-&gt;lang = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_lang'</span>];
-</span><span id="343" class="l"><a class="l" href="#343">343: </a>        }
-</span><span id="344" class="l"><a class="l" href="#344">344: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_direction'</span>, <span class="php-var">$lang_str</span>)) {
-</span><span id="345" class="l"><a class="l" href="#345">345: </a>            <span class="php-var">$this</span>-&gt;<span class="php-keyword2">dir</span> = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_direction'</span>];
-</span><span id="346" class="l"><a class="l" href="#346">346: </a>        }
-</span><span id="347" class="l"><a class="l" href="#347">347: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;output(<span class="php-var">$format</span>);
-</span><span id="348" class="l"><a class="l" href="#348">348: </a>    }
-</span><span id="349" class="l"><a class="l" href="#349">349: </a>
-</span><span id="350" class="l"><a class="l" href="#350">350: </a>    <span class="php-comment">/**
-</span></span><span id="351" class="l"><a class="l" href="#351">351: </a><span class="php-comment">     * Sanitize input string
-</span></span><span id="352" class="l"><a class="l" href="#352">352: </a><span class="php-comment">     * @param string $string text to sanitize
-</span></span><span id="353" class="l"><a class="l" href="#353">353: </a><span class="php-comment">     * @return string sanitized value
-</span></span><span id="354" class="l"><a class="l" href="#354">354: </a><span class="php-comment">     */</span>
-</span><span id="355" class="l"><a class="l" href="#355">355: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_html_safe" href="#_html_safe">html_safe</a>(<span class="php-var">$string</span>) {
-</span><span id="356" class="l"><a class="l" href="#356">356: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">htmlspecialchars</span>(<span class="php-var">$string</span>, ENT_QUOTES | ENT_HTML5, <span class="php-quote">'UTF-8'</span>);
-</span><span id="357" class="l"><a class="l" href="#357">357: </a>    }
-</span><span id="358" class="l"><a class="l" href="#358">358: </a>
-</span><span id="359" class="l"><a class="l" href="#359">359: </a>    <span class="php-comment">/**
-</span></span><span id="360" class="l"><a class="l" href="#360">360: </a><span class="php-comment">     * Output modules need to override this method to add to a page or AJAX response
-</span></span><span id="361" class="l"><a class="l" href="#361">361: </a><span class="php-comment">     * @return mixed should output with $this-&gt;output() if $this-&gt;format == AJAX, or return an HTML5 formatted
-</span></span><span id="362" class="l"><a class="l" href="#362">362: </a><span class="php-comment">     *               string if set to HTML5
-</span></span><span id="363" class="l"><a class="l" href="#363">363: </a><span class="php-comment">     */</span>
-</span><span id="364" class="l"><a class="l" href="#364">364: </a>    <span class="php-keyword1">abstract</span> <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>();
-</span><span id="365" class="l"><a class="l" href="#365">365: </a>}
-</span><span id="366" class="l"><a class="l" href="#366">366: </a>
-</span><span id="367" class="l"><a class="l" href="#367">367: </a><span class="xlang">?&gt;</span>
-</span><span id="368" class="l"><a class="l" href="#368">368: </a></span></code></pre>
+</span><span id="288" class="l"><a class="l" href="#288">288: </a>    <span class="php-keyword1">use</span> Hm_Module_Output;
+</span><span id="289" class="l"><a class="l" href="#289">289: </a>
+</span><span id="290" class="l"><a class="l" href="#290">290: </a>    <span class="php-comment">/* translated language strings */</span>
+</span><span id="291" class="l"><a class="l" href="#291">291: </a>    <span class="php-keyword1">protected</span> <span class="php-var"><a id="$lstr" href="#$lstr">$lstr</a></span> = <span class="php-keyword1">array</span>();
+</span><span id="292" class="l"><a class="l" href="#292">292: </a>
+</span><span id="293" class="l"><a class="l" href="#293">293: </a>    <span class="php-comment">/* langauge name */</span>
+</span><span id="294" class="l"><a class="l" href="#294">294: </a>    <span class="php-keyword1">protected</span> <span class="php-var"><a id="$lang" href="#$lang">$lang</a></span> = <span class="php-keyword1">false</span>;
+</span><span id="295" class="l"><a class="l" href="#295">295: </a>
+</span><span id="296" class="l"><a class="l" href="#296">296: </a>    <span class="php-comment">/* UI layout direction */</span>
+</span><span id="297" class="l"><a class="l" href="#297">297: </a>    <span class="php-keyword1">protected</span> <span class="php-var"><a id="$dir" href="#$dir">$dir</a></span> = <span class="php-quote">'ltr'</span>;
+</span><span id="298" class="l"><a class="l" href="#298">298: </a>
+</span><span id="299" class="l"><a class="l" href="#299">299: </a>    <span class="php-comment">/* Output format (AJAX or HTML5) */</span>
+</span><span id="300" class="l"><a class="l" href="#300">300: </a>    <span class="php-keyword1">protected</span> <span class="php-var"><a id="$format" href="#$format">$format</a></span> = <span class="php-keyword1">false</span>;
+</span><span id="301" class="l"><a class="l" href="#301">301: </a>
+</span><span id="302" class="l"><a class="l" href="#302">302: </a>    <span class="php-comment">/**
+</span></span><span id="303" class="l"><a class="l" href="#303">303: </a><span class="php-comment">     * Constructor
+</span></span><span id="304" class="l"><a class="l" href="#304">304: </a><span class="php-comment">     * @param array $input data from handler modules
+</span></span><span id="305" class="l"><a class="l" href="#305">305: </a><span class="php-comment">     * @param array $protected list of protected keys
+</span></span><span id="306" class="l"><a class="l" href="#306">306: </a><span class="php-comment">     * @return void
+</span></span><span id="307" class="l"><a class="l" href="#307">307: </a><span class="php-comment">     */</span>
+</span><span id="308" class="l"><a class="l" href="#308">308: </a>    <span class="php-keyword1">function</span> <a id="___construct" href="#___construct">__construct</a>(<span class="php-var">$input</span>, <span class="php-var">$protected</span>) {
+</span><span id="309" class="l"><a class="l" href="#309">309: </a>        <span class="php-var">$this</span>-&gt;output = <span class="php-var">$input</span>;
+</span><span id="310" class="l"><a class="l" href="#310">310: </a>        <span class="php-var">$this</span>-&gt;<span class="php-keyword1">protected</span> = <span class="php-var">$protected</span>;
+</span><span id="311" class="l"><a class="l" href="#311">311: </a>    }
+</span><span id="312" class="l"><a class="l" href="#312">312: </a>
+</span><span id="313" class="l"><a class="l" href="#313">313: </a>    <span class="php-comment">/**
+</span></span><span id="314" class="l"><a class="l" href="#314">314: </a><span class="php-comment">     * Return a translated string if possible
+</span></span><span id="315" class="l"><a class="l" href="#315">315: </a><span class="php-comment">     * @param the $string string to be translated
+</span></span><span id="316" class="l"><a class="l" href="#316">316: </a><span class="php-comment">     * @return string translated string
+</span></span><span id="317" class="l"><a class="l" href="#317">317: </a><span class="php-comment">     */</span>
+</span><span id="318" class="l"><a class="l" href="#318">318: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_trans" href="#_trans">trans</a>(<span class="php-var">$string</span>) {
+</span><span id="319" class="l"><a class="l" href="#319">319: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$string</span>, <span class="php-var">$this</span>-&gt;lstr)) {
+</span><span id="320" class="l"><a class="l" href="#320">320: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;lstr[<span class="php-var">$string</span>] === <span class="php-keyword1">false</span>) {
+</span><span id="321" class="l"><a class="l" href="#321">321: </a>                <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$string</span>);
+</span><span id="322" class="l"><a class="l" href="#322">322: </a>            }
+</span><span id="323" class="l"><a class="l" href="#323">323: </a>            <span class="php-keyword1">else</span> {
+</span><span id="324" class="l"><a class="l" href="#324">324: </a>                <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;lstr[<span class="php-var">$string</span>]);
+</span><span id="325" class="l"><a class="l" href="#325">325: </a>            }
+</span><span id="326" class="l"><a class="l" href="#326">326: </a>        }
+</span><span id="327" class="l"><a class="l" href="#327">327: </a>        <span class="php-keyword1">else</span> {
+</span><span id="328" class="l"><a class="l" href="#328">328: </a>            Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'TRANSLATION NOT FOUND :%s:'</span>, <span class="php-var">$string</span>));
+</span><span id="329" class="l"><a class="l" href="#329">329: </a>        }
+</span><span id="330" class="l"><a class="l" href="#330">330: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$string</span>);
+</span><span id="331" class="l"><a class="l" href="#331">331: </a>    }
+</span><span id="332" class="l"><a class="l" href="#332">332: </a>
+</span><span id="333" class="l"><a class="l" href="#333">333: </a>    <span class="php-comment">/**
+</span></span><span id="334" class="l"><a class="l" href="#334">334: </a><span class="php-comment">     * Build output by calling module specific output functions
+</span></span><span id="335" class="l"><a class="l" href="#335">335: </a><span class="php-comment">     * @param string $formt output type, either HTML5 or AJAX
+</span></span><span id="336" class="l"><a class="l" href="#336">336: </a><span class="php-comment">     * @param array $lang_str list of language translation strings
+</span></span><span id="337" class="l"><a class="l" href="#337">337: </a><span class="php-comment">     * @return mixed module output, a string for HTML5 format,
+</span></span><span id="338" class="l"><a class="l" href="#338">338: </a><span class="php-comment">     *               and an array for AJAX
+</span></span><span id="339" class="l"><a class="l" href="#339">339: </a><span class="php-comment">     */</span>
+</span><span id="340" class="l"><a class="l" href="#340">340: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_output_content" href="#_output_content">output_content</a>(<span class="php-var">$format</span>, <span class="php-var">$lang_str</span>, <span class="php-var">$protected</span>) {
+</span><span id="341" class="l"><a class="l" href="#341">341: </a>        <span class="php-var">$this</span>-&gt;lstr = <span class="php-var">$lang_str</span>;
+</span><span id="342" class="l"><a class="l" href="#342">342: </a>        <span class="php-var">$this</span>-&gt;format = <span class="php-keyword2">str_replace</span>(<span class="php-quote">'Hm_Format_'</span>, <span class="php-quote">''</span>, <span class="php-var">$format</span>);
+</span><span id="343" class="l"><a class="l" href="#343">343: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_lang'</span>, <span class="php-var">$lang_str</span>)) {
+</span><span id="344" class="l"><a class="l" href="#344">344: </a>            <span class="php-var">$this</span>-&gt;lang = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_lang'</span>];
+</span><span id="345" class="l"><a class="l" href="#345">345: </a>        }
+</span><span id="346" class="l"><a class="l" href="#346">346: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_direction'</span>, <span class="php-var">$lang_str</span>)) {
+</span><span id="347" class="l"><a class="l" href="#347">347: </a>            <span class="php-var">$this</span>-&gt;<span class="php-keyword2">dir</span> = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_direction'</span>];
+</span><span id="348" class="l"><a class="l" href="#348">348: </a>        }
+</span><span id="349" class="l"><a class="l" href="#349">349: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;output(<span class="php-var">$format</span>);
+</span><span id="350" class="l"><a class="l" href="#350">350: </a>    }
+</span><span id="351" class="l"><a class="l" href="#351">351: </a>
+</span><span id="352" class="l"><a class="l" href="#352">352: </a>    <span class="php-comment">/**
+</span></span><span id="353" class="l"><a class="l" href="#353">353: </a><span class="php-comment">     * Sanitize input string
+</span></span><span id="354" class="l"><a class="l" href="#354">354: </a><span class="php-comment">     * @param string $string text to sanitize
+</span></span><span id="355" class="l"><a class="l" href="#355">355: </a><span class="php-comment">     * @return string sanitized value
+</span></span><span id="356" class="l"><a class="l" href="#356">356: </a><span class="php-comment">     */</span>
+</span><span id="357" class="l"><a class="l" href="#357">357: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_html_safe" href="#_html_safe">html_safe</a>(<span class="php-var">$string</span>) {
+</span><span id="358" class="l"><a class="l" href="#358">358: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">htmlspecialchars</span>(<span class="php-var">$string</span>, ENT_QUOTES | ENT_HTML5, <span class="php-quote">'UTF-8'</span>);
+</span><span id="359" class="l"><a class="l" href="#359">359: </a>    }
+</span><span id="360" class="l"><a class="l" href="#360">360: </a>
+</span><span id="361" class="l"><a class="l" href="#361">361: </a>    <span class="php-comment">/**
+</span></span><span id="362" class="l"><a class="l" href="#362">362: </a><span class="php-comment">     * Output modules need to override this method to add to a page or AJAX response
+</span></span><span id="363" class="l"><a class="l" href="#363">363: </a><span class="php-comment">     * @return mixed should output with $this-&gt;output() if $this-&gt;format == AJAX, or return an HTML5 formatted
+</span></span><span id="364" class="l"><a class="l" href="#364">364: </a><span class="php-comment">     *               string if set to HTML5
+</span></span><span id="365" class="l"><a class="l" href="#365">365: </a><span class="php-comment">     */</span>
+</span><span id="366" class="l"><a class="l" href="#366">366: </a>    <span class="php-keyword1">abstract</span> <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_output" href="#_output">output</a>();
+</span><span id="367" class="l"><a class="l" href="#367">367: </a>}
+</span><span id="368" class="l"><a class="l" href="#368">368: </a>
+</span><span id="369" class="l"><a class="l" href="#369">369: </a><span class="xlang">?&gt;</span>
+</span><span id="370" class="l"><a class="l" href="#370">370: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>

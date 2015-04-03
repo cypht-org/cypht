@@ -8,7 +8,7 @@
 	<title>File modules.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?1960482379"></script>
+	<script type="text/javascript" src="elementlist.js?1520757493"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -111,6 +111,8 @@
 							</ul></li>
 				<li><a href="package-modules.github.html">github<span></span></a>
 						<ul>
+				<li><a href="package-modules.github.functions.html">functions</a>
+						</li>
 				<li><a href="package-modules.github.handler.html">handler</a>
 						</li>
 				<li><a href="package-modules.github.output.html">output</a>
@@ -636,7 +638,7 @@
 </span><span id="344" class="l"><a class="l" href="#344">344: </a>        <span class="php-var">$name</span> = <span class="php-quote">&quot;Hm_Handler_</span><span class="php-var">$name</span><span class="php-quote">&quot;</span>;
 </span><span id="345" class="l"><a class="l" href="#345">345: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">class_exists</span>(<span class="php-var">$name</span>)) {
 </span><span id="346" class="l"><a class="l" href="#346">346: </a>            <span class="php-keyword1">if</span> (!<span class="php-var">$args</span>[<span class="php-num">1</span>] || (<span class="php-var">$args</span>[<span class="php-num">1</span>] &amp;&amp; <span class="php-var">$session</span>-&gt;is_active())) {
-</span><span id="347" class="l"><a class="l" href="#347">347: </a>                <span class="php-var">$mod</span> = <span class="php-keyword1">new</span> <span class="php-var">$name</span>( <span class="php-var">$this</span>, <span class="php-var">$args</span>[<span class="php-num">1</span>], <span class="php-var">$input</span>, <span class="php-var">$protected</span>);
+</span><span id="347" class="l"><a class="l" href="#347">347: </a>                <span class="php-var">$mod</span> = <span class="php-keyword1">new</span> <span class="php-var">$name</span>(<span class="php-var">$this</span>, <span class="php-var">$args</span>[<span class="php-num">1</span>], <span class="php-var">$input</span>, <span class="php-var">$protected</span>, <span class="php-var">$this</span>-&gt;page);
 </span><span id="348" class="l"><a class="l" href="#348">348: </a>                <span class="php-var">$mod</span>-&gt;process(<span class="php-var">$input</span>);
 </span><span id="349" class="l"><a class="l" href="#349">349: </a>                <span class="php-var">$input</span> = <span class="php-var">$mod</span>-&gt;module_output();
 </span><span id="350" class="l"><a class="l" href="#350">350: </a>                <span class="php-var">$protected</span> = <span class="php-var">$mod</span>-&gt;output_protected();

@@ -8,7 +8,7 @@
 	<title>File smtp/hm-smtp.php | Cypht Documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?117538352"></script>
-	<script type="text/javascript" src="elementlist.js?1960482379"></script>
+	<script type="text/javascript" src="elementlist.js?1520757493"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360">
 
 </head>
@@ -111,6 +111,8 @@
 							</ul></li>
 				<li><a href="package-modules.github.html">github<span></span></a>
 						<ul>
+				<li><a href="package-modules.github.functions.html">functions</a>
+						</li>
 				<li><a href="package-modules.github.handler.html">handler</a>
 						</li>
 				<li><a href="package-modules.github.output.html">output</a>
@@ -500,7 +502,7 @@
 </span><span id="223" class="l"><a class="l" href="#223">223: </a>    <span class="php-keyword1">function</span> <a id="_connect" href="#_connect">connect</a>() {
 </span><span id="224" class="l"><a class="l" href="#224">224: </a>        <span class="php-var">$certfile</span> = <span class="php-keyword1">false</span>;
 </span><span id="225" class="l"><a class="l" href="#225">225: </a>        <span class="php-var">$certpass</span> = <span class="php-keyword1">false</span>;
-</span><span id="226" class="l"><a class="l" href="#226">226: </a>        <span class="php-var">$result</span> = <span class="php-quote">'An error occured connecting to the SMTP server'</span>;
+</span><span id="226" class="l"><a class="l" href="#226">226: </a>        <span class="php-var">$result</span> = <span class="php-quote">'An error occurred connecting to the SMTP server'</span>;
 </span><span id="227" class="l"><a class="l" href="#227">227: </a>        <span class="php-var">$server</span> = <span class="php-var">$this</span>-&gt;server;
 </span><span id="228" class="l"><a class="l" href="#228">228: </a>
 </span><span id="229" class="l"><a class="l" href="#229">229: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;tls) {
@@ -528,7 +530,7 @@
 </span><span id="251" class="l"><a class="l" href="#251">251: </a>            <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
 </span><span id="252" class="l"><a class="l" href="#252">252: </a>            <span class="php-var">$response</span> = <span class="php-var">$this</span>-&gt;get_response();
 </span><span id="253" class="l"><a class="l" href="#253">253: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$response</span>, <span class="php-quote">'220'</span>) != <span class="php-num">0</span>) {
-</span><span id="254" class="l"><a class="l" href="#254">254: </a>                <span class="php-var">$result</span> = <span class="php-quote">'An error occured during the STARTTLS command'</span>;
+</span><span id="254" class="l"><a class="l" href="#254">254: </a>                <span class="php-var">$result</span> = <span class="php-quote">'An error occurred during the STARTTLS command'</span>;
 </span><span id="255" class="l"><a class="l" href="#255">255: </a>            }
 </span><span id="256" class="l"><a class="l" href="#256">256: </a>            <span class="php-keyword1">if</span>(<span class="php-keyword1">isset</span>(<span class="php-var">$certfile</span>) &amp;&amp; <span class="php-var">$certfile</span>) {
 </span><span id="257" class="l"><a class="l" href="#257">257: </a>                <span class="php-keyword2">stream_context_set_option</span>(<span class="php-var">$this</span>-&gt;handle, <span class="php-quote">'tls'</span>, <span class="php-quote">'local_cert'</span>, <span class="php-var">$certfile</span>);
@@ -543,7 +545,7 @@
 </span><span id="266" class="l"><a class="l" href="#266">266: </a>            <span class="php-var">$this</span>-&gt;capabilities(<span class="php-var">$response</span>);
 </span><span id="267" class="l"><a class="l" href="#267">267: </a>        }
 </span><span id="268" class="l"><a class="l" href="#268">268: </a>        <span class="php-keyword1">if</span>(<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$response</span>,<span class="php-quote">'250'</span>) != <span class="php-num">0</span>) {
-</span><span id="269" class="l"><a class="l" href="#269">269: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occured during the EHLO command'</span>;
+</span><span id="269" class="l"><a class="l" href="#269">269: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occurred during the EHLO command'</span>;
 </span><span id="270" class="l"><a class="l" href="#270">270: </a>        }
 </span><span id="271" class="l"><a class="l" href="#271">271: </a>        <span class="php-keyword1">else</span> {
 </span><span id="272" class="l"><a class="l" href="#272">272: </a>            <span class="php-keyword1">if</span>(<span class="php-var">$this</span>-&gt;auth) {
@@ -644,7 +646,7 @@
 </span><span id="367" class="l"><a class="l" href="#367">367: </a>                <span class="php-keyword1">exit</span>;
 </span><span id="368" class="l"><a class="l" href="#368">368: </a>        }
 </span><span id="369" class="l"><a class="l" href="#369">369: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$result</span>) {
-</span><span id="370" class="l"><a class="l" href="#370">370: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occured authenticating to the SMTP server'</span>;
+</span><span id="370" class="l"><a class="l" href="#370">370: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occurred authenticating to the SMTP server'</span>;
 </span><span id="371" class="l"><a class="l" href="#371">371: </a>            <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
 </span><span id="372" class="l"><a class="l" href="#372">372: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$res</span>, <span class="php-quote">'235'</span>) == <span class="php-num">0</span>) {
 </span><span id="373" class="l"><a class="l" href="#373">373: </a>                <span class="php-var">$this</span>-&gt;state = <span class="php-quote">'authed'</span>;
@@ -790,7 +792,7 @@
 </span><span id="513" class="l"><a class="l" href="#513">513: </a>        <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
 </span><span id="514" class="l"><a class="l" href="#514">514: </a>        <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
 </span><span id="515" class="l"><a class="l" href="#515">515: </a>        <span class="php-var">$bail</span> = <span class="php-keyword1">false</span>;
-</span><span id="516" class="l"><a class="l" href="#516">516: </a>        <span class="php-var">$result</span> = <span class="php-quote">'An error occured sending the message'</span>;
+</span><span id="516" class="l"><a class="l" href="#516">516: </a>        <span class="php-var">$result</span> = <span class="php-quote">'An error occurred sending the message'</span>;
 </span><span id="517" class="l"><a class="l" href="#517">517: </a>        <span class="php-keyword1">if</span>(<span class="php-keyword2">is_array</span>(<span class="php-var">$recipients</span>)) {
 </span><span id="518" class="l"><a class="l" href="#518">518: </a>            <span class="php-keyword1">foreach</span>(<span class="php-var">$recipients</span> <span class="php-keyword1">as</span> <span class="php-var">$rcpt</span>) {
 </span><span id="519" class="l"><a class="l" href="#519">519: </a>                <span class="php-var">$this</span>-&gt;clean(<span class="php-var">$rcpt</span>);
@@ -817,7 +819,7 @@
 </span><span id="540" class="l"><a class="l" href="#540">540: </a>            <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$command</span>);
 </span><span id="541" class="l"><a class="l" href="#541">541: </a>            <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_response();
 </span><span id="542" class="l"><a class="l" href="#542">542: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;compare_response(<span class="php-var">$res</span>, <span class="php-quote">'354'</span>) != <span class="php-num">0</span>) {
-</span><span id="543" class="l"><a class="l" href="#543">543: </a>                <span class="php-var">$result</span> = <span class="php-quote">'An error occured during the DATA command'</span>;
+</span><span id="543" class="l"><a class="l" href="#543">543: </a>                <span class="php-var">$result</span> = <span class="php-quote">'An error occurred during the DATA command'</span>;
 </span><span id="544" class="l"><a class="l" href="#544">544: </a>            }
 </span><span id="545" class="l"><a class="l" href="#545">545: </a>            <span class="php-keyword1">else</span> {
 </span><span id="546" class="l"><a class="l" href="#546">546: </a>                <span class="php-var">$this</span>-&gt;send_command(<span class="php-var">$message</span>);
@@ -829,12 +831,12 @@
 </span><span id="552" class="l"><a class="l" href="#552">552: </a>                    <span class="php-var">$result</span> = <span class="php-keyword1">false</span>;
 </span><span id="553" class="l"><a class="l" href="#553">553: </a>                }
 </span><span id="554" class="l"><a class="l" href="#554">554: </a>                <span class="php-keyword1">else</span> {
-</span><span id="555" class="l"><a class="l" href="#555">555: </a>                    <span class="php-var">$result</span> = <span class="php-quote">'An error occured sending the message DATA'</span>;
+</span><span id="555" class="l"><a class="l" href="#555">555: </a>                    <span class="php-var">$result</span> = <span class="php-quote">'An error occurred sending the message DATA'</span>;
 </span><span id="556" class="l"><a class="l" href="#556">556: </a>                }
 </span><span id="557" class="l"><a class="l" href="#557">557: </a>            }
 </span><span id="558" class="l"><a class="l" href="#558">558: </a>        }
 </span><span id="559" class="l"><a class="l" href="#559">559: </a>        <span class="php-keyword1">else</span> {
-</span><span id="560" class="l"><a class="l" href="#560">560: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occured during the RCPT command'</span>;
+</span><span id="560" class="l"><a class="l" href="#560">560: </a>            <span class="php-var">$result</span> = <span class="php-quote">'An error occurred during the RCPT command'</span>;
 </span><span id="561" class="l"><a class="l" href="#561">561: </a>        }
 </span><span id="562" class="l"><a class="l" href="#562">562: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
 </span><span id="563" class="l"><a class="l" href="#563">563: </a>    }
