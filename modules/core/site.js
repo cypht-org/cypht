@@ -76,7 +76,7 @@ var Hm_Ajax_Request = function() { return {
         }
         else {
             if ((res.state && res.state == 'not callable') || !res.router_login_state) {
-                window.location.href = "?page=home";
+                return;
             }
             if (res.date) {
                 $('.date').html(res.date);
@@ -911,7 +911,11 @@ var Hm_Utils = {
     },
     save_to_local_storage: function(key, val) {
         if (Storage !== void(0)) {
-            sessionStorage.setItem(key, val);
+            try { sessionStorage.setItem(key, val); } catch(e) {
+                if (e.code == 22) {
+                    sessionStorage.clear();
+                    sessionStorage.setItem(key, val);
+                }}
         }
         return false;
     },
