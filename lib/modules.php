@@ -344,7 +344,7 @@ trait Hm_Handler_Module_Exec {
         $name = "Hm_Handler_$name";
         if (class_exists($name)) {
             if (!$args[1] || ($args[1] && $session->is_active())) {
-                $mod = new $name($this, $args[1], $input, $protected, $this->page);
+                $mod = new $name($this, $args[1], $this->page, $input, $protected);
                 $mod->process($input);
                 $input = $mod->module_output();
                 $protected = $mod->output_protected();
