@@ -83,6 +83,7 @@ add_handler('ajax_imap_debug', 'load_user_data',  true, 'core');
 add_handler('ajax_imap_debug', 'language', true, 'core');
 add_handler('ajax_imap_debug', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_debug', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_debug', 'imap_hide', true);
 add_handler('ajax_imap_debug', 'imap_connect', true);
 add_handler('ajax_imap_debug', 'imap_delete', true);
 add_handler('ajax_imap_debug', 'imap_forget', true);
@@ -287,6 +288,7 @@ return array(
         'imap_save' => FILTER_SANITIZE_STRING,
         'submit_imap_server' => FILTER_SANITIZE_STRING,
         'new_imap_address' => FILTER_SANITIZE_STRING,
+        'new_imap_hidden' => FILTER_VALIDATE_BOOLEAN,
         'new_imap_port' => FILTER_VALIDATE_INT,
         'new_imap_name' => FILTER_SANITIZE_STRING,
         'tls' => FILTER_VALIDATE_BOOLEAN,
@@ -296,6 +298,7 @@ return array(
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_msg_part' => FILTER_SANITIZE_STRING,
         'imap_prefetch' => FILTER_VALIDATE_BOOLEAN,
+        'hide_imap_server' => FILTER_VALIDATE_BOOLEAN,
         'imap_flag_state' => FILTER_SANITIZE_STRING,
     )
 );
