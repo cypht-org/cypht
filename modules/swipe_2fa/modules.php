@@ -42,6 +42,7 @@ class Hm_Handler_swipe_2fa_check extends Hm_Handler_Module {
 
             /* pass a key and no redirect flag to the output modules */
             $this->out('no_redirect', true);
+            Hm_Request_Key::load($this->session, $this->request, false);
             $this->out('2fa_key', Hm_Request_Key::generate());
 
             $sms_number = false;
