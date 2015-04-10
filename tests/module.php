@@ -8,7 +8,7 @@ class Hm_Test_Modules_Output extends PHPUnit_Framework_TestCase {
     public function setUp() {
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false);
+        $this->handler_mod = new Hm_Handler_Test($this->parent, false, 'home');
     }
     /**
      * @preserveGlobalState disabled
@@ -101,7 +101,7 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
     public function setUp() {
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false);
+        $this->handler_mod = new Hm_Handler_Test($this->parent, false, 'home');
     }
     /**
      * @preserveGlobalState disabled
@@ -111,7 +111,7 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
         /* TODO: fix assertions */
         $session = new Hm_Mock_Session();
         $request = new Hm_Mock_Request('AJAX');
-        Hm_Request_Key::load($session, $request);
+        Hm_Request_Key::load($session, $request, false);
 
         $request->post = array();
         $this->handler_mod->request->post = array();
@@ -119,7 +119,7 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
 
         $request->post['hm_page_key'] = 'asdf';
         $this->handler_mod->request->post['hm_page_key'] = 'asdf';
-        Hm_Request_Key::load($session, $request);
+        Hm_Request_Key::load($session, $request, false);
         $this->assertEquals('redirect', $this->handler_mod->process_key());
 
         $this->handler_mod->request->type = 'AJAX';
@@ -151,7 +151,7 @@ class Hm_Test_Handler_Module_Debug extends PHPUnit_Framework_TestCase {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false);
+        $this->handler_mod = new Hm_Handler_Test($this->parent, false, 'home');
     }
     /**
      * @preserveGlobalState disabled
