@@ -15,16 +15,24 @@ class Hm_Test_Server_List extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_add() {
-        $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), Hm_Server_Wrapper::dump(0));
-        $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), Hm_Server_Wrapper::dump(3));
+        $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false), Hm_Server_Wrapper::dump(0));
+        $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false), Hm_Server_Wrapper::dump(3));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_toggle_hidden() {
+        Hm_Server_Wrapper::toggle_hidden(0, 1);
+        $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false, 'hide' => 1), Hm_Server_Wrapper::dump(0));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_dump() {
-        $this->assertEquals(array( 0 => array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), 3 => array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1)), Hm_Server_Wrapper::dump());
-        $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), Hm_Server_Wrapper::dump(0));
+        $this->assertEquals(array( 0 => array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false), 3 => array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false)), Hm_Server_Wrapper::dump());
+        $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false), Hm_Server_Wrapper::dump(0));
         $this->assertEquals(array('pass' => 'testpass', 'user' => 'testuser', 'object' => false, 'connected' => false, 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), Hm_Server_Wrapper::dump(0, true));
         $this->assertEquals(array(), Hm_Server_Wrapper::dump(1));
     }
