@@ -88,10 +88,11 @@ class Hm_Request_Key {
      * Load the request key
      * @param object $session session interface
      * @param object $request request object
+     * @param bool $just_logged_in true if the session was created on this request
      * @return void
      */
-    public static function load($session, $request) {
-        if ($session->is_active() && !$session->loaded) {
+    public static function load($session, $request, $just_logged_in) {
+        if ($session->is_active() && !$just_logged_in) {
             $user = $session->get('username', false);
         }
         else {
