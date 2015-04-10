@@ -96,6 +96,17 @@ trait Hm_Server_List {
             unset(self::$server_list[$id]['pass']);
         }
     }
+    /**
+     * Toggle the hidden status of a server
+     * @param int $id server id
+     * @param int $hide bool
+     * @return void
+     */
+    public static function toggle_hidden($id, $hide) {
+        if (array_key_exists($id, self::$server_list)) {
+            self::$server_list[$id]['hide'] = $hide;
+        }
+    }
 
     /**
      * Add a server definition
@@ -139,20 +150,10 @@ trait Hm_Server_List {
             if ($id !== false && $index != $id) {
                 continue;
             }
-            if ($full) {
-                $list[$index] = $server;
+            if (!$full) {
+                unset($server['pass']);
             }
-            else {
-                $list[$index] = array(
-                    'name' => $server['name'],
-                    'server' => $server['server'],
-                    'port' => $server['port'],
-                    'tls' => $server['tls']
-                );
-                if (array_key_exists('user', $server)) {
-                    $list[$index]['user'] = $server['user'];
-                }
-            }
+            $list[$index] = $server;
             if ($id !== false) {
                 return $list[$index];
             }
