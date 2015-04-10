@@ -197,12 +197,12 @@ abstract class Hm_Handler_Module {
      * Assign input and state sources
      * @param object $parent instance of the Hm_Request_Handler class
      * @param bool $logged_in true if currently logged in
+     * @param string $page page id
      * @param array $output data from handler modules
      * @param array $protected list of protected output names
-     * @param string $page page id
      * @return void
      */
-    public function __construct($parent, $logged_in, $output=array(), $protected=array(), $page) {
+    public function __construct($parent, $logged_in, $page, $output=array(), $protected=array()) {
         $this->session = $parent->session;
         $this->request = $parent->request;
         $this->page = $page;
