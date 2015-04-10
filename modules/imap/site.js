@@ -14,6 +14,37 @@ var imap_delete_action = function() {
     );
 };
 
+var imap_hide = function() {
+    event.preventDefault();
+    var form = $(this).parent();
+    var server_id = $('.imap_server_id', form).val();
+    imap_hide_action(form, server_id, 1);
+};
+var imap_unhide = function() {
+    event.preventDefault();
+    var form = $(this).parent();
+    var server_id = $('.imap_server_id', form).val();
+    imap_hide_action(form, server_id, 0);
+};
+var imap_hide_action = function(form, server_id, hide) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_debug'},
+        {'name': 'imap_server_id', 'value': server_id},
+        {'name': 'hide_imap_server', 'value': hide}],
+        function(res) {
+            if (hide) {
+                $('.unhide_imap_connection', form).show();
+                $('.hide_imap_connection', form).hide();
+            }
+            else {
+                $('.unhide_imap_connection', form).hide();
+                $('.hide_imap_connection', form).show();
+            }
+            Hm_Folders.reload_folders(true);
+        }
+    );
+};
+
 var imap_save_action = function() {
     event.preventDefault();
     var form = $(this).parent();
@@ -59,6 +90,8 @@ var imap_forget_action = function() {
 var imap_setup_server_page = function() {
     $('.imap_delete').on('click', imap_delete_action);
     $('.save_imap_connection').on('click', imap_save_action);
+    $('.hide_imap_connection').on('click', imap_hide);
+    $('.unhide_imap_connection').on('click', imap_unhide);
     $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
     var dsp = Hm_Utils.get_from_local_storage('.imap_section');

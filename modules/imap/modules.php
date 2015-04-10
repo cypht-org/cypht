@@ -390,10 +390,15 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                 if (isset($this->request->post['tls'])) {
                     $tls = true;
                 }
+                $hidden = false;
+                if (isset($this->request->post['new_imap_hidden'])) {
+                    $hidden = true;
+                }
                 if ($con = fsockopen($form['new_imap_address'], $form['new_imap_port'], $errno, $errstr, 2)) {
                     Hm_IMAP_List::add(array(
                         'name' => $form['new_imap_name'],
                         'server' => $form['new_imap_address'],
+                        'hide' => $hidden,
                         'port' => $form['new_imap_port'],
                         'tls' => $tls));
                     Hm_Msgs::add('Added server!');
@@ -455,6 +460,9 @@ class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
      */
     public function process() {
         foreach (Hm_IMAP_List::dump() as $index => $vals) {
+            if (array_key_exists('hide', $vals) && $vals['hide']) {
+                continue;
+            }
             $this->append('data_sources', array('callback' => 'imap_search_page_content', 'type' => 'imap', 'name' => $vals['name'], 'id' => $index));
         }
     }
@@ -503,6 +511,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
         }
         if ($callback) {
             foreach (Hm_IMAP_List::dump() as $index => $vals) {
+                if (array_key_exists('hide', $vals) && $vals['hide']) {
+                    continue;
+                }
                 $this->append('data_sources', array('callback' => $callback, 'type' => 'imap', 'name' => $vals['name'], 'id' => $index));
             }
         }
@@ -779,6 +790,27 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
 }
 
 /**
+ * Hide or unhide an IMAP server
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_hide extends Hm_Handler_Module {
+    /**
+     * Hide or unhide an IMAP server from combined pages and searches
+     */
+    public function process() {
+        if (isset($this->request->post['hide_imap_server'])) {
+            list($success, $form) = $this->process_form(array('imap_server_id'));
+            if ($success) {
+                Hm_IMAP_List::toggle_hidden($form['imap_server_id'], (bool) $this->request->post['hide_imap_server']);
+                Hm_Msgs::add('Hidden status updated');
+                $this->session->record_unsaved('IMAP server hidden status updated');
+                Hm_Page_Cache::flush($this->session);
+            }
+        }
+    }
+}
+
+/**
  * Delete an IMAP server
  * @subpackage imap/handler
  */
@@ -950,7 +982,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= 
                 '<form class="imap_connect" method="POST">'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<input type="hidden" name="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
+                '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label>'.
                 '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').'" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
                 '<span><label class="screen_reader" for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label>'.
@@ -965,6 +997,20 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
                     $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection" />';
                 }
+                $hidden = false;
+                if (array_key_exists('hide', $vals) && $vals['hide']) {
+                    $hidden = true;
+                }
+                $res .= '<input type="submit" ';
+                if ($hidden) {
+                    $res .= 'style="display: none;" ';
+                }
+                $res .= 'value="'.$this->trans('Hide').'" class="hide_imap_connection" />';
+                $res .= '<input type="submit" ';
+                if (!$hidden) {
+                    $res .= 'style="display: none;" ';
+                }
+                $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection" />';
                 $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
             }
             $res .= '</form></div>';
@@ -996,6 +1042,8 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld" placeholder="'.$this->trans('IMAP server address').'" value=""/></td></tr>'.
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('IMAP port').'</label>'.
             '<input required type="number" id="new_imap_port" name="new_imap_port" class="port_fld" value="" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<tr><td colspan="2"><input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="" value="1">'.
+            '<label for="new_imap_hidden">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" id="imap_tls" checked="checked" /> <label for="imap_tls">'.$this->trans('Use TLS').'</label></td>'.
             '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" /></td></tr>'.
             '</table></form>';
