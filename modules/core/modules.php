@@ -1955,7 +1955,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
      */
     protected function output() {
         if (!$this->get('no_list_controls', false)) {
-            $source_link = false; //'<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+            $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';
             }
