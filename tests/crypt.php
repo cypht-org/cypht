@@ -56,7 +56,7 @@ class Hm_Test_Request_Key extends PHPUnit_Framework_TestCase {
         require 'bootstrap.php';
         $session = new Hm_Mock_Session();
         $request = new Hm_Mock_Request('AJAX');
-        Hm_Request_Key::load($session, $request);
+        Hm_Request_Key::load($session, $request, false);
     }
     /**
      * @preserveGlobalState disabled
