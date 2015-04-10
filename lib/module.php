@@ -220,7 +220,7 @@ abstract class Hm_Handler_Module {
      */
     public function process_key() {
 
-        Hm_Request_Key::load($this->session, $this->request);
+        Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
 
         if (empty($this->request->post)) {
             return false;
