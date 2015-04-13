@@ -1186,7 +1186,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
             if ($this->current_stream_size >= $this->stream_size) {
                 $this->stream_size = 0;
-                $res = '';
             }
         }
         else {
