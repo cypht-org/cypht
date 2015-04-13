@@ -57,7 +57,8 @@ add_handler('message_list', 'imap_message_list_type', true, 'imap', 'message_lis
 /* message view page */
 add_handler('message', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('message', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('message', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('message', 'imap_download_message', true, 'imap', 'imap_oauth2_token_check', 'after');
+add_handler('message', 'load_imap_servers_for_message_list', true, 'imap', 'imap_download_message', 'after');
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -269,6 +270,8 @@ return array(
 
     'allowed_get' => array(
         'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
+        'imap_msg_part' => FILTER_SANITIZE_STRING
     ),
 
     'allowed_post' => array(

@@ -11,6 +11,74 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/imap/hm-imap.php';
 
 /**
+ * Stream a message from IMAP to the browser
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_download_message extends Hm_Handler_Module {
+    /**
+     * Download a message from the IMAP server
+     */
+    public function process() {
+        if (array_key_exists('imap_download_message', $this->request->get) && $this->request->get['imap_download_message']) {
+
+            $server_id = NULL;
+            $uid = NULL;
+            $folder = NULL;
+            $msg_id = NULL;
+
+            if (array_key_exists('uid', $this->request->get) && is_numeric($this->request->get['uid'])) {
+                $uid = $this->request->get['uid'];
+            }
+            if (array_key_exists('list_path', $this->request->get) && preg_match("/^imap_(\d+)_(.+)/", $this->request->get['list_path'], $matches)) {
+                $server_id = $matches[1];
+                $folder = $matches[2];
+            }
+            if (array_key_exists('imap_msg_part', $this->request->get) && preg_match("/^[0-9\.]+$/", $this->request->get['imap_msg_part'])) {
+                $msg_id = preg_replace("/^0.{1}/", '', $this->request->get['imap_msg_part']);
+            }
+            if ($server_id !== NULL && $uid !== NULL && $folder !== NULL && $msg_id !== NULL) {
+                $cache = Hm_IMAP_List::get_cache($this->session, $server_id);
+                $imap = Hm_IMAP_List::connect($server_id, $cache);
+                if ($imap) {
+                    if ($imap->select_mailbox($folder)) {
+                        $msg_struct = $imap->get_message_structure($uid);
+                        $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $msg_id));
+                        if (!empty($struct)) {
+                            $part_struct = array_shift($struct);
+                            $encoding = false;
+                            if (array_key_exists('encoding', $part_struct)) {
+                                $encoding = trim(strtolower($part_struct['encoding']));
+                            }
+                            $stream_size = $imap->start_message_stream($uid, $msg_id);
+                            if ($stream_size > 0) {
+                                $name = get_imap_part_name($part_struct, $uid, $msg_id);
+                                header('Content-Disposition: attachment; filename="'.$name.'"');
+                                header('Content-Transfer-Encoding: binary');
+                                header('Content-Length: '.$part_struct['size']);
+                                ob_end_clean();
+                                while($line = $imap->read_stream_line()) {
+                                    if ($encoding == 'quoted-printable') {
+                                        echo quoted_printable_decode($line);
+                                    }
+                                    elseif ($encoding == 'base64') {
+                                        echo base64_decode($line);
+                                    }
+                                    else {
+                                        echo $line;
+                                    }
+                                }
+                                exit;
+                            }
+                        }
+                    }
+                }
+            }
+            Hm_Msgs::add('ERRAn Error occurred trying to download the message');
+        }
+    }
+}
+
+/**
  * Process reply field values
  * @subpackage imap/handler
  */
@@ -783,6 +851,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
                     $this->out('msg_text', $msg_text);
+                    $this->out('msg_download_args', sprintf("page=message&amp;uid=%d&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
                 }
             }
         }
@@ -876,7 +945,8 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
         if ($this->get('msg_struct')) {
             $res = '<table class="msg_parts">';
             $part = $this->get('imap_msg_part', '1');
-            $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part);
+            $args = $this->get('msg_download_args', '');
+            $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part, $args);
             $res .= '</table>';
             $this->out('msg_parts', $res);
         }
@@ -1539,9 +1609,10 @@ function build_page_links($detail, $path) {
  * @param object $mod Hm_Output_Module
  * @param int $level indention level
  * @param string $part currently selected part
+ * @param string $dl_args base arguments for a download link URL
  * @return string
  */
-function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
+function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
     $allowed = array(
         'textplain',
         'texthtml',
@@ -1602,7 +1673,8 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
     }
     $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
         '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '').
-        '</td><td>'.$output_mod->html_safe($desc).'</td></tr>';
+        '</td><td>'.$output_mod->html_safe($desc).'</td>';
+    $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">Download</a></td></tr>';
     return $res;
 }
 
@@ -1612,21 +1684,22 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part) {
  * @param array $struct message structure
  * @param object $mod Hm_Output_Module
  * @param string $part currently selected message part id
+ * @param string $dl_link base arguments for a download link
  * @param int $level indention level
  * @return string
  */
-function format_msg_part_section($struct, $output_mod, $part, $level=0) {
+function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0) {
     $res = '';
     foreach ($struct as $id => $vals) {
         if (is_array($vals) && isset($vals['type'])) {
-            $res .= format_msg_part_row($id, $vals, $output_mod, $level, $part);
+            $res .= format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link);
             if (isset($vals['subs'])) {
-                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, ($level + 1));
+                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, ($level + 1));
             }
         }
         else {
             if (count($vals) == 1 && isset($vals['subs'])) {
-                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $level);
+                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $level);
             }
         }
     }
@@ -1758,6 +1831,30 @@ function imap_refresh_oauth2_token($server, $config) {
         }
     }
     return array();
+}
+
+function get_imap_part_name($struct, $uid, $part_id) {
+    $extension = '';
+    if (strtolower($struct['type']) == 'message' && strtolower($struct['subtype'] = 'rfc822')) {
+        $extension = '.eml';
+    }
+    if (array_key_exists('file_attributes', $struct) && array_key_exists('attachment', $struct['file_attributes'])) {
+        for ($i=0;$i<count($struct['file_attributes']['attachment']);$i++) {
+            if (strtolower(trim($struct['file_attributes']['attachment'][$i])) == 'filename') {
+                if (array_key_exists(($i+1), $struct['file_attributes']['attachment'])) {
+                    return trim($struct['file_attributes']['attachment'][($i+1)]);
+                }
+            }
+        }
+    }
+
+    if (array_key_exists('attributes', $struct) && is_array($struct['attributes']) && array_key_exists('name', $struct['attributes'])) {
+        return trim($struct['attributes']['name']);
+    }
+    if (array_key_exists('description', $struct)) {
+        return trim(str_replace(' ', '_', $struct['description'])).$extension;
+    }
+    return 'message_'.$uid.'_part_'.$part_id.$extension;
 }
 
 ?>
