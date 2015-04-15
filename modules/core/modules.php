@@ -869,7 +869,9 @@ class Hm_Output_server_content_start extends Hm_Output_Module {
      * The server_content div is closed in Hm_Output_server_content_end
      */
     protected function output() {
-        return '<div class="content_title">'.$this->trans('Servers').'</div><div class="server_content">';
+        return '<div class="content_title">'.$this->trans('Servers').
+            '<div class="list_controls"></div>'.
+            '</div><div class="server_content">';
     }
 }
 
@@ -1954,7 +1956,13 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
      * Title, list controls, and message controls
      */
     protected function output() {
-        if (!$this->get('no_list_controls', false)) {
+
+        if ($this->get('custom_list_controls', '')) {
+            $config_link = $this->get('custom_list_controls');
+            $source_link = '';
+            $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+        }
+        elseif (!$this->get('no_list_controls', false)) {
             $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';

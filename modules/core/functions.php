@@ -206,10 +206,10 @@ function date_callback($vals, $style, $output_mod) {
  */
 function icon_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
-        return sprintf('<td class="icon">%s</td>', (in_array('flagged', $vals[0]) ? '&#9733;' : ''));
+        return sprintf('<td class="icon">%s</td>', (in_array('flagged', $vals[0]) ? '<img src="'.Hm_Image_Sources::$star.'" alt="'.$output_mod->trans('Flagged').'" />' : ''));
     }
     elseif ($style == 'news') {
-        return sprintf('<div class="icon">%s</div>', (in_array('flagged', $vals[0]) ? '&#9733;' : ''));
+        return sprintf('<div class="icon">%s</div>', (in_array('flagged', $vals[0]) ? '<img src="'.Hm_Image_Sources::$star.'" alt="'.$output_mod->trans('Flagged').'" />' : ''));
     }
 }
 
