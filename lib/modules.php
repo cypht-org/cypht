@@ -291,6 +291,7 @@ trait Hm_Output_Module_Exec {
                 }
                 else {
                     $mod_output = $mod->output_content($format, $lang_str, array());
+                    $input = $mod->module_output();
                 }
             }
         }
