@@ -11,6 +11,39 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/imap/hm-imap.php';
 
 /**
+ * Process a request to change a combined page source
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_imap_source_update extends Hm_Handler_Module {
+    /**
+     * Add or remove an IMAP folder to the combined view
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('combined_source_state', 'list_path'));
+        if ($success) {
+            $sources = $this->user_config->get('custom_imap_sources');
+            if ($form['combined_source_state'] == 1) {
+                $sources[$form['list_path']] = 'add';
+                Hm_Msgs::add('Folder added to combined pages');
+                $this->session->record_unsaved('Added folder to combined pages');
+            }
+            else {
+                if (array_key_exists($form['list_path'], $sources)) {
+                    unset($sources[$form['list_path']]);
+                }
+                else {
+                    $sources[$form['list_path']] = 'remove';
+                }
+                Hm_Msgs::add('Folder removed from combined pages');
+                $this->session->record_unsaved('Removed folder from combined pages');
+            }
+            $this->user_config->set('custom_imap_sources', $sources);
+            $this->session->set('user_data', $this->user_config->dump());
+        }
+    }
+}
+
+/**
  * Stream a message from IMAP to the browser
  * @subpackage imap/handler
  */
@@ -108,11 +141,18 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if (preg_match("/^imap_\d+_.+$/", $path)) {
-                $this->out('no_list_controls', true);
                 $this->out('list_meta', false, false);
                 $this->out('list_path', $path);
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
+                $custom_link = 'add';
+                foreach (imap_data_sources(false, $this->user_config->get('custom_imap_sources', array())) as $vals) {
+                    if ($vals['id'] == $parts[1] && $vals['folder'] == $parts[2]) {
+                        $custom_link = 'remove';
+                        break;
+                    }
+                }
+                $this->out('custom_list_controls_type', $custom_link);
                 if (!empty($details)) {
                     $this->out('mailbox_list_title', array('IMAP', $details['name'], $parts[2]));
                 }
@@ -331,7 +371,11 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             $fld = $this->session->get('search_fld', 'TEXT');
             $ids = explode(',', $form['imap_server_ids']);
             $date = process_since_argument($since);
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
+            $folder = 'INBOX';
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array($folder), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
             $this->out('imap_search_results', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
@@ -358,7 +402,11 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
                 $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
             }
             $ids = explode(',', $form['imap_server_ids']);
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
+            $folder = 'INBOX';
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array($folder), $limit, array('SINCE' => $date));
             $this->out('imap_combined_inbox_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
@@ -379,7 +427,11 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
             $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
             $ids = explode(',', $form['imap_server_ids']);
             $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_SINCE));
-            $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
+            $folder = 'INBOX';
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, array($folder), $limit, array('SINCE' => $date));
             $this->out('imap_flagged_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
@@ -431,7 +483,11 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
-            $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, array('INBOX'), $limit, array('SINCE' => $date));
+            $folder = 'INBOX';
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, array($folder), $limit, array('SINCE' => $date));
             $this->out('imap_unread_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
@@ -527,11 +583,8 @@ class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
      * Output IMAP server array used on the search page
      */
     public function process() {
-        foreach (Hm_IMAP_List::dump() as $index => $vals) {
-            if (array_key_exists('hide', $vals) && $vals['hide']) {
-                continue;
-            }
-            $this->append('data_sources', array('callback' => 'imap_search_page_content', 'type' => 'imap', 'name' => $vals['name'], 'id' => $index));
+        foreach(imap_data_sources('imap_search_page_content', $this->user_config->get('custom_imap_sources', array())) as $vals) {
+            $this->append('data_sources', $vals);
         }
     }
 }
@@ -578,11 +631,8 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 break;
         }
         if ($callback) {
-            foreach (Hm_IMAP_List::dump() as $index => $vals) {
-                if (array_key_exists('hide', $vals) && $vals['hide']) {
-                    continue;
-                }
-                $this->append('data_sources', array('callback' => $callback, 'type' => 'imap', 'name' => $vals['name'], 'id' => $index));
+            foreach (imap_data_sources($callback, $this->user_config->get('custom_imap_sources', array())) as $vals) {
+                $this->append('data_sources', $vals);
             }
         }
     }
@@ -902,6 +952,29 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
             else {
                 $this->out('old_form', $form);
             }
+        }
+    }
+}
+
+/**
+ * Format a custom list controls section
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_custom_controls extends Hm_Output_Module {
+    /**
+     * Adds list controls to the IMAP folder page view
+     */
+    protected function output() {
+        if ($this->get('custom_list_controls_type')) {
+            if ($this->get('custom_list_controls_type') == 'remove') {
+                $custom = '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').'" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.$this->trans('Remove').'"/></a>';
+                $custom .= '<a style="display: none;" class="add_source" title="'.$this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+            }
+            else {
+                $custom = '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').'" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.$this->trans('Remove').'"/></a>';
+                $custom .= '<a class="add_source" title="'.$this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+            }
+            $this->out('custom_list_controls', $custom);
         }
     }
 }
@@ -1398,6 +1471,46 @@ class Hm_Output_filter_reply_content extends Hm_Output_Module {
 }
 
 /**
+ * Build a source list
+ * @subpackage imap/functions
+ * @param string $callback javascript callback function name
+ * @param array $custom user specific assignments
+ * @return array
+ */
+function imap_data_sources($callback, $custom=array()) {
+    $sources = array();
+    foreach (Hm_IMAP_List::dump() as $index => $vals) {
+        if (array_key_exists('hide', $vals) && $vals['hide']) {
+            continue;
+        }
+        $sources[] = array('callback' => $callback, 'folder' => 'INBOX', 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+    }
+    foreach ($custom as $path => $type) {
+        $parts = explode('_', $path, 3);
+        $remove_id = false;
+
+        if ($type == 'add') {
+            $details = Hm_IMAP_List::dump($parts[1]);
+            if ($details) {
+                $sources[] = array('callback' => $callback, 'folder' => $parts[2], 'type' => 'imap', 'name' => $details['name'], 'id' => $parts[1]);
+            }
+        }
+        elseif ($type == 'remove') {
+            foreach ($sources as $index => $vals) {
+                if ($vals['folder'] == $parts[2] && $vals['id'] == $parts[1]) {
+                    $remove_id = $index;
+                    break;
+                }
+            }
+            if ($remove_id !== false) {
+                unset($sources[$remove_id]);
+            }
+        }
+    }
+    return $sources;
+}
+
+/**
  * Prepare and format message list data 
  * @subpackage imap/functions
  * @param array $msgs list of message headers to format
@@ -1731,34 +1844,33 @@ function sort_by_internal_date($a, $b) {
  */
 function merge_imap_search_results($ids, $search_type, $session, $folders = array('INBOX'), $limit=0, $terms=array()) {
     $msg_list = array();
-    foreach($ids as $id) {
+    foreach($ids as $index => $id) {
         $id = intval($id);
         $cache = Hm_IMAP_List::get_cache($session, $id);
         $imap = Hm_IMAP_List::connect($id, $cache);
         if (is_object($imap) && $imap->get_state() == 'authenticated') {
             $server_details = Hm_IMAP_List::dump($id);
-            foreach ($folders as $folder) {
-                if ($imap->select_mailbox($folder)) {
-                    if (!empty($terms)) {
-                        $msgs = $imap->search($search_type, false, $terms);
+            $folder = $folders[$index];
+            if ($imap->select_mailbox($folder)) {
+                if (!empty($terms)) {
+                    $msgs = $imap->search($search_type, false, $terms);
+                }
+                else {
+                    $msgs = $imap->search($search_type);
+                }
+                if ($msgs) {
+                    if ($limit) {
+                        rsort($msgs);
+                        $msgs = array_slice($msgs, 0, $limit);
                     }
-                    else {
-                        $msgs = $imap->search($search_type);
-                    }
-                    if ($msgs) {
-                        if ($limit) {
-                            rsort($msgs);
-                            $msgs = array_slice($msgs, 0, $limit);
+                    foreach ($imap->get_message_list($msgs) as $msg) {
+                        if (stristr($msg['flags'], 'deleted')) {
+                            continue;
                         }
-                        foreach ($imap->get_message_list($msgs) as $msg) {
-                            if (stristr($msg['flags'], 'deleted')) {
-                                continue;
-                            }
-                            $msg['server_id'] = $id;
-                            $msg['folder'] = $folder;
-                            $msg['server_name'] = $server_details['name'];
-                            $msg_list[] = $msg;
-                        }
+                        $msg['server_id'] = $id;
+                        $msg['folder'] = $folder;
+                        $msg['server_name'] = $server_details['name'];
+                        $msg_list[] = $msg;
                     }
                 }
             }

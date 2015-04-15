@@ -53,6 +53,7 @@ add_handler('message_list', 'imap_oauth2_token_check', true, 'imap', 'load_imap_
 add_handler('message_list', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('message_list', 'imap_bust_cache',  true, 'imap', 'load_imap_servers_for_message_list', 'after');
 add_handler('message_list', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
+add_output('message_list', 'imap_custom_controls', true, 'imap', 'message_list_heading', 'before');
 
 /* message view page */
 add_handler('message', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
@@ -136,6 +137,16 @@ add_handler('ajax_imap_unread', 'imap_unread',  true);
 add_handler('ajax_imap_unread', 'date', true, 'core');
 add_handler('ajax_imap_unread', 'http_headers', true, 'core');
 add_output('ajax_imap_unread', 'filter_unread_data', true);
+
+/* ajax add/remove to combined view */
+add_handler('ajax_imap_update_combined_source', 'login', false, 'core');
+add_handler('ajax_imap_update_combined_source', 'load_user_data', true, 'core');
+add_handler('ajax_imap_update_combined_source', 'language', true, 'core');
+add_handler('ajax_imap_update_combined_source', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_update_combined_source', 'process_imap_source_update',  true);
+add_handler('ajax_imap_update_combined_source', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_update_combined_source', 'date', true, 'core');
+add_handler('ajax_imap_update_combined_source', 'http_headers', true, 'core');
 
 /* ajax status callback data */
 add_handler('ajax_imap_status', 'login', false, 'core');
@@ -252,6 +263,7 @@ return array(
         'ajax_imap_save_folder_state',
         'ajax_imap_message_action',
         'ajax_imap_flag_message',
+        'ajax_imap_update_combined_source',
     ),
 
     'allowed_output' => array(
@@ -303,6 +315,8 @@ return array(
         'imap_prefetch' => FILTER_VALIDATE_BOOLEAN,
         'hide_imap_server' => FILTER_VALIDATE_BOOLEAN,
         'imap_flag_state' => FILTER_SANITIZE_STRING,
+        'combined_source_state' => FILTER_VALIDATE_INT,
+        'list_path' => FILTER_SANITIZE_STRING,
     )
 );
 
