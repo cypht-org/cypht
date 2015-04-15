@@ -1,13 +1,14 @@
 <?php
 
 /**
- * The following constants are automatically filled in when
+ * Some of the following constants are automatically filled in when
  * the build process is run. If you change them in site/index.php
  * and rerun the build process your changes will be lost
  *
  * APP_PATH   absolute path to the php files of the app
  * DEBUG_MODE flag to enable easier debugging and development
  * CACHE_ID   unique string to bust js/css browser caching for a new build
+ * SITE_ID    random site id used for page keys
  */
 define('APP_PATH', '');
 define('DEBUG_MODE', true);
