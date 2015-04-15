@@ -628,6 +628,7 @@
 				<li><a href="class-Hm_Handler_process_github_authorization.html">Hm_Handler_process_github_authorization</a></li>
 				<li><a href="class-Hm_Handler_process_idle_time.html">Hm_Handler_process_idle_time</a></li>
 				<li><a href="class-Hm_Handler_process_idle_time_setting.html">Hm_Handler_process_idle_time_setting</a></li>
+				<li><a href="class-Hm_Handler_process_imap_source_update.html">Hm_Handler_process_imap_source_update</a></li>
 				<li><a href="class-Hm_Handler_process_language_setting.html">Hm_Handler_process_language_setting</a></li>
 				<li><a href="class-Hm_Handler_process_list_style_setting.html">Hm_Handler_process_list_style_setting</a></li>
 				<li><a href="class-Hm_Handler_process_nux_add_service.html">Hm_Handler_process_nux_add_service</a></li>
@@ -765,6 +766,7 @@
 				<li><a href="class-Hm_Output_home_heading.html">Hm_Output_home_heading</a></li>
 				<li><a href="class-Hm_Output_HTTP.html">Hm_Output_HTTP</a></li>
 				<li><a href="class-Hm_Output_idle_time_setting.html">Hm_Output_idle_time_setting</a></li>
+				<li><a href="class-Hm_Output_imap_custom_controls.html">Hm_Output_imap_custom_controls</a></li>
 				<li><a href="class-Hm_Output_imap_reply_details.html">Hm_Output_imap_reply_details</a></li>
 				<li><a href="class-Hm_Output_imap_server_ids.html">Hm_Output_imap_server_ids</a></li>
 				<li><a href="class-Hm_Output_info_heading.html">Hm_Output_info_heading</a></li>
@@ -898,6 +900,7 @@
 				<li><a href="function-hn_parse_subtext.html">hn_parse_subtext</a></li>
 				<li><a href="function-human_readable_interval.html">human_readable_interval</a></li>
 				<li><a href="function-icon_callback.html">icon_callback</a></li>
+				<li><a href="function-imap_data_sources.html">imap_data_sources</a></li>
 				<li><a href="function-imap_get_oauth2_data.html">imap_get_oauth2_data</a></li>
 				<li><a href="function-imap_refresh_oauth2_token.html">imap_refresh_oauth2_token</a></li>
 				<li><a href="function-interface_langs.html">interface_langs</a></li>
@@ -1107,7 +1110,7 @@
 </span><span id="116" class="l"><a href="#116">116: </a>        <span class="php-quote">'box'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQETkQC7JUPAAAAD9JREFUOMtj/P///38GCgATw5AHjLjCgJGRkRGZ/////w8MDAz8VA8DRjyx8BWNz02qAfSJxlEDBosBlKSDfwDIjxcGBtR7UQAAAABJRU5ErkJggg=='</span>,
 </span><span id="117" class="l"><a href="#117">117: </a>        <span class="php-quote">'home'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQEToO2pA6nAAAAGhJREFUOMvd0MEJgDAMheEX8VRH0ZUEcTIdqu7gAD3/XgQFkbR4KPhBjgkvT3oBBGA5J6gE0AORSwT63OUJSDwlYFZGZM8KdF5kzwYMXmTPDox2S0FJ0WZmktToo/oHWu9Hr6MfdFDfAT+d6y1VFmwhAAAAAElFTkSuQmCC'</span>,
 </span><span id="118" class="l"><a href="#118">118: </a>        <span class="php-quote">'search'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQETsZQFiOGgAAAQFJREFUOMuVkk1KA0EUhCuBgPEEiQfwAi4EiTmB6wmusgq4SRA9gxK8iBKIWehFxIALzzD4tzCr/rKpgabRSU/BY5p61dX9ekqKABwAc2ANbFyvwC3QVx2Ac+CH//ENFHWbg4UL4ATYcw2ApXsBGOmPa1cnT2tueG3NF9CLG3M37rUDwMram5hcmzzOMBha+xKTG5OdDIN9a38rrq1mCCnRlvTu9VGGQaV5iw2evL7KMJj5+xjP1XdIAC5r5r+IQjVLm0UUpCVwCnRdA+AhSWUAJqnJyCHJRQDGrcSkJ2kq6UzSoaSWH/lZUinpzlyFz0b/EJhEowKUagpgDHwAJVBsATE1gdzGTVAZAAAAAElFTkSuQmCC'</span>,
-</span><span id="119" class="l"><a href="#119">119: </a>        <span class="php-quote">'star'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQEgAW7hPC6gAAAJ9JREFUOMudkcENhCAQRQcP9mALWIE3m6AF21jbsCE7oAX3uGdOby+4KgmzwEtICJk/GeaJKAAjYLWaTnRcPG0AHvCt4ZEL2/IFl7lXjX/itcIFCNQTgOVsMgFHRfgApnSSAdgLwjsw5L7TA5sS3oC+Rl+KLdHoCtX+1ReiobslXzr+Y8uJJas1WHNbvll6aTv4iMhsjHmnDeLbHGt+fAFuKGb/qc92/AAAAABJRU5ErkJggg=='</span>,
+</span><span id="119" class="l"><a href="#119">119: </a>        <span class="php-quote">'star'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wQOFTImH3NlvgAAAGZJREFUOMvtkkEOgCAMBKfqo028qTHxr/5hvUiiSCOIR+dGaCd0qUkSgJkZQDjHhPuYhkq63ELnZSM6OBdmMl0aCgULcUOBYK0NcbuF82KE3hWk0ncYir4xwSypfRR4G/jZJv4C2AHdVvG0L8dP8QAAAABJRU5ErkJggg=='</span>,
 </span><span id="120" class="l"><a href="#120">120: </a>        <span class="php-quote">'doc'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQEgEhT7VWpAAAAFdJREFUOMvdkEEOgDAMwxLEw/fzcAFUJNIVygmfN9cKZMCOpIGMgkCppCjwkgeCe4n7kBwYXcFFwvg4QpIosKDJWXBcdEWusF2wxrHeCL4rmK3uCn+wwQZhHehD1gJkTQAAAABJRU5ErkJggg=='</span>,
 </span><span id="121" class="l"><a href="#121">121: </a>        <span class="php-quote">'power'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQEgMq6lHtrgAAAOhJREFUOMulkj0OQVEQhceLhlLEzz5UEmzCzxIkGkSpZS8aUbAQP5XYBBoaPs2R3Fz3/SRO8vLuOzNz3p05YxYDBEtBZH8i8v6aT7hRPlEA6JvZHigFistmdgR6ceo94K22h/4MgIk+X0DXL64CNyWM4oYIzEXdgJorsFBgleYCsBW9dMmjyGYGgY7ok0s+RRbSLAMKyn2GbCSD7Tk/NzKzi86NDALfnLMrsNN5nEFgqvfO7asO3NXbOKH/mWNj1Q8OnEVaAy0NrAi0gY1i76RtHDg3CeH6s4UBkRqwBA7AQ89ey1YJ1XwApyFJo3twLfIAAAAASUVORK5CYII='</span>,
 </span><span id="122" class="l"><a href="#122">122: </a>        <span class="php-quote">'globe'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIQEgQv1XqP5gAAAS5JREFUOMuFk7FKA2EQhOfS5GztbaxswiFoI3Y+hO/gG+QBDAiCoAkJRGzTCzaCQQRLW4MWp6ClluIFIZ/Nnqy//38OHBy3O7M7u3tSAGAdGAGPwNyeB2AIFEoBWAJOacbCxPMY+cYlHQMbQNtih4HQ9S+RSOVeUODchD2G3nONd6AX8wpMgDNg1+ayAAqZJ4AnYD8xnwwogbFZmxhnIJs2wGXDgDPgzvJegcreZ7J2AL6AlYRAN7GVygusATsR8rKJRwVakp4td1XSNNLAh6S3hLuy5UgXkirgwGdkWTaXtCmpK2ks6daFrwQUkR3vNQx0yx1cp/44CgTKBLkDvFhO3wdyO88an8C2nXFuuz9y65sC7VA9t04W//xM/T/kQKgABsDMKlbAPXDy49nhG8faR5/cSs2AAAAAAElFTkSuQmCC'</span>,
@@ -1126,15 +1129,18 @@
 </span><span id="135" class="l"><a href="#135">135: </a>        <span class="php-quote">'circle_check'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIXARYef+fanwAAAP5JREFUOMuVk01uwjAUhMdRpYYLsOiaBohURT0Cl4EDQQULrgJUvUB3IOiy5e8GsOFj86iMSUL4JEtxkhk/j5+lAOAdGAEr4GhjCQyBTEUANWBMOSczj/PEX1Tn88qkwsoX1sDGnof+nqvwB7wCTWBr28kiST3dZy2p45z7kRTZOyepK0s7XGkbzBtWbRvYed8WsmPy99gAWmbyWyIGOOQZJCZoeeI0R/xvsMxJOvFOKAX2BcHOI0nTILAXSTMgAVJJM0n1gnAnztrz21L12Uh6KhEjKbuUOeJxBn4nxtaeVZkCz+F9iK2S053LNLgRB0YZ8AEsgIONOdAH3sL/z413lqgszXfqAAAAAElFTkSuQmCC'</span>,
 </span><span id="136" class="l"><a href="#136">136: </a>        <span class="php-quote">'key'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIZAQgSQs/eWAAAAJNJREFUOMvFkssJwzAQRHddgz9VhRDSUG4BgytQDYaU4MQdBYwvhufLHoRAshwd8kAHzTCzrJDIAcAdmIHVzge4SQ7AQJw+Z7LPCNRAA7xMu6YK5qCg9rzWtHeqYA0KGs/rTFuqxBZbcHc2uRMRd7T/gzymkjDApST8PBv+Agsw/TS5+MFieY2Zqqo5372SQv5fsAP546KRN4Vv2gAAAABJRU5ErkJggg=='</span>,
 </span><span id="137" class="l"><a href="#137">137: </a>        <span class="php-quote">'save'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wIcESgkMwk8IQAAAFJJREFUOMvtkrsKwEAIBN18+f75pEkhQe/ygJDiphNkUFdFA0CuJanq2+IlS5AEgElUqSTcRWfmeDjSROJLezUS3zrOSeJHFz4kjl+jKvNPP3EH61WZgXMMlJoAAAAASUVORK5CYII='</span>,
-</span><span id="138" class="l"><a href="#138">138: </a>
-</span><span id="139" class="l"><a href="#139">139: </a>    );
-</span><span id="140" class="l"><a href="#140">140: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$icons</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
-</span><span id="141" class="l"><a href="#141">141: </a>        Hm_Image_Sources::<span class="php-var">$$name</span> = <span class="php-var">$value</span>;
-</span><span id="142" class="l"><a href="#142">142: </a>    }
-</span><span id="143" class="l"><a href="#143">143: </a>}
-</span><span id="144" class="l"><a href="#144">144: </a>
-</span><span id="145" class="l"><a href="#145">145: </a><span class="xlang">?&gt;</span>
-</span><span id="146" class="l"><a href="#146">146: </a></span></code></pre>
+</span><span id="138" class="l"><a href="#138">138: </a>        <span class="php-quote">'book'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wQOFC4W3h9ieAAAAHRJREFUOMvdksEJgDAMRRMVXMglnMruoEO5iHdxgeelSKitLRU8+E/hN3mknwgwAhsJSSBvr9ZIDj8ALl9jTVaqqiHA+o28VBEAcICLvXUlwyIy+fr+xVwGuWy+yeDnADFXO9RucPi6rd1goUIW0AMzsNcATp/U4mn8NERgAAAAAElFTkSuQmC'</span>,
+</span><span id="139" class="l"><a href="#139">139: </a>        <span class="php-quote">'undo'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wQOFDAM9zyk3QAAAJhJREFUOMvV0rENAjEMheEL1ZWUCPaggj2QWICaCdJxw8A03CZQXMVHc4gowBGo4EkubOv9thJX1U8KMzRo0fVxxA7Td+Y1zl7rhNWQ+ZIZ9lig7mOJwwOkXzufvB3YdINJWmjyyQVvNU+TNgMsCgDjNOkyQF0ACCFJpM0Q7r0hjRBz8w2IWHo48cl/x0+vL35tziCx+itdAVZFDLL5ueHqAAAAAElFTkSuQmCC'</span>,
+</span><span id="140" class="l"><a href="#140">140: </a>        <span class="php-quote">'circle_x'</span> =&gt; <span class="php-quote">'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wQOFQ0h2cnaIQAAAOZJREFUOMulk01uwkAMhV+yabhIkk0V9QhcBg4UKlj0LAhxCFCzD7kCbPi6cSrXzQQknvSkGct+47+RAoAPYAd0wM34DWyBRikAC+CLedxNvJgKPvI8Dn9Ewsu9MaIHLu6+9TV7p9LYT9grYHDlNLmkdexHlmWdpKWki3Fptsy7SVrJuh1TLS270p1r9/qIs2xMpERmggGuuV6FLUmqhBqoZ7I4yTYsFTwYUyKtgMZGMgpUE47DmE0Y4/tYxi44TzUs2je+D4Wt57PYA2+xmYVlcn/wmTb/goNQA3wCZ+BqPAHtb80OPyBztrpQou9vAAAAAElFTkSuQmCC'</span>,
+</span><span id="141" class="l"><a href="#141">141: </a>
+</span><span id="142" class="l"><a href="#142">142: </a>    );
+</span><span id="143" class="l"><a href="#143">143: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$icons</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
+</span><span id="144" class="l"><a href="#144">144: </a>        Hm_Image_Sources::<span class="php-var">$$name</span> = <span class="php-var">$value</span>;
+</span><span id="145" class="l"><a href="#145">145: </a>    }
+</span><span id="146" class="l"><a href="#146">146: </a>}
+</span><span id="147" class="l"><a href="#147">147: </a>
+</span><span id="148" class="l"><a href="#148">148: </a><span class="xlang">?&gt;</span>
+</span><span id="149" class="l"><a href="#149">149: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1142,6 +1148,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?201cc7db2162b0a3507bb1ce29a316e096a431d8"></script>
+<script src="elementlist.js?8006914cedc37dd5066c5a4769c9ea8efbe23611"></script>
 </body>
 </html>
