@@ -229,29 +229,6 @@ var Hm_Message_List = {
         'flagged': 'formatted_flagged_data'
     },
 
-    is_source_active: function(type, id) {
-        var src;
-        for (var index in Hm_Message_List.sources) {
-            src = Hm_Message_List.sources[index];
-            if (src.type == type && src.id == id) {
-                return true;
-            }
-        }
-        return false;
-    },
-
-    remove_source: function(type, id) {
-        var new_sources = [];
-        var src;
-        for (var index in Hm_Message_List.sources) {
-            src = Hm_Message_List.sources[index];
-            if (src.type != type && src.id != id) {
-                new_sources.push(src);
-            }
-        }
-        Hm_Message_List.sources = new_sources;
-    },
-
     update: function(ids, msgs, type, cache) {
         var msg_rows;
         if (!cache) {
@@ -268,19 +245,55 @@ var Hm_Message_List = {
         return count;
     },
 
+    clear_missing_sources: function(msg_rows) {
+        $('tr', msg_rows).filter(function() {
+            var detail = Hm_Utils.parse_folder_path(this.className);
+            if (!detail) {
+                return false;
+            }
+            var source;
+            var index;
+            var found = false;
+            for (index in Hm_Message_List.sources) {
+                source = Hm_Message_List.sources[index];
+                if (source.type == detail.type && source.folder == detail.folder && source.id == detail.server_id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                $(this).remove();
+            }
+        });
+        return 0;
+    },
 
     remove_rows: function(ids, msg_ids, type, msg_rows) {
         var count = $('tr', msg_rows).length;
+        var parts;
+        var re;
         var i;
-        var filter_function = function() {
-            var id = this.className;
-            if ($.inArray(id, msg_ids) == -1) {
-                count--;
-                $(this).remove();
-            }
-        };
+        var id;
         for (i=0;i<ids.length;i++) {
-            $('tr[class^='+type+'_'+ids[i]+'_]', msg_rows).filter(filter_function);
+            id = ids[i];
+            if ((id+'').search('_') != -1) {
+                parts = id.split('_', 2);
+                parts[0] -= 0;
+                re = new RegExp(parts[1]+'$');
+                parts[1] = re;
+            }
+            else {
+                parts = [id, false];
+            }
+            $('tr[class^='+type+'_'+parts[0]+'_]', msg_rows).filter(function() {
+                var id = this.className;
+                if (!parts[1] || parts[1].exec(id)) {
+                    if ($.inArray(id, msg_ids) == -1) {
+                        count--;
+                        $(this).remove();
+                    }
+                }
+            });
         }
         return count;
     },
@@ -480,7 +493,7 @@ var Hm_Message_List = {
         $('.total').text($('.message_table tbody tr').length);
         for (index in Hm_Message_List.sources) {
             source = Hm_Message_List.sources[index];
-            source.callback(source.id);
+            source.callback(source.id, source.folder);
         }
         return false;
     },
@@ -643,6 +656,7 @@ var Hm_Message_List = {
 
     set_message_list_state: function(list_type) {
         var data = $('.message_table tbody');
+        //Hm_Message_List.clear_missing_sources(data);
         data.find('*[style]').attr('style', '');
         Hm_Utils.save_to_local_storage(list_type, data.html());
         var empty = Hm_Message_List.check_empty_list();
