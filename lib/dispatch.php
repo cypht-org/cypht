@@ -7,6 +7,9 @@
  */
 if (!defined('DEBUG_MODE')) { die(); }
 
+/**
+ * Page request router that ties all the framework peices together
+ */
 class Hm_Dispatch {
 
     public $site_config;
