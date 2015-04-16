@@ -215,21 +215,22 @@ var Hm_Timer = {
     }
 };
 
-/* message list */
-var Hm_Message_List = {
-    range_start: '',
-    sources: [],
-    deleted: [],
+function New_Hm_Message_List() {
 
-    page_caches: {
+    var self = this;
+    this.range_start = '',
+    this.sources = [];
+    this.deleted = [];
+
+    this.page_caches = {
         'feeds': 'formatted_feed_data',
         'combined_inbox': 'formatted_combined_inbox',
         'email': 'formatted_all_mail',
         'unread': 'formatted_unread_data',
         'flagged': 'formatted_flagged_data'
-    },
+    };
 
-    update: function(ids, msgs, type, cache) {
+    this.update = function(ids, msgs, type, cache) {
         var msg_rows;
         if (!cache) {
             msg_rows = $('.message_table tbody');
@@ -240,12 +241,12 @@ var Hm_Message_List = {
         if (!$.isEmptyObject(msgs)) {
             $('.empty_list').remove();
         }
-        var msg_ids = Hm_Message_List.add_rows(msgs, msg_rows);
-        var count = Hm_Message_List.remove_rows(ids, msg_ids, type, msg_rows);
+        var msg_ids = this.add_rows(msgs, msg_rows);
+        var count = this.remove_rows(ids, msg_ids, type, msg_rows);
         return count;
-    },
+    };
 
-    clear_missing_sources: function(msg_rows) {
+    this.clear_missing_sources = function(msg_rows) {
         $('tr', msg_rows).filter(function() {
             var detail = Hm_Utils.parse_folder_path(this.className);
             if (!detail) {
@@ -254,8 +255,8 @@ var Hm_Message_List = {
             var source;
             var index;
             var found = false;
-            for (index in Hm_Message_List.sources) {
-                source = Hm_Message_List.sources[index];
+            for (index in this.sources) {
+                source = this.sources[index];
                 if (source.type == detail.type && source.folder == detail.folder && source.id == detail.server_id) {
                     found = true;
                     break;
@@ -266,9 +267,9 @@ var Hm_Message_List = {
             }
         });
         return 0;
-    },
+    };
 
-    remove_rows: function(ids, msg_ids, type, msg_rows) {
+    this.remove_rows = function(ids, msg_ids, type, msg_rows) {
         var count = $('tr', msg_rows).length;
         var parts;
         var re;
@@ -296,9 +297,9 @@ var Hm_Message_List = {
             });
         }
         return count;
-    },
+    };
 
-    add_rows: function(msgs, msg_rows) {
+    this.add_rows = function(msgs, msg_rows) {
         var msg_ids = [];
         var row;
         var id;
@@ -309,12 +310,12 @@ var Hm_Message_List = {
         for (index in msgs) {
             row = msgs[index][0];
             id = msgs[index][1];
-            if (Hm_Message_List.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
+            if (this.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
                 continue;
             }
             id = id.replace(/ /, '-');
             if (!$('.'+Hm_Utils.clean_selector(id), msg_rows).length) { 
-                Hm_Message_List.insert_into_message_list(row, msg_rows);
+                this.insert_into_message_list(row, msg_rows);
                 $('.'+Hm_Utils.clean_selector(id), msg_rows).show();
             }
             else {
@@ -328,9 +329,9 @@ var Hm_Message_List = {
             msg_ids.push(id);
         }
         return msg_ids;
-    },
+    };
 
-    insert_into_message_list: function(row, msg_rows) {
+    this.insert_into_message_list = function(row, msg_rows) {
         var timestr = $('.msg_timestamp', $(row)).val();
         var element = false;
         var timestr2;
@@ -347,15 +348,15 @@ var Hm_Message_List = {
         else {
             msg_rows.append(row);
         }
-    },
+    };
 
-    reset_checkboxes: function() {
+    this.reset_checkboxes = function() {
         $('input[type=checkbox]').each(function () { this.checked = false; });
-        Hm_Message_List.toggle_msg_controls();
-        Hm_Message_List.set_checkbox_callback();
-    },
+        this.toggle_msg_controls();
+        this.set_checkbox_callback();
+    };
 
-    select_range: function(start, end) {
+    this.select_range = function(start, end) {
         var found = false;
         var other = false;
         $('.message_table tbody tr').each(function() {
@@ -374,38 +375,36 @@ var Hm_Message_List = {
                 other = start;
             }
         });
-        
-    },
+    };
 
-    check_select_range: function(event_object) {
+    this.check_select_range = function(event_object) {
         var start;
         var end;
         if (event_object && event_object.shiftKey) {
             if (event_object.target.checked) {
-                if (Hm_Message_List.range_start !== '') {
-                    start = Hm_Message_List.range_start;
+                if (this.range_start !== '') {
+                    start = this.range_start;
                     end = event_object.target.value;
-                    Hm_Message_List.select_range(start, end);
-                    Hm_Message_List.range_start = '';
+                    this.select_range(start, end);
+                    this.range_start = '';
                 }
                 else {
-                   Hm_Message_List.range_start = event_object.target.value; 
+                   this.range_start = event_object.target.value; 
                 }
             }
         }
+    };
 
-    },
-
-    toggle_msg_controls: function() {
+    this.toggle_msg_controls = function() {
         if ($('input[type=checkbox]').filter(function() {return this.checked; }).length > 0) {
             $('.msg_controls').addClass('msg_controls_visible');
         }
         else {
             $('.msg_controls').removeClass('msg_controls_visible');
         }
-    },
+    };
 
-    update_after_action: function(action_type, selected) {
+    this.update_after_action = function(action_type, selected) {
         var remove = false;
         if (action_type == 'read' && hm_list_path() == 'unread') {
             remove = true;
@@ -414,27 +413,27 @@ var Hm_Message_List = {
             remove = true;
         }
         if (remove) {
-            Hm_Message_List.remove_after_action(action_type, selected);
+            this.remove_after_action(action_type, selected);
         }
         else {
             if (action_type == 'read' || action_type == 'unread') {
-                Hm_Message_List.read_after_action(action_type, selected);
+                this.read_after_action(action_type, selected);
             }
             else if (action_type == 'flag' || action_type == 'unflag') {
-                Hm_Message_List.flag_after_action(action_type, selected);
+                this.flag_after_action(action_type, selected);
             }
         }
-        Hm_Message_List.save_updated_list();
-        Hm_Message_List.reset_checkboxes();
-    },
+        this.save_updated_list();
+        this.reset_checkboxes();
+    };
 
-    save_updated_list: function() {
-        if (Hm_Message_List.page_caches.hasOwnProperty(hm_list_path())) {
-            Hm_Message_List.set_message_list_state(Hm_Message_List.page_caches[hm_list_path()]);
+    this.save_updated_list = function() {
+        if (this.page_caches.hasOwnProperty(hm_list_path())) {
+            this.set_message_list_state(this.page_caches[hm_list_path()]);
         }
-    },
+    };
 
-    remove_after_action: function(action_type, selected) {
+    this.remove_after_action = function(action_type, selected) {
         var removed = 0;
         var class_name = false;
         var index;
@@ -442,14 +441,14 @@ var Hm_Message_List = {
             class_name = selected[index];
             $('.'+Hm_Utils.clean_selector(class_name)).remove();
             if (action_type == 'delete') {
-                Hm_Message_List.deleted.push(class_name);
+                this.deleted.push(class_name);
             }
             removed++;
         }
         return removed;
-    },
+    };
 
-    read_after_action: function(action_type, selected) {
+    this.read_after_action = function(action_type, selected) {
         var read = 0;
         var row;
         var index;
@@ -466,9 +465,9 @@ var Hm_Message_List = {
             read++;
         }
         return read;
-    },
+    };
 
-    flag_after_action: function(action_type, selected) {
+    this.flag_after_action = function(action_type, selected) {
         var flagged = 0;
         var row;
         var index;
@@ -484,60 +483,60 @@ var Hm_Message_List = {
             flagged++;
         }
         return flagged;
-    },
+    };
 
-    load_sources: function() {
+    this.load_sources = function() {
         var index;
         var source;
-        $('.src_count').text(Hm_Message_List.sources.length);
+        $('.src_count').text(self.sources.length);
         $('.total').text($('.message_table tbody tr').length);
-        for (index in Hm_Message_List.sources) {
-            source = Hm_Message_List.sources[index];
+        for (index in self.sources) {
+            source = self.sources[index];
             source.callback(source.id, source.folder);
         }
         return false;
-    },
+    };
 
-    select_combined_view: function() {
-        if (Hm_Message_List.page_caches.hasOwnProperty(hm_list_path())) {
-            Hm_Message_List.setup_combined_view(Hm_Message_List.page_caches[hm_list_path()]);
+    this.select_combined_view = function() {
+        if (self.page_caches.hasOwnProperty(hm_list_path())) {
+            self.setup_combined_view(self.page_caches[hm_list_path()]);
         }
         else {
             if (hm_page_name() == 'search') {
-                Hm_Message_List.setup_combined_view('formatted_search_data');
+                self.setup_combined_view('formatted_search_data');
             }
             else {
-                Hm_Message_List.setup_combined_view(false);
+                self.setup_combined_view(false);
             }
         }
-        $('.msg_controls > a').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
-        $('.toggle_link').click(function() { return Hm_Message_List.toggle_rows(); });
-        $('.refresh_link').click(function() { return Hm_Message_List.load_sources(); });
-    },
+        $('.msg_controls > a').click(function() { return self.message_action($(this).data('action')); });
+        $('.toggle_link').click(function() { return self.toggle_rows(); });
+        $('.refresh_link').click(function() { return self.load_sources(); });
+    };
 
-    add_sources: function(sources) {
-        Hm_Message_List.sources = sources;
-    },
+    this.add_sources = function(sources) {
+        self.sources = sources;
+    };
 
-    setup_combined_view: function(cache_name) {
-        Hm_Message_List.add_sources(hm_data_sources());
+    this.setup_combined_view = function(cache_name) {
+        self.add_sources(hm_data_sources());
         var data = Hm_Utils.get_from_local_storage(cache_name);
         if (data && data.length) {
             $('.message_table tbody').html(data);
             if (cache_name == 'formatted_unread_data') {
-                Hm_Message_List.clear_read_messages();
+                self.clear_read_messages();
             }
-            Hm_Message_List.set_checkbox_callback();
+            self.set_checkbox_callback();
         }
         if (hm_page_name() == 'search' && hm_run_search() == "0") {
-            Hm_Timer.add_job(Hm_Message_List.load_sources, 60, true);
+            Hm_Timer.add_job(self.load_sources, 60, true);
         }
         else {
-            Hm_Timer.add_job(Hm_Message_List.load_sources, 60);
+            Hm_Timer.add_job(this.load_sources, 60);
         }
-    },
+    };
 
-    clear_read_messages: function() {
+    this.clear_read_messages = function() {
         var class_name;
         var list = Hm_Utils.get_from_local_storage('read_message_list');
         if (list && list.length) {
@@ -547,10 +546,10 @@ var Hm_Message_List = {
             }
             Hm_Utils.save_to_local_storage('read_message_list', '');
         }
-    },
+    };
 
     /* TODO: remove module specific refs */
-    update_title: function() {
+    this.update_title = function() {
         var count = 0;
         if (hm_list_path() == 'unread') {
             count = $('.message_table tbody tr').length;
@@ -572,9 +571,9 @@ var Hm_Message_List = {
             count = $('.unseen', $('.message_table tbody')).length;
             document.title = count+' Unread in Feeds';
         }
-    },
+    };
 
-    message_action: function(action_type) {
+    this.message_action = function(action_type) {
         var msg_list = $('.message_list');
         var selected = [];
         $('input[type=checkbox]', msg_list).each(function() {
@@ -590,12 +589,12 @@ var Hm_Message_List = {
                 false,
                 []
             );
-            Hm_Message_List.update_after_action(action_type, selected);
+            self.update_after_action(action_type, selected);
         }
         return false;
-    },
+    };
 
-    prev_next_links: function(cache, class_name) {
+    this.prev_next_links = function(cache, class_name) {
         var href;
         var target;
         var plink = false;
@@ -621,9 +620,9 @@ var Hm_Message_List = {
             nlink = '<a class="nlink" href="'+href+'"><div class="prevnext next_img"></div> '+next.find('.subject').text()+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
-    },
+    };
 
-    check_empty_list: function() {
+    this.check_empty_list = function() {
         var count = $('.message_table tbody tr').length;
         if (!count) {
             if (!$('.empty_list').length) {
@@ -634,9 +633,9 @@ var Hm_Message_List = {
             $('.empty_list').remove();
         }
         return count === 0;
-    },
+    };
 
-    track_read_messages: function(class_name) {
+    this.track_read_messages = function(class_name) {
         var read_messages = Hm_Utils.get_from_local_storage('read_message_list');
         if (read_messages && read_messages.length) {
             read_messages = JSON.parse(read_messages);
@@ -646,40 +645,40 @@ var Hm_Message_List = {
         }
         read_messages[class_name] = 1;
         Hm_Utils.save_to_local_storage('read_message_list', JSON.stringify(read_messages));
-    },
+    };
 
-    toggle_rows: function() {
+    this.toggle_rows = function() {
         $('input[type=checkbox]').each(function () { this.checked = !this.checked; });
-        Hm_Message_List.toggle_msg_controls();
+        self.toggle_msg_controls();
         return false;
-    },
+    };
 
-    set_message_list_state: function(list_type) {
+    this.set_message_list_state = function(list_type) {
         var data = $('.message_table tbody');
-        //Hm_Message_List.clear_missing_sources(data);
+        //self.clear_missing_sources(data);
         data.find('*[style]').attr('style', '');
         Hm_Utils.save_to_local_storage(list_type, data.html());
-        var empty = Hm_Message_List.check_empty_list();
+        var empty = self.check_empty_list();
         if (!empty) {
-            Hm_Message_List.set_checkbox_callback();
+            self.set_checkbox_callback();
         }
         $('.total').text($('.message_table tbody tr').length);
-        Hm_Message_List.update_title();
-    },
+        self.update_title();
+    };
 
-    set_checkbox_callback: function() {
+    this.set_checkbox_callback = function() {
         $('input[type=checkbox]').unbind('click');
         $('input[type=checkbox]').click(function(e) {
-            Hm_Message_List.toggle_msg_controls();
-            Hm_Message_List.check_select_range(e);
+            self.toggle_msg_controls();
+            self.check_select_range(e);
         });
-    },
+    };
 
-    set_all_mail_state: function() { Hm_Message_List.set_message_list_state('formatted_all_mail'); },
-    set_combined_inbox_state: function() { Hm_Message_List.set_message_list_state('formatted_combined_inbox'); },
-    set_flagged_state: function() { Hm_Message_List.set_message_list_state('formatted_flagged_data'); },
-    set_unread_state: function() { Hm_Message_List.set_message_list_state('formatted_unread_data'); },
-    set_search_state: function() { Hm_Message_List.set_message_list_state('formatted_search_data'); }
+    this.set_all_mail_state = function() { self.set_message_list_state('formatted_all_mail'); };
+    this.set_combined_inbox_state = function() { self.set_message_list_state('formatted_combined_inbox'); };
+    this.set_flagged_state = function() { self.set_message_list_state('formatted_flagged_data'); };
+    this.set_unread_state = function() { self.set_message_list_state('formatted_unread_data'); };
+    this.set_search_state = function() { self.set_message_list_state('formatted_search_data'); };
 };
 
 /* folder list */
@@ -979,6 +978,8 @@ Hm_Folders.toggle_folders_event();
 
 /* fire up the job scheduler */
 Hm_Timer.fire();
+
+Hm_Message_List = new New_Hm_Message_List();
 
 /* executes on real onload, has access to other module code */
 $(function() {
