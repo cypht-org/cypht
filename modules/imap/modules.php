@@ -1602,13 +1602,17 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if (stristr($msg['flags'], 'flagged')) {
             $flags[] = 'flagged';
         }
+        $source = $msg['server_name'];
+        if ($msg['folder'] && $msg['folder'] != 'INBOX') {
+            $source .= '-'.preg_replace("/^INBOX.{1}/", '', $msg['folder']);
+        }
         $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('icon_callback', $flags),
                     array('subject_callback', $subject, $url, $flags),
-                    array('safe_output_callback', 'source', $msg['server_name']),
+                    array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from', $from),
                     array('date_callback', $date, $timestamp),
                 ),
@@ -1620,7 +1624,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         else {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
-                    array('safe_output_callback', 'source', $msg['server_name']),
+                    array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from', $from),
                     array('subject_callback', $subject, $url, $flags),
                     array('date_callback', $date, $timestamp),
