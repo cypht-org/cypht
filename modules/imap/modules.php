@@ -625,13 +625,14 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $callback = 'imap_all_mail_content';
                 break;
             default:
-                if ($page != 'message_list' && $page != 'search') {
-                    $callback = 'imap_background_unread_content';
-                }
+                $callback = 'imap_background_unread_content';
                 break;
         }
         if ($callback) {
             foreach (imap_data_sources($callback, $this->user_config->get('custom_imap_sources', array())) as $vals) {
+                if ($callback == 'imap_background_unread_content') {
+                    $vals['group'] = 'background';
+                }
                 $this->append('data_sources', $vals);
             }
         }

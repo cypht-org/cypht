@@ -47,6 +47,31 @@ add_handler('search', 'load_imap_servers_for_message_list', true, 'imap', 'load_
 add_handler('search', 'load_imap_servers_for_search',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('search', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 
+/* calendar page */
+add_handler('calendar', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('calendar', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('calendar', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
+
+/* save settings page */
+add_handler('save', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('save', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('save', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
+
+/* contacts page */
+add_handler('contacts', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('contacts', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('contacts', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
+
+/* profiles page */
+add_handler('profiles', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('profiles', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('profiles', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
+
+/* dev page */
+add_handler('dev', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
+add_handler('dev', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('dev', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
+
 /* message list pages */
 add_handler('message_list', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('message_list', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');

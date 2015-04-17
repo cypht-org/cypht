@@ -501,20 +501,47 @@ function list_sources($sources, $output_mod) {
  * @return string
  */
 function format_data_sources($array, $output_mod) {
-    $objects = array();
-    foreach ($array as $values) {
-        $items = array();
-        foreach ($values as $name => $value) {
-            if ($name == 'callback') {
-                $items[] = $output_mod->html_safe($name).':'.$output_mod->html_safe($value);
+    $result = '';
+    $groups = group_data_sources($array);
+    foreach ($groups as $group_name => $sources) {
+        $objects = array();
+        foreach ($sources as $values) {
+            $items = array();
+            foreach ($values as $name => $value) {
+                if ($name == 'callback') {
+                    $items[] = $output_mod->html_safe($name).':'.$output_mod->html_safe($value);
+                }
+                else {
+                    $items[] = $output_mod->html_safe($name).':"'.$output_mod->html_safe($value).'"';
+                }
             }
-            else {
-                $items[] = $output_mod->html_safe($name).':"'.$output_mod->html_safe($value).'"';
-            }
+            $objects[] = '{'.implode(',', $items).'}';
         }
-        $objects[] = '{'.implode(',', $items).'}';
+        $function = 'hm_data_sources';
+        if ($group_name != 'default') {
+            $function .= '_'.$group_name;
+        }
+        $result .= 'var '.$function.' = function() { return ['.implode(',', $objects).']; };';
     }
-    return '['.implode(',', $objects).']';
+    return $result;
+}
+
+/**
+ * @subpackage core/functions
+ * Group data sources by the "group" attribute if it exists, otherwise use "default"
+ * @param array $array list of data sources
+ * @return array
+ */
+function group_data_sources($array) {
+    $groups = array();
+    foreach($array as $vals) {
+        $key = 'default';
+        if (array_key_exists('group', $vals)) {
+            $key = $vals['group'];
+        }
+        $groups[$key][] = $vals;
+    }
+    return $groups;
 }
 
 /**

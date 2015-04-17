@@ -215,7 +215,8 @@ var Hm_Timer = {
     }
 };
 
-function New_Hm_Message_List() {
+/* message list */
+function Message_List() {
 
     var self = this;
     this.range_start = '',
@@ -979,7 +980,8 @@ Hm_Folders.toggle_folders_event();
 /* fire up the job scheduler */
 Hm_Timer.fire();
 
-Hm_Message_List = new New_Hm_Message_List();
+/* create a default message list object */
+Hm_Message_List = new Message_List();
 
 /* executes on real onload, has access to other module code */
 $(function() {
