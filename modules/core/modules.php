@@ -495,7 +495,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
  */
 class Hm_Handler_default_page_data extends Hm_Handler_Module {
     /**
-     * For now the data_sources array is the onl default
+     * For now the data_sources array is the only default
      */
     public function process() {
         $this->out('data_sources', array(), false);
@@ -1121,7 +1121,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_list_path = function() { return "'.$this->html_safe($this->get('list_path', '')).'"; };'.
             'var hm_list_parent = function() { return "'.$this->html_safe($this->get('list_parent', '')).'"; };'.
             'var hm_msg_uid = function() { return "'.$this->html_safe($this->get('uid', '')).'"; };'.
-            'var hm_data_sources = function() { return '.format_data_sources($this->get('data_sources', array()), $this).'; };'.
+            format_data_sources($this->get('data_sources', array()), $this).
             '</script>';
     }
 }
