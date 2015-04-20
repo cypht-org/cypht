@@ -419,6 +419,7 @@ class Nux_Quick_Services {
             $settings = parse_ini_file($ini_file, true);
             if (!empty($settings)) {
                 foreach ($settings as $service => $vals) {
+                    self::$services[$service]['auth'] = 'oauth2';
                     self::$services[$service]['client_id'] = $vals['client_id'];
                     self::$services[$service]['client_secret'] = $vals['client_secret'];
                     self::$services[$service]['redirect_uri'] = $vals['client_uri'];
