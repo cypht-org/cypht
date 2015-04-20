@@ -523,6 +523,9 @@ function format_data_sources($array, $output_mod) {
         }
         $result .= 'var '.$function.' = function() { return ['.implode(',', $objects).']; };';
     }
+    if (!$result) {
+        $result = 'var hm_data_sources = function() { return []; };';
+    }
     return $result;
 }
 
