@@ -18,7 +18,6 @@ Nux_Quick_Services::add('gmail', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Gmail',
-    'auth' => 'oauth2',
     'scope' => ' https://mail.google.com/',
     'smtp' => array(
         'server' => 'smtp.gmail.com',
@@ -33,7 +32,6 @@ Nux_Quick_Services::add('outlook', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Outlook.com',
-    'auth' => 'oauth2',
     'scope' => 'wl.imap',
 ));
 
