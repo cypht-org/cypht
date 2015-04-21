@@ -1,4 +1,4 @@
-var feed_test_action = function() {
+var feed_test_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -8,7 +8,7 @@ var feed_test_action = function() {
     );
 };
 
-var feed_delete_action = function() {
+var feed_delete_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(

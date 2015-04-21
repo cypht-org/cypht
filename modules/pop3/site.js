@@ -1,4 +1,4 @@
-var pop3_test_action = function() {
+var pop3_test_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -8,7 +8,7 @@ var pop3_test_action = function() {
     );
 };
 
-var pop3_save_action = function() {
+var pop3_save_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -29,7 +29,7 @@ var pop3_save_action = function() {
     );
 };
 
-var pop3_forget_action = function() {
+var pop3_forget_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -50,7 +50,7 @@ var pop3_forget_action = function() {
     );
 };
 
-var pop3_delete_action = function() {
+var pop3_delete_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
