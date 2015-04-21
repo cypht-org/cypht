@@ -180,8 +180,11 @@ var Hm_Timer = {
     jobs: [],
     interval: 1000,
 
-    add_job: function(job, interval, defer) {
-        if (interval) {
+    add_job: function(job, interval, defer, custom_defer) {
+        if (custom_defer) {
+            Hm_Timer.jobs.push([job, interval, custom_defer]);
+        }
+        else if (interval) {
             Hm_Timer.jobs.push([job, interval, interval]);
         }
         if (!defer) {

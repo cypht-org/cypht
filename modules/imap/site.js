@@ -1,4 +1,4 @@
-var imap_delete_action = function() {
+var imap_delete_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -14,14 +14,14 @@ var imap_delete_action = function() {
     );
 };
 
-var imap_hide = function() {
+var imap_hide = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     var server_id = $('.imap_server_id', form).val();
     imap_hide_action(form, server_id, 1);
 };
 
-var imap_unhide = function() {
+var imap_unhide = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     var server_id = $('.imap_server_id', form).val();
@@ -47,7 +47,7 @@ var imap_hide_action = function(form, server_id, hide) {
     );
 };
 
-var imap_save_action = function() {
+var imap_save_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -68,7 +68,7 @@ var imap_save_action = function() {
     );
 };
 
-var imap_forget_action = function() {
+var imap_forget_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -102,7 +102,7 @@ var imap_setup_server_page = function() {
     }
 };
 
-var imap_test_action = function() {
+var imap_test_action = function(event) {
     $('.imap_folder_data').empty();
     event.preventDefault();
     var form = $(this).parent();
@@ -195,15 +195,15 @@ var imap_search_page_content = function(id, folder) {
     return false;
 };
 
-var remove_imap_combined_source = function() {
-    return update_imap_combined_source(hm_list_path(), 0);
+var remove_imap_combined_source = function(event) {
+    return update_imap_combined_source(hm_list_path(), 0, event);
 };
 
-var add_imap_combined_source = function() {
-    return update_imap_combined_source(hm_list_path(), 1);
+var add_imap_combined_source = function(event) {
+    return update_imap_combined_source(hm_list_path(), 1, event);
 };
 
-var update_imap_combined_source = function(path, state) {
+var update_imap_combined_source = function(path, state, event) {
     event.preventDefault();
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_update_combined_source'},

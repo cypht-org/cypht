@@ -1,4 +1,4 @@
-var smtp_test_action = function() {
+var smtp_test_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -10,7 +10,7 @@ var smtp_test_action = function() {
     );
 };
 
-var smtp_save_action = function() {
+var smtp_save_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -32,7 +32,7 @@ var smtp_save_action = function() {
     );
 };
 
-var smtp_forget_action = function() {
+var smtp_forget_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
@@ -54,7 +54,7 @@ var smtp_forget_action = function() {
     );
 };
 
-var smtp_delete_action = function() {
+var smtp_delete_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
     Hm_Ajax.request(
