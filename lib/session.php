@@ -206,7 +206,7 @@ abstract class Hm_Session {
      */
     public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='', $html_only=true) {
         if ($name == 'hm_reload_folders') {
-            Hm_Functions::setcookie($name, $value);
+            return Hm_Functions::setcookie($name, $value);
         }
         if ($request->tls) {
             $secure = true;
