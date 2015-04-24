@@ -1,7 +1,0 @@
-.calendar_week th, .calendar_month th { font-weight: normal; padding-top: 10px; border-bottom: solid 1px #eee; padding-bottom: 10px; border-right: solid 1px #eee; }
-.calendar_month td { width: 14%; height: 120px; text-align: left; padding: 10px; border-bottom: solid 1px #eee; vertical-align: top; border-right: solid 1px #eee; }
-.calendar_week, .calendar_month { padding-bottom: 50px; }
-.calendar_week .today, .calendar_month .today { background-color: #f5f5f5; }
-.calendar_week .offmonth, .calendar_month .offmonth { color: #ccc; }
-.month_label { font-size: 120%; padding: 20px; margin-left: 10px; color: #999; }
-.calendar_week td { width: 14%; height: 600px; text-align: left; padding: 10px; border-bottom: solid 1px #eee; vertical-align: top; border-right: solid 1px #eee; }

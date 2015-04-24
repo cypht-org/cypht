@@ -1,9 +1,0 @@
-.compose_page { height: 100%; min-height: 400px; background-color: #fff; width: 100%; }
-.compose_form { display: block; padding: 20px; width: 80%; padding-left: 30px; }
-.compose_subject, .compose_to { padding: 5px; margin: 5px; width: 100%; }
-.compose_body { width: 100%; min-height: 300px; padding: 5px; margin: 5px; }
-.smtp_send { color: #666; font-size: 125%; padding: 10px; margin-top: 10px; }
-.smtp_section { display: none; }
-.smtp_server_setup .content_title { cursor: pointer; }
-.compose_server, .compose_server option { width: 100%; padding: 5px; margin: 5px; }
-.smtp_reset { float: right; margin-top: 10px; }
