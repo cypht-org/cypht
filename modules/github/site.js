@@ -1,10 +1,24 @@
-var load_github_data = function() {
-    Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}], display_github_data);
+var load_github_data = function(id) {
+    Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_repo', 'value': id}], display_github_data);
 };
 
 var display_github_data = function(res) {
     Hm_Message_List.update([0], res.formatted_message_list, 'github_all');
     Hm_Message_List.set_message_list_state('github_all')
+};
+var github_item_view = function() {
+    $('.msg_text_inner').html('');
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_github_event_detail'},
+        {'name': 'list_path', 'value': hm_list_path()},
+        {'name': 'github_uid', 'value': hm_msg_uid()}],
+        display_github_item_content
+    );
+    return false;
+};
+
+var display_github_item_content = function(res) {
+    $('.msg_text').html(res.github_msg_text);
 };
 
 if (hm_page_name() == 'servers') {
@@ -12,6 +26,9 @@ if (hm_page_name() == 'servers') {
     if (dsp == 'block' || dsp == 'none') {
         $('.github_connect_section').css('display', dsp);
     }
+}
+else if (hm_page_name() == 'message' && hm_list_path().substr(0, 6) == 'github') {
+    github_item_view();
 }
 
 
