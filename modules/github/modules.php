@@ -14,6 +14,35 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_github_folders_data extends Hm_Handler_Module {
     public function process() {
         $this->out('github_connect_details', $this->user_config->get('github_connect_details', array()));
+        $this->out('github_repos', $this->user_config->get('github_repos', array()));
+    }
+}
+
+/**
+ * @subpackage github/handler
+ */
+class Hm_Handler_github_event_detail extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('list_path', 'github_uid'));
+        if ($success) {
+            $details = $this->user_config->get('github_connect_details', array());
+            $repos = $this->user_config->get('github_repos', array());
+            $repo = substr($form['list_path'], 7);
+            if (in_array($repo, $repos, true)) {
+                $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $repo);
+                $data = github_fetch_content($details, $url);
+                $event = array();
+                if (is_array($data)) {
+                    foreach ($data as $item) {
+                        if ($item['id'] == $form['github_uid']) {
+                            $event = $item;
+                            break;
+                        }
+                    }
+                }
+                $this->out('github_event_detail', $event);
+            }
+        }
     }
 }
 
@@ -63,6 +92,36 @@ class Hm_Handler_setup_github_connect extends Hm_Handler_Module {
             $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
             $this->out('github_auth_url', $oauth2->request_authorization_url($details['auth_url'], 'repo', 'github_authorization'));
             $this->out('github_connect_details', $this->user_config->get('github_connect_details', array()));
+            $this->out('github_repos', $this->user_config->get('github_repos', array()));
+        }
+    }
+}
+
+/**
+ * @subpackage github/handler
+ */
+class Hm_Handler_github_process_remove_repo extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('github_repo', 'github_remove_repo'));
+        if ($success) {
+            $details = $this->user_config->get('github_connect_details');
+            if ($details) {
+                $repos = $this->user_config->get('github_repos', array());
+                if (in_array($form['github_repo'], $repos, true)) {
+                    foreach ($repos as $index => $repo) {
+                        if ($repo === $form['github_repo']) {
+                            unset($repos[$index]);
+                            break;
+                        }
+                    }
+                    $this->user_config->set('github_repos', $repos);
+                    $user_data = $this->user_config->dump();
+                    $this->session->set('user_data', $user_data);
+                    $this->session->record_unsaved('Github repository removed');
+                    $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
+                    Hm_Msgs::add('Removed repository');
+                }
+            }
         }
     }
 }
@@ -87,6 +146,7 @@ class Hm_Handler_github_process_add_repo extends Hm_Handler_Module {
                         $user_data = $this->user_config->dump();
                         $this->session->set('user_data', $user_data);
                         $this->session->record_unsaved('Github repository added');
+                        $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
                         Hm_Msgs::add('Added repository');
                     }
                     else {
@@ -123,10 +183,15 @@ class Hm_Handler_github_disconnect extends Hm_Handler_Module {
  */
 class Hm_Handler_github_list_data extends Hm_Handler_Module {
     public function process() {
-        $details = $this->user_config->get('github_connect_details');
-        if ($details) {
-            $url = 'https://api.github.com/repos/jasonmunro/hm3/events?page=1&per_page=25';
-            $this->out('github_data', github_fetch_content($details, $url));
+        list($success, $form) = $this->process_form(array('github_repo'));
+        if ($success) {
+            $details = $this->user_config->get('github_connect_details');
+            $repos = $this->user_config->get('github_repos');
+            if (in_array($form['github_repo'], $repos, true) && $details) {
+                $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $form['github_repo']);
+                $this->out('github_data', github_fetch_content($details, $url));
+                $this->out('github_data_source', $form['github_repo']);
+            }
         }
     }
 }
@@ -138,11 +203,23 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
-            if ($path == 'github_all') {
-                $this->out('list_path', 'github_all');
-                $this->out('list_parent', 'github_all');
-                $this->out('mailbox_list_title', array('Github', 'cypht'));
-                $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => 0));
+            $repos = $this->user_config->get('github_repos', array());
+            if (preg_match("/^github_(.+)$/", $path)) {
+                if ($path == 'github_all') {
+                    $this->out('list_path', 'github_all');
+                    $this->out('list_parent', 'github_all');
+                    $this->out('mailbox_list_title', array('Github', 'All'));
+                    foreach ($repos as $repo) {
+                        $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                    }
+                }
+                else {
+                    $repo = substr($path, 7);
+                    $this->out('list_path', $path);
+                    $this->out('list_parent', 'github_all');
+                    $this->out('mailbox_list_title', array('Github', urldecode($repo)));
+                    $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                }
             }
         }
     }
@@ -156,7 +233,12 @@ class Hm_Output_github_folders extends Hm_Output_Module {
         if (!empty($this->get('github_connect_details', array()))) {
             $res = '<li class="menu_github_all"><a class="unread_link" href="?page=message_list&list_path=github_all">'.
                 '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
-                '" alt="" width="16" height="16" /> '.$this->trans('Cypht').'</a></li>';
+                '" alt="" width="16" height="16" /> '.$this->trans('All').'</a></li>';
+            foreach ($this->get('github_repos', array()) as $repo) {
+                $res .= '<li class="menu_github_'.$this->html_safe($repo).'"><a class="unread_link" href="?page=message_list&list_path=github_'.$this->html_safe($repo).'">'.
+                    '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
+                    '" alt="" width="16" height="16" /> '.$this->html_safe(urldecode($repo)).'</a></li>';
+            }
 
             $this->append('folder_sources', 'github_folders');
             Hm_Page_Cache::add('github_folders', $res, true);
@@ -174,7 +256,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
         foreach ($this->get('github_data', array()) as $event) {
             $id = $event['id'];
             $subject = build_github_subject($event, $this);
-            $url = '';
+            $repo = $this->get('github_data_source', 'Github');
+            $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
             $from = $event['actor']['login'];
             $ts = strtotime($event['created_at']);
             $date = date('r', $ts);
@@ -187,7 +270,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                         array('checkbox_callback', $id),
                         array('icon_callback', array()),
                         array('subject_callback', $subject, $url, array()),
-                        array('safe_output_callback', 'source', 'Github'),
+                        array('safe_output_callback', 'source', $repo),
                         array('safe_output_callback', 'from', $from),
                         array('date_callback', human_readable_interval($date), $ts),
                     ),
@@ -199,7 +282,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             else {
                 $res[$id] = message_list_row(array(
                         array('checkbox_callback', $id),
-                        array('safe_output_callback', 'source', 'Github'),
+                        array('safe_output_callback', 'source', $repo),
                         array('safe_output_callback', 'from', $from),
                         array('subject_callback', $subject, $url, array()),
                         array('date_callback', human_readable_interval($date), $ts),
@@ -232,7 +315,30 @@ class Hm_Output_github_add_repo extends Hm_Output_Module {
                 '<input type="submit" name="github_add_repo" value="Add" />'.
                 '</form></div>';
         }
-        return $res.'</div></div>';
+        $res .= '<div class="configured_server"><div class="server_title">'.$this->trans('Repositories').'</div>';
+        foreach ($this->get('github_repos', array()) as $repo) {
+            $res .= '<div class="configured_repo"><form method="POST">'.
+                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+                '<input type="hidden" name="github_repo" value="'.$this->html_safe($repo).'" />'.
+                '<input type="submit" name="github_remove_repo" value="'.$this->trans('Remove').'" class="github_remove_repo" />'.$this->html_safe($repo).'</form></div>';
+        }
+        return $res.'</div></div></div>';
+    }
+}
+
+/**
+ * @subpackage github/output
+ */
+class Hm_Output_filter_github_event_detail extends Hm_Output_Module {
+    protected function output() {
+        $details = $this->get('github_event_detail', array());
+        if (!empty($details)) {
+            if (array_key_exists('payload', $details)) {
+                $body = github_parse_payload($details['payload'], $this);
+                $headers = github_parse_headers($details, $this);
+            }
+            $this->out('github_msg_text', $headers.$body);
+        }
     }
 }
 
@@ -281,6 +387,7 @@ function github_connect_details($config) {
 function build_github_subject($event, $output_mod) {
     $pre = '['.trim(str_replace('Event', '', trim(preg_replace("/([A-Z])/", " $1", $event['type'])))).']';
     $post = '';
+    $max = 100;
     switch (strtolower($event['type'])) {
         case 'issuecommentevent':
             $post = $event['payload']['issue']['title'];
@@ -290,11 +397,12 @@ function build_github_subject($event, $output_mod) {
             break;
         case 'pushevent':
             if (count($event['payload']['commits']) > 1) {
-                $post = sprintf($output_mod->trans('%d new changes committed'), count($event['payload']['commits']));
+                $post = sprintf($output_mod->trans('%d commits: '), count($event['payload']['commits']));
             }
             else {
-                $post = sprintf($output_mod->trans('%d new change committed'), count($event['payload']['commits']));
+                $post = sprintf($output_mod->trans('%d commit: '), count($event['payload']['commits']));
             }
+            $post .= substr($event['payload']['commits'][0]['message'], 0, $max);
             break;
         case 'watchevent':
             if ($event['payload']['action'] == 'started') {
@@ -304,11 +412,68 @@ function build_github_subject($event, $output_mod) {
                 $post  .= sprintf($output_mod->trans('%s stopped watching this repo'), $event['actor']['login']);
             }
             break;
+        case 'forkevent':
+            $post = sprintf($output_mod->trans("%s forked %s"), $event['actor']['login'], $event['repo']['name']);
+            break;
+        case 'createevent':
+            $post = sprintf($output_mod->trans("%s repository created"), $event['repo']['name']);
+            break;
+        case 'pullrequestevent':
+            $post = substr($event['payload']['pull_request']['body'], 0, $max);
+            break;
+        case 'commitcommentevent':
+            $post = substr($event['payload']['comment']['body'], 0, $max);
+            break;
         default:
             break;
     }
     return $pre.' '.$post;
 }
+
+/**
+ * @subpackage github/functions
+ */
+function github_parse_headers($data, $output_mod) {
+    $res = '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
+    if (array_key_exists('type', $data)) {
+        $type = trim(str_replace('Event', '', trim(preg_replace("/([A-Z])/", " $1", $data['type']))));
+    }
+    else {
+        $type = $data['type'];
+    }
+    if (array_key_exists('created_at', $data)) {
+        $date = $data['created_at'];
+    }
+    else {
+        $date = '[No date]';
+    }
+    if (array_key_exists('repo', $data) && array_key_exists('name', $data['repo'])) {
+        $name = $data['repo']['name'];
+    }
+    else {
+        $name = '[No Repo]';
+    }
+    $res .= '<tr><th>'.$output_mod->trans('Type').'</th><td>'.$output_mod->html_safe($type).'</td></tr>';
+    $res .= '<tr><th>'.$output_mod->trans('Date').'</th><td>'.$output_mod->html_safe($date).'</td></tr>';
+    $res .= '<tr><th>'.$output_mod->trans('Repository').'</th><td>'.$output_mod->html_safe($name).'</td></tr>';
+    $res .= '</table>';
+    return $res;
+}
+
+/**
+ * @subpackage github/functions
+ */
+function github_parse_payload($data, $output_mod) {
+    $res = '<div class="msg_text_inner">';
+    foreach ($data as $vals) {
+        if (is_array($vals) && array_key_exists('body', $vals)) {
+            $res .= '<div class="github_para">'.$output_mod->html_safe($vals['body']).'</div>';
+        }
+    }
+    $res .= '</div>';
+    return $res;
+}
+
 /**
  * @subpackage github/functions
  */
