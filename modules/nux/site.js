@@ -7,6 +7,7 @@ var display_next_nux_step = function(res) {
         $('.nux_step_two').html('');
         document.getElementById('service_select').getElementsByTagName('option')[0].selected = 'selected';
         $('.nux_username').val('');
+        $('.nux_account_name').val('');
         return false;
     });
 };
