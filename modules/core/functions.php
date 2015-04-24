@@ -172,10 +172,12 @@ function checkbox_callback($vals, $style, $output_mod) {
  */
 function subject_callback($vals, $style, $output_mod) {
     if ($style == 'email') {
-        return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[0]));
+        $subject = $output_mod->html_safe($vals[0]);
+        $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
+        return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
     }
     elseif ($style == 'news') {
-        return sprintf('<div class="subject"><div class="%s" title="%s"><a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[0]));
+        return sprintf('<div class="subject"><div class="%s" title="%s"><a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
     }
 }
 
@@ -502,6 +504,7 @@ function list_sources($sources, $output_mod) {
  */
 function format_data_sources($array, $output_mod) {
     $result = '';
+    $default = false;
     $groups = group_data_sources($array);
     foreach ($groups as $group_name => $sources) {
         $objects = array();
@@ -521,9 +524,12 @@ function format_data_sources($array, $output_mod) {
         if ($group_name != 'default') {
             $function .= '_'.$group_name;
         }
+        else {
+            $default = true;
+        }
         $result .= 'var '.$function.' = function() { return ['.implode(',', $objects).']; };';
     }
-    if (!$result) {
+    if (!$default) {
         $result = 'var hm_data_sources = function() { return []; };';
     }
     return $result;
