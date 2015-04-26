@@ -26,6 +26,20 @@ Nux_Quick_Services::add('gmail', array(
     )
 ));
 
+Nux_Quick_Services::add('icloud', array(
+    'server' => 'imap.mail.me.com',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'iCloud',
+    'scope' => ' https://icloud.com/',
+    'smtp' => array(
+        'server' => 'smtp.mail.me.com',
+        'port' => 587,
+        'tls' => false
+    )
+));
+
 Nux_Quick_Services::add('outlook', array(
     'server' => 'imap.live.com',
     'type' => 'imap',

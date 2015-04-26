@@ -434,7 +434,7 @@ class Nux_Quick_Services {
 
     static public function option_list($current, $mod) {
         $res = '';
-        uasort(self::$services, function($a, $b) { return strcmp($a['name'], $b['name']); });
+        uasort(self::$services, function($a, $b) { return strcasecmp($a['name'], $b['name']); });
         foreach(self::$services as $id => $details) {
             $res .= '<option value="'.$mod->html_safe($id).'"';
             if ($id == $current) {
