@@ -551,8 +551,12 @@
 				<li><a href="class-Hm_Handler_get_calendar_date.html">Hm_Handler_get_calendar_date</a></li>
 				<li><a href="class-Hm_Handler_get_wp_notice_data.html">Hm_Handler_get_wp_notice_data</a></li>
 				<li><a href="class-Hm_Handler_github_disconnect.html">Hm_Handler_github_disconnect</a></li>
+				<li><a href="class-Hm_Handler_github_event_detail.html">Hm_Handler_github_event_detail</a></li>
 				<li><a href="class-Hm_Handler_github_folders_data.html">Hm_Handler_github_folders_data</a></li>
+				<li><a href="class-Hm_Handler_github_list_data.html">Hm_Handler_github_list_data</a></li>
 				<li><a href="class-Hm_Handler_github_list_type.html">Hm_Handler_github_list_type</a></li>
+				<li><a href="class-Hm_Handler_github_process_add_repo.html">Hm_Handler_github_process_add_repo</a></li>
+				<li><a href="class-Hm_Handler_github_process_remove_repo.html">Hm_Handler_github_process_remove_repo</a></li>
 				<li><a href="class-Hm_Handler_hacker_news_data.html">Hm_Handler_hacker_news_data</a></li>
 				<li><a href="class-Hm_Handler_hacker_news_fields.html">Hm_Handler_hacker_news_fields</a></li>
 				<li><a href="class-Hm_Handler_hello_world_page_handler.html">Hm_Handler_hello_world_page_handler</a></li>
@@ -730,6 +734,8 @@
 				<li><a href="class-Hm_Output_filter_feed_status_data.html">Hm_Output_filter_feed_status_data</a></li>
 				<li><a href="class-Hm_Output_filter_flagged_data.html">Hm_Output_filter_flagged_data</a></li>
 				<li><a href="class-Hm_Output_filter_folder_page.html">Hm_Output_filter_folder_page</a></li>
+				<li><a href="class-Hm_Output_filter_github_data.html">Hm_Output_filter_github_data</a></li>
+				<li><a href="class-Hm_Output_filter_github_event_detail.html">Hm_Output_filter_github_event_detail</a></li>
 				<li><a href="class-Hm_Output_filter_hacker_news_data.html">Hm_Output_filter_hacker_news_data</a></li>
 				<li><a href="class-Hm_Output_filter_imap_folders.html">Hm_Output_filter_imap_folders</a></li>
 				<li><a href="class-Hm_Output_filter_imap_search.html">Hm_Output_filter_imap_search</a></li>
@@ -753,6 +759,7 @@
 				<li><a href="class-Hm_Output_folder_list_content_start.html">Hm_Output_folder_list_content_start</a></li>
 				<li><a href="class-Hm_Output_folder_list_end.html">Hm_Output_folder_list_end</a></li>
 				<li><a href="class-Hm_Output_folder_list_start.html">Hm_Output_folder_list_start</a></li>
+				<li><a href="class-Hm_Output_github_add_repo.html">Hm_Output_github_add_repo</a></li>
 				<li><a href="class-Hm_Output_github_connect_section.html">Hm_Output_github_connect_section</a></li>
 				<li><a href="class-Hm_Output_github_folders.html">Hm_Output_github_folders</a></li>
 				<li><a href="class-Hm_Output_hacker_news_folders.html">Hm_Output_hacker_news_folders</a></li>
@@ -871,6 +878,7 @@
 				<li><a href="function-add_module_to_all_pages.html">add_module_to_all_pages</a></li>
 				<li><a href="function-add_output.html">add_output</a></li>
 				<li><a href="function-address_from_url.html">address_from_url</a></li>
+				<li><a href="function-build_github_subject.html">build_github_subject</a></li>
 				<li><a href="function-build_mime_msg.html">build_mime_msg</a></li>
 				<li><a href="function-build_page_links.html">build_page_links</a></li>
 				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
@@ -894,6 +902,10 @@
 				<li><a href="function-get_imap_part_name.html">get_imap_part_name</a></li>
 				<li><a href="function-get_secondfactor_state.html">get_secondfactor_state</a></li>
 				<li><a href="function-github_connect_details.html">github_connect_details</a></li>
+				<li><a href="function-github_fetch_content.html">github_fetch_content</a></li>
+				<li><a href="function-github_parse_headers.html">github_parse_headers</a></li>
+				<li><a href="function-github_parse_payload.html">github_parse_payload</a></li>
+				<li><a href="function-group_data_sources.html">group_data_sources</a></li>
 				<li><a href="function-handler_source.html">handler_source</a></li>
 				<li><a href="function-hm_theme_white_icons.html">hm_theme_white_icons</a></li>
 				<li><a href="function-hm_themes.html">hm_themes</a></li>
@@ -1204,69 +1216,74 @@
 </span></span><span id="210" class="l"><a href="#210">210: </a><span class="php-comment">     */</span>
 </span><span id="211" class="l"><a href="#211">211: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> save(<span class="php-var">$username</span>, <span class="php-var">$key</span>) {
 </span><span id="212" class="l"><a href="#212">212: </a>        <span class="php-var">$config</span> = Hm_Crypt::ciphertext(<span class="php-keyword2">serialize</span>(<span class="php-var">$this</span>-&gt;config), <span class="php-var">$key</span>);
-</span><span id="213" class="l"><a href="#213">213: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;connect()) {
-</span><span id="214" class="l"><a href="#214">214: </a>            <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">&quot;update hm_user_settings set settings=? where username=?&quot;</span>);
-</span><span id="215" class="l"><a href="#215">215: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$config</span>, <span class="php-var">$username</span>)) &amp;&amp; <span class="php-var">$sql</span>-&gt;rowCount() == <span class="php-num">1</span>) {
-</span><span id="216" class="l"><a href="#216">216: </a>                Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;Saved user data to DB for %s&quot;</span>, <span class="php-var">$username</span>));
-</span><span id="217" class="l"><a href="#217">217: </a>                <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
-</span><span id="218" class="l"><a href="#218">218: </a>            }
-</span><span id="219" class="l"><a href="#219">219: </a>        }
-</span><span id="220" class="l"><a href="#220">220: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="221" class="l"><a href="#221">221: </a>    }
-</span><span id="222" class="l"><a href="#222">222: </a>}
-</span><span id="223" class="l"><a href="#223">223: </a>
-</span><span id="224" class="l"><a href="#224">224: </a><span class="php-comment">/**
-</span></span><span id="225" class="l"><a href="#225">225: </a><span class="php-comment"> * File based site configuration
-</span></span><span id="226" class="l"><a href="#226">226: </a><span class="php-comment"> */</span>
-</span><span id="227" class="l"><a href="#227">227: </a><span class="php-keyword1">class</span> Hm_Site_Config_File <span class="php-keyword1">extends</span> Hm_Config {
+</span><span id="213" class="l"><a href="#213">213: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;connect()) {
+</span><span id="214" class="l"><a href="#214">214: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="215" class="l"><a href="#215">215: </a>        }
+</span><span id="216" class="l"><a href="#216">216: </a>        <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">&quot;update hm_user_settings set settings=? where username=?&quot;</span>);
+</span><span id="217" class="l"><a href="#217">217: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$config</span>, <span class="php-var">$username</span>)) &amp;&amp; <span class="php-var">$sql</span>-&gt;rowCount() == <span class="php-num">1</span>) {
+</span><span id="218" class="l"><a href="#218">218: </a>            Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;Saved user data to DB for %s&quot;</span>, <span class="php-var">$username</span>));
+</span><span id="219" class="l"><a href="#219">219: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="220" class="l"><a href="#220">220: </a>        }
+</span><span id="221" class="l"><a href="#221">221: </a>        <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">&quot;insert into hm_user_settings values(?,?)&quot;</span>);
+</span><span id="222" class="l"><a href="#222">222: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$username</span>, <span class="php-var">$config</span>))) {
+</span><span id="223" class="l"><a href="#223">223: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="224" class="l"><a href="#224">224: </a>        }
+</span><span id="225" class="l"><a href="#225">225: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="226" class="l"><a href="#226">226: </a>    }
+</span><span id="227" class="l"><a href="#227">227: </a>}
 </span><span id="228" class="l"><a href="#228">228: </a>
-</span><span id="229" class="l"><a href="#229">229: </a>    <span class="php-comment">/**
-</span></span><span id="230" class="l"><a href="#230">230: </a><span class="php-comment">     * Load data based on source
-</span></span><span id="231" class="l"><a href="#231">231: </a><span class="php-comment">     * @param string $source source location for site configuration
-</span></span><span id="232" class="l"><a href="#232">232: </a><span class="php-comment">     * @return void
-</span></span><span id="233" class="l"><a href="#233">233: </a><span class="php-comment">     */</span>
-</span><span id="234" class="l"><a href="#234">234: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> __construct(<span class="php-var">$source</span>) {
-</span><span id="235" class="l"><a href="#235">235: </a>        <span class="php-var">$this</span>-&gt;load(<span class="php-var">$source</span>, <span class="php-keyword1">false</span>);
-</span><span id="236" class="l"><a href="#236">236: </a>    }
-</span><span id="237" class="l"><a href="#237">237: </a>
-</span><span id="238" class="l"><a href="#238">238: </a>    <span class="php-comment">/**
-</span></span><span id="239" class="l"><a href="#239">239: </a><span class="php-comment">     * Load user data from a file
-</span></span><span id="240" class="l"><a href="#240">240: </a><span class="php-comment">     * @param string $source file path to the site configuration
-</span></span><span id="241" class="l"><a href="#241">241: </a><span class="php-comment">     * @param string $key encryption key (unsued in this class)
-</span></span><span id="242" class="l"><a href="#242">242: </a><span class="php-comment">     * @return void
-</span></span><span id="243" class="l"><a href="#243">243: </a><span class="php-comment">     */</span>
-</span><span id="244" class="l"><a href="#244">244: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> load(<span class="php-var">$source</span>, <span class="php-var">$key</span>) {
-</span><span id="245" class="l"><a href="#245">245: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_readable</span>(<span class="php-var">$source</span>)) {
-</span><span id="246" class="l"><a href="#246">246: </a>            <span class="php-var">$data</span> = <span class="php-keyword2">unserialize</span>(<span class="php-keyword2">file_get_contents</span>(<span class="php-var">$source</span>));
-</span><span id="247" class="l"><a href="#247">247: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$data</span>) {
-</span><span id="248" class="l"><a href="#248">248: </a>                <span class="php-var">$this</span>-&gt;config = <span class="php-keyword2">array_merge</span>(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$data</span>);
-</span><span id="249" class="l"><a href="#249">249: </a>            }
-</span><span id="250" class="l"><a href="#250">250: </a>        }
-</span><span id="251" class="l"><a href="#251">251: </a>    }
-</span><span id="252" class="l"><a href="#252">252: </a>}
-</span><span id="253" class="l"><a href="#253">253: </a>
-</span><span id="254" class="l"><a href="#254">254: </a><span class="php-comment">/**
-</span></span><span id="255" class="l"><a href="#255">255: </a><span class="php-comment"> * Load a user config object
-</span></span><span id="256" class="l"><a href="#256">256: </a><span class="php-comment"> * @param object $config site configuration
-</span></span><span id="257" class="l"><a href="#257">257: </a><span class="php-comment"> * @return object
-</span></span><span id="258" class="l"><a href="#258">258: </a><span class="php-comment"> */</span>
-</span><span id="259" class="l"><a href="#259">259: </a><span class="php-keyword1">function</span> load_user_config_object(<span class="php-var">$config</span>) {
-</span><span id="260" class="l"><a href="#260">260: </a>    <span class="php-var">$type</span> = <span class="php-var">$config</span>-&gt;get(<span class="php-quote">'user_config_type'</span>, <span class="php-quote">'file'</span>);
-</span><span id="261" class="l"><a href="#261">261: </a>    <span class="php-keyword1">switch</span> (<span class="php-var">$type</span>) {
-</span><span id="262" class="l"><a href="#262">262: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'DB'</span>:
-</span><span id="263" class="l"><a href="#263">263: </a>            <span class="php-var">$user_config</span> = <span class="php-keyword1">new</span> Hm_User_Config_DB(<span class="php-var">$config</span>);
-</span><span id="264" class="l"><a href="#264">264: </a>            Hm_Debug::add(<span class="php-quote">&quot;Using DB user configuration&quot;</span>);
-</span><span id="265" class="l"><a href="#265">265: </a>            <span class="php-keyword1">break</span>;
-</span><span id="266" class="l"><a href="#266">266: </a>        <span class="php-keyword1">default</span>:
-</span><span id="267" class="l"><a href="#267">267: </a>            <span class="php-var">$user_config</span> = <span class="php-keyword1">new</span> Hm_User_Config_File(<span class="php-var">$config</span>);
-</span><span id="268" class="l"><a href="#268">268: </a>            Hm_Debug::add(<span class="php-quote">&quot;Using file based user configuration&quot;</span>);
-</span><span id="269" class="l"><a href="#269">269: </a>            <span class="php-keyword1">break</span>;
-</span><span id="270" class="l"><a href="#270">270: </a>    }
-</span><span id="271" class="l"><a href="#271">271: </a>    <span class="php-keyword1">return</span> <span class="php-var">$user_config</span>;
-</span><span id="272" class="l"><a href="#272">272: </a>}
-</span><span id="273" class="l"><a href="#273">273: </a>
-</span><span id="274" class="l"><a href="#274">274: </a><span class="xlang">?&gt;</span>
-</span><span id="275" class="l"><a href="#275">275: </a></span></code></pre>
+</span><span id="229" class="l"><a href="#229">229: </a><span class="php-comment">/**
+</span></span><span id="230" class="l"><a href="#230">230: </a><span class="php-comment"> * File based site configuration
+</span></span><span id="231" class="l"><a href="#231">231: </a><span class="php-comment"> */</span>
+</span><span id="232" class="l"><a href="#232">232: </a><span class="php-keyword1">class</span> Hm_Site_Config_File <span class="php-keyword1">extends</span> Hm_Config {
+</span><span id="233" class="l"><a href="#233">233: </a>
+</span><span id="234" class="l"><a href="#234">234: </a>    <span class="php-comment">/**
+</span></span><span id="235" class="l"><a href="#235">235: </a><span class="php-comment">     * Load data based on source
+</span></span><span id="236" class="l"><a href="#236">236: </a><span class="php-comment">     * @param string $source source location for site configuration
+</span></span><span id="237" class="l"><a href="#237">237: </a><span class="php-comment">     * @return void
+</span></span><span id="238" class="l"><a href="#238">238: </a><span class="php-comment">     */</span>
+</span><span id="239" class="l"><a href="#239">239: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> __construct(<span class="php-var">$source</span>) {
+</span><span id="240" class="l"><a href="#240">240: </a>        <span class="php-var">$this</span>-&gt;load(<span class="php-var">$source</span>, <span class="php-keyword1">false</span>);
+</span><span id="241" class="l"><a href="#241">241: </a>    }
+</span><span id="242" class="l"><a href="#242">242: </a>
+</span><span id="243" class="l"><a href="#243">243: </a>    <span class="php-comment">/**
+</span></span><span id="244" class="l"><a href="#244">244: </a><span class="php-comment">     * Load user data from a file
+</span></span><span id="245" class="l"><a href="#245">245: </a><span class="php-comment">     * @param string $source file path to the site configuration
+</span></span><span id="246" class="l"><a href="#246">246: </a><span class="php-comment">     * @param string $key encryption key (unsued in this class)
+</span></span><span id="247" class="l"><a href="#247">247: </a><span class="php-comment">     * @return void
+</span></span><span id="248" class="l"><a href="#248">248: </a><span class="php-comment">     */</span>
+</span><span id="249" class="l"><a href="#249">249: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> load(<span class="php-var">$source</span>, <span class="php-var">$key</span>) {
+</span><span id="250" class="l"><a href="#250">250: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_readable</span>(<span class="php-var">$source</span>)) {
+</span><span id="251" class="l"><a href="#251">251: </a>            <span class="php-var">$data</span> = <span class="php-keyword2">unserialize</span>(<span class="php-keyword2">file_get_contents</span>(<span class="php-var">$source</span>));
+</span><span id="252" class="l"><a href="#252">252: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$data</span>) {
+</span><span id="253" class="l"><a href="#253">253: </a>                <span class="php-var">$this</span>-&gt;config = <span class="php-keyword2">array_merge</span>(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$data</span>);
+</span><span id="254" class="l"><a href="#254">254: </a>            }
+</span><span id="255" class="l"><a href="#255">255: </a>        }
+</span><span id="256" class="l"><a href="#256">256: </a>    }
+</span><span id="257" class="l"><a href="#257">257: </a>}
+</span><span id="258" class="l"><a href="#258">258: </a>
+</span><span id="259" class="l"><a href="#259">259: </a><span class="php-comment">/**
+</span></span><span id="260" class="l"><a href="#260">260: </a><span class="php-comment"> * Load a user config object
+</span></span><span id="261" class="l"><a href="#261">261: </a><span class="php-comment"> * @param object $config site configuration
+</span></span><span id="262" class="l"><a href="#262">262: </a><span class="php-comment"> * @return object
+</span></span><span id="263" class="l"><a href="#263">263: </a><span class="php-comment"> */</span>
+</span><span id="264" class="l"><a href="#264">264: </a><span class="php-keyword1">function</span> load_user_config_object(<span class="php-var">$config</span>) {
+</span><span id="265" class="l"><a href="#265">265: </a>    <span class="php-var">$type</span> = <span class="php-var">$config</span>-&gt;get(<span class="php-quote">'user_config_type'</span>, <span class="php-quote">'file'</span>);
+</span><span id="266" class="l"><a href="#266">266: </a>    <span class="php-keyword1">switch</span> (<span class="php-var">$type</span>) {
+</span><span id="267" class="l"><a href="#267">267: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'DB'</span>:
+</span><span id="268" class="l"><a href="#268">268: </a>            <span class="php-var">$user_config</span> = <span class="php-keyword1">new</span> Hm_User_Config_DB(<span class="php-var">$config</span>);
+</span><span id="269" class="l"><a href="#269">269: </a>            Hm_Debug::add(<span class="php-quote">&quot;Using DB user configuration&quot;</span>);
+</span><span id="270" class="l"><a href="#270">270: </a>            <span class="php-keyword1">break</span>;
+</span><span id="271" class="l"><a href="#271">271: </a>        <span class="php-keyword1">default</span>:
+</span><span id="272" class="l"><a href="#272">272: </a>            <span class="php-var">$user_config</span> = <span class="php-keyword1">new</span> Hm_User_Config_File(<span class="php-var">$config</span>);
+</span><span id="273" class="l"><a href="#273">273: </a>            Hm_Debug::add(<span class="php-quote">&quot;Using file based user configuration&quot;</span>);
+</span><span id="274" class="l"><a href="#274">274: </a>            <span class="php-keyword1">break</span>;
+</span><span id="275" class="l"><a href="#275">275: </a>    }
+</span><span id="276" class="l"><a href="#276">276: </a>    <span class="php-keyword1">return</span> <span class="php-var">$user_config</span>;
+</span><span id="277" class="l"><a href="#277">277: </a>}
+</span><span id="278" class="l"><a href="#278">278: </a>
+</span><span id="279" class="l"><a href="#279">279: </a><span class="xlang">?&gt;</span>
+</span><span id="280" class="l"><a href="#280">280: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1274,6 +1291,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?8006914cedc37dd5066c5a4769c9ea8efbe23611"></script>
+<script src="elementlist.js?60cfa5cf3e0e47a4d6c297634256e185b41627c5"></script>
 </body>
 </html>
