@@ -796,7 +796,6 @@
 				<li><a href="class-Hm_Output_Module.html">Hm_Output_Module</a></li>
 				<li><a href="class-Hm_Output_Modules.html">Hm_Output_Modules</a></li>
 				<li><a href="class-Hm_Output_msgs.html">Hm_Output_msgs</a></li>
-				<li><a href="class-Hm_Output_no_login.html">Hm_Output_no_login</a></li>
 				<li><a href="class-Hm_Output_notfound_content.html">Hm_Output_notfound_content</a></li>
 				<li><a href="class-Hm_Output_nux_dev_news.html">Hm_Output_nux_dev_news</a></li>
 				<li><a href="class-Hm_Output_nux_help.html">Hm_Output_nux_help</a></li>
@@ -928,6 +927,7 @@
 				<li><a href="function-message_since_dropdown.html">message_since_dropdown</a></li>
 				<li><a href="function-oauth2_form.html">oauth2_form</a></li>
 				<li><a href="function-output_source.html">output_source</a></li>
+				<li><a href="function-payload_search.html">payload_search</a></li>
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
 				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
@@ -1042,71 +1042,71 @@
 </span></span><span id="36" class="l"><a href="#36"> 36: </a><span class="php-comment"> */</span>
 </span><span id="37" class="l"><a href="#37"> 37: </a><span class="php-keyword1">class</span> Hm_Handler_process_create_account <span class="php-keyword1">extends</span> Hm_Handler_Module {
 </span><span id="38" class="l"><a href="#38"> 38: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="39" class="l"><a href="#39"> 39: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'create_username'</span>, <span class="php-quote">'create_password'</span>, <span class="php-quote">'create_password_again'</span>));
-</span><span id="40" class="l"><a href="#40"> 40: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
-</span><span id="41" class="l"><a href="#41"> 41: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$form</span>[<span class="php-quote">'create_password'</span>] == <span class="php-var">$form</span>[<span class="php-quote">'create_password_again'</span>]) {
-</span><span id="42" class="l"><a href="#42"> 42: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;session-&gt;internal_users) {
-</span><span id="43" class="l"><a href="#43"> 43: </a>                    <span class="php-var">$this</span>-&gt;session-&gt;create(<span class="php-var">$this</span>-&gt;request, <span class="php-var">$form</span>[<span class="php-quote">'create_username'</span>], <span class="php-var">$form</span>[<span class="php-quote">'create_password'</span>]);
-</span><span id="44" class="l"><a href="#44"> 44: </a>                }
-</span><span id="45" class="l"><a href="#45"> 45: </a>            }
-</span><span id="46" class="l"><a href="#46"> 46: </a>            <span class="php-keyword1">else</span> {
-</span><span id="47" class="l"><a href="#47"> 47: </a>                Hm_Msgs::add(<span class="php-quote">'ERRPasswords did not match'</span>);
-</span><span id="48" class="l"><a href="#48"> 48: </a>            }
-</span><span id="49" class="l"><a href="#49"> 49: </a>        }
-</span><span id="50" class="l"><a href="#50"> 50: </a>    }
-</span><span id="51" class="l"><a href="#51"> 51: </a>}
-</span><span id="52" class="l"><a href="#52"> 52: </a>
-</span><span id="53" class="l"><a href="#53"> 53: </a><span class="php-comment">/**
-</span></span><span id="54" class="l"><a href="#54"> 54: </a><span class="php-comment"> * @subpackage account/handler
-</span></span><span id="55" class="l"><a href="#55"> 55: </a><span class="php-comment"> */</span>
-</span><span id="56" class="l"><a href="#56"> 56: </a><span class="php-keyword1">class</span> Hm_Handler_check_internal_users <span class="php-keyword1">extends</span> Hm_Handler_Module {
-</span><span id="57" class="l"><a href="#57"> 57: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="58" class="l"><a href="#58"> 58: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'internal_users'</span>, <span class="php-var">$this</span>-&gt;session-&gt;internal_users);
-</span><span id="59" class="l"><a href="#59"> 59: </a>    }
-</span><span id="60" class="l"><a href="#60"> 60: </a>}
-</span><span id="61" class="l"><a href="#61"> 61: </a>
-</span><span id="62" class="l"><a href="#62"> 62: </a><span class="php-comment">/**
-</span></span><span id="63" class="l"><a href="#63"> 63: </a><span class="php-comment"> * @subpackage account/output
-</span></span><span id="64" class="l"><a href="#64"> 64: </a><span class="php-comment"> */</span>
-</span><span id="65" class="l"><a href="#65"> 65: </a><span class="php-keyword1">class</span> Hm_Output_create_account_link <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="66" class="l"><a href="#66"> 66: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="67" class="l"><a href="#67"> 67: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_login_state'</span>) &amp;&amp; <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'internal_users'</span>)) {
-</span><span id="68" class="l"><a href="#68"> 68: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;a class=&quot;create_account_link&quot; href=&quot;?page=create_account&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Create'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
-</span><span id="69" class="l"><a href="#69"> 69: </a>        }
-</span><span id="70" class="l"><a href="#70"> 70: </a>    }
-</span><span id="71" class="l"><a href="#71"> 71: </a>}
-</span><span id="72" class="l"><a href="#72"> 72: </a>
-</span><span id="73" class="l"><a href="#73"> 73: </a><span class="php-comment">/**
-</span></span><span id="74" class="l"><a href="#74"> 74: </a><span class="php-comment"> * @subpackage account/output
-</span></span><span id="75" class="l"><a href="#75"> 75: </a><span class="php-comment"> */</span>
-</span><span id="76" class="l"><a href="#76"> 76: </a><span class="php-keyword1">class</span> Hm_Output_no_login <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="77" class="l"><a href="#77"> 77: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="78" class="l"><a href="#78"> 78: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
-</span><span id="79" class="l"><a href="#79"> 79: </a>    }
-</span><span id="80" class="l"><a href="#80"> 80: </a>}
-</span><span id="81" class="l"><a href="#81"> 81: </a>
-</span><span id="82" class="l"><a href="#82"> 82: </a><span class="php-comment">/**
-</span></span><span id="83" class="l"><a href="#83"> 83: </a><span class="php-comment"> * @subpackage account/output
-</span></span><span id="84" class="l"><a href="#84"> 84: </a><span class="php-comment"> */</span>
-</span><span id="85" class="l"><a href="#85"> 85: </a><span class="php-keyword1">class</span> Hm_Output_create_form <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="86" class="l"><a href="#86"> 86: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="87" class="l"><a href="#87"> 87: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'router_login_state'</span>)) {
-</span><span id="88" class="l"><a href="#88"> 88: </a>            Hm_Dispatch::page_redirect(<span class="php-quote">'?page=home'</span>);
-</span><span id="89" class="l"><a href="#89"> 89: </a>        }
-</span><span id="90" class="l"><a href="#90"> 90: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'internal_users'</span>)) {
-</span><span id="91" class="l"><a href="#91"> 91: </a>            <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;create_user&quot;&gt;'</span>.
-</span><span id="92" class="l"><a href="#92"> 92: </a>                <span class="php-quote">'&lt;h1 class=&quot;title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Create Account'</span>).<span class="php-quote">'&lt;/h1&gt;'</span>.
-</span><span id="93" class="l"><a href="#93"> 93: </a>                <span class="php-quote">'&lt;form method=&quot;POST&quot; autocomplete=&quot;off&quot; &gt;'</span>.
-</span><span id="94" class="l"><a href="#94"> 94: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.Hm_Request_Key::generate().<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="95" class="l"><a href="#95"> 95: </a>                <span class="php-quote">'&lt;input style=&quot;display:none&quot; type=&quot;text&quot; name=&quot;fake_username&quot; /&gt;'</span>.
-</span><span id="96" class="l"><a href="#96"> 96: </a>                <span class="php-quote">'&lt;input style=&quot;display:none&quot; type=&quot;password&quot; name=&quot;fake_password&quot; /&gt;'</span>.
-</span><span id="97" class="l"><a href="#97"> 97: </a>                <span class="php-quote">' &lt;input required type=&quot;text&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Username'</span>).<span class="php-quote">'&quot; name=&quot;create_username&quot; value=&quot;&quot;&gt;'</span>.
-</span><span id="98" class="l"><a href="#98"> 98: </a>                <span class="php-quote">' &lt;input type=&quot;password&quot; required placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>).<span class="php-quote">'&quot; name=&quot;create_password&quot;&gt;'</span>.
-</span><span id="99" class="l"><a href="#99"> 99: </a>                <span class="php-quote">' &lt;input type=&quot;password&quot; required placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password Again'</span>).<span class="php-quote">'&quot; name=&quot;create_password_again&quot;&gt;'</span>.
-</span><span id="100" class="l"><a href="#100">100: </a>                <span class="php-quote">' &lt;input type=&quot;submit&quot; name=&quot;create_hm_user&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Create'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="101" class="l"><a href="#101">101: </a>                <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;'</span>.
-</span><span id="102" class="l"><a href="#102">102: </a>                <span class="php-quote">'&lt;a class=&quot;create_account_link&quot; href=&quot;?page=home&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Login'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
-</span><span id="103" class="l"><a href="#103">103: </a>        }
+</span><span id="39" class="l"><a href="#39"> 39: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;session-&gt;is_admin()) {
+</span><span id="40" class="l"><a href="#40"> 40: </a>            <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'create_username'</span>, <span class="php-quote">'create_password'</span>, <span class="php-quote">'create_password_again'</span>));
+</span><span id="41" class="l"><a href="#41"> 41: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
+</span><span id="42" class="l"><a href="#42"> 42: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$form</span>[<span class="php-quote">'create_password'</span>] == <span class="php-var">$form</span>[<span class="php-quote">'create_password_again'</span>]) {
+</span><span id="43" class="l"><a href="#43"> 43: </a>                    <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;session-&gt;internal_users) {
+</span><span id="44" class="l"><a href="#44"> 44: </a>                        <span class="php-var">$this</span>-&gt;session-&gt;create(<span class="php-var">$this</span>-&gt;request, <span class="php-var">$form</span>[<span class="php-quote">'create_username'</span>], <span class="php-var">$form</span>[<span class="php-quote">'create_password'</span>]);
+</span><span id="45" class="l"><a href="#45"> 45: </a>                    }
+</span><span id="46" class="l"><a href="#46"> 46: </a>                }
+</span><span id="47" class="l"><a href="#47"> 47: </a>                <span class="php-keyword1">else</span> {
+</span><span id="48" class="l"><a href="#48"> 48: </a>                    Hm_Msgs::add(<span class="php-quote">'ERRPasswords did not match'</span>);
+</span><span id="49" class="l"><a href="#49"> 49: </a>                }
+</span><span id="50" class="l"><a href="#50"> 50: </a>            }
+</span><span id="51" class="l"><a href="#51"> 51: </a>        }
+</span><span id="52" class="l"><a href="#52"> 52: </a>    }
+</span><span id="53" class="l"><a href="#53"> 53: </a>}
+</span><span id="54" class="l"><a href="#54"> 54: </a>
+</span><span id="55" class="l"><a href="#55"> 55: </a><span class="php-comment">/**
+</span></span><span id="56" class="l"><a href="#56"> 56: </a><span class="php-comment"> * @subpackage account/handler
+</span></span><span id="57" class="l"><a href="#57"> 57: </a><span class="php-comment"> */</span>
+</span><span id="58" class="l"><a href="#58"> 58: </a><span class="php-keyword1">class</span> Hm_Handler_check_internal_users <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="59" class="l"><a href="#59"> 59: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
+</span><span id="60" class="l"><a href="#60"> 60: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'is_admin'</span>, <span class="php-var">$this</span>-&gt;session-&gt;is_admin());
+</span><span id="61" class="l"><a href="#61"> 61: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'internal_users'</span>, <span class="php-var">$this</span>-&gt;session-&gt;internal_users);
+</span><span id="62" class="l"><a href="#62"> 62: </a>    }
+</span><span id="63" class="l"><a href="#63"> 63: </a>}
+</span><span id="64" class="l"><a href="#64"> 64: </a>
+</span><span id="65" class="l"><a href="#65"> 65: </a><span class="php-comment">/**
+</span></span><span id="66" class="l"><a href="#66"> 66: </a><span class="php-comment"> * @subpackage account/output
+</span></span><span id="67" class="l"><a href="#67"> 67: </a><span class="php-comment"> */</span>
+</span><span id="68" class="l"><a href="#68"> 68: </a><span class="php-keyword1">class</span> Hm_Output_create_account_link <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="69" class="l"><a href="#69"> 69: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="70" class="l"><a href="#70"> 70: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_admin'</span>, <span class="php-keyword1">false</span>)) {
+</span><span id="71" class="l"><a href="#71"> 71: </a>            <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="72" class="l"><a href="#72"> 72: </a>        }
+</span><span id="73" class="l"><a href="#73"> 73: </a>        <span class="php-keyword1">else</span> {
+</span><span id="74" class="l"><a href="#74"> 74: </a>            <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_create_account&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=create_account&quot;&gt;'</span>.
+</span><span id="75" class="l"><a href="#75"> 75: </a>                <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$plus</span>).<span class="php-quote">'&quot; alt=&quot;&quot; '</span>.
+</span><span id="76" class="l"><a href="#76"> 76: </a>                <span class="php-quote">'width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Create Account'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="77" class="l"><a href="#77"> 77: </a>        }
+</span><span id="78" class="l"><a href="#78"> 78: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="79" class="l"><a href="#79"> 79: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="80" class="l"><a href="#80"> 80: </a>        }
+</span><span id="81" class="l"><a href="#81"> 81: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="82" class="l"><a href="#82"> 82: </a>    }
+</span><span id="83" class="l"><a href="#83"> 83: </a>}
+</span><span id="84" class="l"><a href="#84"> 84: </a>
+</span><span id="85" class="l"><a href="#85"> 85: </a><span class="php-comment">/**
+</span></span><span id="86" class="l"><a href="#86"> 86: </a><span class="php-comment"> * @subpackage account/output
+</span></span><span id="87" class="l"><a href="#87"> 87: </a><span class="php-comment"> */</span>
+</span><span id="88" class="l"><a href="#88"> 88: </a><span class="php-keyword1">class</span> Hm_Output_create_form <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="89" class="l"><a href="#89"> 89: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="90" class="l"><a href="#90"> 90: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'internal_users'</span>) || !<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_admin'</span>, <span class="php-keyword1">false</span>)) {
+</span><span id="91" class="l"><a href="#91"> 91: </a>            Hm_Dispatch::page_redirect(<span class="php-quote">'?page=home'</span>);
+</span><span id="92" class="l"><a href="#92"> 92: </a>        }
+</span><span id="93" class="l"><a href="#93"> 93: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Create Account'</span>).<span class="php-quote">'&lt;/div&gt;'</span>.
+</span><span id="94" class="l"><a href="#94"> 94: </a>            <span class="php-quote">'&lt;div class=&quot;create_user&quot;&gt;'</span>.
+</span><span id="95" class="l"><a href="#95"> 95: </a>            <span class="php-quote">'&lt;form method=&quot;POST&quot; autocomplete=&quot;off&quot; &gt;'</span>.
+</span><span id="96" class="l"><a href="#96"> 96: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.Hm_Request_Key::generate().<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="97" class="l"><a href="#97"> 97: </a>            <span class="php-quote">'&lt;input style=&quot;display:none&quot; type=&quot;text&quot; name=&quot;fake_username&quot; /&gt;'</span>.
+</span><span id="98" class="l"><a href="#98"> 98: </a>            <span class="php-quote">'&lt;input style=&quot;display:none&quot; type=&quot;password&quot; name=&quot;fake_password&quot; /&gt;'</span>.
+</span><span id="99" class="l"><a href="#99"> 99: </a>            <span class="php-quote">' &lt;input required type=&quot;text&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Username'</span>).<span class="php-quote">'&quot; name=&quot;create_username&quot; value=&quot;&quot;&gt;'</span>.
+</span><span id="100" class="l"><a href="#100">100: </a>            <span class="php-quote">' &lt;input type=&quot;password&quot; required placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>).<span class="php-quote">'&quot; name=&quot;create_password&quot;&gt;'</span>.
+</span><span id="101" class="l"><a href="#101">101: </a>            <span class="php-quote">' &lt;input type=&quot;password&quot; required placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password Again'</span>).<span class="php-quote">'&quot; name=&quot;create_password_again&quot;&gt;'</span>.
+</span><span id="102" class="l"><a href="#102">102: </a>            <span class="php-quote">' &lt;input type=&quot;submit&quot; name=&quot;create_hm_user&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Create'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="103" class="l"><a href="#103">103: </a>            <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;'</span>;
 </span><span id="104" class="l"><a href="#104">104: </a>    }
 </span><span id="105" class="l"><a href="#105">105: </a>}
 </span><span id="106" class="l"><a href="#106">106: </a>
@@ -1134,6 +1134,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?60cfa5cf3e0e47a4d6c297634256e185b41627c5"></script>
+<script src="elementlist.js?41823bba697e5069c0117318aeaccbe4a4704560"></script>
 </body>
 </html>

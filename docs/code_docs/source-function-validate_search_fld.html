@@ -796,7 +796,6 @@
 				<li><a href="class-Hm_Output_Module.html">Hm_Output_Module</a></li>
 				<li><a href="class-Hm_Output_Modules.html">Hm_Output_Modules</a></li>
 				<li><a href="class-Hm_Output_msgs.html">Hm_Output_msgs</a></li>
-				<li><a href="class-Hm_Output_no_login.html">Hm_Output_no_login</a></li>
 				<li><a href="class-Hm_Output_notfound_content.html">Hm_Output_notfound_content</a></li>
 				<li><a href="class-Hm_Output_nux_dev_news.html">Hm_Output_nux_dev_news</a></li>
 				<li><a href="class-Hm_Output_nux_help.html">Hm_Output_nux_help</a></li>
@@ -928,6 +927,7 @@
 				<li><a href="function-message_since_dropdown.html">message_since_dropdown</a></li>
 				<li><a href="function-oauth2_form.html">oauth2_form</a></li>
 				<li><a href="function-output_source.html">output_source</a></li>
+				<li><a href="function-payload_search.html">payload_search</a></li>
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
 				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
@@ -1177,9 +1177,9 @@
 </span></span><span id="171" class="l"><a href="#171">171: </a><span class="php-comment"> * @return string
 </span></span><span id="172" class="l"><a href="#172">172: </a><span class="php-comment"> */</span>
 </span><span id="173" class="l"><a href="#173">173: </a><span class="php-keyword1">function</span> subject_callback(<span class="php-var">$vals</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>) {
-</span><span id="174" class="l"><a href="#174">174: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
-</span><span id="175" class="l"><a href="#175">175: </a>        <span class="php-var">$subject</span> = <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]);
-</span><span id="176" class="l"><a href="#176">176: </a>        <span class="php-var">$hl_subject</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/^(\[[^\]]+\])/&quot;</span>, <span class="php-quote">'&lt;span class=&quot;s_pre&quot;&gt;$1&lt;/span&gt;'</span>, <span class="php-var">$subject</span>);
+</span><span id="174" class="l"><a href="#174">174: </a>    <span class="php-var">$subject</span> = <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]);
+</span><span id="175" class="l"><a href="#175">175: </a>    <span class="php-var">$hl_subject</span> = <span class="php-keyword2">preg_replace</span>(<span class="php-quote">&quot;/^(\[[^\]]+\])/&quot;</span>, <span class="php-quote">'&lt;span class=&quot;s_pre&quot;&gt;$1&lt;/span&gt;'</span>, <span class="php-var">$subject</span>);
+</span><span id="176" class="l"><a href="#176">176: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
 </span><span id="177" class="l"><a href="#177">177: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;td class=&quot;subject&quot;&gt;&lt;div class=&quot;%s&quot;&gt;&lt;a title=&quot;%s&quot; href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;'</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">implode</span>(<span class="php-quote">' '</span>, <span class="php-var">$vals</span>[<span class="php-num">2</span>])), <span class="php-var">$subject</span>, <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">1</span>]), <span class="php-var">$hl_subject</span>);
 </span><span id="178" class="l"><a href="#178">178: </a>    }
 </span><span id="179" class="l"><a href="#179">179: </a>    <span class="php-keyword1">elseif</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
@@ -1706,6 +1706,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?60cfa5cf3e0e47a4d6c297634256e185b41627c5"></script>
+<script src="elementlist.js?41823bba697e5069c0117318aeaccbe4a4704560"></script>
 </body>
 </html>

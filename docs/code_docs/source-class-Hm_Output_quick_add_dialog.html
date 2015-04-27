@@ -796,7 +796,6 @@
 				<li><a href="class-Hm_Output_Module.html">Hm_Output_Module</a></li>
 				<li><a href="class-Hm_Output_Modules.html">Hm_Output_Modules</a></li>
 				<li><a href="class-Hm_Output_msgs.html">Hm_Output_msgs</a></li>
-				<li><a href="class-Hm_Output_no_login.html">Hm_Output_no_login</a></li>
 				<li><a href="class-Hm_Output_notfound_content.html">Hm_Output_notfound_content</a></li>
 				<li><a href="class-Hm_Output_nux_dev_news.html">Hm_Output_nux_dev_news</a></li>
 				<li><a href="class-Hm_Output_nux_help.html">Hm_Output_nux_help</a></li>
@@ -928,6 +927,7 @@
 				<li><a href="function-message_since_dropdown.html">message_since_dropdown</a></li>
 				<li><a href="function-oauth2_form.html">oauth2_form</a></li>
 				<li><a href="function-output_source.html">output_source</a></li>
+				<li><a href="function-payload_search.html">payload_search</a></li>
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
 				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
@@ -1440,7 +1440,7 @@
 </span><span id="434" class="l"><a href="#434">434: </a>
 </span><span id="435" class="l"><a href="#435">435: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> option_list(<span class="php-var">$current</span>, <span class="php-var">$mod</span>) {
 </span><span id="436" class="l"><a href="#436">436: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="437" class="l"><a href="#437">437: </a>        <span class="php-keyword2">uasort</span>(self::<span class="php-var">$services</span>, <span class="php-keyword1">function</span>(<span class="php-var">$a</span>, <span class="php-var">$b</span>) { <span class="php-keyword1">return</span> <span class="php-keyword2">strcmp</span>(<span class="php-var">$a</span>[<span class="php-quote">'name'</span>], <span class="php-var">$b</span>[<span class="php-quote">'name'</span>]); });
+</span><span id="437" class="l"><a href="#437">437: </a>        <span class="php-keyword2">uasort</span>(self::<span class="php-var">$services</span>, <span class="php-keyword1">function</span>(<span class="php-var">$a</span>, <span class="php-var">$b</span>) { <span class="php-keyword1">return</span> <span class="php-keyword2">strcasecmp</span>(<span class="php-var">$a</span>[<span class="php-quote">'name'</span>], <span class="php-var">$b</span>[<span class="php-quote">'name'</span>]); });
 </span><span id="438" class="l"><a href="#438">438: </a>        <span class="php-keyword1">foreach</span>(self::<span class="php-var">$services</span> <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$details</span>) {
 </span><span id="439" class="l"><a href="#439">439: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option value=&quot;'</span>.<span class="php-var">$mod</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;'</span>;
 </span><span id="440" class="l"><a href="#440">440: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$id</span> == <span class="php-var">$current</span>) {
@@ -1473,6 +1473,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?60cfa5cf3e0e47a4d6c297634256e185b41627c5"></script>
+<script src="elementlist.js?41823bba697e5069c0117318aeaccbe4a4704560"></script>
 </body>
 </html>
