@@ -36,15 +36,17 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
  */
 class Hm_Handler_process_create_account extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('create_username', 'create_password', 'create_password_again'));
-        if ($success) {
-            if ($form['create_password'] == $form['create_password_again']) {
-                if ($this->session->internal_users) {
-                    $this->session->create($this->request, $form['create_username'], $form['create_password']);
+        if ($this->session->is_admin()) {
+            list($success, $form) = $this->process_form(array('create_username', 'create_password', 'create_password_again'));
+            if ($success) {
+                if ($form['create_password'] == $form['create_password_again']) {
+                    if ($this->session->internal_users) {
+                        $this->session->create($this->request, $form['create_username'], $form['create_password']);
+                    }
                 }
-            }
-            else {
-                Hm_Msgs::add('ERRPasswords did not match');
+                else {
+                    Hm_Msgs::add('ERRPasswords did not match');
+                }
             }
         }
     }
@@ -55,6 +57,7 @@ class Hm_Handler_process_create_account extends Hm_Handler_Module {
  */
 class Hm_Handler_check_internal_users extends Hm_Handler_Module {
     public function process() {
+        $this->out('is_admin', $this->session->is_admin());
         $this->out('internal_users', $this->session->internal_users);
     }
 }
@@ -64,18 +67,18 @@ class Hm_Handler_check_internal_users extends Hm_Handler_Module {
  */
 class Hm_Output_create_account_link extends Hm_Output_Module {
     protected function output() {
-        if (!$this->get('router_login_state') && $this->get('internal_users')) {
-            return '<a class="create_account_link" href="?page=create_account">'.$this->trans('Create').'</a>';
+        if (!$this->get('is_admin', false)) {
+            $res = '';
         }
-    }
-}
-
-/**
- * @subpackage account/output
- */
-class Hm_Output_no_login extends Hm_Output_Module {
-    protected function output() {
-        return '';
+        else {
+            $res = '<li class="menu_create_account"><a class="unread_link" href="?page=create_account">'.
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$plus).'" alt="" '.
+                'width="16" height="16" /> '.$this->trans('Create Account').'</a></li>';
+        }
+        if ($this->format == 'HTML5') {
+            return $res;
+        }
+        $this->concat('formatted_folder_list', $res);
     }
 }
 
@@ -84,23 +87,20 @@ class Hm_Output_no_login extends Hm_Output_Module {
  */
 class Hm_Output_create_form extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('router_login_state')) {
+        if (!$this->get('internal_users') || !$this->get('is_admin', false)) {
             Hm_Dispatch::page_redirect('?page=home');
         }
-        if ($this->get('internal_users')) {
-            return '<div class="create_user">'.
-                '<h1 class="title">'.$this->trans('Create Account').'</h1>'.
-                '<form method="POST" autocomplete="off" >'.
-                '<input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
-                '<input style="display:none" type="text" name="fake_username" />'.
-                '<input style="display:none" type="password" name="fake_password" />'.
-                ' <input required type="text" placeholder="'.$this->trans('Username').'" name="create_username" value="">'.
-                ' <input type="password" required placeholder="'.$this->trans('Password').'" name="create_password">'.
-                ' <input type="password" required placeholder="'.$this->trans('Password Again').'" name="create_password_again">'.
-                ' <input type="submit" name="create_hm_user" value="'.$this->trans('Create').'" />'.
-                '</form></div>'.
-                '<a class="create_account_link" href="?page=home">'.$this->trans('Login').'</a>';
-        }
+        return '<div class="content_title">'.$this->trans('Create Account').'</div>'.
+            '<div class="create_user">'.
+            '<form method="POST" autocomplete="off" >'.
+            '<input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
+            '<input style="display:none" type="text" name="fake_username" />'.
+            '<input style="display:none" type="password" name="fake_password" />'.
+            ' <input required type="text" placeholder="'.$this->trans('Username').'" name="create_username" value="">'.
+            ' <input type="password" required placeholder="'.$this->trans('Password').'" name="create_password">'.
+            ' <input type="password" required placeholder="'.$this->trans('Password Again').'" name="create_password_again">'.
+            ' <input type="submit" name="create_hm_user" value="'.$this->trans('Create').'" />'.
+            '</form></div>';
     }
 }
 
