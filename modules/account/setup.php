@@ -6,20 +6,19 @@ handler_source('account');
 output_source('account');
 
 /* create account page */
-//setup_base_page('create_account', 'core');
-//replace_module('output', 'login', 'no_login', 'create_account');
-//add_handler('create_account', 'process_create_account', false, 'account', 'login', 'before');
-//add_handler('create_account', 'check_internal_users', false, 'account', 'login', 'before');
-//add_output('create_account', 'create_form', false, 'account', 'content_section_start', 'after');
-
-/* home page */
-add_handler('home', 'check_internal_users', false, 'account', 'login', 'before');
-//add_output('home', 'create_account_link', false, 'account', 'login', 'after');
+setup_base_page('create_account', 'core');
+add_handler('create_account', 'process_create_account', true, 'account', 'login', 'after');
+add_handler('create_account', 'check_internal_users', true, 'account', 'login', 'after');
+add_output('create_account', 'create_form', true, 'account', 'content_section_start', 'after');
 
 /* settings page for password change */
 add_handler('settings', 'process_change_password', true, 'account', 'date', 'after');
-add_handler('settings', 'check_internal_users', false, 'account', 'login', 'before');
+add_handler('settings', 'check_internal_users', true, 'account', 'login', 'after');
 add_output('settings', 'change_password', true, 'account', 'list_style_setting', 'after');
+
+/* folder list link */
+add_handler('ajax_hm_folders', 'check_internal_users', true, 'account', 'login', 'after');
+add_output('ajax_hm_folders', 'create_account_link', true, 'account', 'settings_menu_end', 'before');
 
 /* input/output */
 return array(
