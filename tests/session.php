@@ -38,6 +38,26 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_is_admin() {
+        $request = new Hm_Mock_Request('HTTP');
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $this->assertFalse($session->is_admin());
+        $session->active = true;
+        $this->assertFalse($session->is_admin());
+
+        $this->config->set('admin_users', 'testuser');
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $session->active = true;
+        $this->assertFalse($session->is_admin());
+        $session->set('username', 'nottestuser');
+        $this->assertFalse($session->is_admin());
+        $session->set('username', 'testuser');
+        $this->assertTrue($session->is_admin());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_is_active() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');

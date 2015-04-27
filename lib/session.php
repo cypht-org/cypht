@@ -155,6 +155,25 @@ abstract class Hm_Session {
     }
 
     /**
+     * Returns bool true if the user is an admin
+     * @return bool
+     */
+    public function is_admin() {
+        if (!$this->active) {
+            return false;
+        }
+        $admins = array_filter(explode(',', $this->site_config->get('admin_users', '')));
+        if (empty($admins)) {
+            return false;
+        }
+        $user = $this->get('username', '');
+        if (!strlen($user)) {
+            return false;
+        }
+        return in_array($user, $admins, true);
+    }
+
+    /**
      * Encrypt session data
      * @param array $data session data to encrypt
      * @return string encrypted session data
