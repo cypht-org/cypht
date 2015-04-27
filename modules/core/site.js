@@ -1,6 +1,7 @@
 /* ajax multiplexer */
 var Hm_Ajax = {
     request_count: 0,
+    aborted: false,
     batch_callback: false,
     icon_loading_id: 0,
 
@@ -66,7 +67,10 @@ var Hm_Ajax_Request = function() { return {
     },
 
     done: function(res) {
-        if (typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
+        if (Hm_Ajax.aborted) {
+            return;
+        }
+        else if (typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
             this.fail(res);
             return;
         }
@@ -103,6 +107,7 @@ var Hm_Ajax_Request = function() { return {
         }
         Hm_Ajax.request_count--;
         if (Hm_Ajax.request_count === 0) {
+            Hm_Ajax.aborted = false;
             if (Hm_Ajax.batch_callback) {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
@@ -235,6 +240,10 @@ function Message_List() {
     };
 
     this.update = function(ids, msgs, type, cache) {
+        if ($('input[type=checkbox]').filter(function() {return this.checked; }).length > 0) {
+            Hm_Ajax.aborted = true;
+            return 0;
+        }
         var msg_rows;
         if (!cache) {
             msg_rows = $('.message_table tbody');
