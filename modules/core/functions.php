@@ -171,9 +171,9 @@ function checkbox_callback($vals, $style, $output_mod) {
  * @return string
  */
 function subject_callback($vals, $style, $output_mod) {
+    $subject = $output_mod->html_safe($vals[0]);
+    $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
     if ($style == 'email') {
-        $subject = $output_mod->html_safe($vals[0]);
-        $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
         return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
     }
     elseif ($style == 'news') {
