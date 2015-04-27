@@ -436,26 +436,38 @@ function build_github_subject($event, $output_mod) {
 function github_parse_headers($data, $output_mod) {
     $res = '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
     if (array_key_exists('type', $data)) {
-        $type = trim(str_replace('Event', '', trim(preg_replace("/([A-Z])/", " $1", $data['type']))));
+        $type = build_github_subject($data, $output_mod);
     }
     else {
-        $type = $data['type'];
+        $type = '[Unknown Type]';
     }
     if (array_key_exists('created_at', $data)) {
-        $date = $data['created_at'];
+        $date = sprintf("%s (%s)", date('r', strtotime($data['created_at'])), translate_time_str(human_readable_interval($data['created_at']), $output_mod));
     }
     else {
         $date = '[No date]';
     }
+    $repo_link = '';
+    $from_link = '';
+
+    if (array_key_exists('actor', $data) && array_key_exists('login', $data['actor'])) {
+        $from = $data['actor']['login'];
+        $from_link = sprintf(' - <a target="_blank" href="https://github.com/%s">https://github.com/%s</a>', $output_mod->html_safe($from), $output_mod->html_safe($from));
+    }
+    else {
+        $from = '[No From]';
+    }
     if (array_key_exists('repo', $data) && array_key_exists('name', $data['repo'])) {
         $name = $data['repo']['name'];
+        $repo_link = sprintf(' - <a target="_blank" href="https://github.com/%s">https://github.com/%s</a>', $output_mod->html_safe($name), $output_mod->html_safe($name));
     }
     else {
         $name = '[No Repo]';
     }
-    $res .= '<tr><th>'.$output_mod->trans('Type').'</th><td>'.$output_mod->html_safe($type).'</td></tr>';
+    $res .= '<tr class="header_subject"><th colspan="2">'.$output_mod->html_safe($type).'</th></tr>';
     $res .= '<tr><th>'.$output_mod->trans('Date').'</th><td>'.$output_mod->html_safe($date).'</td></tr>';
-    $res .= '<tr><th>'.$output_mod->trans('Repository').'</th><td>'.$output_mod->html_safe($name).'</td></tr>';
+    $res .= '<tr><th>'.$output_mod->trans('Author').'</th><td>'.$output_mod->html_safe($from).$from_link.'</td></tr>';
+    $res .= '<tr><th>'.$output_mod->trans('Repository').'</th><td>'.$output_mod->html_safe($name).$repo_link.'</td></tr>';
     $res .= '</table>';
     return $res;
 }
@@ -464,13 +476,46 @@ function github_parse_headers($data, $output_mod) {
  * @subpackage github/functions
  */
 function github_parse_payload($data, $output_mod) {
+    elog($data);
+    $content = payload_search($data);
     $res = '<div class="msg_text_inner">';
-    foreach ($data as $vals) {
-        if (is_array($vals) && array_key_exists('body', $vals)) {
-            $res .= '<div class="github_para">'.$output_mod->html_safe($vals['body']).'</div>';
+    foreach ($content as $vals) {
+        $res .= '<div class="github_para">';
+        if (count($vals) == 2) {
+            $res .= sprintf('<div class="github_link"><a target="_blank" href="%s">%s</a></div>', $vals[1], $vals[1]);
         }
+        $res .= $output_mod->html_safe($vals[0]).'</div>';
     }
     $res .= '</div>';
+    return $res;
+}
+
+/**
+ * @subpackage github/functions
+ */
+function payload_search($data) {
+    $res = array();
+    $data_flds = array('body', 'description', 'message');
+    foreach($data as $vals) {
+        if (is_array($vals)) {
+            $item = array();
+            foreach ($data_flds as $fld) {
+                if (array_key_exists($fld, $vals)) {
+                    $item[] = $vals[$fld];
+                    break;
+                }
+            }
+            if (!empty($item)) {
+                if (array_key_exists('html_url', $data)) {
+                    $item[] = $vals['html_url'];
+                }
+            }
+            else {
+                $res = array_merge($res, payload_search($vals));
+            }
+            $res[] = $item;
+        }
+    }
     return $res;
 }
 
