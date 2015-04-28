@@ -91,7 +91,7 @@ var display_feeds_combined = function(res) {
 
 var feeds_combined_inbox_content= function(id) {
     Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined_inbox'},
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined'},
         {'name': 'feed_server_ids', 'value': id}],
         display_feeds_combined_inbox,
         [],
@@ -139,7 +139,7 @@ var display_feed_item_content = function(res) {
 
 var load_feed_list = function(id) {
     Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_list_display'},
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined'},
         {'name': 'feed_server_ids', 'value': id}],
         display_feed_list
     );
