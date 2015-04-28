@@ -221,6 +221,11 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
             }
+            elseif ($path == 'combined_inbox') {
+                foreach ($repos as $repo) {
+                    $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                }
+            }
         }
     }
 }
