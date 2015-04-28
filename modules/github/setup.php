@@ -23,8 +23,8 @@ add_handler('message', 'github_list_type', true, 'github', 'message_list_type', 
 add_handler('ajax_github_data', 'login', false, 'core');
 add_handler('ajax_github_data', 'load_user_data', true, 'core');
 add_handler('ajax_github_data', 'language', true, 'core');
-add_handler('ajax_github_data', 'github_list_data', true);
 add_handler('ajax_github_data', 'close_session_early',  true, 'core');
+add_handler('ajax_github_data', 'github_list_data', true);
 add_handler('ajax_github_data', 'date', true, 'core');
 add_handler('ajax_github_data', 'http_headers', true, 'core');
 add_output('ajax_github_data', 'filter_github_data', true);
@@ -32,10 +32,12 @@ add_output('ajax_github_data', 'filter_github_data', true);
 add_handler('ajax_github_event_detail', 'login', false, 'core');
 add_handler('ajax_github_event_detail', 'load_user_data', true, 'core');
 add_handler('ajax_github_event_detail', 'language', true, 'core');
+add_handler('ajax_github_event_detail', 'close_session_early', true, 'core');
 add_handler('ajax_github_event_detail', 'github_event_detail',  true);
 add_handler('ajax_github_event_detail', 'date', true, 'core');
 add_handler('ajax_github_event_detail', 'http_headers', true, 'core');
 add_output('ajax_github_event_detail', 'filter_github_event_detail', true);
+
 return array(
     'allowed_pages' => array(
         'ajax_github_data',
