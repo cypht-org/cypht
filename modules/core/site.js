@@ -14,7 +14,9 @@ var Hm_Ajax = {
             }
         }
         Hm_Ajax.request_count++;
-        Hm_Ajax.batch_callback = batch_callback;
+        if (batch_callback) {
+            Hm_Ajax.batch_callback = batch_callback;
+        }
         return ajax.make_request(args, callback, extra);
     },
 
