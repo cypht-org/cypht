@@ -58,7 +58,7 @@ add_handler('ajax_hm_folders', 'load_pop3_folders', true, 'pop3', 'load_pop3_ser
 add_handler('ajax_hm_folders', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('ajax_hm_folders', 'filter_pop3_folders', true, 'pop3', 'folder_list_content_start', 'before');
 
-/* select pop3 "folder" */
+/* pop3 message list messages */
 add_handler('ajax_pop3_folder_display', 'login', false, 'core');
 add_handler('ajax_pop3_folder_display', 'load_user_data', true, 'core');
 add_handler('ajax_pop3_folder_display', 'language', true, 'core');
@@ -70,32 +70,6 @@ add_handler('ajax_pop3_folder_display', 'pop3_folder_page', true);
 add_handler('ajax_pop3_folder_display', 'date', true, 'core');
 add_handler('ajax_pop3_folder_display', 'http_headers', true, 'core');
 add_output('ajax_pop3_folder_display', 'filter_pop3_message_list', true);
-
-/* unread */
-add_handler('ajax_pop3_unread', 'login', false, 'core');
-add_handler('ajax_pop3_unread', 'load_user_data', true, 'core');
-add_handler('ajax_pop3_unread', 'language', true, 'core');
-add_handler('ajax_pop3_unread', 'message_list_type', true, 'core');
-add_handler('ajax_pop3_unread', 'pop3_message_list_type', true);
-add_handler('ajax_pop3_unread', 'load_pop3_servers_from_config',  true);
-add_handler('ajax_pop3_unread', 'close_session_early', true, 'core');
-add_handler('ajax_pop3_unread', 'pop3_folder_page',  true);
-add_handler('ajax_pop3_unread', 'date', true, 'core');
-add_handler('ajax_pop3_unread', 'http_headers', true, 'core');
-add_output('ajax_pop3_unread', 'filter_pop3_message_list', true);
-
-/* combined inbox */
-add_handler('ajax_pop3_combined_inbox', 'login', false, 'core');
-add_handler('ajax_pop3_combined_inbox', 'load_user_data', true, 'core');
-add_handler('ajax_pop3_combined_inbox', 'language', true, 'core');
-add_handler('ajax_pop3_combined_inbox', 'message_list_type', true, 'core');
-add_handler('ajax_pop3_combined_inbox', 'pop3_message_list_type', true);
-add_handler('ajax_pop3_combined_inbox', 'load_pop3_servers_from_config',  true);
-add_handler('ajax_pop3_combined_inbox', 'close_session_early', true, 'core');
-add_handler('ajax_pop3_combined_inbox', 'pop3_folder_page',  true);
-add_handler('ajax_pop3_combined_inbox', 'date', true, 'core');
-add_handler('ajax_pop3_combined_inbox', 'http_headers', true, 'core');
-add_output('ajax_pop3_combined_inbox', 'filter_pop3_message_list', true);
 
 /* view pop3 message */
 add_handler('ajax_pop3_message_display', 'login', false, 'core');
@@ -147,7 +121,6 @@ return array(
         'ajax_pop3_debug',
         'ajax_pop3_message_display',
         'ajax_pop3_folder_display',
-        'ajax_pop3_combined_inbox',
         'ajax_pop3_unread',
         'ajax_pop3_status'
     ),

@@ -121,7 +121,7 @@ var pop3_message_view_finished = function() {
 
 var pop3_all_mail_content = function(id) {
     Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
         {'name': 'pop3_server_id', 'value': id}],
         display_pop3_list,
         [],
@@ -133,7 +133,7 @@ var pop3_all_mail_content = function(id) {
 
 var pop3_combined_inbox_content = function(id) {
     Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
         {'name': 'pop3_server_id', 'value': id}],
         display_pop3_list,
         [],
@@ -175,7 +175,7 @@ var update_pop3_status_display = function(res) {
 var pop3_search_page_content = function(id) {
     if (hm_search_terms) {
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_combined_inbox'},
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
             {'name': 'pop3_search', 'value': 1},
             {'name': 'pop3_server_id', 'value': id}],
             update_pop3_search_result,
@@ -194,7 +194,7 @@ var update_pop3_search_result = function(res) {
 
 var pop3_combined_unread_content = function(id) {
     Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_unread'},
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
         {'name': 'pop3_unread_only', 'value': 1},
         {'name': 'pop3_server_id', 'value': id}],
         update_pop3_unread_display,
