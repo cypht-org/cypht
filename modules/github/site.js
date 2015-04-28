@@ -1,11 +1,17 @@
 var load_github_data = function(id) {
-    Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_repo', 'value': id}], display_github_data);
+    Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_repo', 'value': id}], display_github_data, [], false, cache_github_all);
 };
 
 var display_github_data = function(res) {
     Hm_Message_List.update([0], res.formatted_message_list, 'github_all');
-    Hm_Message_List.set_message_list_state('github_all')
 };
+
+var cache_github_all = function() {
+    if (hm_list_path() == 'github_all') {
+        Hm_Message_List.set_message_list_state('formatted_github_all')
+    }
+};
+
 var github_item_view = function() {
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
@@ -31,4 +37,9 @@ else if (hm_page_name() == 'message' && hm_list_path().substr(0, 6) == 'github')
     github_item_view();
 }
 
+if (hm_page_name() == 'message_list') {
+    if (hm_list_path() == 'github_all') {
+        Hm_Message_List.page_caches.github_all = 'formatted_github_all';
+    }
+}
 

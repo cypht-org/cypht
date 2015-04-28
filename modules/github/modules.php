@@ -9,6 +9,14 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * Used to cache "read" github items
+ * @subpackage github/lib
+ */
+class Hm_Github_Seen_Cache {
+    use Hm_Uid_Cache;
+}
+
+/**
  * @subpackage github/handler
  */
 class Hm_Handler_github_folders_data extends Hm_Handler_Module {
@@ -185,6 +193,11 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('github_repo'));
         if ($success) {
+            $login_time = $this->session->get('login_time', false);
+            if ($login_time) {
+                $this->out('login_time', $login_time);
+            }
+            Hm_Github_Seen_Cache::load($this->session->get('github_read_uids', array()));
             $details = $this->user_config->get('github_connect_details');
             $repos = $this->user_config->get('github_repos');
             if (in_array($form['github_repo'], $repos, true) && $details) {
@@ -258,6 +271,10 @@ class Hm_Output_github_folders extends Hm_Output_Module {
 class Hm_Output_filter_github_data extends Hm_Output_Module {
     protected function output() {
         $res = array();
+        $login_time = false;
+        if ($this->get('login_time')) {
+            $login_time = $this->get('login_time');
+        }
         foreach ($this->get('github_data', array()) as $event) {
             $id = $event['id'];
             $subject = build_github_subject($event, $this);
@@ -265,6 +282,15 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
             $from = $event['actor']['login'];
             $ts = strtotime($event['created_at']);
+            if (Hm_Github_Seen_Cache::is_present($id)) {
+                $flags = array();
+            }
+            elseif ($ts && $login_time && $ts <= $login_time) {
+                $flags = array();
+            }
+            else {
+                $flags = array('unseen');
+            }
             $date = date('r', $ts);
             $style = $this->get('news_list_style') ? 'news' : 'email';
             if ($this->get('is_mobile')) {
@@ -273,8 +299,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             if ($style == 'news') {
                 $res[$id] = message_list_row(array(
                         array('checkbox_callback', $id),
-                        array('icon_callback', array()),
-                        array('subject_callback', $subject, $url, array()),
+                        array('icon_callback', $flags),
+                        array('subject_callback', $subject, $url, $flags),
                         array('safe_output_callback', 'source', $repo),
                         array('safe_output_callback', 'from', $from),
                         array('date_callback', human_readable_interval($date), $ts),
@@ -289,9 +315,9 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                         array('checkbox_callback', $id),
                         array('safe_output_callback', 'source', $repo),
                         array('safe_output_callback', 'from', $from),
-                        array('subject_callback', $subject, $url, array()),
+                        array('subject_callback', $subject, $url, $flags),
                         array('date_callback', human_readable_interval($date), $ts),
-                        array('icon_callback', array())
+                        array('icon_callback', $flags)
                     ),
                     $id,
                     $style,
@@ -481,7 +507,6 @@ function github_parse_headers($data, $output_mod) {
  * @subpackage github/functions
  */
 function github_parse_payload($data, $output_mod) {
-    elog($data);
     $content = payload_search($data);
     $res = '<div class="msg_text_inner">';
     foreach ($content as $vals) {
