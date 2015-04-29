@@ -396,15 +396,16 @@ class Hm_Output_github_add_repo extends Hm_Output_Module {
                 '<input type="text" value="" placeholder="'.$this->trans('Owner').'" name="new_github_repo_owner" />'.
                 '<input type="submit" name="github_add_repo" value="Add" />'.
                 '</form></div>';
+            $res .= '<div class="configured_server"><div class="server_title">'.$this->trans('Repositories').'</div>';
+            foreach ($this->get('github_repos', array()) as $repo) {
+                $res .= '<div class="configured_repo"><form method="POST">'.
+                    '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+                    '<input type="hidden" name="github_repo" value="'.$this->html_safe($repo).'" />'.
+                    '<input type="submit" name="github_remove_repo" value="'.$this->trans('Remove').'" class="github_remove_repo" />'.$this->html_safe($repo).'</form></div>';
+            }
+            $res .= '</div></div></div>';
         }
-        $res .= '<div class="configured_server"><div class="server_title">'.$this->trans('Repositories').'</div>';
-        foreach ($this->get('github_repos', array()) as $repo) {
-            $res .= '<div class="configured_repo"><form method="POST">'.
-                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<input type="hidden" name="github_repo" value="'.$this->html_safe($repo).'" />'.
-                '<input type="submit" name="github_remove_repo" value="'.$this->trans('Remove').'" class="github_remove_repo" />'.$this->html_safe($repo).'</form></div>';
-        }
-        return $res.'</div></div></div>';
+        return $res;
     }
 }
 
