@@ -19,6 +19,7 @@ add_output('servers', 'github_add_repo', true, 'github', 'github_connect_section
 add_handler('home', 'process_github_authorization', true, 'github', 'load_user_data', 'after');
 
 add_handler('message', 'github_list_type', true, 'github', 'message_list_type', 'after');
+add_handler('ajax_message_action', 'github_message_action', true, 'github', 'load_user_data', 'after');
 
 add_handler('ajax_github_data', 'login', false, 'core');
 add_handler('ajax_github_data', 'load_user_data', true, 'core');

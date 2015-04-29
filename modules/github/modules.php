@@ -12,10 +12,36 @@ if (!defined('DEBUG_MODE')) { die(); }
  * Used to cache "read" github items
  * @subpackage github/lib
  */
-class Hm_Github_Seen_Cache {
+class Hm_Github_Uid_Cache {
     use Hm_Uid_Cache;
 }
 
+/**
+ * @subpackage github/handler
+ */
+class Hm_Handler_github_message_action extends Hm_Handler_Module {
+    public function process() {
+
+        list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
+        if ($success) {
+            $id_list = explode(',', $form['message_ids']);
+            foreach ($id_list as $msg_id) {
+                if (preg_match("/^github_(\d)+$/", $msg_id)) {
+                    $parts = explode('_', $msg_id, 2);
+                    $guid = $parts[1];
+                    switch($form['action_type']) {
+                        case 'unread':
+                            Hm_Github_Uid_Cache::unread($guid);
+                            break;
+                        case 'read':
+                            Hm_Github_Uid_Cache::read($guid);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+}
 /**
  * @subpackage github/handler
  */
@@ -197,13 +223,19 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
             if ($login_time) {
                 $this->out('login_time', $login_time);
             }
-            Hm_Github_Seen_Cache::load($this->session->get('github_read_uids', array()));
+            Hm_Github_Uid_Cache::load($this->session->get('github_read_uids', array()));
             $details = $this->user_config->get('github_connect_details');
             $repos = $this->user_config->get('github_repos');
             if (in_array($form['github_repo'], $repos, true) && $details) {
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $form['github_repo']);
                 $this->out('github_data', github_fetch_content($details, $url));
                 $this->out('github_data_source', $form['github_repo']);
+            }
+            if (array_key_exists('list_path', $this->request->get)) {
+                $this->out('list_path', $this->request->get['list_path']);
+            }
+            else {
+                $this->out('list_path', false);
             }
         }
     }
@@ -235,6 +267,11 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                 }
             }
             elseif ($path == 'combined_inbox') {
+                foreach ($repos as $repo) {
+                    $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                }
+            }
+            elseif ($path == 'unread') {
                 foreach ($repos as $repo) {
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
@@ -272,24 +309,34 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
     protected function output() {
         $res = array();
         $login_time = false;
+        $unread_only = false;
         if ($this->get('login_time')) {
             $login_time = $this->get('login_time');
         }
+        if ($this->get('list_path', '') == 'unread') {
+            $unread_only = true;
+        }
         foreach ($this->get('github_data', array()) as $event) {
-            $id = $event['id'];
+            $id = 'github_'.$event['id'];
             $subject = build_github_subject($event, $this);
             $repo = $this->get('github_data_source', 'Github');
             $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
             $from = $event['actor']['login'];
             $ts = strtotime($event['created_at']);
-            if (Hm_Github_Seen_Cache::is_present($id)) {
+            if (Hm_Github_Uid_Cache::is_read($event['id'])) {
                 $flags = array();
+            }
+            elseif (Hm_Github_Uid_Cache::is_unread($event['id'])) {
+                $flags = array('unseen');
             }
             elseif ($ts && $login_time && $ts <= $login_time) {
                 $flags = array();
             }
             else {
                 $flags = array('unseen');
+            }
+            if ($unread_only && !in_array('unseen', $flags)) {
+                continue;
             }
             $date = date('r', $ts);
             $style = $this->get('news_list_style') ? 'news' : 'email';
