@@ -266,12 +266,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
             }
-            elseif ($path == 'combined_inbox') {
-                foreach ($repos as $repo) {
-                    $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
-                }
-            }
-            elseif ($path == 'unread') {
+            elseif ($path == 'combined_inbox' || $path == 'unread') {
                 foreach ($repos as $repo) {
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
@@ -335,6 +330,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             else {
                 $flags = array('unseen');
             }
+            //TODO: time constraint for unread page
             if ($unread_only && !in_array('unseen', $flags)) {
                 continue;
             }
