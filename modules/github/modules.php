@@ -27,9 +27,9 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
             $id_list = explode(',', $form['message_ids']);
             Hm_Github_Uid_Cache::load($this->session->get('github_read_uids', array()));
             foreach ($id_list as $msg_id) {
-                if (preg_match("/^github_(\d)+$/", $msg_id)) {
-                    $parts = explode('_', $msg_id, 2);
-                    $guid = $parts[1];
+                if (preg_match("/^github_0_(\d)+$/", $msg_id)) {
+                    $parts = explode('_', $msg_id, 3);
+                    $guid = $parts[2];
                     switch($form['action_type']) {
                         case 'unread':
                             Hm_Github_Uid_Cache::unread($guid);
@@ -69,7 +69,7 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $repo);
                 $data = github_fetch_content($details, $url);
                 $event = array();
-                $uid = substr($form['github_uid'], 7);
+                $uid = substr($form['github_uid'], 9);
                 if (is_array($data)) {
                     foreach ($data as $item) {
                         if ($item['id'] == $uid) {
@@ -318,7 +318,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             $unread_only = true;
         }
         foreach ($this->get('github_data', array()) as $event) {
-            $id = 'github_'.$event['id'];
+            $id = 'github_0_'.$event['id'];
             $subject = build_github_subject($event, $this);
             $repo = $this->get('github_data_source', 'Github');
             $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
@@ -340,6 +340,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             if ($unread_only && !in_array('unseen', $flags)) {
                 continue;
             }
+            elog($flags);
+            elog($event['id']);
             $date = date('r', $ts);
             $style = $this->get('news_list_style') ? 'news' : 'email';
             if ($this->get('is_mobile')) {
@@ -563,7 +565,9 @@ function github_parse_payload($data, $output_mod) {
         if (count($vals) == 2) {
             $res .= sprintf('<div class="github_link"><a target="_blank" href="%s">%s</a></div>', $vals[1], $vals[1]);
         }
-        $res .= $output_mod->html_safe($vals[0]).'</div>';
+        if (count($vals) ==1) {
+            $res .= $output_mod->html_safe($vals[0]).'</div>';
+        }
     }
     $res .= '</div>';
     return $res;

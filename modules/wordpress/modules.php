@@ -21,9 +21,9 @@ class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
             $wp_ids = array();
             if ($form['action_type'] == 'read') {
                 foreach ($id_list as $msg_id) {
-                    if (preg_match("/^wordpress_(\d)+$/", $msg_id)) {
-                        $parts = explode('_', $msg_id, 2);
-                        $wp_ids[] = $parts[1];
+                    if (preg_match("/^wordpress_0_(\d)+$/", $msg_id)) {
+                        $parts = explode('_', $msg_id, 3);
+                        $wp_ids[] = $parts[2];
                     }
                 }
                 if (!empty($wp_ids)) {
@@ -248,7 +248,7 @@ class Hm_Output_filter_wp_freshly_pressed_data extends Hm_Output_Module {
     protected function output() {
         $res = array();
         foreach ($this->get('wp_freshly_pressed_data') as $vals) {
-            $id = $vals['ID'].'_'.$vals['site_ID'];
+            $id = 'wordpress_'.$vals['ID'].'_'.$vals['site_ID'];
             $url = '?page=message&list_path=wp_freshly_pressed&uid='.$this->html_safe($id);
             $style = 'email';
             $style = $this->get('news_list_style') ? 'news' : 'email';
@@ -304,7 +304,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
         }
         foreach ($this->get('wp_notice_data', array()) as $vals) {
             if (array_key_exists('id', $vals)) {
-                $id = 'wordpress_'.$vals['id'];
+                $id = 'wordpress_0_'.$vals['id'];
                 $url = '?page=message&list_path=wp_notifications&uid='.$this->html_safe($id);;
                 $style = 'email';
                 $style = $this->get('news_list_style') ? 'news' : 'email';
