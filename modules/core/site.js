@@ -553,7 +553,6 @@ function Message_List() {
         else {
             Hm_Timer.add_job(this.load_sources, 60);
         }
-        self.check_empty_list();
     };
 
     this.clear_read_messages = function() {
