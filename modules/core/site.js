@@ -109,6 +109,7 @@ var Hm_Ajax_Request = function() { return {
         }
         Hm_Ajax.request_count--;
         if (Hm_Ajax.request_count === 0) {
+            Hm_Message_List.set_checkbox_callback();
             Hm_Ajax.aborted = false;
             if (Hm_Ajax.batch_callback) {
                 Hm_Ajax.batch_callback(res);
@@ -549,6 +550,7 @@ function Message_List() {
         else {
             Hm_Timer.add_job(this.load_sources, 60);
         }
+        self.check_empty_list();
     };
 
     this.clear_read_messages = function() {
