@@ -8,7 +8,7 @@ var load_github_data = function(id) {
 };
 
 var display_github_data = function(res) {
-    Hm_Message_List.update([0], res.formatted_message_list, 'github_all');
+    Hm_Message_List.update([0], res.formatted_message_list, 'github');
 };
 
 var cache_github_all = function() {
