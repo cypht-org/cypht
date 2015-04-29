@@ -33,8 +33,8 @@ add_output('ajax_github_data', 'filter_github_data', true);
 add_handler('ajax_github_event_detail', 'login', false, 'core');
 add_handler('ajax_github_event_detail', 'load_user_data', true, 'core');
 add_handler('ajax_github_event_detail', 'language', true, 'core');
-add_handler('ajax_github_event_detail', 'close_session_early', true, 'core');
 add_handler('ajax_github_event_detail', 'github_event_detail',  true);
+add_handler('ajax_github_event_detail', 'close_session_early', true, 'core');
 add_handler('ajax_github_event_detail', 'date', true, 'core');
 add_handler('ajax_github_event_detail', 'http_headers', true, 'core');
 add_output('ajax_github_event_detail', 'filter_github_event_detail', true);
@@ -48,7 +48,7 @@ return array(
         'github_msg_text' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_post' => array(
-        'github_uid' => FILTER_VALIDATE_INT,
+        'github_uid' => FILTER_SANITIZE_STRING,
         'github_disconnect' => FILTER_SANITIZE_STRING,
         'new_github_repo_owner' => FILTER_SANITIZE_STRING,
         'new_github_repo' => FILTER_SANITIZE_STRING,

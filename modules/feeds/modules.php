@@ -18,7 +18,7 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if ($path == 'feeds') {
-                $this->out('list_path', 'feeds');
+                $this->out('list_path', 'feeds', false);
                 $this->out('mailbox_list_title', array('All Feeds'));
                 $this->out('message_list_since', $this->user_config->get('feed_since', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit', DEFAULT_SINCE));
@@ -26,7 +26,7 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
             elseif (preg_match("/^feeds_\d+$/", $path)) {
                 $this->out('message_list_since', $this->user_config->get('feed_since', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit', DEFAULT_SINCE));
-                $this->out('list_path', $path);
+                $this->out('list_path', $path, false);
                 $parts = explode('_', $path, 2);
                 $details = Hm_Feed_List::dump(intval($parts[1]));
                 if (!empty($details)) {

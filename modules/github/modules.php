@@ -25,6 +25,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
             $id_list = explode(',', $form['message_ids']);
+            Hm_Github_Uid_Cache::load($this->session->get('github_read_uids', array()));
             foreach ($id_list as $msg_id) {
                 if (preg_match("/^github_(\d)+$/", $msg_id)) {
                     $parts = explode('_', $msg_id, 2);
@@ -39,6 +40,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
                     }
                 }
             }
+            $this->session->set('github_read_uids', Hm_Github_Uid_Cache::dump());
         }
     }
 }
@@ -59,6 +61,7 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('list_path', 'github_uid'));
         if ($success) {
+            Hm_Github_Uid_Cache::load($this->session->get('github_read_uids', array()));
             $details = $this->user_config->get('github_connect_details', array());
             $repos = $this->user_config->get('github_repos', array());
             $repo = substr($form['list_path'], 7);
@@ -66,14 +69,17 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $repo);
                 $data = github_fetch_content($details, $url);
                 $event = array();
+                $uid = substr($form['github_uid'], 7);
                 if (is_array($data)) {
                     foreach ($data as $item) {
-                        if ($item['id'] == $form['github_uid']) {
+                        if ($item['id'] == $uid) {
                             $event = $item;
                             break;
                         }
                     }
                 }
+                Hm_Github_Uid_Cache::read($item['id']);
+                $this->session->set('github_read_uids', Hm_Github_Uid_Cache::dump());
                 $this->out('github_event_detail', $event);
             }
         }
@@ -232,10 +238,10 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                 $this->out('github_data_source', $form['github_repo']);
             }
             if (array_key_exists('list_path', $this->request->get)) {
-                $this->out('list_path', $this->request->get['list_path']);
+                $this->out('list_path', $this->request->get['list_path'], false);
             }
             else {
-                $this->out('list_path', false);
+                $this->out('list_path', false, false);
             }
         }
     }
@@ -251,7 +257,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
             $repos = $this->user_config->get('github_repos', array());
             if (preg_match("/^github_(.+)$/", $path)) {
                 if ($path == 'github_all') {
-                    $this->out('list_path', 'github_all');
+                    $this->out('list_path', 'github_all', false);
                     $this->out('list_parent', 'github_all');
                     $this->out('mailbox_list_title', array('Github', 'All'));
                     foreach ($repos as $repo) {
@@ -260,7 +266,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                 }
                 else {
                     $repo = substr($path, 7);
-                    $this->out('list_path', $path);
+                    $this->out('list_path', $path, false);
                     $this->out('list_parent', 'github_all');
                     $this->out('mailbox_list_title', array('Github', urldecode($repo)));
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));

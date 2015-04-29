@@ -142,7 +142,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             $path = $this->request->get['list_path'];
             if (preg_match("/^imap_\d+_.+$/", $path)) {
                 $this->out('list_meta', false, false);
-                $this->out('list_path', $path);
+                $this->out('list_path', $path, false);
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
                 $custom_link = 'add';
