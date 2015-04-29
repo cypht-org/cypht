@@ -195,10 +195,10 @@ class Hm_Handler_feed_message_action extends Hm_Handler_Module {
                     $guid = $parts[2];
                     switch($form['action_type']) {
                         case 'unread':
-                            Hm_Feed_Seen_Cache::remove($guid);
+                            Hm_Feed_Uid_Cache::unread($guid);
                             break;
                         case 'read':
-                            Hm_Feed_Seen_Cache::add($guid);
+                            Hm_Feed_Uid_Cache::read($guid);
                             break;
                     }
                 }
@@ -257,14 +257,16 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                         $feed = is_feed($feed_data['server'], $limit);
                         if ($feed && $feed->parsed_data) {
                             foreach ($feed->parsed_data as $item) {
-                                if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
-                                    continue;
-                                }
-                                elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
-                                    continue;
-                                }
-                                if (isset($item['guid']) && $unread_only && Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
-                                    continue;
+                                if (!Hm_Feed_Uid_Cache::is_unread(md5($item['guid']))) {
+                                    if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
+                                        continue;
+                                    }
+                                    elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
+                                        continue;
+                                    }
+                                    if (isset($item['guid']) && $unread_only && Hm_Feed_Uid_Cache::is_read(md5($item['guid']))) {
+                                        continue;
+                                    }
                                 }
                                 if ($terms && !search_feed_item($item, $terms, $since, $fld)) {
                                     continue;
@@ -334,7 +336,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                 }
             }
             if ($content) {
-                Hm_Feed_Seen_Cache::add($form['feed_uid']);
+                Hm_Feed_Uid_Cache::read($form['feed_uid']);
                 $this->out('feed_message_content', $content);
                 $this->out('feed_message_headers', $headers);
             }
@@ -413,7 +415,7 @@ class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
         foreach ($feeds as $index => $feed) {
             Hm_Feed_List::add($feed, $index);
         }
-        Hm_Feed_Seen_Cache::load($this->session->get('feed_read_uids', array()));
+        Hm_Feed_Uid_Cache::load($this->session->get('feed_read_uids', array()));
     }
 }
 
@@ -499,7 +501,7 @@ class Hm_Handler_save_feeds extends Hm_Handler_Module {
     public function process() {
         $feeds = Hm_Feed_List::dump();
         $this->user_config->set('feeds', $feeds);
-        $this->session->set('feed_read_uids', Hm_Feed_Seen_Cache::dump());
+        $this->session->set('feed_read_uids', Hm_Feed_Uid_Cache::dump());
     }
 }
 
@@ -658,8 +660,11 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 if ($this->get('is_mobile')) {
                     $style = 'news';
                 }
-                if (Hm_Feed_Seen_Cache::is_present(md5($item['guid']))) {
+                if (Hm_Feed_Uid_Cache::is_read(md5($item['guid']))) {
                     $flags = array();
+                }
+                elseif (Hm_Feed_Uid_Cache::is_unread(md5($item['guid']))) {
+                    $flags = array('unseen');
                 }
                 elseif ($timestamp && $login_time && $timestamp <= $login_time) {
                     $flags = array();

@@ -136,10 +136,10 @@ class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
                 if (preg_match("/^pop3_(\d)+_(\d)+$/", $msg_id)) {
                     switch($form['action_type']) {
                         case 'unread':
-                            Hm_POP3_Seen_Cache::remove($msg_id);
+                            Hm_POP3_Uid_Cache::unread($msg_id);
                             break;
                         case 'read':
-                            Hm_POP3_Seen_Cache::add($msg_id);
+                            Hm_POP3_Uid_Cache::read($msg_id);
                             break;
                     }
                 }
@@ -210,11 +210,11 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                     $msg_headers = $pop3->msg_headers($id);
                     if (!empty($msg_headers)) {
                         if (isset($msg_headers['date'])) {
-                            if (strtotime($msg_headers['date']) < $cutoff_timestamp) {
+                            if (!Hm_POP3_Uid_Cache::is_unread(sprintf('pop3_%d_%d', $form['pop3_server_id'], $id)) && strtotime($msg_headers['date']) < $cutoff_timestamp) {
                                 continue;
                             }
                         }
-                        if ($unread_only && Hm_POP3_Seen_Cache::is_present(sprintf('pop3_%d_%d', $form['pop3_server_id'], $id))) {
+                        if ($unread_only && Hm_POP3_Uid_Cache::is_read(sprintf('pop3_%d_%d', $form['pop3_server_id'], $id))) {
                             continue;
                         }
                         if ($terms) {
@@ -281,7 +281,7 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                 $this->out('pop3_mailbox_page_path', $form['pop3_list_path']);
                 $this->out('pop3_server_id', $id);
 
-                Hm_POP3_Seen_Cache::add(sprintf("pop3_%s_%s", $id, $form['pop3_uid']));
+                Hm_POP3_Uid_Cache::read(sprintf("pop3_%s_%s", $id, $form['pop3_uid']));
             }
         }
     }
@@ -522,7 +522,7 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
                 $this->session->del('pop3_auth_server_settings');
             }
         }
-        Hm_POP3_Seen_Cache::load($this->session->get('pop3_read_uids', array()));
+        Hm_POP3_Uid_Cache::load($this->session->get('pop3_read_uids', array()));
     }
 }
 
@@ -614,7 +614,7 @@ class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_POP3_List::dump(false, true);
         $this->user_config->set('pop3_servers', $servers);
-        $this->session->set('pop3_read_uids', Hm_POP3_Seen_Cache::dump());
+        $this->session->set('pop3_read_uids', Hm_POP3_Uid_Cache::dump());
         Hm_POP3_List::clean_up();
     }
 }
@@ -948,8 +948,11 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         }
         $timestamp = display_value('date', $msg, 'time');
         $url = '?page=message&uid='.$msg_id.'&list_path='.sprintf('pop3_%d', $msg['server_id']).'&list_parent='.$list_parent;
-        if (Hm_POP3_Seen_Cache::is_present($id)) {
+        if (Hm_POP3_Uid_Cache::is_read($id)) {
             $flags = array();
+        }
+        elseif (Hm_POP3_Uid_Cache::is_unread($id)) {
+            $flags = array('unseen');
         }
         elseif (isset($msg['date']) && $login_time && strtotime($msg['date']) <= $login_time) {
             $flags = array();

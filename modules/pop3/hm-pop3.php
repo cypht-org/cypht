@@ -108,7 +108,7 @@ class Hm_Auth_POP3 extends Hm_Auth {
  * Used to mark messages as "read"
  * @subpackage pop3/lib
  */
-class Hm_POP3_Seen_Cache {
+class Hm_POP3_Uid_Cache {
     use Hm_Uid_Cache;
 }
 
