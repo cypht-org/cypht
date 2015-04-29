@@ -134,28 +134,36 @@ class Hm_Page_Cache {
 trait Hm_Uid_Cache {
 
     /* UID list */
-    private static $uids;
+    private static $read = array();
+    private static $unread = array();
 
     /* Load UIDs from an outside source
      * @param list $uid_array of uids
      * @return void
      */
-    public static function load($uid_array) {
-        if (!empty($uid_array)) {
-            self::$uids = array_combine($uid_array, array_fill(0, count($uid_array), 0));
-        }
-        else {
-            self::$uids = array();
+    public static function load($data) {
+        if (is_array($data) && count($data) == 2) {
+            self::$read = array_combine($data[0], array_fill(0, count($data[0]), 0));
+            self::$unread = array_combine($data[1], array_fill(0, count($data[1]), 0));
         }
     }
 
     /**
-     * Determine if a UID is present
+     * Determine if a UID has been unread
      * @param string $uid UID to search for
      * @return bool true if te UID exists
      */
-    public static function is_present($uid) {
-        return array_key_exists($uid, self::$uids);
+    public static function is_unread($uid) {
+        return array_key_exists($uid, self::$unread);
+    }
+
+    /**
+     * Determine if a UID has been read
+     * @param string $uid UID to search for
+     * @return bool true if te UID exists
+     */
+    public static function is_read($uid) {
+        return array_key_exists($uid, self::$read);
     }
 
     /**
@@ -163,28 +171,29 @@ trait Hm_Uid_Cache {
      * @return array list of known UIDs
      */
     public static function dump() {
-        return array_keys(self::$uids);
+        return array(array_keys(self::$read), array_keys(self::$unread));
     }
 
     /**
-     * Add a UID to the list
+     * Add a UID to the unread list 
      * @param string $uid uid to add
      */
-    public static function add($uid) {
-        self::$uids[$uid] = 0;
+    public static function unread($uid) {
+        self::$unread[$uid] = 0;
+        if (array_key_exists($uid, self::$read)) {
+            unset(self::$read[$uid]);
+        }
     }
 
     /**
-     * Remove a UID from the list
-     * @param string $uid uid to remove
-     * @return bool true on success
+     * Add a UID to the read list 
+     * @param string $uid uid to add
      */
-    public static function remove($uid) {
-        if (array_key_exists($uid, self::$uids)) {
-            unset(self::$uids[$uid]);
-            return true;
+    public static function read($uid) {
+        self::$read[$uid] = 0;
+        if (array_key_exists($uid, self::$unread)) {
+            unset(self::$unread[$uid]);
         }
-        return false;
     }
 }
 
