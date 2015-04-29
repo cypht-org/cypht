@@ -9,6 +9,40 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * @subpackage feeds/handler
+ */
+class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
+    public function process() {
+
+        list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
+        if ($success) {
+            $id_list = explode(',', $form['message_ids']);
+            $wp_details = $this->user_config->get('wp_connect_details', array());
+            $wp_ids = array();
+            if ($action_type == 'read') {
+                foreach ($id_list as $msg_id) {
+                    if (preg_match("/^wordpress_(\d)+$/", $msg_id)) {
+                        $parts = explode('_', $msg_id, 2);
+                        $wp_ids[] = $parts[1];
+                    }
+                }
+                if (!empty($wp_ids)) {
+                    $post = array();
+                    foreach ($wp_ids as $id) {
+                        $post['counts['.$id.']'] = 5;
+                    }
+                    $url = 'https://public-api.wordpress.com/rest/v1.1/notifications/read';
+                    $res = wp_fetch_content($wp_details, $url, $post);
+                    if (!is_array($res) || !array_key_exists('success', $res) || $res['success'] != 1) {
+                        Hm_Msgs::add('ERRUnable to update read status of WordPress notification');
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
  * @subpackage wordpress/handler
  */
 class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
@@ -19,7 +53,7 @@ class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
         else {
             $path = '';
         }
-        if ($path == 'combined_inbox') {
+        if ($path == 'combined_inbox' || $path == 'unread') {
             $this->append('data_sources', array('callback' => 'load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
         }
     }
@@ -67,6 +101,7 @@ class Hm_Handler_wordpress_list_type extends Hm_Handler_Module {
                 $this->out('mailbox_list_title', array('WordPress.com Freshly Pressed'));
                 $this->append('data_sources', array('callback' => 'load_freshly_pressed', 'type' => 'wordpress', 'name' => 'WordPress.com Freshly Pressed', 'id' => 0));
             }
+            $this->out('list_path', $path);
         }
     }
 }
@@ -97,7 +132,6 @@ class Hm_Handler_wp_notification_data extends Hm_Handler_Module {
             $res = $details['notes'];
         }
         $this->out('wp_notice_data', $res);
-        //$this->out('list_path', 'wp_notifications');
     }
 }
 
@@ -262,9 +296,13 @@ class Hm_Output_filter_wp_freshly_pressed_data extends Hm_Output_Module {
 class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
     protected function output() {
         $res = array();
+        $unread_only = false;
+        if ($this->get('list_path', '') == 'unread') {
+            $unread_only = true;
+        }
         foreach ($this->get('wp_notice_data', array()) as $vals) {
             if (array_key_exists('id', $vals)) {
-                $id = $vals['id'];
+                $id = 'wordpress_'.$vals['id'];
                 $url = '?page=message&list_path=wp_notifications&uid='.$this->html_safe($id);;
                 $style = 'email';
                 $style = $this->get('news_list_style') ? 'news' : 'email';
@@ -275,8 +313,12 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 $from = ucfirst(str_replace('_', ' ', $vals['type']));
                 $ts = $vals['timestamp'];
                 $flags = array();
-                if ($vals['unread'] === "0") {
+                if ((int) $vals['unread'] > 0) {
                     $flags[] = 'unseen';
+                }
+                //TODO: time constraint for unread page
+                if ($unread_only && !in_array('unseen', $flags, true)) {
+                    continue;
                 }
                 $date = date('r', $ts);
                 if ($style == 'news') {
@@ -408,13 +450,24 @@ function wp_get_freshly_pressed($details) {
 /**
  * @subpackage wordpress/functions
  */
-function wp_fetch_content($details, $url) {
+function wp_fetch_content($details, $url, $post=array()) {
     $result = array();
     $headers = array('Authorization: Bearer ' . $details['access_token']);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+    if (!empty($post)) {
+        $post_tmp = array();
+        foreach ($post as $name => $value) {
+            $post_tmp[] = urlencode($name).'='.urlencode($value);
+        }
+        $post_str = implode('&', $post_tmp);
+        curl_setopt($ch,CURLOPT_POST, count($post));
+        curl_setopt($ch,CURLOPT_POSTFIELDS, $post_str);
+    }
+
     $curl_result = curl_exec($ch);
     if (substr($curl_result, 0, 1) == '{') {
         $result = @json_decode($curl_result, true);
