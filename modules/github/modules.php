@@ -27,7 +27,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
             $id_list = explode(',', $form['message_ids']);
             Hm_Github_Uid_Cache::load($this->session->get('github_read_uids', array()));
             foreach ($id_list as $msg_id) {
-                if (preg_match("/^github_0_(\d)+$/", $msg_id)) {
+                if (preg_match("/^github_(\d)+_(\d)+$/", $msg_id)) {
                     $parts = explode('_', $msg_id, 3);
                     $guid = $parts[2];
                     switch($form['action_type']) {
@@ -236,6 +236,7 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $form['github_repo']);
                 $this->out('github_data', github_fetch_content($details, $url));
                 $this->out('github_data_source', $form['github_repo']);
+                $this->out('github_data_source_id', array_search($form['github_repo'], $repos, true));
             }
             if (array_key_exists('list_path', $this->request->get)) {
                 $this->out('list_path', $this->request->get['list_path'], false);
@@ -317,10 +318,11 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
         if ($this->get('list_path', '') == 'unread') {
             $unread_only = true;
         }
+        $repo_id = $this->get('github_data_source_id');
+        $repo = $this->get('github_data_source', 'Github');
         foreach ($this->get('github_data', array()) as $event) {
-            $id = 'github_0_'.$event['id'];
+            $id = 'github_'.$repo_id.'_'.$event['id'];
             $subject = build_github_subject($event, $this);
-            $repo = $this->get('github_data_source', 'Github');
             $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
             $from = $event['actor']['login'];
             $ts = strtotime($event['created_at']);
@@ -377,6 +379,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             }
         }
         $this->out('formatted_message_list', $res);
+        $this->out('github_server_id', $repo_id);
     }
 }
 

@@ -46,6 +46,7 @@ return array(
     ),
     'allowed_output' => array(
         'github_msg_text' => array(FILTER_UNSAFE_RAW, false),
+        'github_server_id' => array(FILTER_VALIDATE_INT, false),
     ),
     'allowed_post' => array(
         'github_uid' => FILTER_SANITIZE_STRING,
