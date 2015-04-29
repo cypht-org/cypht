@@ -34,6 +34,10 @@ var display_wp_notice = function(res) {
     $('.msg_text').html('');
     $('.msg_text').append(res.wp_notice_headers);
     $('.msg_text').append(res.wp_notice_text);
+    var path = hm_list_path();
+    var uid = hm_msg_uid();
+    Hm_Message_List.track_read_messages(path+'_'+uid);
+
 };
 
 if (hm_page_name() == 'message_list') {

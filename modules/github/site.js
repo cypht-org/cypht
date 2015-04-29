@@ -30,6 +30,9 @@ var github_item_view = function() {
 
 var display_github_item_content = function(res) {
     $('.msg_text').html(res.github_msg_text);
+    var path = hm_list_path();
+    var uid = hm_msg_uid();
+    Hm_Message_List.track_read_messages(path+'_'+uid);
 };
 
 if (hm_page_name() == 'servers') {
