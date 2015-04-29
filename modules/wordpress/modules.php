@@ -19,7 +19,7 @@ class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
             $id_list = explode(',', $form['message_ids']);
             $wp_details = $this->user_config->get('wp_connect_details', array());
             $wp_ids = array();
-            if ($action_type == 'read') {
+            if ($form['action_type'] == 'read') {
                 foreach ($id_list as $msg_id) {
                     if (preg_match("/^wordpress_(\d)+$/", $msg_id)) {
                         $parts = explode('_', $msg_id, 2);
@@ -90,18 +90,20 @@ class Hm_Handler_wordpress_list_type extends Hm_Handler_Module {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if ($path == 'wp_notifications') {
-                $this->out('list_path', 'wp_notifications');
+                $this->out('list_path', 'wp_notifications', false);
                 $this->out('list_parent', 'wp_notifications');
                 $this->out('mailbox_list_title', array('WordPress.com Notifications'));
                 $this->append('data_sources', array('callback' => 'load_wp_notices', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
             }
             elseif ($path == 'wp_freshly_pressed') {
-                $this->out('list_path', 'wp_freshly_pressed');
+                $this->out('list_path', 'wp_freshly_pressed', false);
                 $this->out('list_parent', 'wp_freshly_pressed');
                 $this->out('mailbox_list_title', array('WordPress.com Freshly Pressed'));
                 $this->append('data_sources', array('callback' => 'load_freshly_pressed', 'type' => 'wordpress', 'name' => 'WordPress.com Freshly Pressed', 'id' => 0));
             }
-            $this->out('list_path', $path);
+            else {
+                $this->out('list_path', $path, false);
+            }
         }
     }
 }
