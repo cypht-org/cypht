@@ -134,6 +134,9 @@ class Hm_Handler_wp_notification_data extends Hm_Handler_Module {
             $res = $details['notes'];
         }
         $this->out('wp_notice_data', $res);
+        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'unread') {
+            $this->out('wp_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE)));
+        }
     }
 }
 
@@ -302,6 +305,13 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
         if ($this->get('list_path', '') == 'unread') {
             $unread_only = true;
         }
+        $cutoff = $this->get('wp_list_since', '');
+        if ($cutoff) {
+            $cutoff = strtotime($cutoff);
+        }
+        else {
+            $cutoff = 0;
+        }
         foreach ($this->get('wp_notice_data', array()) as $vals) {
             if (array_key_exists('id', $vals)) {
                 $id = 'wordpress_0_'.$vals['id'];
@@ -314,11 +324,13 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 $subject = html_entity_decode($vals['subject']['text']);
                 $from = ucfirst(str_replace('_', ' ', $vals['type']));
                 $ts = $vals['timestamp'];
+                if ($ts < $cutoff) {
+                    continue;
+                }
                 $flags = array();
                 if ((int) $vals['unread'] > 0) {
                     $flags[] = 'unseen';
                 }
-                //TODO: time constraint for unread page
                 if ($unread_only && !in_array('unseen', $flags, true)) {
                     continue;
                 }
