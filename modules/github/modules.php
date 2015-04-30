@@ -239,6 +239,9 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                 $this->out('github_data_source_id', array_search($form['github_repo'], $repos, true));
             }
             if (array_key_exists('list_path', $this->request->get)) {
+                if ($this->request->get['list_path'] == 'unread') {
+                    $this->out('github_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE)));
+                }
                 $this->out('list_path', $this->request->get['list_path'], false);
             }
             else {
@@ -320,12 +323,22 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
         }
         $repo_id = $this->get('github_data_source_id');
         $repo = $this->get('github_data_source', 'Github');
+        $cutoff = $this->get('github_list_since', '');
+        if ($cutoff) {
+            $cutoff = strtotime($cutoff);
+        }
+        else {
+            $cutoff = 0;
+        }
         foreach ($this->get('github_data', array()) as $event) {
             $id = 'github_'.$repo_id.'_'.$event['id'];
             $subject = build_github_subject($event, $this);
             $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
             $from = $event['actor']['login'];
             $ts = strtotime($event['created_at']);
+            if ($ts < $cutoff) {
+                continue;
+            }
             if (Hm_Github_Uid_Cache::is_read($event['id'])) {
                 $flags = array();
             }
@@ -338,12 +351,9 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             else {
                 $flags = array('unseen');
             }
-            //TODO: time constraint for unread page
             if ($unread_only && !in_array('unseen', $flags)) {
                 continue;
             }
-            elog($flags);
-            elog($event['id']);
             $date = date('r', $ts);
             $style = $this->get('news_list_style') ? 'news' : 'email';
             if ($this->get('is_mobile')) {
