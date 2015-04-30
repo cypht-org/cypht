@@ -4,15 +4,14 @@ body { padding: 0px; margin: 0px; font-family: Sans-Serif; width: 100%; backgrou
 h1 { text-shadow: 1px -1px 0px #999; margin: 0px; padding: 0px; font-size: 90px; text-align: left; color: #fff; letter-spacing: -2px; text-align: center; padding-top: 20px; padding-bottom: 20px; }
 .selected { color: #333 !important; }
 .para {clear: both; max-width: 40em; margin: 0px; margin-left: auto; margin-right: auto; padding: 20px; padding-left: 30px; font-size: 12pt; min-height: 400px; line-height: 20pt; color: #666; margin-top: 20px; padding-bottom: 60px; }
+.inner {clear: both; max-width: 40em; margin: 0px; margin-left: auto; margin-right: auto; }
 li { margin-bottom: 10px; margin-right: 15px; list-style-type: none; }
-.links a { color: #aaa; letter-spacing: 0px; font-variant: small-caps; text-transform: lowercase; font-size: 110%; padding-left: 10px; padding-right: 10px; }
+.links a { color: #aaa; letter-spacing: 0px; font-variant: small-caps; text-transform: lowercase; font-size: 110%; margin-left: 10px; margin-right: 10px; float: left; margin: 10px; display: block; }
 .footer { text-align: center; margin-bottom: 20px; margin-top: 20px; }
 .footer a { color: #ccc !important; }
 blockquote { font-style: italic; color: #666; }
 .homepage_title { font-size: 60pt; text-align: center; color: #666; letter-spacing: -2px; height: 100%; padding: 50px; }
 h1 span { margin-right: 2px; vertical-align: -2px; }
-.inner { padding: 0px; background-color: #fff; }
-.links { text-shadow: none; text-align: left; padding: 0px; padding-top: 5px; text-align: center; font-size: 14pt; font-weight: normal; }
 .aft { background-color: #bbb; border-radius: 10px 0px 0px 0px }
 .for { background-color: #bbb; border-radius: 0px 10px 0px 0px }
 ul { margin: 0px; }
@@ -20,9 +19,9 @@ ul li:before { margin-left: -2em; color: #aaa; content: '\229A'; padding-right: 
 .para a { color: #111 !important; }
 .e_hl { color: #999; }
 .screenshot { box-shadow: 5px 5px 7px #ccc; border: solid 1px #ddd; }
-@media screen and (max-device-width:480px) and (orientation : portrait) {
-    .screenshot: max-width: 320px;
+@media screen and (max-device-width:320px) {
+    .screenshot { max-width: 288px; }
 }
-figcaption { text-align: center; padding-bottom: 15px; font-size: 90%; font-style: italic; }
+.caption { text-align: center; padding-bottom: 15px; font-size: 90%; font-style: italic; }
 h3 { margin: 10px; margin-left: 0px; margin-top: 30px; padding: 0px; }
 .top { margin-top: 0px !important; }
