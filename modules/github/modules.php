@@ -256,9 +256,9 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
  */
 class Hm_Handler_github_list_type extends Hm_Handler_Module {
     public function process() {
+        $repos = $this->user_config->get('github_repos', array());
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
-            $repos = $this->user_config->get('github_repos', array());
             if (preg_match("/^github_(.+)$/", $path)) {
                 if ($path == 'github_all') {
                     $this->out('list_path', 'github_all', false);
@@ -280,6 +280,11 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                 foreach ($repos as $repo) {
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
+            }
+        }
+        else {
+            foreach ($repos as $repo) {
+                //$this->append('data_sources', array('callback' => 'load_github_data', 'group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
             }
         }
     }
