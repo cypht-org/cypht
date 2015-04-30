@@ -2,9 +2,6 @@
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #aaa; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
 .save_settings, .server_link { line-height: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #ddd; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; border-radius: 3px; }
-.message_table td { padding: 5px; padding-left: 10px; padding-top: 5px; padding-bottom: 3px; color: #333; border-bottom: solid 1px #eee; }
-.message_table { table-layout: fixed; width: 100%; padding: 20px; padding-top: 15px; padding-bottom: 40px; padding-left: 20px; }
-.message_table th:hover { color: #000; }
 .subject div, .msg_date, .from, .source { overflow: hidden; color: #333; text-overflow: ellipsis; white-space: nowrap; }
 .subject { cursor: pointer; font-size: 110%; }
 .subject a { color: #333 !important; }
