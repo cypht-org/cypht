@@ -302,9 +302,6 @@ function Message_List() {
             else {
                 parts = [id, false];
             }
-        if (type == 'github_all') {
-            elog('tr[class^='+type+'_'+parts[0]+'_]');
-        }
             $('tr[class^='+type+'_'+parts[0]+'_]', msg_rows).filter(function() {
                 var id = this.className;
                 if (!parts[1] || parts[1].exec(id)) {
