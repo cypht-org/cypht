@@ -61,7 +61,7 @@ function compress($string, $command) {
         return join('', $output);
     }
     else {
-        return preg_replace("/\s+/", ' ', $string);
+        return str_replace('\\\\', '\\', $string); //preg_replace("/\s{2,}/", ' ', $string);
     }
 }
 
@@ -114,7 +114,7 @@ function get_module_assignments($settings) {
                 $filters = Hm_Module_Exec::merge_filters($filters, require sprintf("modules/%s/setup.php", $mod));
             }
             if (is_readable(sprintf("modules/%s/assets/", $mod))) {
-                $assets[] = sprintf("modules/%s/assets/", $mod);
+                $assets[] = sprintf("modules/%s/assets", $mod);
             }
         }
     }
@@ -184,15 +184,31 @@ function create_production_site($assets, $settings) {
     $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
     file_put_contents('site/index.php', $index_file);
     foreach ($assets as $path) {
-        if (!is_readable('site/'.$path)) {
-            mkdir('site/'.$path, 0755, true);
+        copy_recursive($path);
+    }
+}
+
+/**
+ * Recursively copy files
+ * @param string $path file path with no trailing slash
+ * @return void
+ */
+function copy_recursive($path) {
+    $path .= '/';
+    if (!is_readable('site/'.$path)) {
+        mkdir('site/'.$path, 0755, true);
+    }
+    foreach (scandir($path) as $file) {
+        if (in_array($file, array('.', '..'), true)) {
+            continue;
         }
-        foreach (scandir($path) as $file) {
-            if (in_array($file, array('.', '..'), true)) {
-                continue;
-            }
+        elseif (is_dir($path.$file)) {
+            copy_recursive($path.$file);
+        }
+        else {
             copy($path.$file, 'site/'.$path.$file);
         }
     }
 }
+
 ?>
