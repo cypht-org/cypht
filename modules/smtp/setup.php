@@ -18,6 +18,9 @@ add_handler('servers', 'save_smtp_servers', true, 'smtp', 'add_smtp_servers_to_p
 add_output('servers', 'add_smtp_server_dialog', true, 'smtp', 'server_content_start', 'after');
 add_output('servers', 'display_configured_smtp_servers', true, 'smtp', 'add_smtp_server_dialog', 'after');
 
+add_handler('settings', 'process_compose_type', true, 'smtp', 'save_user_settings', 'before');
+add_output('settings', 'compose_type_setting', true, 'smtp', 'start_general_settings', 'after');
+
 /* ajax server setup callback data */
 add_handler('ajax_smtp_debug', 'login', false, 'core');
 add_handler('ajax_smtp_debug', 'load_user_data',  true, 'core');
@@ -49,6 +52,7 @@ return array(
         'ajax_smtp_save_draft',
     ),
     'allowed_post' => array(
+        'smtp_compose_type_setting' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_SANITIZE_STRING,
         'new_smtp_address' => FILTER_SANITIZE_STRING,
         'new_smtp_port' => FILTER_SANITIZE_STRING,
