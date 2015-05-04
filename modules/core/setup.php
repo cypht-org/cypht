@@ -179,10 +179,6 @@ return array(
         'msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),
-        'reply_body' => array(FILTER_UNSAFE_RAW, false),
-        'reply_subject' => array(FILTER_SANITIZE_STRING, false),
-        'reply_to' => array(FILTER_UNSAFE_RAW, false),
-
     ),
     'allowed_cookie' => array(
         'PHPSESSID' => FILTER_SANITIZE_STRING,
@@ -219,8 +215,6 @@ return array(
         'search_terms' => FILTER_SANITIZE_STRING,
         'search_since' => FILTER_SANITIZE_STRING,
         'search_fld' => FILTER_SANITIZE_STRING,
-        'reply_uid' => FILTER_VALIDATE_INT,
-        'reply_source' => FILTER_SANITIZE_STRING
     ),
 
     'allowed_post' => array(
@@ -250,7 +244,6 @@ return array(
         'message_ids' => FILTER_SANITIZE_STRING,
         'action_type' => FILTER_SANITIZE_STRING,
         'message_list_since' => FILTER_SANITIZE_STRING,
-        'reply_format' => FILTER_VALIDATE_INT,
     )
 );
 
