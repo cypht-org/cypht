@@ -309,7 +309,8 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
  */
 class Hm_Output_github_folders extends Hm_Output_Module {
     protected function output() {
-        if (!empty($this->get('github_connect_details', array()))) {
+        $details = $this->get('github_connect_details', array());
+        if (!empty($details)) {
             $res = '<li class="menu_github_all"><a class="unread_link" href="?page=message_list&list_path=github_all">'.
                 '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
                 '" alt="" width="16" height="16" /> '.$this->trans('All').'</a></li>';
@@ -421,7 +422,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
 class Hm_Output_github_add_repo extends Hm_Output_Module {
     protected function output() {
         $res = '';
-        if (!empty($this->get('github_connect_details', array()))) {
+        $details = $this->get('github_connect_details', array());
+        if (!empty($details)) {
             $res = '<div class="configured_server"><div class="subtitle">'.$this->trans('Add a Repository').'</div>'.
                 '<form method="POST">'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.

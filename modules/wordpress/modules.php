@@ -216,7 +216,8 @@ class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
  */
 class Hm_Output_wordpress_folders extends Hm_Output_Module {
     protected function output() {
-        if (!empty($this->get('wp_connect_details', array()))) {
+        $details = $this->get('wp_connect_details', array());
+        if (!empty($details)) {
             $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">'.
                 '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
                 '" alt="" width="16" height="16" /> '.$this->trans('Notifications').'</a></li>';
