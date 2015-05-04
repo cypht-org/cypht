@@ -619,13 +619,7 @@ function Message_List() {
         var current = $('<div></div>').append(list).find('.'+Hm_Utils.clean_selector(class_name));
         var prev = current.prev();
         var next = current.next();
-        var header_links = $('.header_links');
-        if (header_links.length) {
-            target = header_links.parent();
-        }
-        else {
-            target = $('.msg_headers tr').last();
-        }
+        target = $('.msg_headers tr').last();
         if (prev.length) {
             href = prev.find('.subject').find('a').prop('href');
             plink = '<a class="plink" href="'+href+'"><div class="prevnext prev_img"></div> '+prev.find('.subject').text()+'</a>';
@@ -771,13 +765,13 @@ var Hm_Folders = {
         var path = hm_list_path();
         $('.folder_list').find('*').removeClass('selected_menu');
         if (path.length) {
-            if (page == 'message_list' || page == 'message') {
-                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
-                $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
-            }
-            else if (hm_list_parent()) {
+            if (hm_list_parent()) {
                 $('a', $('.'+Hm_Utils.clean_selector(hm_list_parent()))).addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(hm_list_parent())).addClass('selected_menu');
+            }
+            else if (page == 'message_list' || page == 'message') {
+                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
+                $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
             }
             else {
                 $('.menu_'+path).addClass('selected_menu');
