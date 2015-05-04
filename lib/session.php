@@ -265,6 +265,7 @@ class Hm_PHP_Session extends Hm_Session {
                 $this->loaded = true;
                 $this->start($request);
                 $this->set_fingerprint($request);
+                $this->save_auth_detail();
                 $this->just_started();
             }
             else {
@@ -292,6 +293,14 @@ class Hm_PHP_Session extends Hm_Session {
     public function auth($user, $pass) {
         $this->load_auth_mech();
         return $this->auth_mech->check_credentials($user, $pass);
+    }
+
+    /**
+     * Save auth detail if i'ts needed (mech specific)
+     * @return void
+     */
+    public function save_auth_detail() {
+        $this->auth_mech->save_auth_detail($this);
     }
 
     /**

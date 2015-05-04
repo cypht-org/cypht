@@ -9,57 +9,6 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * Authenticate against an IMAP server
- * @subpackage imap/lib
- */
-class Hm_Auth_IMAP extends Hm_Auth {
-
-    /* IMAP authentication server settings */
-    private $imap_settings = array();
-
-    /**
-     * Send the username and password to the configured IMAP server for authentication
-     * @param string $user username
-     * @param string $pass password
-     * @return bool true if authentication worked
-     */
-    public function check_credentials($user, $pass) {
-        $imap = new Hm_IMAP();
-        list($server, $port, $tls) = $this->get_imap_config();
-        if ($user && $pass && $server && $port) {
-            $this->imap_settings = array(
-                'server' => $server,
-                'port' => $port,
-                'tls' => $tls,
-                'username' => $user,
-                'password' => $pass,
-                'no_caps' => true,
-                'blacklisted_extensions' => array('enable')
-            );
-            $imap->connect($this->imap_settings);
-        }
-        if ($imap->get_state() == 'authenticated') {
-            return true;
-        }
-        else {
-            Hm_Msgs::add("Invalid username or password");
-        }
-        return false;
-    }
-
-    /**
-     * Get IMAP server details from the site config
-     * @return array list of required details
-     */
-    private function get_imap_config() {
-        $server = $this->site_config->get('imap_auth_server', false);
-        $port = $this->site_config->get('imap_auth_port', false);
-        $tls = $this->site_config->get('imap_auth_tls', false);
-        return array($server, $port, $tls);
-    }
-}
-
-/**
  * IMAP connection manager
  * @subpackage imap/lib
  */
