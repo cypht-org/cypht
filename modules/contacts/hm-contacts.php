@@ -215,12 +215,4 @@ class Hm_Contact_Store_Test extends Hm_Contact_Store {
     }
 }
 
-//$test = new Hm_Contact_Store_Test('email_address');
-//$test->load(false);
-//elog($test->search(array('email_address' => 'user1')));
-//$data = $test->export();
-//$new = new Hm_Contact_Store_Test('email_address', 'is_email');
-//$new->import($data);
-//elog($new->dump());
-
 ?>

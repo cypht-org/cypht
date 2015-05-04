@@ -843,9 +843,10 @@ class Hm_Output_login extends Hm_Output_Module {
                 ' <input type="submit" value="'.$this->trans('Login').'" /></form>';
         }
         else {
+            $settings = $this->get('changed_settings', array());
             return '<form class="logout_form" method="POST">'.
                 '<input type="hidden" id="unsaved_changes" value="'.
-                (!empty($this->get('changed_settings', array())) ? '1' : '0').'" />'.
+                (!empty($settings) ? '1' : '0').'" />'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').' &nbsp;'.
@@ -1847,10 +1848,12 @@ class Hm_Output_message_start extends Hm_Output_Module {
                 $page = 'message_list';
             }
             $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
-            if (count($this->get('mailbox_list_title', array())) > 1) {
+            if (count($this->get('mailbox_list_title', array())) > 0) {
                 $mb_title = $this->get('mailbox_list_title', array());
                 $title .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
-                    '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.$this->trans($mb_title[1]).'</a>';
+                    '<a href="?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
+                implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />',
+                    array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()))).'</a>';
             }
         }
         elseif ($this->get('mailbox_list_title')) {
