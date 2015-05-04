@@ -513,7 +513,9 @@
 			<ul>
 				<li><a href="class-Hm_Auth.html">Hm_Auth</a></li>
 				<li class="active"><a href="class-Hm_Auth_DB.html">Hm_Auth_DB</a></li>
+				<li><a href="class-Hm_Auth_IMAP.html">Hm_Auth_IMAP</a></li>
 				<li><a href="class-Hm_Auth_None.html">Hm_Auth_None</a></li>
+				<li><a href="class-Hm_Auth_POP3.html">Hm_Auth_POP3</a></li>
 			</ul>
 
 
@@ -602,7 +604,7 @@
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.auth.html">auth</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Auth_DB.html#68-167" title="Go to source code">auth.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Auth_DB.html#76-175" title="Go to source code">auth.php</a>
 		<br>
 	</div>
 
@@ -622,7 +624,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_check_credentials">#</a>
-		<code><a href="source-class-Hm_Auth_DB.html#76-94" title="Go to source code">check_credentials</a>( <span>string <var>$user</var></span>, <span>string <var>$pass</var></span> )</code>
+		<code><a href="source-class-Hm_Auth_DB.html#84-102" title="Go to source code">check_credentials</a>( <span>string <var>$user</var></span>, <span>string <var>$pass</var></span> )</code>
 
 		<div class="description short">
 			<p>Send the username and password to the configured DB for authentication</p>
@@ -663,7 +665,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_delete">#</a>
-		<code><a href="source-class-Hm_Auth_DB.html#96-109" title="Go to source code">delete</a>( <span>string <var>$user</var></span> )</code>
+		<code><a href="source-class-Hm_Auth_DB.html#104-117" title="Go to source code">delete</a>( <span>string <var>$user</var></span> )</code>
 
 		<div class="description short">
 			<p>Delete a user account from the db</p>
@@ -702,7 +704,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_connect">#</a>
-		<code><a href="source-class-Hm_Auth_DB.html#111-121" title="Go to source code">connect</a>( )</code>
+		<code><a href="source-class-Hm_Auth_DB.html#119-129" title="Go to source code">connect</a>( )</code>
 
 		<div class="description short">
 			<p>Create a new or re-use an existing DB connection</p>
@@ -736,7 +738,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_change_pass">#</a>
-		<code><a href="source-class-Hm_Auth_DB.html#123-138" title="Go to source code">change_pass</a>( <span>string <var>$user</var></span>, <span>string <var>$pass</var></span> )</code>
+		<code><a href="source-class-Hm_Auth_DB.html#131-146" title="Go to source code">change_pass</a>( <span>string <var>$user</var></span>, <span>string <var>$pass</var></span> )</code>
 
 		<div class="description short">
 			<p>Change the password for a user in the DB</p>
@@ -777,7 +779,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_create">#</a>
-		<code><a href="source-class-Hm_Auth_DB.html#140-166" title="Go to source code">create</a>( <span>object <var>$user</var></span>, <span>string <var>$pass</var></span>, <span>string <var>$pass</var>,…</span> )</code>
+		<code><a href="source-class-Hm_Auth_DB.html#148-174" title="Go to source code">create</a>( <span>object <var>$user</var></span>, <span>string <var>$pass</var></span>, <span>string <var>$pass</var>,…</span> )</code>
 
 		<div class="description short">
 			<p>Create a new user in the DB</p>
@@ -814,7 +816,8 @@
 	<caption>Methods inherited from <a href="class-Hm_Auth.html#methods">Hm_Auth</a></caption>
 	<tr>
 		<td><code>
-			<a href="class-Hm_Auth.html#___construct">__construct()</a>
+			<a href="class-Hm_Auth.html#___construct">__construct()</a>, 
+			<a href="class-Hm_Auth.html#_save_auth_detail">save_auth_detail()</a>
 		</code></td>
 	</tr>
 	</table>
@@ -838,7 +841,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Auth_DB.html#74" title="Go to source code"><var>$internal_users</var></a>
+				<a href="source-class-Hm_Auth_DB.html#82" title="Go to source code"><var>$internal_users</var></a>
 
 			<div class="description short">
 				

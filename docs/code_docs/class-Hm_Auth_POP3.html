@@ -511,10 +511,11 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
+				<li><a href="class-Hm_Auth.html">Hm_Auth</a></li>
+				<li><a href="class-Hm_Auth_DB.html">Hm_Auth_DB</a></li>
+				<li><a href="class-Hm_Auth_IMAP.html">Hm_Auth_IMAP</a></li>
+				<li><a href="class-Hm_Auth_None.html">Hm_Auth_None</a></li>
 				<li class="active"><a href="class-Hm_Auth_POP3.html">Hm_Auth_POP3</a></li>
-				<li><a href="class-Hm_POP3.html">Hm_POP3</a></li>
-				<li><a href="class-Hm_POP3_List.html">Hm_POP3_List</a></li>
-				<li><a href="class-Hm_POP3_Seen_Cache.html">Hm_POP3_Seen_Cache</a></li>
 			</ul>
 
 
@@ -601,9 +602,9 @@
 		
 		
 		
-		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.pop3.html">pop3</a>\<a href="package-modules.pop3.lib.html">lib</a><br>
+		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.auth.html">auth</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Auth_POP3.html#53-105" title="Go to source code">pop3/hm-pop3.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Auth_POP3.html#233-292" title="Go to source code">auth.php</a>
 		<br>
 	</div>
 
@@ -623,7 +624,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_check_credentials">#</a>
-		<code><a href="source-class-Hm_Auth_POP3.html#62-93" title="Go to source code">check_credentials</a>( <span> <var>$user</var></span>, <span> <var>$pass</var></span> )</code>
+		<code><a href="source-class-Hm_Auth_POP3.html#241-271" title="Go to source code">check_credentials</a>( <span> <var>$user</var></span>, <span> <var>$pass</var></span> )</code>
 
 		<div class="description short">
 			<p>Send the username and password to the configured POP3 server for authentication</p>
@@ -664,7 +665,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_pop3_config">#</a>
-		<code><a href="source-class-Hm_Auth_POP3.html#95-104" title="Go to source code">get_pop3_config</a>( )</code>
+		<code><a href="source-class-Hm_Auth_POP3.html#273-282" title="Go to source code">get_pop3_config</a>( )</code>
 
 		<div class="description short">
 			<p>Get POP3 server details from the site config</p>
@@ -682,6 +683,43 @@
 
 
 
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="save_auth_detail" id="_save_auth_detail">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_save_auth_detail">#</a>
+		<code><a href="source-class-Hm_Auth_POP3.html#284-291" title="Go to source code">save_auth_detail</a>( <span>object <var>$session</var></span> )</code>
+
+		<div class="description short">
+			<p>Save POP3 server details</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Save POP3 server details</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$session</var></dt>
+					<dd>session object</dd>
+				</dl></div>
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Hm_Auth.html#_save_auth_detail">Hm_Auth::save_auth_detail()</a></code></div>
 
 		</div>
 		</div></td>
@@ -716,7 +754,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Auth_POP3.html#60" title="Go to source code"><var>$pop3_settings</var></a>
+				<a href="source-class-Hm_Auth_POP3.html#239" title="Go to source code"><var>$pop3_settings</var></a>
 
 			<div class="description short">
 				

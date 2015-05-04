@@ -585,9 +585,9 @@
 
 	<div>
 		<h4>Direct Known Users</h4>
-			<a href="class-Hm_Feed_Seen_Cache.html">Hm_Feed_Seen_Cache</a>, 
-			<a href="class-Hm_Github_Seen_Cache.html">Hm_Github_Seen_Cache</a>, 
-			<a href="class-Hm_POP3_Seen_Cache.html">Hm_POP3_Seen_Cache</a>
+			<a href="class-Hm_Feed_Uid_Cache.html">Hm_Feed_Uid_Cache</a>, 
+			<a href="class-Hm_Github_Uid_Cache.html">Hm_Github_Uid_Cache</a>, 
+			<a href="class-Hm_POP3_Uid_Cache.html">Hm_POP3_Uid_Cache</a>
 	</div>
 
 
@@ -597,7 +597,7 @@
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.cache.html">cache</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Uid_Cache.html#128-189" title="Go to source code">cache.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Uid_Cache.html#128-198" title="Go to source code">cache.php</a>
 		<br>
 	</div>
 
@@ -617,7 +617,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_load">#</a>
-		<code><a href="source-class-Hm_Uid_Cache.html#143-150" title="Go to source code">load</a>( <span> <var>$uid_array</var></span> )</code>
+		<code><a href="source-class-Hm_Uid_Cache.html#144-149" title="Go to source code">load</a>( <span> <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
@@ -635,7 +635,7 @@
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="is_present" id="_is_present">
+	<tr data-order="is_unread" id="_is_unread">
 
 		<td class="attributes"><code>
 			 public static
@@ -646,15 +646,54 @@
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_is_present">#</a>
-		<code><a href="source-class-Hm_Uid_Cache.html#152-159" title="Go to source code">is_present</a>( <span>string <var>$uid</var></span> )</code>
+		<a class="anchor" href="#_is_unread">#</a>
+		<code><a href="source-class-Hm_Uid_Cache.html#151-158" title="Go to source code">is_unread</a>( <span>string <var>$uid</var></span> )</code>
 
 		<div class="description short">
-			<p>Determine if a UID is present</p>
+			<p>Determine if a UID has been unread</p>
 		</div>
 
 		<div class="description detailed hidden">
-			<p>Determine if a UID is present</p>
+			<p>Determine if a UID has been unread</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$uid</var></dt>
+					<dd>UID to search for</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					boolean<br>true if te UID exists
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="is_read" id="_is_read">
+
+		<td class="attributes"><code>
+			 public static
+
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_is_read">#</a>
+		<code><a href="source-class-Hm_Uid_Cache.html#160-167" title="Go to source code">is_read</a>( <span>string <var>$uid</var></span> )</code>
+
+		<div class="description short">
+			<p>Determine if a UID has been read</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Determine if a UID has been read</p>
 
 
 				<h4>Parameters</h4>
@@ -686,7 +725,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_dump">#</a>
-		<code><a href="source-class-Hm_Uid_Cache.html#161-167" title="Go to source code">dump</a>( )</code>
+		<code><a href="source-class-Hm_Uid_Cache.html#169-175" title="Go to source code">dump</a>( )</code>
 
 		<div class="description short">
 			<p>Return all the UIDs</p>
@@ -708,7 +747,7 @@
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="add" id="_add">
+	<tr data-order="unread" id="_unread">
 
 		<td class="attributes"><code>
 			 public static
@@ -719,15 +758,15 @@
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_add">#</a>
-		<code><a href="source-class-Hm_Uid_Cache.html#169-175" title="Go to source code">add</a>( <span>string <var>$uid</var></span> )</code>
+		<a class="anchor" href="#_unread">#</a>
+		<code><a href="source-class-Hm_Uid_Cache.html#177-186" title="Go to source code">unread</a>( <span>string <var>$uid</var></span> )</code>
 
 		<div class="description short">
-			<p>Add a UID to the list</p>
+			<p>Add a UID to the unread list</p>
 		</div>
 
 		<div class="description detailed hidden">
-			<p>Add a UID to the list</p>
+			<p>Add a UID to the unread list</p>
 
 
 				<h4>Parameters</h4>
@@ -743,38 +782,34 @@
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="remove" id="_remove">
+	<tr data-order="read" id="_read">
 
 		<td class="attributes"><code>
 			 public static
 
-			boolean
+			
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_remove">#</a>
-		<code><a href="source-class-Hm_Uid_Cache.html#177-188" title="Go to source code">remove</a>( <span>string <var>$uid</var></span> )</code>
+		<a class="anchor" href="#_read">#</a>
+		<code><a href="source-class-Hm_Uid_Cache.html#188-197" title="Go to source code">read</a>( <span>string <var>$uid</var></span> )</code>
 
 		<div class="description short">
-			<p>Remove a UID from the list</p>
+			<p>Add a UID to the read list</p>
 		</div>
 
 		<div class="description detailed hidden">
-			<p>Remove a UID from the list</p>
+			<p>Add a UID to the read list</p>
 
 
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$uid</var></dt>
-					<dd>uid to remove</dd>
+					<dd>uid to add</dd>
 				</dl></div>
 
-				<h4>Returns</h4>
-				<div class="list">
-					boolean<br>true on success
-				</div>
 
 
 
@@ -797,14 +832,14 @@
 
 	<table class="summary properties" id="properties">
 	<caption>Properties summary</caption>
-	<tr data-order="uids" id="$uids">
+	<tr data-order="read" id="$read">
 		<td class="attributes"><code>
 			private static 
-			
+			array
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Uid_Cache.html#137" title="Go to source code"><var>$uids</var></a>
+				<a href="source-class-Hm_Uid_Cache.html#137" title="Go to source code"><var>$read</var></a>
 
 			<div class="description short">
 				
@@ -817,8 +852,33 @@
 		</td>
 		<td class="value">
 			<div>
-				<a href="#$uids" class="anchor">#</a>
-				<code></code>
+				<a href="#$read" class="anchor">#</a>
+				<code><span class="php-keyword1">array</span>()</code>
+			</div>
+		</td>
+	</tr>
+	<tr data-order="unread" id="$unread">
+		<td class="attributes"><code>
+			private static 
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Uid_Cache.html#138" title="Go to source code"><var>$unread</var></a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#$unread" class="anchor">#</a>
+				<code><span class="php-keyword1">array</span>()</code>
 			</div>
 		</td>
 	</tr>
