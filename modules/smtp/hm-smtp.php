@@ -594,15 +594,20 @@ class Hm_SMTP {
  */
 class Hm_MIME_Msg {
     private $headers = array('MIME-Version' => '1.0');
+    private $boundary = '';
     private $body = '';
+    private $text_body = '';
+    private $html = false;
     private $allow_unqualified_addresses = false;
 
     /* build mime message data */
-    function __construct($to, $subject, $body, $from) {
+    function __construct($to, $subject, $body, $from, $html=false) {
         $this->headers['To'] = $this->encode_header_fld($to);
         $this->headers['Subject'] = $this->encode_header_fld($subject);
         $this->headers['Date'] = date('r');
         $this->headers['Message-ID'] = '<'.md5(uniqid(rand(),1)).'@'.php_uname('n').'>';
+        $this->boundary = Hm_Crypt::unique_id(32);
+        $this->html = $html;
         $this->body = $this->prep_message_body($body);
     }
 
@@ -611,6 +616,9 @@ class Hm_MIME_Msg {
         $res = '';
         foreach ($this->headers as $name => $val) {
             $res .= sprintf("%s: %s\r\n", $name, $val);
+        }
+        if ($this->html) {
+            $res .= $this->text_body;
         }
         return $res."\r\n".$this->body;
     }
@@ -756,9 +764,7 @@ class Hm_MIME_Msg {
         return $res;
     }
 
-    function prep_message_body($body) {
-        $message = mb_convert_encoding(trim($body), "HTML-ENTITIES", "UTF-8");
-        $message = mb_convert_encoding($message, "UTF-8", "HTML-ENTITIES");
+    function format_message_text($body) {
         $message = trim($body);
         $message = str_replace("\r\n", "\n", $message);
         $lines = explode("\n", $message);
@@ -767,10 +773,27 @@ class Hm_MIME_Msg {
             $line = trim($line, "\r\n")."\r\n";
             $new_lines[] = preg_replace("/^\.\r\n/", "..\r\n", $line);
         }
-        $this->headers['Content-Type'] = 'text/plain; charset=UTF-8; format=flowed';
+        return $this->qp_encode(implode('', $new_lines));
+    }
+
+    function prep_message_body($body) {
+        if (!$this->html) {
+            $body = mb_convert_encoding(trim($body), "HTML-ENTITIES", "UTF-8");
+            $body = mb_convert_encoding($body, "UTF-8", "HTML-ENTITIES");
+            $body = $this->format_message_text($body);
+            $this->headers['Content-Type'] = 'text/plain; charset=UTF-8; format=flowed';
+        }
+        else {
+            require 'third_party/Html2Text.php';
+            $html = new \Html2Text\Html2Text($body);
+            $this->text_body = sprintf("--%s\r\nContent-Type: text/plain; charset=UTF-8; format=flowed\r\n\r\n%s",
+                $this->boundary, $this->format_message_text($html->getText()));
+            $body = sprintf("--%s\r\nContent-Type: text/html; charset=UTF-8; format=flowed\r\n\r\n%s",
+                $this->boundary, $this->format_message_text($body));
+            $this->headers['Content-Type'] = 'multipart/alternative; boundary='.$this->boundary;
+        }
         $this->headers['Content-Transfer-Encoding'] = 'quoted-printable';
-        $body = implode('', $new_lines);
-        return $this->qp_encode($body);
+        return $body;
     }
 
     function qp_encode($string) {
