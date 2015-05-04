@@ -13,6 +13,31 @@ require APP_PATH.'modules/smtp/hm-smtp.php';
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_process_compose_type extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('save_settings', 'smtp_compose_type_setting'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
+        if ($success) {
+            if ($form['smtp_compose_type_setting'] == 0 || $form['smtp_compose_type_setting'] == 1) {
+                $new_settings['smtp_compose_type'] = $form['smtp_compose_type_setting'];
+            }
+            else {
+                $settings['smtp_compose_type'] = $this->user_config->get('smtp_compose_type', false);
+            }
+        }
+        else {
+            $settings['smtp_compose_type'] = $this->user_config->get('smtp_compose_type', false);
+        }
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
     public function process() {
         $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
@@ -32,6 +57,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             Hm_SMTP_List::add( $server, $index );
         }
         $this->out('compose_draft', $this->session->get('compose_draft', array()));
+        $this->out('smtp_compose_type', $this->user_config->get('smtp_compose_type', 0));
     }
 }
 
@@ -212,7 +238,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     $from = $smtp_details['user'];
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
-                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from);
+                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->user_config->get('smtp_compose_type', 0));
                         $recipients = $mime->get_recipient_addresses();
                         if (empty($recipients)) {
                             Hm_Msgs::add("ERRNo valid receipts found");
@@ -255,15 +281,30 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             $subject = $this->html_safe($draft['draft_subject']);
             $body= $this->html_safe($draft['draft_body']);
         }
-        return '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
+        $res = '';
+        if ($this->get('smtp_compose_type', 0) == 1) {
+            $res .= '<script type="text/javascript" src="modules/smtp/assets/kindeditor/kindeditor-all-min.js"></script>'.
+                '<link href="modules/smtp/assets/kindeditor/themes/default/default.css" rel="stylesheet" />'.
+                '<script type="text/javascript">KindEditor.ready(function(K) { K.create("#compose_body", {items:'.
+                "['formatblock', 'fontname', 'fontsize', 'forecolor', 'hilitecolor', 'bold',".
+                "'italic', 'underline', 'strikethrough', 'lineheight', 'table', 'hr', 'pagebreak', 'link', 'unlink',".
+                "'justifyleft', 'justifycenter', 'justifyright',".
+                "'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', '|',".
+                "'undo', 'redo', 'preview', 'print', '|', 'selectall', 'cut', 'copy', 'paste',".
+                "'plainpaste', 'wordpaste', '|', 'source', 'fullscreen']".
+                ",basePath: 'modules/smtp/assets/kindeditor/'".
+                '})});;</script>';
+        }
+        $res .= '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input value="'.$to.'" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
             '<input value="'.$subject.'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
-            '<textarea required name="compose_body" class="compose_body">'.$body.'</textarea>'.
+            '<textarea novalidate id="compose_body" name="compose_body" class="compose_body">'.$body.'</textarea>'.
             smtp_server_dropdown($this->module_output(), $this).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" /></form></div>';
+        return $res;
     }
 }
 
@@ -288,6 +329,30 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
             '<tr><td><input type="checkbox" name="tls" value="1" id="smtp_tls" checked="checked" /> <label for="smtp_tls">'.$this->trans('Use TLS').'</label></td>'.
             '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" /></td></tr>'.
             '</table></form>';
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_compose_type_setting extends Hm_Output_Module {
+    protected function output() {
+        $selected = 2;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('smtp_compose_type', $settings)) {
+            $selected = $settings['smtp_compose_type'];
+        }
+        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select name="smtp_compose_type_setting">';
+        $res .= '<option ';
+        if ($selected == 0) {
+            $res .= 'selected="selected" ';
+        }
+        $res .= 'value="0">'.$this->trans('Plain text').'</option><option ';
+        if ($selected == 1) {
+            $res .= 'selected="selected" ';
+        }
+        $res .= 'value="1">'.$this->trans('HTML').'</option></select></td></tr>';
+        return $res;
     }
 }
 

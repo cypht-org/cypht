@@ -165,7 +165,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .folder_list { min-width: 150px; }
     .src_name, .content_title { font-size: 140%; padding-bottom: 15px; padding-top: 25px; max-height: 50px; }
     body { font-size: 150%; }
-    .list_controls { padding-right: 10px; }
+    .list_controls { margin-top: -20px; position: relative; float: right; padding-right: 10px; }
     .msg_text { font-size: 125%; }
     .msg_text_inner { font-size: 140%; }
     .list_meta { display: none; }
@@ -182,7 +182,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .checkbox_cell { padding-left: 15px !important; }
     .folder_list { display: none; width: 150px; }
     .src_name, .content_title { font-size: 125%; max-height: 50px; }
-    .list_controls { padding-right: 10px; }
+    .list_controls { margin-top: -20px; position: relative; float: right; padding-right: 10px; }
     .msg_text_inner { font-size: 140%; }
     .msg_controls { position: absolute; background-color: #fff !important; }
     .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
@@ -191,6 +191,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
     body { font-size: 90%; min-width: 100%; }
     .list_meta { display: block; }
+    .list_controls { margin-top: -20px; position: relative; float: right; padding-right: 10px; }
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
     .folder_list { display: none; width: 340px; }
     .content_cell { min-width: 360px; max-width: 480px; word-break: break-all; word-wrap: break-word;}
