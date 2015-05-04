@@ -36,6 +36,9 @@ var display_wp_notice = function(res) {
     $('.msg_text').append(res.wp_notice_text);
     var path = hm_list_path();
     var uid = hm_msg_uid();
+    if (hm_list_parent() == 'unread') {
+        Hm_Message_List.prev_next_links('formatted_unread_data', uid);
+    }
     Hm_Message_List.track_read_messages(path+'_'+uid);
 
 };

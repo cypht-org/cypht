@@ -588,7 +588,7 @@ function github_parse_headers($data, $output_mod) {
     $res .= '<tr><th>'.$output_mod->trans('Date').'</th><td>'.$output_mod->html_safe($date).'</td></tr>';
     $res .= '<tr><th>'.$output_mod->trans('Author').'</th><td>'.$output_mod->html_safe($from).$from_link.'</td></tr>';
     $res .= '<tr><th>'.$output_mod->trans('Repository').'</th><td>'.$output_mod->html_safe($name).$repo_link.'</td></tr>';
-    $res .= '</table>';
+    $res .= '<tr><td></td><td></td></tr></table>';
     return $res;
 }
 
