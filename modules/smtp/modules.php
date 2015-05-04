@@ -56,6 +56,13 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         foreach ($servers as $index => $server) {
             Hm_SMTP_List::add( $server, $index );
         }
+        if (array_key_exists('reply', $this->request->get) && $this->request->get['reply']) {
+            $details = $this->session->get('reply_details', array());
+            if (!empty($details)) {
+                $this->out('reply_details', $details);
+                /* TODO: unset session data here */
+            }
+        }
         $this->out('compose_draft', $this->session->get('compose_draft', array()));
         $this->out('smtp_compose_type', $this->user_config->get('smtp_compose_type', 0));
     }
@@ -276,13 +283,18 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $subject = '';
         $body = '';
         $draft = $this->get('compose_draft', array());
-        if (!empty($draft)) {
-            $to = $this->html_safe($draft['draft_to']);
-            $subject = $this->html_safe($draft['draft_subject']);
-            $body= $this->html_safe($draft['draft_body']);
+        $reply = $this->get('reply_details', array());
+        $html = $this->get('smtp_compose_type', 0);
+        if (!empty($reply)) {
+            list($to, $subject, $body) = format_reply_fields($reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this);
+        }
+        elseif (!empty($draft)) {
+            $to = $draft['draft_to'];
+            $subject = $draft['draft_subject'];
+            $body= $draft['draft_body'];
         }
         $res = '';
-        if ($this->get('smtp_compose_type', 0) == 1) {
+        if ($html == 1) {
             $res .= '<script type="text/javascript" src="modules/smtp/assets/kindeditor/kindeditor-all-min.js"></script>'.
                 '<link href="modules/smtp/assets/kindeditor/themes/default/default.css" rel="stylesheet" />'.
                 '<script type="text/javascript">KindEditor.ready(function(K) { K.create("#compose_body", {items:'.
@@ -298,9 +310,9 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $res .= '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<input value="'.$to.'" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
-            '<input value="'.$subject.'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
-            '<textarea novalidate id="compose_body" name="compose_body" class="compose_body">'.$body.'</textarea>'.
+            '<input value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
+            '<textarea novalidate id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
             smtp_server_dropdown($this->module_output(), $this).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" /></form></div>';

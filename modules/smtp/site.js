@@ -103,5 +103,6 @@ if (hm_page_name() == 'compose') {
         $('.compose_body').val('');
         $('.compose_subject').val('');
         $('.compose_to').val('');
+        $('.ke-content', $('iframe').contents()).html('');
     });
 }

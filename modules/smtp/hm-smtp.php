@@ -782,17 +782,17 @@ class Hm_MIME_Msg {
             $body = mb_convert_encoding($body, "UTF-8", "HTML-ENTITIES");
             $body = $this->format_message_text($body);
             $this->headers['Content-Type'] = 'text/plain; charset=UTF-8; format=flowed';
+            $this->headers['Content-Transfer-Encoding'] = 'quoted-printable';
         }
         else {
             require 'third_party/Html2Text.php';
             $html = new \Html2Text\Html2Text($body);
-            $this->text_body = sprintf("--%s\r\nContent-Type: text/plain; charset=UTF-8; format=flowed\r\n\r\n%s",
+            $this->text_body = sprintf("--%s\r\nContent-Type: text/plain; charset=UTF-8; format=flowed\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n%s",
                 $this->boundary, $this->format_message_text($html->getText()));
-            $body = sprintf("--%s\r\nContent-Type: text/html; charset=UTF-8; format=flowed\r\n\r\n%s",
+            $body = sprintf("--%s\r\nContent-Type: text/html; charset=UTF-8; format=flowed\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n%s",
                 $this->boundary, $this->format_message_text($body));
             $this->headers['Content-Type'] = 'multipart/alternative; boundary='.$this->boundary;
         }
-        $this->headers['Content-Transfer-Encoding'] = 'quoted-printable';
         return $body;
     }
 

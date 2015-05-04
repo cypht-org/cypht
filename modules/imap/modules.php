@@ -112,24 +112,6 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
 }
 
 /**
- * Process reply field values
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_process_reply_fields extends Hm_Handler_Module {
-    /**
-     * Output reply field values if found in the request arguments
-     */
-    public function process() {
-        if (array_key_exists('reply_source', $this->request->get) && preg_match("/^imap_(\d+)_(.+)$/", $this->request->get['reply_source'])) {
-            if (array_key_exists('reply_uid', $this->request->get)) {
-                $this->out('imap_reply_source', $this->request->get['reply_source']);
-                $this->out('imap_reply_uid', $this->request->get['reply_uid']);
-            }
-        }
-    }
-}
-
-/**
  * Process the list_path input argument
  * @subpackage imap/handler
  */
@@ -866,9 +848,6 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             elseif (isset($this->request->post['imap_prefetch']) && $this->request->post['imap_prefetch']) {
                 $prefetch = true;
             }
-            if (array_key_exists('reply_format', $this->request->post) && $this->request->post['reply_format']) {
-                $this->out('reply_format', true);
-            }
             $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if ($imap) {
@@ -895,13 +874,15 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
                         $msg_struct_current = array_shift($struct);
                     }
-                    $this->out('msg_headers', $imap->get_message_headers($form['imap_msg_uid']));
+                    $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);
+                    $this->out('msg_headers', $msg_headers);
                     $this->out('imap_msg_part', "$part");
                     if ($msg_struct_current) {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%d&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+                    $this->session->set('reply_details', array('msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
                 }
             }
         }
@@ -1069,11 +1050,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="header_toggle">'.$this->trans('all').'</a>'.
                 '<a class="header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
-                ' | <a href="?page=compose&amp;reply_uid='.$this->html_safe($this->get('msg_text_uid', 0)).
-                '&amp;reply_source='.$this->html_safe(sprintf('imap_%d_%s', $this->get('msg_server_id'), $this->get('msg_folder'))).'">'.
-                $this->trans('reply').'</a>'.
-                ' | <a href="?page=compose">'.$this->trans('forward').'</a>'.
-                ' | <a href="?page=compose">'.$this->trans('attach').'</a>'.
+                ' | <a href="?page=compose&amp;reply=1">'.$this->trans('reply').'</a>'.
+                ' | <a href="?page=compose&amp;forward=1">'.$this->trans('forward').'</a>'.
+                ' | <a href="?page=compose&amp;attach=1">'.$this->trans('attach').'</a>'.
                 ' | <a class="msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
                 $txt .= ' | <a style="display: none;" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
@@ -1209,26 +1188,6 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
             }
             $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
                 '<td class="imap_detail_'.$index.'"></td></tr>';
-        }
-        return $res;
-    }
-}
-
-/**
- * Build HTML for reply to hidden fields
- * @subpackage imap/output
- */
-class Hm_Output_imap_reply_details extends Hm_Output_Module {
-    /**
-     * Used on the message view page to pass reply to information to the compose page
-     */
-    protected function output() {
-        $res = '';
-        if ($this->get('imap_reply_source')) {
-            $res .= '<input type="hidden" class="imap_reply_source" value="'.$this->html_safe($this->get('imap_reply_source')).'" />';
-        }
-        if ($this->get('imap_reply_uid')) {
-            $res .= '<input type="hidden" class="imap_reply_uid" value="'.$this->html_safe($this->get('imap_reply_uid')).'" />';
         }
         return $res;
     }
@@ -1416,56 +1375,6 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
-        }
-    }
-}
-
-/**
- * Format reply content for the compose page
- * @subpackage imap/output
- */
-class Hm_Output_filter_reply_content extends Hm_Output_Module {
-    /**
-     * Build data to be used when replying a message
-     */
-    protected function output() {
-        $reply_subject = 'Re: [No Subject]';
-        $reply_to = '';
-        $reply_body = '';
-        $lead_in = '';
-        if ($this->get('reply_format')) {
-            if (is_array($this->get('msg_headers'))) {
-                $hdrs = $this->get('msg_headers');
-                if (array_key_exists('Subject', $hdrs)) {
-                    $reply_subject = sprintf("Re: %s", $hdrs['Subject']);
-                }
-                if (array_key_exists('Reply-to', $hdrs)) {
-                    $reply_to = $hdrs['Reply-to'];
-                }
-                elseif (array_key_exists('From', $hdrs)) {
-                    $reply_to = $hdrs['From'];
-                }
-                elseif (array_key_exists('Sender', $hdrs)) {
-                    $reply_to = $hdrs['Sender'];
-                }
-                elseif (array_key_exists('Return-path', $hdrs)) {
-                    $reply_to = $hdrs['Return-path'];
-                }
-                if (array_key_exists('Date', $hdrs)) {
-                    if ($reply_to) {
-                        $lead_in = sprintf($this->trans('On %s %s said')."\n", $hdrs['Date'], $reply_to);
-                    }
-                    else {
-                        $lead_in = sprintf($this->trans('On %s, somebody said')."\n", $hdrs['Date']);
-                    }
-                }
-            }
-            if ($this->get('msg_text')) {
-                $reply_body = $lead_in.format_reply_text($this->get('msg_text'));
-            }
-            $this->out('reply_to', $reply_to);
-            $this->out('reply_body', $reply_body);
-            $this->out('reply_subject', $reply_subject);
         }
     }
 }
