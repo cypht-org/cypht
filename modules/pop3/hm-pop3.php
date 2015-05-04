@@ -51,60 +51,6 @@ class Hm_POP3_List {
 }
 
 /**
- * Authenticate against a POP3 server
- * @subpackage pop3/lib
- */
-class Hm_Auth_POP3 extends Hm_Auth {
-
-    /* POP3 authentication server settings */
-    private $pop3_settings = array();
-
-    /**
-     * Send the username and password to the configured POP3 server for authentication
-     * @param $user string username
-     * @param $pass string password
-     * @return bool true if authentication worked
-     */
-    public function check_credentials($user, $pass) {
-        $pop3 = new Hm_POP3();
-        $authed = false;
-        list($server, $port, $tls) = $this->get_pop3_config();
-        if ($user && $pass && $server && $port) {
-            $this->pop3_settings = array(
-                'server' => $server,
-                'port' => $port,
-                'tls' => $tls,
-                'username' => $user,
-                'password' => $pass,
-                'no_caps' => true
-            );
-            $pop3->server = $server;
-            $pop3->port = $port;
-            $pop3->tls = $tls;
-            if ($pop3->connect()) {
-                $authed = $pop3->auth($user, $pass);
-            }
-        }
-        if ($authed) {
-            return true;
-        }
-        Hm_Msgs::add("Invalid username or password");
-        return false;
-    }
-
-    /**
-     * Get POP3 server details from the site config
-     * @return array list of required details
-     */
-    private function get_pop3_config() {
-        $server = $this->site_config->get('pop3_auth_server', false);
-        $port = $this->site_config->get('pop3_auth_port', false);
-        $tls = $this->site_config->get('pop3_auth_tls', false);
-        return array($server, $port, $tls);
-    }
-}
-
-/**
  * Used to mark messages as "read"
  * @subpackage pop3/lib
  */
