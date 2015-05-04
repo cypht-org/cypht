@@ -467,6 +467,9 @@ function wp_get_freshly_pressed($details) {
  */
 function wp_fetch_content($details, $url, $post=array()) {
     $result = array();
+    if (!is_array($details) || empty($details) || !array_key_exists('access_token', $details)) {
+        return $result;
+    }
     $headers = array('Authorization: Bearer ' . $details['access_token']);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
