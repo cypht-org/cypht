@@ -738,10 +738,10 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod) {
     }
     if (array_key_exists('Date', $headers)) {
         if ($to) {
-            $lead_in = sprintf($output_mod->trans('On %s %s said')."\n", $headers['Date'], $to);
+            $lead_in = sprintf($output_mod->trans('On %s %s said')."\n\n", $headers['Date'], $output_mod->html_safe($to));
         }
         else {
-            $lead_in = sprintf($output_mod->trans('On %s, somebody said')."\n", $headers['Date']);
+            $lead_in = sprintf($output_mod->trans('On %s, somebody said')."\n\n", $headers['Date']);
         }
     }
     $type = 'textplain';
@@ -750,18 +750,18 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod) {
     }
     if ($html) {
         if ($type == 'textplain') {
-            $msg = nl2br(format_reply_text($body));
+            $msg = nl2br($lead_in.format_reply_text($body));
         }
-        else {
-            $msg = format_msg_html($body);
+        elseif ($type == 'texthtml') {
+            $msg = nl2br($lead_in).'<hr /><blockquote>'.format_msg_html($body).'</blockquote>';
         }
     }
     else {
         if ($type == 'texthtml') {
-            $msg = convert_html_to_text($body);
+            $msg = $lead_in.convert_html_to_text($body);
         }
-        else {
-            $msg = format_reply_text($body);
+        elseif ($type == 'textplain') {
+            $msg = $lead_in.format_reply_text($body);
         }
     }
     return array($to, $subject, $msg);
