@@ -44,4 +44,16 @@ class Hm_Server_Wrapper {
     }
 }
 
+class Hm_IMAP {
+    private $connected = false;
+    public function get_state() { return $this->connected ? 'authenticated' : false; }
+    public function connect() { $this->connected = true; return true; }
+}
+
+class Hm_POP3 {
+    public function connect() { return true; }
+    public function auth() { return true; }
+}
+
+
 ?>
