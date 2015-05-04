@@ -60,11 +60,15 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $details = $this->session->get('reply_details', array());
             if (!empty($details)) {
                 $this->out('reply_details', $details);
-                /* TODO: unset session data here */
+                /* TODO: fix cached message page re-view, then unset session data here */
             }
         }
         $this->out('compose_draft', $this->session->get('compose_draft', array()));
-        $this->out('smtp_compose_type', $this->user_config->get('smtp_compose_type', 0));
+        $compose_type = $this->user_config->get('smtp_compose_type', 0);
+        if ($this->get('is_mobile', false)) {
+            $compose_type = 0;
+        }
+        $this->out('smtp_compose_type', $compose_type);
     }
 }
 
@@ -245,7 +249,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     $from = $smtp_details['user'];
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
-                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->user_config->get('smtp_compose_type', 0));
+                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0));
                         $recipients = $mime->get_recipient_addresses();
                         if (empty($recipients)) {
                             Hm_Msgs::add("ERRNo valid receipts found");
