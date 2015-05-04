@@ -176,7 +176,6 @@ class Hm_Auth_DB extends Hm_Auth {
 
 /**
  * Authenticate against an IMAP server
- * @subpackage auth/lib
  */
 class Hm_Auth_IMAP extends Hm_Auth {
 
@@ -233,7 +232,6 @@ class Hm_Auth_IMAP extends Hm_Auth {
 
 /**
  * Authenticate against a POP3 server
- * @subpackage auth/lib
  */
 class Hm_Auth_POP3 extends Hm_Auth {
 
