@@ -58,6 +58,9 @@ class Hm_POP3_Uid_Cache {
     use Hm_Uid_Cache;
 }
 
+/* for unit testing */
+if (!class_exists('Hm_POP3')) {
+
 /**
  * Connect to and interact with POP3 servers
  * @subpackage pop3/lib
@@ -488,6 +491,8 @@ class Hm_POP3 {
         $this->send_command('APOP '.$user.' '.md5($challenge.$pass));
         return $this->is_error($this->get_response()) == false;
     }
+}
+
 }
 
 ?>

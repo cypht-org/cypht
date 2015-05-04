@@ -179,6 +179,16 @@ class Hm_Auth_DB extends Hm_Auth {
  */
 class Hm_Auth_IMAP extends Hm_Auth {
 
+    /**
+     * Assign site config, get required libs
+     * @param object $config site config
+     * @return void
+     */
+    public function __construct($config) {
+        $this->site_config = $config;
+        require_once APP_PATH.'modules/imap/hm-imap.php';
+    }
+
     /* IMAP authentication server settings */
     private $imap_settings = array();
 
@@ -237,6 +247,16 @@ class Hm_Auth_POP3 extends Hm_Auth {
 
     /* POP3 authentication server settings */
     private $pop3_settings = array();
+
+    /**
+     * Assign site config, get required libs
+     * @param object $config site config
+     * @return void
+     */
+    public function __construct($config) {
+        $this->site_config = $config;
+        require_once APP_PATH.'modules/pop3/hm-pop3.php';
+    }
 
     /**
      * Send the username and password to the configured POP3 server for authentication
