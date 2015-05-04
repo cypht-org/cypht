@@ -519,7 +519,6 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
                     'user' => $auth_server['username'],
                     'pass' => $auth_server['password']),
                 count($servers));
-                $this->session->del('pop3_auth_server_settings');
             }
         }
         Hm_POP3_Uid_Cache::load($this->session->get('pop3_read_uids', array()));
