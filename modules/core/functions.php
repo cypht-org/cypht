@@ -307,6 +307,17 @@ function format_msg_html($str, $external_resources=false) {
 }
 
 /**
+ * Convert HTML to plain text
+ * @param string $html content to convert
+ * @return string
+ */
+function convert_html_to_text($html) {
+    require 'third_party/Html2Text.php';
+    $html = new \Html2Text\Html2Text($body);
+    return $html->getText();
+}
+
+/**
  * Format image data
  * @subpackage core/functions
  * @param string $str binary image data
@@ -689,6 +700,71 @@ function validate_local_full($val) {
         return true;
     }
     return false;
+}
+
+/**
+ * Get reply field details
+ * @subpackage core/functions
+ * @param string $body message body
+ * @param array $headers message headers
+ * @param int $html set to 1 if the output should be HTML
+ * @param array $struct message structure details
+ * @return array
+ */
+function format_reply_fields($body, $headers, $struct, $html, $output_mod) {
+    $subject = '';
+    $to = '';
+    $msg = '';
+    $lead_in = '';
+    if (array_key_exists('Subject', $headers)) {
+        if (!preg_match("/^re:/i", trim($headers['Subject']))) {
+            $subject = sprintf("Re: %s", $headers['Subject']);
+        }
+        else {
+            $subject = $headers['Subject'];
+        }
+    }
+    if (array_key_exists('Reply-to', $headers)) {
+        $to = $headers['Reply-to'];
+    }
+    elseif (array_key_exists('From', $headers)) {
+        $to = $headers['From'];
+    }
+    elseif (array_key_exists('Sender', $headers)) {
+        $to = $headers['Sender'];
+    }
+    elseif (array_key_exists('Return-path', $headers)) {
+        $to = $headers['Return-path'];
+    }
+    if (array_key_exists('Date', $headers)) {
+        if ($to) {
+            $lead_in = sprintf($output_mod->trans('On %s %s said')."\n", $headers['Date'], $to);
+        }
+        else {
+            $lead_in = sprintf($output_mod->trans('On %s, somebody said')."\n", $headers['Date']);
+        }
+    }
+    $type = 'textplain';
+    if (array_key_exists('type', $struct) && array_key_exists('subtype', $struct)) {
+        $type = strtolower($struct['type']).strtolower($struct['subtype']);
+    }
+    if ($html) {
+        if ($type == 'textplain') {
+            $msg = nl2br(format_reply_text($body));
+        }
+        else {
+            $msg = format_msg_html($body);
+        }
+    }
+    else {
+        if ($type == 'texthtml') {
+            $msg = convert_html_to_text($body);
+        }
+        else {
+            $msg = format_reply_text($body);
+        }
+    }
+    return array($to, $subject, $msg);
 }
 
 ?>
