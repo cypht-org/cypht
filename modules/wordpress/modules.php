@@ -1,5 +1,10 @@
 <?php
 
+define('WPCOM_READ_URL', 'https://public-api.wordpress.com/rest/v1.1/notifications/read');
+define('WPCOM_NOTICES_URL', 'https://public-api.wordpress.com/rest/v1/notifications/?number=20&fields=id,type,unread,subject,timestamp');
+define('WPCOM_NOTICE_URL', 'https://public-api.wordpress.com/rest/v1/notifications/');
+define('WPCOM_FP_URL', 'https://public-api.wordpress.com/rest/v1.1/freshly-pressed/?number=20&fields=ID,site_ID,author,date,title');
+
 /**
  * WordPress modules
  * @package modules
@@ -31,8 +36,7 @@ class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
                     foreach ($wp_ids as $id) {
                         $post['counts['.$id.']'] = 5;
                     }
-                    $url = 'https://public-api.wordpress.com/rest/v1.1/notifications/read';
-                    $res = wp_fetch_content($wp_details, $url, $post);
+                    $res = wp_fetch_content($wp_details, WPCOM_READ_URL, $post);
                     if (!is_array($res) || !array_key_exists('success', $res) || $res['success'] != 1) {
                         Hm_Msgs::add('ERRUnable to update read status of WordPress notification');
                     }
@@ -76,7 +80,19 @@ class Hm_Handler_get_wp_notice_data extends Hm_Handler_Module {
         if (array_key_exists('uid', $this->request->get)) {
             $wp_details = $this->user_config->get('wp_connect_details', array());
             if ($wp_details) {
-                $this->out('wp_notice_details', wp_get_notice_detail($wp_details, $this->request->get['uid']));
+                $details = wp_get_notice_detail($wp_details, $this->request->get['uid']);
+                if (is_array($details) && !empty($details)) {
+                    if (preg_match("/^wordpress_0_(\d)+$/", $this->request->get['uid'])) {
+                        $parts = explode('_', $this->request->get['uid'], 3);
+                        $wp_id = $parts[2];
+                        $post = array('counts['.$wp_id.']' => 5);
+                        $res = wp_fetch_content($wp_details, WPCOM_READ_URL, $post);
+                        if (!is_array($res) || !array_key_exists('success', $res) || $res['success'] != 1) {
+                            Hm_Msgs::add('ERRUnable to update read status of WordPress notification');
+                        }
+                    }
+                    $this->out('wp_notice_details', $details);
+                }
             }
         }
     }
@@ -354,7 +370,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
                             array('icon_callback', $flags),
-                            array('subject_callback', $subject, $url,$flags),
+                            array('subject_callback', $subject, $url, $flags),
                             array('safe_output_callback', 'source', 'WordPress'),
                             array('safe_output_callback', 'from', $from),
                             array('date_callback', human_readable_interval($date), $ts),
@@ -455,8 +471,7 @@ function wp_build_notice_text($type, $data) {
  */
 function wp_get_notifications($details) {
     $result = array();
-    $url = 'https://public-api.wordpress.com/rest/v1/notifications/?number=20&fields=id,type,unread,subject,timestamp';
-    return wp_fetch_content($details, $url);
+    return wp_fetch_content($details, WPCOM_NOTICES_URL);
 }
 
 /**
@@ -464,16 +479,14 @@ function wp_get_notifications($details) {
  */
 function wp_get_notice_detail($details, $uid) {
     $uid = (int) $uid;
-    $url = 'https://public-api.wordpress.com/rest/v1/notifications/'.$uid;
-    return wp_fetch_content($details, $url);
+    return wp_fetch_content($details, WPCOM_NOTICE_URL.$uid);
 }
 
 /**
  * @subpackage wordpress/functions
  */
 function wp_get_freshly_pressed($details) {
-    $url = 'https://public-api.wordpress.com/rest/v1.1/freshly-pressed/?number=20&fields=ID,site_ID,author,date,title';
-    return wp_fetch_content($details, $url);
+    return wp_fetch_content($details, WPCOM_FP_URL);
 }
 
 /**
