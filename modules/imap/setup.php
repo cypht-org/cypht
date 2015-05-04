@@ -36,9 +36,7 @@ add_handler('compose', 'load_imap_servers_from_config',  true, 'imap', 'load_use
 add_handler('compose', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('compose', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('compose', 'add_imap_servers_to_page_data', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('compose', 'imap_process_reply_fields', true, 'imap', 'add_imap_servers_to_page_data', 'after');
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
-add_output('compose', 'imap_reply_details', true, 'imap', 'page_js', 'before');
 
 /* search page data */
 add_handler('search', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
@@ -144,7 +142,6 @@ add_handler('ajax_imap_message_content', 'save_imap_cache',  true);
 add_handler('ajax_imap_message_content', 'save_imap_servers',  true);
 add_handler('ajax_imap_message_content', 'date', true, 'core');
 add_handler('ajax_imap_message_content', 'http_headers', true, 'core');
-add_output('ajax_imap_message_content', 'filter_reply_content', true);
 add_output('ajax_imap_message_content', 'filter_message_headers', true);
 add_output('ajax_imap_message_content', 'filter_message_body', true);
 add_output('ajax_imap_message_content', 'filter_message_struct', true);

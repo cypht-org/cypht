@@ -51,6 +51,9 @@ return array(
         'ajax_smtp_debug',
         'ajax_smtp_save_draft',
     ),
+    'allowed_get' => array(
+        'reply' => FILTER_VALIDATE_INT,
+    ),
     'allowed_post' => array(
         'smtp_compose_type_setting' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_SANITIZE_STRING,
