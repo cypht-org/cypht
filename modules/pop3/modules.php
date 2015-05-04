@@ -8,7 +8,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require APP_PATH.'modules/pop3/hm-pop3.php';
+require_once APP_PATH.'modules/pop3/hm-pop3.php';
 
 /**
  * Setup the list type

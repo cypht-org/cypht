@@ -44,6 +44,9 @@ class Hm_IMAP_List {
 
 require_once('hm-imap-base.php');
 
+/* for testing */
+if (!class_exists('Hm_IMAP')) {
+ 
 /**
  * public interface to IMAP commands
  * @subpackage imap/lib
@@ -1985,6 +1988,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         }
         return $result;
     }
+}
+
 }
 
 ?>
