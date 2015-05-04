@@ -679,7 +679,6 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                     'user' => $auth_server['username'],
                     'pass' => $auth_server['password']),
                 count($servers));
-                $this->session->del('imap_auth_server_settings');
             }
         }
     }
