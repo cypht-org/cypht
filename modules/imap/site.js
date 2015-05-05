@@ -311,6 +311,7 @@ var display_msg_content = function(res) {
     $('.msg_text').append(res.msg_parts);
     set_message_content();
     document.title = $('.header_subject th').text();
+    $('.hlink').click(function(event) { return true; });
     imap_message_view_finished();
 };
 
@@ -329,11 +330,11 @@ var get_local_message_content = function() {
 };
 
 var get_message_content = function(msg_part) {
+    $('.hlink').click(function(event) { event.preventDefault(); return false; });
     var uid = $('.msg_uid').val();
     var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
     if (detail && uid) {
         window.scrollTo(0,0);
-        $('.msg_text_inner').html('');
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
             {'name': 'imap_msg_uid', 'value': uid},
@@ -396,22 +397,8 @@ var imap_setup_message_view_page = function() {
         $('.msg_text').html(msg_content);
         document.title = $('.header_subject th').text();
         imap_message_view_finished();
-        imap_read_prefetch();
+        get_message_content();
     }
-};
-
-var imap_read_prefetch = function() {
-    var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
-    var uid = hm_msg_uid();
-    var msg_id = 'imap_'+detail.server_id+'_'+uid+'_'+detail.folder;
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
-        {'name': 'action_type', 'value': 'read'},
-        {'name': 'message_ids', 'value': [msg_id]}],
-        false,
-        [],
-        true
-    );
 };
 
 var imap_message_view_finished = function() {

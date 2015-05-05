@@ -387,7 +387,17 @@ function display_value($name, $haystack, $type=false, $default='') {
  * @return string
  */
 function format_reply_text($txt) {
-    return '> '.str_replace("\n", "\n> ", $txt);
+    $lines = explode("\n", $txt);
+    $new_lines = array();
+    foreach ($lines as $line) {
+        $pre = '> ';
+        if (preg_match("/^(>\s*)+/", $line, $matches)) {
+            $pre .= $matches[1];
+        }
+        $wrap = 75 + strlen($pre);
+        $new_lines[] = preg_replace("/$pre /", "$pre", "> ".wordwrap($line, $wrap, "\n$pre"));
+    }
+    return implode("\n", $new_lines);
 }
 
 /**
