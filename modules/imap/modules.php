@@ -882,7 +882,9 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     }
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%d&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
-                    $this->session->set('reply_details', array('msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
+                    if (!$prefetch) {
+                        $this->session->set('reply_details', array('msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
+                    }
                 }
             }
         }
@@ -1050,9 +1052,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="header_toggle">'.$this->trans('all').'</a>'.
                 '<a class="header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
-                ' | <a href="?page=compose&amp;reply=1">'.$this->trans('reply').'</a>'.
-                ' | <a href="?page=compose&amp;forward=1">'.$this->trans('forward').'</a>'.
-                ' | <a href="?page=compose&amp;attach=1">'.$this->trans('attach').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;reply=1">'.$this->trans('reply').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;forward=1">'.$this->trans('forward').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;attach=1">'.$this->trans('attach').'</a>'.
                 ' | <a class="msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
                 $txt .= ' | <a style="display: none;" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
