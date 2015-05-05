@@ -785,10 +785,9 @@ class Hm_MIME_Msg {
             $this->headers['Content-Transfer-Encoding'] = 'quoted-printable';
         }
         else {
-            require 'third_party/Html2Text.php';
-            $html = new \Html2Text\Html2Text($body);
+            $txt = convert_html_to_text($body);
             $this->text_body = sprintf("--%s\r\nContent-Type: text/plain; charset=UTF-8; format=flowed\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n%s",
-                $this->boundary, $this->format_message_text($html->getText()));
+                $this->boundary, $this->format_message_text($txt));
             $body = sprintf("--%s\r\nContent-Type: text/html; charset=UTF-8; format=flowed\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n%s",
                 $this->boundary, $this->format_message_text($body));
             $this->headers['Content-Type'] = 'multipart/alternative; boundary='.$this->boundary;
