@@ -331,6 +331,7 @@ var get_local_message_content = function() {
 
 var get_message_content = function(msg_part) {
     $('.hlink').click(function(event) { event.preventDefault(); return false; });
+    $('.hlink').addClass('disabled_link');
     var uid = $('.msg_uid').val();
     var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
     if (detail && uid) {
