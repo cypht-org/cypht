@@ -636,7 +636,7 @@ function Message_List() {
         var count = $('.message_table tbody tr').length;
         if (!count) {
             if (!$('.empty_list').length) {
-                $('.message_list').append('<div class="empty_list">So alone</div>');
+                $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
             }
         }
         else {
