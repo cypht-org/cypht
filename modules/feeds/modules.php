@@ -749,7 +749,7 @@ class Hm_Output_display_feeds_status extends Hm_Output_Module {
     protected function output() {
         $res = '';
         foreach ($this->get('feeds', array()) as $index => $vals) {
-            $res .= '<tr><td>'.$this->trans('FEED').'</td><td>'.$vals['name'].'</td><td class="feeds_status_'.$index.'"></td>'.
+            $res .= '<tr><td>'.$this->trans('FEED').'</td><td>'.$this->html_safe($vals['name']).'</td><td class="feeds_status_'.$index.'"></td>'.
                 '<td class="feeds_detail_'.$index.'"></td></tr>';
         }
         return $res;
