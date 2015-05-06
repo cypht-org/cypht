@@ -19,6 +19,43 @@ class Hm_Github_Uid_Cache {
 /**
  * @subpackage github/handler
  */
+class Hm_Handler_github_status extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('github_repo'));
+        if ($success) {
+            $details = $this->user_config->get('github_connect_details', array());
+            if (!empty($details)) {
+                $repos = $this->user_config->get('github_repos', array());
+                if (in_array($form['github_repo'], $repos, true)) {
+                    $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=1', $form['github_repo']);
+                    $start = microtime(true);
+                    $data = github_fetch_content($details, $url);
+                    if (!empty($data)) {
+                        $this->out('github_status', 'success');
+                        $this->out('github_connect_time', (microtime(true) - $start));
+                        $this->out('github_repo', $form['github_repo']);
+                        return;
+                    }
+                }
+            }
+            $this->out('github_status', 'failed');
+            $this->out('github_repo', $form['github_repo']);
+        }
+    }
+}
+
+/**
+ * @subpackage github/handler
+ */
+class Hm_Handler_load_github_repos extends Hm_Handler_Module {
+    public function process() {
+        $this->out('github_repos', $this->user_config->get('github_repos', array()));
+    }
+}
+
+/**
+ * @subpackage github/handler
+ */
 class Hm_Handler_github_message_action extends Hm_Handler_Module {
     public function process() {
 
@@ -44,6 +81,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
         }
     }
 }
+
 /**
  * @subpackage github/handler
  */
@@ -459,6 +497,37 @@ class Hm_Output_filter_github_event_detail extends Hm_Output_Module {
             }
             $this->out('github_msg_text', $headers.$body);
         }
+    }
+}
+
+/**
+ * @subpackage github/output
+ */
+class Hm_Output_filter_github_status extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('github_status') == 'success') {
+            $this->out('github_status_display', '<span class="online">'.$this->trans('Connected').'</span> in '.round($this->get('github_connect_time'), 3));
+        }
+        else {
+            $this->out('github_status_display', '<span class="down">'.$this->trans('Down').'</span>');
+        }
+        $this->out('github_status_repo', $this->get('github_repo', ''));
+    }
+};
+
+/**
+ * @subpackage github/output
+ */
+class Hm_Output_display_github_status extends Hm_Output_Module {
+    protected function output() {
+        $res = '';
+        $repos = $this->get('github_repos', array());
+        if (!empty($repos)) {
+            foreach ($repos as $repo) {
+                $res .= '<tr><td class="github_repo" data-id="'.$this->html_safe($repo).'">'.$this->trans('Github repo').'</td><td>'.$this->html_safe($repo).'</td><td class="github_'.$this->html_safe($repo).'"></td></tr>';
+            }
+        }
+        return $res;
     }
 }
 

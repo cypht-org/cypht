@@ -29,6 +29,9 @@ add_handler('ajax_github_data', 'date', true, 'core');
 add_handler('ajax_github_data', 'http_headers', true, 'core');
 add_output('ajax_github_data', 'filter_github_data', true);
 
+add_handler('info', 'load_github_repos', true, 'github', 'language', 'after');
+add_output('info', 'display_github_status', true, 'github', 'server_status_start', 'after');
+
 add_handler('ajax_github_event_detail', 'login', false, 'core');
 add_handler('ajax_github_event_detail', 'load_user_data', true, 'core');
 add_handler('ajax_github_event_detail', 'language', true, 'core');
@@ -38,14 +41,26 @@ add_handler('ajax_github_event_detail', 'date', true, 'core');
 add_handler('ajax_github_event_detail', 'http_headers', true, 'core');
 add_output('ajax_github_event_detail', 'filter_github_event_detail', true);
 
+add_handler('ajax_github_status', 'login', false, 'core');
+add_handler('ajax_github_status', 'load_user_data', true, 'core');
+add_handler('ajax_github_status', 'language', true, 'core');
+add_handler('ajax_github_status', 'github_status',  true);
+add_handler('ajax_github_status', 'close_session_early',  true, 'core');
+add_handler('ajax_github_status', 'date', true, 'core');
+add_handler('ajax_github_status', 'http_headers', true, 'core');
+add_output('ajax_github_status', 'filter_github_status', true);
+
 return array(
     'allowed_pages' => array(
+        'ajax_github_status',
         'ajax_github_data',
         'ajax_github_event_detail',
     ),
     'allowed_output' => array(
         'github_msg_text' => array(FILTER_UNSAFE_RAW, false),
         'github_server_id' => array(FILTER_VALIDATE_INT, false),
+        'github_status_display' => array(FILTER_UNSAFE_RAW, false),
+        'github_status_repo' => array(FILTER_SANITIZE_STRING, false),
     ),
     'allowed_post' => array(
         'github_unread' => FILTER_VALIDATE_INT,

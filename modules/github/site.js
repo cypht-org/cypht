@@ -54,6 +54,25 @@ var display_github_item_content = function(res) {
     Hm_Message_List.track_read_messages(path+'_'+uid);
 };
 
+var github_repo_update = function() {
+    var repo;
+    var repos = [];
+    var i;
+    $('.github_repo').filter(function() { repos.push($(this).data('id')); });
+    for (i=0;i<repos.length;i++) {
+        repo = repos[i];
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_github_status'},
+            {'name': 'github_repo', 'value': repo}],
+            update_github_status_display
+        );
+    }
+};
+
+var update_github_status_display = function(res) {
+    $('.github_'+Hm_Utils.clean_selector(res.github_status_repo)).html(res.github_status_display);
+};
+
 if (hm_page_name() == 'servers') {
     var dsp = Hm_Utils.get_from_local_storage('.github_connect_section');
     if (dsp == 'block' || dsp == 'none') {
@@ -64,9 +83,12 @@ else if (hm_page_name() == 'message' && hm_list_path().substr(0, 6) == 'github')
     github_item_view();
 }
 
-if (hm_page_name() == 'message_list') {
+else if (hm_page_name() == 'message_list') {
     if (hm_list_path() == 'github_all') {
         Hm_Message_List.page_caches.github_all = 'formatted_github_all';
     }
+}
+else if (hm_page_name() == 'info') {
+    setTimeout(github_repo_update, 200);
 }
 
