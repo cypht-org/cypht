@@ -1,15 +1,15 @@
 <?php
 
-define('WPCOM_READ_URL', 'https://public-api.wordpress.com/rest/v1.1/notifications/read');
-define('WPCOM_NOTICES_URL', 'https://public-api.wordpress.com/rest/v1/notifications/?number=20&fields=id,type,unread,subject,timestamp');
-define('WPCOM_NOTICE_URL', 'https://public-api.wordpress.com/rest/v1/notifications/');
-define('WPCOM_FP_URL', 'https://public-api.wordpress.com/rest/v1.1/freshly-pressed/?number=20&fields=ID,site_ID,author,date,title');
-
 /**
  * WordPress modules
  * @package modules
  * @subpackage wordpress
  */
+
+define('WPCOM_READ_URL', 'https://public-api.wordpress.com/rest/v1.1/notifications/read');
+define('WPCOM_NOTICES_URL', 'https://public-api.wordpress.com/rest/v1/notifications/?number=20&fields=id,type,unread,subject,timestamp');
+define('WPCOM_NOTICE_URL', 'https://public-api.wordpress.com/rest/v1/notifications/');
+define('WPCOM_FP_URL', 'https://public-api.wordpress.com/rest/v1.1/freshly-pressed/?number=20&fields=ID,site_ID,author,date,title');
 
 if (!defined('DEBUG_MODE')) { die(); }
 
