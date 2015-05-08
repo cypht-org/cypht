@@ -104,5 +104,6 @@ if (hm_page_name() == 'compose') {
         $('.compose_subject').val('');
         $('.compose_to').val('');
         $('.ke-content', $('iframe').contents()).html('');
+        save_compose_state();
     });
 }
