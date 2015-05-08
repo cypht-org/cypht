@@ -261,28 +261,6 @@
 						</li>
 							</ul></li>
 				<li>
-					<a href="package-modules.hackernews.html">
-						hackernews<span></span>
-					</a>
-
-						<ul>
-				<li>
-					<a href="package-modules.hackernews.functions.html">
-						functions					</a>
-
-						</li>
-				<li>
-					<a href="package-modules.hackernews.handler.html">
-						handler					</a>
-
-						</li>
-				<li>
-					<a href="package-modules.hackernews.output.html">
-						output					</a>
-
-						</li>
-							</ul></li>
-				<li>
 					<a href="package-modules.helloworld.html">
 						helloworld<span></span>
 					</a>
@@ -538,6 +516,10 @@
 				<li><a href="function-message_list_row.html">message_list_row</a></li>
 				<li><a href="function-message_since_dropdown.html">message_since_dropdown</a></li>
 				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
+				<li><a href="function-reply_format_body.html">reply_format_body</a></li>
+				<li><a href="function-reply_lead_in.html">reply_lead_in</a></li>
+				<li><a href="function-reply_to_address.html">reply_to_address</a></li>
+				<li><a href="function-reply_to_subject.html">reply_to_subject</a></li>
 				<li><a href="function-safe_output_callback.html">safe_output_callback</a></li>
 				<li><a href="function-search_field_selection.html">search_field_selection</a></li>
 				<li><a href="function-setup_base_page.html">setup_base_page</a></li>
@@ -606,7 +588,7 @@
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.core.html">core</a>\<a href="package-modules.core.functions.html">functions</a><br>
 		<b>Located at</b>
-		<a href="source-function-format_reply_fields.html#705-768" title="Go to source code">
+		<a href="source-function-format_reply_fields.html#857-877" title="Go to source code">
 			core/functions.php
 		</a><br>
 	</div>
@@ -625,19 +607,24 @@
 		<td>message headers</td>
 	</tr>
 	<tr id="$struct">
-		<td class="name"><code>integer</code></td>
+		<td class="name"><code>array</code></td>
 		<td class="value"><code><var>$struct</var></code></td>
-		<td>$html set to 1 if the output should be HTML</td>
+		<td>message structure details</td>
 	</tr>
 	<tr id="$html">
-		<td class="name"><code>array</code></td>
+		<td class="name"><code>integer</code></td>
 		<td class="value"><code><var>$html</var></code></td>
-		<td>$struct message structure details</td>
+		<td>set to 1 if the output should be HTML</td>
 	</tr>
 	<tr id="$output_mod">
-		<td class="name"><code></code></td>
+		<td class="name"><code>string</code></td>
 		<td class="value"><code><var>$output_mod</var></code></td>
-		<td></td>
+		<td>$type optional type (forward, reply, reply_all)</td>
+	</tr>
+	<tr id="$type">
+		<td class="name"><code>object</code></td>
+		<td class="value"><code><var>$type</var> = <span class="php-quote">'reply'</span></code></td>
+		<td>$output_mod output module object</td>
 	</tr>
 	</table>
 
@@ -662,6 +649,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fe6f8dda82231cfb6bcc3e04b289a53c569335b9"></script>
+<script src="elementlist.js?56327f64b14787c8dcb4cbae6fe5f9869297b2c7"></script>
 </body>
 </html>
