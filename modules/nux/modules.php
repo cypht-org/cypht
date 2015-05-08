@@ -73,6 +73,7 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
             'feeds' => $feed_servers,
             'smtp' => $smtp_servers
         ));
+        $this->out('tzone', $this->user_config->get('timezone_setting'));
     }
 }
 /**
@@ -311,6 +312,7 @@ class Hm_Output_nux_help extends Hm_Output_Module {
 class Hm_Output_welcome_dialog extends Hm_Output_Module {
     protected function output() {
         $server_data = $this->get('nux_server_setup', array());
+        $tz = $this->get('tzone');
         $protos = array('imap', 'pop3', 'smtp', 'feeds');
 
         $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
@@ -341,7 +343,15 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
             }
             $res .= '</li>';
         }
-        $res .= '</ul></div>';
+        $res .= '</ul>';
+        $res .= '<div class="nux_tz">';
+        if (!$tz) {
+            $res .= $this->trans('Your timezone NOT set');
+        }
+        else {
+            $res .= sprintf($this->trans('Your timezone is set to %s'), $this->html_safe($tz));
+        }
+        $res .= ' <a href="?page=settings#general_setting">Update</a></div></div>';
         return $res;
     }
 }
