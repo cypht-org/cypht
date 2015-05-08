@@ -101,6 +101,7 @@ function hm_themes($output_mod) {
         'green' => $output_mod->trans('Poison Mist'),
         'tan' => $output_mod->trans('A Bunch Of Browns'),
         'terminal' => $output_mod->trans('VT100'),
+        'lightblue' => $output_mod->trans('Light Blue'),
         'hn' => $output_mod->trans('Hacker News'),
     );
 }

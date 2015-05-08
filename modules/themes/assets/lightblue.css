@@ -1,0 +1,6 @@
+.folder_list {margin-right: 0px; border-right: solid 1px #efefef; }
+.add_server, html, body, main, main div, nav, nav div, span, .list_meta { border-color: #efefef !important; border-radius: 0px 0px 0px 0px !important; background-color: #d8e2f0 !important; color: #555 !important; }
+select, option, input, textarea, .ke-container * { background-color: #e6ebf2 !important; }
+.src_name, .content_title { background: linear-gradient(180deg, #dbe5f3, #dbe5f3, #dbe5f3, #dde9f3); }
+.message_table td { border-bottom: none; }
+.checkbox_cell input[type="checkbox"]:checked + label { background-color: #666 !important; }
