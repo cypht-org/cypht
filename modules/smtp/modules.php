@@ -56,11 +56,18 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         foreach ($servers as $index => $server) {
             Hm_SMTP_List::add( $server, $index );
         }
+        $reply_type = false;
         if (array_key_exists('reply', $this->request->get) && $this->request->get['reply']) {
+            $reply_type = 'reply';
+        }
+        elseif (array_key_exists('forward', $this->request->get) && $this->request->get['forward']) {
+            $reply_type = 'forward';
+        }
+        if ($reply_type) {
             $details = $this->session->get('reply_details', array());
             if (!empty($details)) {
                 $this->out('reply_details', $details);
-                /* TODO: fix cached message page re-view, then unset session data here */
+                $this->out('reply_type', $reply_type);
             }
         }
         $this->out('compose_draft', $this->session->get('compose_draft', array()));
@@ -288,9 +295,10 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $body = '';
         $draft = $this->get('compose_draft', array());
         $reply = $this->get('reply_details', array());
+        $reply_type = $this->get('reply_type', '');
         $html = $this->get('smtp_compose_type', 0);
         if (!empty($reply)) {
-            list($to, $subject, $body) = format_reply_fields($reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this);
+            list($to, $subject, $body) = format_reply_fields($reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
         }
         elseif (!empty($draft)) {
             $to = $draft['draft_to'];

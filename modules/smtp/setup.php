@@ -53,6 +53,7 @@ return array(
     ),
     'allowed_get' => array(
         'reply' => FILTER_VALIDATE_INT,
+        'forward' => FILTER_VALIDATE_INT,
     ),
     'allowed_post' => array(
         'smtp_compose_type_setting' => FILTER_VALIDATE_INT,

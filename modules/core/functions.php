@@ -713,26 +713,16 @@ function validate_local_full($val) {
 }
 
 /**
- * Get reply field details
+ * Get reply to address
  * @subpackage core/functions
- * @param string $body message body
  * @param array $headers message headers
- * @param int $html set to 1 if the output should be HTML
- * @param array $struct message structure details
- * @return array
+ * @param string $type type (forward, reply, reply_all)
+ * @return string
  */
-function format_reply_fields($body, $headers, $struct, $html, $output_mod) {
-    $subject = '';
+function reply_to_address($headers, $type) {
     $to = '';
-    $msg = '';
-    $lead_in = '';
-    if (array_key_exists('Subject', $headers)) {
-        if (!preg_match("/^re:/i", trim($headers['Subject']))) {
-            $subject = sprintf("Re: %s", $headers['Subject']);
-        }
-        else {
-            $subject = $headers['Subject'];
-        }
+    if ($type == 'forward') {
+        return $to;
     }
     if (array_key_exists('Reply-to', $headers)) {
         $to = $headers['Reply-to'];
@@ -746,21 +736,98 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod) {
     elseif (array_key_exists('Return-path', $headers)) {
         $to = $headers['Return-path'];
     }
-    if (array_key_exists('Date', $headers)) {
-        if ($to) {
-            $lead_in = sprintf($output_mod->trans('On %s %s said')."\n\n", $headers['Date'], $output_mod->html_safe($to));
+    return $to;
+}
+
+/**
+ * Get reply to subject
+ * @subpackage core/functions
+ * @param array $headers message headers
+ * @param string $type type (forward, reply, reply_all)
+ * @return string
+ */
+function reply_to_subject($headers, $type) {
+    $subject = '';
+    if (array_key_exists('Subject', $headers)) {
+        if ($type == 'reply') {
+            if (!preg_match("/^re:/i", trim($headers['Subject']))) {
+                $subject = sprintf("Re: %s", $headers['Subject']);
+            }
         }
-        else {
-            $lead_in = sprintf($output_mod->trans('On %s, somebody said')."\n\n", $headers['Date']);
+        elseif ($type == 'forward') {
+            if (!preg_match("/^fwd:/i", trim($headers['Subject']))) {
+                $subject = sprintf("Fwd: %s", $headers['Subject']);
+            }
+        }
+        if (!$subject) {
+            $subject = $headers['Subject'];
         }
     }
+    return $subject;
+}
+
+/**
+ * Get reply message lead in
+ * @subpackage core/functions
+ * @param array $headers message headers
+ * @param string $type type (forward, reply, reply_all)
+ * @param string $to reply to value
+ * @param object $output_mod output module object
+ * @return string
+ */
+function reply_lead_in($headers, $type, $to, $output_mod) {
+    $lead_in = '';
+    if ($type == 'reply') {
+        if (array_key_exists('Date', $headers)) {
+            if ($to) {
+                $lead_in = sprintf($output_mod->trans('On %s %s said')."\n\n", $headers['Date'], $output_mod->html_safe($to));
+            }
+            else {
+                $lead_in = sprintf($output_mod->trans('On %s, somebody said')."\n\n", $headers['Date']);
+            }
+        }
+    }
+    elseif ($type == 'forward') {
+        $flds = array();
+        foreach( array('From', 'Date', 'Subject') as $fld) {
+            if (array_key_exists($fld, $headers)) {
+                $flds[$fld] = $headers[$fld];
+            }
+        }
+        $lead_in = "\n\n----- ".$output_mod->trans('begin forwarded message')." -----\n\n";
+        foreach ($flds as $fld => $val) {
+            $lead_in .= $fld.': '.$val."\n";
+        }
+        $lead_in .= "\n";
+    }
+    return $lead_in;
+}
+
+/**
+ * Get reply field details
+ * @subpackage core/functions
+ * @param array $headers message headers
+ * @param string $body message body
+ * @param string $lead_in body lead in text
+ * @param string $reply_type type (forward, reply, reply_all)
+ * @param array $struct message structure details
+ * @param int $html set to 1 if the output should be HTML
+ * @return array
+ */
+function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $html) {
+    $msg = '';
     $type = 'textplain';
     if (array_key_exists('type', $struct) && array_key_exists('subtype', $struct)) {
         $type = strtolower($struct['type']).strtolower($struct['subtype']);
     }
     if ($html) {
         if ($type == 'textplain') {
-            $msg = nl2br($lead_in.format_reply_text($body));
+            if ($reply_type == 'reply') {
+                $msg = nl2br($lead_in.format_reply_text($body));
+            }
+            elseif ($reply_type == 'forward') {
+                $msg = nl2br($lead_in.$body);
+            }
         }
         elseif ($type == 'texthtml') {
             $msg = nl2br($lead_in).'<hr /><blockquote>'.format_msg_html($body).'</blockquote>';
@@ -768,12 +835,44 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod) {
     }
     else {
         if ($type == 'texthtml') {
-            $msg = $lead_in.convert_html_to_text($body);
+            if ($reply_type == 'reply') {
+                $msg = $lead_in.format_reply_text(convert_html_to_text($body));
+            }
+            elseif ($reply_type == 'forward') {
+                $msg = $lead_in.convert_html_to_text($body);
+            }
         }
         elseif ($type == 'textplain') {
-            $msg = $lead_in.format_reply_text($body);
+            if ($reply_type == 'reply') {
+                $msg = $lead_in.format_reply_text($body);
+            }
+            else {
+                $msg = $lead_in.$body;
+            }
         }
     }
+    return $msg;
+}
+
+/**
+ * Get reply field details
+ * @subpackage core/functions
+ * @param string $body message body
+ * @param array $headers message headers
+ * @param array $struct message structure details
+ * @param int $html set to 1 if the output should be HTML
+ * @param string $type optional type (forward, reply, reply_all)
+ * @param object $output_mod output module object
+ * @return array
+ */
+function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type='reply') {
+    $to = '';
+    $msg = '';
+    $subject = reply_to_subject($headers, $type);
+    $to = reply_to_address($headers, $type);
+    $lead_in = reply_lead_in($headers, $type, $to, $output_mod);
+    $msg = reply_format_body($headers, $body, $lead_in, $type, $struct, $html);
+
     return array($to, $subject, $msg);
 }
 
