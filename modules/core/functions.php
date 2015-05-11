@@ -312,7 +312,7 @@ function format_msg_html($str, $external_resources=false) {
  * @return string
  */
 function convert_html_to_text($html) {
-    require 'third_party/Html2Text.php';
+    require APP_PATH.'third_party/Html2Text.php';
     $html = new \Html2Text\Html2Text($html, array('do_links' => 'table', 'width' => 0));
     return $html->getText();
 }
