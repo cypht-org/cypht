@@ -780,7 +780,7 @@ function reply_lead_in($headers, $type, $to, $output_mod) {
     if ($type == 'reply') {
         if (array_key_exists('Date', $headers)) {
             if ($to) {
-                $lead_in = sprintf($output_mod->trans('On %s %s said')."\n\n", $headers['Date'], $output_mod->html_safe($to));
+                $lead_in = sprintf($output_mod->trans('On %s %s said')."\n\n", $headers['Date'], $to);
             }
             else {
                 $lead_in = sprintf($output_mod->trans('On %s, somebody said')."\n\n", $headers['Date']);
@@ -872,7 +872,6 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type
     $to = reply_to_address($headers, $type);
     $lead_in = reply_lead_in($headers, $type, $to, $output_mod);
     $msg = reply_format_body($headers, $body, $lead_in, $type, $struct, $html);
-
     return array($to, $subject, $msg);
 }
 
