@@ -1622,27 +1622,24 @@
 </span><span id="628" class="l"><a href="#628">628: </a>    <span class="php-var">$session_type</span> = <span class="php-var">$config</span>-&gt;get(<span class="php-quote">'session_type'</span>, <span class="php-keyword1">false</span>);
 </span><span id="629" class="l"><a href="#629">629: </a>    <span class="php-var">$auth_type</span> = <span class="php-var">$config</span>-&gt;get(<span class="php-quote">'auth_type'</span>, <span class="php-keyword1">false</span>);
 </span><span id="630" class="l"><a href="#630">630: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$auth_type</span>) {
-</span><span id="631" class="l"><a href="#631">631: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$auth_type</span> == <span class="php-quote">'DB'</span>) {
-</span><span id="632" class="l"><a href="#632">632: </a>            <span class="php-keyword1">require_once</span> APP_PATH.<span class="php-quote">'third_party/pbkdf2.php'</span>;
-</span><span id="633" class="l"><a href="#633">633: </a>        }
-</span><span id="634" class="l"><a href="#634">634: </a>        <span class="php-var">$auth_class</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'Hm_Auth_%s'</span>, <span class="php-var">$auth_type</span>);
+</span><span id="631" class="l"><a href="#631">631: </a>        <span class="php-var">$auth_class</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'Hm_Auth_%s'</span>, <span class="php-var">$auth_type</span>);
+</span><span id="632" class="l"><a href="#632">632: </a>    }
+</span><span id="633" class="l"><a href="#633">633: </a>    <span class="php-keyword1">else</span> {
+</span><span id="634" class="l"><a href="#634">634: </a>        <span class="php-var">$auth_class</span> = <span class="php-quote">'Hm_Auth_None'</span>;
 </span><span id="635" class="l"><a href="#635">635: </a>    }
-</span><span id="636" class="l"><a href="#636">636: </a>    <span class="php-keyword1">else</span> {
-</span><span id="637" class="l"><a href="#637">637: </a>        <span class="php-var">$auth_class</span> = <span class="php-quote">'Hm_Auth_None'</span>;
+</span><span id="636" class="l"><a href="#636">636: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$session_type</span> == <span class="php-quote">'DB'</span>) {
+</span><span id="637" class="l"><a href="#637">637: </a>        <span class="php-var">$session_class</span> = <span class="php-quote">'Hm_DB_Session'</span>;
 </span><span id="638" class="l"><a href="#638">638: </a>    }
-</span><span id="639" class="l"><a href="#639">639: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$session_type</span> == <span class="php-quote">'DB'</span>) {
-</span><span id="640" class="l"><a href="#640">640: </a>        <span class="php-var">$session_class</span> = <span class="php-quote">'Hm_DB_Session'</span>;
+</span><span id="639" class="l"><a href="#639">639: </a>    <span class="php-keyword1">else</span> {
+</span><span id="640" class="l"><a href="#640">640: </a>        <span class="php-var">$session_class</span> = <span class="php-quote">'Hm_PHP_Session'</span>;
 </span><span id="641" class="l"><a href="#641">641: </a>    }
-</span><span id="642" class="l"><a href="#642">642: </a>    <span class="php-keyword1">else</span> {
-</span><span id="643" class="l"><a href="#643">643: </a>        <span class="php-var">$session_class</span> = <span class="php-quote">'Hm_PHP_Session'</span>;
-</span><span id="644" class="l"><a href="#644">644: </a>    }
-</span><span id="645" class="l"><a href="#645">645: </a>    Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Using %s with %s'</span>, <span class="php-var">$session_class</span>, <span class="php-var">$auth_class</span>));
-</span><span id="646" class="l"><a href="#646">646: </a>    <span class="php-var">$session</span> = <span class="php-keyword1">new</span> <span class="php-var">$session_class</span>(<span class="php-var">$config</span>, <span class="php-var">$auth_class</span>);
-</span><span id="647" class="l"><a href="#647">647: </a>    <span class="php-keyword1">return</span> <span class="php-var">$session</span>;
-</span><span id="648" class="l"><a href="#648">648: </a>}
-</span><span id="649" class="l"><a href="#649">649: </a>
-</span><span id="650" class="l"><a href="#650">650: </a><span class="xlang">?&gt;</span>
-</span><span id="651" class="l"><a href="#651">651: </a></span></code></pre>
+</span><span id="642" class="l"><a href="#642">642: </a>    Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Using %s with %s'</span>, <span class="php-var">$session_class</span>, <span class="php-var">$auth_class</span>));
+</span><span id="643" class="l"><a href="#643">643: </a>    <span class="php-var">$session</span> = <span class="php-keyword1">new</span> <span class="php-var">$session_class</span>(<span class="php-var">$config</span>, <span class="php-var">$auth_class</span>);
+</span><span id="644" class="l"><a href="#644">644: </a>    <span class="php-keyword1">return</span> <span class="php-var">$session</span>;
+</span><span id="645" class="l"><a href="#645">645: </a>}
+</span><span id="646" class="l"><a href="#646">646: </a>
+</span><span id="647" class="l"><a href="#647">647: </a><span class="xlang">?&gt;</span>
+</span><span id="648" class="l"><a href="#648">648: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
