@@ -248,7 +248,7 @@ class Hm_Site_Config_File extends Hm_Config {
      */
     public function load($source, $key) {
         if (is_readable($source)) {
-            $data = unserialize(file_get_contents($source));
+            $data = @unserialize(file_get_contents($source));
             if ($data) {
                 $this->config = array_merge($this->config, $data);
             }

@@ -164,18 +164,15 @@ class Hm_Crypt {
     }
 
     /**
-     * time constant string comparison for passwords
+     * Compare password hashes
      *
      * @param string $a hash
      * @param string $b hash
      * @return bool
      */ 
     public static function hash_compare($a, $b) {
-        $diff = strlen($a) ^ strlen($b);
-        for($i = 0; $i < strlen($a) && $i < strlen($b); $i++) {
-            $diff |= ord($a[$i]) ^ ord($b[$i]);
-        }
-        return $diff === 0;
+        sleep(1);
+        return $a === $b;
     }
 
     /**
