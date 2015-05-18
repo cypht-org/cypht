@@ -51,6 +51,10 @@ class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
  */
 class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
     public function process() {
+        $wp_details = $this->user_config->get('wp_connect_details', array());
+        if (empty($wp_details)) {
+            return;
+        }
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
         }
