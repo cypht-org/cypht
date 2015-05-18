@@ -683,6 +683,7 @@
 				<li><a href="class-Hm_Output_calendar_content.html">Hm_Output_calendar_content</a></li>
 				<li><a href="class-Hm_Output_calendar_page_link.html">Hm_Output_calendar_page_link</a></li>
 				<li><a href="class-Hm_Output_change_password.html">Hm_Output_change_password</a></li>
+				<li><a href="class-Hm_Output_change_password_link.html">Hm_Output_change_password_link</a></li>
 				<li><a href="class-Hm_Output_compose_form.html">Hm_Output_compose_form</a></li>
 				<li><a href="class-Hm_Output_compose_page_link.html">Hm_Output_compose_page_link</a></li>
 				<li><a href="class-Hm_Output_compose_type_setting.html">Hm_Output_compose_type_setting</a></li>
@@ -1049,16 +1050,16 @@
 </span><span id="55" class="l"><a href="#55"> 55: </a>        <span class="php-var">$modules</span> = <span class="php-var">$this</span>-&gt;config-&gt;get(<span class="php-quote">'modules'</span>, <span class="php-quote">''</span>);
 </span><span id="56" class="l"><a href="#56"> 56: </a>
 </span><span id="57" class="l"><a href="#57"> 57: </a>        <span class="php-keyword1">if</span> (data_source_available(<span class="php-var">$modules</span>, <span class="php-quote">'imap'</span>)) {
-</span><span id="58" class="l"><a href="#58"> 58: </a>            <span class="php-var">$imap_servers</span> = <span class="php-keyword2">count</span>( Hm_IMAP_List::dump(<span class="php-keyword1">false</span>) );
+</span><span id="58" class="l"><a href="#58"> 58: </a>            <span class="php-var">$imap_servers</span> = <span class="php-keyword2">count</span>(Hm_IMAP_List::dump(<span class="php-keyword1">false</span>));
 </span><span id="59" class="l"><a href="#59"> 59: </a>        }
 </span><span id="60" class="l"><a href="#60"> 60: </a>        <span class="php-keyword1">if</span> (data_source_available(<span class="php-var">$modules</span>, <span class="php-quote">'pop3'</span>)) {
-</span><span id="61" class="l"><a href="#61"> 61: </a>            <span class="php-var">$pop3_servers</span> = <span class="php-keyword2">count</span>( Hm_POP3_List::dump(<span class="php-keyword1">false</span>) );
+</span><span id="61" class="l"><a href="#61"> 61: </a>            <span class="php-var">$pop3_servers</span> = <span class="php-keyword2">count</span>(Hm_POP3_List::dump(<span class="php-keyword1">false</span>));
 </span><span id="62" class="l"><a href="#62"> 62: </a>        }
 </span><span id="63" class="l"><a href="#63"> 63: </a>        <span class="php-keyword1">if</span> (data_source_available(<span class="php-var">$modules</span>, <span class="php-quote">'feeds'</span>)) {
-</span><span id="64" class="l"><a href="#64"> 64: </a>            <span class="php-var">$feed_servers</span> = <span class="php-keyword2">count</span>( Hm_Feed_List::dump(<span class="php-keyword1">false</span>) );
+</span><span id="64" class="l"><a href="#64"> 64: </a>            <span class="php-var">$feed_servers</span> = <span class="php-keyword2">count</span>(Hm_Feed_List::dump(<span class="php-keyword1">false</span>));
 </span><span id="65" class="l"><a href="#65"> 65: </a>        }
 </span><span id="66" class="l"><a href="#66"> 66: </a>        <span class="php-keyword1">if</span> (data_source_available(<span class="php-var">$modules</span>, <span class="php-quote">'smtp'</span>)) {
-</span><span id="67" class="l"><a href="#67"> 67: </a>            <span class="php-var">$smtp_servers</span> = <span class="php-keyword2">count</span>( Hm_SMTP_List::dump(<span class="php-keyword1">false</span>) );
+</span><span id="67" class="l"><a href="#67"> 67: </a>            <span class="php-var">$smtp_servers</span> = <span class="php-keyword2">count</span>(Hm_SMTP_List::dump(<span class="php-keyword1">false</span>));
 </span><span id="68" class="l"><a href="#68"> 68: </a>        }
 </span><span id="69" class="l"><a href="#69"> 69: </a>
 </span><span id="70" class="l"><a href="#70"> 70: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'nux_server_setup'</span>, <span class="php-keyword1">array</span>(
@@ -1471,6 +1472,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?56327f64b14787c8dcb4cbae6fe5f9869297b2c7"></script>
+<script src="elementlist.js?5ad3add04edb3e08961609ffa9d827b8d474bcf2"></script>
 </body>
 </html>

@@ -683,6 +683,7 @@
 				<li><a href="class-Hm_Output_calendar_content.html">Hm_Output_calendar_content</a></li>
 				<li><a href="class-Hm_Output_calendar_page_link.html">Hm_Output_calendar_page_link</a></li>
 				<li><a href="class-Hm_Output_change_password.html">Hm_Output_change_password</a></li>
+				<li><a href="class-Hm_Output_change_password_link.html">Hm_Output_change_password_link</a></li>
 				<li><a href="class-Hm_Output_compose_form.html">Hm_Output_compose_form</a></li>
 				<li><a href="class-Hm_Output_compose_page_link.html">Hm_Output_compose_page_link</a></li>
 				<li><a href="class-Hm_Output_compose_type_setting.html">Hm_Output_compose_type_setting</a></li>
@@ -2575,437 +2576,436 @@
 </span><span id="1581" class="l"><a href="#1581">1581: </a>            <span class="php-quote">'&lt;li class=&quot;menu_combined_inbox&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=combined_inbox&quot;&gt;'</span>.
 </span><span id="1582" class="l"><a href="#1582">1582: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$box</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Everything'</span>).
 </span><span id="1583" class="l"><a href="#1583">1583: </a>            <span class="php-quote">'&lt;/a&gt;&lt;span class=&quot;combined_inbox_count&quot;&gt;&lt;/span&gt;&lt;/li&gt;'</span>;
-</span><span id="1584" class="l"><a href="#1584">1584: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$email</span>) {
-</span><span id="1585" class="l"><a href="#1585">1585: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_unread&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=unread&quot;&gt;'</span>.
-</span><span id="1586" class="l"><a href="#1586">1586: </a>                <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$env_closed</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Unread'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="1587" class="l"><a href="#1587">1587: </a>        }
-</span><span id="1588" class="l"><a href="#1588">1588: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_flagged&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=flagged&quot;&gt;'</span>.
-</span><span id="1589" class="l"><a href="#1589">1589: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$star</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Flagged'</span>).
-</span><span id="1590" class="l"><a href="#1590">1590: </a>            <span class="php-quote">'&lt;/a&gt; &lt;span class=&quot;flagged_count&quot;&gt;&lt;/span&gt;&lt;/li&gt;'</span>;
-</span><span id="1591" class="l"><a href="#1591">1591: </a>
-</span><span id="1592" class="l"><a href="#1592">1592: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="1593" class="l"><a href="#1593">1593: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1594" class="l"><a href="#1594">1594: </a>        }
-</span><span id="1595" class="l"><a href="#1595">1595: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="1596" class="l"><a href="#1596">1596: </a>    }
-</span><span id="1597" class="l"><a href="#1597">1597: </a>}
-</span><span id="1598" class="l"><a href="#1598">1598: </a>
-</span><span id="1599" class="l"><a href="#1599">1599: </a><span class="php-comment">/**
-</span></span><span id="1600" class="l"><a href="#1600">1600: </a><span class="php-comment"> * Outputs the logout link in the Main menu of the folder list
-</span></span><span id="1601" class="l"><a href="#1601">1601: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1602" class="l"><a href="#1602">1602: </a><span class="php-comment"> */</span>
-</span><span id="1603" class="l"><a href="#1603">1603: </a><span class="php-keyword1">class</span> Hm_Output_logout_menu_item <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1604" class="l"><a href="#1604">1604: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1605" class="l"><a href="#1605">1605: </a>        <span class="php-var">$res</span> =  <span class="php-quote">'&lt;li&gt;&lt;a class=&quot;unread_link logout_link&quot; href=&quot;#&quot;&gt;&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.
-</span><span id="1606" class="l"><a href="#1606">1606: </a>            <span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$power</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Logout'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="1607" class="l"><a href="#1607">1607: </a>
-</span><span id="1608" class="l"><a href="#1608">1608: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="1609" class="l"><a href="#1609">1609: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1610" class="l"><a href="#1610">1610: </a>        }
-</span><span id="1611" class="l"><a href="#1611">1611: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="1612" class="l"><a href="#1612">1612: </a>    }
-</span><span id="1613" class="l"><a href="#1613">1613: </a>}
-</span><span id="1614" class="l"><a href="#1614">1614: </a>
-</span><span id="1615" class="l"><a href="#1615">1615: </a><span class="php-comment">/**
-</span></span><span id="1616" class="l"><a href="#1616">1616: </a><span class="php-comment"> * Close the Main menu section of the folder list
-</span></span><span id="1617" class="l"><a href="#1617">1617: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1618" class="l"><a href="#1618">1618: </a><span class="php-comment"> */</span>
-</span><span id="1619" class="l"><a href="#1619">1619: </a><span class="php-keyword1">class</span> Hm_Output_main_menu_end <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1620" class="l"><a href="#1620">1620: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1621" class="l"><a href="#1621">1621: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;'</span>;
-</span><span id="1622" class="l"><a href="#1622">1622: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="1623" class="l"><a href="#1623">1623: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1624" class="l"><a href="#1624">1624: </a>        }
-</span><span id="1625" class="l"><a href="#1625">1625: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="1626" class="l"><a href="#1626">1626: </a>    }
-</span><span id="1627" class="l"><a href="#1627">1627: </a>}
-</span><span id="1628" class="l"><a href="#1628">1628: </a>
-</span><span id="1629" class="l"><a href="#1629">1629: </a><span class="php-comment">/**
-</span></span><span id="1630" class="l"><a href="#1630">1630: </a><span class="php-comment"> * Output the E-mail section of the folder list
-</span></span><span id="1631" class="l"><a href="#1631">1631: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1632" class="l"><a href="#1632">1632: </a><span class="php-comment"> */</span>
-</span><span id="1633" class="l"><a href="#1633">1633: </a><span class="php-keyword1">class</span> Hm_Output_email_menu_content <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1634" class="l"><a href="#1634">1634: </a>    <span class="php-comment">/**
-</span></span><span id="1635" class="l"><a href="#1635">1635: </a><span class="php-comment">     * Displays a list of all configured E-mail accounts
-</span></span><span id="1636" class="l"><a href="#1636">1636: </a><span class="php-comment">     */</span>
-</span><span id="1637" class="l"><a href="#1637">1637: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1638" class="l"><a href="#1638">1638: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="1639" class="l"><a href="#1639">1639: </a>        <span class="php-var">$folder_sources</span> = <span class="php-keyword2">array_unique</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'folder_sources'</span>, <span class="php-keyword1">array</span>()));
-</span><span id="1640" class="l"><a href="#1640">1640: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$folder_sources</span> <span class="php-keyword1">as</span> <span class="php-var">$src</span>) {
-</span><span id="1641" class="l"><a href="#1641">1641: </a>            <span class="php-var">$parts</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">'_'</span>, <span class="php-var">$src</span>);
-</span><span id="1642" class="l"><a href="#1642">1642: </a>            <span class="php-keyword2">array_pop</span>(<span class="php-var">$parts</span>);
-</span><span id="1643" class="l"><a href="#1643">1643: </a>            <span class="php-var">$name</span> = <span class="php-keyword2">ucwords</span>(<span class="php-keyword2">implode</span>(<span class="php-quote">' '</span>, <span class="php-var">$parts</span>));
-</span><span id="1644" class="l"><a href="#1644">1644: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;src_name&quot; data-source=&quot;.'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$src</span>).<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-var">$name</span>).
-</span><span id="1645" class="l"><a href="#1645">1645: </a>                <span class="php-quote">'&lt;img class=&quot;menu_caret&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$chevron</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;&lt;/div&gt;'</span>;
-</span><span id="1646" class="l"><a href="#1646">1646: </a>
-</span><span id="1647" class="l"><a href="#1647">1647: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div style=&quot;display: none;&quot; '</span>;
-</span><span id="1648" class="l"><a href="#1648">1648: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'class=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$src</span>).<span class="php-quote">'&quot;&gt;&lt;ul class=&quot;folders&quot;&gt;'</span>;
-</span><span id="1649" class="l"><a href="#1649">1649: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$name</span> == <span class="php-quote">'Email'</span>) {
-</span><span id="1650" class="l"><a href="#1650">1650: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_email&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=email&quot;&gt;'</span>.
-</span><span id="1651" class="l"><a href="#1651">1651: </a>                    <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$globe</span>).
-</span><span id="1652" class="l"><a href="#1652">1652: </a>                    <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'All'</span>).<span class="php-quote">'&lt;/a&gt; &lt;span class=&quot;unread_mail_count&quot;&gt;&lt;/span&gt;&lt;/li&gt;'</span>;
-</span><span id="1653" class="l"><a href="#1653">1653: </a>            }
-</span><span id="1654" class="l"><a href="#1654">1654: </a>            <span class="php-var">$cache</span> = Hm_Page_Cache::get(<span class="php-var">$src</span>);
-</span><span id="1655" class="l"><a href="#1655">1655: </a>            Hm_Page_Cache::del(<span class="php-var">$src</span>);
-</span><span id="1656" class="l"><a href="#1656">1656: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$cache</span>) {
-</span><span id="1657" class="l"><a href="#1657">1657: </a>                <span class="php-var">$res</span> .= <span class="php-var">$cache</span>;
-</span><span id="1658" class="l"><a href="#1658">1658: </a>            }
-</span><span id="1659" class="l"><a href="#1659">1659: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;'</span>;
-</span><span id="1660" class="l"><a href="#1660">1660: </a>        }
-</span><span id="1661" class="l"><a href="#1661">1661: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="1662" class="l"><a href="#1662">1662: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1663" class="l"><a href="#1663">1663: </a>        }
-</span><span id="1664" class="l"><a href="#1664">1664: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="1665" class="l"><a href="#1665">1665: </a>    }
-</span><span id="1666" class="l"><a href="#1666">1666: </a>}
-</span><span id="1667" class="l"><a href="#1667">1667: </a>
-</span><span id="1668" class="l"><a href="#1668">1668: </a><span class="php-comment">/**
-</span></span><span id="1669" class="l"><a href="#1669">1669: </a><span class="php-comment"> * Start the Settings section of the folder list
-</span></span><span id="1670" class="l"><a href="#1670">1670: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1671" class="l"><a href="#1671">1671: </a><span class="php-comment"> */</span>
-</span><span id="1672" class="l"><a href="#1672">1672: </a><span class="php-keyword1">class</span> Hm_Output_settings_menu_start <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1673" class="l"><a href="#1673">1673: </a>    <span class="php-comment">/**
-</span></span><span id="1674" class="l"><a href="#1674">1674: </a><span class="php-comment">     * Opens an unordered list
-</span></span><span id="1675" class="l"><a href="#1675">1675: </a><span class="php-comment">     */</span>
-</span><span id="1676" class="l"><a href="#1676">1676: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1677" class="l"><a href="#1677">1677: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;src_name&quot; data-source=&quot;.settings&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Settings'</span>).
-</span><span id="1678" class="l"><a href="#1678">1678: </a>            <span class="php-quote">'&lt;img class=&quot;menu_caret&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$chevron</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;'</span>.
-</span><span id="1679" class="l"><a href="#1679">1679: </a>            <span class="php-quote">'&lt;/div&gt;&lt;ul style=&quot;display: none;&quot; class=&quot;settings folders&quot;&gt;'</span>;
-</span><span id="1680" class="l"><a href="#1680">1680: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="1681" class="l"><a href="#1681">1681: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1682" class="l"><a href="#1682">1682: </a>        }
-</span><span id="1683" class="l"><a href="#1683">1683: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="1684" class="l"><a href="#1684">1684: </a>    }
-</span><span id="1685" class="l"><a href="#1685">1685: </a>}
-</span><span id="1686" class="l"><a href="#1686">1686: </a>
-</span><span id="1687" class="l"><a href="#1687">1687: </a><span class="php-comment">/**
-</span></span><span id="1688" class="l"><a href="#1688">1688: </a><span class="php-comment"> * Save settings page content
-</span></span><span id="1689" class="l"><a href="#1689">1689: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1690" class="l"><a href="#1690">1690: </a><span class="php-comment"> */</span>
-</span><span id="1691" class="l"><a href="#1691">1691: </a><span class="php-keyword1">class</span> Hm_Output_save_form <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1692" class="l"><a href="#1692">1692: </a>    <span class="php-comment">/**
-</span></span><span id="1693" class="l"><a href="#1693">1693: </a><span class="php-comment">     * Outputs save form
-</span></span><span id="1694" class="l"><a href="#1694">1694: </a><span class="php-comment">     */</span>
-</span><span id="1695" class="l"><a href="#1695">1695: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1696" class="l"><a href="#1696">1696: </a>        <span class="php-var">$changed</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'changed_settings'</span>, <span class="php-keyword1">array</span>());
-</span><span id="1697" class="l"><a href="#1697">1697: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;save_settings_page&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save Settings'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1698" class="l"><a href="#1698">1698: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;save_details&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Settings are not saved permanently on the server unless you explicitly allow it. '</span>.
-</span><span id="1699" class="l"><a href="#1699">1699: </a>            <span class="php-quote">'If you don\'t save your settings, any changes made since you last logged in will be deleted when your '</span>.
-</span><span id="1700" class="l"><a href="#1700">1700: </a>            <span class="php-quote">'session expires or you logout. You must re-enter your password for security purposes to save your settings '</span>.
-</span><span id="1701" class="l"><a href="#1701">1701: </a>            <span class="php-quote">'permanently.'</span>);
-</span><span id="1702" class="l"><a href="#1702">1702: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;save_subtitle&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Unsaved Changes'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1703" class="l"><a href="#1703">1703: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;ul class=&quot;unsaved_settings&quot;&gt;'</span>;
-</span><span id="1704" class="l"><a href="#1704">1704: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$changed</span>)) {
-</span><span id="1705" class="l"><a href="#1705">1705: </a>            <span class="php-var">$changed</span> = <span class="php-keyword2">array_count_values</span>(<span class="php-var">$changed</span>);
-</span><span id="1706" class="l"><a href="#1706">1706: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$changed</span> <span class="php-keyword1">as</span> <span class="php-var">$change</span> =&gt; <span class="php-var">$num</span>) {
-</span><span id="1707" class="l"><a href="#1707">1707: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-var">$change</span>).<span class="php-quote">' ('</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$num</span>).<span class="php-quote">'X)&lt;/li&gt;'</span>;
-</span><span id="1708" class="l"><a href="#1708">1708: </a>            }
-</span><span id="1709" class="l"><a href="#1709">1709: </a>        }
-</span><span id="1710" class="l"><a href="#1710">1710: </a>        <span class="php-keyword1">else</span> {
-</span><span id="1711" class="l"><a href="#1711">1711: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'No changes need to be saved'</span>).<span class="php-quote">'&lt;/li&gt;'</span>;
-</span><span id="1712" class="l"><a href="#1712">1712: </a>        }
-</span><span id="1713" class="l"><a href="#1713">1713: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;&lt;div class=&quot;save_perm_form&quot;&gt;&lt;form method=&quot;post&quot;&gt;'</span>.
-</span><span id="1714" class="l"><a href="#1714">1714: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="1715" class="l"><a href="#1715">1715: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;password&quot;&gt;Password&lt;/label&gt;&lt;input required id=&quot;password&quot; '</span>.
-</span><span id="1716" class="l"><a href="#1716">1716: </a>            <span class="php-quote">'name=&quot;password&quot; class=&quot;save_settings_password&quot; type=&quot;password&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="1717" class="l"><a href="#1717">1717: </a>            <span class="php-quote">'&lt;input class=&quot;save_settings&quot; type=&quot;submit&quot; name=&quot;save_settings_permanently&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="1718" class="l"><a href="#1718">1718: </a>            <span class="php-quote">'&lt;input class=&quot;save_settings&quot; type=&quot;submit&quot; name=&quot;save_settings_permanently_then_logout&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save and Logout'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="1719" class="l"><a href="#1719">1719: </a>            <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;'</span>;
-</span><span id="1720" class="l"><a href="#1720">1720: </a>
-</span><span id="1721" class="l"><a href="#1721">1721: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1722" class="l"><a href="#1722">1722: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1723" class="l"><a href="#1723">1723: </a>    }
-</span><span id="1724" class="l"><a href="#1724">1724: </a>}
-</span><span id="1725" class="l"><a href="#1725">1725: </a>
-</span><span id="1726" class="l"><a href="#1726">1726: </a><span class="php-comment">/**
-</span></span><span id="1727" class="l"><a href="#1727">1727: </a><span class="php-comment"> * Content for the Settings menu section of the folder list
-</span></span><span id="1728" class="l"><a href="#1728">1728: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1729" class="l"><a href="#1729">1729: </a><span class="php-comment"> */</span>
-</span><span id="1730" class="l"><a href="#1730">1730: </a><span class="php-keyword1">class</span> Hm_Output_settings_menu_content <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1731" class="l"><a href="#1731">1731: </a>    <span class="php-comment">/**
-</span></span><span id="1732" class="l"><a href="#1732">1732: </a><span class="php-comment">     * Outputs links to the Servers and Site Settings pages
-</span></span><span id="1733" class="l"><a href="#1733">1733: </a><span class="php-comment">     */</span>
-</span><span id="1734" class="l"><a href="#1734">1734: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1735" class="l"><a href="#1735">1735: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_servers&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=servers&quot;&gt;'</span>.
-</span><span id="1736" class="l"><a href="#1736">1736: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$monitor</span>).
-</span><span id="1737" class="l"><a href="#1737">1737: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Servers'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>.
-</span><span id="1738" class="l"><a href="#1738">1738: </a>            <span class="php-quote">'&lt;li class=&quot;menu_settings&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=settings&quot;&gt;'</span>.
-</span><span id="1739" class="l"><a href="#1739">1739: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$cog</span>).
-</span><span id="1740" class="l"><a href="#1740">1740: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Site'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>.
-</span><span id="1741" class="l"><a href="#1741">1741: </a>            <span class="php-quote">'&lt;li class=&quot;menu_save&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=save&quot;&gt;'</span>.
-</span><span id="1742" class="l"><a href="#1742">1742: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$save</span>).
-</span><span id="1743" class="l"><a href="#1743">1743: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="1744" class="l"><a href="#1744">1744: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="1745" class="l"><a href="#1745">1745: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1746" class="l"><a href="#1746">1746: </a>        }
-</span><span id="1747" class="l"><a href="#1747">1747: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="1748" class="l"><a href="#1748">1748: </a>    }
-</span><span id="1749" class="l"><a href="#1749">1749: </a>}
-</span><span id="1750" class="l"><a href="#1750">1750: </a>
-</span><span id="1751" class="l"><a href="#1751">1751: </a><span class="php-comment">/**
-</span></span><span id="1752" class="l"><a href="#1752">1752: </a><span class="php-comment"> * Closes the Settings menu in the folder list
-</span></span><span id="1753" class="l"><a href="#1753">1753: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1754" class="l"><a href="#1754">1754: </a><span class="php-comment"> */</span>
-</span><span id="1755" class="l"><a href="#1755">1755: </a><span class="php-keyword1">class</span> Hm_Output_settings_menu_end <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1756" class="l"><a href="#1756">1756: </a>    <span class="php-comment">/**
-</span></span><span id="1757" class="l"><a href="#1757">1757: </a><span class="php-comment">     * Closes the ul tag opened in Hm_Output_settings_menu_start
-</span></span><span id="1758" class="l"><a href="#1758">1758: </a><span class="php-comment">     */</span>
-</span><span id="1759" class="l"><a href="#1759">1759: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1760" class="l"><a href="#1760">1760: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/ul&gt;'</span>;
-</span><span id="1761" class="l"><a href="#1761">1761: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="1762" class="l"><a href="#1762">1762: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1763" class="l"><a href="#1763">1763: </a>        }
-</span><span id="1764" class="l"><a href="#1764">1764: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="1765" class="l"><a href="#1765">1765: </a>    }
-</span><span id="1766" class="l"><a href="#1766">1766: </a>}
-</span><span id="1767" class="l"><a href="#1767">1767: </a>
-</span><span id="1768" class="l"><a href="#1768">1768: </a><span class="php-comment">/**
-</span></span><span id="1769" class="l"><a href="#1769">1769: </a><span class="php-comment"> * End of the content section of the folder list
-</span></span><span id="1770" class="l"><a href="#1770">1770: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1771" class="l"><a href="#1771">1771: </a><span class="php-comment"> */</span>
-</span><span id="1772" class="l"><a href="#1772">1772: </a><span class="php-keyword1">class</span> Hm_Output_folder_list_content_end <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1773" class="l"><a href="#1773">1773: </a>    <span class="php-comment">/**
-</span></span><span id="1774" class="l"><a href="#1774">1774: </a><span class="php-comment">     * Adds collapse and reload links
-</span></span><span id="1775" class="l"><a href="#1775">1775: </a><span class="php-comment">     */</span>
-</span><span id="1776" class="l"><a href="#1776">1776: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1777" class="l"><a href="#1777">1777: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;a href=&quot;#&quot; class=&quot;update_message_list&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'[reload]'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
-</span><span id="1778" class="l"><a href="#1778">1778: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;#&quot; class=&quot;hide_folders&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$big_caret_left</span>.
-</span><span id="1779" class="l"><a href="#1779">1779: </a>            <span class="php-quote">'&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Collapse'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;&lt;/a&gt;'</span>;
-</span><span id="1780" class="l"><a href="#1780">1780: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="1781" class="l"><a href="#1781">1781: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1782" class="l"><a href="#1782">1782: </a>        }
-</span><span id="1783" class="l"><a href="#1783">1783: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="1784" class="l"><a href="#1784">1784: </a>    }
-</span><span id="1785" class="l"><a href="#1785">1785: </a>}
-</span><span id="1786" class="l"><a href="#1786">1786: </a>
-</span><span id="1787" class="l"><a href="#1787">1787: </a><span class="php-comment">/**
-</span></span><span id="1788" class="l"><a href="#1788">1788: </a><span class="php-comment"> * Closes the folder list
-</span></span><span id="1789" class="l"><a href="#1789">1789: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1790" class="l"><a href="#1790">1790: </a><span class="php-comment"> */</span>
-</span><span id="1791" class="l"><a href="#1791">1791: </a><span class="php-keyword1">class</span> Hm_Output_folder_list_end <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1792" class="l"><a href="#1792">1792: </a>    <span class="php-comment">/**
-</span></span><span id="1793" class="l"><a href="#1793">1793: </a><span class="php-comment">     * Closes the div and nav tags opened in Hm_Output_folder_list_start
-</span></span><span id="1794" class="l"><a href="#1794">1794: </a><span class="php-comment">     */</span>
-</span><span id="1795" class="l"><a href="#1795">1795: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1796" class="l"><a href="#1796">1796: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;&lt;/nav&gt;'</span>;
-</span><span id="1797" class="l"><a href="#1797">1797: </a>    }
-</span><span id="1798" class="l"><a href="#1798">1798: </a>}
-</span><span id="1799" class="l"><a href="#1799">1799: </a>
-</span><span id="1800" class="l"><a href="#1800">1800: </a><span class="php-comment">/**
-</span></span><span id="1801" class="l"><a href="#1801">1801: </a><span class="php-comment"> * Starts the main content section
-</span></span><span id="1802" class="l"><a href="#1802">1802: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1803" class="l"><a href="#1803">1803: </a><span class="php-comment"> */</span>
-</span><span id="1804" class="l"><a href="#1804">1804: </a><span class="php-keyword1">class</span> Hm_Output_content_section_start <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1805" class="l"><a href="#1805">1805: </a>    <span class="php-comment">/**
-</span></span><span id="1806" class="l"><a href="#1806">1806: </a><span class="php-comment">     * Opens a main tag for the primary content section
-</span></span><span id="1807" class="l"><a href="#1807">1807: </a><span class="php-comment">     */</span>
-</span><span id="1808" class="l"><a href="#1808">1808: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1809" class="l"><a href="#1809">1809: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;main class=&quot;content_cell&quot;&gt;'</span>;
-</span><span id="1810" class="l"><a href="#1810">1810: </a>    }
-</span><span id="1811" class="l"><a href="#1811">1811: </a>}
-</span><span id="1812" class="l"><a href="#1812">1812: </a>
-</span><span id="1813" class="l"><a href="#1813">1813: </a><span class="php-comment">/**
-</span></span><span id="1814" class="l"><a href="#1814">1814: </a><span class="php-comment"> * Closes the main content section
-</span></span><span id="1815" class="l"><a href="#1815">1815: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1816" class="l"><a href="#1816">1816: </a><span class="php-comment"> */</span>
-</span><span id="1817" class="l"><a href="#1817">1817: </a><span class="php-keyword1">class</span> Hm_Output_content_section_end <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1818" class="l"><a href="#1818">1818: </a>    <span class="php-comment">/**
-</span></span><span id="1819" class="l"><a href="#1819">1819: </a><span class="php-comment">     * Closes the main tag opened in Hm_Output_content_section_start
-</span></span><span id="1820" class="l"><a href="#1820">1820: </a><span class="php-comment">     */</span>
-</span><span id="1821" class="l"><a href="#1821">1821: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1822" class="l"><a href="#1822">1822: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/main&gt;'</span>;
-</span><span id="1823" class="l"><a href="#1823">1823: </a>    }
-</span><span id="1824" class="l"><a href="#1824">1824: </a>}
-</span><span id="1825" class="l"><a href="#1825">1825: </a>
-</span><span id="1826" class="l"><a href="#1826">1826: </a><span class="php-comment">/**
-</span></span><span id="1827" class="l"><a href="#1827">1827: </a><span class="php-comment"> * Starts the message view page
-</span></span><span id="1828" class="l"><a href="#1828">1828: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1829" class="l"><a href="#1829">1829: </a><span class="php-comment"> */</span>
-</span><span id="1830" class="l"><a href="#1830">1830: </a><span class="php-keyword1">class</span> Hm_Output_message_start <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1831" class="l"><a href="#1831">1831: </a>    <span class="php-comment">/**
-</span></span><span id="1832" class="l"><a href="#1832">1832: </a><span class="php-comment">     * @todo this is pretty ugly, clean it up and remove module specific stuff
-</span></span><span id="1833" class="l"><a href="#1833">1833: </a><span class="php-comment">     */</span>
-</span><span id="1834" class="l"><a href="#1834">1834: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1835" class="l"><a href="#1835">1835: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;in(<span class="php-quote">'list_parent'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'search'</span>, <span class="php-quote">'flagged'</span>, <span class="php-quote">'combined_inbox'</span>, <span class="php-quote">'unread'</span>, <span class="php-quote">'feeds'</span>, <span class="php-quote">'email'</span>))) {
-</span><span id="1836" class="l"><a href="#1836">1836: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>) == <span class="php-quote">'combined_inbox'</span>) {
-</span><span id="1837" class="l"><a href="#1837">1837: </a>                <span class="php-var">$list_name</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Everything'</span>);
-</span><span id="1838" class="l"><a href="#1838">1838: </a>            }
-</span><span id="1839" class="l"><a href="#1839">1839: </a>            <span class="php-keyword1">elseif</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>) == <span class="php-quote">'email'</span>) {
-</span><span id="1840" class="l"><a href="#1840">1840: </a>                <span class="php-var">$list_name</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'All Email'</span>);
-</span><span id="1841" class="l"><a href="#1841">1841: </a>            }
-</span><span id="1842" class="l"><a href="#1842">1842: </a>            <span class="php-keyword1">else</span> {
-</span><span id="1843" class="l"><a href="#1843">1843: </a>                <span class="php-var">$list_name</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-keyword2">ucwords</span>(<span class="php-keyword2">str_replace</span>(<span class="php-quote">'_'</span>, <span class="php-quote">' '</span>, <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>))));
-</span><span id="1844" class="l"><a href="#1844">1844: </a>            }
-</span><span id="1845" class="l"><a href="#1845">1845: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>) == <span class="php-quote">'search'</span>) {
-</span><span id="1846" class="l"><a href="#1846">1846: </a>                <span class="php-var">$page</span> = <span class="php-quote">'search'</span>;
-</span><span id="1847" class="l"><a href="#1847">1847: </a>            }
-</span><span id="1848" class="l"><a href="#1848">1848: </a>            <span class="php-keyword1">else</span> {
-</span><span id="1849" class="l"><a href="#1849">1849: </a>                <span class="php-var">$page</span> = <span class="php-quote">'message_list'</span>;
-</span><span id="1850" class="l"><a href="#1850">1850: </a>            }
-</span><span id="1851" class="l"><a href="#1851">1851: </a>            <span class="php-var">$title</span> = <span class="php-quote">'&lt;a href=&quot;?page='</span>.<span class="php-var">$page</span>.<span class="php-quote">'&amp;amp;list_path='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>)).<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$list_name</span>.<span class="php-quote">'&lt;/a&gt;'</span>;
-</span><span id="1852" class="l"><a href="#1852">1852: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>())) &gt; <span class="php-num">0</span>) {
-</span><span id="1853" class="l"><a href="#1853">1853: </a>                <span class="php-var">$mb_title</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>());
-</span><span id="1854" class="l"><a href="#1854">1854: </a>                <span class="php-var">$title</span> .= <span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; /&gt;'</span>.
-</span><span id="1855" class="l"><a href="#1855">1855: </a>                    <span class="php-quote">'&lt;a href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>)).<span class="php-quote">'&quot;&gt;'</span>.
-</span><span id="1856" class="l"><a href="#1856">1856: </a>                <span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; /&gt;'</span>,
-</span><span id="1857" class="l"><a href="#1857">1857: </a>                    <span class="php-keyword2">array_map</span>( <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;trans(<span class="php-var">$v</span>); }, <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>()))).<span class="php-quote">'&lt;/a&gt;'</span>;
-</span><span id="1858" class="l"><a href="#1858">1858: </a>            }
-</span><span id="1859" class="l"><a href="#1859">1859: </a>        }
-</span><span id="1860" class="l"><a href="#1860">1860: </a>        <span class="php-keyword1">elseif</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>)) {
-</span><span id="1861" class="l"><a href="#1861">1861: </a>            <span class="php-var">$title</span> = <span class="php-quote">'&lt;a href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>)).<span class="php-quote">'&quot;&gt;'</span>.
-</span><span id="1862" class="l"><a href="#1862">1862: </a>                <span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; /&gt;'</span>,
-</span><span id="1863" class="l"><a href="#1863">1863: </a>                    <span class="php-keyword2">array_map</span>( <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;trans(<span class="php-var">$v</span>); }, <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>()))).<span class="php-quote">'&lt;/a&gt;'</span>;
-</span><span id="1864" class="l"><a href="#1864">1864: </a>        }
-</span><span id="1865" class="l"><a href="#1865">1865: </a>        <span class="php-keyword1">else</span> {
-</span><span id="1866" class="l"><a href="#1866">1866: </a>            <span class="php-var">$title</span> = <span class="php-quote">''</span>;
-</span><span id="1867" class="l"><a href="#1867">1867: </a>        }
-</span><span id="1868" class="l"><a href="#1868">1868: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="1869" class="l"><a href="#1869">1869: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'uid'</span>)) {
-</span><span id="1870" class="l"><a href="#1870">1870: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; class=&quot;msg_uid&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'uid'</span>)).<span class="php-quote">'&quot; /&gt;'</span>;
-</span><span id="1871" class="l"><a href="#1871">1871: </a>        }
-</span><span id="1872" class="l"><a href="#1872">1872: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$title</span>.<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1873" class="l"><a href="#1873">1873: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;msg_text&quot;&gt;'</span>;
-</span><span id="1874" class="l"><a href="#1874">1874: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1875" class="l"><a href="#1875">1875: </a>    }
-</span><span id="1876" class="l"><a href="#1876">1876: </a>}
-</span><span id="1877" class="l"><a href="#1877">1877: </a>
-</span><span id="1878" class="l"><a href="#1878">1878: </a><span class="php-comment">/**
-</span></span><span id="1879" class="l"><a href="#1879">1879: </a><span class="php-comment"> * Close the message view content section
-</span></span><span id="1880" class="l"><a href="#1880">1880: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1881" class="l"><a href="#1881">1881: </a><span class="php-comment"> */</span>
-</span><span id="1882" class="l"><a href="#1882">1882: </a><span class="php-keyword1">class</span> Hm_Output_message_end <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1883" class="l"><a href="#1883">1883: </a>    <span class="php-comment">/**
-</span></span><span id="1884" class="l"><a href="#1884">1884: </a><span class="php-comment">     * Closes the div opened in Hm_Output_message_start
-</span></span><span id="1885" class="l"><a href="#1885">1885: </a><span class="php-comment">     */</span>
-</span><span id="1886" class="l"><a href="#1886">1886: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1887" class="l"><a href="#1887">1887: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1888" class="l"><a href="#1888">1888: </a>    }
-</span><span id="1889" class="l"><a href="#1889">1889: </a>}
-</span><span id="1890" class="l"><a href="#1890">1890: </a>
-</span><span id="1891" class="l"><a href="#1891">1891: </a><span class="php-comment">/**
-</span></span><span id="1892" class="l"><a href="#1892">1892: </a><span class="php-comment"> * Not found content for a bad page request
-</span></span><span id="1893" class="l"><a href="#1893">1893: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1894" class="l"><a href="#1894">1894: </a><span class="php-comment"> */</span>
-</span><span id="1895" class="l"><a href="#1895">1895: </a><span class="php-keyword1">class</span> Hm_Output_notfound_content <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1896" class="l"><a href="#1896">1896: </a>    <span class="php-comment">/**
-</span></span><span id="1897" class="l"><a href="#1897">1897: </a><span class="php-comment">     * Simple &quot;page not found&quot; page content
-</span></span><span id="1898" class="l"><a href="#1898">1898: </a><span class="php-comment">     */</span>
-</span><span id="1899" class="l"><a href="#1899">1899: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1900" class="l"><a href="#1900">1900: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Page Not Found!'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1901" class="l"><a href="#1901">1901: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;empty_list&quot;&gt;&lt;br /&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Nothingness'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1902" class="l"><a href="#1902">1902: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1903" class="l"><a href="#1903">1903: </a>    }
-</span><span id="1904" class="l"><a href="#1904">1904: </a>}
-</span><span id="1905" class="l"><a href="#1905">1905: </a>
-</span><span id="1906" class="l"><a href="#1906">1906: </a><span class="php-comment">/**
-</span></span><span id="1907" class="l"><a href="#1907">1907: </a><span class="php-comment"> * Start the table for a message list
-</span></span><span id="1908" class="l"><a href="#1908">1908: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1909" class="l"><a href="#1909">1909: </a><span class="php-comment"> */</span>
-</span><span id="1910" class="l"><a href="#1910">1910: </a><span class="php-keyword1">class</span> Hm_Output_message_list_start <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1911" class="l"><a href="#1911">1911: </a>    <span class="php-comment">/**
-</span></span><span id="1912" class="l"><a href="#1912">1912: </a><span class="php-comment">     * Uses the message_list_fields input to determine the format.
-</span></span><span id="1913" class="l"><a href="#1913">1913: </a><span class="php-comment">     */</span>
-</span><span id="1914" class="l"><a href="#1914">1914: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1915" class="l"><a href="#1915">1915: </a>
-</span><span id="1916" class="l"><a href="#1916">1916: </a>        <span class="php-var">$col_flds</span> = <span class="php-keyword1">array</span>();
-</span><span id="1917" class="l"><a href="#1917">1917: </a>        <span class="php-var">$header_flds</span> = <span class="php-keyword1">array</span>();
-</span><span id="1918" class="l"><a href="#1918">1918: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'message_list_fields'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
-</span><span id="1919" class="l"><a href="#1919">1919: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$vals</span>[<span class="php-num">0</span>]) {
-</span><span id="1920" class="l"><a href="#1920">1920: </a>                <span class="php-var">$col_flds</span>[] = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;col class=&quot;%s&quot;&gt;'</span>, <span class="php-var">$vals</span>[<span class="php-num">0</span>]);
-</span><span id="1921" class="l"><a href="#1921">1921: </a>            }
-</span><span id="1922" class="l"><a href="#1922">1922: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$vals</span>[<span class="php-num">1</span>] &amp;&amp; <span class="php-var">$vals</span>[<span class="php-num">2</span>]) {
-</span><span id="1923" class="l"><a href="#1923">1923: </a>                <span class="php-var">$header_flds</span>[] = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;th class=&quot;%s&quot;&gt;%s&lt;/th&gt;'</span>, <span class="php-var">$vals</span>[<span class="php-num">1</span>], <span class="php-var">$this</span>-&gt;trans(<span class="php-var">$vals</span>[<span class="php-num">2</span>]));
-</span><span id="1924" class="l"><a href="#1924">1924: </a>            }
-</span><span id="1925" class="l"><a href="#1925">1925: </a>            <span class="php-keyword1">else</span> {
-</span><span id="1926" class="l"><a href="#1926">1926: </a>                <span class="php-var">$header_flds</span>[] = <span class="php-quote">'&lt;th&gt;&lt;/th&gt;'</span>;
-</span><span id="1927" class="l"><a href="#1927">1927: </a>            }
-</span><span id="1928" class="l"><a href="#1928">1928: </a>        }
-</span><span id="1929" class="l"><a href="#1929">1929: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;table class=&quot;message_table&quot;&gt;'</span>;
-</span><span id="1930" class="l"><a href="#1930">1930: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'no_message_list_headers'</span>)) {
-</span><span id="1931" class="l"><a href="#1931">1931: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$col_flds</span>)) {
-</span><span id="1932" class="l"><a href="#1932">1932: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;colgroup&gt;'</span>.<span class="php-keyword2">implode</span>(<span class="php-quote">''</span>, <span class="php-var">$col_flds</span>).<span class="php-quote">'&lt;/colgroup&gt;'</span>;
-</span><span id="1933" class="l"><a href="#1933">1933: </a>            }
-</span><span id="1934" class="l"><a href="#1934">1934: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$header_flds</span>)) {
-</span><span id="1935" class="l"><a href="#1935">1935: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;thead&gt;&lt;tr&gt;'</span>.<span class="php-keyword2">implode</span>(<span class="php-quote">''</span>, <span class="php-var">$header_flds</span>).<span class="php-quote">'&lt;/tr&gt;&lt;/thead&gt;'</span>;
-</span><span id="1936" class="l"><a href="#1936">1936: </a>            }
-</span><span id="1937" class="l"><a href="#1937">1937: </a>        }
-</span><span id="1938" class="l"><a href="#1938">1938: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tbody&gt;'</span>;
-</span><span id="1939" class="l"><a href="#1939">1939: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1940" class="l"><a href="#1940">1940: </a>    }
-</span><span id="1941" class="l"><a href="#1941">1941: </a>}
-</span><span id="1942" class="l"><a href="#1942">1942: </a>
-</span><span id="1943" class="l"><a href="#1943">1943: </a><span class="php-comment">/**
-</span></span><span id="1944" class="l"><a href="#1944">1944: </a><span class="php-comment"> * Output the heading for the home page
-</span></span><span id="1945" class="l"><a href="#1945">1945: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1946" class="l"><a href="#1946">1946: </a><span class="php-comment"> */</span>
-</span><span id="1947" class="l"><a href="#1947">1947: </a><span class="php-keyword1">class</span> Hm_Output_home_heading <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1948" class="l"><a href="#1948">1948: </a>    <span class="php-comment">/**
-</span></span><span id="1949" class="l"><a href="#1949">1949: </a><span class="php-comment">     */</span>
-</span><span id="1950" class="l"><a href="#1950">1950: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1951" class="l"><a href="#1951">1951: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Home'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1952" class="l"><a href="#1952">1952: </a>    }
-</span><span id="1953" class="l"><a href="#1953">1953: </a>}
-</span><span id="1954" class="l"><a href="#1954">1954: </a><span class="php-comment">/**
-</span></span><span id="1955" class="l"><a href="#1955">1955: </a><span class="php-comment"> * Output the heading for a message list
-</span></span><span id="1956" class="l"><a href="#1956">1956: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1957" class="l"><a href="#1957">1957: </a><span class="php-comment"> */</span>
-</span><span id="1958" class="l"><a href="#1958">1958: </a><span class="php-keyword1">class</span> Hm_Output_message_list_heading <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1959" class="l"><a href="#1959">1959: </a>    <span class="php-comment">/**
-</span></span><span id="1960" class="l"><a href="#1960">1960: </a><span class="php-comment">     * Title, list controls, and message controls
-</span></span><span id="1961" class="l"><a href="#1961">1961: </a><span class="php-comment">     */</span>
-</span><span id="1962" class="l"><a href="#1962">1962: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1963" class="l"><a href="#1963">1963: </a>
-</span><span id="1964" class="l"><a href="#1964">1964: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'custom_list_controls'</span>, <span class="php-quote">''</span>)) {
-</span><span id="1965" class="l"><a href="#1965">1965: </a>            <span class="php-var">$config_link</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'custom_list_controls'</span>);
-</span><span id="1966" class="l"><a href="#1966">1966: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">''</span>;
-</span><span id="1967" class="l"><a href="#1967">1967: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">'&lt;a class=&quot;refresh_link&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Refresh'</span>).<span class="php-quote">'&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;Refresh&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$refresh</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
-</span><span id="1968" class="l"><a href="#1968">1968: </a>        }
-</span><span id="1969" class="l"><a href="#1969">1969: </a>        <span class="php-keyword1">elseif</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'no_list_controls'</span>, <span class="php-keyword1">false</span>)) {
-</span><span id="1970" class="l"><a href="#1970">1970: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">'&lt;a href=&quot;#&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Sources'</span>).<span class="php-quote">'&quot; class=&quot;source_link&quot;&gt;&lt;img alt=&quot;Sources&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$folder</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
-</span><span id="1971" class="l"><a href="#1971">1971: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>) == <span class="php-quote">'combined_inbox'</span>) {
-</span><span id="1972" class="l"><a href="#1972">1972: </a>                <span class="php-var">$path</span> = <span class="php-quote">'all'</span>;
-</span><span id="1973" class="l"><a href="#1973">1973: </a>            }
-</span><span id="1974" class="l"><a href="#1974">1974: </a>            <span class="php-keyword1">else</span> {
-</span><span id="1975" class="l"><a href="#1975">1975: </a>                <span class="php-var">$path</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>);
-</span><span id="1976" class="l"><a href="#1976">1976: </a>            }
-</span><span id="1977" class="l"><a href="#1977">1977: </a>            <span class="php-var">$config_link</span> = <span class="php-quote">'&lt;a title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Configure'</span>).<span class="php-quote">'&quot; href=&quot;?page=settings#'</span>.<span class="php-var">$path</span>.<span class="php-quote">'_setting&quot;&gt;&lt;img alt=&quot;Configure&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$cog</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
-</span><span id="1978" class="l"><a href="#1978">1978: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">'&lt;a class=&quot;refresh_link&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Refresh'</span>).<span class="php-quote">'&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;Refresh&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$refresh</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
-</span><span id="1979" class="l"><a href="#1979">1979: </a>
-</span><span id="1980" class="l"><a href="#1980">1980: </a>        }
-</span><span id="1981" class="l"><a href="#1981">1981: </a>        <span class="php-keyword1">else</span> {
-</span><span id="1982" class="l"><a href="#1982">1982: </a>            <span class="php-var">$config_link</span> = <span class="php-quote">''</span>;
-</span><span id="1983" class="l"><a href="#1983">1983: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">''</span>;
-</span><span id="1984" class="l"><a href="#1984">1984: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">''</span>;
-</span><span id="1985" class="l"><a href="#1985">1985: </a>        }
-</span><span id="1986" class="l"><a href="#1986">1986: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="1987" class="l"><a href="#1987">1987: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;message_list&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>;
-</span><span id="1988" class="l"><a href="#1988">1988: </a>        <span class="php-var">$res</span> .= message_controls(<span class="php-var">$this</span>).
-</span><span id="1989" class="l"><a href="#1989">1989: </a>            <span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;'</span>, <span class="php-keyword2">array_map</span>( <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$v</span>); },
-</span><span id="1990" class="l"><a href="#1990">1990: </a>                <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>())));
-</span><span id="1991" class="l"><a href="#1991">1991: </a>        <span class="php-var">$res</span> .= list_controls(<span class="php-var">$refresh_link</span>, <span class="php-var">$config_link</span>, <span class="php-var">$source_link</span>);
-</span><span id="1992" class="l"><a href="#1992">1992: </a>        <span class="php-var">$res</span> .= message_list_meta(<span class="php-var">$this</span>-&gt;module_output(), <span class="php-var">$this</span>);
-</span><span id="1993" class="l"><a href="#1993">1993: </a>        <span class="php-var">$res</span> .= list_sources(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'data_sources'</span>, <span class="php-keyword1">array</span>()), <span class="php-var">$this</span>);
-</span><span id="1994" class="l"><a href="#1994">1994: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1995" class="l"><a href="#1995">1995: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1996" class="l"><a href="#1996">1996: </a>    }
-</span><span id="1997" class="l"><a href="#1997">1997: </a>}
-</span><span id="1998" class="l"><a href="#1998">1998: </a>
-</span><span id="1999" class="l"><a href="#1999">1999: </a><span class="php-comment">/**
-</span></span><span id="2000" class="l"><a href="#2000">2000: </a><span class="php-comment"> * End a message list table
-</span></span><span id="2001" class="l"><a href="#2001">2001: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="2002" class="l"><a href="#2002">2002: </a><span class="php-comment"> */</span>
-</span><span id="2003" class="l"><a href="#2003">2003: </a><span class="php-keyword1">class</span> Hm_Output_message_list_end <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="2004" class="l"><a href="#2004">2004: </a>    <span class="php-comment">/**
-</span></span><span id="2005" class="l"><a href="#2005">2005: </a><span class="php-comment">     * Close the table opened in Hm_Output_message_list_start
-</span></span><span id="2006" class="l"><a href="#2006">2006: </a><span class="php-comment">     */</span>
-</span><span id="2007" class="l"><a href="#2007">2007: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="2008" class="l"><a href="#2008">2008: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/tbody&gt;&lt;/table&gt;&lt;div class=&quot;page_links&quot;&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
-</span><span id="2009" class="l"><a href="#2009">2009: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="2010" class="l"><a href="#2010">2010: </a>    }
-</span><span id="2011" class="l"><a href="#2011">2011: </a>}
-</span><span id="2012" class="l"><a href="#2012">2012: </a>
-</span><span id="2013" class="l"><a href="#2013">2013: </a><span class="xlang">?&gt;</span>
-</span><span id="2014" class="l"><a href="#2014">2014: </a></span></code></pre>
+</span><span id="1584" class="l"><a href="#1584">1584: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_unread&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=unread&quot;&gt;'</span>.
+</span><span id="1585" class="l"><a href="#1585">1585: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$env_closed</span>).<span class="php-quote">'&quot; alt=&quot;&quot; '</span>.
+</span><span id="1586" class="l"><a href="#1586">1586: </a>            <span class="php-quote">'width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Unread'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="1587" class="l"><a href="#1587">1587: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_flagged&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=flagged&quot;&gt;'</span>.
+</span><span id="1588" class="l"><a href="#1588">1588: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$star</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Flagged'</span>).
+</span><span id="1589" class="l"><a href="#1589">1589: </a>            <span class="php-quote">'&lt;/a&gt; &lt;span class=&quot;flagged_count&quot;&gt;&lt;/span&gt;&lt;/li&gt;'</span>;
+</span><span id="1590" class="l"><a href="#1590">1590: </a>
+</span><span id="1591" class="l"><a href="#1591">1591: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1592" class="l"><a href="#1592">1592: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1593" class="l"><a href="#1593">1593: </a>        }
+</span><span id="1594" class="l"><a href="#1594">1594: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="1595" class="l"><a href="#1595">1595: </a>    }
+</span><span id="1596" class="l"><a href="#1596">1596: </a>}
+</span><span id="1597" class="l"><a href="#1597">1597: </a>
+</span><span id="1598" class="l"><a href="#1598">1598: </a><span class="php-comment">/**
+</span></span><span id="1599" class="l"><a href="#1599">1599: </a><span class="php-comment"> * Outputs the logout link in the Main menu of the folder list
+</span></span><span id="1600" class="l"><a href="#1600">1600: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1601" class="l"><a href="#1601">1601: </a><span class="php-comment"> */</span>
+</span><span id="1602" class="l"><a href="#1602">1602: </a><span class="php-keyword1">class</span> Hm_Output_logout_menu_item <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1603" class="l"><a href="#1603">1603: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1604" class="l"><a href="#1604">1604: </a>        <span class="php-var">$res</span> =  <span class="php-quote">'&lt;li&gt;&lt;a class=&quot;unread_link logout_link&quot; href=&quot;#&quot;&gt;&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.
+</span><span id="1605" class="l"><a href="#1605">1605: </a>            <span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$power</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Logout'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="1606" class="l"><a href="#1606">1606: </a>
+</span><span id="1607" class="l"><a href="#1607">1607: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1608" class="l"><a href="#1608">1608: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1609" class="l"><a href="#1609">1609: </a>        }
+</span><span id="1610" class="l"><a href="#1610">1610: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="1611" class="l"><a href="#1611">1611: </a>    }
+</span><span id="1612" class="l"><a href="#1612">1612: </a>}
+</span><span id="1613" class="l"><a href="#1613">1613: </a>
+</span><span id="1614" class="l"><a href="#1614">1614: </a><span class="php-comment">/**
+</span></span><span id="1615" class="l"><a href="#1615">1615: </a><span class="php-comment"> * Close the Main menu section of the folder list
+</span></span><span id="1616" class="l"><a href="#1616">1616: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1617" class="l"><a href="#1617">1617: </a><span class="php-comment"> */</span>
+</span><span id="1618" class="l"><a href="#1618">1618: </a><span class="php-keyword1">class</span> Hm_Output_main_menu_end <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1619" class="l"><a href="#1619">1619: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1620" class="l"><a href="#1620">1620: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;'</span>;
+</span><span id="1621" class="l"><a href="#1621">1621: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1622" class="l"><a href="#1622">1622: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1623" class="l"><a href="#1623">1623: </a>        }
+</span><span id="1624" class="l"><a href="#1624">1624: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="1625" class="l"><a href="#1625">1625: </a>    }
+</span><span id="1626" class="l"><a href="#1626">1626: </a>}
+</span><span id="1627" class="l"><a href="#1627">1627: </a>
+</span><span id="1628" class="l"><a href="#1628">1628: </a><span class="php-comment">/**
+</span></span><span id="1629" class="l"><a href="#1629">1629: </a><span class="php-comment"> * Output the E-mail section of the folder list
+</span></span><span id="1630" class="l"><a href="#1630">1630: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1631" class="l"><a href="#1631">1631: </a><span class="php-comment"> */</span>
+</span><span id="1632" class="l"><a href="#1632">1632: </a><span class="php-keyword1">class</span> Hm_Output_email_menu_content <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1633" class="l"><a href="#1633">1633: </a>    <span class="php-comment">/**
+</span></span><span id="1634" class="l"><a href="#1634">1634: </a><span class="php-comment">     * Displays a list of all configured E-mail accounts
+</span></span><span id="1635" class="l"><a href="#1635">1635: </a><span class="php-comment">     */</span>
+</span><span id="1636" class="l"><a href="#1636">1636: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1637" class="l"><a href="#1637">1637: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="1638" class="l"><a href="#1638">1638: </a>        <span class="php-var">$folder_sources</span> = <span class="php-keyword2">array_unique</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'folder_sources'</span>, <span class="php-keyword1">array</span>()));
+</span><span id="1639" class="l"><a href="#1639">1639: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$folder_sources</span> <span class="php-keyword1">as</span> <span class="php-var">$src</span>) {
+</span><span id="1640" class="l"><a href="#1640">1640: </a>            <span class="php-var">$parts</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">'_'</span>, <span class="php-var">$src</span>);
+</span><span id="1641" class="l"><a href="#1641">1641: </a>            <span class="php-keyword2">array_pop</span>(<span class="php-var">$parts</span>);
+</span><span id="1642" class="l"><a href="#1642">1642: </a>            <span class="php-var">$name</span> = <span class="php-keyword2">ucwords</span>(<span class="php-keyword2">implode</span>(<span class="php-quote">' '</span>, <span class="php-var">$parts</span>));
+</span><span id="1643" class="l"><a href="#1643">1643: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;src_name&quot; data-source=&quot;.'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$src</span>).<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-var">$name</span>).
+</span><span id="1644" class="l"><a href="#1644">1644: </a>                <span class="php-quote">'&lt;img class=&quot;menu_caret&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$chevron</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;&lt;/div&gt;'</span>;
+</span><span id="1645" class="l"><a href="#1645">1645: </a>
+</span><span id="1646" class="l"><a href="#1646">1646: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div style=&quot;display: none;&quot; '</span>;
+</span><span id="1647" class="l"><a href="#1647">1647: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'class=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$src</span>).<span class="php-quote">'&quot;&gt;&lt;ul class=&quot;folders&quot;&gt;'</span>;
+</span><span id="1648" class="l"><a href="#1648">1648: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$name</span> == <span class="php-quote">'Email'</span>) {
+</span><span id="1649" class="l"><a href="#1649">1649: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_email&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=email&quot;&gt;'</span>.
+</span><span id="1650" class="l"><a href="#1650">1650: </a>                    <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$globe</span>).
+</span><span id="1651" class="l"><a href="#1651">1651: </a>                    <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'All'</span>).<span class="php-quote">'&lt;/a&gt; &lt;span class=&quot;unread_mail_count&quot;&gt;&lt;/span&gt;&lt;/li&gt;'</span>;
+</span><span id="1652" class="l"><a href="#1652">1652: </a>            }
+</span><span id="1653" class="l"><a href="#1653">1653: </a>            <span class="php-var">$cache</span> = Hm_Page_Cache::get(<span class="php-var">$src</span>);
+</span><span id="1654" class="l"><a href="#1654">1654: </a>            Hm_Page_Cache::del(<span class="php-var">$src</span>);
+</span><span id="1655" class="l"><a href="#1655">1655: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$cache</span>) {
+</span><span id="1656" class="l"><a href="#1656">1656: </a>                <span class="php-var">$res</span> .= <span class="php-var">$cache</span>;
+</span><span id="1657" class="l"><a href="#1657">1657: </a>            }
+</span><span id="1658" class="l"><a href="#1658">1658: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;'</span>;
+</span><span id="1659" class="l"><a href="#1659">1659: </a>        }
+</span><span id="1660" class="l"><a href="#1660">1660: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1661" class="l"><a href="#1661">1661: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1662" class="l"><a href="#1662">1662: </a>        }
+</span><span id="1663" class="l"><a href="#1663">1663: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="1664" class="l"><a href="#1664">1664: </a>    }
+</span><span id="1665" class="l"><a href="#1665">1665: </a>}
+</span><span id="1666" class="l"><a href="#1666">1666: </a>
+</span><span id="1667" class="l"><a href="#1667">1667: </a><span class="php-comment">/**
+</span></span><span id="1668" class="l"><a href="#1668">1668: </a><span class="php-comment"> * Start the Settings section of the folder list
+</span></span><span id="1669" class="l"><a href="#1669">1669: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1670" class="l"><a href="#1670">1670: </a><span class="php-comment"> */</span>
+</span><span id="1671" class="l"><a href="#1671">1671: </a><span class="php-keyword1">class</span> Hm_Output_settings_menu_start <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1672" class="l"><a href="#1672">1672: </a>    <span class="php-comment">/**
+</span></span><span id="1673" class="l"><a href="#1673">1673: </a><span class="php-comment">     * Opens an unordered list
+</span></span><span id="1674" class="l"><a href="#1674">1674: </a><span class="php-comment">     */</span>
+</span><span id="1675" class="l"><a href="#1675">1675: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1676" class="l"><a href="#1676">1676: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;src_name&quot; data-source=&quot;.settings&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Settings'</span>).
+</span><span id="1677" class="l"><a href="#1677">1677: </a>            <span class="php-quote">'&lt;img class=&quot;menu_caret&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$chevron</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;'</span>.
+</span><span id="1678" class="l"><a href="#1678">1678: </a>            <span class="php-quote">'&lt;/div&gt;&lt;ul style=&quot;display: none;&quot; class=&quot;settings folders&quot;&gt;'</span>;
+</span><span id="1679" class="l"><a href="#1679">1679: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1680" class="l"><a href="#1680">1680: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1681" class="l"><a href="#1681">1681: </a>        }
+</span><span id="1682" class="l"><a href="#1682">1682: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="1683" class="l"><a href="#1683">1683: </a>    }
+</span><span id="1684" class="l"><a href="#1684">1684: </a>}
+</span><span id="1685" class="l"><a href="#1685">1685: </a>
+</span><span id="1686" class="l"><a href="#1686">1686: </a><span class="php-comment">/**
+</span></span><span id="1687" class="l"><a href="#1687">1687: </a><span class="php-comment"> * Save settings page content
+</span></span><span id="1688" class="l"><a href="#1688">1688: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1689" class="l"><a href="#1689">1689: </a><span class="php-comment"> */</span>
+</span><span id="1690" class="l"><a href="#1690">1690: </a><span class="php-keyword1">class</span> Hm_Output_save_form <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1691" class="l"><a href="#1691">1691: </a>    <span class="php-comment">/**
+</span></span><span id="1692" class="l"><a href="#1692">1692: </a><span class="php-comment">     * Outputs save form
+</span></span><span id="1693" class="l"><a href="#1693">1693: </a><span class="php-comment">     */</span>
+</span><span id="1694" class="l"><a href="#1694">1694: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1695" class="l"><a href="#1695">1695: </a>        <span class="php-var">$changed</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'changed_settings'</span>, <span class="php-keyword1">array</span>());
+</span><span id="1696" class="l"><a href="#1696">1696: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;save_settings_page&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save Settings'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1697" class="l"><a href="#1697">1697: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;save_details&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Settings are not saved permanently on the server unless you explicitly allow it. '</span>.
+</span><span id="1698" class="l"><a href="#1698">1698: </a>            <span class="php-quote">'If you don\'t save your settings, any changes made since you last logged in will be deleted when your '</span>.
+</span><span id="1699" class="l"><a href="#1699">1699: </a>            <span class="php-quote">'session expires or you logout. You must re-enter your password for security purposes to save your settings '</span>.
+</span><span id="1700" class="l"><a href="#1700">1700: </a>            <span class="php-quote">'permanently.'</span>);
+</span><span id="1701" class="l"><a href="#1701">1701: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;save_subtitle&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Unsaved Changes'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1702" class="l"><a href="#1702">1702: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;ul class=&quot;unsaved_settings&quot;&gt;'</span>;
+</span><span id="1703" class="l"><a href="#1703">1703: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$changed</span>)) {
+</span><span id="1704" class="l"><a href="#1704">1704: </a>            <span class="php-var">$changed</span> = <span class="php-keyword2">array_count_values</span>(<span class="php-var">$changed</span>);
+</span><span id="1705" class="l"><a href="#1705">1705: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$changed</span> <span class="php-keyword1">as</span> <span class="php-var">$change</span> =&gt; <span class="php-var">$num</span>) {
+</span><span id="1706" class="l"><a href="#1706">1706: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-var">$change</span>).<span class="php-quote">' ('</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$num</span>).<span class="php-quote">'X)&lt;/li&gt;'</span>;
+</span><span id="1707" class="l"><a href="#1707">1707: </a>            }
+</span><span id="1708" class="l"><a href="#1708">1708: </a>        }
+</span><span id="1709" class="l"><a href="#1709">1709: </a>        <span class="php-keyword1">else</span> {
+</span><span id="1710" class="l"><a href="#1710">1710: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'No changes need to be saved'</span>).<span class="php-quote">'&lt;/li&gt;'</span>;
+</span><span id="1711" class="l"><a href="#1711">1711: </a>        }
+</span><span id="1712" class="l"><a href="#1712">1712: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/ul&gt;&lt;/div&gt;&lt;div class=&quot;save_perm_form&quot;&gt;&lt;form method=&quot;post&quot;&gt;'</span>.
+</span><span id="1713" class="l"><a href="#1713">1713: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="1714" class="l"><a href="#1714">1714: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;password&quot;&gt;Password&lt;/label&gt;&lt;input required id=&quot;password&quot; '</span>.
+</span><span id="1715" class="l"><a href="#1715">1715: </a>            <span class="php-quote">'name=&quot;password&quot; class=&quot;save_settings_password&quot; type=&quot;password&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="1716" class="l"><a href="#1716">1716: </a>            <span class="php-quote">'&lt;input class=&quot;save_settings&quot; type=&quot;submit&quot; name=&quot;save_settings_permanently&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="1717" class="l"><a href="#1717">1717: </a>            <span class="php-quote">'&lt;input class=&quot;save_settings&quot; type=&quot;submit&quot; name=&quot;save_settings_permanently_then_logout&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save and Logout'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="1718" class="l"><a href="#1718">1718: </a>            <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;'</span>;
+</span><span id="1719" class="l"><a href="#1719">1719: </a>
+</span><span id="1720" class="l"><a href="#1720">1720: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1721" class="l"><a href="#1721">1721: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1722" class="l"><a href="#1722">1722: </a>    }
+</span><span id="1723" class="l"><a href="#1723">1723: </a>}
+</span><span id="1724" class="l"><a href="#1724">1724: </a>
+</span><span id="1725" class="l"><a href="#1725">1725: </a><span class="php-comment">/**
+</span></span><span id="1726" class="l"><a href="#1726">1726: </a><span class="php-comment"> * Content for the Settings menu section of the folder list
+</span></span><span id="1727" class="l"><a href="#1727">1727: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1728" class="l"><a href="#1728">1728: </a><span class="php-comment"> */</span>
+</span><span id="1729" class="l"><a href="#1729">1729: </a><span class="php-keyword1">class</span> Hm_Output_settings_menu_content <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1730" class="l"><a href="#1730">1730: </a>    <span class="php-comment">/**
+</span></span><span id="1731" class="l"><a href="#1731">1731: </a><span class="php-comment">     * Outputs links to the Servers and Site Settings pages
+</span></span><span id="1732" class="l"><a href="#1732">1732: </a><span class="php-comment">     */</span>
+</span><span id="1733" class="l"><a href="#1733">1733: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1734" class="l"><a href="#1734">1734: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_servers&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=servers&quot;&gt;'</span>.
+</span><span id="1735" class="l"><a href="#1735">1735: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$monitor</span>).
+</span><span id="1736" class="l"><a href="#1736">1736: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Servers'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>.
+</span><span id="1737" class="l"><a href="#1737">1737: </a>            <span class="php-quote">'&lt;li class=&quot;menu_settings&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=settings&quot;&gt;'</span>.
+</span><span id="1738" class="l"><a href="#1738">1738: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$cog</span>).
+</span><span id="1739" class="l"><a href="#1739">1739: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Site'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>.
+</span><span id="1740" class="l"><a href="#1740">1740: </a>            <span class="php-quote">'&lt;li class=&quot;menu_save&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=save&quot;&gt;'</span>.
+</span><span id="1741" class="l"><a href="#1741">1741: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$save</span>).
+</span><span id="1742" class="l"><a href="#1742">1742: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="1743" class="l"><a href="#1743">1743: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1744" class="l"><a href="#1744">1744: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1745" class="l"><a href="#1745">1745: </a>        }
+</span><span id="1746" class="l"><a href="#1746">1746: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="1747" class="l"><a href="#1747">1747: </a>    }
+</span><span id="1748" class="l"><a href="#1748">1748: </a>}
+</span><span id="1749" class="l"><a href="#1749">1749: </a>
+</span><span id="1750" class="l"><a href="#1750">1750: </a><span class="php-comment">/**
+</span></span><span id="1751" class="l"><a href="#1751">1751: </a><span class="php-comment"> * Closes the Settings menu in the folder list
+</span></span><span id="1752" class="l"><a href="#1752">1752: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1753" class="l"><a href="#1753">1753: </a><span class="php-comment"> */</span>
+</span><span id="1754" class="l"><a href="#1754">1754: </a><span class="php-keyword1">class</span> Hm_Output_settings_menu_end <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1755" class="l"><a href="#1755">1755: </a>    <span class="php-comment">/**
+</span></span><span id="1756" class="l"><a href="#1756">1756: </a><span class="php-comment">     * Closes the ul tag opened in Hm_Output_settings_menu_start
+</span></span><span id="1757" class="l"><a href="#1757">1757: </a><span class="php-comment">     */</span>
+</span><span id="1758" class="l"><a href="#1758">1758: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1759" class="l"><a href="#1759">1759: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/ul&gt;'</span>;
+</span><span id="1760" class="l"><a href="#1760">1760: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1761" class="l"><a href="#1761">1761: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1762" class="l"><a href="#1762">1762: </a>        }
+</span><span id="1763" class="l"><a href="#1763">1763: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="1764" class="l"><a href="#1764">1764: </a>    }
+</span><span id="1765" class="l"><a href="#1765">1765: </a>}
+</span><span id="1766" class="l"><a href="#1766">1766: </a>
+</span><span id="1767" class="l"><a href="#1767">1767: </a><span class="php-comment">/**
+</span></span><span id="1768" class="l"><a href="#1768">1768: </a><span class="php-comment"> * End of the content section of the folder list
+</span></span><span id="1769" class="l"><a href="#1769">1769: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1770" class="l"><a href="#1770">1770: </a><span class="php-comment"> */</span>
+</span><span id="1771" class="l"><a href="#1771">1771: </a><span class="php-keyword1">class</span> Hm_Output_folder_list_content_end <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1772" class="l"><a href="#1772">1772: </a>    <span class="php-comment">/**
+</span></span><span id="1773" class="l"><a href="#1773">1773: </a><span class="php-comment">     * Adds collapse and reload links
+</span></span><span id="1774" class="l"><a href="#1774">1774: </a><span class="php-comment">     */</span>
+</span><span id="1775" class="l"><a href="#1775">1775: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1776" class="l"><a href="#1776">1776: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;a href=&quot;#&quot; class=&quot;update_message_list&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'[reload]'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
+</span><span id="1777" class="l"><a href="#1777">1777: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;#&quot; class=&quot;hide_folders&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$big_caret_left</span>.
+</span><span id="1778" class="l"><a href="#1778">1778: </a>            <span class="php-quote">'&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Collapse'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="1779" class="l"><a href="#1779">1779: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="1780" class="l"><a href="#1780">1780: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1781" class="l"><a href="#1781">1781: </a>        }
+</span><span id="1782" class="l"><a href="#1782">1782: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="1783" class="l"><a href="#1783">1783: </a>    }
+</span><span id="1784" class="l"><a href="#1784">1784: </a>}
+</span><span id="1785" class="l"><a href="#1785">1785: </a>
+</span><span id="1786" class="l"><a href="#1786">1786: </a><span class="php-comment">/**
+</span></span><span id="1787" class="l"><a href="#1787">1787: </a><span class="php-comment"> * Closes the folder list
+</span></span><span id="1788" class="l"><a href="#1788">1788: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1789" class="l"><a href="#1789">1789: </a><span class="php-comment"> */</span>
+</span><span id="1790" class="l"><a href="#1790">1790: </a><span class="php-keyword1">class</span> Hm_Output_folder_list_end <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1791" class="l"><a href="#1791">1791: </a>    <span class="php-comment">/**
+</span></span><span id="1792" class="l"><a href="#1792">1792: </a><span class="php-comment">     * Closes the div and nav tags opened in Hm_Output_folder_list_start
+</span></span><span id="1793" class="l"><a href="#1793">1793: </a><span class="php-comment">     */</span>
+</span><span id="1794" class="l"><a href="#1794">1794: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1795" class="l"><a href="#1795">1795: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;&lt;/nav&gt;'</span>;
+</span><span id="1796" class="l"><a href="#1796">1796: </a>    }
+</span><span id="1797" class="l"><a href="#1797">1797: </a>}
+</span><span id="1798" class="l"><a href="#1798">1798: </a>
+</span><span id="1799" class="l"><a href="#1799">1799: </a><span class="php-comment">/**
+</span></span><span id="1800" class="l"><a href="#1800">1800: </a><span class="php-comment"> * Starts the main content section
+</span></span><span id="1801" class="l"><a href="#1801">1801: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1802" class="l"><a href="#1802">1802: </a><span class="php-comment"> */</span>
+</span><span id="1803" class="l"><a href="#1803">1803: </a><span class="php-keyword1">class</span> Hm_Output_content_section_start <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1804" class="l"><a href="#1804">1804: </a>    <span class="php-comment">/**
+</span></span><span id="1805" class="l"><a href="#1805">1805: </a><span class="php-comment">     * Opens a main tag for the primary content section
+</span></span><span id="1806" class="l"><a href="#1806">1806: </a><span class="php-comment">     */</span>
+</span><span id="1807" class="l"><a href="#1807">1807: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1808" class="l"><a href="#1808">1808: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;main class=&quot;content_cell&quot;&gt;'</span>;
+</span><span id="1809" class="l"><a href="#1809">1809: </a>    }
+</span><span id="1810" class="l"><a href="#1810">1810: </a>}
+</span><span id="1811" class="l"><a href="#1811">1811: </a>
+</span><span id="1812" class="l"><a href="#1812">1812: </a><span class="php-comment">/**
+</span></span><span id="1813" class="l"><a href="#1813">1813: </a><span class="php-comment"> * Closes the main content section
+</span></span><span id="1814" class="l"><a href="#1814">1814: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1815" class="l"><a href="#1815">1815: </a><span class="php-comment"> */</span>
+</span><span id="1816" class="l"><a href="#1816">1816: </a><span class="php-keyword1">class</span> Hm_Output_content_section_end <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1817" class="l"><a href="#1817">1817: </a>    <span class="php-comment">/**
+</span></span><span id="1818" class="l"><a href="#1818">1818: </a><span class="php-comment">     * Closes the main tag opened in Hm_Output_content_section_start
+</span></span><span id="1819" class="l"><a href="#1819">1819: </a><span class="php-comment">     */</span>
+</span><span id="1820" class="l"><a href="#1820">1820: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1821" class="l"><a href="#1821">1821: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/main&gt;'</span>;
+</span><span id="1822" class="l"><a href="#1822">1822: </a>    }
+</span><span id="1823" class="l"><a href="#1823">1823: </a>}
+</span><span id="1824" class="l"><a href="#1824">1824: </a>
+</span><span id="1825" class="l"><a href="#1825">1825: </a><span class="php-comment">/**
+</span></span><span id="1826" class="l"><a href="#1826">1826: </a><span class="php-comment"> * Starts the message view page
+</span></span><span id="1827" class="l"><a href="#1827">1827: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1828" class="l"><a href="#1828">1828: </a><span class="php-comment"> */</span>
+</span><span id="1829" class="l"><a href="#1829">1829: </a><span class="php-keyword1">class</span> Hm_Output_message_start <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1830" class="l"><a href="#1830">1830: </a>    <span class="php-comment">/**
+</span></span><span id="1831" class="l"><a href="#1831">1831: </a><span class="php-comment">     * @todo this is pretty ugly, clean it up and remove module specific stuff
+</span></span><span id="1832" class="l"><a href="#1832">1832: </a><span class="php-comment">     */</span>
+</span><span id="1833" class="l"><a href="#1833">1833: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1834" class="l"><a href="#1834">1834: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;in(<span class="php-quote">'list_parent'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'search'</span>, <span class="php-quote">'flagged'</span>, <span class="php-quote">'combined_inbox'</span>, <span class="php-quote">'unread'</span>, <span class="php-quote">'feeds'</span>, <span class="php-quote">'email'</span>))) {
+</span><span id="1835" class="l"><a href="#1835">1835: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>) == <span class="php-quote">'combined_inbox'</span>) {
+</span><span id="1836" class="l"><a href="#1836">1836: </a>                <span class="php-var">$list_name</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Everything'</span>);
+</span><span id="1837" class="l"><a href="#1837">1837: </a>            }
+</span><span id="1838" class="l"><a href="#1838">1838: </a>            <span class="php-keyword1">elseif</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>) == <span class="php-quote">'email'</span>) {
+</span><span id="1839" class="l"><a href="#1839">1839: </a>                <span class="php-var">$list_name</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'All Email'</span>);
+</span><span id="1840" class="l"><a href="#1840">1840: </a>            }
+</span><span id="1841" class="l"><a href="#1841">1841: </a>            <span class="php-keyword1">else</span> {
+</span><span id="1842" class="l"><a href="#1842">1842: </a>                <span class="php-var">$list_name</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-keyword2">ucwords</span>(<span class="php-keyword2">str_replace</span>(<span class="php-quote">'_'</span>, <span class="php-quote">' '</span>, <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>))));
+</span><span id="1843" class="l"><a href="#1843">1843: </a>            }
+</span><span id="1844" class="l"><a href="#1844">1844: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>) == <span class="php-quote">'search'</span>) {
+</span><span id="1845" class="l"><a href="#1845">1845: </a>                <span class="php-var">$page</span> = <span class="php-quote">'search'</span>;
+</span><span id="1846" class="l"><a href="#1846">1846: </a>            }
+</span><span id="1847" class="l"><a href="#1847">1847: </a>            <span class="php-keyword1">else</span> {
+</span><span id="1848" class="l"><a href="#1848">1848: </a>                <span class="php-var">$page</span> = <span class="php-quote">'message_list'</span>;
+</span><span id="1849" class="l"><a href="#1849">1849: </a>            }
+</span><span id="1850" class="l"><a href="#1850">1850: </a>            <span class="php-var">$title</span> = <span class="php-quote">'&lt;a href=&quot;?page='</span>.<span class="php-var">$page</span>.<span class="php-quote">'&amp;amp;list_path='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>)).<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$list_name</span>.<span class="php-quote">'&lt;/a&gt;'</span>;
+</span><span id="1851" class="l"><a href="#1851">1851: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>())) &gt; <span class="php-num">0</span>) {
+</span><span id="1852" class="l"><a href="#1852">1852: </a>                <span class="php-var">$mb_title</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>());
+</span><span id="1853" class="l"><a href="#1853">1853: </a>                <span class="php-var">$title</span> .= <span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; /&gt;'</span>.
+</span><span id="1854" class="l"><a href="#1854">1854: </a>                    <span class="php-quote">'&lt;a href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>)).<span class="php-quote">'&quot;&gt;'</span>.
+</span><span id="1855" class="l"><a href="#1855">1855: </a>                <span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; /&gt;'</span>,
+</span><span id="1856" class="l"><a href="#1856">1856: </a>                    <span class="php-keyword2">array_map</span>( <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;trans(<span class="php-var">$v</span>); }, <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>()))).<span class="php-quote">'&lt;/a&gt;'</span>;
+</span><span id="1857" class="l"><a href="#1857">1857: </a>            }
+</span><span id="1858" class="l"><a href="#1858">1858: </a>        }
+</span><span id="1859" class="l"><a href="#1859">1859: </a>        <span class="php-keyword1">elseif</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>)) {
+</span><span id="1860" class="l"><a href="#1860">1860: </a>            <span class="php-var">$title</span> = <span class="php-quote">'&lt;a href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>)).<span class="php-quote">'&quot;&gt;'</span>.
+</span><span id="1861" class="l"><a href="#1861">1861: </a>                <span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; /&gt;'</span>,
+</span><span id="1862" class="l"><a href="#1862">1862: </a>                    <span class="php-keyword2">array_map</span>( <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;trans(<span class="php-var">$v</span>); }, <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>()))).<span class="php-quote">'&lt;/a&gt;'</span>;
+</span><span id="1863" class="l"><a href="#1863">1863: </a>        }
+</span><span id="1864" class="l"><a href="#1864">1864: </a>        <span class="php-keyword1">else</span> {
+</span><span id="1865" class="l"><a href="#1865">1865: </a>            <span class="php-var">$title</span> = <span class="php-quote">''</span>;
+</span><span id="1866" class="l"><a href="#1866">1866: </a>        }
+</span><span id="1867" class="l"><a href="#1867">1867: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="1868" class="l"><a href="#1868">1868: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'uid'</span>)) {
+</span><span id="1869" class="l"><a href="#1869">1869: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; class=&quot;msg_uid&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'uid'</span>)).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="1870" class="l"><a href="#1870">1870: </a>        }
+</span><span id="1871" class="l"><a href="#1871">1871: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$title</span>.<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1872" class="l"><a href="#1872">1872: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;msg_text&quot;&gt;'</span>;
+</span><span id="1873" class="l"><a href="#1873">1873: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1874" class="l"><a href="#1874">1874: </a>    }
+</span><span id="1875" class="l"><a href="#1875">1875: </a>}
+</span><span id="1876" class="l"><a href="#1876">1876: </a>
+</span><span id="1877" class="l"><a href="#1877">1877: </a><span class="php-comment">/**
+</span></span><span id="1878" class="l"><a href="#1878">1878: </a><span class="php-comment"> * Close the message view content section
+</span></span><span id="1879" class="l"><a href="#1879">1879: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1880" class="l"><a href="#1880">1880: </a><span class="php-comment"> */</span>
+</span><span id="1881" class="l"><a href="#1881">1881: </a><span class="php-keyword1">class</span> Hm_Output_message_end <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1882" class="l"><a href="#1882">1882: </a>    <span class="php-comment">/**
+</span></span><span id="1883" class="l"><a href="#1883">1883: </a><span class="php-comment">     * Closes the div opened in Hm_Output_message_start
+</span></span><span id="1884" class="l"><a href="#1884">1884: </a><span class="php-comment">     */</span>
+</span><span id="1885" class="l"><a href="#1885">1885: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1886" class="l"><a href="#1886">1886: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1887" class="l"><a href="#1887">1887: </a>    }
+</span><span id="1888" class="l"><a href="#1888">1888: </a>}
+</span><span id="1889" class="l"><a href="#1889">1889: </a>
+</span><span id="1890" class="l"><a href="#1890">1890: </a><span class="php-comment">/**
+</span></span><span id="1891" class="l"><a href="#1891">1891: </a><span class="php-comment"> * Not found content for a bad page request
+</span></span><span id="1892" class="l"><a href="#1892">1892: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1893" class="l"><a href="#1893">1893: </a><span class="php-comment"> */</span>
+</span><span id="1894" class="l"><a href="#1894">1894: </a><span class="php-keyword1">class</span> Hm_Output_notfound_content <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1895" class="l"><a href="#1895">1895: </a>    <span class="php-comment">/**
+</span></span><span id="1896" class="l"><a href="#1896">1896: </a><span class="php-comment">     * Simple &quot;page not found&quot; page content
+</span></span><span id="1897" class="l"><a href="#1897">1897: </a><span class="php-comment">     */</span>
+</span><span id="1898" class="l"><a href="#1898">1898: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1899" class="l"><a href="#1899">1899: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Page Not Found!'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1900" class="l"><a href="#1900">1900: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;empty_list&quot;&gt;&lt;br /&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Nothingness'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1901" class="l"><a href="#1901">1901: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1902" class="l"><a href="#1902">1902: </a>    }
+</span><span id="1903" class="l"><a href="#1903">1903: </a>}
+</span><span id="1904" class="l"><a href="#1904">1904: </a>
+</span><span id="1905" class="l"><a href="#1905">1905: </a><span class="php-comment">/**
+</span></span><span id="1906" class="l"><a href="#1906">1906: </a><span class="php-comment"> * Start the table for a message list
+</span></span><span id="1907" class="l"><a href="#1907">1907: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1908" class="l"><a href="#1908">1908: </a><span class="php-comment"> */</span>
+</span><span id="1909" class="l"><a href="#1909">1909: </a><span class="php-keyword1">class</span> Hm_Output_message_list_start <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1910" class="l"><a href="#1910">1910: </a>    <span class="php-comment">/**
+</span></span><span id="1911" class="l"><a href="#1911">1911: </a><span class="php-comment">     * Uses the message_list_fields input to determine the format.
+</span></span><span id="1912" class="l"><a href="#1912">1912: </a><span class="php-comment">     */</span>
+</span><span id="1913" class="l"><a href="#1913">1913: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1914" class="l"><a href="#1914">1914: </a>
+</span><span id="1915" class="l"><a href="#1915">1915: </a>        <span class="php-var">$col_flds</span> = <span class="php-keyword1">array</span>();
+</span><span id="1916" class="l"><a href="#1916">1916: </a>        <span class="php-var">$header_flds</span> = <span class="php-keyword1">array</span>();
+</span><span id="1917" class="l"><a href="#1917">1917: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'message_list_fields'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="1918" class="l"><a href="#1918">1918: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$vals</span>[<span class="php-num">0</span>]) {
+</span><span id="1919" class="l"><a href="#1919">1919: </a>                <span class="php-var">$col_flds</span>[] = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;col class=&quot;%s&quot;&gt;'</span>, <span class="php-var">$vals</span>[<span class="php-num">0</span>]);
+</span><span id="1920" class="l"><a href="#1920">1920: </a>            }
+</span><span id="1921" class="l"><a href="#1921">1921: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$vals</span>[<span class="php-num">1</span>] &amp;&amp; <span class="php-var">$vals</span>[<span class="php-num">2</span>]) {
+</span><span id="1922" class="l"><a href="#1922">1922: </a>                <span class="php-var">$header_flds</span>[] = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;th class=&quot;%s&quot;&gt;%s&lt;/th&gt;'</span>, <span class="php-var">$vals</span>[<span class="php-num">1</span>], <span class="php-var">$this</span>-&gt;trans(<span class="php-var">$vals</span>[<span class="php-num">2</span>]));
+</span><span id="1923" class="l"><a href="#1923">1923: </a>            }
+</span><span id="1924" class="l"><a href="#1924">1924: </a>            <span class="php-keyword1">else</span> {
+</span><span id="1925" class="l"><a href="#1925">1925: </a>                <span class="php-var">$header_flds</span>[] = <span class="php-quote">'&lt;th&gt;&lt;/th&gt;'</span>;
+</span><span id="1926" class="l"><a href="#1926">1926: </a>            }
+</span><span id="1927" class="l"><a href="#1927">1927: </a>        }
+</span><span id="1928" class="l"><a href="#1928">1928: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;table class=&quot;message_table&quot;&gt;'</span>;
+</span><span id="1929" class="l"><a href="#1929">1929: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'no_message_list_headers'</span>)) {
+</span><span id="1930" class="l"><a href="#1930">1930: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$col_flds</span>)) {
+</span><span id="1931" class="l"><a href="#1931">1931: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;colgroup&gt;'</span>.<span class="php-keyword2">implode</span>(<span class="php-quote">''</span>, <span class="php-var">$col_flds</span>).<span class="php-quote">'&lt;/colgroup&gt;'</span>;
+</span><span id="1932" class="l"><a href="#1932">1932: </a>            }
+</span><span id="1933" class="l"><a href="#1933">1933: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$header_flds</span>)) {
+</span><span id="1934" class="l"><a href="#1934">1934: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;thead&gt;&lt;tr&gt;'</span>.<span class="php-keyword2">implode</span>(<span class="php-quote">''</span>, <span class="php-var">$header_flds</span>).<span class="php-quote">'&lt;/tr&gt;&lt;/thead&gt;'</span>;
+</span><span id="1935" class="l"><a href="#1935">1935: </a>            }
+</span><span id="1936" class="l"><a href="#1936">1936: </a>        }
+</span><span id="1937" class="l"><a href="#1937">1937: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tbody&gt;'</span>;
+</span><span id="1938" class="l"><a href="#1938">1938: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1939" class="l"><a href="#1939">1939: </a>    }
+</span><span id="1940" class="l"><a href="#1940">1940: </a>}
+</span><span id="1941" class="l"><a href="#1941">1941: </a>
+</span><span id="1942" class="l"><a href="#1942">1942: </a><span class="php-comment">/**
+</span></span><span id="1943" class="l"><a href="#1943">1943: </a><span class="php-comment"> * Output the heading for the home page
+</span></span><span id="1944" class="l"><a href="#1944">1944: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1945" class="l"><a href="#1945">1945: </a><span class="php-comment"> */</span>
+</span><span id="1946" class="l"><a href="#1946">1946: </a><span class="php-keyword1">class</span> Hm_Output_home_heading <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1947" class="l"><a href="#1947">1947: </a>    <span class="php-comment">/**
+</span></span><span id="1948" class="l"><a href="#1948">1948: </a><span class="php-comment">     */</span>
+</span><span id="1949" class="l"><a href="#1949">1949: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1950" class="l"><a href="#1950">1950: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;content_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Home'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1951" class="l"><a href="#1951">1951: </a>    }
+</span><span id="1952" class="l"><a href="#1952">1952: </a>}
+</span><span id="1953" class="l"><a href="#1953">1953: </a><span class="php-comment">/**
+</span></span><span id="1954" class="l"><a href="#1954">1954: </a><span class="php-comment"> * Output the heading for a message list
+</span></span><span id="1955" class="l"><a href="#1955">1955: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1956" class="l"><a href="#1956">1956: </a><span class="php-comment"> */</span>
+</span><span id="1957" class="l"><a href="#1957">1957: </a><span class="php-keyword1">class</span> Hm_Output_message_list_heading <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1958" class="l"><a href="#1958">1958: </a>    <span class="php-comment">/**
+</span></span><span id="1959" class="l"><a href="#1959">1959: </a><span class="php-comment">     * Title, list controls, and message controls
+</span></span><span id="1960" class="l"><a href="#1960">1960: </a><span class="php-comment">     */</span>
+</span><span id="1961" class="l"><a href="#1961">1961: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1962" class="l"><a href="#1962">1962: </a>
+</span><span id="1963" class="l"><a href="#1963">1963: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'custom_list_controls'</span>, <span class="php-quote">''</span>)) {
+</span><span id="1964" class="l"><a href="#1964">1964: </a>            <span class="php-var">$config_link</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'custom_list_controls'</span>);
+</span><span id="1965" class="l"><a href="#1965">1965: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">''</span>;
+</span><span id="1966" class="l"><a href="#1966">1966: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">'&lt;a class=&quot;refresh_link&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Refresh'</span>).<span class="php-quote">'&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;Refresh&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$refresh</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="1967" class="l"><a href="#1967">1967: </a>        }
+</span><span id="1968" class="l"><a href="#1968">1968: </a>        <span class="php-keyword1">elseif</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'no_list_controls'</span>, <span class="php-keyword1">false</span>)) {
+</span><span id="1969" class="l"><a href="#1969">1969: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">'&lt;a href=&quot;#&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Sources'</span>).<span class="php-quote">'&quot; class=&quot;source_link&quot;&gt;&lt;img alt=&quot;Sources&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$folder</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="1970" class="l"><a href="#1970">1970: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>) == <span class="php-quote">'combined_inbox'</span>) {
+</span><span id="1971" class="l"><a href="#1971">1971: </a>                <span class="php-var">$path</span> = <span class="php-quote">'all'</span>;
+</span><span id="1972" class="l"><a href="#1972">1972: </a>            }
+</span><span id="1973" class="l"><a href="#1973">1973: </a>            <span class="php-keyword1">else</span> {
+</span><span id="1974" class="l"><a href="#1974">1974: </a>                <span class="php-var">$path</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>);
+</span><span id="1975" class="l"><a href="#1975">1975: </a>            }
+</span><span id="1976" class="l"><a href="#1976">1976: </a>            <span class="php-var">$config_link</span> = <span class="php-quote">'&lt;a title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Configure'</span>).<span class="php-quote">'&quot; href=&quot;?page=settings#'</span>.<span class="php-var">$path</span>.<span class="php-quote">'_setting&quot;&gt;&lt;img alt=&quot;Configure&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$cog</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="1977" class="l"><a href="#1977">1977: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">'&lt;a class=&quot;refresh_link&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Refresh'</span>).<span class="php-quote">'&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;Refresh&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$refresh</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="1978" class="l"><a href="#1978">1978: </a>
+</span><span id="1979" class="l"><a href="#1979">1979: </a>        }
+</span><span id="1980" class="l"><a href="#1980">1980: </a>        <span class="php-keyword1">else</span> {
+</span><span id="1981" class="l"><a href="#1981">1981: </a>            <span class="php-var">$config_link</span> = <span class="php-quote">''</span>;
+</span><span id="1982" class="l"><a href="#1982">1982: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">''</span>;
+</span><span id="1983" class="l"><a href="#1983">1983: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">''</span>;
+</span><span id="1984" class="l"><a href="#1984">1984: </a>        }
+</span><span id="1985" class="l"><a href="#1985">1985: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="1986" class="l"><a href="#1986">1986: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;message_list&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>;
+</span><span id="1987" class="l"><a href="#1987">1987: </a>        <span class="php-var">$res</span> .= message_controls(<span class="php-var">$this</span>).
+</span><span id="1988" class="l"><a href="#1988">1988: </a>            <span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;'</span>, <span class="php-keyword2">array_map</span>( <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$v</span>); },
+</span><span id="1989" class="l"><a href="#1989">1989: </a>                <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>())));
+</span><span id="1990" class="l"><a href="#1990">1990: </a>        <span class="php-var">$res</span> .= list_controls(<span class="php-var">$refresh_link</span>, <span class="php-var">$config_link</span>, <span class="php-var">$source_link</span>);
+</span><span id="1991" class="l"><a href="#1991">1991: </a>        <span class="php-var">$res</span> .= message_list_meta(<span class="php-var">$this</span>-&gt;module_output(), <span class="php-var">$this</span>);
+</span><span id="1992" class="l"><a href="#1992">1992: </a>        <span class="php-var">$res</span> .= list_sources(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'data_sources'</span>, <span class="php-keyword1">array</span>()), <span class="php-var">$this</span>);
+</span><span id="1993" class="l"><a href="#1993">1993: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1994" class="l"><a href="#1994">1994: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1995" class="l"><a href="#1995">1995: </a>    }
+</span><span id="1996" class="l"><a href="#1996">1996: </a>}
+</span><span id="1997" class="l"><a href="#1997">1997: </a>
+</span><span id="1998" class="l"><a href="#1998">1998: </a><span class="php-comment">/**
+</span></span><span id="1999" class="l"><a href="#1999">1999: </a><span class="php-comment"> * End a message list table
+</span></span><span id="2000" class="l"><a href="#2000">2000: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="2001" class="l"><a href="#2001">2001: </a><span class="php-comment"> */</span>
+</span><span id="2002" class="l"><a href="#2002">2002: </a><span class="php-keyword1">class</span> Hm_Output_message_list_end <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="2003" class="l"><a href="#2003">2003: </a>    <span class="php-comment">/**
+</span></span><span id="2004" class="l"><a href="#2004">2004: </a><span class="php-comment">     * Close the table opened in Hm_Output_message_list_start
+</span></span><span id="2005" class="l"><a href="#2005">2005: </a><span class="php-comment">     */</span>
+</span><span id="2006" class="l"><a href="#2006">2006: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="2007" class="l"><a href="#2007">2007: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/tbody&gt;&lt;/table&gt;&lt;div class=&quot;page_links&quot;&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
+</span><span id="2008" class="l"><a href="#2008">2008: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="2009" class="l"><a href="#2009">2009: </a>    }
+</span><span id="2010" class="l"><a href="#2010">2010: </a>}
+</span><span id="2011" class="l"><a href="#2011">2011: </a>
+</span><span id="2012" class="l"><a href="#2012">2012: </a><span class="xlang">?&gt;</span>
+</span><span id="2013" class="l"><a href="#2013">2013: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -3013,6 +3013,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?56327f64b14787c8dcb4cbae6fe5f9869297b2c7"></script>
+<script src="elementlist.js?5ad3add04edb3e08961609ffa9d827b8d474bcf2"></script>
 </body>
 </html>
