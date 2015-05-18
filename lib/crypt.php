@@ -177,7 +177,6 @@ class Hm_Crypt {
      * @return bool
      */ 
     public static function hash_compare($a, $b) {
-        sleep(1);
         return $a === $b;
     }
 
@@ -209,12 +208,12 @@ class Hm_Crypt {
      */
     public static function hash_password($password, $salt=false, $count=false, $algo='sha512') {
         if (!$salt) {
-            $salt = base64_encode(self::generate_salt());
+            $salt = self::generate_salt();
         }
         if (!$count) {
             $count = self::$password_rounds;
         }
-        return sprintf("%s:%s:%s:%s", $algo, $count, $salt, base64_encode(
+        return sprintf("%s:%s:%s:%s", $algo, $count, base64_encode($salt), base64_encode(
             self::pbkdf2($algo, $password, $salt, $count, 32)));
     }
 
@@ -227,7 +226,7 @@ class Hm_Crypt {
     public static function check_password($password, $hash) {
         if (count(explode(':', $hash)) == 4) {
             list($algo, $count, $salt, $nothing) = explode(':', $hash);
-            return self::hash_compare(self::hash_password($password, $salt, $count, $algo), $hash);
+            return self::hash_compare(self::hash_password($password, base64_decode($salt), $count, $algo), $hash);
         }
         return false;
     }
