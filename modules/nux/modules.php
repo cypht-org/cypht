@@ -346,7 +346,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         $res .= '</ul>';
         $res .= '<div class="nux_tz">';
         if (!$tz) {
-            $res .= $this->trans('Your timezone NOT set');
+            $res .= $this->trans('Your timezone is NOT set');
         }
         else {
             $res .= sprintf($this->trans('Your timezone is set to %s'), $this->html_safe($tz));
