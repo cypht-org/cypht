@@ -55,16 +55,16 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         $modules = $this->config->get('modules', '');
 
         if (data_source_available($modules, 'imap')) {
-            $imap_servers = count( Hm_IMAP_List::dump(false) );
+            $imap_servers = count(Hm_IMAP_List::dump(false));
         }
         if (data_source_available($modules, 'pop3')) {
-            $pop3_servers = count( Hm_POP3_List::dump(false) );
+            $pop3_servers = count(Hm_POP3_List::dump(false));
         }
         if (data_source_available($modules, 'feeds')) {
-            $feed_servers = count( Hm_Feed_List::dump(false) );
+            $feed_servers = count(Hm_Feed_List::dump(false));
         }
         if (data_source_available($modules, 'smtp')) {
-            $smtp_servers = count( Hm_SMTP_List::dump(false) );
+            $smtp_servers = count(Hm_SMTP_List::dump(false));
         }
 
         $this->out('nux_server_setup', array(
