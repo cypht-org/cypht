@@ -23,7 +23,7 @@
     <div class="para">
 <ul>
 <li>
-Session level data is encrypted with a long random string stored in a cookie and generated on login.
+Session level data is encrypted with a long random string generated on login and stored in a cookie.
 </li>
 <li>
 Persistent data stored between logins is encrypted with your clear text password, which is obviously not stored anywhere.
@@ -75,6 +75,9 @@ Module design enforces a separation of input processing and output formatting, a
 </li>
 <li>
     <a href="http://cypht.org/docs/test_coverage/index.html">100% unit test coverage with PHPUnit</a> for the application framework, with a cyclomatic complexity maximum for classes of 39, and a method complexity max of 11.
+</li>
+<li>
+HTML formatted E-Mail is filtered through HTMLPurifier with all external resources removed before being rendered.
 </li>
 </ul>
     </div>
