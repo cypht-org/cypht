@@ -3,23 +3,15 @@ body {
 }
 
 .popover {
- max-width: none;
+ width: 600px;
 }
 
-.glyphicon {
- margin-right:.25em;
-}
-
-.table-bordered>thead>tr>td {
- border-bottom-width: 1px;
-}
-
-.table tbody>tr>td, .table thead>tr>td {
+.table td {
  padding-top: 3px;
  padding-bottom: 3px;
 }
 
-.table-condensed tbody>tr>td {
+.table-condensed td {
  padding-top: 0;
  padding-bottom: 0;
 }
@@ -49,7 +41,7 @@ body {
 }
 
 td.big {
- width: 117px;
+ width: 100px;
 }
 
 td.small {
@@ -91,24 +83,4 @@ span.success, span.warning, span.danger {
 #classCoverageDistribution, #classComplexity {
  height: 200px;
  width: 475px;
-}
-
-#toplink {
- position: fixed;
- left: 5px;
- bottom: 5px;
- outline: 0;
-}
-
-svg text {
- font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
- font-size: 11px;
- color: #666;
- fill: #666;
-}
-
-.scrollbox {
- height:245px;
- overflow-x:hidden;
- overflow-y:scroll;
 }
