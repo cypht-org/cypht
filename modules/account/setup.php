@@ -11,19 +11,21 @@ add_handler('create_account', 'process_create_account', true, 'account', 'login'
 add_handler('create_account', 'check_internal_users', true, 'account', 'login', 'after');
 add_output('create_account', 'create_form', true, 'account', 'content_section_start', 'after');
 
-/* settings page for password change */
-//add_handler('settings', 'process_change_password', true, 'account', 'date', 'after');
-//add_handler('settings', 'check_internal_users', true, 'account', 'login', 'after');
-//add_output('settings', 'change_password', true, 'account', 'list_style_setting', 'after');
+setup_base_page('change_password', 'core');
+add_handler('change_password', 'process_change_password', true, 'account', 'load_user_data', 'after');
+add_handler('change_password', 'check_internal_users', true, 'account', 'login', 'after');
+add_output('change_password', 'change_password', true, 'account', 'content_section_start', 'after');
 
 /* folder list link */
 add_handler('ajax_hm_folders', 'check_internal_users', true, 'account', 'login', 'after');
 add_output('ajax_hm_folders', 'create_account_link', true, 'account', 'settings_menu_end', 'before');
+add_output('ajax_hm_folders', 'change_password_link', true, 'developer', 'settings_menu_end', 'before');
 
 /* input/output */
 return array(
     'allowed_pages' => array(
-        'create_account'
+        'create_account',
+        'change_password'
     ),
     'allowed_post' => array(
         'create_username' => FILTER_SANITIZE_STRING,
@@ -31,6 +33,8 @@ return array(
         'create_password_again' => FILTER_SANITIZE_STRING,
         'new_pass1' => FILTER_SANITIZE_STRING,
         'new_pass2' => FILTER_SANITIZE_STRING,
+        'old_pass' => FILTER_SANITIZE_STRING,
+        'change_password' => FILTER_SANITIZE_STRING,
     )
 );
 

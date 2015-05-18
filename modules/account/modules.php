@@ -12,21 +12,27 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_process_change_password extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2'));
+        if (!$this->session->internal_users) {
+            return;
+        }
+
+        list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2', 'old_pass', 'change_password'));
         if ($success) {
-            if ($this->session->internal_users) {
-                if ($form['new_pass1'] && $form['new_pass2']) {
-                    if ($form['new_pass1'] != $form['new_pass2']) {
-                        Hm_Msgs::add("ERRNew passwords don't match");
-                    }
-                    else {
-                        $user = $this->session->get('username', false);
-                        if ($this->session->change_pass($user, $form['new_pass1'])) {
-                            $this->out('new_password', $form['new_pass1']);
-                        }
-                    }
-                }
+            if ($form['new_pass1'] !== $form['new_pass2']) {
+                Hm_Msgs::add("ERRNew passwords don't not match"); 
+                return;
             }
+            $user = $this->session->get('username', false);
+            if (!$this->session->auth($user, $form['old_pass'])) {
+                Hm_Msgs::add("ERRCurrent password is incorrect");
+                return;
+            }
+            $user_config = load_user_config_object($this->config);
+            if (!$this->session->change_pass($user, $form['new_pass1'])) {
+                Hm_Msgs::add("ERRAn error Occurred");
+            }
+            $user_config->load($user, $form['old_pass']);
+            $user_config->save($user, $form['new_pass1']);
         }
     }
 }
@@ -72,8 +78,8 @@ class Hm_Output_create_account_link extends Hm_Output_Module {
         }
         else {
             $res = '<li class="menu_create_account"><a class="unread_link" href="?page=create_account">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$plus).'" alt="" '.
-                'width="16" height="16" /> '.$this->trans('Create Account').'</a></li>';
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" '.
+                'width="16" height="16" /> '.$this->trans('Accounts').'</a></li>';
         }
         if ($this->format == 'HTML5') {
             return $res;
@@ -105,15 +111,38 @@ class Hm_Output_create_form extends Hm_Output_Module {
 }
 
 /**
+ * Adds a link to the change password page to the folder list
+ * @subpackage account/output
+ */
+class Hm_Output_change_password_link extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('internal_users')) {
+            $res = '<li class="menu_change_password"><a class="unread_link" href="?page=change_password">'.
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$key).'" alt="" width="16" height="16" /> '.$this->trans('Password').'</a></li>';
+            $this->concat('formatted_folder_list', $res);
+        }
+    }
+}
+
+
+/**
  * @subpackage account/output
  */
 class Hm_Output_change_password extends Hm_Output_Module {
     protected function output() {
         $res = '';
         if ($this->get('internal_users')) {
-            $res .= '<tr class="general_setting"><td><label for="new_pass1">'.$this->trans('Change password').
-                '</label></td><td><input type="password" id="new_pass1" name="new_pass1" placeholder="'.$this->trans('New password').'" />'.
-                ' <input type="password" name="new_pass2" placeholder="'.$this->trans('New password again').'" /></td></tr>';
+            $res .= '<div class="chg_pass_page"><div class="content_title">'.$this->trans('Change Password').'</div>'.
+                '<div class="change_pass"><form method="POST">'.
+                '<input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
+                '<label class="screen_reader" for="new_pass1">'.$this->trans('New password').'</label>'.
+                '<input required type="password" id="new_pass1" name="new_pass1" placeholder="'.$this->trans('New password').'" /><br />'.
+                '<label class="screen_reader" for="new_pass2">'.$this->trans('New password again').'</label>'.
+                '<input required type="password" id="new_pass2" name="new_pass2" placeholder="'.$this->trans('New password again').'" /><br />'.
+                '<label class="screen_reader" for="old_pass">'.$this->trans('Current password').'</label>'.
+                '<input required type="password" id="old_pass" name="old_pass" placeholder="'.$this->trans('Current password').'" /><br />'.
+                '<input type="submit" name="change_password" value="'.$this->trans('Update').'" />';
+            $res .= '</form></div></div>';
         }
         return $res;
     }
