@@ -12,9 +12,9 @@ add_handler('create_account', 'check_internal_users', true, 'account', 'login', 
 add_output('create_account', 'create_form', true, 'account', 'content_section_start', 'after');
 
 /* settings page for password change */
-add_handler('settings', 'process_change_password', true, 'account', 'date', 'after');
-add_handler('settings', 'check_internal_users', true, 'account', 'login', 'after');
-add_output('settings', 'change_password', true, 'account', 'list_style_setting', 'after');
+//add_handler('settings', 'process_change_password', true, 'account', 'date', 'after');
+//add_handler('settings', 'check_internal_users', true, 'account', 'login', 'after');
+//add_output('settings', 'change_password', true, 'account', 'list_style_setting', 'after');
 
 /* folder list link */
 add_handler('ajax_hm_folders', 'check_internal_users', true, 'account', 'login', 'after');
