@@ -3,6 +3,9 @@
 /**
  * CLI script to delete a user account from the local DB
  */
+if (strtolower(php_sapi_name()) !== 'cli') {
+    die("Must be run from the command line\n");
+}
 
 if (is_array($argv) && count($argv) == 2) {
     $user = $argv[1];
