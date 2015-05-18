@@ -3,6 +3,9 @@
 /**
  * CLI script to update a user password
  */
+if (strtolower(php_sapi_name()) !== 'cli') {
+    die("Must be run from the command line\n");
+}
 
 if (is_array($argv) && count($argv) == 3) {
     $user = $argv[1];
