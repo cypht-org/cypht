@@ -23,22 +23,23 @@
     <div class="para">
 <ul>
 <li>
-Session level data is encrypted with a long random string generated each time you login.
+Session level data is encrypted with a long random string stored in a cookie and generated on login.
 </li>
 <li>
-Persistent data stored between logins is encrypted with your clear text password, which is obviously not stored anywhere on the server or in the session.
+Persistent data stored between logins is encrypted with your clear text password, which is obviously not stored anywhere.
 </li>
 <li>
 All cookies are session level, HTTP only, and have the secure flag, path, and domain values set.
 </li>
 <li>
-All encryption is AES compliant using PHP MCRYPT with tunable knobs.
+Session and persistent data is encrypted with Rijandael 128, CBC block mode, and PBKDF2 key derivation.
 </li>
 <li>
 TLS everywhere - forced TLS for browsers, and TLS/STARTTLS support for IMAP, POP3, and SMTP connections.
 </li>
 <li>
 Oauth2 login for Gmail and Outlook servers supported.
+</li>
 <li>
 HTTP request header fingerprinting, site/user specific page keys, and dynamic session ids.
 </li>
@@ -73,7 +74,7 @@ Configurable idle timeout module set that ends a session after a predetermined a
 Module design enforces a separation of input processing and output formatting, and encourages concise methods, which makes the code easier to debug and audit.
 </li>
 <li>
-    <a href="http://cypht.org/docs/test_coverage/index.html">100% unit test coverage with PHPUnit</a> for the application framework, with a cyclomatic complexity maximum for classes of 39, and a method complexity max of 11 (<a href="http://cypht.org/docs/test_coverage/dashboard.html">http://cypht.org/docs/test_coverage/dashboard.html</a>).
+    <a href="http://cypht.org/docs/test_coverage/index.html">100% unit test coverage with PHPUnit</a> for the application framework, with a cyclomatic complexity maximum for classes of 39, and a method complexity max of 11.
 </li>
 </ul>
     </div>
