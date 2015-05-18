@@ -57,7 +57,7 @@ IMAP, or an included database schema. Sessions and Authentication were built to
 be overridden for site specific needs without breaking module sets.
       </li>
       <li>
-On the server, page request processing peaks at around 2-4MB of memory (less than 1 MB with HHVM). The module system
+On the server, page request processing peaks at around 4-5MB of memory (1-2 MB with HHVM). The module system
 only includes PHP files required to process the current request, so time is not
 wasted parsing unused code paths.
       </li>
