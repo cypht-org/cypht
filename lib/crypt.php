@@ -65,6 +65,12 @@ class Hm_Crypt {
     /* hmac algo */
     static private $hmac = 'sha512';
 
+    /* password PBKDF2 rounds */
+    static private $password_rounds = 86000;
+
+    /* encryptiong PBKDF2 rounds */
+    static private $encryption_rounds = 100;
+
     /**
      * Convert ciphertext to plaintext
      * @param string $string ciphertext to decrypt
@@ -140,7 +146,7 @@ class Hm_Crypt {
      * @return string
      */
     public static function generate_crypt_key($salt, $key) {
-        return self::pbkdf2(self::$hmac, $key, $salt, 100, 32);
+        return self::pbkdf2(self::$hmac, $key, $salt, self::$encryption_rounds, 32);
     }
 
     /**
@@ -150,7 +156,7 @@ class Hm_Crypt {
      * @return string
      */
     public static function generate_hmac_key($salt, $key) {
-        return self::pbkdf2(self::$hmac, $key, $salt, 100, 32);
+        return self::pbkdf2(self::$hmac, $key, $salt, self::$encryption_rounds, 32);
     }
 
     /**
@@ -160,7 +166,7 @@ class Hm_Crypt {
      * @return string
      */
     public static function generate_iv($salt, $key) {
-        return self::pbkdf2(self::$hmac, $key, $salt, 100, 16);
+        return self::pbkdf2(self::$hmac, $key, $salt, self::$encryption_rounds, 16);
     }
 
     /**
@@ -197,13 +203,16 @@ class Hm_Crypt {
      * Hash a password using PBKDF2
      * @param string $password password to hash
      * @param string $salt salt to use, if false generate a new one
-     * @param int $count interations, defaults to 86000
-     * @param string $algo pbkdf2 algo, defaults to sha512
+     * @param int $count interations for PBKDF2
+     * @param string $algo PBKDF2 algo, defaults to sha512
      * @return string
      */
-    public static function hash_password($password, $salt=false, $count=86000, $algo='sha512') {
+    public static function hash_password($password, $salt=false, $count=false, $algo='sha512') {
         if (!$salt) {
             $salt = base64_encode(self::generate_salt());
+        }
+        if (!$count) {
+            $count = self::$password_rounds;
         }
         return sprintf("%s:%s:%s:%s", $algo, $count, $salt, base64_encode(
             self::pbkdf2($algo, $password, $salt, $count, 32)));
