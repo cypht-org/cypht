@@ -31,6 +31,15 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_check_password() {
+        $this->assertFalse(Hm_Crypt::check_password('test', 'asdf'));
+        $hash = Hm_Crypt::hash_password('test');
+        $this->assertTrue(Hm_Crypt::check_password('test', $hash));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_hash_password() {
         $hash = Hm_Crypt::hash_password('test');
         $this->assertTrue(Hm_Crypt::check_password('test', $hash));
