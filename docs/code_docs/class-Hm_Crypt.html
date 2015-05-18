@@ -547,9 +547,6 @@
 	<h1>Class Hm_Crypt</h1>
 
 
-	<div class="description">
-	<p>Class to make encryption easier</p>
-	</div>
 
 
 
@@ -565,7 +562,7 @@
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.crypt.html">crypt</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Crypt.html#20-77" title="Go to source code">crypt.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Crypt.html#54-272" title="Go to source code">crypt.php</a>
 		<br>
 	</div>
 
@@ -585,7 +582,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_plaintext">#</a>
-		<code><a href="source-class-Hm_Crypt.html#34-47" title="Go to source code">plaintext</a>( <span>string <var>$string</var></span>, <span>string <var>$key</var></span> )</code>
+		<code><a href="source-class-Hm_Crypt.html#68-101" title="Go to source code">plaintext</a>( <span>string <var>$string</var></span>, <span>string <var>$key</var></span> )</code>
 
 		<div class="description short">
 			<p>Convert ciphertext to plaintext</p>
@@ -626,7 +623,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_ciphertext">#</a>
-		<code><a href="source-class-Hm_Crypt.html#49-60" title="Go to source code">ciphertext</a>( <span>string <var>$string</var></span>, <span>string <var>$key</var></span> )</code>
+		<code><a href="source-class-Hm_Crypt.html#103-126" title="Go to source code">ciphertext</a>( <span>string <var>$string</var></span>, <span>string <var>$key</var></span> )</code>
 
 		<div class="description short">
 			<p>Convert plaintext into ciphertext</p>
@@ -655,33 +652,404 @@
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="iv_size" id="_iv_size">
+	<tr data-order="generate_salt" id="_generate_salt">
 
 		<td class="attributes"><code>
 			 public static
 
-			integer
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_iv_size">#</a>
-		<code><a href="source-class-Hm_Crypt.html#62-68" title="Go to source code">iv_size</a>( )</code>
+		<a class="anchor" href="#_generate_salt">#</a>
+		<code><a href="source-class-Hm_Crypt.html#128-134" title="Go to source code">generate_salt</a>( )</code>
 
 		<div class="description short">
-			<p>Calculate iv size</p>
+			<p>Generate a strong random salt</p>
 		</div>
 
 		<div class="description detailed hidden">
-			<p>Calculate iv size</p>
+			<p>Generate a strong random salt</p>
 
 
 
 				<h4>Returns</h4>
 				<div class="list">
-					integer<br>"Initialization Vector" size for the selected cipher/mode
+					string
 				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="generate_crypt_key" id="_generate_crypt_key">
+
+		<td class="attributes"><code>
+			 public static
+
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_generate_crypt_key">#</a>
+		<code><a href="source-class-Hm_Crypt.html#136-144" title="Go to source code">generate_crypt_key</a>( <span>string <var>$salt</var></span>, <span>string <var>$key</var></span> )</code>
+
+		<div class="description short">
+			<p>Generate an ecncryption key from a user key and a salt</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Generate an ecncryption key from a user key and a salt</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$salt</var></dt>
+					<dd>from generate_salt()</dd>
+					<dt><var>$key</var></dt>
+					<dd>supplied key for the encryption</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					string
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="generate_hmac_key" id="_generate_hmac_key">
+
+		<td class="attributes"><code>
+			 public static
+
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_generate_hmac_key">#</a>
+		<code><a href="source-class-Hm_Crypt.html#146-154" title="Go to source code">generate_hmac_key</a>( <span>string <var>$salt</var></span>, <span>string <var>$key</var></span> )</code>
+
+		<div class="description short">
+			<p>Generate an hmac key from a user key and a salt</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Generate an hmac key from a user key and a salt</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$salt</var></dt>
+					<dd>from generate_salt()</dd>
+					<dt><var>$key</var></dt>
+					<dd>supplied key for the encryption</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					string
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="generate_iv" id="_generate_iv">
+
+		<td class="attributes"><code>
+			 public static
+
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_generate_iv">#</a>
+		<code><a href="source-class-Hm_Crypt.html#156-164" title="Go to source code">generate_iv</a>( <span>string <var>$salt</var></span>, <span>string <var>$key</var></span> )</code>
+
+		<div class="description short">
+			<p>Generate an iv from a user key and a salt</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Generate an iv from a user key and a salt</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$salt</var></dt>
+					<dd>from generate_salt()</dd>
+					<dt><var>$key</var></dt>
+					<dd>supplied key for the encryption</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					string
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="hash_compare" id="_hash_compare">
+
+		<td class="attributes"><code>
+			 public static
+
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_hash_compare">#</a>
+		<code><a href="source-class-Hm_Crypt.html#166-176" title="Go to source code">hash_compare</a>( <span>string <var>$a</var></span>, <span>string <var>$b</var></span> )</code>
+
+		<div class="description short">
+			<p>Compare password hashes</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Compare password hashes</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$a</var></dt>
+					<dd>hash</dd>
+					<dt><var>$b</var></dt>
+					<dd>hash</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					boolean
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="pad" id="_pad">
+
+		<td class="attributes"><code>
+			 public static
+
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_pad">#</a>
+		<code><a href="source-class-Hm_Crypt.html#178-194" title="Go to source code">pad</a>( <span>string <var>$data</var></span> )</code>
+
+		<div class="description short">
+			<p>Pad a string before encryption</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Pad a string before encryption</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$data</var></dt>
+					<dd>data to pad</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					string
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="hash_password" id="_hash_password">
+
+		<td class="attributes"><code>
+			 public static
+
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_hash_password">#</a>
+		<code><a href="source-class-Hm_Crypt.html#196-210" title="Go to source code">hash_password</a>( <span>string <var>$password</var></span>, <span>string <var>$salt</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$count</var> = <span class="php-num">86000</span></span>, <span>string <var>$algo</var> = <span class="php-quote">'sha512'</span></span> )</code>
+
+		<div class="description short">
+			<p>Hash a password using PBKDF2</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Hash a password using PBKDF2</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$password</var></dt>
+					<dd>password to hash</dd>
+					<dt><var>$salt</var></dt>
+					<dd>salt to use, if false generate a new one</dd>
+					<dt><var>$count</var></dt>
+					<dd>interations, defaults to 86000</dd>
+					<dt><var>$algo</var></dt>
+					<dd>pbkdf2 algo, defaults to sha512</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					string
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="check_password" id="_check_password">
+
+		<td class="attributes"><code>
+			 public static
+
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_check_password">#</a>
+		<code><a href="source-class-Hm_Crypt.html#212-224" title="Go to source code">check_password</a>( <span>string <var>$password</var></span>, <span>string <var>$hash</var></span> )</code>
+
+		<div class="description short">
+			<p>Check a password against it's stored hash</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Check a password against it's stored hash</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$password</var></dt>
+					<dd>clear text password</dd>
+					<dt><var>$hash</var></dt>
+					<dd>hashed password</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					boolean
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="unpad" id="_unpad">
+
+		<td class="attributes"><code>
+			 public static
+
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_unpad">#</a>
+		<code><a href="source-class-Hm_Crypt.html#226-238" title="Go to source code">unpad</a>( <span>string <var>$data</var></span> )</code>
+
+		<div class="description short">
+			<p>remove padding from a decrypted string</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>remove padding from a decrypted string</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$data</var></dt>
+					<dd>string to unpad</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					string
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="pbkdf2" id="_pbkdf2">
+
+		<td class="attributes"><code>
+			 public static
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_pbkdf2">#</a>
+		<code><a href="source-class-Hm_Crypt.html#240-262" title="Go to source code">pbkdf2</a>( <span>string <var>$algo</var></span>, <span>string <var>$key</var></span>, <span>string <var>$salt</var></span>, <span>string <var>$count</var></span>, <span>string <var>$length</var></span> )</code>
+
+		<div class="description short">
+			<p>key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$algo</var></dt>
+					<dd>hash algorithm to use</dd>
+					<dt><var>$key</var></dt>
+					<dd>payload</dd>
+					<dt><var>$salt</var></dt>
+					<dd>random string from generate_salt</dd>
+					<dt><var>$count</var></dt>
+					<dd>iterations</dd>
+					<dt><var>$length</var></dt>
+					<dd>result length</dd>
+				</dl></div>
+
 
 
 
@@ -701,7 +1069,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_unique_id">#</a>
-		<code><a href="source-class-Hm_Crypt.html#70-76" title="Go to source code">unique_id</a>( <span> <var>$size</var> = <span class="php-num">128</span></span> )</code>
+		<code><a href="source-class-Hm_Crypt.html#264-271" title="Go to source code">unique_id</a>( <span>integer <var>$size</var> = <span class="php-num">128</span></span> )</code>
 
 		<div class="description short">
 			<p>Return a unique-enough-key for session cookie ids</p>
@@ -711,6 +1079,11 @@
 			<p>Return a unique-enough-key for session cookie ids</p>
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$size</var></dt>
+					<dd>length of the result</dd>
+				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
@@ -741,11 +1114,11 @@
 	<tr data-order="mode" id="$mode">
 		<td class="attributes"><code>
 			private static 
-			
+			string
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Crypt.html#26" title="Go to source code"><var>$mode</var></a>
+				<a href="source-class-Hm_Crypt.html#57" title="Go to source code"><var>$mode</var></a>
 
 			<div class="description short">
 				
@@ -759,18 +1132,18 @@
 		<td class="value">
 			<div>
 				<a href="#$mode" class="anchor">#</a>
-				<code>BLOCK_MODE</code>
+				<code>MCRYPT_MODE_CBC</code>
 			</div>
 		</td>
 	</tr>
 	<tr data-order="cipher" id="$cipher">
 		<td class="attributes"><code>
 			private static 
-			
+			string
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Crypt.html#29" title="Go to source code"><var>$cipher</var></a>
+				<a href="source-class-Hm_Crypt.html#60" title="Go to source code"><var>$cipher</var></a>
 
 			<div class="description short">
 				
@@ -784,18 +1157,18 @@
 		<td class="value">
 			<div>
 				<a href="#$cipher" class="anchor">#</a>
-				<code>CIPHER</code>
+				<code>MCRYPT_RIJNDAEL_128</code>
 			</div>
 		</td>
 	</tr>
 	<tr data-order="r_source" id="$r_source">
 		<td class="attributes"><code>
 			private static 
-			
+			integer
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Crypt.html#32" title="Go to source code"><var>$r_source</var></a>
+				<a href="source-class-Hm_Crypt.html#63" title="Go to source code"><var>$r_source</var></a>
 
 			<div class="description short">
 				
@@ -809,7 +1182,32 @@
 		<td class="value">
 			<div>
 				<a href="#$r_source" class="anchor">#</a>
-				<code>RAND_SOURCE</code>
+				<code>MCRYPT_RAND</code>
+			</div>
+		</td>
+	</tr>
+	<tr data-order="hmac" id="$hmac">
+		<td class="attributes"><code>
+			private static 
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Crypt.html#66" title="Go to source code"><var>$hmac</var></a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#$hmac" class="anchor">#</a>
+				<code><span class="php-quote">'sha512'</span></code>
 			</div>
 		</td>
 	</tr>
