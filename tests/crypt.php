@@ -7,14 +7,13 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        $this->crypt = new Hm_Crypt();
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_ciphertext() {
-        $cipher = $this->crypt->ciphertext('test', 'testkey');
+        $cipher = Hm_Crypt::ciphertext('test', 'testkey');
         $this->assertFalse($cipher == 'test');
     }
     /**
@@ -22,28 +21,55 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_plaintext() {
-        $cipher = $this->crypt->ciphertext('test', 'testkey');
-        $plain = rtrim($this->crypt->plaintext($cipher, 'testkey'), "\0");
+        $this->assertFalse(Hm_Crypt::plaintext('asdf', 'testkey'));
+        $this->assertFalse(Hm_Crypt::plaintext(base64_encode(str_repeat('a', 201)), 'testkey'));
+        $cipher = Hm_Crypt::ciphertext('test', 'testkey');
+        $plain = rtrim(Hm_Crypt::plaintext($cipher, 'testkey'), "\0");
         $this->assertEquals('test', $plain);
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_iv_size() {
-        $this->assertEquals(16, $this->crypt->iv_size());
+    public function test_hash_password() {
+        $hash = Hm_Crypt::hash_password('test');
+        $this->assertTrue(Hm_Crypt::check_password('test', $hash));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_unpad() {
+        $this->assertEquals('', Hm_Crypt::unpad(base64_decode('EBAQEBAQEBAQEBAQEBAQEA==')));
+        $this->assertEquals('asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf', Hm_Crypt::unpad(base64_decode('YXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZg==')));
+        $this->assertEquals('aaaaaaaaaaaaaaab', Hm_Crypt::unpad('aaaaaaaaaaaaaaab'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_pad() {
+        $this->assertEquals('EBAQEBAQEBAQEBAQEBAQEA==', base64_encode(Hm_Crypt::pad('')));
+        $this->assertEquals('YXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZg==', base64_encode(Hm_Crypt::pad('asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf')));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_hash_compare() {
+        $this->assertFalse(Hm_Crypt::hash_compare('asdf', 'xcvb'));
+        $this->assertFalse(Hm_Crypt::hash_compare('asdf', false));
+        $this->assertFalse(Hm_Crypt::hash_compare('0', false));
+        $this->assertTrue(Hm_Crypt::hash_compare('asdf', 'asdf'));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_unique_id() {
-        $this->assertEquals(24, strlen(base64_decode($this->crypt->unique_id(24))));
-        $this->assertEquals(48, strlen(base64_decode($this->crypt->unique_id(48))));
-        $this->assertEquals(128, strlen(base64_decode($this->crypt->unique_id())));
-    }
-    public function tearDown() {
-        unset($this->crypt);
+        $this->assertEquals(24, strlen(base64_decode(Hm_Crypt::unique_id(24))));
+        $this->assertEquals(48, strlen(base64_decode(Hm_Crypt::unique_id(48))));
+        $this->assertEquals(128, strlen(base64_decode(Hm_Crypt::unique_id())));
     }
 }
 

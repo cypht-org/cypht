@@ -4,7 +4,6 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        require APP_PATH.'third_party/pbkdf2.php';
         $this->config = new Hm_Mock_Config();
         setup_db($this->config);
     }

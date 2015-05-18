@@ -7,7 +7,6 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        require APP_PATH.'third_party/pbkdf2.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
@@ -241,7 +240,6 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        require APP_PATH.'third_party/pbkdf2.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
