@@ -68,7 +68,7 @@ class Hm_Functions {
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
         public static function header($header) { return true; }
         public static function cease() { return true; }
-        public static function session_start() { $_SESSION['data'] = 'KpZv3Ld4TsdPuKHF5r/EXfA5a9QGfIJRAa0EZrU3aK5tx3vXvKV345yOzs66NPh4'; }
+        public static function session_start() { $_SESSION['data'] = 'RzEp5KFVqtwJeQLsx3+vjNLbvROUT7mGmUoHqzU0i/1P1W4W6qxsmhP+QAFF19wuFM741RSd+afsDxH4tKyIrtn+kxsvIfO/6xFAXQso8rwmLPKw46lAGbQifATo0GRFlUU3cFs215DAZ5BP3tIgc3KsNQP0cPy9ZAaJ+3IM2ivNLoX7JXE69ZyflgVeJI7ihgYQBgVnai0dwGcF1R4kHLjssqbeqDsh7hGnLiCBn4BaTeOGYTUqTIfgm7ZaBCg1CBq98jntG8kdLLdQDgopYw=='; }
         public static function error_log() { return true; }
         public static function c_init() { return true; }
         public static function c_setopt() { return true; }
