@@ -92,7 +92,7 @@ class Hm_Auth_DB extends Hm_Auth {
             $sql = $this->dbh->prepare("select hash from hm_user where username = ?");
             if ($sql->execute(array($user))) {
                 $row = $sql->fetch();
-                if ($row['hash'] && pbkdf2_validate_password($pass, $row['hash'])) {
+                if ($row['hash'] && Hm_Crypt::check_password($pass, $row['hash'])) {
                     return true;
                 }
             }
@@ -136,7 +136,7 @@ class Hm_Auth_DB extends Hm_Auth {
      */
     public function change_pass($user, $pass) {
         $this->connect();
-        $hash = pbkdf2_create_hash($pass);
+        $hash = Hm_Crypt::hash_password($pass);
         $sql = $this->dbh->prepare("update hm_user set hash=? where username=?");
         if ($sql->execute(array($hash, $user)) && $sql->rowCount() == 1) {
             Hm_Msgs::add("Password changed");
@@ -163,7 +163,7 @@ class Hm_Auth_DB extends Hm_Auth {
             }
             else {
                 $sql = $this->dbh->prepare("insert into hm_user values(?,?)");
-                $hash = pbkdf2_create_hash($pass);
+                $hash = Hm_Crypt::hash_password($pass);
                 if ($sql->execute(array($user, $hash))) {
                     Hm_Msgs::add("Account created");
                     $created = true;

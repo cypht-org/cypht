@@ -628,9 +628,6 @@ function setup_session($config) {
     $session_type = $config->get('session_type', false);
     $auth_type = $config->get('auth_type', false);
     if ($auth_type) {
-        if ($auth_type == 'DB') {
-            require_once APP_PATH.'third_party/pbkdf2.php';
-        }
         $auth_class = sprintf('Hm_Auth_%s', $auth_type);
     }
     else {
