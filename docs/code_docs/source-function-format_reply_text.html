@@ -794,6 +794,7 @@
 				<li><a href="class-Hm_Output_quick_add_dialog.html">Hm_Output_quick_add_dialog</a></li>
 				<li><a href="class-Hm_Output_quick_add_section.html">Hm_Output_quick_add_section</a></li>
 				<li><a href="class-Hm_Output_save_form.html">Hm_Output_save_form</a></li>
+				<li><a href="class-Hm_Output_save_reminder.html">Hm_Output_save_reminder</a></li>
 				<li><a href="class-Hm_Output_search_content_end.html">Hm_Output_search_content_end</a></li>
 				<li><a href="class-Hm_Output_search_content_start.html">Hm_Output_search_content_start</a></li>
 				<li><a href="class-Hm_Output_search_form.html">Hm_Output_search_form</a></li>
@@ -886,6 +887,7 @@
 				<li><a href="function-format_reply_fields.html">format_reply_fields</a></li>
 				<li><a href="function-format_reply_text.html">format_reply_text</a></li>
 				<li><a href="function-get_imap_part_name.html">get_imap_part_name</a></li>
+				<li><a href="function-get_oauth2_data.html">get_oauth2_data</a></li>
 				<li><a href="function-get_secondfactor_state.html">get_secondfactor_state</a></li>
 				<li><a href="function-github_connect_details.html">github_connect_details</a></li>
 				<li><a href="function-github_fetch_content.html">github_fetch_content</a></li>
@@ -898,7 +900,6 @@
 				<li><a href="function-human_readable_interval.html">human_readable_interval</a></li>
 				<li><a href="function-icon_callback.html">icon_callback</a></li>
 				<li><a href="function-imap_data_sources.html">imap_data_sources</a></li>
-				<li><a href="function-imap_get_oauth2_data.html">imap_get_oauth2_data</a></li>
 				<li><a href="function-imap_refresh_oauth2_token.html">imap_refresh_oauth2_token</a></li>
 				<li><a href="function-interface_langs.html">interface_langs</a></li>
 				<li><a href="function-is_email.html">is_email</a></li>
@@ -930,6 +931,7 @@
 				<li><a href="function-setup_base_page.html">setup_base_page</a></li>
 				<li><a href="function-setup_session.html">setup_session</a></li>
 				<li><a href="function-setup_swipe_api.html">setup_swipe_api</a></li>
+				<li><a href="function-smtp_refresh_oauth2_token.html">smtp_refresh_oauth2_token</a></li>
 				<li><a href="function-smtp_server_dropdown.html">smtp_server_dropdown</a></li>
 				<li><a href="function-sort_by_internal_date.html">sort_by_internal_date</a></li>
 				<li><a href="function-start_api.html">start_api</a></li>
@@ -1870,8 +1872,23 @@
 </span><span id="875" class="l"><a href="#875">875: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(<span class="php-var">$to</span>, <span class="php-var">$subject</span>, <span class="php-var">$msg</span>);
 </span><span id="876" class="l"><a href="#876">876: </a>}
 </span><span id="877" class="l"><a href="#877">877: </a>
-</span><span id="878" class="l"><a href="#878">878: </a><span class="xlang">?&gt;</span>
-</span><span id="879" class="l"><a href="#879">879: </a></span></code></pre>
+</span><span id="878" class="l"><a href="#878">878: </a><span class="php-comment">/**
+</span></span><span id="879" class="l"><a href="#879">879: </a><span class="php-comment"> * Get Oauth2 server info
+</span></span><span id="880" class="l"><a href="#880">880: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="881" class="l"><a href="#881">881: </a><span class="php-comment"> * @param object $config site config object
+</span></span><span id="882" class="l"><a href="#882">882: </a><span class="php-comment"> * @return array
+</span></span><span id="883" class="l"><a href="#883">883: </a><span class="php-comment"> */</span>
+</span><span id="884" class="l"><a href="#884">884: </a><span class="php-keyword1">function</span> get_oauth2_data(<span class="php-var">$config</span>) {
+</span><span id="885" class="l"><a href="#885">885: </a>    <span class="php-var">$settings</span> = <span class="php-keyword1">array</span>();
+</span><span id="886" class="l"><a href="#886">886: </a>    <span class="php-var">$ini_file</span> = <span class="php-keyword2">rtrim</span>(<span class="php-var">$config</span>-&gt;get(<span class="php-quote">'app_data_dir'</span>, <span class="php-quote">''</span>), <span class="php-quote">'/'</span>).<span class="php-quote">'/oauth2.ini'</span>;
+</span><span id="887" class="l"><a href="#887">887: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">is_readable</span>(<span class="php-var">$ini_file</span>)) {
+</span><span id="888" class="l"><a href="#888">888: </a>        <span class="php-var">$settings</span> = <span class="php-keyword2">parse_ini_file</span>(<span class="php-var">$ini_file</span>, <span class="php-keyword1">true</span>);
+</span><span id="889" class="l"><a href="#889">889: </a>    }
+</span><span id="890" class="l"><a href="#890">890: </a>    <span class="php-keyword1">return</span> <span class="php-var">$settings</span>;
+</span><span id="891" class="l"><a href="#891">891: </a>}
+</span><span id="892" class="l"><a href="#892">892: </a>
+</span><span id="893" class="l"><a href="#893">893: </a><span class="xlang">?&gt;</span>
+</span><span id="894" class="l"><a href="#894">894: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1879,6 +1896,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?5ad3add04edb3e08961609ffa9d827b8d474bcf2"></script>
+<script src="elementlist.js?2feb4ad1597607818b67dd4858254515f47780c9"></script>
 </body>
 </html>
