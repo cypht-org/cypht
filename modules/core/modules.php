@@ -1298,9 +1298,9 @@ class Hm_Output_unread_since_setting extends Hm_Output_Module {
      * Processed by Hm_Handler_process_unread_since_setting
      */
     protected function output() {
-        $since = false;
+        $since = DEFAULT_SINCE;
         $settings = $this->get('user_settings', array());
-        if (array_key_exists('unread_since', $settings)) {
+        if (array_key_exists('unread_since', $settings) && $settings['unread_since']) {
             $since = $settings['unread_since'];
         }
         return '<tr class="unread_setting"><td><label for="unread_since">'.
@@ -1338,9 +1338,9 @@ class Hm_Output_flagged_since_setting extends Hm_Output_Module {
         /**
          * Processed by Hm_Handler_process_flagged_since_setting
          */
-        $since = false;
+        $since = DEFAULT_SINCE;
         $settings = $this->get('user_settings', array());
-        if (array_key_exists('flagged_since', $settings)) {
+        if (array_key_exists('flagged_since', $settings) && $settings['flagged_since']) {
             $since = $settings['flagged_since'];
         }
         return '<tr class="flagged_setting"><td><label for="flagged_since">'.
@@ -1404,9 +1404,9 @@ class Hm_Output_all_email_since_setting extends Hm_Output_Module {
         if (!email_is_active($this->get('router_module_list'))) {
             return '';
         }
-        $since = false;
+        $since = DEFAULT_SINCE;
         $settings = $this->get('user_settings', array());
-        if (array_key_exists('all_email_since', $settings)) {
+        if (array_key_exists('all_email_since', $settings) && $settings['all_email_since']) {
             $since = $settings['all_email_since'];
         }
         return '<tr class="email_setting"><td><label for="all_email_since">'.
@@ -1424,9 +1424,9 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
      * Processed by Hm_Handler_process_all_since_setting
      */
     protected function output() {
-        $since = false;
+        $since = DEFAULT_SINCE; 
         $settings = $this->get('user_settings', array());
-        if (array_key_exists('all_since', $settings)) {
+        if (array_key_exists('all_since', $settings) && $settings['all_since']) {
             $since = $settings['all_since'];
         }
         return '<tr class="all_setting"><td><label for="all_since">'.
