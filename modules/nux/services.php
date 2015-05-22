@@ -47,6 +47,11 @@ Nux_Quick_Services::add('outlook', array(
     'port' => 993,
     'name' => 'Outlook.com',
     'scope' => 'wl.imap',
+    /*'smtp' => array(
+        'server' => 'smtp.live.com',
+        'port' => 587,
+        'tls'=> 'yes'
+    )*/
 ));
 
 Nux_Quick_Services::add('yahoo', array(
