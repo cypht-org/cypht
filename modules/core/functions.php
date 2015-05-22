@@ -875,4 +875,19 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type
     return array($to, $subject, $msg);
 }
 
+/**
+ * Get Oauth2 server info
+ * @subpackage core/functions
+ * @param object $config site config object
+ * @return array
+ */
+function get_oauth2_data($config) {
+    $settings = array();
+    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/oauth2.ini';
+    if (is_readable($ini_file)) {
+        $settings = parse_ini_file($ini_file, true);
+    }
+    return $settings;
+}
+
 ?>
