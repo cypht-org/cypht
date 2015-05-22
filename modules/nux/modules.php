@@ -106,7 +106,9 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                             'tls' => $details['smtp']['tls'],
                             'auth' => 'xoauth2',
                             'user' => $details['email'],
-                            'pass' => $result['access_token']
+                            'pass' => $result['access_token'],
+                            'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
+                            'refresh_token' => $result['refresh_token']
                         ));
                         $this->session->record_unsaved('SMTP server added');
                         $smtp_servers = Hm_SMTP_List::dump(false, true);
