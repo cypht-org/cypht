@@ -53,6 +53,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('smtp_servers', array());
+        elog($servers);
         foreach ($servers as $index => $server) {
             Hm_SMTP_List::add( $server, $index );
         }
@@ -251,10 +252,18 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     $body = $this->request->post['compose_body'];
                     $draft['draft_body'] = $this->request->post['compose_body'];
                 }
-                $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id']);
+                $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
                 if ($smtp_details) {
                     $from = $smtp_details['user'];
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
+                    if ($smtp && $smtp->state != 'authed' && array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
+                        $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
+                        if (!empty($results)) {
+                            if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
+                                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
+                            }
+                        }
+                    }
                     if ($smtp && $smtp->state == 'authed') {
                         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0));
                         $recipients = $mime->get_recipient_addresses();
@@ -481,6 +490,31 @@ function build_mime_msg($to, $subject, $body, $from) {
         )
     );
     return imap_mail_compose($headers, $body);
+}
+
+/**
+ * Check for and do an Oauth2 token reset if needed
+ * @param array $server imap server data
+ * @param object $config site config object
+ * @return mixed
+ */
+function smtp_refresh_oauth2_token($server, $config) {
+
+    if ((int) $server['expiration'] <= time()) {
+        $oauth2_data = get_oauth2_data($config);
+        $details = array();
+        if ($server['server'] == 'smtp.gmail.com') {
+            $details = $oauth2_data['gmail'];
+        }
+        if (!empty($details)) {
+            $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['client_uri']);
+            $result = $oauth2->refresh_token($details['refresh_uri'], $server['refresh_token']);
+            if (array_key_exists('access_token', $result)) {
+                return array(strtotime(sprintf('+%d seconds', $result['expires_in'])), $result['access_token']);
+            }
+        }
+    }
+    return array();
 }
 
 
