@@ -687,7 +687,6 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
                 if (!empty($results)) {
                     if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
                         Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $server_id));
-                        //$this->session->record_unsaved('Oauth2 access token updated');
                         $updated++;
                     }
                 }
