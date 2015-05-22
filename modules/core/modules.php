@@ -766,6 +766,19 @@ class Hm_Output_search_content_end extends Hm_Output_Module {
 }
 
 /**
+ * Unsaved data reminder
+ */
+class Hm_Output_save_reminder extends Hm_Output_Module {
+    protected function output() {
+        $changed = $this->get('changed_settings', array());
+        if (!empty($changed)) {
+            return '<div class="save_reminder"><a title="You have unsaved changes." href="?page=save"><img src="'.Hm_Image_Sources::$save.'" width="20" height="20" /></a></div>';
+        }
+        return '';
+    }
+}
+
+/**
  * Output the search form used on the search page
  * @subpackage core/output
  */
