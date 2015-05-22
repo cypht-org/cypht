@@ -1817,21 +1817,6 @@ function add_attached_images($txt, $uid, $struct, $imap) {
 }
 
 /**
- * Get Oauth2 server info
- * @subpackage imap/functions
- * @param object $config site config object
- * @return array
- */
-function imap_get_oauth2_data($config) {
-    $settings = array();
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/oauth2.ini';
-    if (is_readable($ini_file)) {
-        $settings = parse_ini_file($ini_file, true);
-    }
-    return $settings;
-}
-
-/**
  * Check for and do an Oauth2 token reset if needed
  * @param array $server imap server data
  * @param object $config site config object
@@ -1840,7 +1825,7 @@ function imap_get_oauth2_data($config) {
 function imap_refresh_oauth2_token($server, $config) {
 
     if ((int) $server['expiration'] <= time()) {
-        $oauth2_data = imap_get_oauth2_data($config);
+        $oauth2_data = get_oauth2_data($config);
         $details = array();
         if ($server['server'] == 'imap.gmail.com') {
             $details = $oauth2_data['gmail'];
