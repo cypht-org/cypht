@@ -53,7 +53,6 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('smtp_servers', array());
-        elog($servers);
         foreach ($servers as $index => $server) {
             Hm_SMTP_List::add( $server, $index );
         }
@@ -261,6 +260,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                         if (!empty($results)) {
                             if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
                                 Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
+                                $servers = Hm_SMTP_List::dump(false, true);
+                                $this->user_config->set('smtp_servers', $servers);
+                                $this->session->set('user_data', $this->user_config->dump());
+                                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                             }
                         }
                     }
