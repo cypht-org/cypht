@@ -259,6 +259,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                         $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                         if (!empty($results)) {
                             if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
+                                $smtp->disconnect();
                                 Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
                                 $servers = Hm_SMTP_List::dump(false, true);
                                 $this->user_config->set('smtp_servers', $servers);
