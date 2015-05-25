@@ -82,6 +82,7 @@ trait Hm_Server_List {
         }
         self::$server_list[$id]['pass'] = $pass;
         self::$server_list[$id]['expiration'] = $expiry;
+        self::$server_list[$id]['object'] = false;
         return true;
     }
 
