@@ -247,6 +247,9 @@ function Message_List() {
             Hm_Ajax.aborted = true;
             return 0;
         }
+        if (msgs[0] === "") {
+            return 0;
+        }
         var msg_rows;
         if (!cache) {
             msg_rows = $('.message_table tbody');

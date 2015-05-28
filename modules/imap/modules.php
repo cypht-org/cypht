@@ -1480,6 +1480,9 @@ function format_imap_folder_section($folders, $id, $output_mod) {
  */
 function format_imap_message_list($msg_list, $output_module, $parent_list=false, $style='email') {
     $res = array();
+    if ($msg_list === array(false)) {
+        return $msg_list;
+    }
     foreach($msg_list as $msg) {
         if (!$parent_list) {
             $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
@@ -1758,6 +1761,7 @@ function sort_by_internal_date($a, $b) {
  */
 function merge_imap_search_results($ids, $search_type, $session, $folders = array('INBOX'), $limit=0, $terms=array()) {
     $msg_list = array();
+    $connection_failed = false;
     foreach($ids as $index => $id) {
         $id = intval($id);
         $cache = Hm_IMAP_List::get_cache($session, $id);
@@ -1789,6 +1793,12 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
                 }
             }
         }
+        else {
+            $connection_failed = true;
+        }
+    }
+    if ($connection_failed && empty($msg_list)) {
+        return array(false);
     }
     return $msg_list;
 }
