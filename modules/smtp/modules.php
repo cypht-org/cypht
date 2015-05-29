@@ -13,6 +13,39 @@ require APP_PATH.'modules/smtp/hm-smtp.php';
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('username', 'password'));
+        if ($success) {
+            $smtp_server = $this->config->get('default_smtp_server', false);
+            if ($smtp_server) {
+                $smtp_port = $this->config->get('default_smtp_port', 465);
+                $smtp_tls = $this->config->get('default_smtp_tls', true);
+                $servers = $this->user_config->get('smtp_servers', array());
+                foreach ($servers as $index => $server) {
+                    Hm_SMTP_List::add( $server, $index );
+                }
+                Hm_SMTP_List::add(array(
+                    'name' => 'Default',
+                    'server' => $smtp_tls,
+                    'port' => $smtp_port,
+                    'tls' => $smtp_tls,
+                    'user' => $form['username'],
+                    'pass' => $form['password']
+                ));
+            }
+            $smtp_servers = Hm_SMTP_List::dump(false, true);
+            $this->user_config->set('smtp_servers', $smtp_servers);
+            $user_data = $this->user_config->dump();
+            $this->session->set('user_data', $user_data);
+            Hm_Debug::add('Default SMTP server added');
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_process_compose_type extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings', 'smtp_compose_type_setting'));
