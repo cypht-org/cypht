@@ -23,6 +23,9 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
                 $smtp_tls = $this->config->get('default_smtp_tls', true);
                 $servers = $this->user_config->get('smtp_servers', array());
                 foreach ($servers as $index => $server) {
+                    if ($server['server'] == $smtp_server && $server['tls'] == $smtp_tls && $server['port'] == $smtp_port) {
+                        continue;
+                    }
                     Hm_SMTP_List::add( $server, $index );
                 }
                 Hm_SMTP_List::add(array(
@@ -33,12 +36,12 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
                     'user' => $form['username'],
                     'pass' => $form['password']
                 ));
+                $smtp_servers = Hm_SMTP_List::dump(false, true);
+                $this->user_config->set('smtp_servers', $smtp_servers);
+                $user_data = $this->user_config->dump();
+                $this->session->set('user_data', $user_data);
+                Hm_Debug::add('Default SMTP server added');
             }
-            $smtp_servers = Hm_SMTP_List::dump(false, true);
-            $this->user_config->set('smtp_servers', $smtp_servers);
-            $user_data = $this->user_config->dump();
-            $this->session->set('user_data', $user_data);
-            Hm_Debug::add('Default SMTP server added');
         }
     }
 }
