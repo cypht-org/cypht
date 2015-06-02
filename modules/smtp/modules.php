@@ -30,7 +30,7 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
                 }
                 Hm_SMTP_List::add(array(
                     'name' => 'Default',
-                    'server' => $smtp_tls,
+                    'server' => $smtp_server,
                     'port' => $smtp_port,
                     'tls' => $smtp_tls,
                     'user' => $form['username'],
