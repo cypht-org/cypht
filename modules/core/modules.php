@@ -474,8 +474,8 @@ class Hm_Handler_login extends Hm_Handler_Module {
         if (!$this->get('create_username', false)) {
             list($success, $form) = $this->process_form(array('username', 'password'));
             if ($success) {
-                $this->session->check($this->request, $form['username'], $form['password']);
-                $this->session->set('username', $form['username']);
+                $this->session->check($this->request, rtrim($form['username']), $form['password']);
+                $this->session->set('username', rtrim($form['username']));
             }
             else {
                 $this->session->check($this->request);
@@ -514,7 +514,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('username', 'password'));
         if ($this->session->is_active()) {
             if ($success) {
-                $this->user_config->load($form['username'], $form['password']);
+                $this->user_config->load(rtrim($form['username']), $form['password']);
             }
             else {
                 $user_data = $this->session->get('user_data', array());
