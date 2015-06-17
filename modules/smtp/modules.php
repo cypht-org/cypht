@@ -245,6 +245,7 @@ class Hm_Handler_smtp_delete extends Hm_Handler_Module {
 class Hm_Handler_smtp_connect extends Hm_Handler_Module {
     public function process() {
         $smtp = false;
+        /* TODO: do an oauth2 token refresh check before trying to connect() */
         if (isset($this->request->post['smtp_connect'])) {
             list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
             if ($success) {
@@ -291,6 +292,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 if ($smtp_details) {
                     $from = $smtp_details['user'];
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
+                    /* TODO: do an oauth2 token refresh check before connect() */
                     if ($smtp && $smtp->state != 'authed' && array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
                         $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                         if (!empty($results)) {
