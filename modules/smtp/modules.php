@@ -245,9 +245,22 @@ class Hm_Handler_smtp_delete extends Hm_Handler_Module {
 class Hm_Handler_smtp_connect extends Hm_Handler_Module {
     public function process() {
         $smtp = false;
-        /* TODO: do an oauth2 token refresh check before trying to connect() */
         if (isset($this->request->post['smtp_connect'])) {
             list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
+            $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
+            if ($smtp_details && ($success | array_key_exists('smtp_server_id', $form))) {
+                if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
+                    $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
+                    if (!empty($results)) {
+                        if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
+                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
+                            $servers = Hm_SMTP_List::dump(false, true);
+                            $this->user_config->set('smtp_servers', $servers);
+                            $this->session->set('user_data', $this->user_config->dump());
+                        }
+                    }
+                }
+            }
             if ($success) {
                 $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass']);
             }
@@ -291,21 +304,18 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
                 if ($smtp_details) {
                     $from = $smtp_details['user'];
-                    $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
-                    /* TODO: do an oauth2 token refresh check before connect() */
-                    if ($smtp && $smtp->state != 'authed' && array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
+                    if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
                         $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                         if (!empty($results)) {
                             if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
-                                $smtp->disconnect();
                                 Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
                                 $servers = Hm_SMTP_List::dump(false, true);
                                 $this->user_config->set('smtp_servers', $servers);
                                 $this->session->set('user_data', $this->user_config->dump());
-                                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                             }
                         }
                     }
+                    $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
                         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0));
                         $recipients = $mime->get_recipient_addresses();
@@ -542,7 +552,7 @@ function build_mime_msg($to, $subject, $body, $from) {
  */
 function smtp_refresh_oauth2_token($server, $config) {
 
-    if ((int) $server['expiration'] <= time()) {
+    if (array_key_exists('expiration', $server) && (int) $server['expiration'] <= time()) {
         $oauth2_data = get_oauth2_data($config);
         $details = array();
         if ($server['server'] == 'smtp.gmail.com') {
