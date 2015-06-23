@@ -20,4 +20,4 @@ return array(
     'allowed_post' => array()
 );
 
-?>
+

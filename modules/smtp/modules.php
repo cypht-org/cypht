@@ -570,4 +570,4 @@ function smtp_refresh_oauth2_token($server, $config) {
 }
 
 
-?>
+

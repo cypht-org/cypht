@@ -215,4 +215,4 @@ class Hm_Contact_Store_Test extends Hm_Contact_Store {
     }
 }
 
-?>
+

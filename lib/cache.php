@@ -196,5 +196,3 @@ trait Hm_Uid_Cache {
         }
     }
 }
-
-?>

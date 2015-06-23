@@ -1018,4 +1018,4 @@ function search_pop3_msg($body, $headers, $terms, $fld) {
     }
 }
 
-?>
+

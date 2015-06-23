@@ -31,4 +31,4 @@ class Hm_Output_profile_content extends Hm_Output_Module {
     }
 }
 
-?>
+

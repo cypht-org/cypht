@@ -67,5 +67,3 @@ if ($config->get('user_settings_dir', false) && is_readable($config->get('user_s
 if (!defined('HHVM_VERSION')) {
     ini_set('open_basedir', $base);
 }
-
-?>

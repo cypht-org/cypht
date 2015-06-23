@@ -253,4 +253,4 @@ function get_secondfactor_state($api, $api_config, $username, $address) {
     return $state;
 }
 
-?>
+

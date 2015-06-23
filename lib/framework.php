@@ -56,4 +56,3 @@ if (!class_exists('Hm_Functions')) {
         }
     }
 }
-?>

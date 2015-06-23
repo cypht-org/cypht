@@ -78,4 +78,4 @@ return array(
         'draft_to' => FILTER_UNSAFE_RAW
     )
 );
-?>
+

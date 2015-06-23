@@ -365,5 +365,3 @@ abstract class Hm_Output_Module {
      */
     abstract protected function output();
 }
-
-?>

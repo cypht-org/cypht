@@ -310,5 +310,3 @@ class Hm_Auth_POP3 extends Hm_Auth {
         $session->set('pop3_auth_server_settings', $this->pop3_settings);
     }
 }
-
-?>

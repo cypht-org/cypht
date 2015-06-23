@@ -524,4 +524,4 @@ function wp_fetch_content($details, $url, $post=array()) {
     return $result;
 }
 
-?>
+

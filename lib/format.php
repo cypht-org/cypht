@@ -89,5 +89,3 @@ class Hm_Format_HTML5 extends HM_Format {
         return implode('', $output);
     }
 }
-
-?>

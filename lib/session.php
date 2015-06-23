@@ -643,5 +643,3 @@ function setup_session($config) {
     $session = new $session_class($config, $auth_class);
     return $session;
 }
-
-?>

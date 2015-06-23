@@ -218,5 +218,3 @@ class Hm_Request {
         return $path;
     }
 }
-
-?>

@@ -156,5 +156,3 @@ class Hm_Dispatch {
         return Hm_Functions::cease();
     }
 }
-
-?>

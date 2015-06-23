@@ -83,4 +83,4 @@ class Hm_Output_idle_time_setting extends Hm_Output_Module {
         return $res;
     }
 }
-?>
+
