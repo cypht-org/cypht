@@ -80,24 +80,24 @@ var save_compose_state = function() {
         {'name': 'draft_body', 'value': body},
         {'name': 'draft_subject', 'value': subject},
         {'name': 'draft_to', 'value': to}],
-        function(res) { },
+        function() { },
         [],
         true
     );
 };
 
-if (hm_page_name() == 'servers') {
+if (hm_page_name() === 'servers') {
     $('.test_smtp_connect').on('click', smtp_test_action);
     $('.save_smtp_connection').on('click', smtp_save_action);
     $('.forget_smtp_connection').on('click', smtp_forget_action);
     $('.delete_smtp_connection').on('click', smtp_delete_action);
     var dsp = Hm_Utils.get_from_local_storage('.smtp_section');
-    if (dsp == 'block' || dsp == 'none') {
+    if (dsp === 'block' || dsp === 'none') {
         $('.smtp_section').css('display', dsp);
     }
 }
 
-if (hm_page_name() == 'compose') {
+if (hm_page_name() === 'compose') {
     Hm_Timer.add_job(save_compose_state, 30, true);
     $('.smtp_reset').click(function() {
         $('.compose_body').val('');
