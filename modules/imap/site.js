@@ -1,3 +1,5 @@
+/* globals Hm_Ajax,Hm_Message_List,Hm_Utils,Hm_Folders: true */
+
 var imap_delete_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
@@ -47,27 +49,6 @@ var imap_unhide = function(event) {
     imap_hide_action(form, server_id, 0);
 };
 
-var imap_forget_action = function(event) {
-    event.preventDefault();
-    var form = $(this).parent();
-    Hm_Ajax.request(
-        form.serializeArray(),
-        function(res) {
-            if (res.just_forgot_credentials) {
-                form.find('.credentials').prop('disabled', false);
-                form.find('.imap_password').val('');
-                form.find('.imap_password').prop('placeholder', 'Password');
-                form.append('<input type="submit" value="Save" class="save_imap_connection" />');
-                $('.save_imap_connection').on('click', imap_save_action);
-                $('.forget_imap_connection', form).hide();
-                Hm_Utils.set_unsaved_changes(1);
-                Hm_Folders.reload_folders(true);
-            }
-        },
-        {'imap_forget': 1}
-    );
-};
-
 var imap_save_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
@@ -86,6 +67,27 @@ var imap_save_action = function(event) {
             }
         },
         {'imap_save': 1}
+    );
+};
+
+var imap_forget_action = function(event) {
+    event.preventDefault();
+    var form = $(this).parent();
+    Hm_Ajax.request(
+        form.serializeArray(),
+        function(res) {
+            if (res.just_forgot_credentials) {
+                form.find('.credentials').prop('disabled', false);
+                form.find('.imap_password').val('');
+                form.find('.imap_password').prop('placeholder', 'Password');
+                form.append('<input type="submit" value="Save" class="save_imap_connection" />');
+                $('.save_imap_connection').on('click', imap_save_action);
+                $('.forget_imap_connection', form).hide();
+                Hm_Utils.set_unsaved_changes(1);
+                Hm_Folders.reload_folders(true);
+            }
+        },
+        {'imap_forget': 1}
     );
 };
 
@@ -111,6 +113,13 @@ var imap_setup_server_page = function() {
     if (dsp === 'block' || dsp === 'none') {
         $('.imap_section').css('display', dsp);
     }
+};
+
+var set_message_content = function() {
+    var path = hm_list_path();
+    var msg_uid = hm_msg_uid();
+    var key = msg_uid+'_'+path;
+    Hm_Utils.save_to_local_storage(key, $('.msg_text').html());
 };
 
 var imap_flag_message = function(state) {
@@ -271,14 +280,6 @@ var select_imap_folder = function(path) {
     return false;
 };
 
-var expand_imap_mailbox = function(res) {
-    if (res.imap_expanded_folder_path) {
-        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path)).append(res.imap_expanded_folder_formatted);
-        $('.imap_folder_link').unbind('click');
-        $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
-    }
-};
-
 var expand_imap_folders = function(path) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder));
@@ -304,11 +305,31 @@ var expand_imap_folders = function(path) {
     return false;
 };
 
-var set_message_content = function() {
-    var path = hm_list_path();
-    var msg_uid = hm_msg_uid();
-    var key = msg_uid+'_'+path;
-    Hm_Utils.save_to_local_storage(key, $('.msg_text').html());
+var expand_imap_mailbox = function(res) {
+    if (res.imap_expanded_folder_path) {
+        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path)).append(res.imap_expanded_folder_formatted);
+        $('.imap_folder_link').unbind('click');
+        $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
+    }
+};
+
+var get_message_content = function(msg_part) {
+    $('.hlink').click(function(event) { event.preventDefault(); return false; });
+    $('.hlink').addClass('disabled_link');
+    var uid = $('.msg_uid').val();
+    var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    if (detail && uid) {
+        window.scrollTo(0,0);
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
+            {'name': 'imap_msg_uid', 'value': uid},
+            {'name': 'imap_msg_part', 'value': msg_part},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder}],
+            display_msg_content
+        );
+    }
+    return false;
 };
 
 var imap_message_view_finished = function() {
@@ -352,25 +373,6 @@ var get_local_message_content = function() {
     var msg_uid = hm_msg_uid();
     var key = msg_uid+'_'+path;
     return Hm_Utils.get_from_local_storage(key);
-};
-
-var get_message_content = function(msg_part) {
-    $('.hlink').click(function(event) { event.preventDefault(); return false; });
-    $('.hlink').addClass('disabled_link');
-    var uid = $('.msg_uid').val();
-    var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
-    if (detail && uid) {
-        window.scrollTo(0,0);
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
-            {'name': 'imap_msg_uid', 'value': uid},
-            {'name': 'imap_msg_part', 'value': msg_part},
-            {'name': 'imap_server_id', 'value': detail.server_id},
-            {'name': 'folder', 'value': detail.folder}],
-            display_msg_content
-        );
-    }
-    return false;
 };
 
 var imap_prefetch_message_content = function(uid, server_id, folder) {
@@ -476,7 +478,7 @@ else if (hm_page_name() === 'info') {
 
 $(function() {
     if (hm_list_path() !== 'unread') {
-        if (typeof hm_data_sources_background == 'function') {
+        if (typeof hm_data_sources_background === 'function') {
             Hm_Background_Unread = new Message_List();
             Hm_Background_Unread.add_sources(hm_data_sources_background());
             Hm_Timer.add_job(Hm_Background_Unread.load_sources, 43, true);
