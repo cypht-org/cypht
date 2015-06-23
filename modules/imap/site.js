@@ -1,4 +1,4 @@
-/* globals Hm_Ajax,Hm_Message_List,Hm_Utils,Hm_Folders: true */
+/* globals Hm_Ajax,Hm_Message_List,Hm_Utils,Hm_Folders,Hm_Background_Unread,hm_list_path,hm_msg_uid,hm_search_terms,hm_list_parent,hm_page_name,Message_List,Hm_Timer: true */
 
 var imap_delete_action = function(event) {
     event.preventDefault();
@@ -21,7 +21,7 @@ var imap_hide_action = function(form, server_id, hide) {
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_debug'},
         {'name': 'imap_server_id', 'value': server_id},
         {'name': 'hide_imap_server', 'value': hide}],
-        function(res) {
+        function() {
             if (hide) {
                 $('.unhide_imap_connection', form).show();
                 $('.hide_imap_connection', form).hide();
@@ -210,7 +210,7 @@ var update_imap_combined_source = function(path, state, event) {
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_update_combined_source'},
         {'name': 'list_path', 'value': path},
         {'name': 'combined_source_state', 'value': state}],
-        function(res) {
+        function() {
             if (state === 1) {
                 $('.add_source').hide();
                 $('.remove_source').show();
@@ -364,7 +364,7 @@ var display_msg_content = function(res) {
     $('.msg_text').append(res.msg_parts);
     set_message_content();
     document.title = $('.header_subject th').text();
-    $('.hlink').click(function(event) { return true; });
+    $('.hlink').click(function() { return true; });
     imap_message_view_finished();
 };
 

@@ -1,3 +1,5 @@
+/* globals Hm_Ajax,Hm_Message_List,Hm_Utils,Hm_Folders,Hm_Background_Unread,hm_list_path,hm_msg_uid,hm_search_terms,hm_list_parent,hm_page_name,Message_List,Hm_Timer: true */
+
 var pop3_test_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
