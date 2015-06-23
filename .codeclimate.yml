@@ -14,3 +14,4 @@ exclude_paths:
  - "third_party/*"
  - "docs/*"
  - "language/*"
+ - "modules/*/assets/*
