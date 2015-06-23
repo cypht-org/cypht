@@ -209,5 +209,3 @@ function elog($mixed) {
         return Hm_Functions::error_log(Hm_Debug::str($mixed));
     }
 }
-
-?>

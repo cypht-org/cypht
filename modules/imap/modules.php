@@ -1877,4 +1877,4 @@ function get_imap_part_name($struct, $uid, $part_id) {
     return 'message_'.$uid.'_part_'.$part_id.$extension;
 }
 
-?>
+

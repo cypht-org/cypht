@@ -166,4 +166,4 @@ Nux_Quick_Services::add('inbox', array(
     )
 ));
 
-?>
+

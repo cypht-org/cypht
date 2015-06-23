@@ -644,5 +644,3 @@ function add_module_to_all_pages($type, $mod, $logged_in, $source, $marker, $pla
         Hm_Handler_Modules::queue_module_for_all_pages($mod, $logged_in, $marker, $placement, $source);
     }
 }
-
-?>

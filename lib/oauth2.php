@@ -99,5 +99,3 @@ class Hm_Oauth2 {
         return $result;
     }
 }
-
-?>

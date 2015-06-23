@@ -95,4 +95,4 @@ class Hm_Output_hello_world_ajax_content extends Hm_Output_Module {
         $this->out('hello_world_ajax_result', $this->trans('Hello World Again!'));
     }
 }
-?>
+

@@ -275,5 +275,3 @@ function load_user_config_object($config) {
     }
     return $user_config;
 }
-
-?>

@@ -148,4 +148,4 @@ class Hm_Output_change_password extends Hm_Output_Module {
     }
 }
 
-?>
+

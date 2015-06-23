@@ -248,4 +248,4 @@ class Hm_Cal_Data {
         return $res;
     }
 }
-?>
+

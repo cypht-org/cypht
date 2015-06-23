@@ -192,5 +192,3 @@ trait Hm_Server_List {
         }
     }
 }
-
-?>

@@ -470,4 +470,4 @@ class Nux_Quick_Services {
     }
 }
 
-?>
+

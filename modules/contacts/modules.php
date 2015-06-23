@@ -70,4 +70,4 @@ class Hm_Output_contacts_content_add_form extends Hm_Output_Module {
             '</form></div>';
     }
 }
-?>
+
