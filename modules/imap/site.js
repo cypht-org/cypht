@@ -97,7 +97,7 @@ var imap_setup_server_page = function() {
     $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
     var dsp = Hm_Utils.get_from_local_storage('.imap_section');
-    if (dsp == 'block' || dsp == 'none') {
+    if (dsp === 'block' || dsp === 'none') {
         $('.imap_section').css('display', dsp);
     }
 };
@@ -124,7 +124,7 @@ var imap_flag_message = function(state) {
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
             function() {
-                if (state == 'flagged') {
+                if (state === 'flagged') {
                     $('#flag_msg').show();
                     $('#unflag_msg').hide();
                 }
@@ -210,7 +210,7 @@ var update_imap_combined_source = function(path, state, event) {
         {'name': 'list_path', 'value': path},
         {'name': 'combined_source_state', 'value': state}],
         function(res) {
-            if (state == 1) {
+            if (state === 1) {
                 $('.add_source').hide();
                 $('.remove_source').show();
             }
@@ -349,7 +349,6 @@ var get_message_content = function(msg_part) {
 };
 
 var imap_prefetch_message_content = function(uid, server_id, folder) {
-    var div;
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
         {'name': 'imap_msg_uid', 'value': uid},
@@ -360,12 +359,12 @@ var imap_prefetch_message_content = function(uid, server_id, folder) {
         function(res) {
             var key = uid+'_imap_'+server_id+'_'+folder;
             if (!Hm_Utils.get_from_local_storage(key)) {
+                var div;
                 div = $('<div></div>');
                 div.append(res.msg_headers);
                 div.append(res.msg_text);
                 div.append(res.msg_parts);
                 Hm_Utils.save_to_local_storage(key, div.html());
-                delete div;
             }
         },
         [],
@@ -408,13 +407,13 @@ var imap_message_view_finished = function() {
     var msg_uid = hm_msg_uid();
     if (detail) {
         class_name = 'imap_'+detail.server_id+'_'+msg_uid+'_'+detail.folder;
-        if (hm_list_parent() == 'combined_inbox') {
+        if (hm_list_parent() === 'combined_inbox') {
             Hm_Message_List.prev_next_links('formatted_combined_inbox', class_name);
         }
-        else if (hm_list_parent() == 'unread') {
+        else if (hm_list_parent() === 'unread') {
             Hm_Message_List.prev_next_links('formatted_unread_data', class_name);
         }
-        else if (hm_list_parent() == 'flagged') {
+        else if (hm_list_parent() === 'flagged') {
             Hm_Message_List.prev_next_links('formatted_flagged_data', class_name);
         }
     }
@@ -439,17 +438,6 @@ var display_reply_content = function(res) {
     document.title = res.reply_subject;
 };
 
-var imap_background_unread_content = function(id) {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
-        {'name': 'imap_server_ids', 'value': id}],
-        imap_background_unread_content_result,
-        [],
-        true
-    );
-    return false;
-};
-
 var imap_background_unread_content_result = function(res) {
     var ids = [res.imap_server_id];
     var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
@@ -462,17 +450,27 @@ var imap_background_unread_content_result = function(res) {
     }
 };
 
+var imap_background_unread_content = function(id) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
+        {'name': 'imap_server_ids', 'value': id}],
+        imap_background_unread_content_result,
+        [],
+        true
+    );
+    return false;
+};
 
-if (hm_page_name() == 'message_list' && hm_list_path().substring(0, 4) == 'imap') {
+if (hm_page_name() === 'message_list' && hm_list_path().substring(0, 4) === 'imap') {
     setup_imap_folder_page();
 }
-else if (hm_page_name() == 'message' && hm_list_path().substr(0, 4) == 'imap') {
+else if (hm_page_name() === 'message' && hm_list_path().substr(0, 4) === 'imap') {
     imap_setup_message_view_page();
 }
-else if (hm_page_name() == 'servers') {
+else if (hm_page_name() === 'servers') {
     imap_setup_server_page();
 }
-else if (hm_page_name() == 'info') {
+else if (hm_page_name() === 'info') {
     setTimeout(imap_status_update, 100);
 }
 
