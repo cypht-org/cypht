@@ -56,6 +56,7 @@ function get_message_list_settings($path, $handler) {
     $mailbox_list_title = array();
     $message_list_since = DEFAULT_SINCE;
     $per_source_limit = DEFAULT_PER_SOURCE;
+
     if ($path == 'unread') {
         $list_path = 'unread';
         $mailbox_list_title = array('Unread');
@@ -397,4 +398,24 @@ function process_source_max_setting($type, $handler) {
     $handler->out('user_settings', $settings, false);
 }
 
+/**
+ * Process combiend page "since" setting
+ * @param string $type setting name
+ * @param object $handler hm handler object
+ * @return void
+ */
+function process_since_setting($type, $handler) {
+    list($success, $form) = $handler->process_form(array('save_settings', $type));
+    $new_settings = $handler->get('new_user_settings', array());
+    $settings = $handler->get('user_settings', array());
+
+    if ($success) {
+        $new_settings[$type.'_setting'] = process_since_argument($form[$type], true);
+    }
+    else {
+        $settings[$type] = $handler->user_config->get($type.'_setting', false);
+    }
+    $handler->out('new_user_settings', $new_settings, false);
+    $handler->out('user_settings', $settings, false);
+}
 

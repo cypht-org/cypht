@@ -139,18 +139,7 @@ class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'flagged_since'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            $new_settings['flagged_since_setting'] = process_since_argument($form['flagged_since'], true);
-        }
-        else {
-            $settings['flagged_since'] = $this->user_config->get('flagged_since_setting', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_since_setting('flagged_since', $this);
     }
 }
 
@@ -163,18 +152,7 @@ class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'all_since'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            $new_settings['all_since_setting'] = process_since_argument($form['all_since'], true);
-        }
-        else {
-            $settings['all_since'] = $this->user_config->get('all_since_setting', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_since_setting('all_since', $this);
     }
 }
 
@@ -187,18 +165,7 @@ class Hm_Handler_process_all_email_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'all_email_since'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            $new_settings['all_email_since_setting'] = process_since_argument($form['all_email_since'], true);
-        }
-        else {
-            $settings['all_email_since'] = $this->user_config->get('all_email_since_setting', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_since_setting('all_email_since', $this);
     }
 }
 
@@ -211,18 +178,7 @@ class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'unread_since'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            $new_settings['unread_since_setting'] = process_since_argument($form['unread_since'], true);
-        }
-        else {
-            $settings['unread_since'] = $this->user_config->get('unread_since_setting', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_since_setting('unread_since', $this);
     }
 }
 
@@ -529,6 +485,10 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         $list_parent = '';
         $list_page = 1;
         $list_meta = true;
+        $list_path = '';
+        $mailbox_list_title = array();
+        $message_list_since = DEFAULT_SINCE;
+        $per_source_limit = DEFAULT_PER_SOURCE;
         $no_list_headers = false;
 
         if (array_key_exists('list_path', $this->request->get)) {
