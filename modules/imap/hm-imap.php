@@ -6,7 +6,10 @@
  * @subpackage imap
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
+require_once('hm-imap-base.php');
+require_once('hm-imap-parser.php');
+require_once('hm-imap-cache.php');
+require_once('hm-imap-bodystructure.php');
 
 /**
  * IMAP connection manager
@@ -41,8 +44,6 @@ class Hm_IMAP_List {
         return false;
     }
 }
-
-require_once('hm-imap-base.php');
 
 /* for testing */
 if (!class_exists('Hm_IMAP')) {
