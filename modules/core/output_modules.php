@@ -6,8 +6,6 @@
  * @subpackage core
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Simple search form for the folder list
  * @subpackage core/output
