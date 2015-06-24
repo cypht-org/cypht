@@ -20,12 +20,12 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
             if ($path == 'feeds') {
                 $this->out('list_path', 'feeds', false);
                 $this->out('mailbox_list_title', array('All Feeds'));
-                $this->out('message_list_since', $this->user_config->get('feed_since', DEFAULT_SINCE));
-                $this->out('per_source_limit', $this->user_config->get('feed_limit', DEFAULT_SINCE));
+                $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_SINCE));
             }
             elseif (preg_match("/^feeds_\d+$/", $path)) {
-                $this->out('message_list_since', $this->user_config->get('feed_since', DEFAULT_SINCE));
-                $this->out('per_source_limit', $this->user_config->get('feed_limit', DEFAULT_SINCE));
+                $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_SINCE));
                 $this->out('list_path', $path, false);
                 $parts = explode('_', $path, 2);
                 $details = Hm_Feed_List::dump(intval($parts[1]));
@@ -42,24 +42,7 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
  */
 class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'feed_limit'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if ($form['feed_limit'] > MAX_PER_SOURCE || $form['feed_limit'] < 0) {
-                $limit = DEFAULT_PER_SOURCE;
-            }
-            else {
-                $limit = $form['feed_limit'];
-            }
-            $new_settings['feed_limit'] = $limit;
-        }
-        else {
-            $settings['feed_limit'] = $this->user_config->get('feed_limit', DEFAULT_PER_SOURCE);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_site_setting('feed_limit', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
     }
 }
 
@@ -68,18 +51,7 @@ class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
  */
 class Hm_Handler_process_feed_since_setting extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'feed_since'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            $new_settings['feed_since'] = process_since_argument($form['feed_since'], true);
-        }
-        else {
-            $settings['feed_since'] = $this->user_config->get('feed_since', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_site_setting('feed_since', $this, 'since_setting_callback');
     }
 }
 
@@ -88,23 +60,8 @@ class Hm_Handler_process_feed_since_setting extends Hm_Handler_Module {
  */
 class Hm_Handler_process_unread_feeds_setting extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if (array_key_exists('unread_exclude_feeds', $this->request->post)) {
-                $new_settings['unread_exclude_feeds'] = true;
-            }
-            else {
-                $new_settings['unread_exclude_feeds'] = false;
-            }
-        }
-        else {
-            $settings['unread_exclude_feeds'] = $this->user_config->get('unread_exclude_feeds', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        function unread_feed_setting_callback($val) { return $val; }
+        process_site_setting('unread_exclude_feeds', $this, 'unread_feed_setting_callback', false, true);
     }
 }
 
@@ -246,8 +203,8 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 $cutoff_timestamp = strtotime($date);
             }
             else {
-                $limit = $this->user_config->get('feed_limit', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('feed_since', DEFAULT_SINCE)); 
+                $limit = $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('feed_since_setting', DEFAULT_SINCE)); 
                 $cutoff_timestamp = strtotime($date);
             }
             if (!$search || ($search && $terms)) {
@@ -429,7 +386,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
     public function process() {
         $excluded = false;
         if ($this->get('list_path') == 'unread') {
-            $excluded = $this->user_config->get('unread_exclude_feeds', false);
+            $excluded = $this->user_config->get('unread_exclude_feeds_setting', false);
         }
         if ($excluded) {
             return; 
@@ -469,7 +426,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
         }
         switch ($path) {
             case 'unread':
-                if (!$this->user_config->get('unread_exclude_feeds', false)) {
+                if (!$this->user_config->get('unread_exclude_feeds_setting', false)) {
                     $callback = 'feeds_combined_content_unread';
                 }
                 break;
