@@ -804,7 +804,7 @@ function reply_lead_in($headers, $type, $to, $output_mod) {
 }
 
 /**
- * Get reply field details
+ * Format reply field details
  * @subpackage core/functions
  * @param array $headers message headers
  * @param string $body message body
@@ -821,34 +821,62 @@ function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $htm
         $type = strtolower($struct['type']).strtolower($struct['subtype']);
     }
     if ($html) {
-        if ($type == 'textplain') {
-            if ($reply_type == 'reply') {
-                $msg = nl2br($lead_in.format_reply_text($body));
-            }
-            elseif ($reply_type == 'forward') {
-                $msg = nl2br($lead_in.$body);
-            }
-        }
-        elseif ($type == 'texthtml') {
-            $msg = nl2br($lead_in).'<hr /><blockquote>'.format_msg_html($body).'</blockquote>';
-        }
+        $msg = format_reply_as_html($body, $type, $reply_type, $lead_in);
     }
     else {
-        if ($type == 'texthtml') {
-            if ($reply_type == 'reply') {
-                $msg = $lead_in.format_reply_text(convert_html_to_text($body));
-            }
-            elseif ($reply_type == 'forward') {
-                $msg = $lead_in.convert_html_to_text($body);
-            }
+        $msg = format_reply_as_text($body, $type, $reply_type, $lead_in);
+    }
+    return $msg;
+}
+
+/**
+ * Format reply text as HTML
+ * @subpackage core/functions
+ * @param string $body message body
+ * @param string $type MIME type
+ * @param string $reply_type type (forward, reply, reply_all)
+ * @param string $lead_in body lead in text
+ * @return string
+ */
+function format_reply_as_html($body, $type, $reply_type, $lead_in) {
+    if ($type == 'textplain') {
+        if ($reply_type == 'reply') {
+            $msg = nl2br($lead_in.format_reply_text($body));
         }
-        elseif ($type == 'textplain') {
-            if ($reply_type == 'reply') {
-                $msg = $lead_in.format_reply_text($body);
-            }
-            else {
-                $msg = $lead_in.$body;
-            }
+        elseif ($reply_type == 'forward') {
+            $msg = nl2br($lead_in.$body);
+        }
+    }
+    elseif ($type == 'texthtml') {
+        $msg = nl2br($lead_in).'<hr /><blockquote>'.format_msg_html($body).'</blockquote>';
+    }
+    return $msg;
+}
+
+/**
+ * Format reply text as text
+ * @subpackage core/functions
+ * @param string $body message body
+ * @param string $type MIME type
+ * @param string $reply_type type (forward, reply, reply_all)
+ * @param string $lead_in body lead in text
+ * @return string
+ */
+function format_reply_as_text($body, $type, $reply_type, $lead_in) {
+    if ($type == 'texthtml') {
+        if ($reply_type == 'reply') {
+            $msg = $lead_in.format_reply_text(convert_html_to_text($body));
+        }
+        elseif ($reply_type == 'forward') {
+            $msg = $lead_in.convert_html_to_text($body);
+        }
+    }
+    elseif ($type == 'textplain') {
+        if ($reply_type == 'reply') {
+            $msg = $lead_in.format_reply_text($body);
+        }
+        else {
+            $msg = $lead_in.$body;
         }
     }
     return $msg;
