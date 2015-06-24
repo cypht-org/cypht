@@ -8,8 +8,6 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        require '../modules/core/setup.php';
-        require '../modules/core/modules.php';
         $this->json = new Hm_Format_JSON();
         $this->html5 = new Hm_Format_HTML5();
         Hm_Output_Modules::add('test', 'date', false, false, 'after', true, 'core');
