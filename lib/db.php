@@ -6,8 +6,6 @@
  * @subpackage db
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * DB interface for the framework and modules
  */

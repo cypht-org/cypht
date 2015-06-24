@@ -6,8 +6,6 @@
  * @subpackage oauth2
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Class for deailing with Oauth2
  */

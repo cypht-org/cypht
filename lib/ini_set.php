@@ -1,7 +1,5 @@
 <?php
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Tweak ini settings
  * @package framework

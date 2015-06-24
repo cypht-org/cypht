@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage output
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Base class that controls how data is output

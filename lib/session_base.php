@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage session
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Use for browser fingerprinting

@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage module
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Module data management. These functions provide an interface for modules (both handler and output)

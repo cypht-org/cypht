@@ -6,8 +6,6 @@
  * @subpackage format
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Base class for output formatting. Currently JSON and HTML5 formats are
  * supported. To add support for a new format this class must be extended

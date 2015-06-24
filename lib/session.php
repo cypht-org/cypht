@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage session
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * PHP Sessions that extend the base session class

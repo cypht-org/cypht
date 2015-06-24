@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage dispatch
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Page request router that ties all the framework peices together

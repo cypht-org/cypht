@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage servers
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Struct that makes it easy for a module set to manage a list of server connections

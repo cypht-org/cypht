@@ -6,8 +6,6 @@
  * @subpackage config
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Base class for both site and user configuration data management
  */

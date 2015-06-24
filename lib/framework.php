@@ -1,7 +1,5 @@
 <?php
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Initial setup
  * @package framework

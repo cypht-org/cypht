@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage modules
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Trait used as the basic logic for module management
