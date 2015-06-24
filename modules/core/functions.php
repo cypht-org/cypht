@@ -40,11 +40,11 @@ function message_list_meta($input, $output_mod) {
     if (!$since) {
         $since = DEFAULT_SINCE;
     }
-    $dt = sprintf('%s', strtolower($output_mod->trans($times[$since])));
+    $date = sprintf('%s', strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
     return '<div class="list_meta">'.
-        $output_mod->html_safe($dt).
+        $output_mod->html_safe($date).
         '<b>-</b>'.
         '<span class="src_count"></span> '.$max.
         '<b>-</b>'.
@@ -720,23 +720,23 @@ function validate_local_full($val) {
  * @return string
  */
 function reply_to_address($headers, $type) {
-    $to = '';
+    $msg_to = '';
     if ($type == 'forward') {
-        return $to;
+        return $msg_to;
     }
     if (array_key_exists('Reply-to', $headers)) {
-        $to = $headers['Reply-to'];
+        $msg_to = $headers['Reply-to'];
     }
     elseif (array_key_exists('From', $headers)) {
-        $to = $headers['From'];
+        $msg_to = $headers['From'];
     }
     elseif (array_key_exists('Sender', $headers)) {
-        $to = $headers['Sender'];
+        $msg_to = $headers['Sender'];
     }
     elseif (array_key_exists('Return-path', $headers)) {
-        $to = $headers['Return-path'];
+        $msg_to = $headers['Return-path'];
     }
-    return $to;
+    return $msg_to;
 }
 
 /**
@@ -894,13 +894,13 @@ function format_reply_as_text($body, $type, $reply_type, $lead_in) {
  * @return array
  */
 function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type='reply') {
-    $to = '';
+    $msg_to = '';
     $msg = '';
     $subject = reply_to_subject($headers, $type);
-    $to = reply_to_address($headers, $type);
-    $lead_in = reply_lead_in($headers, $type, $to, $output_mod);
+    $msg_to = reply_to_address($headers, $type);
+    $lead_in = reply_lead_in($headers, $type, $msg_to, $output_mod);
     $msg = reply_format_body($headers, $body, $lead_in, $type, $struct, $html);
-    return array($to, $subject, $msg);
+    return array($msg_to, $subject, $msg);
 }
 
 /**
