@@ -6,8 +6,6 @@
  * @subpackage core
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Format a value for display
  * @subpackage core/functions
@@ -42,46 +40,6 @@ function display_value($name, $haystack, $type=false, $default='') {
             break;
     }
     return $res;
-}
-
-/**
- * set basic message list settings
- * @subpackage core/functions
- * @param string $path message list path
- * @param object $handler hm handler module
- * @return array
- */
-function get_message_list_settings($path, $handler) {
-    $list_path = '';
-    $mailbox_list_title = array();
-    $message_list_since = DEFAULT_SINCE;
-    $per_source_limit = DEFAULT_PER_SOURCE;
-
-    if ($path == 'unread') {
-        $list_path = 'unread';
-        $mailbox_list_title = array('Unread');
-        $message_list_since = $handler->user_config->get('unread_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
-    }
-    elseif ($path == 'email') {
-        $message_list_since = $handler->user_config->get('all_email_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
-        $list_path = 'email';
-        $mailbox_list_title = array('All Email');
-    }
-    elseif ($path == 'flagged') {
-        $list_path = 'flagged';
-        $message_list_since = $handler->user_config->get('flagged_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
-        $mailbox_list_title = array('Flagged');
-    }
-    elseif ($path == 'combined_inbox') {
-        $list_path = 'combined_inbox';
-        $message_list_since = $handler->user_config->get('all_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
-        $mailbox_list_title = array('Everything');
-    }
-    return array($list_path, $mailbox_list_title, $message_list_since, $per_source_limit);
 }
 
 /**
@@ -371,6 +329,14 @@ function get_oauth2_data($config) {
     return $settings;
 }
 
+/**
+ * Process user input for a site setting and prep it to be saved
+ * @param string $type the name of the setting
+ * @param object $handler hm hanndler module object
+ * @param function $callback a function to sanitize the submitted value
+ * @param mixed $default a default to use if callback is not submitted
+ * @return void
+ */
 function process_site_setting($type, $handler, $callback=false, $default=false) {
     list($success, $form) = $handler->process_form(array('save_settings', $type));
     $new_settings = $handler->get('new_user_settings', array());
