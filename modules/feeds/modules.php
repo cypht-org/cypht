@@ -257,6 +257,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                         $feed = is_feed($feed_data['server'], $limit);
                         if ($feed && $feed->parsed_data) {
                             foreach ($feed->parsed_data as $item) {
+                                if (!array_key_exists('guid', $item)) {
+                                    continue;
+                                }
                                 if (!Hm_Feed_Uid_Cache::is_unread(md5($item['guid']))) {
                                     if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
                                         continue;
