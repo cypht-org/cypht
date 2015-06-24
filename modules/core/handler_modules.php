@@ -6,8 +6,6 @@
  * @subpackage core
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Close the session before it's automatically closed at the end of page processing
  * @subpackage core/handler
