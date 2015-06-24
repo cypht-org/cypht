@@ -87,24 +87,7 @@ class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'unread_per_source'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if ($form['unread_per_source'] > MAX_PER_SOURCE || $form['unread_per_source'] < 0) {
-                $sources = DEFAULT_PER_SOURCE;
-            }
-            else {
-                $sources = $form['unread_per_source'];
-            }
-            $new_settings['unread_per_source_setting'] = $sources;
-        }
-        else {
-            $settings['unread_per_source'] = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_source_max_setting('unread_per_source', $this);
     }
 }
 
@@ -117,24 +100,7 @@ class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module 
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'all_email_per_source'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if ($form['all_email_per_source'] > MAX_PER_SOURCE || $form['all_email_per_source'] < 0) {
-                $sources = DEFAULT_PER_SOURCE;
-            }
-            else {
-                $sources = $form['all_email_per_source'];
-            }
-            $new_settings['all_email_per_source_setting'] = $sources;
-        }
-        else {
-            $settings['all_email_per_source'] = $this->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_source_max_setting('all_email_per_source', $this);
     }
 }
 
@@ -147,24 +113,7 @@ class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'all_per_source'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if ($form['all_per_source'] > MAX_PER_SOURCE || $form['all_per_source'] < 0) {
-                $sources = DEFAULT_PER_SOURCE;
-            }
-            else {
-                $sources = $form['all_per_source'];
-            }
-            $new_settings['all_per_source_setting'] = $sources;
-        }
-        else {
-            $settings['all_per_source'] = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_source_max_setting('all_per_source', $this);
     }
 }
 
@@ -177,24 +126,7 @@ class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'flagged_per_source'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if ($form['flagged_per_source'] > MAX_PER_SOURCE || $form['flagged_per_source'] < 0) {
-                $sources = DEFAULT_PER_SOURCE;
-            }
-            else {
-                $sources = $form['flagged_per_source'];
-            }
-            $new_settings['flagged_per_source_setting'] = $sources;
-        }
-        else {
-            $settings['flagged_per_source'] = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
-        }
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
+        process_source_max_setting('flagged_per_source', $this);
     }
 }
 

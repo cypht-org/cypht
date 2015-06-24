@@ -370,4 +370,31 @@ function get_oauth2_data($config) {
     return $settings;
 }
 
+/**
+ * Process combined page max per source setting
+ * @param string $type setting name
+ * @param object $handler hm handler object
+ * @return void
+ */
+function process_source_max_setting($type, $handler) {
+    list($success, $form) = $handler->process_form(array('save_settings', $type));
+    $new_settings = $handler->get('new_user_settings', array());
+    $settings = $handler->get('user_settings', array());
+
+    if ($success) {
+        if ($form[$type] > MAX_PER_SOURCE || $form[$type] < 0) {
+            $sources = DEFAULT_PER_SOURCE;
+        }
+        else {
+            $sources = $form[$type];
+        }
+        $new_settings[$type.'_setting'] = $sources;
+    }
+    else {
+        $settings[$type] = $handler->user_config->get($type.'_setting', DEFAULT_PER_SOURCE);
+    }
+    $handler->out('new_user_settings', $new_settings, false);
+    $handler->out('user_settings', $settings, false);
+}
+
 
