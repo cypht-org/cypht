@@ -754,9 +754,9 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         }
         asort($translated);
         $mylang = $this->get('language', '');
-        $res = '<tr class="general_setting"><td><label for="language_setting">'.
+        $res = '<tr class="general_setting"><td><label for="language">'.
             $this->trans('Language').'</label></td>'.
-            '<td><select id="language_setting" name="language_setting">';
+            '<td><select id="language" name="language">';
         foreach ($translated as $id => $lang) {
             $res .= '<option ';
             if ($id == $mylang) {
@@ -780,14 +780,15 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
     protected function output() {
         $zones = timezone_identifiers_list();
         $settings = $this->get('user_settings', array());
+        elog($settings);
         if (array_key_exists('timezone', $settings)) {
             $myzone = $settings['timezone'];
         }
         else {
             $myzone = false;
         }
-        $res = '<tr class="general_setting"><td><label for="timezone_setting">'.
-            $this->trans('Timezone').'</label></td><td><select id="timezone_setting" name="timezone_setting">';
+        $res = '<tr class="general_setting"><td><label for="timezone">'.
+            $this->trans('Timezone').'</label></td><td><select id="timezone" name="timezone">';
         foreach ($zones as $zone) {
             $res .= '<option ';
             if ($zone == $myzone) {

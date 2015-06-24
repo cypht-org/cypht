@@ -371,25 +371,19 @@ function get_oauth2_data($config) {
     return $settings;
 }
 
-/**
- * Process combined page max per source setting
- * @param string $type setting name
- * @param object $handler hm handler object
- * @return void
- */
-function process_source_max_setting($type, $handler) {
+function process_site_setting($type, $handler, $callback=false, $default=false) {
     list($success, $form) = $handler->process_form(array('save_settings', $type));
     $new_settings = $handler->get('new_user_settings', array());
     $settings = $handler->get('user_settings', array());
 
     if ($success) {
-        if ($form[$type] > MAX_PER_SOURCE || $form[$type] < 0) {
-            $sources = DEFAULT_PER_SOURCE;
+        if (function_exists($callback)) {
+            $result = $callback($form[$type]);
         }
         else {
-            $sources = $form[$type];
+            $result = $default;
         }
-        $new_settings[$type.'_setting'] = $sources;
+        $new_settings[$type.'_setting'] = $result;
     }
     else {
         $settings[$type] = $handler->user_config->get($type.'_setting', DEFAULT_PER_SOURCE);
@@ -399,23 +393,47 @@ function process_source_max_setting($type, $handler) {
 }
 
 /**
- * Process combiend page "since" setting
- * @param string $type setting name
- * @param object $handler hm handler object
- * @return void
+ * Return a date for a "received since" value, or just sanitize it
+ * @subpackage core/functions
+ * @param string $val "received since" value to process
+ * @param bool $validate flag to limit to validation only
  */
-function process_since_setting($type, $handler) {
-    list($success, $form) = $handler->process_form(array('save_settings', $type));
-    $new_settings = $handler->get('new_user_settings', array());
-    $settings = $handler->get('user_settings', array());
-
-    if ($success) {
-        $new_settings[$type.'_setting'] = process_since_argument($form[$type], true);
+function process_since_argument($val, $validate=false) {
+    $date = false;
+    $valid = false;
+    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'), true)) {
+        $valid = $val;
+        $date = date('j-M-Y', strtotime($val));
     }
     else {
-        $settings[$type] = $handler->user_config->get($type.'_setting', false);
+        $val = 'today';
+        $valid = $val;
+        $date = date('j-M-Y');
     }
-    $handler->out('new_user_settings', $new_settings, false);
-    $handler->out('user_settings', $settings, false);
+    if ($validate) {
+        return $valid;
+    }
+    return $date;
+}
+
+/**
+ * Sanitize a "since" setting value for combined pages
+ * @param string $val value to check
+ * @return sanitized value
+ */
+function since_setting_callback($val) {
+    return process_since_argument($val, true);
+}
+
+/**
+ * Sanitize a max per source value
+ * @param int $val request max
+ * @return sanitized max
+ */
+function max_source_setting_callback($val) {
+    if ($val > MAX_PER_SOURCE || $val < 0) {
+        return DEFAULT_PER_SOURCE;
+    }
+    return $val;
 }
 

@@ -58,23 +58,13 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
      * Can be one of two values, 'email_style' or 'list_style'. The default is 'email_style'.
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'list_style'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if (in_array($form['list_style'], array('email_style', 'news_style'))) {
-                $new_settings['list_style'] = $form['list_style'];
+        function list_style_callback($val) {
+            if (in_array($val, array('email_style', 'news_style'))) {
+                return $val;
             }
-            else {
-                $settings['list_style'] = $this->user_config->get('list_style', false);
-            }
+            return 'email_style';
         }
-        else {
-            $settings['list_style'] = $this->user_config->get('list_style', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_site_setting('list_style', $this, 'list_style_callback');
     }
 }
 
@@ -87,7 +77,7 @@ class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_source_max_setting('unread_per_source', $this);
+        process_site_setting('unread_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
     }
 }
 
@@ -100,20 +90,20 @@ class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module 
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_source_max_setting('all_email_per_source', $this);
+        process_site_setting('all_email_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
     }
 }
 
 /**
  * Process input from the max per source setting for the Everything page in the settings page
- * @subpackage core/handler
+M` * @subpackage core/handler
  */
 class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
     /**
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_source_max_setting('all_per_source', $this);
+        process_site_setting('all_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
     }
 }
 
@@ -126,7 +116,7 @@ class Hm_Handler_process_flagged_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_source_max_setting('flagged_per_source', $this);
+        process_site_setting('flagged_per_source', $this,'max_source_setting_callback', DEFAULT_PER_SOURCE);
     }
 }
 
@@ -139,7 +129,7 @@ class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_since_setting('flagged_since', $this);
+        process_site_setting('flagged_since', $this, 'since_setting_callback');
     }
 }
 
@@ -152,7 +142,7 @@ class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_since_setting('all_since', $this);
+        process_site_setting('all_since', $this, 'since_setting_callback');
     }
 }
 
@@ -165,7 +155,7 @@ class Hm_Handler_process_all_email_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_since_setting('all_email_since', $this);
+        process_site_setting('all_email_since', $this, 'since_setting_callback');
     }
 }
 
@@ -178,7 +168,7 @@ class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_since_setting('unread_since', $this);
+        process_site_setting('unread_since', $this, 'since_setting_callback');
     }
 }
 
@@ -188,21 +178,16 @@ class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
  */
 class Hm_Handler_process_language_setting extends Hm_Handler_Module {
     /**
-     * @todo add validation
+     * compared against the list in modules/core/functions.php:interface_langs()
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'language_setting'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            $new_settings['language_setting'] = $form['language_setting'];
+        function language_setting_callback($val) {
+            if (array_key_exists($val, interface_langs())) {
+                return $val;
+            }
+            return 'en';
         }
-        else {
-            $settings['language'] = $this->user_config->get('language_setting', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_site_setting('language', $this, 'language_setting_callback');
     }
 }
 
@@ -211,22 +196,15 @@ class Hm_Handler_process_language_setting extends Hm_Handler_Module {
  * @subpackage core/handler
  */
 class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
-    /**
-     * @todo: add validation
-     */
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'timezone_setting'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            $new_settings['timezone_setting'] = $form['timezone_setting'];
+        function timezone_setting_callback($val) {
+            if (in_array($val, timezone_identifiers_list(), true)) {
+                return $val;
+            }
+            elog("WWWWTTTTFFFF");
+            return false;
         }
-        else {
-            $settings['timezone'] = $this->user_config->get('timezone_setting', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        process_site_setting('timezone', $this, 'timezone_setting_callback');
     }
 }
 
