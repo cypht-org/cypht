@@ -229,28 +229,7 @@ class Hm_Handler_process_save_form extends Hm_Handler_Module {
                 $logout = true;
             }
             if ($save) {
-                $user = $this->session->get('username', false);
-                $path = $this->config->get('user_settings_dir', false);
-
-                if ($this->session->auth($user, $form['password'])) {
-                    $pass = $form['password'];
-                }
-                else {
-                    Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
-                    $pass = false;
-                }
-                if ($user && $path && $pass) {
-                    $this->user_config->save($user, $pass);
-                    $this->session->set('changed_settings', array());
-                    if ($logout) {
-                        $this->session->destroy($this->request);
-                        Hm_Msgs::add('Saved user data on logout');
-                        Hm_Msgs::add('Session destroyed on logout');
-                    }
-                    else {
-                        Hm_Msgs::add('Settings saved');
-                    }
-                }
+                save_user_settings($this, $form, $logout);
             }
         }
     }

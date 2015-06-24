@@ -437,3 +437,34 @@ function max_source_setting_callback($val) {
     return $val;
 }
 
+/**
+ * Save user settings from the session to permanent storage
+ * @param object $handler hm handler module object
+ * @param array $form sanitized user input
+ * @param bool $logout true if this is a save + logout request
+ * @return void
+ */
+function save_user_settings($handler, $form, $logout) {
+    $user = $handler->session->get('username', false);
+    $path = $handler->config->get('user_settings_dir', false);
+
+    if ($handler->session->auth($user, $form['password'])) {
+        $pass = $form['password'];
+    }
+    else {
+        Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
+        $pass = false;
+    }
+    if ($user && $path && $pass) {
+        $handler->user_config->save($user, $pass);
+        $handler->session->set('changed_settings', array());
+        if ($logout) {
+            $handler->session->destroy($handler->request);
+            Hm_Msgs::add('Saved user data on logout');
+            Hm_Msgs::add('Session destroyed on logout');
+        }
+        else {
+            Hm_Msgs::add('Settings saved');
+        }
+    }
+}
