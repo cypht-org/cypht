@@ -6,8 +6,6 @@
  * @subpackage auth
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Base class for authentication
  * Creating a new authentication method requires extending this class

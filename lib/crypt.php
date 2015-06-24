@@ -6,8 +6,6 @@
  * @subpackage crypt
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Manage request keys for modules
  */

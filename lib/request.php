@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage request
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Data request details

@@ -6,8 +6,6 @@
  * @subpackage cache
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Used to cache HTML5 formatted sections of a page
  * @package framework

@@ -5,7 +5,6 @@
  * @package framework
  * @subpackage modules
  */
-if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Output module execution methods
