@@ -314,3 +314,16 @@ function list_sources($sources, $output_mod) {
     return $res;
 }
 
+/**
+ * Output message list controls
+ * @subpackage core/functions
+ * @param string $refresh_link refresh link tag
+ * @param string $config_link configuration link tag
+ * @param string $source_link source link tag
+ * @return string
+ */
+function list_controls($refresh_link, $config_link, $source_link=false) {
+    return '<div class="list_controls">'.
+        $refresh_link.$source_link.$config_link.'</div>';
+}
+
