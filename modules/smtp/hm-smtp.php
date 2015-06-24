@@ -623,67 +623,6 @@ class Hm_MIME_Msg {
         return $res."\r\n".$this->body;
     }
 
-    /* try to accurately validate an E-mail. Based on RFC 3696 */
-    function match_email_full($val) {
-        /* defaults */
-        $domain = false;
-        $local = false;
-        /* basic checks to weed out obviously incorrect values */
-        if (!trim($val) || strlen($val) > 320) {
-            return false;
-        }
-        /* determine if this is a local address or if it has a domain part */
-        if (strpos($val, '@') !== false) {
-            $local = substr($val, 0, strrpos($val, '@'));
-            $domain = substr($val, (strrpos($val, '@') + 1));
-        }
-        else {
-            $local = $val;
-        }
-        /* domain is not require but the local part is */
-        if (!$local) {
-            return false;
-        }
-        else {
-            /* if we have a domain validate it. */
-            if ($domain && !$this->validate_domain_full($domain)) {
-                return false;
-            }
-            /* validate the required local part */
-            if (!$this->validate_local_full($local)) {
-                return false;
-            }
-        }
-        /* E-mail is valid */
-        return true;
-    }
-
-    function validate_local_full($val) {
-        /* check length, "." rules, and for characters > ASCII 127 */
-        if (strlen($val) > 64 || $val{0} == '.' || $val{(strlen($val) -1)} == '.' || strstr($val, '..') ||
-            preg_match('/[^\x00-\x7F]/',$val)) {
-            return false;
-        }
-        /* remove escaped characters and quoted strings */
-        $local = preg_replace("/\\\\.{1}/", '', $val);
-        $local = preg_replace("/\"[^\"]+\"/", '', $local);
-
-        /* validate remaining unescaped characters */
-        if (preg_match("/[[:print:]]/", $local) && !preg_match("/[@\\\",\[\]]/", $local)) {
-            return true;
-        }
-        return false;
-    }
-
-    function validate_domain_full($val) {
-        /* check for a dot, max allowed length and standard ASCII characters */
-        if (strpos($val, '.') === false || strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
-            $val{0} == '-' || $val{(strlen($val) - 1)} == '-') {
-            return false;
-        }
-        return true;
-    }
-
     function encode_header_fld($input, $email=true) {
         $res = array();
         $input = trim($input, ',; ');
@@ -715,7 +654,7 @@ class Hm_MIME_Msg {
                 $res[] = $enc_val;
             }
             else {
-                if ($email && strpos($v, '@') !== false && $this->match_email_full($v)) {
+                if ($email && strpos($v, '@') !== false && is_email($v)) {
                     $res[] = '<'.$v.'>';
                 }
                 else {
@@ -746,7 +685,7 @@ class Hm_MIME_Msg {
                 }
                 if (strstr($val, '@')) {
                     $address = ltrim(rtrim($val ,'>'), '<');
-                    if ($this->match_email_full($address)) {
+                    if (is_email($address)) {
                         $res[] = $address;
                     }
                 }
