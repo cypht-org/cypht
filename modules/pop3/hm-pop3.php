@@ -65,39 +65,7 @@ if (!class_exists('Hm_POP3')) {
  * Connect to and interact with POP3 servers
  * @subpackage pop3/lib
  */
-class Hm_POP3 {
-    var $server;
-    var $starttls;
-    var $port;
-    var $ssl;
-    var $debug;
-    var $command_count;
-    var $commands;
-    var $responses;
-    var $connected;
-    var $banner;
-    var $state;
-    var $no_apop;
-    var $handle;
-   
-    /**
-     * Set defaults
-     * @return void
-     */
-    public function __construct() {
-        $this->debug = array();
-        $this->server = 'localhost';
-        $this->port = 110; // ssl @ 995
-        $this->ssl = false;
-        $this->starttls = false;
-        $this->no_apop = true;
-        $this->command_count = 0;
-        $this->commands = array();
-        $this->responses = array();
-        $this->connected = false;
-        $this->state = 'started';
-        $this->handle = false;
-    }
+class Hm_POP3_Base {
 
     /**
      * Get server response
@@ -204,6 +172,42 @@ class Hm_POP3 {
             $this->debug[] = 'fsockopen errors #'.$errorno.'. '.$errorstr;
         }
         return $this->connected;
+    }
+
+}
+
+class Hm_POP3 extends Hm_POP3_Base {
+    var $server;
+    var $starttls;
+    var $port;
+    var $ssl;
+    var $debug;
+    var $command_count;
+    var $commands;
+    var $responses;
+    var $connected;
+    var $banner;
+    var $state;
+    var $no_apop;
+    var $handle;
+   
+    /**
+     * Set defaults
+     * @return void
+     */
+    public function __construct() {
+        $this->debug = array();
+        $this->server = 'localhost';
+        $this->port = 110; // ssl @ 995
+        $this->ssl = false;
+        $this->starttls = false;
+        $this->no_apop = true;
+        $this->command_count = 0;
+        $this->commands = array();
+        $this->responses = array();
+        $this->connected = false;
+        $this->state = 'started';
+        $this->handle = false;
     }
 
     /**
