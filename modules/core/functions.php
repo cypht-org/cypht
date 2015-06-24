@@ -335,10 +335,23 @@ function get_oauth2_data($config) {
  * @param object $handler hm hanndler module object
  * @param function $callback a function to sanitize the submitted value
  * @param mixed $default a default to use if callback is not submitted
+ * @param bool $checkbox true if this is a checkbox setting
  * @return void
  */
-function process_site_setting($type, $handler, $callback=false, $default=false) {
-    list($success, $form) = $handler->process_form(array('save_settings', $type));
+function process_site_setting($type, $handler, $callback=false, $default=false, $checkbox=false) {
+    if ($checkbox) {
+        list($success, $form) = $handler->process_form(array('save_settings'));
+        if (array_key_exists($type, $handler->request->post)) {
+            $form = array($type => $handler->request->post[$type]);
+        }
+        else {
+            $form = array($type => false);
+        }
+        elog($form);
+    }
+    else {
+        list($success, $form) = $handler->process_form(array('save_settings', $type));
+    }
     $new_settings = $handler->get('new_user_settings', array());
     $settings = $handler->get('user_settings', array());
 
@@ -352,7 +365,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false) 
         $new_settings[$type.'_setting'] = $result;
     }
     else {
-        $settings[$type] = $handler->user_config->get($type.'_setting', DEFAULT_PER_SOURCE);
+        $settings[$type] = $handler->user_config->get($type.'_setting', $default);
     }
     $handler->out('new_user_settings', $new_settings, false);
     $handler->out('user_settings', $settings, false);

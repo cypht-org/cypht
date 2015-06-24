@@ -778,7 +778,6 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
     protected function output() {
         $zones = timezone_identifiers_list();
         $settings = $this->get('user_settings', array());
-        elog($settings);
         if (array_key_exists('timezone', $settings)) {
             $myzone = $settings['timezone'];
         }
