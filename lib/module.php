@@ -191,7 +191,7 @@ abstract class Hm_Handler_Module {
     protected $page = false;
 
     /* user settings */
-    protected $user_config = false;
+    public $user_config = false;
 
     /**
      * Assign input and state sources

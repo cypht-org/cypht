@@ -602,41 +602,14 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
      */
     public function process() {
         $uid = '';
-        $list_path = '';
         $list_parent = '';
         $list_page = 1;
         $list_meta = true;
-        $mailbox_list_title = array();
-        $message_list_since = DEFAULT_SINCE;
-        $per_source_limit = DEFAULT_PER_SOURCE;
-        $no_message_list_headers = false;
+        $no_list_headers = false;
 
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
-            if ($path == 'unread') {
-                $list_path = 'unread';
-                $mailbox_list_title = array('Unread');
-                $message_list_since = $this->user_config->get('unread_since_setting', DEFAULT_SINCE);
-                $per_source_limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
-            }
-            elseif ($path == 'email') {
-                $message_list_since = $this->user_config->get('all_email_since_setting', DEFAULT_SINCE);
-                $per_source_limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
-                $list_path = 'email';
-                $mailbox_list_title = array('All Email');
-            }
-            elseif ($path == 'flagged') {
-                $list_path = 'flagged';
-                $message_list_since = $this->user_config->get('flagged_since_setting', DEFAULT_SINCE);
-                $per_source_limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
-                $mailbox_list_title = array('Flagged');
-            }
-            elseif ($path == 'combined_inbox') {
-                $list_path = 'combined_inbox';
-                $message_list_since = $this->user_config->get('all_since_setting', DEFAULT_SINCE);
-                $per_source_limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
-                $mailbox_list_title = array('Everything');
-            }
+            list($list_path, $mailbox_list_title, $message_list_since, $per_source_limit) = get_message_list_settings($path, $this);
         }
         if (array_key_exists('list_parent', $this->request->get)) {
             $list_parent = $this->request->get['list_parent'];
@@ -658,7 +631,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
             $list_style = 'news_style';
         }
         if ($list_style == 'news_style') {
-            $no_message_list_headers = true;
+            $no_list_headers = true;
             $this->out('news_list_style', true);
         }
         $this->out('uid', $uid);
@@ -669,7 +642,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         $this->out('mailbox_list_title', $mailbox_list_title, false);
         $this->out('message_list_since', $message_list_since, false);
         $this->out('per_source_limit', $per_source_limit, false);
-        $this->out('no_message_list_headers', $no_message_list_headers);
+        $this->out('no_message_list_headers', $no_list_headers);
         $this->out('message_list_fields', array(
             array('chkbox_col', false, false),
             array('source_col', 'source', 'Source'),
