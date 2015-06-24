@@ -6,8 +6,6 @@
  * @subpackage core
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
 /**
  * Format a message body that has HMTL markup
  * @subpackage core/functions
