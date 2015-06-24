@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/smtp/hm-smtp.php';
+require APP_PATH.'modules/smtp/hm-mime-message.php';
 
 /**
  * @subpackage smtp/handler
