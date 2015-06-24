@@ -177,59 +177,6 @@ function group_data_sources($array) {
 }
 
 /**
- * Validate search terms
- * @subpackage core/functions
- * @param string $terms search terms to validate
- * @return string
- */
-function validate_search_terms($terms) {
-    $terms = trim(strip_tags($terms));
-    if (!$terms) {
-        $terms = false;
-    }
-    return $terms;
-}
-
-/**
- * Validate the name of a search field
- * @subpackage core/functions
- * @param string $fld name to validate
- * @return mixed
- */
-function validate_search_fld($fld) {
-    if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'))) {
-        return $fld;
-    }
-    return false;
-}
-
-/**
- * Output a select element for the search field
- * @subpackage core/functions
- * @param string $current currently selected field
- * @param object $output_mod Hm_Output_Module
- * @return string
- */
-function search_field_selection($current, $output_mod) {
-    $flds = array(
-        'TEXT' => 'Entire message',
-        'BODY' => 'Message body',
-        'SUBJECT' => 'Subject',
-        'FROM' => 'From',
-    );
-    $res = '<select id="search_fld" name="search_fld">';
-    foreach ($flds as $val => $name) {
-        $res .= '<option ';
-        if ($current == $val) {
-            $res .= 'selected="selected" ';
-        }
-        $res .= 'value="'.$val.'">'.$output_mod->trans($name).'</option>';
-    }
-    $res .= '</select>';
-    return $res;
-}
-
-/**
  * Determine if E-mail modules are active
  * @subpackage core/functions
  * @param string $mod_list list of active module sets
