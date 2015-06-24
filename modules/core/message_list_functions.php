@@ -264,30 +264,6 @@ function message_since_dropdown($since, $name, $output_mod) {
 }
 
 /**
- * Return a date for a "received since" value, or just sanitize it
- * @subpackage core/functions
- * @param string $val "received since" value to process
- * @param bool $validate flag to limit to validation only
- */
-function process_since_argument($val, $validate=false) {
-    $date = false;
-    $valid = false;
-    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'), true)) {
-        $valid = $val;
-        $date = date('j-M-Y', strtotime($val));
-    }
-    else {
-        $val = 'today';
-        $valid = $val;
-        $date = date('j-M-Y');
-    }
-    if ($validate) {
-        return $valid;
-    }
-    return $date;
-}
-
-/**
  * Output a source list for a message list
  * @subpackage core/functions
  * @param array $sources source of the list

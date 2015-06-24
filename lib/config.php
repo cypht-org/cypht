@@ -55,7 +55,7 @@ abstract class Hm_Config {
      * @return void
      */
     public function set_tz() {
-        date_default_timezone_set($this->get('timezone_setting', 'UTC'));
+        date_default_timezone_set($this->get('timezone', 'UTC'));
     }
 }
 
