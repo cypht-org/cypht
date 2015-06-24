@@ -110,22 +110,11 @@ trait Hm_Modules {
             $source = self::$source;
         }
         if ($marker) {
-            $mods = array_keys(self::$module_list[$page]);
-            $index = array_search($marker, $mods);
-            if ($index !== false) {
-                if ($placement == 'after') {
-                    $index++;
-                }
-                $list = self::$module_list[$page];
-                self::$module_list[$page] = array_merge(array_slice($list, 0, $index), 
-                    array($module => array($source, $logged_in)),
-                    array_slice($list, $index));
-                $inserted = true;
-            }
+            $inserted = self::insert_at_marker($marker, $page, $module, $logged_in, $placement, $source);
         }
         else {
-            $inserted = true;
             self::$module_list[$page][$module] = array($source, $logged_in);
+            $inserted = true;
         }
         if (!$inserted) {
             if ($queue) {
@@ -135,6 +124,33 @@ trait Hm_Modules {
                 Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
             }
         }
+    }
+
+    /**
+     * Insert a module before or after another one
+     * @param string $marker the module to insert before or after
+     * @param string $page the page to assign the module to
+     * @param string $module the module to add
+     * @param bool $logged_in true if the module requires the user to be logged in
+     * @param string $placement "before" or "after" the $marker module
+     * @param string $source the module set containing this module
+     * @return void
+     */
+    private static function insert_at_marker($marker, $page, $module, $logged_in, $placement, $source) {
+        $inserted = false;
+        $mods = array_keys(self::$module_list[$page]);
+        $index = array_search($marker, $mods);
+        if ($index !== false) {
+            if ($placement == 'after') {
+                $index++;
+            }
+            $list = self::$module_list[$page];
+            self::$module_list[$page] = array_merge(array_slice($list, 0, $index), 
+                array($module => array($source, $logged_in)),
+                array_slice($list, $index));
+            $inserted = true;
+        }
+        return $inserted;
     }
 
     /**
