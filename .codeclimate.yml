@@ -7,6 +7,8 @@ engines:
     enabled: true
   bundler-audit:
     enabled: true
+  phpcodesniffer:
+    enabled: true
 
 ratings:
       paths:
