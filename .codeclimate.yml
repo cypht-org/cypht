@@ -8,6 +8,10 @@ engines:
   bundler-audit:
     enabled: true
 
+ratings:
+      paths:
+    - lib/*
+
 exclude_paths:
  - "test/*"
  - "third_party/*"
