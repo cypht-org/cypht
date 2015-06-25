@@ -1,14 +1,13 @@
-languages:
-   Ruby: false
-   JavaScript: true
-   Python: false
-   PHP: true
-#
-# ---Exclude Files or Directories---
-# List the files or directories you would like excluded from our analysis.
-# For help setting your exclude paths:
-# http://docs.codeclimate.com/article/166-excluding-files-folders
-#
+engines:
+  rubocop:
+    enabled: true
+  eslint:
+    enabled: true
+  csslint:
+    enabled: true
+  bundler-audit:
+    enabled: true
+
 exclude_paths:
  - "test/*"
  - "third_party/*"
