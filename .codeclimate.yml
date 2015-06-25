@@ -1,20 +1,20 @@
 engines:
-  rubocop:
-    enabled: true
-  eslint:
-    enabled: true
-  csslint:
-    enabled: true
-  bundler-audit:
-    enabled: true
+    rubocop:
+        enabled: true
+    eslint:
+        enabled: true
+    csslint:
+        enabled: true
+    bundler-audit:
+        enabled: true
 
 ratings:
-      paths:
-    - "lib/*"
+    paths:
+        - "lib/*"
 
 exclude_paths:
- - "test/*"
- - "third_party/*"
- - "docs/*"
- - "language/*"
- - "modules/*/assets/*"
+    - "test/*"
+    - "third_party/*"
+    - "docs/*"
+    - "language/*"
+    - "modules/*/assets/*"
