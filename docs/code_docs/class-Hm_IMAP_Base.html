@@ -580,7 +580,7 @@ and is covered by the same license restrictions (GPL2)</p>
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.imap.html">imap</a>\<a href="package-modules.imap.lib.html">lib</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_IMAP_Base.html#11-531" title="Go to source code">imap/hm-imap-base.php</a>
+			<b>Located at</b> <a href="source-class-Hm_IMAP_Base.html#10-530" title="Go to source code">imap/hm-imap-base.php</a>
 		<br>
 	</div>
 
@@ -600,7 +600,7 @@ and is covered by the same license restrictions (GPL2)</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_command_number">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#50-58" title="Go to source code">command_number</a>( )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#49-57" title="Go to source code">command_number</a>( )</code>
 
 		<div class="description short">
 			<p>increment the imap command prefix such that it counts
@@ -636,7 +636,7 @@ up on each command sent. ('A1', 'A2', ...)</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_read_literal">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#60-97" title="Go to source code">read_literal</a>( <span>integer <var>$size</var></span>, <span>integer <var>$max</var></span>, <span>integer <var>$current</var></span>, <span>integer <var>$line_length</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#59-96" title="Go to source code">read_literal</a>( <span>integer <var>$size</var></span>, <span>integer <var>$max</var></span>, <span>integer <var>$current</var></span>, <span>integer <var>$line_length</var></span> )</code>
 
 		<div class="description short">
 			<p>Read IMAP literal found during parse_line().</p>
@@ -683,7 +683,7 @@ up on each command sent. ('A1', 'A2', ...)</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_parse_line">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#99-199" title="Go to source code">parse_line</a>( <span>string <var>$line</var></span>, <span>integer <var>$current_size</var></span>, <span>integer <var>$max</var></span>, <span>integer <var>$line_length</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#98-198" title="Go to source code">parse_line</a>( <span>string <var>$line</var></span>, <span>integer <var>$current_size</var></span>, <span>integer <var>$max</var></span>, <span>integer <var>$line_length</var></span> )</code>
 
 		<div class="description short">
 			<p>break up a "line" response from imap. If we find
@@ -731,7 +731,7 @@ a literal we read ahead on the stream and include it.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_fgets">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#201-216" title="Go to source code">fgets</a>( <span>integer <var>$len</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#200-215" title="Go to source code">fgets</a>( <span>integer <var>$len</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>wrapper around fgets using $this->handle</p>
@@ -770,7 +770,7 @@ a literal we read ahead on the stream and include it.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_response">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#218-356" title="Go to source code">get_response</a>( <span>integer <var>$max</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$chunked</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$line_length</var> = <span class="php-num">8192</span></span>, <span>boolean <var>$sort</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#217-355" title="Go to source code">get_response</a>( <span>integer <var>$max</var> = <span class="php-keyword1">false</span></span>, <span>boolean <var>$chunked</var> = <span class="php-keyword1">false</span></span>, <span>integer <var>$line_length</var> = <span class="php-num">8192</span></span>, <span>boolean <var>$sort</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>loop through "lines" returned from imap and parse them with parse_line() and read_literal.
@@ -819,7 +819,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 
 		<td class="name"><div>
 		<a class="anchor" href="#_send_command">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#358-384" title="Go to source code">send_command</a>( <span>mixed <var>$command</var></span>, <span>boolean <var>$no_prefix</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#357-383" title="Go to source code">send_command</a>( <span>mixed <var>$command</var></span>, <span>boolean <var>$no_prefix</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>put a prefix on a command and send it to the server</p>
@@ -856,7 +856,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 
 		<td class="name"><div>
 		<a class="anchor" href="#_check_response">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#386-418" title="Go to source code">check_response</a>( <span>array <var>$data</var></span>, <span>boolean <var>$chunked</var> = <span class="php-keyword1">false</span></span>, <span> <var>$log_failures</var> = <span class="php-keyword1">true</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#385-417" title="Go to source code">check_response</a>( <span>array <var>$data</var></span>, <span>boolean <var>$chunked</var> = <span class="php-keyword1">false</span></span>, <span> <var>$log_failures</var> = <span class="php-keyword1">true</span></span> )</code>
 
 		<div class="description short">
 			<p>determine if an imap response returned an "OK", returns true or false</p>
@@ -899,7 +899,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 
 		<td class="name"><div>
 		<a class="anchor" href="#_utf7_decode">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#420-430" title="Go to source code">utf7_decode</a>( <span>string <var>$string</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#419-429" title="Go to source code">utf7_decode</a>( <span>string <var>$string</var></span> )</code>
 
 		<div class="description short">
 			<p>convert UTF-7 encoded forlder names to UTF-8</p>
@@ -938,7 +938,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 
 		<td class="name"><div>
 		<a class="anchor" href="#_utf7_encode">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#432-442" title="Go to source code">utf7_encode</a>( <span>string <var>$string</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#431-441" title="Go to source code">utf7_encode</a>( <span>string <var>$string</var></span> )</code>
 
 		<div class="description short">
 			<p>convert UTF-8 encoded forlder names to UTF-7</p>
@@ -977,7 +977,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 
 		<td class="name"><div>
 		<a class="anchor" href="#_input_validate">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#444-502" title="Go to source code">input_validate</a>( <span>string <var>$val</var></span>, <span>string <var>$type</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#443-501" title="Go to source code">input_validate</a>( <span>string <var>$val</var></span>, <span>string <var>$type</var></span> )</code>
 
 		<div class="description short">
 			<p>type checks</p>
@@ -1018,7 +1018,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 
 		<td class="name"><div>
 		<a class="anchor" href="#_is_clean">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#510-516" title="Go to source code">is_clean</a>( <span> <var>$val</var></span>, <span> <var>$type</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#509-515" title="Go to source code">is_clean</a>( <span> <var>$val</var></span>, <span> <var>$type</var></span> )</code>
 
 		<div class="description short">
 			
@@ -1048,7 +1048,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 
 		<td class="name"><div>
 		<a class="anchor" href="#_apply_config">#</a>
-		<code><a href="source-class-Hm_IMAP_Base.html#518-529" title="Go to source code">apply_config</a>( <span>array <var>$config</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Base.html#517-528" title="Go to source code">apply_config</a>( <span>array <var>$config</var></span> )</code>
 
 		<div class="description short">
 			<p>overwrite defaults with supplied config array</p>
@@ -1093,7 +1093,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#19" title="Go to source code"><var>$cached_response</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#18" title="Go to source code"><var>$cached_response</var></a>
 
 			<div class="description short">
 				
@@ -1118,7 +1118,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#20" title="Go to source code"><var>$handle</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#19" title="Go to source code"><var>$handle</var></a>
 
 			<div class="description short">
 				
@@ -1143,7 +1143,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#21" title="Go to source code"><var>$debug</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#20" title="Go to source code"><var>$debug</var></a>
 
 			<div class="description short">
 				
@@ -1168,7 +1168,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#22" title="Go to source code"><var>$commands</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#21" title="Go to source code"><var>$commands</var></a>
 
 			<div class="description short">
 				
@@ -1193,7 +1193,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#23" title="Go to source code"><var>$responses</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#22" title="Go to source code"><var>$responses</var></a>
 
 			<div class="description short">
 				
@@ -1218,7 +1218,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#24" title="Go to source code"><var>$current_command</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#23" title="Go to source code"><var>$current_command</var></a>
 
 			<div class="description short">
 				
@@ -1243,7 +1243,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#25" title="Go to source code"><var>$max_read</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#24" title="Go to source code"><var>$max_read</var></a>
 
 			<div class="description short">
 				
@@ -1268,7 +1268,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#26" title="Go to source code"><var>$command_count</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#25" title="Go to source code"><var>$command_count</var></a>
 
 			<div class="description short">
 				
@@ -1293,7 +1293,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#27" title="Go to source code"><var>$cache_data</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#26" title="Go to source code"><var>$cache_data</var></a>
 
 			<div class="description short">
 				
@@ -1318,7 +1318,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#28" title="Go to source code"><var>$supported_extensions</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#27" title="Go to source code"><var>$supported_extensions</var></a>
 
 			<div class="description short">
 				
@@ -1343,7 +1343,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#29" title="Go to source code"><var>$enabled_extensions</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#28" title="Go to source code"><var>$enabled_extensions</var></a>
 
 			<div class="description short">
 				
@@ -1368,7 +1368,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#30" title="Go to source code"><var>$capability</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#29" title="Go to source code"><var>$capability</var></a>
 
 			<div class="description short">
 				
@@ -1393,7 +1393,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#31" title="Go to source code"><var>$server_id</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#30" title="Go to source code"><var>$server_id</var></a>
 
 			<div class="description short">
 				
@@ -1418,7 +1418,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#32" title="Go to source code"><var>$literal_overflow</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#31" title="Go to source code"><var>$literal_overflow</var></a>
 
 			<div class="description short">
 				
@@ -1443,7 +1443,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#33" title="Go to source code"><var>$struct_object</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#32" title="Go to source code"><var>$struct_object</var></a>
 
 			<div class="description short">
 				
@@ -1468,7 +1468,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#37-40" title="Go to source code"><var>$config</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#36-39" title="Go to source code"><var>$config</var></a>
 
 			<div class="description short">
 				
@@ -1496,7 +1496,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#43-45" title="Go to source code"><var>$client_extensions</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#42-44" title="Go to source code"><var>$client_extensions</var></a>
 
 			<div class="description short">
 				
@@ -1523,7 +1523,7 @@ number of lines to return, in case we did something stupid like list a loaded un
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Base.html#48" title="Go to source code"><var>$declared_extensions</var></a>
+				<a href="source-class-Hm_IMAP_Base.html#47" title="Go to source code"><var>$declared_extensions</var></a>
 
 			<div class="description short">
 				

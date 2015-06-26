@@ -594,7 +594,7 @@
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.imap.html">imap</a>\<a href="package-modules.imap.lib.html">lib</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_IMAP_Cache.html#873-1191" title="Go to source code">imap/hm-imap-base.php</a>
+			<b>Located at</b> <a href="source-class-Hm_IMAP_Cache.html#9-327" title="Go to source code">imap/hm-imap-cache.php</a>
 		<br>
 	</div>
 
@@ -614,7 +614,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_update_cache_data">#</a>
-		<code><a href="source-class-Hm_IMAP_Cache.html#879-954" title="Go to source code">update_cache_data</a>( <span>array <var>$data</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Cache.html#15-90" title="Go to source code">update_cache_data</a>( <span>array <var>$data</var></span> )</code>
 
 		<div class="description short">
 			<p>update the cache untagged QRESYNC FETCH responses</p>
@@ -653,7 +653,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_cache_return_val">#</a>
-		<code><a href="source-class-Hm_IMAP_Cache.html#956-993" title="Go to source code">cache_return_val</a>( <span>array <var>$res</var></span>, <span> <var>$command</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Cache.html#92-129" title="Go to source code">cache_return_val</a>( <span>array <var>$res</var></span>, <span> <var>$command</var></span> )</code>
 
 		<div class="description short">
 			<p>cache certain IMAP command return values for re-use</p>
@@ -694,7 +694,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_collect_cache_entries_to_prune">#</a>
-		<code><a href="source-class-Hm_IMAP_Cache.html#995-1018" title="Go to source code">collect_cache_entries_to_prune</a>( <span>integer <var>$count</var></span>, <span>array <var>$exclude</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Cache.html#131-154" title="Go to source code">collect_cache_entries_to_prune</a>( <span>integer <var>$count</var></span>, <span>array <var>$exclude</var></span> )</code>
 
 		<div class="description short">
 			<p>search for cache entries to prune</p>
@@ -735,7 +735,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_prune_cache">#</a>
-		<code><a href="source-class-Hm_IMAP_Cache.html#1020-1048" title="Go to source code">prune_cache</a>( <span> <var>$count</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Cache.html#156-184" title="Go to source code">prune_cache</a>( <span> <var>$count</var></span> )</code>
 
 		<div class="description short">
 			<p>prune the IMAP cache if it needs it</p>
@@ -765,7 +765,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_check_cache">#</a>
-		<code><a href="source-class-Hm_IMAP_Cache.html#1050-1100" title="Go to source code">check_cache</a>( <span>string <var>$command</var></span>, <span>boolean <var>$check_only</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Cache.html#186-236" title="Go to source code">check_cache</a>( <span>string <var>$command</var></span>, <span>boolean <var>$check_only</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>determine if the current command can be served from cache</p>
@@ -806,7 +806,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_bust_cache">#</a>
-		<code><a href="source-class-Hm_IMAP_Cache.html#1102-1145" title="Go to source code">bust_cache</a>( <span>string <var>$type</var></span>, <span> <var>$full</var> = <span class="php-keyword1">true</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Cache.html#238-281" title="Go to source code">bust_cache</a>( <span>string <var>$type</var></span>, <span> <var>$full</var> = <span class="php-keyword1">true</span></span> )</code>
 
 		<div class="description short">
 			<p>invalidate parts of the data cache</p>
@@ -843,7 +843,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_dump_cache">#</a>
-		<code><a href="source-class-Hm_IMAP_Cache.html#1147-1161" title="Go to source code">dump_cache</a>( <span> <var>$type</var> = <span class="php-quote">'string'</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Cache.html#283-297" title="Go to source code">dump_cache</a>( <span> <var>$type</var> = <span class="php-quote">'string'</span></span> )</code>
 
 		<div class="description short">
 			<p>output a string version of the cache that can be re-used</p>
@@ -877,7 +877,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_load_cache">#</a>
-		<code><a href="source-class-Hm_IMAP_Cache.html#1163-1189" title="Go to source code">load_cache</a>( <span>string <var>$data</var></span>, <span> <var>$type</var> = <span class="php-quote">'string'</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Cache.html#299-325" title="Go to source code">load_cache</a>( <span>string <var>$data</var></span>, <span> <var>$type</var> = <span class="php-quote">'string'</span></span> )</code>
 
 		<div class="description short">
 			<p>load cache data from the output of dump_cache()</p>

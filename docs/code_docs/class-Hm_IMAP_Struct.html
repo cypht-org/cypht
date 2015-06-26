@@ -570,7 +570,7 @@ BODYSTRUCTURE command</p>
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.imap.html">imap</a>\<a href="package-modules.imap.lib.html">lib</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_IMAP_Struct.html#1193-1616" title="Go to source code">imap/hm-imap-base.php</a>
+			<b>Located at</b> <a href="source-class-Hm_IMAP_Struct.html#9-432" title="Go to source code">imap/hm-imap-bodystructure.php</a>
 		<br>
 	</div>
 
@@ -590,7 +590,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1245-1254" title="Go to source code">__construct</a>( <span>array <var>$struct_response</var></span>, <span> <var>$imap</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#61-70" title="Go to source code">__construct</a>( <span>array <var>$struct_response</var></span>, <span> <var>$imap</var></span> )</code>
 
 		<div class="description short">
 			<p>Constructor. Takes the BODYSTRUCTURE response and builds a data representation</p>
@@ -627,7 +627,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_build">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1256-1280" title="Go to source code">build</a>( <span>array <var>$array</var></span>, <span>integer <var>$index</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#72-96" title="Go to source code">build</a>( <span>array <var>$array</var></span>, <span>integer <var>$index</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			<p>Builds a nested array based on parens in the input</p>
@@ -668,7 +668,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_attribute_set">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1281-1297" title="Go to source code">attribute_set</a>( <span>array <var>$vals</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#97-113" title="Go to source code">attribute_set</a>( <span>array <var>$vals</var></span> )</code>
 
 		<div class="description short">
 			<p>Create a name => value attribute set</p>
@@ -707,7 +707,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_envelope_address">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1299-1326" title="Go to source code">envelope_address</a>( <span>array <var>$vals</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#115-142" title="Go to source code">envelope_address</a>( <span>array <var>$vals</var></span> )</code>
 
 		<div class="description short">
 			<p>Parse an ENVELOPE address</p>
@@ -746,7 +746,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_set_value">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1328-1353" title="Go to source code">set_value</a>( <span>mixed <var>$val</var></span>, <span>string <var>$type</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#144-169" title="Go to source code">set_value</a>( <span>mixed <var>$val</var></span>, <span>string <var>$type</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>Prepare a value to be added to the structure</p>
@@ -787,7 +787,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_envelope">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1355-1368" title="Go to source code">envelope</a>( <span>array <var>$vals</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#171-184" title="Go to source code">envelope</a>( <span>array <var>$vals</var></span> )</code>
 
 		<div class="description short">
 			<p>Parse an RFC822 ENVELOPE section</p>
@@ -826,7 +826,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_part_type">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1370-1390" title="Go to source code">get_part_type</a>( <span>array <var>$vals</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#186-206" title="Go to source code">get_part_type</a>( <span>array <var>$vals</var></span> )</code>
 
 		<div class="description short">
 			<p>Determine if this is a multipart, rfc822 message, or single part type</p>
@@ -865,7 +865,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_id_rfc822_part">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1392-1421" title="Go to source code">id_rfc822_part</a>( <span>array <var>$vals</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#208-237" title="Go to source code">id_rfc822_part</a>( <span>array <var>$vals</var></span> )</code>
 
 		<div class="description short">
 			<p>Parse an RFC822 message part</p>
@@ -904,7 +904,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_id_multi_part">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1423-1441" title="Go to source code">id_multi_part</a>( <span>array <var>$vals</var></span>, <span>boolean <var>$increment</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#239-257" title="Go to source code">id_multi_part</a>( <span>array <var>$vals</var></span>, <span>boolean <var>$increment</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>Parse multipart message part</p>
@@ -945,7 +945,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_parse_multi_part_subs">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1443-1461" title="Go to source code">parse_multi_part_subs</a>( <span>array <var>$vals</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#259-277" title="Go to source code">parse_multi_part_subs</a>( <span>array <var>$vals</var></span> )</code>
 
 		<div class="description short">
 			<p>Parse multipart message parts</p>
@@ -984,7 +984,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_parse_multi_part_flds">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1463-1483" title="Go to source code">parse_multi_part_flds</a>( <span>integer <var>$index</var></span>, <span>array <var>$vals</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#279-299" title="Go to source code">parse_multi_part_flds</a>( <span>integer <var>$index</var></span>, <span>array <var>$vals</var></span> )</code>
 
 		<div class="description short">
 			<p>Parse multipart message fields</p>
@@ -1025,7 +1025,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_id_single_part">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1485-1507" title="Go to source code">id_single_part</a>( <span>array <var>$vals</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#301-323" title="Go to source code">id_single_part</a>( <span>array <var>$vals</var></span> )</code>
 
 		<div class="description short">
 			<p>Parse single message part</p>
@@ -1064,7 +1064,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_id_parts">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1509-1539" title="Go to source code">id_parts</a>( <span>array <var>$struct</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#325-355" title="Go to source code">id_parts</a>( <span>array <var>$struct</var></span> )</code>
 
 		<div class="description short">
 			<p>parse the message parts at the current "level"</p>
@@ -1103,7 +1103,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_increment_part_number">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1541-1558" title="Go to source code">increment_part_number</a>( )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#357-374" title="Go to source code">increment_part_number</a>( )</code>
 
 		<div class="description short">
 			<p>Increment the message part number in the weird way IMAP does.</p>
@@ -1137,7 +1137,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_recursive_search">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1560-1597" title="Go to source code">recursive_search</a>( <span>array <var>$struct</var></span>, <span>array <var>$flds</var></span>, <span>boolean <var>$all</var></span>, <span>array <var>$res</var></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#376-413" title="Go to source code">recursive_search</a>( <span>array <var>$struct</var></span>, <span>array <var>$flds</var></span>, <span>boolean <var>$all</var></span>, <span>array <var>$res</var></span> )</code>
 
 		<div class="description short">
 			<p>Search a parsed BODYSTRUCTURE response</p>
@@ -1182,7 +1182,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_data">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1599-1605" title="Go to source code">data</a>( )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#415-421" title="Go to source code">data</a>( )</code>
 
 		<div class="description short">
 			<p>Return structure</p>
@@ -1216,7 +1216,7 @@ BODYSTRUCTURE command</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_search">#</a>
-		<code><a href="source-class-Hm_IMAP_Struct.html#1607-1615" title="Go to source code">search</a>( <span>array <var>$flds</var></span>, <span>boolean <var>$all</var> = <span class="php-keyword1">true</span></span> )</code>
+		<code><a href="source-class-Hm_IMAP_Struct.html#423-431" title="Go to source code">search</a>( <span>array <var>$flds</var></span>, <span>boolean <var>$all</var> = <span class="php-keyword1">true</span></span> )</code>
 
 		<div class="description short">
 			<p>Public search function, returns a list of matching parts</p>
@@ -1267,7 +1267,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1201" title="Go to source code"><var>$struct</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#17" title="Go to source code"><var>$struct</var></a>
 
 			<div class="description short">
 				
@@ -1292,7 +1292,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1204" title="Go to source code"><var>$part_number</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#20" title="Go to source code"><var>$part_number</var></a>
 
 			<div class="description short">
 				
@@ -1317,7 +1317,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1207" title="Go to source code"><var>$parent_type</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#23" title="Go to source code"><var>$parent_type</var></a>
 
 			<div class="description short">
 				
@@ -1342,7 +1342,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1210" title="Go to source code"><var>$mime_types</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#26" title="Go to source code"><var>$mime_types</var></a>
 
 			<div class="description short">
 				
@@ -1367,7 +1367,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1213" title="Go to source code"><var>$readable_message_types</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#29" title="Go to source code"><var>$readable_message_types</var></a>
 
 			<div class="description short">
 				
@@ -1392,7 +1392,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1216-1217" title="Go to source code"><var>$single_format</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#32-33" title="Go to source code"><var>$single_format</var></a>
 
 			<div class="description short">
 				
@@ -1418,7 +1418,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1220-1222" title="Go to source code"><var>$text_format</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#36-38" title="Go to source code"><var>$text_format</var></a>
 
 			<div class="description short">
 				
@@ -1445,7 +1445,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1225-1227" title="Go to source code"><var>$rfc822_format</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#41-43" title="Go to source code"><var>$rfc822_format</var></a>
 
 			<div class="description short">
 				
@@ -1472,7 +1472,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1230" title="Go to source code"><var>$multipart_format</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#46" title="Go to source code"><var>$multipart_format</var></a>
 
 			<div class="description short">
 				
@@ -1497,7 +1497,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1233" title="Go to source code"><var>$envelope_addresses</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#49" title="Go to source code"><var>$envelope_addresses</var></a>
 
 			<div class="description short">
 				
@@ -1522,7 +1522,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1236" title="Go to source code"><var>$address_format</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#52" title="Go to source code"><var>$address_format</var></a>
 
 			<div class="description short">
 				
@@ -1547,7 +1547,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1239-1240" title="Go to source code"><var>$envelope_format</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#55-56" title="Go to source code"><var>$envelope_format</var></a>
 
 			<div class="description short">
 				
@@ -1573,7 +1573,7 @@ BODYSTRUCTURE command</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_IMAP_Struct.html#1243" title="Go to source code"><var>$imap</var></a>
+				<a href="source-class-Hm_IMAP_Struct.html#59" title="Go to source code"><var>$imap</var></a>
 
 			<div class="description short">
 				
