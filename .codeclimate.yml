@@ -13,6 +13,7 @@ ratings:
         - "lib/*"
 
 exclude_paths:
+    - "modules/*"
     - "test/*"
     - "third_party/*"
     - "docs/*"
