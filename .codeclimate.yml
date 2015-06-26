@@ -10,12 +10,12 @@ engines:
 
 ratings:
     paths:
-        - "lib/*"
+        - "lib/auth.php"
 
 exclude_paths:
     - "modules/*"
-    - "test/*"
+    - "tests/*"
     - "third_party/*"
     - "docs/*"
     - "language/*"
-    - "modules/*/assets/*"
+    - "website/*"
