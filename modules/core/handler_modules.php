@@ -199,7 +199,6 @@ class Hm_Handler_process_timezone_setting extends Hm_Handler_Module {
             if (in_array($val, timezone_identifiers_list(), true)) {
                 return $val;
             }
-            elog("WWWWTTTTFFFF");
             return false;
         }
         process_site_setting('timezone', $this, 'timezone_setting_callback');
