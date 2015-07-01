@@ -272,7 +272,6 @@ var cache_imap_page = function() {
 
 var fetch_cached_imap_page = function() {
     var key = 'imap_'+get_imap_page_number()+'_'+hm_list_path();
-    elog(key);
     var page = Hm_Utils.get_from_local_storage(key);
     var links = Hm_Utils.get_from_local_storage(key+'_page_links');
     return [ page, links ];
