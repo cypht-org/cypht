@@ -14,17 +14,17 @@ trait Hm_Output_Module_Exec {
     /**
      * Run all the handler modules for a page and merge the results
      * @param object $request details about the request
-     * @param object $session session interface
+     * @param bool $active_session true if the session is active
      * @return void
      */
-    public function run_output_modules($request, $session, $page) {
+    public function run_output_modules($request, $active_session, $page) {
         $input = $this->handler_response;
         $protected = array();
         $modules = Hm_Output_Modules::get_for_page($page);
         $list_output = array();
         $lang_str = $this->get_current_language();
         foreach ($modules as $name => $args) {
-            list($output, $protected, $type) = $this->run_output_module($input, $protected, $name, $args, $session, $request->format, $lang_str);
+            list($output, $protected, $type) = $this->run_output_module($input, $protected, $name, $args, $active_session, $request->format, $lang_str);
             if ($type != 'JSON') {
                 $list_output[] = $output;
             }
@@ -46,15 +46,15 @@ trait Hm_Output_Module_Exec {
      * @param array $protected list of protected output
      * @param string $name handler module name
      * @param array $args module arguments
-     * @param object $session session interface
+     * @param bool $active_session true if the session is active
      * @param string $format HTML5 or JSON format
      * @param array $lang_str translation lookup array
      */
-    public function run_output_module($input, $protected, $name, $args, $session, $format, $lang_str) {
+    public function run_output_module($input, $protected, $name, $args, $active_session, $format, $lang_str) {
         $name = "Hm_Output_$name";
         $mod_output = false;
         if (class_exists($name)) {
-            if (!$args[1] || ($args[1] && $session->is_active())) {
+            if (!$args[1] || ($args[1] && $active_session)) {
                 $mod = new $name($input, $protected);
                 if ($format == 'Hm_Format_JSON') {
                     $mod->output_content($format, $lang_str, $protected);
