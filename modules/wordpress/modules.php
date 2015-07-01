@@ -14,7 +14,17 @@ define('WPCOM_FP_URL', 'https://public-api.wordpress.com/rest/v1.1/freshly-press
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * @subpackage feeds/handler
+ * @subpackage wordpress/handler
+ */
+class Hm_Handler_process_unread_wp_included extends Hm_Handler_Module {
+    public function process() {
+        function unread_wp_setting_callback($val) { return $val; }
+        process_site_setting('unread_exclude_wordpress', $this, 'unread_wp_setting_callback', false, true);
+    }
+}
+
+/**
+ * @subpackage wordpress/handler
  */
 class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
     public function process() {
@@ -62,7 +72,13 @@ class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
             $path = '';
         }
         if ($path == 'combined_inbox' || $path == 'unread') {
-            $this->append('data_sources', array('callback' => 'load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
+            $excluded = false;
+            if ($path == 'unread' && $this->user_config->get('unread_exclude_wordpress_setting', false)) {
+                $excluded = true;
+            }
+            if (!$excluded) {
+                $this->append('data_sources', array('callback' => 'load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
+            }
         }
     }
 }
@@ -399,6 +415,23 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
             }
         }
         $this->out('formatted_message_list', $res);
+    }
+}
+
+/**
+ * @subpackage wordpress/output
+ */
+class Hm_Output_unread_wp_included_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('unread_exclude_wordpress', $settings) && $settings['unread_exclude_wordpress']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $checked = '';
+        }
+        return '<tr class="unread_setting"><td><label for="unread_exclude_wordpress">'.$this->trans('Exclude unread WordPress notices').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' value="1" id="unread_exclude_wordpress" name="unread_exclude_wordpress" /></td></tr>';
     }
 }
 

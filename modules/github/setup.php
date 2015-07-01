@@ -50,6 +50,9 @@ add_handler('ajax_github_status', 'date', true, 'core');
 add_handler('ajax_github_status', 'http_headers', true, 'core');
 add_output('ajax_github_status', 'filter_github_status', true);
 
+add_handler('settings', 'process_unread_github_included', true, 'wordpress', 'save_user_settings', 'before');
+add_output('settings', 'unread_github_included_setting', true, 'wordpress', 'unread_source_max_setting', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_github_status',
@@ -71,6 +74,7 @@ return array(
         'github_remove_repo' => FILTER_SANITIZE_STRING,
         'github_add_repo' => FILTER_SANITIZE_STRING,
         'github_repo' => FILTER_SANITIZE_STRING,
+        'unread_exclude_github' => FILTER_VALIDATE_INT,
     )
 );
 
