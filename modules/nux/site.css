@@ -20,3 +20,4 @@
 .nux_welcome ul { margin-top: 30px; }
 .nux_try_out { display: block; text-align: center; margin: auto; margin-top: 10px; }
 .nux_tz {  margin-top: 30px; }
+.nux_empty_combined_view { display: none; text-align: center; padding-top: 100px; color: #666; }

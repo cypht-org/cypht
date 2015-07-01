@@ -42,6 +42,8 @@ add_output('home', 'welcome_dialog', true, 'nux', 'home_heading', 'after');
 add_output('home', 'nux_help', true, 'nux', 'welcome_dialog', 'after');
 add_output('home', 'nux_dev_news', true, 'nux', 'nux_help', 'after');
 
+add_output('message_list', 'nux_message_list_notice', true, 'nux', 'message_list_start', 'before');
+
 return array(
     'allowed_pages' => array(
         'ajax_nux_service_select',

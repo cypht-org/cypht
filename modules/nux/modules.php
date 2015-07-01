@@ -361,6 +361,19 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
 /**
  * @subpackage nux/output
  */
+class Hm_Output_nux_message_list_notice extends Hm_Output_Module {
+    protected function output() {
+        $msg = '<div class="nux_empty_combined_view">';
+        $msg .= $this->trans('You don\'t have any data sources assigned to this page.');
+        $msg .= '<br /><a href="?page=servers">'.$this->trans('Add some').'</a>';
+        $msg .= '</div>';
+        return $msg;
+    }
+}
+
+/**
+ * @subpackage nux/output
+ */
 class Hm_Output_quick_add_section extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
