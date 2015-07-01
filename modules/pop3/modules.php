@@ -573,9 +573,6 @@ class Hm_Handler_add_pop3_servers_to_page_data extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_POP3_List::dump();
         $this->out('pop3_servers', $servers);
-        if (!empty($servers)) {
-            $this->append('email_folders', 'folder_sources');
-        }
     }
 }
 
@@ -720,7 +717,9 @@ class Hm_Output_filter_pop3_folders extends Hm_Output_Module {
                 '<img class="account_icon" alt="Toggle folder" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
                 $this->html_safe($folder).'</a></li>';
         }
-        Hm_Page_Cache::concat('email_folders', $res);
+        if ($res) {
+            $this->append('folder_sources', array('email_folders', $res));
+        }
         return '';
     }
 }

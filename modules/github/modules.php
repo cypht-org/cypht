@@ -357,11 +357,8 @@ class Hm_Output_github_folders extends Hm_Output_Module {
                     '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
                     '" alt="" width="16" height="16" /> '.$this->html_safe(urldecode($repo)).'</a></li>';
             }
-
-            $this->append('folder_sources', 'github_folders');
-            Hm_Page_Cache::add('github_folders', $res, true);
+            $this->append('folder_sources', array('github_folders', $res));
         }
-        return '';
     }
 }
 

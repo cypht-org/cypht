@@ -394,7 +394,6 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
         $feeds = Hm_Feed_List::dump();
         if (!empty($feeds)) {
             $this->out('feeds', $feeds);
-            $this->append('folder_sources', 'feeds_folders');
         }
     }
 }
@@ -697,7 +696,9 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
                     $this->html_safe($folder).'</a></li>';
             }
         }
-        Hm_Page_Cache::add('feeds_folders', $res, true);
+        if ($res) {
+            $this->append('folder_sources', array('feeds_folders', $res));
+        }
         return '';
     }
 }

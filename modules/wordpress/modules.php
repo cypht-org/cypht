@@ -252,8 +252,7 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
             $res .= '<li class="menu_wp_freshly_pressed"><a class="unread_link" href="?page=message_list&list_path=wp_freshly_pressed">'.
                 '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
                 '" alt="" width="16" height="16" /> '.$this->trans('Freshly Pressed').'</a></li>';
-            $this->append('folder_sources', 'wordPress_folders');
-            Hm_Page_Cache::add('wordPress_folders', $res, true);
+            $this->append('folder_sources', array('wordPress_folders', $res));
         }
         return '';
     }
