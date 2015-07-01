@@ -605,7 +605,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_run_output_modules">#</a>
-		<code><a href="source-class-Hm_Output_Module_Exec.html#14-41" title="Go to source code">run_output_modules</a>( <span>object <var>$request</var></span>, <span>object <var>$session</var></span>, <span> <var>$page</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module_Exec.html#14-41" title="Go to source code">run_output_modules</a>( <span>object <var>$request</var></span>, <span>boolean <var>$active_session</var></span>, <span> <var>$page</var></span> )</code>
 
 		<div class="description short">
 			<p>Run all the handler modules for a page and merge the results</p>
@@ -619,8 +619,8 @@
 				<div class="list"><dl>
 					<dt><var>$request</var></dt>
 					<dd>details about the request</dd>
-					<dt><var>$session</var></dt>
-					<dd>session interface</dd>
+					<dt><var>$active_session</var></dt>
+					<dd>true if the session is active</dd>
 					<dt><var>$page</var></dt>
 					<dd></dd>
 				</dl></div>
@@ -644,7 +644,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_run_output_module">#</a>
-		<code><a href="source-class-Hm_Output_Module_Exec.html#43-77" title="Go to source code">run_output_module</a>( <span>array <var>$input</var></span>, <span>array <var>$protected</var></span>, <span>string <var>$name</var></span>, <span>array <var>$args</var></span>, <span>object <var>$session</var></span>, <span>string <var>$format</var></span>, <span>array <var>$lang_str</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module_Exec.html#43-77" title="Go to source code">run_output_module</a>( <span>array <var>$input</var></span>, <span>array <var>$protected</var></span>, <span>string <var>$name</var></span>, <span>array <var>$args</var></span>, <span>boolean <var>$active_session</var></span>, <span>string <var>$format</var></span>, <span>array <var>$lang_str</var></span> )</code>
 
 		<div class="description short">
 			<p>Run a single output modules and return the results</p>
@@ -664,8 +664,8 @@
 					<dd>handler module name</dd>
 					<dt><var>$args</var></dt>
 					<dd>module arguments</dd>
-					<dt><var>$session</var></dt>
-					<dd>session interface</dd>
+					<dt><var>$active_session</var></dt>
+					<dd>true if the session is active</dd>
 					<dt><var>$format</var></dt>
 					<dd>HTML5 or JSON format</dd>
 					<dt><var>$lang_str</var></dt>

@@ -786,6 +786,7 @@
 				<li><a href="class-Hm_Output_notfound_content.html">Hm_Output_notfound_content</a></li>
 				<li><a href="class-Hm_Output_nux_dev_news.html">Hm_Output_nux_dev_news</a></li>
 				<li><a href="class-Hm_Output_nux_help.html">Hm_Output_nux_help</a></li>
+				<li><a href="class-Hm_Output_nux_message_list_notice.html">Hm_Output_nux_message_list_notice</a></li>
 				<li><a href="class-Hm_Output_page_js.html">Hm_Output_page_js</a></li>
 				<li><a href="class-Hm_Output_pop3_limit_setting.html">Hm_Output_pop3_limit_setting</a></li>
 				<li><a href="class-Hm_Output_pop3_server_ids.html">Hm_Output_pop3_server_ids</a></li>
@@ -913,6 +914,7 @@
 				<li><a href="function-list_sources.html">list_sources</a></li>
 				<li><a href="function-load_user_config_object.html">load_user_config_object</a></li>
 				<li><a href="function-max_source_setting_callback.html">max_source_setting_callback</a></li>
+				<li><a href="function-merge_folder_list_details.html">merge_folder_list_details</a></li>
 				<li><a href="function-merge_imap_search_results.html">merge_imap_search_results</a></li>
 				<li><a href="function-message_controls.html">message_controls</a></li>
 				<li><a href="function-message_list_meta.html">message_list_meta</a></li>
@@ -1403,8 +1405,8 @@
 </span><span id="397" class="l"><a href="#397">397: </a>
 </span><span id="398" class="l"><a href="#398">398: </a><span class="php-comment">/**
 </span></span><span id="399" class="l"><a href="#399">399: </a><span class="php-comment"> * Setup commonly used modules for a page
-</span></span><span id="400" class="l"><a href="#400">400: </a><span class="php-comment"> * @param $name string the page id
-</span></span><span id="401" class="l"><a href="#401">401: </a><span class="php-comment"> * @param $source string the module set name
+</span></span><span id="400" class="l"><a href="#400">400: </a><span class="php-comment"> * @param string $name the page id
+</span></span><span id="401" class="l"><a href="#401">401: </a><span class="php-comment"> * @param string $source the module set name
 </span></span><span id="402" class="l"><a href="#402">402: </a><span class="php-comment"> * @return void
 </span></span><span id="403" class="l"><a href="#403">403: </a><span class="php-comment"> */</span>
 </span><span id="404" class="l"><a href="#404">404: </a><span class="php-keyword1">function</span> setup_base_page(<span class="php-var">$name</span>, <span class="php-var">$source</span>=<span class="php-keyword1">false</span>) {
@@ -1440,7 +1442,25 @@
 </span><span id="434" class="l"><a href="#434">434: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_end'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
 </span><span id="435" class="l"><a href="#435">435: </a>}
 </span><span id="436" class="l"><a href="#436">436: </a>
-</span><span id="437" class="l"><a href="#437">437: </a></span></code></pre>
+</span><span id="437" class="l"><a href="#437">437: </a><span class="php-comment">/**
+</span></span><span id="438" class="l"><a href="#438">438: </a><span class="php-comment"> * Merge array details for folder sources
+</span></span><span id="439" class="l"><a href="#439">439: </a><span class="php-comment"> * @param array $folder_sources list of folder list entries
+</span></span><span id="440" class="l"><a href="#440">440: </a><span class="php-comment"> * @return array
+</span></span><span id="441" class="l"><a href="#441">441: </a><span class="php-comment"> */</span>
+</span><span id="442" class="l"><a href="#442">442: </a><span class="php-keyword1">function</span> merge_folder_list_details(<span class="php-var">$folder_sources</span>) {
+</span><span id="443" class="l"><a href="#443">443: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="444" class="l"><a href="#444">444: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$folder_sources</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="445" class="l"><a href="#445">445: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$vals</span>[<span class="php-num">0</span>], <span class="php-var">$res</span>)) {
+</span><span id="446" class="l"><a href="#446">446: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] .= <span class="php-var">$vals</span>[<span class="php-num">1</span>];
+</span><span id="447" class="l"><a href="#447">447: </a>        }
+</span><span id="448" class="l"><a href="#448">448: </a>        <span class="php-keyword1">else</span> {
+</span><span id="449" class="l"><a href="#449">449: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] = <span class="php-var">$vals</span>[<span class="php-num">1</span>];
+</span><span id="450" class="l"><a href="#450">450: </a>        }
+</span><span id="451" class="l"><a href="#451">451: </a>    }
+</span><span id="452" class="l"><a href="#452">452: </a>    <span class="php-keyword2">ksort</span>(<span class="php-var">$res</span>);
+</span><span id="453" class="l"><a href="#453">453: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="454" class="l"><a href="#454">454: </a>}
+</span><span id="455" class="l"><a href="#455">455: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1448,6 +1468,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?341a24b610ee59935e2a39085b09917a67158213"></script>
+<script src="elementlist.js?94f15b106ae140663171c7f0961b4706e48684ec"></script>
 </body>
 </html>

@@ -786,6 +786,7 @@
 				<li><a href="class-Hm_Output_notfound_content.html">Hm_Output_notfound_content</a></li>
 				<li><a href="class-Hm_Output_nux_dev_news.html">Hm_Output_nux_dev_news</a></li>
 				<li><a href="class-Hm_Output_nux_help.html">Hm_Output_nux_help</a></li>
+				<li><a href="class-Hm_Output_nux_message_list_notice.html">Hm_Output_nux_message_list_notice</a></li>
 				<li><a href="class-Hm_Output_page_js.html">Hm_Output_page_js</a></li>
 				<li><a href="class-Hm_Output_pop3_limit_setting.html">Hm_Output_pop3_limit_setting</a></li>
 				<li><a href="class-Hm_Output_pop3_server_ids.html">Hm_Output_pop3_server_ids</a></li>
@@ -913,6 +914,7 @@
 				<li><a href="function-list_sources.html">list_sources</a></li>
 				<li><a href="function-load_user_config_object.html">load_user_config_object</a></li>
 				<li><a href="function-max_source_setting_callback.html">max_source_setting_callback</a></li>
+				<li><a href="function-merge_folder_list_details.html">merge_folder_list_details</a></li>
 				<li><a href="function-merge_imap_search_results.html">merge_imap_search_results</a></li>
 				<li><a href="function-message_controls.html">message_controls</a></li>
 				<li><a href="function-message_list_meta.html">message_list_meta</a></li>
@@ -1226,312 +1228,310 @@
 </span><span id="220" class="l"><a href="#220">220: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'reload_folders'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">false</span>);
 </span><span id="221" class="l"><a href="#221">221: </a>            <span class="php-var">$this</span>-&gt;session-&gt;record_unsaved(<span class="php-quote">'WordPress connection deleted'</span>);
 </span><span id="222" class="l"><a href="#222">222: </a>            Hm_Msgs::add(<span class="php-quote">'Wordpress connection deleted'</span>);
-</span><span id="223" class="l"><a href="#223">223: </a>            Hm_Page_Cache::<span class="php-keyword2">flush</span>(<span class="php-var">$this</span>-&gt;session);
-</span><span id="224" class="l"><a href="#224">224: </a>        }
-</span><span id="225" class="l"><a href="#225">225: </a>    }
-</span><span id="226" class="l"><a href="#226">226: </a>}
-</span><span id="227" class="l"><a href="#227">227: </a>
-</span><span id="228" class="l"><a href="#228">228: </a><span class="php-comment">/**
-</span></span><span id="229" class="l"><a href="#229">229: </a><span class="php-comment"> * @subpackage wordpress/handler
-</span></span><span id="230" class="l"><a href="#230">230: </a><span class="php-comment"> */</span>
-</span><span id="231" class="l"><a href="#231">231: </a><span class="php-keyword1">class</span> Hm_Handler_setup_wordpress_connect <span class="php-keyword1">extends</span> Hm_Handler_Module {
-</span><span id="232" class="l"><a href="#232">232: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="233" class="l"><a href="#233">233: </a>        <span class="php-var">$details</span> = wp_connect_details(<span class="php-var">$this</span>-&gt;config);
-</span><span id="234" class="l"><a href="#234">234: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
-</span><span id="235" class="l"><a href="#235">235: </a>            <span class="php-var">$oauth2</span> = <span class="php-keyword1">new</span> Hm_Oauth2(<span class="php-var">$details</span>[<span class="php-quote">'client_id'</span>], <span class="php-var">$details</span>[<span class="php-quote">'client_secret'</span>], <span class="php-var">$details</span>[<span class="php-quote">'redirect_uri'</span>]);
-</span><span id="236" class="l"><a href="#236">236: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'wp_auth_url'</span>, <span class="php-var">$oauth2</span>-&gt;request_authorization_url(<span class="php-var">$details</span>[<span class="php-quote">'auth_url'</span>], <span class="php-quote">'global'</span>, <span class="php-quote">'wp_authorization'</span>));
-</span><span id="237" class="l"><a href="#237">237: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'wp_connect_details'</span>, <span class="php-var">$this</span>-&gt;user_config-&gt;get(<span class="php-quote">'wp_connect_details'</span>, <span class="php-keyword1">array</span>()));
-</span><span id="238" class="l"><a href="#238">238: </a>        }
-</span><span id="239" class="l"><a href="#239">239: </a>    }
-</span><span id="240" class="l"><a href="#240">240: </a>}
-</span><span id="241" class="l"><a href="#241">241: </a>
-</span><span id="242" class="l"><a href="#242">242: </a><span class="php-comment">/**
-</span></span><span id="243" class="l"><a href="#243">243: </a><span class="php-comment"> * @subpackage wordpress/output
-</span></span><span id="244" class="l"><a href="#244">244: </a><span class="php-comment"> */</span>
-</span><span id="245" class="l"><a href="#245">245: </a><span class="php-keyword1">class</span> Hm_Output_wordpress_folders <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="246" class="l"><a href="#246">246: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="247" class="l"><a href="#247">247: </a>        <span class="php-var">$details</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_connect_details'</span>, <span class="php-keyword1">array</span>());
-</span><span id="248" class="l"><a href="#248">248: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
-</span><span id="249" class="l"><a href="#249">249: </a>            <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_wp_notifications&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;list_path=wp_notifications&quot;&gt;'</span>.
-</span><span id="250" class="l"><a href="#250">250: </a>                <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$env_closed</span>).
-</span><span id="251" class="l"><a href="#251">251: </a>                <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Notifications'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="252" class="l"><a href="#252">252: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_wp_freshly_pressed&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;list_path=wp_freshly_pressed&quot;&gt;'</span>.
-</span><span id="253" class="l"><a href="#253">253: </a>                <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$env_closed</span>).
-</span><span id="254" class="l"><a href="#254">254: </a>                <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Freshly Pressed'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="255" class="l"><a href="#255">255: </a>            <span class="php-var">$this</span>-&gt;append(<span class="php-quote">'folder_sources'</span>, <span class="php-quote">'wordPress_folders'</span>);
-</span><span id="256" class="l"><a href="#256">256: </a>            Hm_Page_Cache::add(<span class="php-quote">'wordPress_folders'</span>, <span class="php-var">$res</span>, <span class="php-keyword1">true</span>);
-</span><span id="257" class="l"><a href="#257">257: </a>        }
-</span><span id="258" class="l"><a href="#258">258: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
-</span><span id="259" class="l"><a href="#259">259: </a>    }
-</span><span id="260" class="l"><a href="#260">260: </a>}
-</span><span id="261" class="l"><a href="#261">261: </a>
-</span><span id="262" class="l"><a href="#262">262: </a><span class="php-comment">/**
-</span></span><span id="263" class="l"><a href="#263">263: </a><span class="php-comment"> * @subpackage wordpress/output
-</span></span><span id="264" class="l"><a href="#264">264: </a><span class="php-comment"> */</span>
-</span><span id="265" class="l"><a href="#265">265: </a><span class="php-keyword1">class</span> Hm_Output_filter_wp_notice_data <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="266" class="l"><a href="#266">266: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="267" class="l"><a href="#267">267: </a>        <span class="php-var">$data</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_notice_details'</span>, <span class="php-keyword1">array</span>());
-</span><span id="268" class="l"><a href="#268">268: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$data</span>[<span class="php-quote">'notes'</span>][<span class="php-num">0</span>][<span class="php-quote">'id'</span>])) {
-</span><span id="269" class="l"><a href="#269">269: </a>            <span class="php-var">$data</span> = <span class="php-var">$data</span>[<span class="php-quote">'notes'</span>][<span class="php-num">0</span>];
-</span><span id="270" class="l"><a href="#270">270: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'wp_notice_text'</span>, wp_build_notice_text(<span class="php-var">$data</span>[<span class="php-quote">'type'</span>], <span class="php-var">$data</span>[<span class="php-quote">'body'</span>]));
-</span><span id="271" class="l"><a href="#271">271: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'wp_notice_headers'</span>, wp_build_notice_headers(<span class="php-var">$data</span>, <span class="php-var">$this</span>));
-</span><span id="272" class="l"><a href="#272">272: </a>        }
-</span><span id="273" class="l"><a href="#273">273: </a>    }
-</span><span id="274" class="l"><a href="#274">274: </a>}
-</span><span id="275" class="l"><a href="#275">275: </a>
-</span><span id="276" class="l"><a href="#276">276: </a><span class="php-comment">/**
-</span></span><span id="277" class="l"><a href="#277">277: </a><span class="php-comment"> * @subpackage wordpress/output
-</span></span><span id="278" class="l"><a href="#278">278: </a><span class="php-comment"> */</span>
-</span><span id="279" class="l"><a href="#279">279: </a><span class="php-keyword1">class</span> Hm_Output_filter_wp_freshly_pressed_data <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="280" class="l"><a href="#280">280: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="281" class="l"><a href="#281">281: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
-</span><span id="282" class="l"><a href="#282">282: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_freshly_pressed_data'</span>) <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
-</span><span id="283" class="l"><a href="#283">283: </a>            <span class="php-var">$id</span> = <span class="php-quote">'wordpress_'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'ID'</span>].<span class="php-quote">'_'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'site_ID'</span>];
-</span><span id="284" class="l"><a href="#284">284: </a>            <span class="php-var">$url</span> = <span class="php-quote">'?page=message&amp;list_path=wp_freshly_pressed&amp;uid='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>);
-</span><span id="285" class="l"><a href="#285">285: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>)) {
-</span><span id="286" class="l"><a href="#286">286: </a>                <span class="php-var">$url</span> .= <span class="php-quote">'&amp;list_parent='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>));
-</span><span id="287" class="l"><a href="#287">287: </a>            }
-</span><span id="288" class="l"><a href="#288">288: </a>            <span class="php-var">$style</span> = <span class="php-quote">'email'</span>;
-</span><span id="289" class="l"><a href="#289">289: </a>            <span class="php-var">$style</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'news_list_style'</span>) ? <span class="php-quote">'news'</span> : <span class="php-quote">'email'</span>;
-</span><span id="290" class="l"><a href="#290">290: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_mobile'</span>)) {
-</span><span id="291" class="l"><a href="#291">291: </a>                <span class="php-var">$style</span> = <span class="php-quote">'news'</span>;
-</span><span id="292" class="l"><a href="#292">292: </a>            }
-</span><span id="293" class="l"><a href="#293">293: </a>            <span class="php-var">$subject</span> = <span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$vals</span>[<span class="php-quote">'title'</span>]);
-</span><span id="294" class="l"><a href="#294">294: </a>            <span class="php-var">$from</span> = <span class="php-var">$vals</span>[<span class="php-quote">'author'</span>][<span class="php-quote">'name'</span>];
-</span><span id="295" class="l"><a href="#295">295: </a>            <span class="php-var">$ts</span> = <span class="php-keyword2">strtotime</span>(<span class="php-var">$vals</span>[<span class="php-quote">'date'</span>]);
-</span><span id="296" class="l"><a href="#296">296: </a>            <span class="php-var">$date</span> = <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$ts</span>);
-</span><span id="297" class="l"><a href="#297">297: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
-</span><span id="298" class="l"><a href="#298">298: </a>                <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
-</span><span id="299" class="l"><a href="#299">299: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
-</span><span id="300" class="l"><a href="#300">300: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-keyword1">array</span>()),
-</span><span id="301" class="l"><a href="#301">301: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-keyword1">array</span>()),
-</span><span id="302" class="l"><a href="#302">302: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-quote">'WordPress'</span>),
-</span><span id="303" class="l"><a href="#303">303: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
-</span><span id="304" class="l"><a href="#304">304: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, human_readable_interval(<span class="php-var">$date</span>), <span class="php-var">$ts</span>),
-</span><span id="305" class="l"><a href="#305">305: </a>                    ),
-</span><span id="306" class="l"><a href="#306">306: </a>                    <span class="php-var">$id</span>,
-</span><span id="307" class="l"><a href="#307">307: </a>                    <span class="php-var">$style</span>,
-</span><span id="308" class="l"><a href="#308">308: </a>                    <span class="php-var">$this</span>
-</span><span id="309" class="l"><a href="#309">309: </a>                );
-</span><span id="310" class="l"><a href="#310">310: </a>            }
-</span><span id="311" class="l"><a href="#311">311: </a>            <span class="php-keyword1">else</span> {
-</span><span id="312" class="l"><a href="#312">312: </a>                <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
-</span><span id="313" class="l"><a href="#313">313: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
-</span><span id="314" class="l"><a href="#314">314: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-quote">'WordPress'</span>),
-</span><span id="315" class="l"><a href="#315">315: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
-</span><span id="316" class="l"><a href="#316">316: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-keyword1">array</span>()),
-</span><span id="317" class="l"><a href="#317">317: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, human_readable_interval(<span class="php-var">$date</span>), <span class="php-var">$ts</span>),
-</span><span id="318" class="l"><a href="#318">318: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-keyword1">array</span>())
-</span><span id="319" class="l"><a href="#319">319: </a>                    ),
-</span><span id="320" class="l"><a href="#320">320: </a>                    <span class="php-var">$id</span>,
-</span><span id="321" class="l"><a href="#321">321: </a>                    <span class="php-var">$style</span>,
-</span><span id="322" class="l"><a href="#322">322: </a>                    <span class="php-var">$this</span>
-</span><span id="323" class="l"><a href="#323">323: </a>                );
-</span><span id="324" class="l"><a href="#324">324: </a>            }
-</span><span id="325" class="l"><a href="#325">325: </a>        }
-</span><span id="326" class="l"><a href="#326">326: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'formatted_message_list'</span>, <span class="php-var">$res</span>);
-</span><span id="327" class="l"><a href="#327">327: </a>    }
-</span><span id="328" class="l"><a href="#328">328: </a>}
-</span><span id="329" class="l"><a href="#329">329: </a>
-</span><span id="330" class="l"><a href="#330">330: </a><span class="php-comment">/**
-</span></span><span id="331" class="l"><a href="#331">331: </a><span class="php-comment"> * @subpackage wordpress/output
-</span></span><span id="332" class="l"><a href="#332">332: </a><span class="php-comment"> */</span>
-</span><span id="333" class="l"><a href="#333">333: </a><span class="php-keyword1">class</span> Hm_Output_filter_wp_notification_data <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="334" class="l"><a href="#334">334: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="335" class="l"><a href="#335">335: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
-</span><span id="336" class="l"><a href="#336">336: </a>        <span class="php-var">$unread_only</span> = <span class="php-keyword1">false</span>;
-</span><span id="337" class="l"><a href="#337">337: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>, <span class="php-quote">''</span>) == <span class="php-quote">'unread'</span>) {
-</span><span id="338" class="l"><a href="#338">338: </a>            <span class="php-var">$unread_only</span> = <span class="php-keyword1">true</span>;
-</span><span id="339" class="l"><a href="#339">339: </a>        }
-</span><span id="340" class="l"><a href="#340">340: </a>        <span class="php-var">$cutoff</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_list_since'</span>, <span class="php-quote">''</span>);
-</span><span id="341" class="l"><a href="#341">341: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$cutoff</span>) {
-</span><span id="342" class="l"><a href="#342">342: </a>            <span class="php-var">$cutoff</span> = <span class="php-keyword2">strtotime</span>(<span class="php-var">$cutoff</span>);
-</span><span id="343" class="l"><a href="#343">343: </a>        }
-</span><span id="344" class="l"><a href="#344">344: </a>        <span class="php-keyword1">else</span> {
-</span><span id="345" class="l"><a href="#345">345: </a>            <span class="php-var">$cutoff</span> = <span class="php-num">0</span>;
-</span><span id="346" class="l"><a href="#346">346: </a>        }
-</span><span id="347" class="l"><a href="#347">347: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_notice_data'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
-</span><span id="348" class="l"><a href="#348">348: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'id'</span>, <span class="php-var">$vals</span>)) {
-</span><span id="349" class="l"><a href="#349">349: </a>                <span class="php-var">$id</span> = <span class="php-quote">'wordpress_0_'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'id'</span>];
-</span><span id="350" class="l"><a href="#350">350: </a>                <span class="php-var">$url</span> = <span class="php-quote">'?page=message&amp;list_path=wp_notifications&amp;uid='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>);;
-</span><span id="351" class="l"><a href="#351">351: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>)) {
-</span><span id="352" class="l"><a href="#352">352: </a>                    <span class="php-var">$url</span> .= <span class="php-quote">'&amp;list_parent='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>));
-</span><span id="353" class="l"><a href="#353">353: </a>                }
-</span><span id="354" class="l"><a href="#354">354: </a>                <span class="php-var">$style</span> = <span class="php-quote">'email'</span>;
-</span><span id="355" class="l"><a href="#355">355: </a>                <span class="php-var">$style</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'news_list_style'</span>) ? <span class="php-quote">'news'</span> : <span class="php-quote">'email'</span>;
-</span><span id="356" class="l"><a href="#356">356: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_mobile'</span>)) {
-</span><span id="357" class="l"><a href="#357">357: </a>                    <span class="php-var">$style</span> = <span class="php-quote">'news'</span>;
-</span><span id="358" class="l"><a href="#358">358: </a>                }
-</span><span id="359" class="l"><a href="#359">359: </a>                <span class="php-var">$subject</span> = <span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$vals</span>[<span class="php-quote">'subject'</span>][<span class="php-quote">'text'</span>]);
-</span><span id="360" class="l"><a href="#360">360: </a>                <span class="php-var">$from</span> = <span class="php-keyword2">ucfirst</span>(<span class="php-keyword2">str_replace</span>(<span class="php-quote">'_'</span>, <span class="php-quote">' '</span>, <span class="php-var">$vals</span>[<span class="php-quote">'type'</span>]));
-</span><span id="361" class="l"><a href="#361">361: </a>                <span class="php-var">$ts</span> = <span class="php-var">$vals</span>[<span class="php-quote">'timestamp'</span>];
-</span><span id="362" class="l"><a href="#362">362: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$ts</span> &lt; <span class="php-var">$cutoff</span>) {
-</span><span id="363" class="l"><a href="#363">363: </a>                    <span class="php-keyword1">continue</span>;
-</span><span id="364" class="l"><a href="#364">364: </a>                }
-</span><span id="365" class="l"><a href="#365">365: </a>                <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
-</span><span id="366" class="l"><a href="#366">366: </a>                <span class="php-keyword1">if</span> ((int) <span class="php-var">$vals</span>[<span class="php-quote">'unread'</span>] &gt; <span class="php-num">0</span>) {
-</span><span id="367" class="l"><a href="#367">367: </a>                    <span class="php-var">$flags</span>[] = <span class="php-quote">'unseen'</span>;
-</span><span id="368" class="l"><a href="#368">368: </a>                }
-</span><span id="369" class="l"><a href="#369">369: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$unread_only</span> &amp;&amp; !<span class="php-keyword2">in_array</span>(<span class="php-quote">'unseen'</span>, <span class="php-var">$flags</span>, <span class="php-keyword1">true</span>)) {
-</span><span id="370" class="l"><a href="#370">370: </a>                    <span class="php-keyword1">continue</span>;
-</span><span id="371" class="l"><a href="#371">371: </a>                }
-</span><span id="372" class="l"><a href="#372">372: </a>                <span class="php-var">$date</span> = <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$ts</span>);
-</span><span id="373" class="l"><a href="#373">373: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
-</span><span id="374" class="l"><a href="#374">374: </a>                    <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
-</span><span id="375" class="l"><a href="#375">375: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
-</span><span id="376" class="l"><a href="#376">376: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>),
-</span><span id="377" class="l"><a href="#377">377: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
-</span><span id="378" class="l"><a href="#378">378: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-quote">'WordPress'</span>),
-</span><span id="379" class="l"><a href="#379">379: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
-</span><span id="380" class="l"><a href="#380">380: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, human_readable_interval(<span class="php-var">$date</span>), <span class="php-var">$ts</span>),
-</span><span id="381" class="l"><a href="#381">381: </a>                        ),
-</span><span id="382" class="l"><a href="#382">382: </a>                        <span class="php-var">$id</span>,
-</span><span id="383" class="l"><a href="#383">383: </a>                        <span class="php-var">$style</span>,
-</span><span id="384" class="l"><a href="#384">384: </a>                        <span class="php-var">$this</span>
-</span><span id="385" class="l"><a href="#385">385: </a>                    );
-</span><span id="386" class="l"><a href="#386">386: </a>                }
-</span><span id="387" class="l"><a href="#387">387: </a>                <span class="php-keyword1">else</span> {
-</span><span id="388" class="l"><a href="#388">388: </a>                    <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
-</span><span id="389" class="l"><a href="#389">389: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
-</span><span id="390" class="l"><a href="#390">390: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-quote">'WordPress'</span>),
-</span><span id="391" class="l"><a href="#391">391: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
-</span><span id="392" class="l"><a href="#392">392: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
-</span><span id="393" class="l"><a href="#393">393: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, human_readable_interval(<span class="php-var">$date</span>), <span class="php-var">$ts</span>),
-</span><span id="394" class="l"><a href="#394">394: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>)
-</span><span id="395" class="l"><a href="#395">395: </a>                        ),
-</span><span id="396" class="l"><a href="#396">396: </a>                        <span class="php-var">$id</span>,
-</span><span id="397" class="l"><a href="#397">397: </a>                        <span class="php-var">$style</span>,
-</span><span id="398" class="l"><a href="#398">398: </a>                        <span class="php-var">$this</span>
-</span><span id="399" class="l"><a href="#399">399: </a>                    );
-</span><span id="400" class="l"><a href="#400">400: </a>                }
-</span><span id="401" class="l"><a href="#401">401: </a>            }
-</span><span id="402" class="l"><a href="#402">402: </a>        }
-</span><span id="403" class="l"><a href="#403">403: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'formatted_message_list'</span>, <span class="php-var">$res</span>);
-</span><span id="404" class="l"><a href="#404">404: </a>    }
-</span><span id="405" class="l"><a href="#405">405: </a>}
-</span><span id="406" class="l"><a href="#406">406: </a>
-</span><span id="407" class="l"><a href="#407">407: </a><span class="php-comment">/**
-</span></span><span id="408" class="l"><a href="#408">408: </a><span class="php-comment"> * @subpackage wordpress/output
-</span></span><span id="409" class="l"><a href="#409">409: </a><span class="php-comment"> */</span>
-</span><span id="410" class="l"><a href="#410">410: </a><span class="php-keyword1">class</span> Hm_Output_wordpress_connect_section <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="411" class="l"><a href="#411">411: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="412" class="l"><a href="#412">412: </a>        <span class="php-var">$details</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_connect_details'</span>, <span class="php-keyword1">array</span>());
-</span><span id="413" class="l"><a href="#413">413: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;wordpress_connect&quot;&gt;&lt;div data-target=&quot;.wordpress_connect_section&quot; class=&quot;server_section&quot;&gt;'</span>.
-</span><span id="414" class="l"><a href="#414">414: </a>            <span class="php-quote">'&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$key</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.
-</span><span id="415" class="l"><a href="#415">415: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'WordPress.com Connect'</span>).<span class="php-quote">'&lt;/div&gt;&lt;div class=&quot;wordpress_connect_section&quot;&gt;'</span>;
-</span><span id="416" class="l"><a href="#416">416: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
-</span><span id="417" class="l"><a href="#417">417: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'Connect to WordPress.com to view notifications and posts.&lt;br /&gt;&lt;br /&gt;'</span>;
-</span><span id="418" class="l"><a href="#418">418: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;'</span>.<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_auth_url'</span>, <span class="php-quote">''</span>).<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Enable'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
-</span><span id="419" class="l"><a href="#419">419: </a>        }
-</span><span id="420" class="l"><a href="#420">420: </a>        <span class="php-keyword1">else</span> {
-</span><span id="421" class="l"><a href="#421">421: </a>            <span class="php-var">$res</span> .= <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Already connected'</span>);
-</span><span id="422" class="l"><a href="#422">422: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;br /&gt;&lt;form method=&quot;POST&quot;&gt;'</span>;
-</span><span id="423" class="l"><a href="#423">423: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>;
-</span><span id="424" class="l"><a href="#424">424: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; name=&quot;wp_disconnect&quot; class=&quot;wp_disconnect&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Disconnect'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
-</span><span id="425" class="l"><a href="#425">425: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
-</span><span id="426" class="l"><a href="#426">426: </a>        }
-</span><span id="427" class="l"><a href="#427">427: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="428" class="l"><a href="#428">428: </a>    }
-</span><span id="429" class="l"><a href="#429">429: </a>}
-</span><span id="430" class="l"><a href="#430">430: </a>
-</span><span id="431" class="l"><a href="#431">431: </a><span class="php-comment">/**
-</span></span><span id="432" class="l"><a href="#432">432: </a><span class="php-comment"> * @subpackage wordpress/functions
-</span></span><span id="433" class="l"><a href="#433">433: </a><span class="php-comment"> */</span>
-</span><span id="434" class="l"><a href="#434">434: </a><span class="php-keyword1">function</span> wp_connect_details(<span class="php-var">$config</span>) {
-</span><span id="435" class="l"><a href="#435">435: </a>    <span class="php-var">$details</span> = <span class="php-keyword1">array</span>();
-</span><span id="436" class="l"><a href="#436">436: </a>    <span class="php-var">$ini_file</span> = <span class="php-keyword2">rtrim</span>(<span class="php-var">$config</span>-&gt;get(<span class="php-quote">'app_data_dir'</span>, <span class="php-quote">''</span>), <span class="php-quote">'/'</span>).<span class="php-quote">'/wordpress.ini'</span>;
-</span><span id="437" class="l"><a href="#437">437: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">is_readable</span>(<span class="php-var">$ini_file</span>)) {
-</span><span id="438" class="l"><a href="#438">438: </a>        <span class="php-var">$settings</span> = <span class="php-keyword2">parse_ini_file</span>(<span class="php-var">$ini_file</span>);
-</span><span id="439" class="l"><a href="#439">439: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$settings</span>)) {
-</span><span id="440" class="l"><a href="#440">440: </a>            <span class="php-var">$details</span> = <span class="php-var">$settings</span>;
-</span><span id="441" class="l"><a href="#441">441: </a>        }
-</span><span id="442" class="l"><a href="#442">442: </a>    }
-</span><span id="443" class="l"><a href="#443">443: </a>    <span class="php-keyword1">return</span> <span class="php-var">$details</span>;
-</span><span id="444" class="l"><a href="#444">444: </a>}
-</span><span id="445" class="l"><a href="#445">445: </a>
-</span><span id="446" class="l"><a href="#446">446: </a><span class="php-comment">/**
-</span></span><span id="447" class="l"><a href="#447">447: </a><span class="php-comment"> * @subpackage wordpress/functions
-</span></span><span id="448" class="l"><a href="#448">448: </a><span class="php-comment"> */</span>
-</span><span id="449" class="l"><a href="#449">449: </a><span class="php-keyword1">function</span> wp_build_notice_headers(<span class="php-var">$data</span>, <span class="php-var">$output_mod</span>) {
-</span><span id="450" class="l"><a href="#450">450: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;table class=&quot;msg_headers&quot;&gt;'</span>.
-</span><span id="451" class="l"><a href="#451">451: </a>        <span class="php-quote">'&lt;col class=&quot;header_name_col&quot;&gt;&lt;col class=&quot;header_val_col&quot;&gt;&lt;/colgroup&gt;'</span>.
-</span><span id="452" class="l"><a href="#452">452: </a>        <span class="php-quote">'&lt;tr class=&quot;header_subject&quot;&gt;&lt;th colspan=&quot;2&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$data</span>[<span class="php-quote">'subject'</span>][<span class="php-quote">'text'</span>])).
-</span><span id="453" class="l"><a href="#453">453: </a>        <span class="php-quote">'&lt;/th&gt;&lt;/tr&gt;'</span>.
-</span><span id="454" class="l"><a href="#454">454: </a>        <span class="php-quote">'&lt;tr class=&quot;header_date&quot;&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Date'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$data</span>[<span class="php-quote">'timestamp'</span>]).
-</span><span id="455" class="l"><a href="#455">455: </a>        <span class="php-quote">' ('</span>.human_readable_interval(<span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$data</span>[<span class="php-quote">'timestamp'</span>])).<span class="php-quote">')&lt;/td&gt;&lt;/tr&gt;'</span>.
-</span><span id="456" class="l"><a href="#456">456: </a>        <span class="php-quote">'&lt;tr class=&quot;header_type&quot;&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Type'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$data</span>[<span class="php-quote">'type'</span>].<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>.
-</span><span id="457" class="l"><a href="#457">457: </a>        <span class="php-quote">'&lt;tr class=&quot;header_cid&quot;&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Id'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$data</span>[<span class="php-quote">'id'</span>].<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;'</span>;
-</span><span id="458" class="l"><a href="#458">458: </a>}
-</span><span id="459" class="l"><a href="#459">459: </a>
-</span><span id="460" class="l"><a href="#460">460: </a><span class="php-comment">/**
-</span></span><span id="461" class="l"><a href="#461">461: </a><span class="php-comment"> * @subpackage wordpress/functions
-</span></span><span id="462" class="l"><a href="#462">462: </a><span class="php-comment"> */</span>
-</span><span id="463" class="l"><a href="#463">463: </a><span class="php-keyword1">function</span> wp_build_notice_text(<span class="php-var">$type</span>, <span class="php-var">$data</span>) {
-</span><span id="464" class="l"><a href="#464">464: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
-</span><span id="465" class="l"><a href="#465">465: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$type</span> == <span class="php-quote">'comment'</span>) {
-</span><span id="466" class="l"><a href="#466">466: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$data</span>[<span class="php-quote">'items'</span>] <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
-</span><span id="467" class="l"><a href="#467">467: </a>            <span class="php-var">$res</span>[] = <span class="php-var">$vals</span>[<span class="php-quote">'header_text'</span>].<span class="php-quote">'&lt;br /&gt;'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'html'</span>];
-</span><span id="468" class="l"><a href="#468">468: </a>        }
-</span><span id="469" class="l"><a href="#469">469: </a>    }
-</span><span id="470" class="l"><a href="#470">470: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;msg_text_inner&quot;&gt;'</span>.format_msg_html(<span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;div class=&quot;hr&quot;&gt;&lt;/div&gt;'</span>, <span class="php-var">$res</span>)).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="471" class="l"><a href="#471">471: </a>}
-</span><span id="472" class="l"><a href="#472">472: </a>
-</span><span id="473" class="l"><a href="#473">473: </a><span class="php-comment">/**
-</span></span><span id="474" class="l"><a href="#474">474: </a><span class="php-comment"> * @subpackage wordpress/functions
-</span></span><span id="475" class="l"><a href="#475">475: </a><span class="php-comment"> */</span>
-</span><span id="476" class="l"><a href="#476">476: </a><span class="php-keyword1">function</span> wp_get_notifications(<span class="php-var">$details</span>) {
-</span><span id="477" class="l"><a href="#477">477: </a>    <span class="php-var">$result</span> = <span class="php-keyword1">array</span>();
-</span><span id="478" class="l"><a href="#478">478: </a>    <span class="php-keyword1">return</span> wp_fetch_content(<span class="php-var">$details</span>, WPCOM_NOTICES_URL);
-</span><span id="479" class="l"><a href="#479">479: </a>}
-</span><span id="480" class="l"><a href="#480">480: </a>
-</span><span id="481" class="l"><a href="#481">481: </a><span class="php-comment">/**
-</span></span><span id="482" class="l"><a href="#482">482: </a><span class="php-comment"> * @subpackage wordpress/functions
-</span></span><span id="483" class="l"><a href="#483">483: </a><span class="php-comment"> */</span>
-</span><span id="484" class="l"><a href="#484">484: </a><span class="php-keyword1">function</span> wp_get_notice_detail(<span class="php-var">$details</span>, <span class="php-var">$uid</span>) {
-</span><span id="485" class="l"><a href="#485">485: </a>    <span class="php-var">$uid</span> = (int) <span class="php-var">$uid</span>;
-</span><span id="486" class="l"><a href="#486">486: </a>    <span class="php-keyword1">return</span> wp_fetch_content(<span class="php-var">$details</span>, WPCOM_NOTICE_URL.<span class="php-var">$uid</span>);
-</span><span id="487" class="l"><a href="#487">487: </a>}
-</span><span id="488" class="l"><a href="#488">488: </a>
-</span><span id="489" class="l"><a href="#489">489: </a><span class="php-comment">/**
-</span></span><span id="490" class="l"><a href="#490">490: </a><span class="php-comment"> * @subpackage wordpress/functions
-</span></span><span id="491" class="l"><a href="#491">491: </a><span class="php-comment"> */</span>
-</span><span id="492" class="l"><a href="#492">492: </a><span class="php-keyword1">function</span> wp_get_freshly_pressed(<span class="php-var">$details</span>) {
-</span><span id="493" class="l"><a href="#493">493: </a>    <span class="php-keyword1">return</span> wp_fetch_content(<span class="php-var">$details</span>, WPCOM_FP_URL);
-</span><span id="494" class="l"><a href="#494">494: </a>}
-</span><span id="495" class="l"><a href="#495">495: </a>
-</span><span id="496" class="l"><a href="#496">496: </a><span class="php-comment">/**
-</span></span><span id="497" class="l"><a href="#497">497: </a><span class="php-comment"> * @subpackage wordpress/functions
-</span></span><span id="498" class="l"><a href="#498">498: </a><span class="php-comment"> */</span>
-</span><span id="499" class="l"><a href="#499">499: </a><span class="php-keyword1">function</span> wp_fetch_content(<span class="php-var">$details</span>, <span class="php-var">$url</span>, <span class="php-var">$post</span>=<span class="php-keyword1">array</span>()) {
-</span><span id="500" class="l"><a href="#500">500: </a>    <span class="php-var">$result</span> = <span class="php-keyword1">array</span>();
-</span><span id="501" class="l"><a href="#501">501: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$details</span>) || <span class="php-keyword1">empty</span>(<span class="php-var">$details</span>) || !<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'access_token'</span>, <span class="php-var">$details</span>)) {
-</span><span id="502" class="l"><a href="#502">502: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
-</span><span id="503" class="l"><a href="#503">503: </a>    }
-</span><span id="504" class="l"><a href="#504">504: </a>    <span class="php-var">$headers</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'Authorization: Bearer '</span> . <span class="php-var">$details</span>[<span class="php-quote">'access_token'</span>]);
-</span><span id="505" class="l"><a href="#505">505: </a>    <span class="php-var">$ch</span> = <span class="php-keyword2">curl_init</span>();
-</span><span id="506" class="l"><a href="#506">506: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_URL, <span class="php-var">$url</span>);
-</span><span id="507" class="l"><a href="#507">507: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_HTTPHEADER, <span class="php-var">$headers</span>);
-</span><span id="508" class="l"><a href="#508">508: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="php-num">1</span>);
-</span><span id="509" class="l"><a href="#509">509: </a>
-</span><span id="510" class="l"><a href="#510">510: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$post</span>)) {
-</span><span id="511" class="l"><a href="#511">511: </a>        <span class="php-var">$post_tmp</span> = <span class="php-keyword1">array</span>();
-</span><span id="512" class="l"><a href="#512">512: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$post</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
-</span><span id="513" class="l"><a href="#513">513: </a>            <span class="php-var">$post_tmp</span>[] = <span class="php-keyword2">urlencode</span>(<span class="php-var">$name</span>).<span class="php-quote">'='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-var">$value</span>);
-</span><span id="514" class="l"><a href="#514">514: </a>        }
-</span><span id="515" class="l"><a href="#515">515: </a>        <span class="php-var">$post_str</span> = <span class="php-keyword2">implode</span>(<span class="php-quote">'&amp;'</span>, <span class="php-var">$post_tmp</span>);
-</span><span id="516" class="l"><a href="#516">516: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>,CURLOPT_POST, <span class="php-keyword2">count</span>(<span class="php-var">$post</span>));
-</span><span id="517" class="l"><a href="#517">517: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>,CURLOPT_POSTFIELDS, <span class="php-var">$post_str</span>);
-</span><span id="518" class="l"><a href="#518">518: </a>    }
-</span><span id="519" class="l"><a href="#519">519: </a>
-</span><span id="520" class="l"><a href="#520">520: </a>    <span class="php-var">$curl_result</span> = <span class="php-keyword2">curl_exec</span>(<span class="php-var">$ch</span>);
-</span><span id="521" class="l"><a href="#521">521: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">substr</span>(<span class="php-var">$curl_result</span>, <span class="php-num">0</span>, <span class="php-num">1</span>) == <span class="php-quote">'{'</span>) {
-</span><span id="522" class="l"><a href="#522">522: </a>        <span class="php-var">$result</span> = @<span class="php-keyword2">json_decode</span>(<span class="php-var">$curl_result</span>, <span class="php-keyword1">true</span>);
-</span><span id="523" class="l"><a href="#523">523: </a>    }
-</span><span id="524" class="l"><a href="#524">524: </a>    <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
-</span><span id="525" class="l"><a href="#525">525: </a>}
-</span><span id="526" class="l"><a href="#526">526: </a>
-</span><span id="527" class="l"><a href="#527">527: </a>
-</span><span id="528" class="l"><a href="#528">528: </a></span></code></pre>
+</span><span id="223" class="l"><a href="#223">223: </a>        }
+</span><span id="224" class="l"><a href="#224">224: </a>    }
+</span><span id="225" class="l"><a href="#225">225: </a>}
+</span><span id="226" class="l"><a href="#226">226: </a>
+</span><span id="227" class="l"><a href="#227">227: </a><span class="php-comment">/**
+</span></span><span id="228" class="l"><a href="#228">228: </a><span class="php-comment"> * @subpackage wordpress/handler
+</span></span><span id="229" class="l"><a href="#229">229: </a><span class="php-comment"> */</span>
+</span><span id="230" class="l"><a href="#230">230: </a><span class="php-keyword1">class</span> Hm_Handler_setup_wordpress_connect <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="231" class="l"><a href="#231">231: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
+</span><span id="232" class="l"><a href="#232">232: </a>        <span class="php-var">$details</span> = wp_connect_details(<span class="php-var">$this</span>-&gt;config);
+</span><span id="233" class="l"><a href="#233">233: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
+</span><span id="234" class="l"><a href="#234">234: </a>            <span class="php-var">$oauth2</span> = <span class="php-keyword1">new</span> Hm_Oauth2(<span class="php-var">$details</span>[<span class="php-quote">'client_id'</span>], <span class="php-var">$details</span>[<span class="php-quote">'client_secret'</span>], <span class="php-var">$details</span>[<span class="php-quote">'redirect_uri'</span>]);
+</span><span id="235" class="l"><a href="#235">235: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'wp_auth_url'</span>, <span class="php-var">$oauth2</span>-&gt;request_authorization_url(<span class="php-var">$details</span>[<span class="php-quote">'auth_url'</span>], <span class="php-quote">'global'</span>, <span class="php-quote">'wp_authorization'</span>));
+</span><span id="236" class="l"><a href="#236">236: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'wp_connect_details'</span>, <span class="php-var">$this</span>-&gt;user_config-&gt;get(<span class="php-quote">'wp_connect_details'</span>, <span class="php-keyword1">array</span>()));
+</span><span id="237" class="l"><a href="#237">237: </a>        }
+</span><span id="238" class="l"><a href="#238">238: </a>    }
+</span><span id="239" class="l"><a href="#239">239: </a>}
+</span><span id="240" class="l"><a href="#240">240: </a>
+</span><span id="241" class="l"><a href="#241">241: </a><span class="php-comment">/**
+</span></span><span id="242" class="l"><a href="#242">242: </a><span class="php-comment"> * @subpackage wordpress/output
+</span></span><span id="243" class="l"><a href="#243">243: </a><span class="php-comment"> */</span>
+</span><span id="244" class="l"><a href="#244">244: </a><span class="php-keyword1">class</span> Hm_Output_wordpress_folders <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="245" class="l"><a href="#245">245: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="246" class="l"><a href="#246">246: </a>        <span class="php-var">$details</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_connect_details'</span>, <span class="php-keyword1">array</span>());
+</span><span id="247" class="l"><a href="#247">247: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
+</span><span id="248" class="l"><a href="#248">248: </a>            <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_wp_notifications&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;list_path=wp_notifications&quot;&gt;'</span>.
+</span><span id="249" class="l"><a href="#249">249: </a>                <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$env_closed</span>).
+</span><span id="250" class="l"><a href="#250">250: </a>                <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Notifications'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="251" class="l"><a href="#251">251: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_wp_freshly_pressed&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;list_path=wp_freshly_pressed&quot;&gt;'</span>.
+</span><span id="252" class="l"><a href="#252">252: </a>                <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$env_closed</span>).
+</span><span id="253" class="l"><a href="#253">253: </a>                <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Freshly Pressed'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="254" class="l"><a href="#254">254: </a>            <span class="php-var">$this</span>-&gt;append(<span class="php-quote">'folder_sources'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'wordPress_folders'</span>, <span class="php-var">$res</span>));
+</span><span id="255" class="l"><a href="#255">255: </a>        }
+</span><span id="256" class="l"><a href="#256">256: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
+</span><span id="257" class="l"><a href="#257">257: </a>    }
+</span><span id="258" class="l"><a href="#258">258: </a>}
+</span><span id="259" class="l"><a href="#259">259: </a>
+</span><span id="260" class="l"><a href="#260">260: </a><span class="php-comment">/**
+</span></span><span id="261" class="l"><a href="#261">261: </a><span class="php-comment"> * @subpackage wordpress/output
+</span></span><span id="262" class="l"><a href="#262">262: </a><span class="php-comment"> */</span>
+</span><span id="263" class="l"><a href="#263">263: </a><span class="php-keyword1">class</span> Hm_Output_filter_wp_notice_data <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="264" class="l"><a href="#264">264: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="265" class="l"><a href="#265">265: </a>        <span class="php-var">$data</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_notice_details'</span>, <span class="php-keyword1">array</span>());
+</span><span id="266" class="l"><a href="#266">266: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$data</span>[<span class="php-quote">'notes'</span>][<span class="php-num">0</span>][<span class="php-quote">'id'</span>])) {
+</span><span id="267" class="l"><a href="#267">267: </a>            <span class="php-var">$data</span> = <span class="php-var">$data</span>[<span class="php-quote">'notes'</span>][<span class="php-num">0</span>];
+</span><span id="268" class="l"><a href="#268">268: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'wp_notice_text'</span>, wp_build_notice_text(<span class="php-var">$data</span>[<span class="php-quote">'type'</span>], <span class="php-var">$data</span>[<span class="php-quote">'body'</span>]));
+</span><span id="269" class="l"><a href="#269">269: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'wp_notice_headers'</span>, wp_build_notice_headers(<span class="php-var">$data</span>, <span class="php-var">$this</span>));
+</span><span id="270" class="l"><a href="#270">270: </a>        }
+</span><span id="271" class="l"><a href="#271">271: </a>    }
+</span><span id="272" class="l"><a href="#272">272: </a>}
+</span><span id="273" class="l"><a href="#273">273: </a>
+</span><span id="274" class="l"><a href="#274">274: </a><span class="php-comment">/**
+</span></span><span id="275" class="l"><a href="#275">275: </a><span class="php-comment"> * @subpackage wordpress/output
+</span></span><span id="276" class="l"><a href="#276">276: </a><span class="php-comment"> */</span>
+</span><span id="277" class="l"><a href="#277">277: </a><span class="php-keyword1">class</span> Hm_Output_filter_wp_freshly_pressed_data <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="278" class="l"><a href="#278">278: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="279" class="l"><a href="#279">279: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="280" class="l"><a href="#280">280: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_freshly_pressed_data'</span>) <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="281" class="l"><a href="#281">281: </a>            <span class="php-var">$id</span> = <span class="php-quote">'wordpress_'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'ID'</span>].<span class="php-quote">'_'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'site_ID'</span>];
+</span><span id="282" class="l"><a href="#282">282: </a>            <span class="php-var">$url</span> = <span class="php-quote">'?page=message&amp;list_path=wp_freshly_pressed&amp;uid='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>);
+</span><span id="283" class="l"><a href="#283">283: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>)) {
+</span><span id="284" class="l"><a href="#284">284: </a>                <span class="php-var">$url</span> .= <span class="php-quote">'&amp;list_parent='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>));
+</span><span id="285" class="l"><a href="#285">285: </a>            }
+</span><span id="286" class="l"><a href="#286">286: </a>            <span class="php-var">$style</span> = <span class="php-quote">'email'</span>;
+</span><span id="287" class="l"><a href="#287">287: </a>            <span class="php-var">$style</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'news_list_style'</span>) ? <span class="php-quote">'news'</span> : <span class="php-quote">'email'</span>;
+</span><span id="288" class="l"><a href="#288">288: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_mobile'</span>)) {
+</span><span id="289" class="l"><a href="#289">289: </a>                <span class="php-var">$style</span> = <span class="php-quote">'news'</span>;
+</span><span id="290" class="l"><a href="#290">290: </a>            }
+</span><span id="291" class="l"><a href="#291">291: </a>            <span class="php-var">$subject</span> = <span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$vals</span>[<span class="php-quote">'title'</span>]);
+</span><span id="292" class="l"><a href="#292">292: </a>            <span class="php-var">$from</span> = <span class="php-var">$vals</span>[<span class="php-quote">'author'</span>][<span class="php-quote">'name'</span>];
+</span><span id="293" class="l"><a href="#293">293: </a>            <span class="php-var">$ts</span> = <span class="php-keyword2">strtotime</span>(<span class="php-var">$vals</span>[<span class="php-quote">'date'</span>]);
+</span><span id="294" class="l"><a href="#294">294: </a>            <span class="php-var">$date</span> = <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$ts</span>);
+</span><span id="295" class="l"><a href="#295">295: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="296" class="l"><a href="#296">296: </a>                <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
+</span><span id="297" class="l"><a href="#297">297: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
+</span><span id="298" class="l"><a href="#298">298: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-keyword1">array</span>()),
+</span><span id="299" class="l"><a href="#299">299: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-keyword1">array</span>()),
+</span><span id="300" class="l"><a href="#300">300: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-quote">'WordPress'</span>),
+</span><span id="301" class="l"><a href="#301">301: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
+</span><span id="302" class="l"><a href="#302">302: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, human_readable_interval(<span class="php-var">$date</span>), <span class="php-var">$ts</span>),
+</span><span id="303" class="l"><a href="#303">303: </a>                    ),
+</span><span id="304" class="l"><a href="#304">304: </a>                    <span class="php-var">$id</span>,
+</span><span id="305" class="l"><a href="#305">305: </a>                    <span class="php-var">$style</span>,
+</span><span id="306" class="l"><a href="#306">306: </a>                    <span class="php-var">$this</span>
+</span><span id="307" class="l"><a href="#307">307: </a>                );
+</span><span id="308" class="l"><a href="#308">308: </a>            }
+</span><span id="309" class="l"><a href="#309">309: </a>            <span class="php-keyword1">else</span> {
+</span><span id="310" class="l"><a href="#310">310: </a>                <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
+</span><span id="311" class="l"><a href="#311">311: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
+</span><span id="312" class="l"><a href="#312">312: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-quote">'WordPress'</span>),
+</span><span id="313" class="l"><a href="#313">313: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
+</span><span id="314" class="l"><a href="#314">314: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-keyword1">array</span>()),
+</span><span id="315" class="l"><a href="#315">315: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, human_readable_interval(<span class="php-var">$date</span>), <span class="php-var">$ts</span>),
+</span><span id="316" class="l"><a href="#316">316: </a>                        <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-keyword1">array</span>())
+</span><span id="317" class="l"><a href="#317">317: </a>                    ),
+</span><span id="318" class="l"><a href="#318">318: </a>                    <span class="php-var">$id</span>,
+</span><span id="319" class="l"><a href="#319">319: </a>                    <span class="php-var">$style</span>,
+</span><span id="320" class="l"><a href="#320">320: </a>                    <span class="php-var">$this</span>
+</span><span id="321" class="l"><a href="#321">321: </a>                );
+</span><span id="322" class="l"><a href="#322">322: </a>            }
+</span><span id="323" class="l"><a href="#323">323: </a>        }
+</span><span id="324" class="l"><a href="#324">324: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'formatted_message_list'</span>, <span class="php-var">$res</span>);
+</span><span id="325" class="l"><a href="#325">325: </a>    }
+</span><span id="326" class="l"><a href="#326">326: </a>}
+</span><span id="327" class="l"><a href="#327">327: </a>
+</span><span id="328" class="l"><a href="#328">328: </a><span class="php-comment">/**
+</span></span><span id="329" class="l"><a href="#329">329: </a><span class="php-comment"> * @subpackage wordpress/output
+</span></span><span id="330" class="l"><a href="#330">330: </a><span class="php-comment"> */</span>
+</span><span id="331" class="l"><a href="#331">331: </a><span class="php-keyword1">class</span> Hm_Output_filter_wp_notification_data <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="332" class="l"><a href="#332">332: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="333" class="l"><a href="#333">333: </a>        <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="334" class="l"><a href="#334">334: </a>        <span class="php-var">$unread_only</span> = <span class="php-keyword1">false</span>;
+</span><span id="335" class="l"><a href="#335">335: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>, <span class="php-quote">''</span>) == <span class="php-quote">'unread'</span>) {
+</span><span id="336" class="l"><a href="#336">336: </a>            <span class="php-var">$unread_only</span> = <span class="php-keyword1">true</span>;
+</span><span id="337" class="l"><a href="#337">337: </a>        }
+</span><span id="338" class="l"><a href="#338">338: </a>        <span class="php-var">$cutoff</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_list_since'</span>, <span class="php-quote">''</span>);
+</span><span id="339" class="l"><a href="#339">339: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$cutoff</span>) {
+</span><span id="340" class="l"><a href="#340">340: </a>            <span class="php-var">$cutoff</span> = <span class="php-keyword2">strtotime</span>(<span class="php-var">$cutoff</span>);
+</span><span id="341" class="l"><a href="#341">341: </a>        }
+</span><span id="342" class="l"><a href="#342">342: </a>        <span class="php-keyword1">else</span> {
+</span><span id="343" class="l"><a href="#343">343: </a>            <span class="php-var">$cutoff</span> = <span class="php-num">0</span>;
+</span><span id="344" class="l"><a href="#344">344: </a>        }
+</span><span id="345" class="l"><a href="#345">345: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_notice_data'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="346" class="l"><a href="#346">346: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'id'</span>, <span class="php-var">$vals</span>)) {
+</span><span id="347" class="l"><a href="#347">347: </a>                <span class="php-var">$id</span> = <span class="php-quote">'wordpress_0_'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'id'</span>];
+</span><span id="348" class="l"><a href="#348">348: </a>                <span class="php-var">$url</span> = <span class="php-quote">'?page=message&amp;list_path=wp_notifications&amp;uid='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>);;
+</span><span id="349" class="l"><a href="#349">349: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>)) {
+</span><span id="350" class="l"><a href="#350">350: </a>                    <span class="php-var">$url</span> .= <span class="php-quote">'&amp;list_parent='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_parent'</span>, <span class="php-quote">''</span>));
+</span><span id="351" class="l"><a href="#351">351: </a>                }
+</span><span id="352" class="l"><a href="#352">352: </a>                <span class="php-var">$style</span> = <span class="php-quote">'email'</span>;
+</span><span id="353" class="l"><a href="#353">353: </a>                <span class="php-var">$style</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'news_list_style'</span>) ? <span class="php-quote">'news'</span> : <span class="php-quote">'email'</span>;
+</span><span id="354" class="l"><a href="#354">354: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_mobile'</span>)) {
+</span><span id="355" class="l"><a href="#355">355: </a>                    <span class="php-var">$style</span> = <span class="php-quote">'news'</span>;
+</span><span id="356" class="l"><a href="#356">356: </a>                }
+</span><span id="357" class="l"><a href="#357">357: </a>                <span class="php-var">$subject</span> = <span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$vals</span>[<span class="php-quote">'subject'</span>][<span class="php-quote">'text'</span>]);
+</span><span id="358" class="l"><a href="#358">358: </a>                <span class="php-var">$from</span> = <span class="php-keyword2">ucfirst</span>(<span class="php-keyword2">str_replace</span>(<span class="php-quote">'_'</span>, <span class="php-quote">' '</span>, <span class="php-var">$vals</span>[<span class="php-quote">'type'</span>]));
+</span><span id="359" class="l"><a href="#359">359: </a>                <span class="php-var">$ts</span> = <span class="php-var">$vals</span>[<span class="php-quote">'timestamp'</span>];
+</span><span id="360" class="l"><a href="#360">360: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$ts</span> &lt; <span class="php-var">$cutoff</span>) {
+</span><span id="361" class="l"><a href="#361">361: </a>                    <span class="php-keyword1">continue</span>;
+</span><span id="362" class="l"><a href="#362">362: </a>                }
+</span><span id="363" class="l"><a href="#363">363: </a>                <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
+</span><span id="364" class="l"><a href="#364">364: </a>                <span class="php-keyword1">if</span> ((int) <span class="php-var">$vals</span>[<span class="php-quote">'unread'</span>] &gt; <span class="php-num">0</span>) {
+</span><span id="365" class="l"><a href="#365">365: </a>                    <span class="php-var">$flags</span>[] = <span class="php-quote">'unseen'</span>;
+</span><span id="366" class="l"><a href="#366">366: </a>                }
+</span><span id="367" class="l"><a href="#367">367: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$unread_only</span> &amp;&amp; !<span class="php-keyword2">in_array</span>(<span class="php-quote">'unseen'</span>, <span class="php-var">$flags</span>, <span class="php-keyword1">true</span>)) {
+</span><span id="368" class="l"><a href="#368">368: </a>                    <span class="php-keyword1">continue</span>;
+</span><span id="369" class="l"><a href="#369">369: </a>                }
+</span><span id="370" class="l"><a href="#370">370: </a>                <span class="php-var">$date</span> = <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$ts</span>);
+</span><span id="371" class="l"><a href="#371">371: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="372" class="l"><a href="#372">372: </a>                    <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
+</span><span id="373" class="l"><a href="#373">373: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
+</span><span id="374" class="l"><a href="#374">374: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>),
+</span><span id="375" class="l"><a href="#375">375: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
+</span><span id="376" class="l"><a href="#376">376: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-quote">'WordPress'</span>),
+</span><span id="377" class="l"><a href="#377">377: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
+</span><span id="378" class="l"><a href="#378">378: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, human_readable_interval(<span class="php-var">$date</span>), <span class="php-var">$ts</span>),
+</span><span id="379" class="l"><a href="#379">379: </a>                        ),
+</span><span id="380" class="l"><a href="#380">380: </a>                        <span class="php-var">$id</span>,
+</span><span id="381" class="l"><a href="#381">381: </a>                        <span class="php-var">$style</span>,
+</span><span id="382" class="l"><a href="#382">382: </a>                        <span class="php-var">$this</span>
+</span><span id="383" class="l"><a href="#383">383: </a>                    );
+</span><span id="384" class="l"><a href="#384">384: </a>                }
+</span><span id="385" class="l"><a href="#385">385: </a>                <span class="php-keyword1">else</span> {
+</span><span id="386" class="l"><a href="#386">386: </a>                    <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
+</span><span id="387" class="l"><a href="#387">387: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
+</span><span id="388" class="l"><a href="#388">388: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-quote">'WordPress'</span>),
+</span><span id="389" class="l"><a href="#389">389: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
+</span><span id="390" class="l"><a href="#390">390: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
+</span><span id="391" class="l"><a href="#391">391: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, human_readable_interval(<span class="php-var">$date</span>), <span class="php-var">$ts</span>),
+</span><span id="392" class="l"><a href="#392">392: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>)
+</span><span id="393" class="l"><a href="#393">393: </a>                        ),
+</span><span id="394" class="l"><a href="#394">394: </a>                        <span class="php-var">$id</span>,
+</span><span id="395" class="l"><a href="#395">395: </a>                        <span class="php-var">$style</span>,
+</span><span id="396" class="l"><a href="#396">396: </a>                        <span class="php-var">$this</span>
+</span><span id="397" class="l"><a href="#397">397: </a>                    );
+</span><span id="398" class="l"><a href="#398">398: </a>                }
+</span><span id="399" class="l"><a href="#399">399: </a>            }
+</span><span id="400" class="l"><a href="#400">400: </a>        }
+</span><span id="401" class="l"><a href="#401">401: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'formatted_message_list'</span>, <span class="php-var">$res</span>);
+</span><span id="402" class="l"><a href="#402">402: </a>    }
+</span><span id="403" class="l"><a href="#403">403: </a>}
+</span><span id="404" class="l"><a href="#404">404: </a>
+</span><span id="405" class="l"><a href="#405">405: </a><span class="php-comment">/**
+</span></span><span id="406" class="l"><a href="#406">406: </a><span class="php-comment"> * @subpackage wordpress/output
+</span></span><span id="407" class="l"><a href="#407">407: </a><span class="php-comment"> */</span>
+</span><span id="408" class="l"><a href="#408">408: </a><span class="php-keyword1">class</span> Hm_Output_wordpress_connect_section <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="409" class="l"><a href="#409">409: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="410" class="l"><a href="#410">410: </a>        <span class="php-var">$details</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_connect_details'</span>, <span class="php-keyword1">array</span>());
+</span><span id="411" class="l"><a href="#411">411: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;wordpress_connect&quot;&gt;&lt;div data-target=&quot;.wordpress_connect_section&quot; class=&quot;server_section&quot;&gt;'</span>.
+</span><span id="412" class="l"><a href="#412">412: </a>            <span class="php-quote">'&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$key</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.
+</span><span id="413" class="l"><a href="#413">413: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'WordPress.com Connect'</span>).<span class="php-quote">'&lt;/div&gt;&lt;div class=&quot;wordpress_connect_section&quot;&gt;'</span>;
+</span><span id="414" class="l"><a href="#414">414: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
+</span><span id="415" class="l"><a href="#415">415: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'Connect to WordPress.com to view notifications and posts.&lt;br /&gt;&lt;br /&gt;'</span>;
+</span><span id="416" class="l"><a href="#416">416: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;'</span>.<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'wp_auth_url'</span>, <span class="php-quote">''</span>).<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Enable'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
+</span><span id="417" class="l"><a href="#417">417: </a>        }
+</span><span id="418" class="l"><a href="#418">418: </a>        <span class="php-keyword1">else</span> {
+</span><span id="419" class="l"><a href="#419">419: </a>            <span class="php-var">$res</span> .= <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Already connected'</span>);
+</span><span id="420" class="l"><a href="#420">420: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;br /&gt;&lt;form method=&quot;POST&quot;&gt;'</span>;
+</span><span id="421" class="l"><a href="#421">421: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="422" class="l"><a href="#422">422: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; name=&quot;wp_disconnect&quot; class=&quot;wp_disconnect&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Disconnect'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="423" class="l"><a href="#423">423: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
+</span><span id="424" class="l"><a href="#424">424: </a>        }
+</span><span id="425" class="l"><a href="#425">425: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="426" class="l"><a href="#426">426: </a>    }
+</span><span id="427" class="l"><a href="#427">427: </a>}
+</span><span id="428" class="l"><a href="#428">428: </a>
+</span><span id="429" class="l"><a href="#429">429: </a><span class="php-comment">/**
+</span></span><span id="430" class="l"><a href="#430">430: </a><span class="php-comment"> * @subpackage wordpress/functions
+</span></span><span id="431" class="l"><a href="#431">431: </a><span class="php-comment"> */</span>
+</span><span id="432" class="l"><a href="#432">432: </a><span class="php-keyword1">function</span> wp_connect_details(<span class="php-var">$config</span>) {
+</span><span id="433" class="l"><a href="#433">433: </a>    <span class="php-var">$details</span> = <span class="php-keyword1">array</span>();
+</span><span id="434" class="l"><a href="#434">434: </a>    <span class="php-var">$ini_file</span> = <span class="php-keyword2">rtrim</span>(<span class="php-var">$config</span>-&gt;get(<span class="php-quote">'app_data_dir'</span>, <span class="php-quote">''</span>), <span class="php-quote">'/'</span>).<span class="php-quote">'/wordpress.ini'</span>;
+</span><span id="435" class="l"><a href="#435">435: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">is_readable</span>(<span class="php-var">$ini_file</span>)) {
+</span><span id="436" class="l"><a href="#436">436: </a>        <span class="php-var">$settings</span> = <span class="php-keyword2">parse_ini_file</span>(<span class="php-var">$ini_file</span>);
+</span><span id="437" class="l"><a href="#437">437: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$settings</span>)) {
+</span><span id="438" class="l"><a href="#438">438: </a>            <span class="php-var">$details</span> = <span class="php-var">$settings</span>;
+</span><span id="439" class="l"><a href="#439">439: </a>        }
+</span><span id="440" class="l"><a href="#440">440: </a>    }
+</span><span id="441" class="l"><a href="#441">441: </a>    <span class="php-keyword1">return</span> <span class="php-var">$details</span>;
+</span><span id="442" class="l"><a href="#442">442: </a>}
+</span><span id="443" class="l"><a href="#443">443: </a>
+</span><span id="444" class="l"><a href="#444">444: </a><span class="php-comment">/**
+</span></span><span id="445" class="l"><a href="#445">445: </a><span class="php-comment"> * @subpackage wordpress/functions
+</span></span><span id="446" class="l"><a href="#446">446: </a><span class="php-comment"> */</span>
+</span><span id="447" class="l"><a href="#447">447: </a><span class="php-keyword1">function</span> wp_build_notice_headers(<span class="php-var">$data</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="448" class="l"><a href="#448">448: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;table class=&quot;msg_headers&quot;&gt;'</span>.
+</span><span id="449" class="l"><a href="#449">449: </a>        <span class="php-quote">'&lt;col class=&quot;header_name_col&quot;&gt;&lt;col class=&quot;header_val_col&quot;&gt;&lt;/colgroup&gt;'</span>.
+</span><span id="450" class="l"><a href="#450">450: </a>        <span class="php-quote">'&lt;tr class=&quot;header_subject&quot;&gt;&lt;th colspan=&quot;2&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$data</span>[<span class="php-quote">'subject'</span>][<span class="php-quote">'text'</span>])).
+</span><span id="451" class="l"><a href="#451">451: </a>        <span class="php-quote">'&lt;/th&gt;&lt;/tr&gt;'</span>.
+</span><span id="452" class="l"><a href="#452">452: </a>        <span class="php-quote">'&lt;tr class=&quot;header_date&quot;&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Date'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$data</span>[<span class="php-quote">'timestamp'</span>]).
+</span><span id="453" class="l"><a href="#453">453: </a>        <span class="php-quote">' ('</span>.human_readable_interval(<span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-var">$data</span>[<span class="php-quote">'timestamp'</span>])).<span class="php-quote">')&lt;/td&gt;&lt;/tr&gt;'</span>.
+</span><span id="454" class="l"><a href="#454">454: </a>        <span class="php-quote">'&lt;tr class=&quot;header_type&quot;&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Type'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$data</span>[<span class="php-quote">'type'</span>].<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>.
+</span><span id="455" class="l"><a href="#455">455: </a>        <span class="php-quote">'&lt;tr class=&quot;header_cid&quot;&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Id'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$data</span>[<span class="php-quote">'id'</span>].<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;'</span>;
+</span><span id="456" class="l"><a href="#456">456: </a>}
+</span><span id="457" class="l"><a href="#457">457: </a>
+</span><span id="458" class="l"><a href="#458">458: </a><span class="php-comment">/**
+</span></span><span id="459" class="l"><a href="#459">459: </a><span class="php-comment"> * @subpackage wordpress/functions
+</span></span><span id="460" class="l"><a href="#460">460: </a><span class="php-comment"> */</span>
+</span><span id="461" class="l"><a href="#461">461: </a><span class="php-keyword1">function</span> wp_build_notice_text(<span class="php-var">$type</span>, <span class="php-var">$data</span>) {
+</span><span id="462" class="l"><a href="#462">462: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="463" class="l"><a href="#463">463: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$type</span> == <span class="php-quote">'comment'</span>) {
+</span><span id="464" class="l"><a href="#464">464: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$data</span>[<span class="php-quote">'items'</span>] <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="465" class="l"><a href="#465">465: </a>            <span class="php-var">$res</span>[] = <span class="php-var">$vals</span>[<span class="php-quote">'header_text'</span>].<span class="php-quote">'&lt;br /&gt;'</span>.<span class="php-var">$vals</span>[<span class="php-quote">'html'</span>];
+</span><span id="466" class="l"><a href="#466">466: </a>        }
+</span><span id="467" class="l"><a href="#467">467: </a>    }
+</span><span id="468" class="l"><a href="#468">468: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;msg_text_inner&quot;&gt;'</span>.format_msg_html(<span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;div class=&quot;hr&quot;&gt;&lt;/div&gt;'</span>, <span class="php-var">$res</span>)).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="469" class="l"><a href="#469">469: </a>}
+</span><span id="470" class="l"><a href="#470">470: </a>
+</span><span id="471" class="l"><a href="#471">471: </a><span class="php-comment">/**
+</span></span><span id="472" class="l"><a href="#472">472: </a><span class="php-comment"> * @subpackage wordpress/functions
+</span></span><span id="473" class="l"><a href="#473">473: </a><span class="php-comment"> */</span>
+</span><span id="474" class="l"><a href="#474">474: </a><span class="php-keyword1">function</span> wp_get_notifications(<span class="php-var">$details</span>) {
+</span><span id="475" class="l"><a href="#475">475: </a>    <span class="php-var">$result</span> = <span class="php-keyword1">array</span>();
+</span><span id="476" class="l"><a href="#476">476: </a>    <span class="php-keyword1">return</span> wp_fetch_content(<span class="php-var">$details</span>, WPCOM_NOTICES_URL);
+</span><span id="477" class="l"><a href="#477">477: </a>}
+</span><span id="478" class="l"><a href="#478">478: </a>
+</span><span id="479" class="l"><a href="#479">479: </a><span class="php-comment">/**
+</span></span><span id="480" class="l"><a href="#480">480: </a><span class="php-comment"> * @subpackage wordpress/functions
+</span></span><span id="481" class="l"><a href="#481">481: </a><span class="php-comment"> */</span>
+</span><span id="482" class="l"><a href="#482">482: </a><span class="php-keyword1">function</span> wp_get_notice_detail(<span class="php-var">$details</span>, <span class="php-var">$uid</span>) {
+</span><span id="483" class="l"><a href="#483">483: </a>    <span class="php-var">$uid</span> = (int) <span class="php-var">$uid</span>;
+</span><span id="484" class="l"><a href="#484">484: </a>    <span class="php-keyword1">return</span> wp_fetch_content(<span class="php-var">$details</span>, WPCOM_NOTICE_URL.<span class="php-var">$uid</span>);
+</span><span id="485" class="l"><a href="#485">485: </a>}
+</span><span id="486" class="l"><a href="#486">486: </a>
+</span><span id="487" class="l"><a href="#487">487: </a><span class="php-comment">/**
+</span></span><span id="488" class="l"><a href="#488">488: </a><span class="php-comment"> * @subpackage wordpress/functions
+</span></span><span id="489" class="l"><a href="#489">489: </a><span class="php-comment"> */</span>
+</span><span id="490" class="l"><a href="#490">490: </a><span class="php-keyword1">function</span> wp_get_freshly_pressed(<span class="php-var">$details</span>) {
+</span><span id="491" class="l"><a href="#491">491: </a>    <span class="php-keyword1">return</span> wp_fetch_content(<span class="php-var">$details</span>, WPCOM_FP_URL);
+</span><span id="492" class="l"><a href="#492">492: </a>}
+</span><span id="493" class="l"><a href="#493">493: </a>
+</span><span id="494" class="l"><a href="#494">494: </a><span class="php-comment">/**
+</span></span><span id="495" class="l"><a href="#495">495: </a><span class="php-comment"> * @subpackage wordpress/functions
+</span></span><span id="496" class="l"><a href="#496">496: </a><span class="php-comment"> */</span>
+</span><span id="497" class="l"><a href="#497">497: </a><span class="php-keyword1">function</span> wp_fetch_content(<span class="php-var">$details</span>, <span class="php-var">$url</span>, <span class="php-var">$post</span>=<span class="php-keyword1">array</span>()) {
+</span><span id="498" class="l"><a href="#498">498: </a>    <span class="php-var">$result</span> = <span class="php-keyword1">array</span>();
+</span><span id="499" class="l"><a href="#499">499: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$details</span>) || <span class="php-keyword1">empty</span>(<span class="php-var">$details</span>) || !<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'access_token'</span>, <span class="php-var">$details</span>)) {
+</span><span id="500" class="l"><a href="#500">500: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
+</span><span id="501" class="l"><a href="#501">501: </a>    }
+</span><span id="502" class="l"><a href="#502">502: </a>    <span class="php-var">$headers</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'Authorization: Bearer '</span> . <span class="php-var">$details</span>[<span class="php-quote">'access_token'</span>]);
+</span><span id="503" class="l"><a href="#503">503: </a>    <span class="php-var">$ch</span> = <span class="php-keyword2">curl_init</span>();
+</span><span id="504" class="l"><a href="#504">504: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_URL, <span class="php-var">$url</span>);
+</span><span id="505" class="l"><a href="#505">505: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_HTTPHEADER, <span class="php-var">$headers</span>);
+</span><span id="506" class="l"><a href="#506">506: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="php-num">1</span>);
+</span><span id="507" class="l"><a href="#507">507: </a>
+</span><span id="508" class="l"><a href="#508">508: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$post</span>)) {
+</span><span id="509" class="l"><a href="#509">509: </a>        <span class="php-var">$post_tmp</span> = <span class="php-keyword1">array</span>();
+</span><span id="510" class="l"><a href="#510">510: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$post</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
+</span><span id="511" class="l"><a href="#511">511: </a>            <span class="php-var">$post_tmp</span>[] = <span class="php-keyword2">urlencode</span>(<span class="php-var">$name</span>).<span class="php-quote">'='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-var">$value</span>);
+</span><span id="512" class="l"><a href="#512">512: </a>        }
+</span><span id="513" class="l"><a href="#513">513: </a>        <span class="php-var">$post_str</span> = <span class="php-keyword2">implode</span>(<span class="php-quote">'&amp;'</span>, <span class="php-var">$post_tmp</span>);
+</span><span id="514" class="l"><a href="#514">514: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>,CURLOPT_POST, <span class="php-keyword2">count</span>(<span class="php-var">$post</span>));
+</span><span id="515" class="l"><a href="#515">515: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>,CURLOPT_POSTFIELDS, <span class="php-var">$post_str</span>);
+</span><span id="516" class="l"><a href="#516">516: </a>    }
+</span><span id="517" class="l"><a href="#517">517: </a>
+</span><span id="518" class="l"><a href="#518">518: </a>    <span class="php-var">$curl_result</span> = <span class="php-keyword2">curl_exec</span>(<span class="php-var">$ch</span>);
+</span><span id="519" class="l"><a href="#519">519: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">substr</span>(<span class="php-var">$curl_result</span>, <span class="php-num">0</span>, <span class="php-num">1</span>) == <span class="php-quote">'{'</span>) {
+</span><span id="520" class="l"><a href="#520">520: </a>        <span class="php-var">$result</span> = @<span class="php-keyword2">json_decode</span>(<span class="php-var">$curl_result</span>, <span class="php-keyword1">true</span>);
+</span><span id="521" class="l"><a href="#521">521: </a>    }
+</span><span id="522" class="l"><a href="#522">522: </a>    <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
+</span><span id="523" class="l"><a href="#523">523: </a>}
+</span><span id="524" class="l"><a href="#524">524: </a>
+</span><span id="525" class="l"><a href="#525">525: </a>
+</span><span id="526" class="l"><a href="#526">526: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1539,6 +1539,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?341a24b610ee59935e2a39085b09917a67158213"></script>
+<script src="elementlist.js?94f15b106ae140663171c7f0961b4706e48684ec"></script>
 </body>
 </html>
