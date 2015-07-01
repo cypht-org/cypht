@@ -162,8 +162,9 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $path = sprintf("imap_%d_%s", $form['imap_server_id'], $folder);
             $page_cache =  Hm_Page_Cache::get('imap_folders_'.$path);
             if ($page_cache) {
+                $this->out('imap_expanded_folder_data', $page_cache);
+                $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
-                $this->out('imap_expanded_folder_formatted', $page_cache);
                 return;
             }
             $details = Hm_IMAP_List::dump($form['imap_server_id']);
@@ -174,6 +175,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
+                Hm_Page_Cache::add('imap_folders_'.$path, $msgs);
                 $this->out('imap_expanded_folder_data', $msgs);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
@@ -813,7 +815,6 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                     $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");
                     $this->session->record_unsaved('IMAP server saved');
-                    Hm_Page_Cache::flush($this->session);
                 }
                 else {
                     Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
@@ -904,7 +905,6 @@ class Hm_Handler_imap_hide extends Hm_Handler_Module {
                 Hm_IMAP_List::toggle_hidden($form['imap_server_id'], (bool) $this->request->post['hide_imap_server']);
                 Hm_Msgs::add('Hidden status updated');
                 $this->session->record_unsaved('IMAP server hidden status updated');
-                Hm_Page_Cache::flush($this->session);
             }
         }
     }
@@ -1221,7 +1221,6 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
             ksort($folder_data);
             $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this);
             $this->out('imap_expanded_folder_formatted', $res);
-            Hm_Page_Cache::add('imap_folders_'.$this->get('imap_expanded_folder_path'), $res);
         }
     }
 }

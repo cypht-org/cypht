@@ -251,7 +251,6 @@ class Hm_Handler_github_disconnect extends Hm_Handler_Module {
             $this->out('reload_folders', true, false);
             $this->session->record_unsaved('Github connection deleted');
             Hm_Msgs::add('Github connection deleted');
-            Hm_Page_Cache::flush($this->session);
         }
     }
 }

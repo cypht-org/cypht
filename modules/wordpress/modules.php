@@ -220,7 +220,6 @@ class Hm_Handler_wordpress_disconnect extends Hm_Handler_Module {
             $this->out('reload_folders', true, false);
             $this->session->record_unsaved('WordPress connection deleted');
             Hm_Msgs::add('Wordpress connection deleted');
-            Hm_Page_Cache::flush($this->session);
         }
     }
 }
