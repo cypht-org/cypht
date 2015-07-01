@@ -104,7 +104,7 @@ if (hm_page_name() === 'servers') {
 }
 else if (hm_page_name() === 'message_list') {
     var list_path = hm_list_path();
-    if (list_path === 'unread' || list_path === 'everything' || list_path === 'flagged') {
+    if (list_path === 'unread' || list_path === 'combined_inbox' || list_path === 'flagged') {
         var data_sources = hm_data_sources();
         if (data_sources.length === 0) {
             $('.nux_empty_combined_view').show();
