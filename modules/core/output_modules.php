@@ -874,7 +874,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
      */
     protected function output() {
         $email = false;
-        if (in_array('email_folders', $this->get('folder_sources', array()))) {
+        if (array_key_exists('email_folders', merge_folder_list_details($this->get('folder_sources', array())))) {
             $email = true;
         }
         $res = '<li class="menu_home"><a class="unread_link" href="?page=home">'.
@@ -936,8 +936,8 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        $folder_sources = array_unique($this->get('folder_sources', array()));
-        foreach ($folder_sources as $src) {
+        $folder_sources = merge_folder_list_details($this->get('folder_sources'));
+        foreach ($folder_sources as $src => $content) {
             $parts = explode('_', $src);
             array_pop($parts);
             $name = ucwords(implode(' ', $parts));
@@ -951,12 +951,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
                     '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).
                     '" alt="" width="16" height="16" /> '.$this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
             }
-            $cache = Hm_Page_Cache::get($src);
-            Hm_Page_Cache::del($src);
-            if ($cache) {
-                $res .= $cache;
-            }
-            $res .= '</ul></div>';
+            $res .= $content.'</ul></div>';
         }
         if ($this->format == 'HTML5') {
             return $res;
