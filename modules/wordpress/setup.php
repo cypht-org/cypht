@@ -49,6 +49,9 @@ add_handler('ajax_wordpess_freshly_pressed', 'date', true, 'core');
 add_handler('ajax_wordpess_freshly_pressed', 'http_headers', true, 'core');
 add_output('ajax_wordpess_freshly_pressed', 'filter_wp_freshly_pressed_data', true);
 
+add_handler('settings', 'process_unread_wp_included', true, 'wordpress', 'save_user_settings', 'before');
+add_output('settings', 'unread_wp_included_setting', true, 'wordpress', 'unread_source_max_setting', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_wordpess_freshly_pressed',
@@ -56,7 +59,8 @@ return array(
         'ajax_wp_notice_display',
     ),
     'allowed_post' => array(
-        'wp_disconnect' => FILTER_SANITIZE_STRING
+        'wp_disconnect' => FILTER_SANITIZE_STRING,
+        'unread_exclude_wordpress' => FILTER_VALIDATE_INT
     ),
     'allowed_output' => array(
         'wp_notice_text' => array(FILTER_UNSAFE_RAW, false),

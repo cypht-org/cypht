@@ -19,6 +19,16 @@ class Hm_Github_Uid_Cache {
 /**
  * @subpackage github/handler
  */
+class Hm_Handler_process_unread_github_included extends Hm_Handler_Module {
+    public function process() {
+        function unread_github_setting_callback($val) { return $val; }
+        process_site_setting('unread_exclude_github', $this, 'unread_github_setting_callback', false, true);
+    }
+}
+
+/**
+ * @subpackage github/handler
+ */
 class Hm_Handler_github_status extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('github_repo'));
@@ -328,8 +338,14 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                 }
             }
             elseif ($path == 'combined_inbox' || $path == 'unread') {
-                foreach ($repos as $repo) {
-                    $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                $excluded = false;
+                if ($path == 'unread'  &&$this->user_config->get('unread_exclude_github_setting', false)) {
+                    $excluded = true;
+                }
+                if (!$excluded) {
+                    foreach ($repos as $repo) {
+                        $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                    }
                 }
             }
         }
@@ -548,6 +564,23 @@ class Hm_Output_github_connect_section extends Hm_Output_Module {
             $res .= '</form>';
         }
         return $res.'</div>';
+    }
+}
+
+/**
+ * @subpackage github/output
+ */
+class Hm_Output_unread_github_included_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('unread_exclude_github', $settings) && $settings['unread_exclude_github']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $checked = '';
+        }
+        return '<tr class="unread_setting"><td><label for="unread_exclude_github">'.$this->trans('Exclude unread Github notices').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' value="1" id="unread_exclude_github" name="unread_exclude_github" /></td></tr>';
     }
 }
 
