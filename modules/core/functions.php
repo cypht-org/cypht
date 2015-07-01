@@ -397,8 +397,8 @@ function save_user_settings($handler, $form, $logout) {
 
 /**
  * Setup commonly used modules for a page
- * @param $name string the page id
- * @param $source string the module set name
+ * @param string $name the page id
+ * @param string $source the module set name
  * @return void
  */
 function setup_base_page($name, $source=false) {
@@ -434,3 +434,21 @@ function setup_base_page($name, $source=false) {
     add_output($name, 'content_end', true, $source);
 }
 
+/**
+ * Merge array details for folder sources
+ * @param array $folder_sources list of folder list entries
+ * @return array
+ */
+function merge_folder_list_details($folder_sources) {
+    $res = array();
+    foreach ($folder_sources as $vals) {
+        if (array_key_exists($vals[0], $res)) {
+            $res[$vals[0]] .= $vals[1];
+        }
+        else {
+            $res[$vals[0]] = $vals[1];
+        }
+    }
+    ksort($res);
+    return $res;
+}

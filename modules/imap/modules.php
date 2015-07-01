@@ -712,7 +712,6 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
         $servers = Hm_IMAP_List::dump();
         if (!empty($servers)) {
             $this->out('imap_servers', $servers);
-            $this->append('folder_sources', 'email_folders');
         }
     }
 }
@@ -1265,7 +1264,9 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
                     $this->html_safe($folder).'</a></li>';
             }
         }
-        Hm_Page_Cache::concat('email_folders', $res);
+        if ($res) {
+            $this->append('folder_sources', array('email_folders', $res));
+        }
         return '';
     }
 }
