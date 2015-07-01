@@ -294,7 +294,6 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
         else {
             $form = array($type => false);
         }
-        elog($form);
     }
     else {
         list($success, $form) = $handler->process_form(array('save_settings', $type));
