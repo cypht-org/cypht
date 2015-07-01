@@ -40,9 +40,9 @@ class Hm_Dispatch {
         $this->check_for_tls_redirect();
         $this->module_exec->run_handler_modules($this->request, $this->session, $this->page);
         $this->check_for_redirect();
-        $this->module_exec->run_output_modules($this->request, $this->session, $this->page);
+        $active_session = $this->save_session();
+        $this->module_exec->run_output_modules($this->request, $active_session, $this->page);
         $this->render_output();
-        $this->save_session();
     }
 
     /**
@@ -88,11 +88,13 @@ class Hm_Dispatch {
 
     /**
      * Close and save the session
-     * @return void
+     * @return bool true if the session is active
      */
     private function save_session() {
+        $res = $this->session->is_active();
         Hm_Page_Cache::save($this->session);
         $this->session->end();
+        return $res;
     }
 
     /**
