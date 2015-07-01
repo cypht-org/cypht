@@ -90,15 +90,21 @@ var expand_server_settings = function() {
                 dsp = 'block';
             }
         }
-        if (dsp == 'block' || dsp == 'none') {
+        if (dsp === 'block' || dsp === 'none') {
             $(sections[i]).css('display', dsp);
             Hm_Utils.save_to_local_storage(sections[i], dsp);
         }
     }
 };
 
-if (hm_page_name() == 'servers') {
+if (hm_page_name() === 'servers') {
     expand_server_settings();
     var nux_border = $('.nux_username').css('border');
     $('.nux_next_button').click(nux_service_select);
+}
+else if (hm_page_name() === 'message_list') {
+    var data_sources = hm_data_sources();
+    if (data_sources.length === 0) {
+        $('.nux_empty_combined_view').show();
+    }
 }
