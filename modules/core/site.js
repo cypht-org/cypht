@@ -720,9 +720,11 @@ var Hm_Folders = {
     },
     reload_folders: function(force) {
         if (document.cookie.indexOf('hm_reload_folders=1') > -1 || force) {
+            var settings = Hm_Utils.get_core_settings();
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
             document.cookie = 'hm_reload_folders=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            Hm_Utils.expand_core_settings(settings);
         }
     },
     sort_list: function(class_name, exclude_name) {
@@ -884,8 +886,21 @@ var Hm_Utils = {
         }
         return false;
     },
-    expand_core_settings: function() {
+    expand_core_settings: function(sections) {
+        var key;
         var dsp;
+        for (key in sections) {
+            dsp = sections[key];
+            if (!dsp) {
+                dsp = 'none';
+            }
+            $(key).css('display', dsp);
+            Hm_Utils.save_to_local_storage(key, dsp);
+        }
+    },
+    get_core_settings: function() {
+        var dsp;
+        var results = {}
         var i;
         var hash = window.location.hash;
         var sections = ['.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting'];
@@ -899,11 +914,9 @@ var Hm_Utils = {
                     dsp = 'table-row';
                 }
             }
-            if (dsp == 'table-row' || dsp == 'none') {
-                $(sections[i]).css('display', dsp);
-                Hm_Utils.save_to_local_storage(sections[i], dsp);
-            }
+            results[sections[i]] = dsp;
         }
+        return results;
     },
     get_from_local_storage: function(key) {
         return sessionStorage.getItem(key);
@@ -973,7 +986,7 @@ if (!Hm_Folders.load_from_local_storage()) {
 
 /* setup settings and server pages */
 if (hm_page_name() == 'settings') {
-    Hm_Utils.expand_core_settings();
+    Hm_Utils.expand_core_settings(Hm_Utils.get_core_settings());
     $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     Hm_Folders.reload_folders();
 }
