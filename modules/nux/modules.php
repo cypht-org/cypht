@@ -17,6 +17,7 @@ require APP_PATH.'modules/nux/services.php';
 class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
     public function process() {
         if (Hm_Page_Cache::get('nux_dev_news')) {
+            $this->out('nux_dev_news', Hm_Page_Cache::get('nux_dev_news'));
             return;
         }
         $ch = Hm_Functions::c_init();
@@ -37,6 +38,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
                 }
             }
         }
+        Hm_Page_Cache::add('nux_dev_news', $res);
         $this->out('nux_dev_news', $res);
     }
 }
@@ -277,10 +279,6 @@ class Hm_Output_filter_service_select extends Hm_Output_Module {
  */
 class Hm_Output_nux_dev_news extends Hm_Output_Module {
     protected function output() {
-        $page_cache =  Hm_Page_Cache::get('nux_dev_news');
-        if ($page_cache) {
-            return $page_cache;
-        }
         $res = '<div class="nux_dev_news"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
             $res .= sprintf('<tr><td><a target="_blank" href="https://github.com/jasonmunro/hm3/commit/%s">%s</a>'.
@@ -292,7 +290,6 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
             );
         }
         $res .= '</table></div>';
-        Hm_Page_Cache::add('nux_dev_news', $res);
         return $res;
     }
 }
