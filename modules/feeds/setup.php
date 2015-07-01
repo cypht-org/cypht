@@ -27,9 +27,9 @@ add_handler('search', 'feed_list_type', true, 'feeds', 'message_list_type', 'aft
 
 /* settings page */
 add_handler('settings', 'process_unread_feeds_setting', true, 'feeds', 'save_user_settings', 'before'); 
-add_output('settings', 'unread_feeds_included', true, 'feeds', 'unread_source_max_setting', 'after');
 add_handler('settings', 'process_feed_limit_setting', true, 'feeds', 'save_user_settings', 'before');
 add_handler('settings', 'process_feed_since_setting', true, 'feeds', 'save_user_settings', 'before');
+add_output('settings', 'unread_feeds_included', true, 'feeds', 'unread_source_max_setting', 'after');
 add_output('settings', 'start_feed_settings', true, 'feeds', 'end_settings_form', 'before');
 add_output('settings', 'feed_since_setting', true, 'feeds', 'start_feed_settings', 'after');
 add_output('settings', 'feed_limit_setting', true, 'feeds', 'feed_since_setting', 'after');
