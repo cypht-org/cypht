@@ -640,7 +640,12 @@ function Message_List() {
         var count = $('.message_table tbody tr').length;
         if (!count) {
             if (!$('.empty_list').length) {
-                $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
+                if (hm_page_name() == 'search') {
+                    $('.search_content').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
+                }
+                else {
+                    $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
+                }
             }
         }
         else {
