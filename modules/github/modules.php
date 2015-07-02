@@ -339,7 +339,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
             }
             elseif ($path == 'combined_inbox' || $path == 'unread') {
                 $excluded = false;
-                if ($path == 'unread'  &&$this->user_config->get('unread_exclude_github_setting', false)) {
+                if ($path == 'unread'  && $this->user_config->get('unread_exclude_github_setting', false)) {
                     $excluded = true;
                 }
                 if (!$excluded) {
