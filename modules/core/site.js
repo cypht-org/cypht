@@ -82,6 +82,7 @@ var Hm_Ajax_Request = function() { return {
         }
         else {
             if ((res.state && res.state == 'not callable') || !res.router_login_state) {
+                window.location.href = "?page=home";
                 return;
             }
             if (res.date) {
