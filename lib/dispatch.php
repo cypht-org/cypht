@@ -19,14 +19,24 @@ class Hm_Dispatch {
 
     /**
      * Setup object needed to process a request
+     * @param object $config site configuration
      * @return object
      */
-    public function __construct() {
+    public function __construct($config) {
 
-        $this->site_config = new Hm_Site_Config_File(CONFIG_FILE);
+        /* get the site config defined in the hm3.rc file */
+        $this->site_config = $config;
+
+        /* setup a session handler, but don't actually start a session yet */
         $this->session = setup_session($this->site_config); 
+
+        /* instantiate the module runner */
         $this->module_exec = new Hm_Module_Exec($this->site_config);
+
+        /* process request input using the white-lists defined in modules */
         $this->request = new Hm_Request($this->module_exec->filters);
+
+        /* do it */
         $this->process_request();
     }
 
@@ -35,13 +45,29 @@ class Hm_Dispatch {
      * @return void
      */
     private function process_request() {
+
+        /* get the request identifier */
         $this->get_page($this->module_exec->filters, $this->request);
+
+        /* load up the module requirements */
         $this->module_exec->load_module_sets($this->page);
+
+        /* check for TLS connections */
         $this->check_for_tls_redirect();
+
+        /* run handler modules to process input and perform actions */
         $this->module_exec->run_handler_modules($this->request, $this->session, $this->page);
+
+        /* check to see if a handler module told us to redirect the browser */
         $this->check_for_redirect();
+
+        /* save and close a session if one is open */
         $active_session = $this->save_session();
+
+        /* run the output formatting modules */
         $this->module_exec->run_output_modules($this->request, $active_session, $this->page);
+
+        /* output content to the browser */
         $this->render_output();
     }
 
