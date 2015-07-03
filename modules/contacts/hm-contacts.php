@@ -11,53 +11,23 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage contacts/lib
  */
-abstract class Hm_Contact_Store {
+class Hm_Contact_Store {
 
-    protected $contacts = array();
-    protected $key = false;
-    protected $key_validator = false;
+    private $contacts = array();
 
-    public function __construct($key = 0, $key_validator=false) {
-        $this->key = $key;
-        $this->key_validator = $key_validator;
+    public function __construct($user_config) {
+        $this->import($user_config->get('contacts', array()));
     }
 
-    protected function add_contact($data) {
+    public function add_contact($data) {
         $contact = new Hm_Contact($data);
-        if (!is_int($this->key)) {
-            $this->check_key($contact);
-            $this->contacts[$contact->value($this->key)] = $contact;
-        }
-        else {
-            $this->contacts[$this->key] = $contact;
-            $this->key++;
-        }
-
+        $this->contacts[] = $contact;
         return true;
     }
 
-    protected function check_key($contact) {
-        if (!$contact->value($this->key)) {
-            return false;
-        }
-        if (array_key_exists($contact->value($this->key), $this->contacts)) {
-            return false;
-        }
-        if (!$this->validate_key($contact)) {
-            return false;
-        }
+    public function save($user_config) {
+        $user_config->set('contacts', $this->export());
     }
-
-    protected function validate_key($contact) {
-        if ($this->key_validator !== false) {
-            if (!function_exists($this->key_validator) || !call_user_func($this->key_validator, $contact->value($this->key))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    abstract public function load($source);
 
     public function get($id, $default=false) {
         if (!array_key_exists($id, $this->contacts)) {
@@ -70,19 +40,16 @@ abstract class Hm_Contact_Store {
         $res = array();
         foreach ($flds as $fld => $term) {
             foreach ($this->contacts as $id => $contact) {
-                if ($this->search_contact($contact, $fld, $id, $term)) {
-                    $res[$contact->value($this->key)] = $contact;
+                if ($this->search_contact($contact, $fld, $term)) {
+                    $res[$id] = $contact;
                 }
             }
         }
         return $res;
     }
 
-    protected function search_contact($contact, $fld, $id, $term) {
-        if (!is_int($this->key) && $fld == $this->key && stristr($id, $term)) {
-            return true;
-        }
-        elseif (stristr($contact->value($fld, ''), $term)) {
+    protected function search_contact($contact, $fld, $term) {
+        if (stristr($contact->value($fld, ''), $term)) {
             return true;
         }
         return false;
@@ -140,24 +107,6 @@ abstract class Hm_Contact_Store {
             return array();
         }
         return array_slice( $this->contacts, (($page - 1)*$size), $size, true);
-    }
-}
-
-/**
- * @subpackage contacts/lib
- */
-class Hm_Contact_Store_DB extends Hm_Contact_Store {
-
-    public function load($source) {
-    }
-}
-
-/**
- * @subpackage contacts/lib
- */
-class Hm_Contact_Store_File extends Hm_Contact_Store {
-
-    public function load($source) {
     }
 }
 
