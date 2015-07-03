@@ -49,6 +49,7 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
 
 /**
  * @subpackage smtp/handler
+ * @todo: update this for the new settings system
  */
 class Hm_Handler_process_compose_type extends Hm_Handler_Module {
     public function process() {
@@ -107,7 +108,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
                 $this->out('reply_type', $reply_type);
             }
         }
-        $this->out('compose_draft', $this->session->get('compose_draft', array()));
+        $this->out('compose_draft', $this->session->get('compose_draft', array()), false);
         $compose_type = $this->user_config->get('smtp_compose_type', 0);
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
