@@ -311,7 +311,7 @@ abstract class Hm_Output_Module {
 
     /**
      * Return a translated string if possible
-     * @param the $string string to be translated
+     * @param string $string the string to be translated
      * @return string translated string
      */
     public function trans($string) {
@@ -335,6 +335,7 @@ abstract class Hm_Output_Module {
      * @param array $lang_str list of language translation strings
      * @return mixed module output, a string for HTML5 format,
      *               and an array for AJAX
+     * @todo remove or fix $protected arg
      */
     public function output_content($format, $lang_str, $protected) {
         $this->lstr = $lang_str;

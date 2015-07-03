@@ -136,7 +136,7 @@ trait Hm_Uid_Cache {
     private static $unread = array();
 
     /* Load UIDs from an outside source
-     * @param list $uid_array of uids
+     * @param array $data list of uids
      * @return void
      */
     public static function load($data) {

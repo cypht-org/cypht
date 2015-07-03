@@ -258,8 +258,8 @@ class Hm_Auth_POP3 extends Hm_Auth {
 
     /**
      * Send the username and password to the configured POP3 server for authentication
-     * @param $user string username
-     * @param $pass string password
+     * @param string $user username
+     * @param string $pass password
      * @return bool true if authentication worked
      */
     public function check_credentials($user, $pass) {
