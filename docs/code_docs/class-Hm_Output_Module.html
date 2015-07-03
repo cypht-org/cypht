@@ -738,7 +738,7 @@ and string translation services to modules</p>
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.module.html">module</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Output_Module.html#278-366" title="Go to source code">module.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Output_Module.html#278-367" title="Go to source code">module.php</a>
 		<br>
 	</div>
 
@@ -795,7 +795,7 @@ and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_trans">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#312-330" title="Go to source code">trans</a>( <span>the <var>$string</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module.html#312-330" title="Go to source code">trans</a>( <span>string <var>$string</var></span> )</code>
 
 		<div class="description short">
 			<p>Return a translated string if possible</p>
@@ -808,7 +808,7 @@ and string translation services to modules</p>
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$string</var></dt>
-					<dd>string to be translated</dd>
+					<dd>the string to be translated</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
@@ -834,7 +834,7 @@ and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output_content">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#332-349" title="Go to source code">output_content</a>( <span>string <var>$format</var></span>, <span>array <var>$lang_str</var></span>, <span> <var>$protected</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module.html#332-350" title="Go to source code">output_content</a>( <span>string <var>$format</var></span>, <span>array <var>$lang_str</var></span>, <span> <var>$protected</var></span> )</code>
 
 		<div class="description short">
 			<p>Build output by calling module specific output functions</p>
@@ -861,6 +861,10 @@ and string translation services to modules</p>
 				</div>
 
 
+				<h4>Todo</h4>
+				<div class="list">
+						remove or fix $protected arg<br>
+				</div>
 
 
 		</div>
@@ -878,7 +882,7 @@ and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_html_safe">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#351-358" title="Go to source code">html_safe</a>( <span>string <var>$string</var></span> )</code>
+		<code><a href="source-class-Hm_Output_Module.html#352-359" title="Go to source code">html_safe</a>( <span>string <var>$string</var></span> )</code>
 
 		<div class="description short">
 			<p>Sanitize input string</p>
@@ -917,7 +921,7 @@ and string translation services to modules</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output">#</a>
-		<code><a href="source-class-Hm_Output_Module.html#360-365" title="Go to source code">output</a>( )</code>
+		<code><a href="source-class-Hm_Output_Module.html#361-366" title="Go to source code">output</a>( )</code>
 
 		<div class="description short">
 			<p>Output modules need to override this method to add to a page or AJAX response</p>

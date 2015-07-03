@@ -1323,7 +1323,7 @@
 </span><span id="311" class="l"><a href="#311">311: </a>
 </span><span id="312" class="l"><a href="#312">312: </a>    <span class="php-comment">/**
 </span></span><span id="313" class="l"><a href="#313">313: </a><span class="php-comment">     * Return a translated string if possible
-</span></span><span id="314" class="l"><a href="#314">314: </a><span class="php-comment">     * @param the $string string to be translated
+</span></span><span id="314" class="l"><a href="#314">314: </a><span class="php-comment">     * @param string $string the string to be translated
 </span></span><span id="315" class="l"><a href="#315">315: </a><span class="php-comment">     * @return string translated string
 </span></span><span id="316" class="l"><a href="#316">316: </a><span class="php-comment">     */</span>
 </span><span id="317" class="l"><a href="#317">317: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> trans(<span class="php-var">$string</span>) {
@@ -1347,36 +1347,37 @@
 </span></span><span id="335" class="l"><a href="#335">335: </a><span class="php-comment">     * @param array $lang_str list of language translation strings
 </span></span><span id="336" class="l"><a href="#336">336: </a><span class="php-comment">     * @return mixed module output, a string for HTML5 format,
 </span></span><span id="337" class="l"><a href="#337">337: </a><span class="php-comment">     *               and an array for AJAX
-</span></span><span id="338" class="l"><a href="#338">338: </a><span class="php-comment">     */</span>
-</span><span id="339" class="l"><a href="#339">339: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> output_content(<span class="php-var">$format</span>, <span class="php-var">$lang_str</span>, <span class="php-var">$protected</span>) {
-</span><span id="340" class="l"><a href="#340">340: </a>        <span class="php-var">$this</span>-&gt;lstr = <span class="php-var">$lang_str</span>;
-</span><span id="341" class="l"><a href="#341">341: </a>        <span class="php-var">$this</span>-&gt;format = <span class="php-keyword2">str_replace</span>(<span class="php-quote">'Hm_Format_'</span>, <span class="php-quote">''</span>, <span class="php-var">$format</span>);
-</span><span id="342" class="l"><a href="#342">342: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_lang'</span>, <span class="php-var">$lang_str</span>)) {
-</span><span id="343" class="l"><a href="#343">343: </a>            <span class="php-var">$this</span>-&gt;lang = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_lang'</span>];
-</span><span id="344" class="l"><a href="#344">344: </a>        }
-</span><span id="345" class="l"><a href="#345">345: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_direction'</span>, <span class="php-var">$lang_str</span>)) {
-</span><span id="346" class="l"><a href="#346">346: </a>            <span class="php-var">$this</span>-&gt;<span class="php-keyword2">dir</span> = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_direction'</span>];
-</span><span id="347" class="l"><a href="#347">347: </a>        }
-</span><span id="348" class="l"><a href="#348">348: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;output(<span class="php-var">$format</span>);
-</span><span id="349" class="l"><a href="#349">349: </a>    }
-</span><span id="350" class="l"><a href="#350">350: </a>
-</span><span id="351" class="l"><a href="#351">351: </a>    <span class="php-comment">/**
-</span></span><span id="352" class="l"><a href="#352">352: </a><span class="php-comment">     * Sanitize input string
-</span></span><span id="353" class="l"><a href="#353">353: </a><span class="php-comment">     * @param string $string text to sanitize
-</span></span><span id="354" class="l"><a href="#354">354: </a><span class="php-comment">     * @return string sanitized value
-</span></span><span id="355" class="l"><a href="#355">355: </a><span class="php-comment">     */</span>
-</span><span id="356" class="l"><a href="#356">356: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> html_safe(<span class="php-var">$string</span>) {
-</span><span id="357" class="l"><a href="#357">357: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">htmlspecialchars</span>(<span class="php-var">$string</span>, ENT_QUOTES | ENT_HTML5, <span class="php-quote">'UTF-8'</span>);
-</span><span id="358" class="l"><a href="#358">358: </a>    }
-</span><span id="359" class="l"><a href="#359">359: </a>
-</span><span id="360" class="l"><a href="#360">360: </a>    <span class="php-comment">/**
-</span></span><span id="361" class="l"><a href="#361">361: </a><span class="php-comment">     * Output modules need to override this method to add to a page or AJAX response
-</span></span><span id="362" class="l"><a href="#362">362: </a><span class="php-comment">     * @return mixed should output with $this-&gt;output() if $this-&gt;format == AJAX, or return an HTML5 formatted
-</span></span><span id="363" class="l"><a href="#363">363: </a><span class="php-comment">     *               string if set to HTML5
-</span></span><span id="364" class="l"><a href="#364">364: </a><span class="php-comment">     */</span>
-</span><span id="365" class="l"><a href="#365">365: </a>    <span class="php-keyword1">abstract</span> <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output();
-</span><span id="366" class="l"><a href="#366">366: </a>}
-</span><span id="367" class="l"><a href="#367">367: </a></span></code></pre>
+</span></span><span id="338" class="l"><a href="#338">338: </a><span class="php-comment">     * @todo remove or fix $protected arg
+</span></span><span id="339" class="l"><a href="#339">339: </a><span class="php-comment">     */</span>
+</span><span id="340" class="l"><a href="#340">340: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> output_content(<span class="php-var">$format</span>, <span class="php-var">$lang_str</span>, <span class="php-var">$protected</span>) {
+</span><span id="341" class="l"><a href="#341">341: </a>        <span class="php-var">$this</span>-&gt;lstr = <span class="php-var">$lang_str</span>;
+</span><span id="342" class="l"><a href="#342">342: </a>        <span class="php-var">$this</span>-&gt;format = <span class="php-keyword2">str_replace</span>(<span class="php-quote">'Hm_Format_'</span>, <span class="php-quote">''</span>, <span class="php-var">$format</span>);
+</span><span id="343" class="l"><a href="#343">343: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_lang'</span>, <span class="php-var">$lang_str</span>)) {
+</span><span id="344" class="l"><a href="#344">344: </a>            <span class="php-var">$this</span>-&gt;lang = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_lang'</span>];
+</span><span id="345" class="l"><a href="#345">345: </a>        }
+</span><span id="346" class="l"><a href="#346">346: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'interface_direction'</span>, <span class="php-var">$lang_str</span>)) {
+</span><span id="347" class="l"><a href="#347">347: </a>            <span class="php-var">$this</span>-&gt;<span class="php-keyword2">dir</span> = <span class="php-var">$lang_str</span>[<span class="php-quote">'interface_direction'</span>];
+</span><span id="348" class="l"><a href="#348">348: </a>        }
+</span><span id="349" class="l"><a href="#349">349: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;output(<span class="php-var">$format</span>);
+</span><span id="350" class="l"><a href="#350">350: </a>    }
+</span><span id="351" class="l"><a href="#351">351: </a>
+</span><span id="352" class="l"><a href="#352">352: </a>    <span class="php-comment">/**
+</span></span><span id="353" class="l"><a href="#353">353: </a><span class="php-comment">     * Sanitize input string
+</span></span><span id="354" class="l"><a href="#354">354: </a><span class="php-comment">     * @param string $string text to sanitize
+</span></span><span id="355" class="l"><a href="#355">355: </a><span class="php-comment">     * @return string sanitized value
+</span></span><span id="356" class="l"><a href="#356">356: </a><span class="php-comment">     */</span>
+</span><span id="357" class="l"><a href="#357">357: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> html_safe(<span class="php-var">$string</span>) {
+</span><span id="358" class="l"><a href="#358">358: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">htmlspecialchars</span>(<span class="php-var">$string</span>, ENT_QUOTES | ENT_HTML5, <span class="php-quote">'UTF-8'</span>);
+</span><span id="359" class="l"><a href="#359">359: </a>    }
+</span><span id="360" class="l"><a href="#360">360: </a>
+</span><span id="361" class="l"><a href="#361">361: </a>    <span class="php-comment">/**
+</span></span><span id="362" class="l"><a href="#362">362: </a><span class="php-comment">     * Output modules need to override this method to add to a page or AJAX response
+</span></span><span id="363" class="l"><a href="#363">363: </a><span class="php-comment">     * @return mixed should output with $this-&gt;output() if $this-&gt;format == AJAX, or return an HTML5 formatted
+</span></span><span id="364" class="l"><a href="#364">364: </a><span class="php-comment">     *               string if set to HTML5
+</span></span><span id="365" class="l"><a href="#365">365: </a><span class="php-comment">     */</span>
+</span><span id="366" class="l"><a href="#366">366: </a>    <span class="php-keyword1">abstract</span> <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output();
+</span><span id="367" class="l"><a href="#367">367: </a>}
+</span><span id="368" class="l"><a href="#368">368: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>

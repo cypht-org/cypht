@@ -577,7 +577,7 @@
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.config.html">config</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Config.html#9-60" title="Go to source code">config.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Config.html#9-62" title="Go to source code">config.php</a>
 		<br>
 	</div>
 
@@ -597,7 +597,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_load">#</a>
-		<code><a href="source-class-Hm_Config.html#20-23" title="Go to source code">load</a>( <span> <var>$source</var></span>, <span> <var>$key</var></span> )</code>
+		<code><a href="source-class-Hm_Config.html#20-25" title="Go to source code">load</a>( <span>string <var>$source</var></span>, <span>string <var>$key</var></span> )</code>
 
 		<div class="description short">
 			<p>This method must be overriden by classes extending this one</p>
@@ -607,6 +607,13 @@
 			<p>This method must be overriden by classes extending this one</p>
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$source</var></dt>
+					<dd>source or identifier to determine the source</dd>
+					<dt><var>$key</var></dt>
+					<dd>encryption key</dd>
+				</dl></div>
 
 
 
@@ -627,7 +634,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_dump">#</a>
-		<code><a href="source-class-Hm_Config.html#25-31" title="Go to source code">dump</a>( )</code>
+		<code><a href="source-class-Hm_Config.html#27-33" title="Go to source code">dump</a>( )</code>
 
 		<div class="description short">
 			<p>Return all config values</p>
@@ -661,7 +668,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_set">#</a>
-		<code><a href="source-class-Hm_Config.html#33-41" title="Go to source code">set</a>( <span>string <var>$name</var></span>, <span>string <var>$value</var></span> )</code>
+		<code><a href="source-class-Hm_Config.html#35-43" title="Go to source code">set</a>( <span>string <var>$name</var></span>, <span>string <var>$value</var></span> )</code>
 
 		<div class="description short">
 			<p>Set a config value</p>
@@ -698,7 +705,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get">#</a>
-		<code><a href="source-class-Hm_Config.html#43-51" title="Go to source code">get</a>( <span>string <var>$name</var></span>, <span>mixed <var>$default</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_Config.html#45-53" title="Go to source code">get</a>( <span>string <var>$name</var></span>, <span>mixed <var>$default</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>Return a config value if it exists</p>
@@ -739,7 +746,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_set_tz">#</a>
-		<code><a href="source-class-Hm_Config.html#53-59" title="Go to source code">set_tz</a>( )</code>
+		<code><a href="source-class-Hm_Config.html#55-61" title="Go to source code">set_tz</a>( )</code>
 
 		<div class="description short">
 			<p>Set the timezone</p>

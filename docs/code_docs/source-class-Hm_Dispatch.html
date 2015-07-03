@@ -1178,24 +1178,25 @@
 </span><span id="166" class="l"><a href="#166">166: </a>    <span class="php-comment">/**
 </span></span><span id="167" class="l"><a href="#167">167: </a><span class="php-comment">     * Perform an HTTP redirect
 </span></span><span id="168" class="l"><a href="#168">168: </a><span class="php-comment">     * @param string $url url to redirect to
-</span></span><span id="169" class="l"><a href="#169">169: </a><span class="php-comment">     * @return void
-</span></span><span id="170" class="l"><a href="#170">170: </a><span class="php-comment">     */</span>
-</span><span id="171" class="l"><a href="#171">171: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> page_redirect(<span class="php-var">$url</span>, <span class="php-var">$status</span>=<span class="php-keyword1">false</span>) {
-</span><span id="172" class="l"><a href="#172">172: </a>        <span class="php-keyword1">if</span> (DEBUG_MODE) {
-</span><span id="173" class="l"><a href="#173">173: </a>            Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Redirecting to %s'</span>, <span class="php-var">$url</span>));
-</span><span id="174" class="l"><a href="#174">174: </a>            Hm_Debug::load_page_stats();
-</span><span id="175" class="l"><a href="#175">175: </a>            Hm_Debug::show(<span class="php-quote">'log'</span>);
-</span><span id="176" class="l"><a href="#176">176: </a>        }
-</span><span id="177" class="l"><a href="#177">177: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$status</span> == <span class="php-num">303</span>) {
-</span><span id="178" class="l"><a href="#178">178: </a>            Hm_Debug::add(<span class="php-quote">'Redirect loop found'</span>);
-</span><span id="179" class="l"><a href="#179">179: </a>            Hm_Functions::cease(<span class="php-quote">'Redirect loop discovered'</span>);
-</span><span id="180" class="l"><a href="#180">180: </a>        }
-</span><span id="181" class="l"><a href="#181">181: </a>        Hm_Functions::<span class="php-keyword2">header</span>(<span class="php-quote">'HTTP/1.1 303 Found'</span>);
-</span><span id="182" class="l"><a href="#182">182: </a>        Hm_Functions::<span class="php-keyword2">header</span>(<span class="php-quote">'Location: '</span>.<span class="php-var">$url</span>);
-</span><span id="183" class="l"><a href="#183">183: </a>        <span class="php-keyword1">return</span> Hm_Functions::cease();
-</span><span id="184" class="l"><a href="#184">184: </a>    }
-</span><span id="185" class="l"><a href="#185">185: </a>}
-</span><span id="186" class="l"><a href="#186">186: </a></span></code></pre>
+</span></span><span id="169" class="l"><a href="#169">169: </a><span class="php-comment">     * @param int $status current HTTP status
+</span></span><span id="170" class="l"><a href="#170">170: </a><span class="php-comment">     * @return void
+</span></span><span id="171" class="l"><a href="#171">171: </a><span class="php-comment">     */</span>
+</span><span id="172" class="l"><a href="#172">172: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> page_redirect(<span class="php-var">$url</span>, <span class="php-var">$status</span>=<span class="php-keyword1">false</span>) {
+</span><span id="173" class="l"><a href="#173">173: </a>        <span class="php-keyword1">if</span> (DEBUG_MODE) {
+</span><span id="174" class="l"><a href="#174">174: </a>            Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Redirecting to %s'</span>, <span class="php-var">$url</span>));
+</span><span id="175" class="l"><a href="#175">175: </a>            Hm_Debug::load_page_stats();
+</span><span id="176" class="l"><a href="#176">176: </a>            Hm_Debug::show(<span class="php-quote">'log'</span>);
+</span><span id="177" class="l"><a href="#177">177: </a>        }
+</span><span id="178" class="l"><a href="#178">178: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$status</span> == <span class="php-num">303</span>) {
+</span><span id="179" class="l"><a href="#179">179: </a>            Hm_Debug::add(<span class="php-quote">'Redirect loop found'</span>);
+</span><span id="180" class="l"><a href="#180">180: </a>            Hm_Functions::cease(<span class="php-quote">'Redirect loop discovered'</span>);
+</span><span id="181" class="l"><a href="#181">181: </a>        }
+</span><span id="182" class="l"><a href="#182">182: </a>        Hm_Functions::<span class="php-keyword2">header</span>(<span class="php-quote">'HTTP/1.1 303 Found'</span>);
+</span><span id="183" class="l"><a href="#183">183: </a>        Hm_Functions::<span class="php-keyword2">header</span>(<span class="php-quote">'Location: '</span>.<span class="php-var">$url</span>);
+</span><span id="184" class="l"><a href="#184">184: </a>        <span class="php-keyword1">return</span> Hm_Functions::cease();
+</span><span id="185" class="l"><a href="#185">185: </a>    }
+</span><span id="186" class="l"><a href="#186">186: </a>}
+</span><span id="187" class="l"><a href="#187">187: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
