@@ -19,6 +19,8 @@ abstract class Hm_Config {
 
     /**
      * This method must be overriden by classes extending this one
+     * @param string $source source or identifier to determine the source
+     * @param string $key encryption key
      */
     abstract public function load($source, $key);
 

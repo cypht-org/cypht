@@ -169,6 +169,10 @@ class Hm_Module_Exec {
     public $handlers = array();
     public $outputs = array();
 
+    /**
+     * @param objecty $config sit econfig
+     * @return void
+     */
     public function __construct($config) {
         $this->site_config = $config;
         $this->user_config = load_user_config_object($config);

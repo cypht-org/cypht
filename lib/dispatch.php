@@ -166,6 +166,7 @@ class Hm_Dispatch {
     /**
      * Perform an HTTP redirect
      * @param string $url url to redirect to
+     * @param int $status current HTTP status
      * @return void
      */
     static public function page_redirect($url, $status=false) {

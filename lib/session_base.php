@@ -93,16 +93,62 @@ abstract class Hm_Session {
     protected $session_closed = false;
 
     /**
-     * Methods extended classes need to override. See the Hm_PHP_Session extended class
-     * for comments
+     * check for an active session or an attempt to start one
+     * @param object $request request object
+     * @return bool
      */
     abstract protected function check($request);
+
+    /**
+     * Start the session. This could be an existing session or a new login
+     * @param object $request request details
+     * @return void
+     */
     abstract protected function start($request);
+
+    /**
+     * Call the configured authentication method to check user credentials
+     * @param string $user username
+     * @param string $pass password
+     * @return bool true if the authentication was successful
+     */
     abstract protected function auth($user, $pass);
+
+    /**
+     * Return a session value, or a user settings value stored in the session
+     * @param string $name session value name to return
+     * @param mixed $default value to return if $name is not found
+     * @return mixed the value if found, otherwise $default
+     */
     abstract protected function get($name, $default=false);
+
+    /**
+     * Save a value in the session
+     * @param string $name the name to save
+     * @param string $value the value to save
+     * @return void
+     */
     abstract protected function set($name, $value);
+
+    /**
+     * Delete a value from the session
+     * @param string $name name of value to delete
+     * @return void
+     */
     abstract protected function del($name);
+
+    /**
+     * End a session after a page request is complete. This only closes the session and
+     * does not destroy it
+     * @return void
+     */
     abstract protected function end();
+
+    /**
+     * Destroy a session for good
+     * @param object $request request details
+     * @return void
+     */
     abstract protected function destroy($request);
 
     /**
