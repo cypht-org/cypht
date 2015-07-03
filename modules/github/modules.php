@@ -312,6 +312,7 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
 class Hm_Handler_github_list_type extends Hm_Handler_Module {
     public function process() {
         $repos = $this->user_config->get('github_repos', array());
+        $excluded = $this->user_config->get('unread_exclude_github_setting', false);
         $parent = 'github_all';
         if (array_key_exists('list_parent', $this->request->get)) {
             if (in_array($this->request->get['list_parent'], array('combined_inbox', 'unread'), true)) {
@@ -338,11 +339,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                 }
             }
             elseif ($path == 'combined_inbox' || $path == 'unread') {
-                $excluded = false;
-                if ($path == 'unread'  && $this->user_config->get('unread_exclude_github_setting', false)) {
-                    $excluded = true;
-                }
-                if (!$excluded) {
+                if (!$excluded || $path == 'combined_inbox') {
                     foreach ($repos as $repo) {
                         $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                     }
@@ -351,7 +348,9 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
         }
         else {
             foreach ($repos as $repo) {
-                $this->append('data_sources', array('callback' => 'load_github_data_background', 'group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                if (!$excluded) {
+                    $this->append('data_sources', array('callback' => 'load_github_data_background', 'group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                }
             }
         }
     }
