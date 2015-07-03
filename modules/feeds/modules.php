@@ -232,6 +232,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                                     continue;
                                 }
                                 else {
+                                    Hm_Page_Cache::add($id.'_'.md5($item['guid']), $item, true);
                                     $item['server_id'] = $id;
                                     $item['server_name'] = $feed_data['name'];
                                     $res[] = $item;
@@ -264,35 +265,45 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
         if ($success) {
             $path = explode('_', $form['feed_list_path']);
             $id = $path[1];
-            $feed_data = Hm_Feed_List::dump($id);
-            if ($feed_data) {
-                $feed = is_feed($feed_data['server']);
-                if ($feed && $feed->parsed_data) {
-                    foreach ($feed->parsed_data as $item) {
-                        if (isset($item['id']) && !isset($item['guid'])) {
-                            $item['guid'] = $item['id'];
-                            unset($item['id']);
-                        }
-                        elseif (isset($item['title']) && !isset($item['guid'])) {
-                            $item['guid'] = md5($item['title']);
-                        }
-                        if (isset($item['guid']) && md5($item['guid']) == $form['feed_uid']) {
-                            if (isset($item['description'])) {
-                                $content = $item['description'];
-                                unset($item['description']);
-                            }
-                            elseif (isset($item['summary'])) {
-                                $content = $item['summary'];
-                                unset($item['summary']);
-                            }
-                            $title = $item['title'];
-                            $headers = $item;
-                            unset($headers['title']);
-                            $headers = array_merge(array('title' => $title), $headers);
-                            $headers['source'] = $feed_data['name'];
-                            break;
-                        }
+            $cache = Hm_Page_Cache::get($id.'_'.$form['feed_uid']);
+            $feed_items = array();
+            if ($cache) {
+                $feed_items = array($cache);
+            }
+            else {
+                $feed_data = Hm_Feed_List::dump($id);
+                if ($feed_data) {
+                    $feed = is_feed($feed_data['server']);
+                    if ($feed && $feed->parsed_data) {
+                        $feed_items = $feed->parsed_data;
                     }
+                }
+            }
+            foreach ($feed_items as $item) {
+                if (isset($item['id']) && !isset($item['guid'])) {
+                    $item['guid'] = $item['id'];
+                    unset($item['id']);
+                }
+                elseif (isset($item['title']) && !isset($item['guid'])) {
+                    $item['guid'] = md5($item['title']);
+                }
+                if (isset($item['guid']) && md5($item['guid']) == $form['feed_uid']) {
+                    if (isset($item['description'])) {
+                        $content = $item['description'];
+                        unset($item['description']);
+                    }
+                    elseif (isset($item['summary'])) {
+                        $content = $item['summary'];
+                        unset($item['summary']);
+                    }
+                    $title = $item['title'];
+                    $headers = $item;
+                    unset($headers['title']);
+                    $headers = array_merge(array('title' => $title), $headers);
+                    if (!$cache) {
+                        Hm_Page_Cache::add($id.'_'.md5($item['guid']), $item, true);
+                    }
+                    break;
                 }
             }
             if ($content) {
