@@ -25,3 +25,4 @@ ul li:before { margin-left: -2em; color: #aaa; content: '\229A'; padding-right: 
 .caption { text-align: center; padding-bottom: 15px; font-size: 90%; font-style: italic; }
 h3 { margin: 10px; margin-left: 0px; margin-top: 30px; padding: 0px; }
 .top { margin-top: 0px !important; }
+.logo { color: #fff; }
