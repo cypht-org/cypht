@@ -5,6 +5,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function setUp() {
         require 'bootstrap.php';
         define('CONFIG_FILE', APP_PATH.'hm3.rc');
+        $this->config = new Hm_Mock_Config();
     }
     /**
      * @preserveGlobalState disabled
@@ -13,7 +14,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_process_request() {
         ob_start();
         ob_start();
-        $router = new Hm_Dispatch(CONFIG_FILE);
+        $router = new Hm_Dispatch($this->config);
         $this->assertEquals('home', $router->page);
         ob_end_clean();
     }
@@ -24,7 +25,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_check_for_tls_redirect() {
         ob_start();
         ob_start();
-        $router = new Hm_Dispatch();
+        $router = new Hm_Dispatch($this->config);
         ob_end_clean();
         $router->site_config->set('disable_tls', false);
         $router->request->server['SERVER_NAME'] = 'test';
@@ -38,7 +39,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_get_page() {
         ob_start();
         ob_start();
-        $router = new Hm_Dispatch();
+        $router = new Hm_Dispatch($this->config);
         ob_end_clean();
         $request = new Hm_Mock_Request('HTTP');
         $router->get_page(array(), $request);
@@ -61,7 +62,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_check_for_redirect() {
         ob_start();
         ob_start();
-        $router = new Hm_Dispatch();
+        $router = new Hm_Dispatch($this->config);
         ob_end_clean();
         $this->assertFalse($router->check_for_redirect());
         $router->module_exec->handler_response = array('no_redirect' => true);
