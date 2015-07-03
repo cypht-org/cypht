@@ -15,6 +15,7 @@ class Hm_Handler_close_session_early extends Hm_Handler_Module {
      * Uses the close_early method of the session this->session object
      */
     public function process() {
+        Hm_Page_Cache::save($this->session);
         $this->session->close_early();
     }
 }
