@@ -58,7 +58,7 @@ class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
 
 /**
  * @subpackage wordpress/handler
- * TODO: fix for background unread 
+ * @todo: fix for background unread 
  */
 class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
     public function process() {
