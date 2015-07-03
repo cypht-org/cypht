@@ -1,2 +1,7 @@
 .add_contact_form input { margin: 5px; }
 .add_contact_form { padding-top: 10px; display: block; }
+.contact_list  { margin-top: 20px; width: 50%; }
+.contact_list td { padding-bottom: 5px; vertical-align: -5px; padding-top: 5px; border-bottom: solid 1px #ddd; }
+.contact_list_title { padding-top: 0px !important; padding-bottom: 10px; }
+.send_to_contact img, .delete_contact img { opacity: .5; margin-left: 10px; }
+.contact_controls { text-align: right; }
