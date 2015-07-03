@@ -254,9 +254,6 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                 $this->out('reload_folders', true, false);
             }
         }
-        /*elseif (array_key_exists('save_settings', $this->request->post)) {
-            Hm_Msgs::add('ERRYour password is required to save your settings to the server');
-        }*/
     }
 }
 
