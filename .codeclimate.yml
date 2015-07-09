@@ -11,6 +11,9 @@ engines:
 ratings:
     paths:
         - "lib/*.php"
+        - "modules/*/*.php"
+        - "modules/*/*.js"
+        - "modules/*/*.css"
 
 exclude_paths:
     - "modules/*"
