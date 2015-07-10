@@ -86,8 +86,17 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                             if ($stream_size > 0) {
                                 $name = get_imap_part_name($part_struct, $uid, $msg_id);
                                 header('Content-Disposition: attachment; filename="'.$name.'"');
+                                $charset = '';
+                                if (array_key_exists('attributes', $part_struct)) {
+                                    if (is_array($part_struct['attributes']) && array_key_exists('charset', $part_struct['attributes'])) {
+                                        $charset = '; charset='.$part_struct['attributes']['charset'];
+                                    }
+                                }
+                                header('Content-Type: '.$part_struct['type'].'/'.$part_struct['subtype'].$charset);
                                 header('Content-Transfer-Encoding: binary');
-                                header('Content-Length: '.$part_struct['size']);
+                                if (array_key_exists('size', $part_struct)) {
+                                    header('Content-Length: '.$part_struct['size']);
+                                }
                                 ob_end_clean();
                                 while($line = $imap->read_stream_line()) {
                                     if ($encoding == 'quoted-printable') {
@@ -1853,12 +1862,41 @@ function imap_refresh_oauth2_token($server, $config) {
     return array();
 }
 
-function get_imap_part_name($struct, $uid, $part_id) {
-    $extension = '';
-    if (strtolower($struct['type']) == 'message' && strtolower($struct['subtype'] = 'rfc822')) {
-        $extension = '.eml';
+/**
+ * Get a file extension for a mime type
+ * @param string $type primary mime type
+ * @param string $subtype secondary mime type
+ * @todo add tons more type conversions!
+ * @return string
+ */
+function get_imap_mime_extension($type, $subtype) {
+    $extension = $subtype;
+    if ($type == 'multipart' || ($type == 'message' && $subtype == 'rfc822')) {
+        $extension = 'eml';
     }
-    if (array_key_exists('file_attributes', $struct) && array_key_exists('attachment', $struct['file_attributes'])) {
+    if ($type == 'text') {
+        switch ($subtype) {
+            case 'plain':
+                $extension = 'txt';
+                break;
+            case 'richtext':
+                $extension = 'rtf';
+                break;
+        }
+    }
+    return '.'.$extension;
+}
+
+/**
+ * Try to find a filename for a message part download
+ * @param array $struct message part structure
+ * @param int $uid message number
+ * @param string $part_id message part number
+ * @return string
+ */
+function get_imap_part_name($struct, $uid, $part_id) {
+    $extension = get_imap_mime_extension(strtolower($struct['type']), strtolower($struct['subtype']));
+    if (array_key_exists('file_attributes', $struct) && is_array($struct['file_attributes']) && array_key_exists('attachment', $struct['file_attributes'])) {
         for ($i=0;$i<count($struct['file_attributes']['attachment']);$i++) {
             if (strtolower(trim($struct['file_attributes']['attachment'][$i])) == 'filename') {
                 if (array_key_exists(($i+1), $struct['file_attributes']['attachment'])) {
@@ -1868,13 +1906,21 @@ function get_imap_part_name($struct, $uid, $part_id) {
         }
     }
 
+    if (array_key_exists('disposition', $struct) && is_array($struct['disposition']) && array_key_exists('attachment', $struct['disposition'])) {
+        for ($i=0;$i<count($struct['disposition']['attachment']);$i++) {
+            if (strtolower(trim($struct['disposition']['attachment'][$i])) == 'filename') {
+                if (array_key_exists(($i+1), $struct['disposition']['attachment'])) {
+                    return trim($struct['disposition']['attachment'][($i+1)]);
+                }
+            }
+        }
+    }
+
     if (array_key_exists('attributes', $struct) && is_array($struct['attributes']) && array_key_exists('name', $struct['attributes'])) {
         return trim($struct['attributes']['name']);
     }
-    if (array_key_exists('description', $struct)) {
-        return trim(str_replace(' ', '_', $struct['description'])).$extension;
+    if (array_key_exists('description', $struct) && trim($struct['description'])) {
+        return trim(str_replace(array("\n", ' '), '_', $struct['description'])).$extension;
     }
     return 'message_'.$uid.'_part_'.$part_id.$extension;
 }
-
-
