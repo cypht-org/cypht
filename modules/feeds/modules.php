@@ -232,7 +232,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                                     continue;
                                 }
                                 else {
-                                    Hm_Page_Cache::add($id.'_'.md5($item['guid']), $item, true);
+                                    //Hm_Page_Cache::add($id.'_'.md5($item['guid']), $item, true);
                                     $item['server_id'] = $id;
                                     $item['server_name'] = $feed_data['name'];
                                     $res[] = $item;
@@ -265,7 +265,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
         if ($success) {
             $path = explode('_', $form['feed_list_path']);
             $id = $path[1];
-            $cache = Hm_Page_Cache::get($id.'_'.$form['feed_uid']);
+            $cache = false; // Hm_Page_Cache::get($id.'_'.$form['feed_uid']);
             $feed_items = array();
             if ($cache) {
                 $feed_items = array($cache);
@@ -301,7 +301,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                     unset($headers['title']);
                     $headers = array_merge(array('title' => $title), $headers);
                     if (!$cache) {
-                        Hm_Page_Cache::add($id.'_'.md5($item['guid']), $item, true);
+                        //Hm_Page_Cache::add($id.'_'.md5($item['guid']), $item, true);
                     }
                     break;
                 }
