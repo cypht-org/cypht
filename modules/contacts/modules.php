@@ -13,6 +13,29 @@ require APP_PATH.'modules/contacts/hm-contacts.php';
 /**
  * @subpackage contacts/handler
  */
+class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
+    public function process() {
+        $contacts = array();
+        $existing = new Hm_Contact_Store($this->user_config);
+        $addr_headers = array('to', 'cc', 'bcc', 'sender', 'reply-to', 'from');
+        $headers = $this->get('msg_headers');
+        $addresses = array();
+        foreach ($headers as $name => $value) {
+            if (in_array(strtolower($name), $addr_headers, true)) {
+                foreach (Hm_Address_Field::parse($value) as $vals) {
+                    if (!$existing->search(array('email_address' => $vals['email']))) {
+                        $addresses[] = $vals;
+                    }
+                }
+            }
+        }
+        $this->out('contact_addresses', $addresses);
+    }
+}
+
+/**
+ * @subpackage contacts/handler
+ */
 class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('contact_id', $this->request->get)) {
@@ -45,6 +68,27 @@ class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
             $contacts->save($this->user_config);
             $this->session->record_unsaved('Contact deleted');
             Hm_Msgs::add('Contact Deleted');
+        }
+    }
+}
+
+/**
+ * @subpackage contacts/handler
+ */
+class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('contact_value'));
+        if ($success) {
+            $addresses = Hm_Address_Field::parse($form['contact_value']);
+            if (!empty($addresses)) {
+                $contacts = $this->get('contact_store');
+                foreach ($addresses as $vals) {
+                    $contacts->add_contact(array('email_address' => $vals['email'], 'display_name' => $vals['name']));
+                }
+                $contacts->save($this->user_config);
+                $this->session->record_unsaved('Contact added');
+                Hm_Msgs::add('Contact Added');
+            }
         }
     }
 }
@@ -98,6 +142,26 @@ class Hm_Output_contacts_content_start extends Hm_Output_Module {
 class Hm_Output_contacts_content_end extends Hm_Output_Module {
     protected function output() {
         return '</div>';
+    }
+}
+
+/**
+ * @subpackage contacts/output
+ */
+class Hm_Output_add_message_contacts extends Hm_Output_Module {
+    protected function output() {
+        $addresses = $this->get('contact_addresses');
+        $headers = $this->get('msg_headers');
+        if (!empty($addresses)) {
+            $res = '<div class="add_contact_row"><select id="add_contact">';
+            foreach ($addresses as $vals) {
+                $res .= '<option value="'.$this->html_safe($vals['name']).' '.$this->html_safe($vals['email']).
+                    '">'.$this->html_safe($vals['name']).' &lt;'.$this->html_safe($vals['email']).'&gt;</option>';
+            }
+            $res .= '</select> <input onclick="return add_contact_from_message_view()" class="add_contact_button" type="button" value="'.$this->trans('Add').'"></div>';
+            $headers = $res.$headers;
+        }
+        $this->out('msg_headers', $headers);
     }
 }
 
