@@ -11,7 +11,8 @@ var add_contact_from_message_view = function() {
     if (contact) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
-            {'name': 'contact_value', 'value': contact}]
+            {'name': 'contact_value', 'value': contact}],
+            function(res) { $('.add_contact_controls').toggle(); }
         );
     }
 };

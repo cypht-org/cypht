@@ -5,4 +5,8 @@
 .contact_list_title { padding-top: 0px !important; padding-bottom: 10px; }
 .send_to_contact img, .delete_contact img { opacity: .5; margin-left: 10px; }
 .contact_controls { text-align: right; }
-.add_contact_row { padding: 20px; position: absolute; right: 10px; top: 40px; font-size: 90%; }
+.add_contact_row { position: absolute; top: 22px; right: 10px; font-size: 90%; }
+.add_contact_row img { opacity: .4; margin-right: 10px; }
+.add_contact_controls { display: none; }
+#add_contact { max-width: 300px; }
+@media screen and (max-device-width:480px) and (orientation : portrait) { .add_contact_row { display: none; } }

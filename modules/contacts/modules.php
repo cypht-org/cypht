@@ -153,13 +153,13 @@ class Hm_Output_add_message_contacts extends Hm_Output_Module {
         $addresses = $this->get('contact_addresses');
         $headers = $this->get('msg_headers');
         if (!empty($addresses)) {
-            $res = '<div class="add_contact_row"><select id="add_contact">';
+            $res = '<div class="add_contact_row"><a href="#" onclick="$(\'.add_contact_controls\').toggle(); return false;"><img width="20" height="20" src="'.Hm_Image_Sources::$people.'" alt="'.$this->trans('Add').'" title="'.$this->html_safe('Add Contact').'" /></a><span class="add_contact_controls"><select id="add_contact">';
             foreach ($addresses as $vals) {
                 $res .= '<option value="'.$this->html_safe($vals['name']).' '.$this->html_safe($vals['email']).
                     '">'.$this->html_safe($vals['name']).' &lt;'.$this->html_safe($vals['email']).'&gt;</option>';
             }
-            $res .= '</select> <input onclick="return add_contact_from_message_view()" class="add_contact_button" type="button" value="'.$this->trans('Add').'"></div>';
-            $headers = $res.$headers;
+            $res .= '</select> <input onclick="return add_contact_from_message_view()" class="add_contact_button" type="button" value="'.$this->trans('Add').'"></span></div>';
+            $headers = $headers.$res;
         }
         $this->out('msg_headers', $headers);
     }
