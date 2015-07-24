@@ -1044,4 +1044,7 @@ $(function() {
             Hm_Folders.save_folder_list();
         }
     }
+    if ($('.save_reminder').length) {
+        $('.menu_save a').css('font-weight', 'bold');
+    }
 });
