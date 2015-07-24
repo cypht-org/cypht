@@ -1073,7 +1073,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             $txt .= '</th></tr></table>';
 
-            $this->out('msg_headers', $txt);
+            $this->out('msg_headers', $txt, false);
         }
     }
 }

@@ -197,6 +197,7 @@ function email_is_active($mod_list) {
  * @return bool
  */
 function is_email($val, $allow_local=false) {
+    $val = trim($val, "<>");
     $domain = false;
     $local = false;
     if (!trim($val) || strlen($val) > 320) {
@@ -450,4 +451,64 @@ function merge_folder_list_details($folder_sources) {
     }
     ksort($res);
     return $res;
+}
+
+class Hm_Address_Field {
+
+    public static function parse($string) {
+        $marker = true;
+        $results = array();
+
+        while ($marker !== false) {
+            list($marker, $token, $string) = self::get_token($string);
+            if (is_email($token)) {
+                list($name, $marker) = self::find_name_field($string);
+                if ($marker > -1) {
+                    $string = substr($string, 0, $marker);
+                }
+                else {
+                    $marker = false;
+                }
+                $results[] = array('email' => $token, 'name' => $name);
+            }
+        }
+        return $results;
+    }
+
+    private static function get_token($string) {
+        $marker = strrpos($string, ' ');
+        $token = trim(ltrim(substr($string, $marker)), '<>');
+        $string = substr($string, 0, $marker);
+        return array($marker, $token, $string);
+    }
+
+    private static function is_quote($string, $i, $quote) {
+        if (in_array($string{$i}, array('"', "'"), true)) {
+            if (!self::embeded_quote($string, $i)) {
+                $quote = $quote ? false : true;
+            }
+        }
+        return $quote;
+    }
+
+    private static function find_name_field($string) {
+        $quote = false;
+        $result = '';
+        for ($i = strlen($string) - 1;$i>-1; $i--) {
+            $quote = self::is_quote($string, $i, $quote);
+            if (self::delimiter_found($string, $i, $quote)) {
+                break;
+            }
+            $result .= $string{$i};
+        }
+        return array(strrev(trim(trim($result),'"\'')), $i);
+    }
+
+    private static function embeded_quote($string, $i) {
+        return $i > 0 && $string{$i -1} == '\\';
+    }
+
+    private static function delimiter_found($string, $i, $quote) {
+        return !$quote && in_array($string{$i}, array(',', ';'), true);
+    }
 }
