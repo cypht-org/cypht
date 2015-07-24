@@ -494,6 +494,7 @@
 
 			<h3>Functions</h3>
 			<ul>
+				<li><a href="function-get_imap_mime_extension.html">get_imap_mime_extension</a></li>
 				<li class="active"><a href="function-get_imap_part_name.html">get_imap_part_name</a></li>
 				<li><a href="function-imap_refresh_oauth2_token.html">imap_refresh_oauth2_token</a></li>
 			</ul>
@@ -547,12 +548,15 @@
 	<h1>Function get_imap_part_name</h1>
 
 
+	<div class="description">
+	<p>Try to find a filename for a message part download</p>
+	</div>
 
 	<div class="info">
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.imap.html">imap</a><br>
 		<b>Located at</b>
-		<a href="source-function-get_imap_part_name.html#1856-1878" title="Go to source code">
+		<a href="source-function-get_imap_part_name.html#1890-1926" title="Go to source code">
 			imap/modules.php
 		</a><br>
 	</div>
@@ -561,22 +565,33 @@
 	<table class="summary" id="parameters">
 	<caption>Parameters summary</caption>
 	<tr id="$struct">
-		<td class="name"><code></code></td>
+		<td class="name"><code>array</code></td>
 		<td class="value"><code><var>$struct</var></code></td>
-		<td></td>
+		<td>message part structure</td>
 	</tr>
 	<tr id="$uid">
-		<td class="name"><code></code></td>
+		<td class="name"><code>integer</code></td>
 		<td class="value"><code><var>$uid</var></code></td>
-		<td></td>
+		<td>message number</td>
 	</tr>
 	<tr id="$part_id">
-		<td class="name"><code></code></td>
+		<td class="name"><code>string</code></td>
 		<td class="value"><code><var>$part_id</var></code></td>
-		<td></td>
+		<td>message part number</td>
 	</tr>
 	</table>
 
+	<table class="summary" id="returns">
+	<caption>Return value summary</caption>
+	<tr>
+		<td class="name"><code>
+			string
+		</code></td>
+		<td>
+			string
+		</td>
+	</tr>
+	</table>
 
 
 </div>
@@ -587,6 +602,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?6d2cc2fd9148b5a5a9ef7f8c6094221cb43526b3"></script>
+<script src="elementlist.js?4fe77173c735d5a56caded521df4f47a809caaf6"></script>
 </body>
 </html>
