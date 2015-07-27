@@ -11,6 +11,7 @@ setup_base_page('contacts', 'core');
 
 add_handler('contacts', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_handler('contacts', 'process_add_contact', true, 'contacts', 'load_contacts', 'after');
+add_handler('contacts', 'process_edit_contact', true, 'contacts', 'load_contacts', 'after');
 add_output('contacts', 'contacts_content_start', true, 'contacts', 'content_section_start', 'after');
 add_output('contacts', 'contacts_content_add_form', true, 'contacts', 'contacts_content_start', 'after');
 add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_content_add_form', 'after');
@@ -52,7 +53,9 @@ return array(
         'contact_name' => FILTER_SANITIZE_STRING,
         'contact_phone' => FILTER_SANITIZE_STRING,
         'contact_id' => FILTER_VALIDATE_INT,
-        'contact_value' => FILTER_SANITIZE_STRING
+        'contact_value' => FILTER_SANITIZE_STRING,
+        'edit_contact' => FILTER_SANITIZE_STRING,
+        'add_contact' => FILTER_SANITIZE_STRING
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_VALIDATE_INT

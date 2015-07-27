@@ -52,7 +52,16 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_load_contacts extends Hm_Handler_Module {
     public function process() {
-        $this->out('contact_store', new Hm_Contact_Store($this->user_config));
+        $contacts = new Hm_Contact_Store($this->user_config);
+        if (array_key_exists('contact_id', $this->request->get)) {
+            $contact = $contacts->get($this->request->get['contact_id']);
+            if (is_object($contact)) {
+                $current = $contact->export();
+                $current['id'] = $this->request->get['contact_id'];
+                $this->out('current_contact', $current);
+            }
+        }
+        $this->out('contact_store', $contacts);
     }
 }
 
@@ -96,10 +105,31 @@ class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
 /**
  * @subpackage contacts/handler
  */
+class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
+    public function process() {
+        $contacts = $this->get('contact_store');
+        list($success, $form) = $this->process_form(array('contact_id', 'contact_email', 'contact_name', 'edit_contact'));
+        if ($success) {
+            $details = array('email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
+            if (array_key_exists('contact_phone', $this->request->post)) {
+                $details['phone_number'] = $this->request->post['contact_phone'];
+            }
+            if ($contacts->update_contact($form['contact_id'], $details)) {
+                $contacts->save($this->user_config);
+                $this->session->record_unsaved('Contact updated');
+                Hm_Msgs::add('Contact Updated');
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage contacts/handler
+ */
 class Hm_Handler_process_add_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
-        list($success, $form) = $this->process_form(array('contact_email', 'contact_name'));
+        list($success, $form) = $this->process_form(array('contact_email', 'contact_name', 'add_contact'));
         if ($success) {
             $details = array('email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
             if (array_key_exists('contact_phone', $this->request->post) && $this->request->post['contact_phone']) {
@@ -182,6 +212,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<td class="contact_controls">'.
                         '<a data-id="'.$this->html_safe($id).'" class="delete_contact" title="Delete"><img alt="'.$this->trans('Delete').'" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
                         '<a href="?page=compose&contact_id='.$this->html_safe($id).'" class="send_to_contact" title="Send to"><img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$doc.'" /></a>'.
+                        '<a href="?page=contacts&contact_id='.$this->html_safe($id).'" class="delete_contact" title="Edit"><img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>'.
                     '</td>'.
                     '</tr>';
             }
@@ -196,17 +227,37 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
  */
 class Hm_Output_contacts_content_add_form extends Hm_Output_Module {
     protected function output() {
+
+        $email = '';
+        $name = '';
+        $phone = '';
+        $button = '<input class="add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
+        $current = $this->get('current_contact', array());
+        if (!empty($current)) {
+            if (array_key_exists('email_address', $current)) {
+                $email = $current['email_address'];
+            }
+            if (array_key_exists('display_name', $current)) {
+                $name = $current['display_name'];
+            }
+            if (array_key_exists('phone_number', $current)) {
+                $phone = $current['phone_number'];
+            }
+            $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
+                '<input class="edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
+        }
         return '<div class="add_server"><div class="server_title">'.$this->trans('Add').'</div>'.
             '<form class="add_contact_form" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="screen_reader" for="contact_email">'.$this->trans('E-mail Address').'</label>'.
-            '<input autofocus required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" /> *<br />'.
+            '<input autofocus required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" '.
+            'value="'.$this->html_safe($email).'" /> *<br />'.
             '<label class="screen_reader" for="contact_name">'.$this->trans('Full Name').'</label>'.
-            '<input required placeholder="'.$this->trans('Full Name').'" id="contact_name" type="text" name="contact_name" /> *<br />'.
+            '<input required placeholder="'.$this->trans('Full Name').'" id="contact_name" type="text" name="contact_name" '.
+            'value="'.$this->html_safe($name).'" /> *<br />'.
             '<label class="screen_reader" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
-            '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" /><br />'.
-            '<input class="add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />'.
-            '</form></div>';
+            '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
+            'value="'.$this->html_safe($phone).'" /><br />'.$button.'</form></div>';
     }
 }
 
