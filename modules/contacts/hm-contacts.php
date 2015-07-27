@@ -128,9 +128,6 @@ class Hm_Contact {
     }
 
     function update($fld, $val) {
-        if (!array_key_exists($fld, $this->data)) {
-            return false;
-        }
         $this->data[$fld] = $val;
         return true;
     }
