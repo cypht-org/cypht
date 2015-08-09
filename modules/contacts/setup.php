@@ -33,6 +33,15 @@ add_handler('ajax_add_contact', 'save_user_data',  true, 'core');
 add_handler('ajax_add_contact', 'date', true, 'core');
 add_handler('ajax_add_contact', 'http_headers', true, 'core');
 
+add_handler('ajax_autocomplete_contact', 'login', false, 'core');
+add_handler('ajax_autocomplete_contact', 'load_user_data', true, 'core');
+add_handler('ajax_autocomplete_contact', 'load_contacts', true);
+add_handler('ajax_autocomplete_contact', 'autocomplete_contact', true);
+add_handler('ajax_autocomplete_contact', 'language', true, 'core');
+add_handler('ajax_autocomplete_contact', 'save_user_data',  true, 'core');
+add_handler('ajax_autocomplete_contact', 'date', true, 'core');
+add_handler('ajax_autocomplete_contact', 'http_headers', true, 'core');
+
 add_handler('ajax_delete_contact', 'login', false, 'core');
 add_handler('ajax_delete_contact', 'load_user_data', true, 'core');
 add_handler('ajax_delete_contact', 'load_contacts', true);
@@ -46,7 +55,8 @@ return array(
     'allowed_pages' => array(
         'contacts',
         'ajax_add_contact',
-        'ajax_delete_contact'
+        'ajax_delete_contact',
+        'ajax_autocomplete_contact'
     ),
     'allowed_post' => array(
         'contact_email' => FILTER_SANITIZE_STRING,
@@ -59,7 +69,10 @@ return array(
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_VALIDATE_INT
-    )
+    ),
+    'allowed_output' => array(
+        'contact_suggestions' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY)
+    ),
 );
 
 

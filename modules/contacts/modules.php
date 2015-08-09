@@ -13,6 +13,35 @@ require APP_PATH.'modules/contacts/hm-contacts.php';
 /**
  * @subpackage contacts/handler
  */
+class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('contact_value'));
+        $results = array();
+        if ($success) {
+            if (strstr($form['contact_value'], ',')) {
+                $val = explode(',', $form['contact_value']);
+                $val = array_pop($val);
+            }
+            else {
+                $val = $form['contact_value'];
+            }
+            $val = trim($val);
+            $contacts = new Hm_Contact_Store($this->user_config);
+            $search_results = $contacts->search(array(
+                'display_name' => $val,
+                'email_address' => $val
+            ));
+            foreach ($search_results as $contact) {
+                $results[] = sprintf('%s', $contact->value('email_address'));
+            }
+        }
+        $this->out('contact_suggestions', $results);
+    }
+}
+
+/**
+ * @subpackage contacts/handler
+ */
 class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = array();
