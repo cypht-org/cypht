@@ -805,10 +805,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      */
     private function parse_bodystructure_response($result) {
         $response = array();
-        if (strtoupper($result[0][6]) == 'MODSEQ')  {
+        if (array_key_exists(6, $result[0]) && strtoupper($result[0][6]) == 'MODSEQ')  {
             $response = array_slice($result[0], 11, -1);
         }
-        elseif (strtoupper($result[0][4]) == 'UID')  {
+        elseif (array_key_exists(4, $result[0]) && strtoupper($result[0][4]) == 'UID')  {
             $response = array_slice($result[0], 7, -1);
         }
         else {
