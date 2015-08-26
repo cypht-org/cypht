@@ -20,6 +20,7 @@ class Hm_MIME_Msg {
 
     /* build mime message data */
     function __construct($to, $subject, $body, $from, $html=false) {
+        $this->headers['From'] = $from;
         $this->headers['To'] = $this->encode_header_fld($to);
         $this->headers['Subject'] = $this->encode_header_fld($subject);
         $this->headers['Date'] = date('r');
