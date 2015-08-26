@@ -486,7 +486,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             if (!$no_edit) {
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
-                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="smtp_delete" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection" />';
                     $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_smtp_connection" />';
                 }
                 else {
