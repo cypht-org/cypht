@@ -73,6 +73,8 @@ return array(
         'compose_to' => FILTER_UNSAFE_RAW,
         'compose_body' => FILTER_UNSAFE_RAW,
         'compose_subject' => FILTER_SANITIZE_STRING,
+        'compose_cc' => FILTER_SANITIZE_STRING,
+        'compose_bcc' => FILTER_SANITIZE_STRING,
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_SANITIZE_STRING,
         'draft_to' => FILTER_UNSAFE_RAW

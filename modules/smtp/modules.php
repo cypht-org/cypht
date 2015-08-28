@@ -299,9 +299,19 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 $subject = $form['compose_subject'];
                 $body = '';
                 $from = '';
+                $cc = '';
+                $bcc = '';
                 if (array_key_exists('compose_body', $this->request->post)) {
                     $body = $this->request->post['compose_body'];
                     $draft['draft_body'] = $this->request->post['compose_body'];
+                }
+                if (array_key_exists('compose_cc', $this->request->post)) {
+                    $cc = $this->request->post['compose_cc'];
+                    $draft['draft_cc'] = $this->request->post['compose_cc'];
+                }
+                if (array_key_exists('compose_bcc', $this->request->post)) {
+                    $bcc = $this->request->post['compose_bcc'];
+                    $draft['draft_bcc'] = $this->request->post['compose_bcc'];
                 }
                 $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
                 if ($smtp_details) {
@@ -319,7 +329,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     }
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
-                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0));
+                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0), $cc, $bcc);
                         $recipients = $mime->get_recipient_addresses();
                         if (empty($recipients)) {
                             Hm_Msgs::add("ERRNo valid receipts found");
@@ -389,8 +399,8 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input value="'.$this->html_safe($to).'" list="to_contacts" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
             '<datalist id="to_contacts"></datalist>'.
-            '<input value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('CC').'" />'.
-            '<input value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('BCC').'" />'.
+            '<input value="'.$this->html_safe($cc).'" list="to_contacts" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('CC').'" />'.
+            '<input value="'.$this->html_safe($bcc).'" list="to_contacts" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('BCC').'" />'.
             '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
             '<textarea novalidate id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
             smtp_server_dropdown($this->module_output(), $this).
