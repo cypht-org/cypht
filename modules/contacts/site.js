@@ -49,4 +49,10 @@ else if (hm_page_name() == 'compose') {
     $('.compose_to').keyup(function(e) {
         autocomplete_contact(e, '.compose_to');
     });
+    $('.compose_cc').keyup(function(e) {
+        autocomplete_contact(e, '.compose_cc');
+    });
+    $('.compose_bcc').keyup(function(e) {
+        autocomplete_contact(e, '.compose_bcc');
+    });
 }
