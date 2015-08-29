@@ -518,6 +518,7 @@
 				<li><a href="class-Hm_Handler_add_imap_servers_to_page_data.html">Hm_Handler_add_imap_servers_to_page_data</a></li>
 				<li><a href="class-Hm_Handler_add_pop3_servers_to_page_data.html">Hm_Handler_add_pop3_servers_to_page_data</a></li>
 				<li><a href="class-Hm_Handler_add_smtp_servers_to_page_data.html">Hm_Handler_add_smtp_servers_to_page_data</a></li>
+				<li><a href="class-Hm_Handler_autocomplete_contact.html">Hm_Handler_autocomplete_contact</a></li>
 				<li><a href="class-Hm_Handler_check_internal_users.html">Hm_Handler_check_internal_users</a></li>
 				<li><a href="class-Hm_Handler_close_session_early.html">Hm_Handler_close_session_early</a></li>
 				<li><a href="class-Hm_Handler_date.html">Hm_Handler_date</a></li>
@@ -1824,10 +1825,10 @@
 </span></span><span id="805" class="l"><a href="#805"> 805: </a><span class="php-comment">     */</span>
 </span><span id="806" class="l"><a href="#806"> 806: </a>    <span class="php-keyword1">private</span> <span class="php-keyword1">function</span> parse_bodystructure_response(<span class="php-var">$result</span>) {
 </span><span id="807" class="l"><a href="#807"> 807: </a>        <span class="php-var">$response</span> = <span class="php-keyword1">array</span>();
-</span><span id="808" class="l"><a href="#808"> 808: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strtoupper</span>(<span class="php-var">$result</span>[<span class="php-num">0</span>][<span class="php-num">6</span>]) == <span class="php-quote">'MODSEQ'</span>)  {
+</span><span id="808" class="l"><a href="#808"> 808: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-num">6</span>, <span class="php-var">$result</span>[<span class="php-num">0</span>]) &amp;&amp; <span class="php-keyword2">strtoupper</span>(<span class="php-var">$result</span>[<span class="php-num">0</span>][<span class="php-num">6</span>]) == <span class="php-quote">'MODSEQ'</span>)  {
 </span><span id="809" class="l"><a href="#809"> 809: </a>            <span class="php-var">$response</span> = <span class="php-keyword2">array_slice</span>(<span class="php-var">$result</span>[<span class="php-num">0</span>], <span class="php-num">11</span>, -<span class="php-num">1</span>);
 </span><span id="810" class="l"><a href="#810"> 810: </a>        }
-</span><span id="811" class="l"><a href="#811"> 811: </a>        <span class="php-keyword1">elseif</span> (<span class="php-keyword2">strtoupper</span>(<span class="php-var">$result</span>[<span class="php-num">0</span>][<span class="php-num">4</span>]) == <span class="php-quote">'UID'</span>)  {
+</span><span id="811" class="l"><a href="#811"> 811: </a>        <span class="php-keyword1">elseif</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-num">4</span>, <span class="php-var">$result</span>[<span class="php-num">0</span>]) &amp;&amp; <span class="php-keyword2">strtoupper</span>(<span class="php-var">$result</span>[<span class="php-num">0</span>][<span class="php-num">4</span>]) == <span class="php-quote">'UID'</span>)  {
 </span><span id="812" class="l"><a href="#812"> 812: </a>            <span class="php-var">$response</span> = <span class="php-keyword2">array_slice</span>(<span class="php-var">$result</span>[<span class="php-num">0</span>], <span class="php-num">7</span>, -<span class="php-num">1</span>);
 </span><span id="813" class="l"><a href="#813"> 813: </a>        }
 </span><span id="814" class="l"><a href="#814"> 814: </a>        <span class="php-keyword1">else</span> {
@@ -3021,6 +3022,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?0217afa97566ff9ff27e57ae058fdaaf6df353e6"></script>
+<script src="elementlist.js?6d7fbc2e9d2d7bbb1e6fbed42652dd2302504cb7"></script>
 </body>
 </html>
