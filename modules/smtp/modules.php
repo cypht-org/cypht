@@ -368,12 +368,18 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $body = '';
         $cc = '';
         $bcc = '';
+        $recip = '';
+
         $draft = $this->get('compose_draft', array());
         $reply = $this->get('reply_details', array());
         $reply_type = $this->get('reply_type', '');
         $html = $this->get('smtp_compose_type', 0);
+
         if (!empty($reply)) {
             list($to, $subject, $body) = format_reply_fields($reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
+            if (array_key_exists('Envelope-to', $reply['msg_headers'])) {
+                $recip = $reply['msg_headers']['Envelope-to'];
+            }
         }
         elseif (!empty($draft)) {
             $to = $draft['draft_to'];
@@ -397,13 +403,16 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $res .= '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<input value="'.$this->html_safe($to).'" list="to_contacts" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<div class="to_outer"><input value="'.$this->html_safe($to).'" list="to_contacts" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<a href="#" class="toggle_recipients">+</a></div>'.
             '<datalist id="to_contacts"></datalist>'.
-            '<input value="'.$this->html_safe($cc).'" list="to_contacts" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('CC').'" />'.
-            '<input value="'.$this->html_safe($bcc).'" list="to_contacts" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('BCC').'" />'.
+            '<div class="recipient_fields">'.
+            '<input value="'.$this->html_safe($cc).'" list="to_contacts" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" />'.
+            '<input value="'.$this->html_safe($bcc).'" list="to_contacts" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
+            '</div>'.
             '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
             '<textarea novalidate id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
-            smtp_server_dropdown($this->module_output(), $this).
+            smtp_server_dropdown($this->module_output(), $this, $recip).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" /></form></div>';
         return $res;
@@ -530,11 +539,15 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
 /**
  * @subpackage smtp/functions
  */
-function smtp_server_dropdown($data, $output_mod) {
+function smtp_server_dropdown($data, $output_mod, $recip) {
     $res = '<select name="smtp_server_id" class="compose_server">';
     if (array_key_exists('smtp_servers', $data)) {
         foreach ($data['smtp_servers'] as $id => $vals) {
-            $res .= '<option value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['name'], $vals['server'])).'</option>';
+            $res .= '<option ';
+            if ($recip && trim($recip) == trim($vals['user'])) {
+                $res .= 'selected="selected" ';
+            }
+            $res .= 'value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['name'], $vals['server'])).'</option>';
         }
     }
     $res .= '</select>';
