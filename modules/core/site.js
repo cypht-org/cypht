@@ -1,6 +1,7 @@
 /* ajax multiplexer */
 var Hm_Ajax = {
     request_count: 0,
+    callback_hooks: {},
     aborted: false,
     batch_callback: false,
     icon_loading_id: 0,
@@ -30,6 +31,20 @@ var Hm_Ajax = {
         }
         move_background_image();
     },
+
+    process_callback_hooks: function(res) {
+        var hook;
+        var i;
+        for (i in Hm_Ajax.callback_hooks) {
+            hook = Hm_Ajax.callback_hooks[i];
+            hook(res);
+        }
+    },
+
+    add_callback_hook: function(callback, hook_function) {
+        Hm_Ajax.callback_hooks[callback] = hook_function;
+    },
+
 
     stop_loading_icon : function(loading_id) {
         clearTimeout(loading_id);
@@ -93,6 +108,7 @@ var Hm_Ajax_Request = function() { return {
             }
             if (this.callback) {
                 this.callback(res);
+                Hm_Ajax.process_callback_hooks(res);
             }
         }
     },
@@ -112,6 +128,7 @@ var Hm_Ajax_Request = function() { return {
         if (Hm_Ajax.request_count === 0) {
             Hm_Message_List.set_checkbox_callback();
             Hm_Ajax.aborted = false;
+            Hm_Ajax.callback_hooks = {};
             if (Hm_Ajax.batch_callback) {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
