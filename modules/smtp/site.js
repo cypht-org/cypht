@@ -88,6 +88,16 @@ var save_compose_state = function() {
     );
 };
 
+var toggle_recip_flds = function() {
+    var symbol = '+';
+    if ($('.toggle_recipients').text() == '+') {
+        symbol = '-';
+    }
+    $('.toggle_recipients').text(symbol);
+    $('.recipient_fields').toggle();
+    return false;
+}
+
 if (hm_page_name() === 'servers') {
     $('.test_smtp_connect').on('click', smtp_test_action);
     $('.save_smtp_connection').on('click', smtp_save_action);
@@ -99,13 +109,19 @@ if (hm_page_name() === 'servers') {
     }
 }
 
+var reset_smtp_form = function() {
+    $('.compose_body').val('');
+    $('.compose_subject').val('');
+    $('.compose_to').val('');
+    $('.ke-content', $('iframe').contents()).html('');
+    save_compose_state();
+};
+
 if (hm_page_name() === 'compose') {
     Hm_Timer.add_job(save_compose_state, 30, true);
-    $('.smtp_reset').click(function() {
-        $('.compose_body').val('');
-        $('.compose_subject').val('');
-        $('.compose_to').val('');
-        $('.ke-content', $('iframe').contents()).html('');
-        save_compose_state();
-    });
+    $('.toggle_recipients').click(function() { return toggle_recip_flds(); });
+    $('.smtp_reset').click(function() { reset_smtp_form(); });
+    if ($('.compose_cc').val() || $('.compose_bcc').val()) {
+        toggle_recip_flds();
+    }
 }
