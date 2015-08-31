@@ -659,7 +659,7 @@ function github_parse_headers($data, $output_mod) {
         $type = '[Unknown Type]';
     }
     if (array_key_exists('created_at', $data)) {
-        $date = sprintf("%s (%s)", date('r', strtotime($data['created_at'])), translate_time_str(human_readable_interval($data['created_at']), $output_mod));
+        $date = sprintf("%s", date('r', strtotime($data['created_at'])));
     }
     else {
         $date = '[No date]';
@@ -682,8 +682,8 @@ function github_parse_headers($data, $output_mod) {
         $name = '[No Repo]';
     }
     $res .= '<tr class="header_subject"><th colspan="2">'.$output_mod->html_safe($type).'</th></tr>';
-    $res .= '<tr><th>'.$output_mod->trans('Date').'</th><td>'.$output_mod->html_safe($date).'</td></tr>';
-    $res .= '<tr><th>'.$output_mod->trans('Author').'</th><td>'.$output_mod->html_safe($from).$from_link.'</td></tr>';
+    $res .= '<tr class="header_date"><th>'.$output_mod->trans('Date').'</th><td>'.$output_mod->html_safe($date).'</td></tr>';
+    $res .= '<tr class="header_from"><th>'.$output_mod->trans('Author').'</th><td>'.$output_mod->html_safe($from).$from_link.'</td></tr>';
     $res .= '<tr><th>'.$output_mod->trans('Repository').'</th><td>'.$output_mod->html_safe($name).$repo_link.'</td></tr>';
     $res .= '<tr><td></td><td></td></tr></table>';
     return $res;
