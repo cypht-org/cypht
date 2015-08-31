@@ -565,6 +565,9 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                 elseif ($name == 'link') {
                     $header_str .= '<tr class="header_'.$name.'"><th>'.$this->trans($name).'</th><td><a target="_blank" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
                 }
+                elseif ($name == 'pubdate' || $name == 'dc:date') {
+                    $header_str .= '<tr class="header_date"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                }
                 else {
                     $header_str .= '<tr><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
