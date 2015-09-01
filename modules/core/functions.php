@@ -441,6 +441,9 @@ function setup_base_page($name, $source=false) {
  */
 function merge_folder_list_details($folder_sources) {
     $res = array();
+    if (!is_array($folder_sources)) {
+        return $res;
+    }
     foreach ($folder_sources as $vals) {
         if (array_key_exists($vals[0], $res)) {
             $res[$vals[0]] .= $vals[1];
