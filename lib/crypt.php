@@ -153,6 +153,9 @@ class Hm_Crypt {
      */ 
     public static function hash_compare($a, $b) {
         /* requires PHP >= 5.6 */
+        if (!is_string($a) || !is_string($b) || strlen($a) !== strlen($b)) {
+            return false;
+        }
         if (function_exists('hash_equals')) {
             return hash_equals($a, $b);
         }
