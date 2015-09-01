@@ -80,8 +80,8 @@ class Hm_Crypt {
         }
 
         /* generate remaining keys */
-        $iv = self::generate_key($salt, $key, 16);
-        $crypt_key = self::generate_key($salt, $key, 32);
+        $iv = self::pbkdf2($key, $salt, 16, self::$encryption_rounds, self::$hmac);
+        $crypt_key = self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac);
 
         /* return the decrpted text */
         return openssl_decrypt($crypt_string, self::$method, $crypt_key, OPENSSL_RAW_DATA, $iv);
@@ -96,7 +96,7 @@ class Hm_Crypt {
      * @param string key supplied key for the encryption
      */
     public static function check_hmac($crypt_string, $hmac, $salt, $key) {
-        $hmac_key = self::generate_key($salt, $key, 32);
+        $hmac_key = self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac);
 
         /* make sure the crypt text has not been tampered with */
         if ($hmac !== hash_hmac(self::$hmac, $crypt_string, $hmac_key, true)) {
@@ -116,9 +116,9 @@ class Hm_Crypt {
         $salt = self::generate_salt();
 
         /* build required keys */
-        $iv = self::generate_key($salt, $key, 16);
-        $crypt_key = self::generate_key($salt, $key, 32);
-        $hmac_key = self::generate_key($salt, $key, 32);
+        $iv = self::pbkdf2($key, $salt, 16, self::$encryption_rounds, self::$hmac);
+        $crypt_key = self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac);
+        $hmac_key = self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac);
 
         /* encrypt the string */
         $crypt_string = openssl_encrypt($string, self::$method, $crypt_key, OPENSSL_RAW_DATA, $iv);
@@ -131,29 +131,17 @@ class Hm_Crypt {
     }
 
     /**
-     * Generate a strong random salt
+     * Generate a strong random salt (hopefully)
      * @return string
      */
     public static function generate_salt() {
-
         /* generate random bytes */
         $res = openssl_random_pseudo_bytes(128, $strong);
-        if ($strong) {
+        if (!$strong) {
             /* issue a warning if the algo used is not secure */
             Hm_Debug::add('WARNING: openssl_random_pseudo_bytes not cryptographically strong');
         }
         return $res;
-    }
-
-    /*
-     * Generate an ecncryption key from a user key and a salt
-     * @param string salt from generate_salt()
-     * @param string key supplied key for the encryption
-     * @param int size generated key size
-     * @return string
-     */
-    public static function generate_key($salt, $key, $size) {
-        return openssl_pbkdf2($key, $salt, $size, self::$encryption_rounds, self::$hmac);
     }
 
     /**
@@ -164,7 +152,41 @@ class Hm_Crypt {
      * @return bool
      */ 
     public static function hash_compare($a, $b) {
+        /* requires PHP >= 5.6 */
+        if (function_exists('hash_equals')) {
+            return hash_equals($a, $b);
+        }
         return $a === $b;
+    }
+
+    /**
+     * Key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+     * @param string $key payload
+     * @param string $salt random string from generate_salt
+     * @param string $length result length
+     * @param string $count iterations
+     * @param string $algo hash algorithm to use
+     */
+    public static function pbkdf2($key, $salt, $length, $count, $algo) {
+        /* requires PHP >= 5.5 */
+        if (function_exists('openssl_pbkdf2')) {
+            return openssl_pbkdf2($key, $salt, $length, $count, $algo);
+        }
+
+        /* manual version */
+        $size = strlen(hash($algo, '', true));
+        $len = ceil($length / $size);
+        $result = '';
+        for ($i = 1; $i <= $len; $i++) {
+            $tmp = hash_hmac($algo, $salt . pack('N', $i), $key, true);
+            $res = $tmp;
+            for ($j = 1; $j < $count; $j++) {
+                 $tmp  = hash_hmac($algo, $tmp, $key, true);
+                 $res ^= $tmp;
+            }
+            $result .= $res;
+        }
+        return substr($result, 0, $length);
     }
 
     /**
@@ -183,7 +205,7 @@ class Hm_Crypt {
             $count = self::$password_rounds;
         }
         return sprintf("%s:%s:%s:%s", $algo, $count, base64_encode($salt), base64_encode(
-            openssl_pbkdf2($password, $salt, 32, $count, $algo)));
+            self::pbkdf2($password, $salt, 32, $count, $algo)));
     }
 
     /**
