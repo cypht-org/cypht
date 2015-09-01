@@ -54,5 +54,8 @@ if (!class_exists('Hm_Functions')) {
         public static function c_exec($handle) {
             return curl_exec($handle);
         }
+        public static function function_exists($func) {
+            return function_exists($func);
+        }
     }
 }

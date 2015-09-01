@@ -53,6 +53,22 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
         $this->assertFalse(Hm_Crypt::hash_compare('asdf', false));
         $this->assertFalse(Hm_Crypt::hash_compare('0', false));
         $this->assertTrue(Hm_Crypt::hash_compare('asdf', 'asdf'));
+        Hm_Functions::$exists = false;
+        $this->assertFalse(Hm_Crypt::hash_compare('asdf', 'xcvb'));
+        $this->assertFalse(Hm_Crypt::hash_compare('asdf', false));
+        $this->assertFalse(Hm_Crypt::hash_compare('0', false));
+        $this->assertTrue(Hm_Crypt::hash_compare('asdf', 'asdf'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_pbkdf2() {
+        $this->assertEquals(base64_encode(Hm_Crypt::pbkdf2('testkey', 'testsalt', 32, 2, 'sha512')), '8RSGqH63sWwLtwAssCsc01AIweWJW/f8Mf36zDCFN7E=');
+        $this->assertNotEquals(base64_encode(Hm_Crypt::pbkdf2('testkey', 'testsalt', 32, 2, 'sha512')), 'asdf');
+        Hm_Functions::$exists = false;
+        $this->assertEquals(base64_encode(Hm_Crypt::pbkdf2('testkey', 'testsalt', 32, 2, 'sha512')), '8RSGqH63sWwLtwAssCsc01AIweWJW/f8Mf36zDCFN7E=');
+        $this->assertNotEquals(base64_encode(Hm_Crypt::pbkdf2('testkey', 'testsalt', 32, 2, 'sha512')), 'asdf');
     }
     /**
      * @preserveGlobalState disabled
@@ -62,6 +78,15 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
         $this->assertEquals(24, strlen(base64_decode(Hm_Crypt::unique_id(24))));
         $this->assertEquals(48, strlen(base64_decode(Hm_Crypt::unique_id(48))));
         $this->assertEquals(128, strlen(base64_decode(Hm_Crypt::unique_id())));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_random_bytes_check() {
+        $this->assertTrue(Hm_Crypt::random_bytes_check());
+        Hm_Crypt::$strong = false;
+        $this->assertFalse(Hm_Crypt::random_bytes_check());
     }
 }
 

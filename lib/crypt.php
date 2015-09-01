@@ -51,6 +51,7 @@ class Hm_Request_Key {
 
 class Hm_Crypt {
 
+    static public $strong = true;
     static private $method = 'aes-256-cbc';
     static private $hmac = 'sha512';
     static private $password_rounds = 86000;
@@ -114,6 +115,7 @@ class Hm_Crypt {
     public static function ciphertext($string, $key) {
         /* generate a strong salt */
         $salt = self::generate_salt();
+        self::random_bytes_check();
 
         /* build required keys */
         $iv = self::pbkdf2($key, $salt, 16, self::$encryption_rounds, self::$hmac);
@@ -137,11 +139,19 @@ class Hm_Crypt {
     public static function generate_salt() {
         /* generate random bytes */
         $res = openssl_random_pseudo_bytes(128, $strong);
-        if (!$strong) {
-            /* issue a warning if the algo used is not secure */
+        self::$strong = $strong;
+        return $res;
+    }
+
+    /**
+     * Output a debug message if openssl_random_pseudo_bytes is borked
+     * @return bool
+     */
+    public static function random_bytes_check() {
+        if (!self::$strong) {
             Hm_Debug::add('WARNING: openssl_random_pseudo_bytes not cryptographically strong');
         }
-        return $res;
+        return self::$strong;
     }
 
     /**
@@ -156,7 +166,7 @@ class Hm_Crypt {
         if (!is_string($a) || !is_string($b) || strlen($a) !== strlen($b)) {
             return false;
         }
-        if (function_exists('hash_equals')) {
+        if (Hm_Functions::function_exists('hash_equals')) {
             return hash_equals($a, $b);
         }
         return $a === $b;
@@ -172,7 +182,7 @@ class Hm_Crypt {
      */
     public static function pbkdf2($key, $salt, $length, $count, $algo) {
         /* requires PHP >= 5.5 */
-        if (function_exists('openssl_pbkdf2')) {
+        if (Hm_Functions::function_exists('openssl_pbkdf2')) {
             return openssl_pbkdf2($key, $salt, $length, $count, $algo);
         }
 
@@ -203,6 +213,7 @@ class Hm_Crypt {
     public static function hash_password($password, $salt=false, $count=false, $algo='sha512') {
         if (!$salt) {
             $salt = self::generate_salt();
+            self::random_bytes_check();
         }
         if (!$count) {
             $count = self::$password_rounds;
