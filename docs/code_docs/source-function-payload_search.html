@@ -561,6 +561,7 @@
 				<li><a href="class-Hm_Handler_imap_combined_inbox.html">Hm_Handler_imap_combined_inbox</a></li>
 				<li><a href="class-Hm_Handler_imap_connect.html">Hm_Handler_imap_connect</a></li>
 				<li><a href="class-Hm_Handler_imap_delete.html">Hm_Handler_imap_delete</a></li>
+				<li><a href="class-Hm_Handler_imap_delete_message.html">Hm_Handler_imap_delete_message</a></li>
 				<li><a href="class-Hm_Handler_imap_download_message.html">Hm_Handler_imap_download_message</a></li>
 				<li><a href="class-Hm_Handler_imap_flagged.html">Hm_Handler_imap_flagged</a></li>
 				<li><a href="class-Hm_Handler_imap_folder_expand.html">Hm_Handler_imap_folder_expand</a></li>
@@ -1693,7 +1694,7 @@
 </span><span id="659" class="l"><a href="#659">659: </a>        <span class="php-var">$type</span> = <span class="php-quote">'[Unknown Type]'</span>;
 </span><span id="660" class="l"><a href="#660">660: </a>    }
 </span><span id="661" class="l"><a href="#661">661: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'created_at'</span>, <span class="php-var">$data</span>)) {
-</span><span id="662" class="l"><a href="#662">662: </a>        <span class="php-var">$date</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;%s (%s)&quot;</span>, <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-keyword2">strtotime</span>(<span class="php-var">$data</span>[<span class="php-quote">'created_at'</span>])), translate_time_str(human_readable_interval(<span class="php-var">$data</span>[<span class="php-quote">'created_at'</span>]), <span class="php-var">$output_mod</span>));
+</span><span id="662" class="l"><a href="#662">662: </a>        <span class="php-var">$date</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;%s&quot;</span>, <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>, <span class="php-keyword2">strtotime</span>(<span class="php-var">$data</span>[<span class="php-quote">'created_at'</span>])));
 </span><span id="663" class="l"><a href="#663">663: </a>    }
 </span><span id="664" class="l"><a href="#664">664: </a>    <span class="php-keyword1">else</span> {
 </span><span id="665" class="l"><a href="#665">665: </a>        <span class="php-var">$date</span> = <span class="php-quote">'[No date]'</span>;
@@ -1716,8 +1717,8 @@
 </span><span id="682" class="l"><a href="#682">682: </a>        <span class="php-var">$name</span> = <span class="php-quote">'[No Repo]'</span>;
 </span><span id="683" class="l"><a href="#683">683: </a>    }
 </span><span id="684" class="l"><a href="#684">684: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr class=&quot;header_subject&quot;&gt;&lt;th colspan=&quot;2&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$type</span>).<span class="php-quote">'&lt;/th&gt;&lt;/tr&gt;'</span>;
-</span><span id="685" class="l"><a href="#685">685: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Date'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$date</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
-</span><span id="686" class="l"><a href="#686">686: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Author'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$from</span>).<span class="php-var">$from_link</span>.<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
+</span><span id="685" class="l"><a href="#685">685: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr class=&quot;header_date&quot;&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Date'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$date</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
+</span><span id="686" class="l"><a href="#686">686: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr class=&quot;header_from&quot;&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Author'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$from</span>).<span class="php-var">$from_link</span>.<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
 </span><span id="687" class="l"><a href="#687">687: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr&gt;&lt;th&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Repository'</span>).<span class="php-quote">'&lt;/th&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$name</span>).<span class="php-var">$repo_link</span>.<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
 </span><span id="688" class="l"><a href="#688">688: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;'</span>;
 </span><span id="689" class="l"><a href="#689">689: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
@@ -1798,6 +1799,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?402665dddbc20e3fe8c7ff432edf259b2cb67e37"></script>
+<script src="elementlist.js?f8e4308803754d44f11a781f42925b616abf62f6"></script>
 </body>
 </html>

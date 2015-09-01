@@ -561,6 +561,7 @@
 				<li><a href="class-Hm_Handler_imap_combined_inbox.html">Hm_Handler_imap_combined_inbox</a></li>
 				<li><a href="class-Hm_Handler_imap_connect.html">Hm_Handler_imap_connect</a></li>
 				<li><a href="class-Hm_Handler_imap_delete.html">Hm_Handler_imap_delete</a></li>
+				<li><a href="class-Hm_Handler_imap_delete_message.html">Hm_Handler_imap_delete_message</a></li>
 				<li><a href="class-Hm_Handler_imap_download_message.html">Hm_Handler_imap_download_message</a></li>
 				<li><a href="class-Hm_Handler_imap_flagged.html">Hm_Handler_imap_flagged</a></li>
 				<li><a href="class-Hm_Handler_imap_folder_expand.html">Hm_Handler_imap_folder_expand</a></li>
@@ -1475,19 +1476,22 @@
 </span></span><span id="441" class="l"><a href="#441">441: </a><span class="php-comment"> */</span>
 </span><span id="442" class="l"><a href="#442">442: </a><span class="php-keyword1">function</span> merge_folder_list_details(<span class="php-var">$folder_sources</span>) {
 </span><span id="443" class="l"><a href="#443">443: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
-</span><span id="444" class="l"><a href="#444">444: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$folder_sources</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
-</span><span id="445" class="l"><a href="#445">445: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$vals</span>[<span class="php-num">0</span>], <span class="php-var">$res</span>)) {
-</span><span id="446" class="l"><a href="#446">446: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] .= <span class="php-var">$vals</span>[<span class="php-num">1</span>];
-</span><span id="447" class="l"><a href="#447">447: </a>        }
-</span><span id="448" class="l"><a href="#448">448: </a>        <span class="php-keyword1">else</span> {
-</span><span id="449" class="l"><a href="#449">449: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] = <span class="php-var">$vals</span>[<span class="php-num">1</span>];
+</span><span id="444" class="l"><a href="#444">444: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$folder_sources</span>)) {
+</span><span id="445" class="l"><a href="#445">445: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="446" class="l"><a href="#446">446: </a>    }
+</span><span id="447" class="l"><a href="#447">447: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$folder_sources</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="448" class="l"><a href="#448">448: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$vals</span>[<span class="php-num">0</span>], <span class="php-var">$res</span>)) {
+</span><span id="449" class="l"><a href="#449">449: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] .= <span class="php-var">$vals</span>[<span class="php-num">1</span>];
 </span><span id="450" class="l"><a href="#450">450: </a>        }
-</span><span id="451" class="l"><a href="#451">451: </a>    }
-</span><span id="452" class="l"><a href="#452">452: </a>    <span class="php-keyword2">ksort</span>(<span class="php-var">$res</span>);
-</span><span id="453" class="l"><a href="#453">453: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="454" class="l"><a href="#454">454: </a>}
-</span><span id="455" class="l"><a href="#455">455: </a>
-</span><span id="456" class="l"><a href="#456">456: </a></span></code></pre>
+</span><span id="451" class="l"><a href="#451">451: </a>        <span class="php-keyword1">else</span> {
+</span><span id="452" class="l"><a href="#452">452: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] = <span class="php-var">$vals</span>[<span class="php-num">1</span>];
+</span><span id="453" class="l"><a href="#453">453: </a>        }
+</span><span id="454" class="l"><a href="#454">454: </a>    }
+</span><span id="455" class="l"><a href="#455">455: </a>    <span class="php-keyword2">ksort</span>(<span class="php-var">$res</span>);
+</span><span id="456" class="l"><a href="#456">456: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="457" class="l"><a href="#457">457: </a>}
+</span><span id="458" class="l"><a href="#458">458: </a>
+</span><span id="459" class="l"><a href="#459">459: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1495,6 +1499,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?402665dddbc20e3fe8c7ff432edf259b2cb67e37"></script>
+<script src="elementlist.js?f8e4308803754d44f11a781f42925b616abf62f6"></script>
 </body>
 </html>
