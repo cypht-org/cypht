@@ -1111,6 +1111,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $this->out('msg_headers', $txt, false);
         }
+        else {
+            Hm_Msgs::add('ERR'.$this->trans('Could not fetch the message, it was moved or deleted'));
+        }
     }
 }
 

@@ -371,6 +371,10 @@ var expand_imap_folders = function(path) {
 };
 
 var display_msg_content = function(res) {
+    if (!res.msg_headers) {
+        $('.hlink').removeAttr('href');
+        return;
+    };
     $('.msg_text').html('');
     $('.msg_text').append(res.msg_headers);
     $('.msg_text').append(res.msg_text);
