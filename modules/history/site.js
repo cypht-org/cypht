@@ -15,6 +15,9 @@ var display_history_page_links = function() {
     var msg;
     var history = JSON.parse(Hm_Utils.get_from_local_storage('message_history'));
     for (msg in history) {
+        if (history[msg][0] == null) {
+            continue;
+        }
         if (history[msg][1] == null) {
             history[msg][1] = '';
         }
