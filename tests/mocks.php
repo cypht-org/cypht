@@ -19,7 +19,7 @@ class Hm_Mock_Session {
         return 'fakefingerprint';
     }
     public function is_active() {
-        return true;
+        return $this->loaded;
     }
     public function destroy() {
         return true;
