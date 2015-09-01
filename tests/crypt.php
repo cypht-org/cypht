@@ -48,23 +48,6 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_unpad() {
-        $this->assertEquals('', Hm_Crypt::unpad(base64_decode('EBAQEBAQEBAQEBAQEBAQEA==')));
-        $this->assertEquals('asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf', Hm_Crypt::unpad(base64_decode('YXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZg==')));
-        $this->assertEquals('aaaaaaaaaaaaaaab', Hm_Crypt::unpad('aaaaaaaaaaaaaaab'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_pad() {
-        $this->assertEquals('EBAQEBAQEBAQEBAQEBAQEA==', base64_encode(Hm_Crypt::pad('')));
-        $this->assertEquals('YXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZmFzZGZhc2RmYXNkZg==', base64_encode(Hm_Crypt::pad('asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf')));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
     public function test_hash_compare() {
         $this->assertFalse(Hm_Crypt::hash_compare('asdf', 'xcvb'));
         $this->assertFalse(Hm_Crypt::hash_compare('asdf', false));
@@ -98,6 +81,11 @@ class Hm_Test_Request_Key extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_key_load() {
+        $this->assertEquals('fakefingerprint', Hm_Request_Key::generate());
+        $session = new Hm_Mock_Session();
+        $request = new Hm_Mock_Request('AJAX');
+        $session->loaded = false;
+        Hm_Request_Key::load($session, $request, false);
         $this->assertEquals('fakefingerprint', Hm_Request_Key::generate());
     }
     /**
