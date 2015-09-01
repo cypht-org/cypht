@@ -197,6 +197,19 @@ add_handler('ajax_imap_flagged', 'date', true, 'core');
 add_handler('ajax_imap_flagged', 'http_headers', true, 'core');
 add_output('ajax_imap_flagged', 'filter_flagged_data', true);
 
+/* delete message callback */
+add_handler('ajax_imap_delete_message', 'login', false, 'core');
+add_handler('ajax_imap_delete_message', 'load_user_data', true, 'core');
+add_handler('ajax_imap_delete_message', 'language', true, 'core');
+add_handler('ajax_imap_delete_message', 'message_list_type', true, 'core');
+add_handler('ajax_imap_delete_message', 'imap_message_list_type', true);
+add_handler('ajax_imap_delete_message', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_delete_message', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_delete_message', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_delete_message', 'imap_delete_message',  true);
+add_handler('ajax_imap_delete_message', 'date', true, 'core');
+add_handler('ajax_imap_delete_message', 'http_headers', true, 'core');
+
 /* ajax message action callback */
 add_handler('ajax_message_action', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_message_action', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
@@ -285,6 +298,7 @@ return array(
         'ajax_imap_message_content',
         'ajax_imap_save_folder_state',
         'ajax_imap_message_action',
+        'ajax_imap_delete_message',
         'ajax_imap_flag_message',
         'ajax_imap_update_combined_source',
     ),
@@ -301,6 +315,7 @@ return array(
         'imap_server_id' => array(FILTER_VALIDATE_INT, false),
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_STRING, false),
         'page_links' => array(FILTER_UNSAFE_RAW, false),
+        'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
 
     'allowed_get' => array(
