@@ -51,22 +51,9 @@ class Hm_Request_Key {
 
 class Hm_Crypt {
 
-    /* mode */
-    static private $mode = MCRYPT_MODE_CBC;
-
-    /* cipher */
-    static private $cipher = MCRYPT_RIJNDAEL_128;
-
-    /* rand source */
-    static private $r_source = MCRYPT_RAND;
-
-    /* hmac algo */
+    static private $method = 'aes-256-cbc';
     static private $hmac = 'sha512';
-
-    /* password PBKDF2 rounds */
     static private $password_rounds = 86000;
-
-    /* encryptiong PBKDF2 rounds */
     static private $encryption_rounds = 100;
 
     /**
@@ -83,25 +70,39 @@ class Hm_Crypt {
             return false;
         }
 
-        /* split up into salt, hmac, and crypt text */
-        $hmac = substr($string, 128, 64);
+        /* get the payload and salt */
         $crypt_string = substr($string, 192);
         $salt = substr($string, 0, 128);
 
-        /* generate the hmac key */
-        $hmac_key = self::generate_hmac_key($salt, $key);
+        /* check the signature */
+        if (!self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key)) {
+            return false;
+        }
+
+        /* generate remaining keys */
+        $iv = self::generate_key($salt, $key, 16);
+        $crypt_key = self::generate_key($salt, $key, 32);
+
+        /* return the decrpted text */
+        return openssl_decrypt($crypt_string, self::$method, $crypt_key, OPENSSL_RAW_DATA, $iv);
+
+    }
+
+    /**
+     * Check hmac signature
+     * @param string $crypt_string payload to check
+     * @param string $hmac signature to check
+     * @param string salt from generate_salt()
+     * @param string key supplied key for the encryption
+     */
+    public static function check_hmac($crypt_string, $hmac, $salt, $key) {
+        $hmac_key = self::generate_key($salt, $key, 32);
 
         /* make sure the crypt text has not been tampered with */
         if ($hmac !== hash_hmac(self::$hmac, $crypt_string, $hmac_key, true)) {
             return false;
         }
-
-        /* generate remaining keys */
-        $iv = self::generate_iv($salt, $key);
-        $crypt_key = self::generate_crypt_key($salt, $key);
-
-        /* return the decrpted text */
-        return self::unpad(mcrypt_decrypt(self::$cipher, $crypt_key, $crypt_string, self::$mode, $iv));
+        return true;
     }
 
     /**
@@ -115,12 +116,12 @@ class Hm_Crypt {
         $salt = self::generate_salt();
 
         /* build required keys */
-        $iv = self::generate_iv($salt, $key);
-        $crypt_key = self::generate_crypt_key($salt, $key);
-        $hmac_key = self::generate_hmac_key($salt, $key);
+        $iv = self::generate_key($salt, $key, 16);
+        $crypt_key = self::generate_key($salt, $key, 32);
+        $hmac_key = self::generate_key($salt, $key, 32);
 
         /* encrypt the string */
-        $crypt_string = mcrypt_encrypt(self::$cipher, $crypt_key, self::pad($string), self::$mode, $iv);
+        $crypt_string = openssl_encrypt($string, self::$method, $crypt_key, OPENSSL_RAW_DATA, $iv);
 
         /* build a hash of the crypted text */
         $hmac = hash_hmac(self::$hmac, $crypt_string, $hmac_key, true);
@@ -134,37 +135,25 @@ class Hm_Crypt {
      * @return string
      */
     public static function generate_salt() {
-        return mcrypt_create_iv(128, MCRYPT_DEV_URANDOM);
+
+        /* generate random bytes */
+        $res = openssl_random_pseudo_bytes(128, $strong);
+        if ($strong) {
+            /* issue a warning if the algo used is not secure */
+            Hm_Debug::add('WARNING: openssl_random_pseudo_bytes not cryptographically strong');
+        }
+        return $res;
     }
 
-    /**
+    /*
      * Generate an ecncryption key from a user key and a salt
      * @param string salt from generate_salt()
      * @param string key supplied key for the encryption
+     * @param int size generated key size
      * @return string
      */
-    public static function generate_crypt_key($salt, $key) {
-        return self::pbkdf2(self::$hmac, $key, $salt, self::$encryption_rounds, 32);
-    }
-
-    /**
-     * Generate an hmac key from a user key and a salt
-     * @param string salt from generate_salt()
-     * @param string key supplied key for the encryption
-     * @return string
-     */
-    public static function generate_hmac_key($salt, $key) {
-        return self::pbkdf2(self::$hmac, $key, $salt, self::$encryption_rounds, 32);
-    }
-
-    /**
-     * Generate an iv from a user key and a salt
-     * @param string salt from generate_salt()
-     * @param string key supplied key for the encryption
-     * @return string
-     */
-    public static function generate_iv($salt, $key) {
-        return self::pbkdf2(self::$hmac, $key, $salt, self::$encryption_rounds, 16);
+    public static function generate_key($salt, $key, $size) {
+        return openssl_pbkdf2($key, $salt, $size, self::$encryption_rounds, self::$hmac);
     }
 
     /**
@@ -176,24 +165,6 @@ class Hm_Crypt {
      */ 
     public static function hash_compare($a, $b) {
         return $a === $b;
-    }
-
-    /**
-     * Pad a string before encryption
-     *
-     * @param string $data data to pad
-     * @return string
-     */
-    public static function pad($data) {
-        $len = mcrypt_get_block_size(self::$cipher, self::$mode);
-        $diff = $len - strlen($data);
-        if ($diff < 0) {
-            return $data;
-        }
-        if ($diff % $len == 0) {
-            $diff = $len;
-        }
-        return $data.str_repeat(chr($diff), $diff);
     }
 
     /**
@@ -212,7 +183,7 @@ class Hm_Crypt {
             $count = self::$password_rounds;
         }
         return sprintf("%s:%s:%s:%s", $algo, $count, base64_encode($salt), base64_encode(
-            self::pbkdf2($algo, $password, $salt, $count, 32)));
+            openssl_pbkdf2($password, $salt, 32, $count, $algo)));
     }
 
     /**
@@ -227,44 +198,6 @@ class Hm_Crypt {
             return self::hash_compare(self::hash_password($password, base64_decode($salt), $count, $algo), $hash);
         }
         return false;
-    }
-
-    /**
-     * remove padding from a decrypted string
-     * @param string $data string to unpad
-     * @return string
-     */
-    public static function unpad($data) {
-        $length = mcrypt_get_block_size(self::$cipher, self::$mode);
-        $last = ord($data[strlen($data) - 1]);
-        if ($last > $length || substr($data, -1 * $last) !== str_repeat(chr($last), $last)) {
-            return $data;
-        }
-        return substr($data, 0, -1 * $last);
-    }
-
-    /**
-     * key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
-     * @param string $algo hash algorithm to use
-     * @param string $key payload
-     * @param string $salt random string from generate_salt
-     * @param string $count iterations
-     * @param string $length result length
-     */
-    public static function pbkdf2($algo, $key, $salt, $count, $length) {
-        $size = strlen(hash($algo, '', true));
-        $len = ceil($length / $size);
-        $result = '';
-        for ($i = 1; $i <= $len; $i++) {
-            $tmp = hash_hmac($algo, $salt . pack('N', $i), $key, true);
-            $res = $tmp;
-            for ($j = 1; $j < $count; $j++) {
-                 $tmp  = hash_hmac($algo, $tmp, $key, true);
-                 $res ^= $tmp;
-            }
-            $result .= $res;
-        }
-        return substr($result, 0, $length);
     }
 
     /**
