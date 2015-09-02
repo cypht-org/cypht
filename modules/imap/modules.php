@@ -262,9 +262,6 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
         $folders = array();
         if (!empty($servers)) {
             foreach ($servers as $id => $server) {
-                if ($server['name'] == 'Default-Auth-Server') {
-                    $server['name'] = 'Default';
-                }
                 $folders[$id] = $server['name'];
             }
         }
@@ -688,7 +685,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             }
             $new_servers[] = $server;
             Hm_IMAP_List::add($server, $index);
-            if ($server['name'] == 'Default-Auth-Server') {
+            if (array_key_exists('default', $server) && $server['default']) {
                 $added = true;
             }
         }
@@ -699,7 +696,8 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             $auth_server = $this->session->get('imap_auth_server_settings', array());
             if (!empty($auth_server)) {
                 Hm_IMAP_List::add(array( 
-                    'name' => 'Default-Auth-Server',
+                    'name' => $this->config->get('imap_auth_name', 'Default'),
+                    'default' => true,
                     'server' => $auth_server['server'],
                     'port' => $auth_server['port'],
                     'tls' => $auth_server['tls'],
@@ -1141,10 +1139,6 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
             }
-            if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = $this->trans('Default');
-                $no_edit = true;
-            }
             $res .= '<div class="configured_server">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
@@ -1231,9 +1225,6 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = $this->trans('Default');
-            }
             $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
                 '<td class="imap_detail_'.$index.'"></td></tr>';
         }
@@ -1537,9 +1528,6 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         else {
             $parent_value = $parent_list;
-        }
-        if ($msg['server_name'] == 'Default-Auth-Server') {
-            $msg['server_name'] = 'Default';
         }
         $id = sprintf("imap_%s_%s_%s", $msg['server_id'], $msg['uid'], $msg['folder']);
         if (!trim($msg['subject'])) {
