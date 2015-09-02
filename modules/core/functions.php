@@ -382,6 +382,7 @@ function save_user_settings($handler, $form, $logout) {
         $pass = false;
     }
     if ($user && $path && $pass) {
+        filter_auth_servers($handler);
         $handler->user_config->save($user, $pass);
         $handler->session->set('changed_settings', array());
         if ($logout) {
@@ -393,6 +394,28 @@ function save_user_settings($handler, $form, $logout) {
             Hm_Msgs::add('Settings saved');
         }
     }
+}
+
+/**
+ * Filter out default auth and SMTP servers so they don't get saved
+ * to the permanent user config. These are dynamically reloaded on
+ * login
+ * @param object $handler hm handler module object
+ * @return void
+ */
+function filter_auth_servers($handler) {
+    $excluded = array('pop3_servers', 'imap_servers','smtp_servers');
+    $config = $handler->user_config->dump();
+    foreach ($config as $key => $vals) {
+        if (in_array($key, $excluded, true)) {
+            foreach ($vals as $index => $server) {
+                if (array_key_exists('default', $server)) {
+                    unset($config[$key][$index]);
+                }
+            }
+        }
+    }
+    $handler->user_config->reload($config);
 }
 
 /**
