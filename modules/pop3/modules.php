@@ -25,9 +25,6 @@ class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
                 $this->out('list_path', $path, false);
                 $details = Hm_POP3_List::dump($matches[1]);
                 if (!empty($details)) {
-                    if ($details['name'] == 'Default-Auth-Server') {
-                        $details['name'] = 'Default';
-                    }
                     $this->out('mailbox_list_title', array('POP3', $details['name'], 'INBOX'));
                     $this->out('message_list_since', $this->user_config->get('pop3_since', DEFAULT_SINCE));
                     $this->out('per_source_limit', $this->user_config->get('pop3_limit', DEFAULT_SINCE));
@@ -504,7 +501,7 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
         $added = false;
         foreach ($servers as $index => $server) {
             Hm_POP3_List::add( $server, $index );
-            if ($server['name'] == 'Default-Auth-Server') {
+            if (array_key_exists('default', $server) && $server['default']) {
                 $added = true;
             }
         }
@@ -512,7 +509,8 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
             $auth_server = $this->session->get('pop3_auth_server_settings', array());
             if (!empty($auth_server)) {
                 Hm_POP3_List::add(array( 
-                    'name' => 'Default-Auth-Server',
+                    'name' => $this->config->get('pop3_auth_name', 'Default'),
+                    'default' => true,
                     'server' => $auth_server['server'],
                     'port' => $auth_server['port'],
                     'tls' => $auth_server['tls'],
@@ -795,7 +793,7 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
      * Build the HTML for a set of POP3 messages
      */
     protected function output() {
-        $formatted_message_list = array();
+        $res = array();
         if ($this->get('pop3_mailbox_page')) {
             $style = $this->get('news_list_style') ? 'news' : 'email';
             if ($this->get('is_mobile')) {
@@ -808,8 +806,8 @@ class Hm_Output_filter_pop3_message_list extends Hm_Output_Module {
                 $login_time = false;
             }
             $res = format_pop3_message_list($this->get('pop3_mailbox_page'), $this, $style, $login_time, $this->get('list_path'));
-            $this->out('formatted_message_list', $res);
         }
+        $this->out('formatted_message_list', $res);
     }
 }
 
