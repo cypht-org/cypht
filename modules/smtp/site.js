@@ -113,6 +113,8 @@ var reset_smtp_form = function() {
     $('.compose_body').val('');
     $('.compose_subject').val('');
     $('.compose_to').val('');
+    $('.compose_cc').val('');
+    $('.compose_bcc').val('');
     $('.ke-content', $('iframe').contents()).html('');
     save_compose_state();
 };
