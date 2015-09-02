@@ -21,24 +21,13 @@
     </div>
 </div>
     <div class="para">
+<h3>In the browser</h3>
 <ul>
 <li>
-Session level data is encrypted with a long random string generated on login and stored in a cookie.
-</li>
-<li>
-Persistent data stored between logins is encrypted with your clear text password, which is obviously not stored anywhere.
+Forced TLS for browsers connections
 </li>
 <li>
 All cookies are session level, HTTP only, and have the secure flag, path, and domain values set.
-</li>
-<li>
-Session and persistent data is encrypted with Rijandael 128, CBC block mode, and PBKDF2 key derivation.
-</li>
-<li>
-TLS everywhere - forced TLS for browsers, and TLS/STARTTLS support for IMAP, POP3, and SMTP connections.
-</li>
-<li>
-Oauth2 login for Gmail and Outlook servers supported.
 </li>
 <li>
 HTTP request header fingerprinting, site/user specific page keys, and dynamic session ids.
@@ -48,6 +37,27 @@ Security related HTTP headers like X-XSS-Protection, X-Content-Type-Options, and
 </li>
 <li>
 Two factor authentication module set that uses a free SMS based 2FA service from Swipeidentity.
+</li>
+<li>
+Configurable idle timeout module set that ends a session after a predetermined amount of time.
+</li>
+</ul>
+<h3>On the server</h3>
+<ul>
+<li>
+TLS/STARTTLS support for IMAP, POP3, and SMTP connections.
+</li>
+<li>
+Oauth2 login for Gmail and Outlook servers supported.
+</li>
+<li>
+Session level data is encrypted with a long random string generated on login and stored in a cookie.
+</li>
+<li>
+Persistent data stored between logins is encrypted with your clear text password, which is obviously not stored anywhere.
+</li>
+<li>
+All encryption is done with AES-256-CBC, encrypt-then-MAC, and PBKDF2 key derivation
 </li>
 <li>
 Only white-listed and typed/sanitized input is allowed. Modules must pre-define input in order to have access to it.
@@ -71,18 +81,16 @@ Development is done with PHP's "E_ALL" and "E_STRICT" error reporting.
 Easy output escaping inside modules for potentially dangerous content.
 </li>
 <li>
-Configurable idle timeout module set that ends a session after a predetermined amount of time.
-</li>
-<li>
 Module design enforces a separation of input processing and output formatting, and encourages concise methods, which makes the code easier to debug and audit.
 </li>
 <li>
-    <a href="http://cypht.org/docs/test_coverage/index.html">100% unit test coverage with PHPUnit</a> for the application framework, with a cyclomatic complexity maximum for classes of 39, and a method complexity max of 11.
+    <a href="http://cypht.org/docs/test_coverage/index.html">100% unit test coverage with PHPUnit</a> for the application framework.
 </li>
 <li>
 HTML formatted E-Mail is filtered through HTMLPurifier with all external resources removed before being rendered.
 </li>
 </ul>
+
     </div>
   </body>
 </html>
