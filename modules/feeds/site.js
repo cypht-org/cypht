@@ -182,9 +182,17 @@ var update_feed_status_display = function(res) {
 };
 
 var expand_feed_settings = function() {
-    var dsp = Hm_Utils.get_from_local_storage('.feeds_setting');
-    if (dsp == 'table-row' || dsp == 'none') {
-        $('.feeds_setting').css('display', dsp);
+    var hash = window.location.hash;
+    if (hash) {
+        if (hash.replace('#', '.') == '.feeds_setting') {
+            $('.feeds_setting').css('display', 'table-row');
+        }
+    }
+    else {
+        var dsp = Hm_Utils.get_from_local_storage('.feeds_setting');
+        if (dsp == 'table-row' || dsp == 'none') {
+            $('.feeds_setting').css('display', dsp);
+        }
     }
 };
 
