@@ -333,6 +333,8 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('data_sources', array(), false);
+        $this->out('encrypt_ajax_requests', $this->config->get('encrypt_ajax_requests', false));
+        $this->out('encrypt_local_storage', $this->config->get('encrypt_local_storage', false));
     }
 }
 
