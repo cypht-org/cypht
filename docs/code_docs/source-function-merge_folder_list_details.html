@@ -738,6 +738,7 @@
 				<li><a href="class-Hm_Output_feed_limit_setting.html">Hm_Output_feed_limit_setting</a></li>
 				<li><a href="class-Hm_Output_feed_since_setting.html">Hm_Output_feed_since_setting</a></li>
 				<li><a href="class-Hm_Output_filter_all_email.html">Hm_Output_filter_all_email</a></li>
+				<li><a href="class-Hm_Output_filter_autocomplete_list.html">Hm_Output_filter_autocomplete_list</a></li>
 				<li><a href="class-Hm_Output_filter_combined_inbox.html">Hm_Output_filter_combined_inbox</a></li>
 				<li><a href="class-Hm_Output_filter_expanded_folder_data.html">Hm_Output_filter_expanded_folder_data</a></li>
 				<li><a href="class-Hm_Output_filter_feed_folders.html">Hm_Output_filter_feed_folders</a></li>
@@ -904,6 +905,7 @@
 				<li><a href="function-display_value.html">display_value</a></li>
 				<li><a href="function-elog.html">elog</a></li>
 				<li><a href="function-email_is_active.html">email_is_active</a></li>
+				<li><a href="function-filter_auth_servers.html">filter_auth_servers</a></li>
 				<li><a href="function-format_data_sources.html">format_data_sources</a></li>
 				<li><a href="function-format_imap_folder_section.html">format_imap_folder_section</a></li>
 				<li><a href="function-format_imap_message_list.html">format_imap_message_list</a></li>
@@ -1417,81 +1419,104 @@
 </span><span id="382" class="l"><a href="#382">382: </a>        <span class="php-var">$pass</span> = <span class="php-keyword1">false</span>;
 </span><span id="383" class="l"><a href="#383">383: </a>    }
 </span><span id="384" class="l"><a href="#384">384: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$user</span> &amp;&amp; <span class="php-var">$path</span> &amp;&amp; <span class="php-var">$pass</span>) {
-</span><span id="385" class="l"><a href="#385">385: </a>        <span class="php-var">$handler</span>-&gt;user_config-&gt;save(<span class="php-var">$user</span>, <span class="php-var">$pass</span>);
-</span><span id="386" class="l"><a href="#386">386: </a>        <span class="php-var">$handler</span>-&gt;session-&gt;set(<span class="php-quote">'changed_settings'</span>, <span class="php-keyword1">array</span>());
-</span><span id="387" class="l"><a href="#387">387: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$logout</span>) {
-</span><span id="388" class="l"><a href="#388">388: </a>            <span class="php-var">$handler</span>-&gt;session-&gt;destroy(<span class="php-var">$handler</span>-&gt;request);
-</span><span id="389" class="l"><a href="#389">389: </a>            Hm_Msgs::add(<span class="php-quote">'Saved user data on logout'</span>);
-</span><span id="390" class="l"><a href="#390">390: </a>            Hm_Msgs::add(<span class="php-quote">'Session destroyed on logout'</span>);
-</span><span id="391" class="l"><a href="#391">391: </a>        }
-</span><span id="392" class="l"><a href="#392">392: </a>        <span class="php-keyword1">else</span> {
-</span><span id="393" class="l"><a href="#393">393: </a>            Hm_Msgs::add(<span class="php-quote">'Settings saved'</span>);
-</span><span id="394" class="l"><a href="#394">394: </a>        }
-</span><span id="395" class="l"><a href="#395">395: </a>    }
-</span><span id="396" class="l"><a href="#396">396: </a>}
-</span><span id="397" class="l"><a href="#397">397: </a>
-</span><span id="398" class="l"><a href="#398">398: </a><span class="php-comment">/**
-</span></span><span id="399" class="l"><a href="#399">399: </a><span class="php-comment"> * Setup commonly used modules for a page
-</span></span><span id="400" class="l"><a href="#400">400: </a><span class="php-comment"> * @param string $name the page id
-</span></span><span id="401" class="l"><a href="#401">401: </a><span class="php-comment"> * @param string $source the module set name
-</span></span><span id="402" class="l"><a href="#402">402: </a><span class="php-comment"> * @return void
-</span></span><span id="403" class="l"><a href="#403">403: </a><span class="php-comment"> */</span>
-</span><span id="404" class="l"><a href="#404">404: </a><span class="php-keyword1">function</span> setup_base_page(<span class="php-var">$name</span>, <span class="php-var">$source</span>=<span class="php-keyword1">false</span>) {
-</span><span id="405" class="l"><a href="#405">405: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'login'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
-</span><span id="406" class="l"><a href="#406">406: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'default_page_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="407" class="l"><a href="#407">407: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'load_user_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="408" class="l"><a href="#408">408: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'message_list_type'</span>, <span class="php-keyword1">true</span>);
-</span><span id="409" class="l"><a href="#409">409: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'language'</span>,  <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="410" class="l"><a href="#410">410: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'process_search_terms'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="411" class="l"><a href="#411">411: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'title'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="412" class="l"><a href="#412">412: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'date'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="413" class="l"><a href="#413">413: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'save_user_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="414" class="l"><a href="#414">414: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'logout'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="415" class="l"><a href="#415">415: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'http_headers'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="416" class="l"><a href="#416">416: </a>
-</span><span id="417" class="l"><a href="#417">417: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'header_start'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
-</span><span id="418" class="l"><a href="#418">418: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'js_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="419" class="l"><a href="#419">419: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'js_search_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="420" class="l"><a href="#420">420: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'header_css'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
-</span><span id="421" class="l"><a href="#421">421: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'header_content'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
-</span><span id="422" class="l"><a href="#422">422: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'header_end'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
-</span><span id="423" class="l"><a href="#423">423: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_start'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
-</span><span id="424" class="l"><a href="#424">424: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'login'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
-</span><span id="425" class="l"><a href="#425">425: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'loading_icon'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="426" class="l"><a href="#426">426: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'date'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="427" class="l"><a href="#427">427: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'msgs'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
-</span><span id="428" class="l"><a href="#428">428: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'folder_list_start'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="429" class="l"><a href="#429">429: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'folder_list_end'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="430" class="l"><a href="#430">430: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="431" class="l"><a href="#431">431: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_section_end'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="432" class="l"><a href="#432">432: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'save_reminder'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="433" class="l"><a href="#433">433: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'page_js'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="434" class="l"><a href="#434">434: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_end'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
-</span><span id="435" class="l"><a href="#435">435: </a>}
-</span><span id="436" class="l"><a href="#436">436: </a>
-</span><span id="437" class="l"><a href="#437">437: </a><span class="php-comment">/**
-</span></span><span id="438" class="l"><a href="#438">438: </a><span class="php-comment"> * Merge array details for folder sources
-</span></span><span id="439" class="l"><a href="#439">439: </a><span class="php-comment"> * @param array $folder_sources list of folder list entries
-</span></span><span id="440" class="l"><a href="#440">440: </a><span class="php-comment"> * @return array
-</span></span><span id="441" class="l"><a href="#441">441: </a><span class="php-comment"> */</span>
-</span><span id="442" class="l"><a href="#442">442: </a><span class="php-keyword1">function</span> merge_folder_list_details(<span class="php-var">$folder_sources</span>) {
-</span><span id="443" class="l"><a href="#443">443: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
-</span><span id="444" class="l"><a href="#444">444: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$folder_sources</span>)) {
-</span><span id="445" class="l"><a href="#445">445: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="446" class="l"><a href="#446">446: </a>    }
-</span><span id="447" class="l"><a href="#447">447: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$folder_sources</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
-</span><span id="448" class="l"><a href="#448">448: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$vals</span>[<span class="php-num">0</span>], <span class="php-var">$res</span>)) {
-</span><span id="449" class="l"><a href="#449">449: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] .= <span class="php-var">$vals</span>[<span class="php-num">1</span>];
-</span><span id="450" class="l"><a href="#450">450: </a>        }
-</span><span id="451" class="l"><a href="#451">451: </a>        <span class="php-keyword1">else</span> {
-</span><span id="452" class="l"><a href="#452">452: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] = <span class="php-var">$vals</span>[<span class="php-num">1</span>];
-</span><span id="453" class="l"><a href="#453">453: </a>        }
-</span><span id="454" class="l"><a href="#454">454: </a>    }
-</span><span id="455" class="l"><a href="#455">455: </a>    <span class="php-keyword2">ksort</span>(<span class="php-var">$res</span>);
-</span><span id="456" class="l"><a href="#456">456: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="457" class="l"><a href="#457">457: </a>}
-</span><span id="458" class="l"><a href="#458">458: </a>
-</span><span id="459" class="l"><a href="#459">459: </a></span></code></pre>
+</span><span id="385" class="l"><a href="#385">385: </a>        filter_auth_servers(<span class="php-var">$handler</span>);
+</span><span id="386" class="l"><a href="#386">386: </a>        <span class="php-var">$handler</span>-&gt;user_config-&gt;save(<span class="php-var">$user</span>, <span class="php-var">$pass</span>);
+</span><span id="387" class="l"><a href="#387">387: </a>        <span class="php-var">$handler</span>-&gt;session-&gt;set(<span class="php-quote">'changed_settings'</span>, <span class="php-keyword1">array</span>());
+</span><span id="388" class="l"><a href="#388">388: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$logout</span>) {
+</span><span id="389" class="l"><a href="#389">389: </a>            <span class="php-var">$handler</span>-&gt;session-&gt;destroy(<span class="php-var">$handler</span>-&gt;request);
+</span><span id="390" class="l"><a href="#390">390: </a>            Hm_Msgs::add(<span class="php-quote">'Saved user data on logout'</span>);
+</span><span id="391" class="l"><a href="#391">391: </a>            Hm_Msgs::add(<span class="php-quote">'Session destroyed on logout'</span>);
+</span><span id="392" class="l"><a href="#392">392: </a>        }
+</span><span id="393" class="l"><a href="#393">393: </a>        <span class="php-keyword1">else</span> {
+</span><span id="394" class="l"><a href="#394">394: </a>            Hm_Msgs::add(<span class="php-quote">'Settings saved'</span>);
+</span><span id="395" class="l"><a href="#395">395: </a>        }
+</span><span id="396" class="l"><a href="#396">396: </a>    }
+</span><span id="397" class="l"><a href="#397">397: </a>}
+</span><span id="398" class="l"><a href="#398">398: </a>
+</span><span id="399" class="l"><a href="#399">399: </a><span class="php-comment">/**
+</span></span><span id="400" class="l"><a href="#400">400: </a><span class="php-comment"> * Filter out default auth and SMTP servers so they don't get saved
+</span></span><span id="401" class="l"><a href="#401">401: </a><span class="php-comment"> * to the permanent user config. These are dynamically reloaded on
+</span></span><span id="402" class="l"><a href="#402">402: </a><span class="php-comment"> * login
+</span></span><span id="403" class="l"><a href="#403">403: </a><span class="php-comment"> * @param object $handler hm handler module object
+</span></span><span id="404" class="l"><a href="#404">404: </a><span class="php-comment"> * @return void
+</span></span><span id="405" class="l"><a href="#405">405: </a><span class="php-comment"> */</span>
+</span><span id="406" class="l"><a href="#406">406: </a><span class="php-keyword1">function</span> filter_auth_servers(<span class="php-var">$handler</span>) {
+</span><span id="407" class="l"><a href="#407">407: </a>    <span class="php-var">$excluded</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'pop3_servers'</span>, <span class="php-quote">'imap_servers'</span>,<span class="php-quote">'smtp_servers'</span>);
+</span><span id="408" class="l"><a href="#408">408: </a>    <span class="php-var">$config</span> = <span class="php-var">$handler</span>-&gt;user_config-&gt;dump();
+</span><span id="409" class="l"><a href="#409">409: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$config</span> <span class="php-keyword1">as</span> <span class="php-var">$key</span> =&gt; <span class="php-var">$vals</span>) {
+</span><span id="410" class="l"><a href="#410">410: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-var">$key</span>, <span class="php-var">$excluded</span>, <span class="php-keyword1">true</span>)) {
+</span><span id="411" class="l"><a href="#411">411: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$vals</span> <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$server</span>) {
+</span><span id="412" class="l"><a href="#412">412: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'default'</span>, <span class="php-var">$server</span>)) {
+</span><span id="413" class="l"><a href="#413">413: </a>                    <span class="php-keyword1">unset</span>(<span class="php-var">$config</span>[<span class="php-var">$key</span>][<span class="php-var">$index</span>]);
+</span><span id="414" class="l"><a href="#414">414: </a>                }
+</span><span id="415" class="l"><a href="#415">415: </a>            }
+</span><span id="416" class="l"><a href="#416">416: </a>        }
+</span><span id="417" class="l"><a href="#417">417: </a>    }
+</span><span id="418" class="l"><a href="#418">418: </a>    <span class="php-var">$handler</span>-&gt;user_config-&gt;reload(<span class="php-var">$config</span>);
+</span><span id="419" class="l"><a href="#419">419: </a>}
+</span><span id="420" class="l"><a href="#420">420: </a>
+</span><span id="421" class="l"><a href="#421">421: </a><span class="php-comment">/**
+</span></span><span id="422" class="l"><a href="#422">422: </a><span class="php-comment"> * Setup commonly used modules for a page
+</span></span><span id="423" class="l"><a href="#423">423: </a><span class="php-comment"> * @param string $name the page id
+</span></span><span id="424" class="l"><a href="#424">424: </a><span class="php-comment"> * @param string $source the module set name
+</span></span><span id="425" class="l"><a href="#425">425: </a><span class="php-comment"> * @return void
+</span></span><span id="426" class="l"><a href="#426">426: </a><span class="php-comment"> */</span>
+</span><span id="427" class="l"><a href="#427">427: </a><span class="php-keyword1">function</span> setup_base_page(<span class="php-var">$name</span>, <span class="php-var">$source</span>=<span class="php-keyword1">false</span>) {
+</span><span id="428" class="l"><a href="#428">428: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'login'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
+</span><span id="429" class="l"><a href="#429">429: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'default_page_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="430" class="l"><a href="#430">430: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'load_user_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="431" class="l"><a href="#431">431: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'message_list_type'</span>, <span class="php-keyword1">true</span>);
+</span><span id="432" class="l"><a href="#432">432: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'language'</span>,  <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="433" class="l"><a href="#433">433: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'process_search_terms'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="434" class="l"><a href="#434">434: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'title'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="435" class="l"><a href="#435">435: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'date'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="436" class="l"><a href="#436">436: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'save_user_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="437" class="l"><a href="#437">437: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'logout'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="438" class="l"><a href="#438">438: </a>    add_handler(<span class="php-var">$name</span>, <span class="php-quote">'http_headers'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="439" class="l"><a href="#439">439: </a>
+</span><span id="440" class="l"><a href="#440">440: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'header_start'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
+</span><span id="441" class="l"><a href="#441">441: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'js_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="442" class="l"><a href="#442">442: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'js_search_data'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="443" class="l"><a href="#443">443: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'header_css'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
+</span><span id="444" class="l"><a href="#444">444: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'header_content'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
+</span><span id="445" class="l"><a href="#445">445: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'header_end'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
+</span><span id="446" class="l"><a href="#446">446: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_start'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
+</span><span id="447" class="l"><a href="#447">447: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'login'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
+</span><span id="448" class="l"><a href="#448">448: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'loading_icon'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="449" class="l"><a href="#449">449: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'date'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="450" class="l"><a href="#450">450: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'msgs'</span>, <span class="php-keyword1">false</span>, <span class="php-var">$source</span>);
+</span><span id="451" class="l"><a href="#451">451: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'folder_list_start'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="452" class="l"><a href="#452">452: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'folder_list_end'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="453" class="l"><a href="#453">453: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_section_start'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="454" class="l"><a href="#454">454: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_section_end'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="455" class="l"><a href="#455">455: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'save_reminder'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="456" class="l"><a href="#456">456: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'page_js'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="457" class="l"><a href="#457">457: </a>    add_output(<span class="php-var">$name</span>, <span class="php-quote">'content_end'</span>, <span class="php-keyword1">true</span>, <span class="php-var">$source</span>);
+</span><span id="458" class="l"><a href="#458">458: </a>}
+</span><span id="459" class="l"><a href="#459">459: </a>
+</span><span id="460" class="l"><a href="#460">460: </a><span class="php-comment">/**
+</span></span><span id="461" class="l"><a href="#461">461: </a><span class="php-comment"> * Merge array details for folder sources
+</span></span><span id="462" class="l"><a href="#462">462: </a><span class="php-comment"> * @param array $folder_sources list of folder list entries
+</span></span><span id="463" class="l"><a href="#463">463: </a><span class="php-comment"> * @return array
+</span></span><span id="464" class="l"><a href="#464">464: </a><span class="php-comment"> */</span>
+</span><span id="465" class="l"><a href="#465">465: </a><span class="php-keyword1">function</span> merge_folder_list_details(<span class="php-var">$folder_sources</span>) {
+</span><span id="466" class="l"><a href="#466">466: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="467" class="l"><a href="#467">467: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$folder_sources</span>)) {
+</span><span id="468" class="l"><a href="#468">468: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="469" class="l"><a href="#469">469: </a>    }
+</span><span id="470" class="l"><a href="#470">470: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$folder_sources</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="471" class="l"><a href="#471">471: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$vals</span>[<span class="php-num">0</span>], <span class="php-var">$res</span>)) {
+</span><span id="472" class="l"><a href="#472">472: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] .= <span class="php-var">$vals</span>[<span class="php-num">1</span>];
+</span><span id="473" class="l"><a href="#473">473: </a>        }
+</span><span id="474" class="l"><a href="#474">474: </a>        <span class="php-keyword1">else</span> {
+</span><span id="475" class="l"><a href="#475">475: </a>            <span class="php-var">$res</span>[<span class="php-var">$vals</span>[<span class="php-num">0</span>]] = <span class="php-var">$vals</span>[<span class="php-num">1</span>];
+</span><span id="476" class="l"><a href="#476">476: </a>        }
+</span><span id="477" class="l"><a href="#477">477: </a>    }
+</span><span id="478" class="l"><a href="#478">478: </a>    <span class="php-keyword2">ksort</span>(<span class="php-var">$res</span>);
+</span><span id="479" class="l"><a href="#479">479: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="480" class="l"><a href="#480">480: </a>}
+</span><span id="481" class="l"><a href="#481">481: </a>
+</span><span id="482" class="l"><a href="#482">482: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1499,6 +1524,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?f8e4308803754d44f11a781f42925b616abf62f6"></script>
+<script src="elementlist.js?0768a2b9c2ce86c077a60d0070bddc5487e386bf"></script>
 </body>
 </html>
