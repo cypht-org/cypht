@@ -14,6 +14,17 @@
  */
 abstract class HM_Format {
 
+    protected $config;
+
+    /**
+     * Init
+     * @param object $config site config object
+     * @return void
+     */
+    public function __construct($config) {
+        $this->config = $config;
+    }
+
     /**
      * Return combined output from all modules. Must be overridden by specific
      * output classes
@@ -39,6 +50,9 @@ class Hm_Format_JSON extends HM_Format {
     public function content($output, $allowed_output) {
         $output['router_user_msgs'] = Hm_Msgs::get();
         $output = $this->filter_output($output, $allowed_output);
+        if ($this->config->get('encrypt_ajax_requests', false)) {
+            $output = array('payload' => Hm_Crypt::ciphertext(json_encode($output, JSON_FORCE_OBJECT), Hm_Request_Key::generate()));
+        }
         return json_encode($output, JSON_FORCE_OBJECT);
     }
 
