@@ -1041,12 +1041,23 @@ var Hm_Utils = {
 var Hm_Crypt = {
     decrypt: function(ciphertext) {
         try {
-            var secret = $('#hm_page_key').val();
             ciphertext = atob(ciphertext);
+            if (!ciphertext || ciphertext.length < 200) {
+                return false;
+            }
+            var secret = $('#hm_page_key').val();
             var payload = ciphertext.substr(192);
+            var hmac_sig = ciphertext.substr(128, 64);
             var salt = ciphertext.substr(0, 128);
             var digest = forge.md.sha512.create();
+            var hmac = forge.hmac.create();
             var key = forge.pkcs5.pbkdf2(secret, salt, 100, 32, digest);
+
+            hmac.start(digest, key);
+            hmac.update(payload);
+            if (hmac.digest().data != hmac_sig) {
+                return false;
+            }
             var iv = forge.pkcs5.pbkdf2(secret, salt, 100, 16, digest);
             var decipher = forge.cipher.createDecipher('AES-CBC', key);
             decipher.start({iv: iv});
@@ -1059,19 +1070,19 @@ var Hm_Crypt = {
     },
 
     encrypt: function(plaintext) {
+        elog(plaintext);
         try {
             var secret = $('#hm_page_key').val();
             var salt = forge.random.getBytesSync(128);
             var digest = forge.md.sha512.create();
             var key = forge.pkcs5.pbkdf2(secret, salt, 100, 32, digest);
-            var hmac_key = forge.pkcs5.pbkdf2(secret, salt, 100, 32, digest);
             var iv = forge.pkcs5.pbkdf2(secret, salt, 100, 16, digest);
             var hmac = forge.hmac.create();
             var cipher = forge.cipher.createCipher('AES-CBC', key);
             cipher.start({iv: iv});
             cipher.update(forge.util.createBuffer(plaintext));
             cipher.finish();
-            hmac.start(digest, hmac_key);
+            hmac.start(digest, key);
             hmac.update(cipher.output.data);
             return btoa(salt+hmac.digest().data+cipher.output.data);
         } catch(e) {
