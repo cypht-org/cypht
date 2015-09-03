@@ -1020,7 +1020,7 @@ var Hm_Utils = {
     cancel_logout_event: function() {
         $('.cancel_logout').click(function() { $('.confirm_logout').hide(); return false; });
     },
-    json_encode(val) {
+    json_encode: function(val) {
         try {
             return JSON.stringify(val);
         }
@@ -1028,7 +1028,7 @@ var Hm_Utils = {
             return false;
         }
     },
-    json_decode(val) {
+    json_decode: function(val) {
         try {
             return JSON.parse(val);
         }
