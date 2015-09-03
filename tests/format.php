@@ -8,8 +8,9 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        $this->json = new Hm_Format_JSON();
-        $this->html5 = new Hm_Format_HTML5();
+        $config = new Hm_Mock_Config();
+        $this->json = new Hm_Format_JSON($config);
+        $this->html5 = new Hm_Format_HTML5($config);
         Hm_Output_Modules::add('test', 'date', false, false, 'after', true, 'core');
         Hm_Output_Modules::add('test', 'blah', false, false, 'after', true, 'core');
     }
@@ -20,6 +21,11 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
     public function test_content() {
         $this->assertEquals('{"date":"today"}', $this->json->content(array('router_page_name' => 'test', 'language' => 'en', 'date' => 'today'), array('date' => array(FILTER_UNSAFE_RAW, false))));
         $this->assertEquals('testtoday', $this->html5->content(array('router_page_name' => 'test', 'date' => 'today'), array()));
+        $config = new Hm_Mock_Config();
+        $config->set('encrypt_ajax_requests', true);
+        $this->json = new Hm_Format_JSON($config);
+        $res = $this->json->content(array('router_page_name' => 'test', 'language' => 'en', 'date' => 'today'), array('date' => array(FILTER_UNSAFE_RAW, false)));
+        $this->assertTrue((bool) preg_match('/^{"payload/', $res));
     }
     /**
      * @preserveGlobalState disabled
