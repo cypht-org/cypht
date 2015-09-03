@@ -366,7 +366,10 @@ class Hm_Output_page_js extends Hm_Output_Module {
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $zepto = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
+            $js_lib = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
+            if ($this->get('encrypt_ajax_requests', false) || $this->get('encrypt_local_storage', false)) {
+                $js_lib .= '<script type="text/javascript" src="third_party/forge.min.js"></script>';
+            }
             $core = false;
             $mods = $this->get('router_module_list');
             foreach (glob('modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
@@ -382,7 +385,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
             if ($core) {
                 $res = '<script type="text/javascript" src="'.sprintf("%ssite.js", $core).'"></script>'.$res;
             }
-            return $zepto.$res;
+            return $js_lib.$res;
         }
         else {
             return '<script type="text/javascript" src="site.js?v='.CACHE_ID.'"></script>';
@@ -424,6 +427,8 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_list_path = function() { return "'.$this->html_safe($this->get('list_path', '')).'"; };'.
             'var hm_list_parent = function() { return "'.$this->html_safe($this->get('list_parent', '')).'"; };'.
             'var hm_msg_uid = function() { return "'.$this->html_safe($this->get('uid', '')).'"; };'.
+            'var hm_encrypt_ajax_requests = function() { return "'.$this->html_safe($this->get('encrypt_ajax_requests', '')).'"; };'.
+            'var hm_encrypt_local_storage = function() { return "'.$this->html_safe($this->get('encrypt_local_storage', '')).'"; };'.
             format_data_sources($this->get('data_sources', array()), $this).
             '</script>';
     }
