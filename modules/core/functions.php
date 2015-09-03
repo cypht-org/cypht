@@ -159,8 +159,8 @@ function format_data_sources($array, $output_mod) {
 }
 
 /**
- * @subpackage core/functions
  * Group data sources by the "group" attribute if it exists, otherwise use "default"
+ * @subpackage core/functions
  * @param array $array list of data sources
  * @return array
  */
@@ -279,6 +279,7 @@ function get_oauth2_data($config) {
 
 /**
  * Process user input for a site setting and prep it to be saved
+ * @subpackage core/functions
  * @param string $type the name of the setting
  * @param object $handler hm hanndler module object
  * @param function $callback a function to sanitize the submitted value
@@ -344,6 +345,7 @@ function process_since_argument($val, $validate=false) {
 
 /**
  * Sanitize a "since" setting value for combined pages
+ * @subpackage core/functions
  * @param string $val value to check
  * @return sanitized value
  */
@@ -353,6 +355,7 @@ function since_setting_callback($val) {
 
 /**
  * Sanitize a max per source value
+ * @subpackage core/functions
  * @param int $val request max
  * @return sanitized max
  */
@@ -365,6 +368,7 @@ function max_source_setting_callback($val) {
 
 /**
  * Save user settings from the session to permanent storage
+ * @subpackage core/functions
  * @param object $handler hm handler module object
  * @param array $form sanitized user input
  * @param bool $logout true if this is a save + logout request
@@ -400,6 +404,7 @@ function save_user_settings($handler, $form, $logout) {
  * Filter out default auth and SMTP servers so they don't get saved
  * to the permanent user config. These are dynamically reloaded on
  * login
+ * @subpackage core/functions
  * @param object $handler hm handler module object
  * @return void
  */
@@ -420,6 +425,7 @@ function filter_auth_servers($handler) {
 
 /**
  * Setup commonly used modules for a page
+ * @subpackage core/functions
  * @param string $name the page id
  * @param string $source the module set name
  * @return void
@@ -459,6 +465,7 @@ function setup_base_page($name, $source=false) {
 
 /**
  * Merge array details for folder sources
+ * @subpackage core/functions
  * @param array $folder_sources list of folder list entries
  * @return array
  */
