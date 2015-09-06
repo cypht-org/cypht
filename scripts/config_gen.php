@@ -38,7 +38,7 @@ function build_config() {
         list($js, $css, $filters, $assets) = get_module_assignments($settings);
 
         /* combine and compress page content */
-        combine_includes($js, $js_compress, $css, $css_compress);
+        combine_includes($js, $js_compress, $css, $css_compress, $settings);
 
         /* write out the hm3.rc file */
         write_config_file($settings, $filters);
@@ -132,16 +132,23 @@ function get_module_assignments($settings) {
  * @param $js_compress string command to compress the js
  * @param $css string combined css from all modules
  * @param $css_compress string command to compress the css
+ * @param $settings array site settings list
  *
  * @return void
  */
-function combine_includes($js, $js_compress, $css, $css_compress) {
+function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     if ($css) {
         file_put_contents('site.css', compress($css, $css_compress));
         printf("site.css file created\n");
     }
     if ($js) {
         $js_lib = file_get_contents("third_party/zepto.min.js");
+        if ((array_key_exists('encrypt_ajax_requests', $settings) &&
+            $settings['encrypt_ajax_requests']) ||
+            (array_key_exists('encrypt_local_storage', $settings) &&
+            $settings['encrypt_local_storage'])) {
+            $js_lib .= file_get_contents("third_party/forge.min.js");
+        }
         $js = str_replace('\\', '\\\\', $js);
         file_put_contents('site.js', $js_lib.compress($js, $js_compress));
         printf("site.js file created\n");

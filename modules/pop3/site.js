@@ -213,9 +213,17 @@ var update_pop3_unread_display = function(res) {
 };
 
 var expand_pop3_settings = function() {
-    var dsp = Hm_Utils.get_from_local_storage('.pop3_setting');
-    if (dsp == 'table-row' || dsp == 'none') {
-        $('.pop3_setting').css('display', dsp);
+    var hash = window.location.hash;
+    if (hash) {
+        if (hash.replace('#', '.') == '.pop3_setting') {
+            $('.pop3_setting').css('display', 'table-row');
+        }
+    }
+    else {
+        var dsp = Hm_Utils.get_from_local_storage('.pop3_setting');
+        if (dsp == 'table-row' || dsp == 'none') {
+            $('.pop3_setting').css('display', dsp);
+        }
     }
 };
 

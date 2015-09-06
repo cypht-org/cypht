@@ -128,7 +128,7 @@ class Hm_Dispatch {
      * @return void
      */
     private function render_output() {
-        $formatter = new $this->request->format();
+        $formatter = new $this->request->format($this->site_config);
         $renderer = new Hm_Output_HTTP();
         $content = $formatter->content($this->module_exec->output_response, $this->request->allowed_output);
         $renderer->send_response($content, $this->module_exec->output_response);

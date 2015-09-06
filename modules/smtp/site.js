@@ -27,7 +27,7 @@ var smtp_save_action = function(event) {
                 form.append('<input type="submit" value="Forget" class="forget_smtp_connection" />');
                 $('.forget_smtp_connection').on('click', smtp_forget_action);
                 Hm_Utils.set_unsaved_changes(1);
-                reload_folders(true);
+                Hm_Folders.reload_folders(true);
             }
         },
         {'smtp_save': 1}
@@ -49,7 +49,7 @@ var smtp_forget_action = function(event) {
                 $('.save_smtp_connection').on('click', smtp_save_action);
                 $('.forget_smtp_connection', form).remove();
                 Hm_Utils.set_unsaved_changes(1);
-                reload_folders(true);
+                Hm_Folders.reload_folders(true);
             }
         },
         {'smtp_forget': 1}
@@ -113,6 +113,8 @@ var reset_smtp_form = function() {
     $('.compose_body').val('');
     $('.compose_subject').val('');
     $('.compose_to').val('');
+    $('.compose_cc').val('');
+    $('.compose_bcc').val('');
     $('.ke-content', $('iframe').contents()).html('');
     save_compose_state();
 };
