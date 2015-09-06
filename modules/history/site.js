@@ -1,5 +1,5 @@
 var record_message = function(res) {
-    var history = JSON.parse(Hm_Utils.get_from_local_storage('message_history'));
+    var history = Hm_Utils.json_decode(Hm_Utils.get_from_local_storage('message_history'));
     if (!history) {
         history = {};
     }
@@ -8,13 +8,16 @@ var record_message = function(res) {
         $('td', $('.header_from')).html(),
         $('td', $('.header_date')).html(),
     ];
-    Hm_Utils.save_to_local_storage('message_history', JSON.stringify(history));
+    Hm_Utils.save_to_local_storage('message_history', Hm_Utils.json_encode(history));
 };
 
 var display_history_page_links = function() {
     var msg;
-    var history = JSON.parse(Hm_Utils.get_from_local_storage('message_history'));
+    var history = Hm_Utils.json_decode(Hm_Utils.get_from_local_storage('message_history'));
     for (msg in history) {
+        if (history[msg][0] == null) {
+            continue;
+        }
         if (history[msg][1] == null) {
             history[msg][1] = '';
         }

@@ -72,7 +72,7 @@ class Hm_POP3_Base {
      * @param bool $multi_line multi-line flag
      * @return string
      */
-    private function get_response($multi_line=false) {
+    protected function get_response($multi_line=false) {
         if ($multi_line) {
             $res = $this->get_multi_line_response();
         }
@@ -87,7 +87,7 @@ class Hm_POP3_Base {
      * @param int $line_length max read length
      * @return string
      */
-    private function get_multi_line_response($line_length=8192) {
+    protected function get_multi_line_response($line_length=8192) {
         $n = -1;
         $result = array();
         if (!is_resource($this->handle)) {
@@ -119,7 +119,7 @@ class Hm_POP3_Base {
      * @param int $line_length max read length
      * @return string
      */
-    private function get_single_line_response($line_length=512) {
+    protected function get_single_line_response($line_length=512) {
         if (!is_resource($this->handle)) {
             $res = '';
         }
@@ -135,7 +135,7 @@ class Hm_POP3_Base {
      * @param string $command POP3 command
      * @return void
      */
-    private function send_command($command) {
+    protected function send_command($command) {
         if (is_resource($this->handle)) {
             fputs($this->handle, $command."\r\n");
         }
@@ -223,7 +223,7 @@ class Hm_POP3 extends Hm_POP3_Base {
      * @param string $response POP3 response
      * @return bool
      */
-    private function is_error($response) {
+    protected function is_error($response) {
         $index = count($response);
         $error = false;
         if ($index && substr($response[($index - 1)], 0, 3) == '+OK') {

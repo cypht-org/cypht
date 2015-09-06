@@ -96,7 +96,10 @@ var Hm_Ajax_Request = function() { return {
             return;
         }
         else {
-            if ((res.state && res.state == 'not callable') || !res.router_login_state) {
+            if (hm_encrypt_ajax_requests()) {
+                res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
+            }
+            if (!res || (res.state && res.state == 'not callable') || !res.router_login_state) {
                 window.location.href = "?page=home";
                 return;
             }
@@ -577,7 +580,7 @@ function Message_List() {
         var class_name;
         var list = Hm_Utils.get_from_local_storage('read_message_list');
         if (list && list.length) {
-            list = JSON.parse(list);
+            list = Hm_Utils.json_decode(list);
             for (class_name in list) {
                 $('.'+Hm_Utils.clean_selector(class_name)).remove();
             }
@@ -674,13 +677,13 @@ function Message_List() {
     this.track_read_messages = function(class_name) {
         var read_messages = Hm_Utils.get_from_local_storage('read_message_list');
         if (read_messages && read_messages.length) {
-            read_messages = JSON.parse(read_messages);
+            read_messages = Hm_Utils.json_decode(read_messages);
         }
         else {
             read_messages = {};
         }
         read_messages[class_name] = 1;
-        Hm_Utils.save_to_local_storage('read_message_list', JSON.stringify(read_messages));
+        Hm_Utils.save_to_local_storage('read_message_list', Hm_Utils.json_encode(read_messages));
     };
 
     this.toggle_rows = function() {
@@ -961,9 +964,15 @@ var Hm_Utils = {
         return results;
     },
     get_from_local_storage: function(key) {
+        if (hm_encrypt_local_storage()) {
+            return Hm_Crypt.decrypt(sessionStorage.getItem(key));
+        }
         return sessionStorage.getItem(key);
     },
     save_to_local_storage: function(key, val) {
+        if (hm_encrypt_local_storage()) {
+            val = Hm_Crypt.encrypt(val);
+        }
         if (Storage !== void(0)) {
             try { sessionStorage.setItem(key, val); } catch(e) {
                 if (e.code == 22) {
@@ -1010,8 +1019,77 @@ var Hm_Utils = {
     },
     cancel_logout_event: function() {
         $('.cancel_logout').click(function() { $('.confirm_logout').hide(); return false; });
+    },
+    json_encode: function(val) {
+        try {
+            return JSON.stringify(val);
+        }
+        catch (e) {
+            return false;
+        }
+    },
+    json_decode: function(val) {
+        try {
+            return JSON.parse(val);
+        }
+        catch (e) {
+            return false;
+        }
     }
 };
+
+var Hm_Crypt = {
+    decrypt: function(ciphertext) {
+        try {
+            ciphertext = atob(ciphertext);
+            if (!ciphertext || ciphertext.length < 200) {
+                return false;
+            }
+            var secret = $('#hm_page_key').val();
+            var payload = ciphertext.substr(192);
+            var hmac_sig = ciphertext.substr(128, 64);
+            var salt = ciphertext.substr(0, 128);
+            var digest = forge.md.sha512.create();
+            var hmac = forge.hmac.create();
+            var key = forge.pkcs5.pbkdf2(secret, salt, 100, 32, digest);
+
+            hmac.start(digest, key);
+            hmac.update(payload);
+            if (hmac.digest().data != hmac_sig) {
+                return false;
+            }
+            var iv = forge.pkcs5.pbkdf2(secret, salt, 100, 16, digest);
+            var decipher = forge.cipher.createDecipher('AES-CBC', key);
+            decipher.start({iv: iv});
+            decipher.update(forge.util.createBuffer(payload));
+            decipher.finish();
+            return decipher.output.data;
+        } catch(e) {
+            return false;
+        }
+    },
+
+    encrypt: function(plaintext) {
+        elog(plaintext);
+        try {
+            var secret = $('#hm_page_key').val();
+            var salt = forge.random.getBytesSync(128);
+            var digest = forge.md.sha512.create();
+            var key = forge.pkcs5.pbkdf2(secret, salt, 100, 32, digest);
+            var iv = forge.pkcs5.pbkdf2(secret, salt, 100, 16, digest);
+            var hmac = forge.hmac.create();
+            var cipher = forge.cipher.createCipher('AES-CBC', key);
+            cipher.start({iv: iv});
+            cipher.update(forge.util.createBuffer(plaintext));
+            cipher.finish();
+            hmac.start(digest, key);
+            hmac.update(cipher.output.data);
+            return btoa(salt+hmac.digest().data+cipher.output.data);
+        } catch(e) {
+            return false;
+        }
+    },
+}
 
 var elog = function(val) {
     if (hm_debug()) {

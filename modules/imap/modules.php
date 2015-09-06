@@ -262,13 +262,44 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
         $folders = array();
         if (!empty($servers)) {
             foreach ($servers as $id => $server) {
-                if ($server['name'] == 'Default-Auth-Server') {
-                    $server['name'] = 'Default';
-                }
                 $folders[$id] = $server['name'];
             }
         }
         $this->out('imap_folders', $folders);
+    }
+}
+
+/**
+ * Delete a message
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
+    /**
+     * Use IMAP to flag the selected message uid
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder'));
+        if ($success) {
+            $del_result = false;
+            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            if (is_object($imap) && $imap->get_state() == 'authenticated') {
+                if ($imap->select_mailbox($form['folder'])) {
+                    if ($imap->message_action('DELETE', array($form['imap_msg_uid']))) {
+                        $del_result = true;
+                        $imap->message_action('EXPUNGE', array($form['imap_msg_uid']));
+                    }
+                }
+            }
+            if (!$del_result) {
+                Hm_Msgs::add('ERRAn error occurred trying to flag this message');
+                $this->out('imap_delete_error', true);
+            }
+            else {
+                Hm_Msgs::add('Message deleted');
+                $this->out('imap_delete_error', false);
+            }
+        }
     }
 }
 
@@ -654,7 +685,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             }
             $new_servers[] = $server;
             Hm_IMAP_List::add($server, $index);
-            if ($server['name'] == 'Default-Auth-Server') {
+            if (array_key_exists('default', $server) && $server['default']) {
                 $added = true;
             }
         }
@@ -665,7 +696,8 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             $auth_server = $this->session->get('imap_auth_server_settings', array());
             if (!empty($auth_server)) {
                 Hm_IMAP_List::add(array( 
-                    'name' => 'Default-Auth-Server',
+                    'name' => $this->config->get('imap_auth_name', 'Default'),
+                    'default' => true,
                     'server' => $auth_server['server'],
                     'port' => $auth_server['port'],
                     'tls' => $auth_server['tls'],
@@ -1057,23 +1089,28 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
-                '<a href="#" class="header_toggle">'.$this->trans('all').'</a>'.
-                '<a class="header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
+                '<a href="#" class="hlink header_toggle">'.$this->trans('all').'</a>'.
+                '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;reply=1">'.$this->trans('reply').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;forward=1">'.$this->trans('forward').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;attach=1">'.$this->trans('attach').'</a>'.
-                ' | <a class="msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
+                ' | <a class="hlink msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
+
             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                $txt .= ' | <a style="display: none;" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
-                $txt .= '<a id="unflag_msg" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
+                $txt .= ' | <a style="display: none;" class="hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
+                $txt .= '<a id="unflag_msg" class="hlink" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
             }
             else {
-                $txt .= ' | <a id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
-                $txt .= '<a style="display: none;" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
+                $txt .= ' | <a id="flag_msg" class="hlink" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
+                $txt .= '<a style="display: none;" class="hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
             }
+            $txt .= ' | <a class="hlink" id="delete_message" href="#">'.$this->trans('delete').'</a>';
             $txt .= '</th></tr></table>';
 
             $this->out('msg_headers', $txt, false);
+        }
+        else {
+            Hm_Msgs::add('ERR'.$this->trans('Could not fetch the message, it was moved or deleted'));
         }
     }
 }
@@ -1101,10 +1138,6 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $user_pc = '';
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
-            }
-            if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = $this->trans('Default');
-                $no_edit = true;
             }
             $res .= '<div class="configured_server">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
@@ -1192,9 +1225,6 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = $this->trans('Default');
-            }
             $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
                 '<td class="imap_detail_'.$index.'"></td></tr>';
         }
@@ -1498,9 +1528,6 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         else {
             $parent_value = $parent_list;
-        }
-        if ($msg['server_name'] == 'Default-Auth-Server') {
-            $msg['server_name'] = 'Default';
         }
         $id = sprintf("imap_%s_%s_%s", $msg['server_id'], $msg['uid'], $msg['folder']);
         if (!trim($msg['subject'])) {

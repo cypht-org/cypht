@@ -27,13 +27,10 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
             }
             $val = trim($val);
             $contacts = new Hm_Contact_Store($this->user_config);
-            $search_results = $contacts->search(array(
+            $results = $contacts->search(array(
                 'display_name' => $val,
                 'email_address' => $val
             ));
-            foreach ($search_results as $contact) {
-                $results[] = sprintf('%s', $contact->value('email_address'));
-            }
         }
         $this->out('contact_suggestions', $results);
     }
@@ -248,6 +245,21 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         }
         $res .= '</table>';
         return $res;
+    }
+}
+
+/**
+ * @subpackage contacts/output
+ */
+class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
+    protected function output() {
+        $suggestions = array();
+        foreach ($this->get('contact_suggestions', array()) as $contact) {
+            $suggestions[] = $this->html_safe(sprintf(
+                '"%s" %s', $contact->value('display_name'), $contact->value('email_address')
+            ));
+        }
+        $this->out('contact_suggestions', $suggestions);
     }
 }
 

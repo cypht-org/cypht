@@ -41,6 +41,7 @@ add_handler('ajax_autocomplete_contact', 'language', true, 'core');
 add_handler('ajax_autocomplete_contact', 'save_user_data',  true, 'core');
 add_handler('ajax_autocomplete_contact', 'date', true, 'core');
 add_handler('ajax_autocomplete_contact', 'http_headers', true, 'core');
+add_output('ajax_autocomplete_contact', 'filter_autocomplete_list', true);
 
 add_handler('ajax_delete_contact', 'login', false, 'core');
 add_handler('ajax_delete_contact', 'load_user_data', true, 'core');

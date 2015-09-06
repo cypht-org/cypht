@@ -30,7 +30,8 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
                     Hm_SMTP_List::add( $server, $index );
                 }
                 Hm_SMTP_List::add(array(
-                    'name' => 'Default',
+                    'name' => $this->config->get('default_smtp_name', 'Default'),
+                    'default' => true,
                     'server' => $smtp_server,
                     'port' => $smtp_port,
                     'tls' => $smtp_tls,
@@ -486,10 +487,6 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $user_pc = '';
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
-            }
-            if ($vals['name'] == 'Default-Auth-Server') {
-                $vals['name'] = $this->trans('Default');
-                $no_edit = true;
             }
             $res .= '<div class="configured_server">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
