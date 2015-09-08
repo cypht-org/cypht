@@ -1070,7 +1070,6 @@ var Hm_Crypt = {
     },
 
     encrypt: function(plaintext) {
-        elog(plaintext);
         try {
             var secret = $('#hm_page_key').val();
             var salt = forge.random.getBytesSync(128);
