@@ -1092,6 +1092,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 '<a href="#" class="hlink header_toggle">'.$this->trans('all').'</a>'.
                 '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;reply=1">'.$this->trans('reply').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;reply_all=1">'.$this->trans('reply-all').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;forward=1">'.$this->trans('forward').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;attach=1">'.$this->trans('attach').'</a>'.
                 ' | <a class="hlink msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
