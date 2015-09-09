@@ -1,14 +1,16 @@
-html * { font-family: Arial !important; color: #999 !important; border-color: #282828 !important; background-color: transparent !important; }
+html * { font-family: Arial !important; color: #999 !important; border-color: #282828 !important; background-color: transparent; }
 main, div { border-radius: 0px 0px 8px 8px }
 body, .folder_cell { background: none !important; background-color: transparent !important; }
 html { background: linear-gradient(0deg, #111, #333) !important; }
 img { opacity: .4 !important; }
 a { color: #aaa !important; }
 a:hover { color: #fff !important; }
-textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !important; }
+.selected_part, .toggle_recipients, textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !important; }
 textarea { font-size: 100%; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
-.list_sources, .confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #363636 !important; }
+.msg_parts, .info_content, .profile_content, .user_settings, .settings_table, .server_content div, .list_controls, .msg_controls a, .checkbox_label, .search_content, .msg_text, .compose_page, .list_sources, .confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #363636 !important; }
+.today { background-color: #222 !important; }
+.ke-content body * { background-color: #000 !important; }
 .src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #333, #383838) !important; }
 .debug, .subtitle { color: #999 !important; }
 .subject, .subject a { font-weight: normal !important; font-size: 99% !important; color: #999 !important; }
