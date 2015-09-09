@@ -20,14 +20,20 @@ class Hm_MIME_Msg {
     private $allow_unqualified_addresses = false;
 
     /* build mime message data */
-    function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='') {
-        $this->headers['Cc'] = $cc;
+    function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $reply_to_id='') {
+        if ($cc) {
+            $this->headers['Cc'] = $cc;
+        }
+        if ($reply_to_id) {
+            $this->headers['In-Reply-To'] = $reply_to_id;
+        }
         $this->bcc = $bcc;
         $this->headers['From'] = $from;
+        $this->headers['Reply-To'] = $from;
         $this->headers['To'] = $this->encode_header_fld($to);
         $this->headers['Subject'] = $this->encode_header_fld($subject);
         $this->headers['Date'] = date('r');
-        $this->headers['Message-ID'] = '<'.md5(uniqid(rand(),1)).'@'.php_uname('n').'>';
+        $this->headers['Message-Id'] = '<'.md5(uniqid(rand(),1)).'@'.php_uname('n').'>';
         $this->boundary = Hm_Crypt::unique_id(32);
         $this->html = $html;
         $this->body = $this->prep_message_body($body);

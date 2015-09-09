@@ -54,6 +54,7 @@ return array(
     ),
     'allowed_get' => array(
         'reply' => FILTER_VALIDATE_INT,
+        'reply_all' => FILTER_VALIDATE_INT,
         'forward' => FILTER_VALIDATE_INT,
     ),
     'allowed_post' => array(
@@ -73,6 +74,7 @@ return array(
         'compose_to' => FILTER_UNSAFE_RAW,
         'compose_body' => FILTER_UNSAFE_RAW,
         'compose_subject' => FILTER_SANITIZE_STRING,
+        'compose_in_reply_to' => FILTER_UNSAFE_RAW,
         'compose_cc' => FILTER_SANITIZE_STRING,
         'compose_bcc' => FILTER_SANITIZE_STRING,
         'draft_body' => FILTER_UNSAFE_RAW,
