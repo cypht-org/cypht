@@ -99,6 +99,9 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if (array_key_exists('reply', $this->request->get) && $this->request->get['reply']) {
             $reply_type = 'reply';
         }
+        elseif (array_key_exists('reply_all', $this->request->get) && $this->request->get['reply_all']) {
+            $reply_type = 'reply_all';
+        }
         elseif (array_key_exists('forward', $this->request->get) && $this->request->get['forward']) {
             $reply_type = 'forward';
         }
@@ -302,6 +305,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 $from = '';
                 $cc = '';
                 $bcc = '';
+                $in_reply_to = '';
                 if (array_key_exists('compose_body', $this->request->post)) {
                     $body = $this->request->post['compose_body'];
                     $draft['draft_body'] = $this->request->post['compose_body'];
@@ -313,6 +317,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 if (array_key_exists('compose_bcc', $this->request->post)) {
                     $bcc = $this->request->post['compose_bcc'];
                     $draft['draft_bcc'] = $this->request->post['compose_bcc'];
+                }
+                if (array_key_exists('compose_in_reply_to', $this->request->post)) {
+                    $in_reply_to = $this->request->post['compose_in_reply_to'];
+                    $draft['draft_in_reply_to'] = $this->request->post['compose_in_reply_to'];
                 }
                 $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
                 if ($smtp_details) {
@@ -330,7 +338,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     }
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
-                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0), $cc, $bcc);
+                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0), $cc, $bcc, $in_reply_to);
                         $recipients = $mime->get_recipient_addresses();
                         if (empty($recipients)) {
                             Hm_Msgs::add("ERRNo valid receipts found");
@@ -369,6 +377,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $body = '';
         $cc = '';
         $bcc = '';
+        $in_reply_to = '';
         $recip = '';
 
         $draft = $this->get('compose_draft', array());
@@ -377,7 +386,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $html = $this->get('smtp_compose_type', 0);
 
         if (!empty($reply)) {
-            list($to, $subject, $body) = format_reply_fields($reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
+            list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields($reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
             if (array_key_exists('Envelope-to', $reply['msg_headers'])) {
                 $recip = $reply['msg_headers']['Envelope-to'];
             }
@@ -404,6 +413,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $res .= '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+            '<input type="hidden" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
             '<div class="to_outer"><input value="'.$this->html_safe($to).'" list="to_contacts" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
             '<a href="#" class="toggle_recipients">+</a></div>'.
             '<datalist id="to_contacts"></datalist>'.
