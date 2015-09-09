@@ -94,6 +94,7 @@ function format_reply_text($txt) {
  */
 function reply_to_address($headers, $type) {
     $msg_to = '';
+    $msg_cc = '';
     if ($type == 'forward') {
         return $msg_to;
     }
@@ -109,7 +110,12 @@ function reply_to_address($headers, $type) {
     elseif (array_key_exists('Return-path', $headers)) {
         $msg_to = $headers['Return-path'];
     }
-    return $msg_to;
+    if ($type == 'reply_all') {
+        if (array_key_exists('CC', $headers)) {
+            $msg_cc = $headers['CC'];
+        }
+    }
+    return array($msg_to, $msg_cc);
 }
 
 /**
@@ -256,6 +262,27 @@ function format_reply_as_text($body, $type, $reply_type, $lead_in) {
 }
 
 /**
+ * Get the in-reply-to message id for replied
+ * @subpackage core/functions
+ * @param array $headers message headers
+ * @param string $type reply type
+ * @return string
+ */
+function reply_to_id($headers, $type) {
+    $id = '';
+    if ($type != 'forward' && array_key_exists('Message-Id', $headers)) {
+        $id = $headers['Message-Id'];
+    }
+    elseif ($type != 'forward' && array_key_exists('Message-id', $headers)) {
+        $id = $headers['Message-id'];
+    }
+    elseif ($type != 'forward' && array_key_exists('Message-ID', $headers)) {
+        $id = $headers['Message-ID'];
+    }
+    return $id;
+}
+
+/**
  * Get reply field details
  * @subpackage core/functions
  * @param string $body message body
@@ -270,9 +297,10 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type
     $msg_to = '';
     $msg = '';
     $subject = reply_to_subject($headers, $type);
-    $msg_to = reply_to_address($headers, $type);
+    $msg_id = reply_to_id($headers, $type);
+    list($msg_to, $msg_cc) = reply_to_address($headers, $type);
     $lead_in = reply_lead_in($headers, $type, $msg_to, $output_mod);
     $msg = reply_format_body($headers, $body, $lead_in, $type, $struct, $html);
-    return array($msg_to, $subject, $msg);
+    return array($msg_to, $msg_cc, $subject, $msg, $msg_id);
 }
 
