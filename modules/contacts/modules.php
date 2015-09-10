@@ -20,10 +20,11 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
         if ($success) {
             $val = trim($form['contact_value']);
             $contacts = new Hm_Contact_Store($this->user_config);
-            $results = $contacts->search(array(
+            $contacts->sort('email_address');
+            $results = array_slice($contacts->search(array(
                 'display_name' => $val,
                 'email_address' => $val
-            ));
+            )), 0, 10);
         }
         $this->out('contact_suggestions', $results);
     }
