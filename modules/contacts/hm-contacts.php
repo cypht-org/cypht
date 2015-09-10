@@ -14,6 +14,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Contact_Store {
 
     private $contacts = array();
+    private $sort_fld = false;
 
     public function __construct($user_config) {
         $this->import($user_config->get('contacts', array()));
@@ -102,11 +103,24 @@ class Hm_Contact_Store {
         }
     }
 
+    public function reset() {
+        $this->contacts = array();
+    }
+
     public function page($page, $size) {
         if ($page < 1) {
             return array();
         }
         return array_slice( $this->contacts, (($page - 1)*$size), $size, true);
+    }
+
+    public function sort($fld) {
+        $this->sort_fld = $fld;
+        usort($this->contacts, array($this, 'sort_callback'));
+    }
+
+    public function sort_callback($a, $b) {
+        return strcmp($a->value($this->sort_fld), $b->value($this->sort_fld));
     }
 }
 
@@ -207,3 +221,50 @@ class Hm_Address_Field {
     }
 }
 
+/**
+ * @subpackage contacts/lib
+ */
+class Hm_Gmail_Contact_XML {
+    private $collect = false;
+    private $results = array();
+    private $xml_parser = false;
+    private $xml = false;
+    private $index = 0;
+
+    public function __construct($xml) {
+        $this->xml = $xml;
+        $this->xml_parser = xml_parser_create( 'UTF-8');
+        xml_set_object($this->xml_parser, $this);
+        xml_set_element_handler($this->xml_parser, 'xml_start_element', 'xml_end_element');
+        xml_set_character_data_handler($this->xml_parser, 'xml_character_data');
+    }
+    public function parse() {
+        if (xml_parse($this->xml_parser, $this->xml)) {
+        }
+        return $this->results;
+    }
+    public function xml_start_element($parser, $tagname, $attrs) {
+        if ($tagname == 'ENTRY') {
+            if (!array_key_exists($this->index, $this->results)) {
+                $this->results[$this->index] = array();
+            }
+        }
+        if ($tagname == 'GD:EMAIL') {
+            $this->results[$this->index]['email_address'] = $attrs['ADDRESS'];
+        }
+        if ($tagname == 'GD:FULLNAME') {
+            $this->collect = true;
+        }
+    }
+    public function xml_end_element($parser, $tagname) {
+        if ($tagname == 'ENTRY') {
+            $this->index++;
+        }
+    }
+    public function xml_character_data($parser, $data) {
+        if ($this->collect) {
+            $this->results[$this->index]['display_name'] = $data;
+            $this->collect = false;
+        }
+    }
+}
