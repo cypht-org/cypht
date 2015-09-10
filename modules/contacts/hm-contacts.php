@@ -255,6 +255,11 @@ class Hm_Gmail_Contact_XML {
         if ($tagname == 'GD:FULLNAME') {
             $this->collect = true;
         }
+        if ($tagname == 'GD:PHONENUMBER') {
+            if (array_key_exists('URI', $attrs)) {
+                $this->results[$this->index]['phone_number'] = substr($attrs['URI'], 5);
+            }
+        }
     }
     public function xml_end_element($parser, $tagname) {
         if ($tagname == 'ENTRY') {
