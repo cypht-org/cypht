@@ -414,13 +414,14 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="hidden" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
-            '<div class="to_outer"><input value="'.$this->html_safe($to).'" list="to_contacts" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
-            '<a href="#" class="toggle_recipients">+</a></div>'.
-            '<datalist id="to_contacts"></datalist>'.
+            '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<a href="#" class="toggle_recipients">+</a></div><div id="to_contacts"></div>'.
             '<div class="recipient_fields">'.
-            '<input value="'.$this->html_safe($cc).'" list="to_contacts" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" />'.
-            '<input value="'.$this->html_safe($bcc).'" list="to_contacts" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
+            '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" />'.
+            '<div id="cc_contacts"></div>'.
+            '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
             '</div>'.
+            '<div id="bcc_contacts"></div>'.
             '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
             '<textarea novalidate id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
             smtp_server_dropdown($this->module_output(), $this, $recip).
