@@ -18,14 +18,7 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('contact_value'));
         $results = array();
         if ($success) {
-            if (strstr($form['contact_value'], ',')) {
-                $val = explode(',', $form['contact_value']);
-                $val = array_pop($val);
-            }
-            else {
-                $val = $form['contact_value'];
-            }
-            $val = trim($val);
+            $val = trim($form['contact_value']);
             $contacts = new Hm_Contact_Store($this->user_config);
             $results = $contacts->search(array(
                 'display_name' => $val,

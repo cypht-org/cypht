@@ -11,3 +11,5 @@
 .add_contact_controls { display: none; }
 #add_contact { max-width: 300px; }
 @media screen and (max-device-width:480px) and (orientation : portrait) { .add_contact_row { display: none; } }
+.contact_suggestion { display: block; }
+.close_autocomplete { float: right; }
