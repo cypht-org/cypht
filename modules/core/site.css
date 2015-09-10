@@ -44,7 +44,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
 .inner_list { margin-bottom: 10px; } 
-.folders a { color: #555; text-decoration: none; line-height: 1.25em; }
+.folders a, .unread_link { color: #555; text-decoration: none; line-height: 1.25em; }
 .folder_list { background-color: #fff; margin-right: 20px; padding-right: 15px; padding-bottom: 40px; min-width: 200px; padding-top: 0px; }
 .folder_cell { vertical-align: top; height: 100%; max-width: 15%; display: table-cell; padding: 0px; margin: 0px; }
 .content_cell { vertical-align: top; height: 100%;  width: 100%; padding: 0px; margin: 0px; display: table-cell; background-color: #fff; padding-top: 0px; }
