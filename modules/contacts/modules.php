@@ -67,8 +67,10 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
         if (array_key_exists('contact_id', $this->request->get)) {
             $contacts = new Hm_Contact_Store($this->user_config);
             $contact = $contacts->get($this->request->get['contact_id']);
-            $to = sprintf('"%s" <%s>', $contact->value('display_name'), $contact->value('email_address'));
-            $this->out('compose_draft', array('draft_to' => $to, 'draft_subject' => '', 'draft_body' => ''));
+            if ($contact) {
+                $to = sprintf('"%s" <%s>', $contact->value('display_name'), $contact->value('email_address'));
+                $this->out('compose_draft', array('draft_to' => $to, 'draft_subject' => '', 'draft_body' => ''));
+            }
         }
     }
 }
@@ -88,6 +90,40 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
             }
         }
         $this->out('contact_store', $contacts);
+    }
+}
+class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
+    public function process() {
+        if (strpos($this->config->get('modules', ''), 'imap') !== false) {
+            $updated = false;
+            $contact_store = new Hm_Contact_Store($this->user_config);
+            $contact_store->reset();
+            foreach(Hm_IMAP_List::dump(false, true) as $id => $server) {
+                if ($server['server'] == 'imap.gmail.com' && array_key_exists('auth', $server) && $server['auth'] == 'xoauth2') {
+                    $results = imap_refresh_oauth2_token($server, $this->config);
+                    if (!empty($results)) {
+                        if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
+                            Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $server_id));
+                            $updated++;
+                            $server = Hm_IMAP_List::dump($id);
+                        }
+                    }
+                    $url = 'https://www.google.com/m8/feeds/contacts/'.$server['user'].'/full';
+                    $contacts = parse_contact_xml(gmail_contacts_request($server['pass'], $url), $server['name']);
+                    if (!empty($contacts)) {
+                        $contact_store->import($contacts);
+                    }
+                }
+            }
+        }
+        if (!empty($contact_store->dump())) {
+            $this->out('gmail_contacts', $contact_store);
+        }
+        if ($updated > 0) {
+            $servers = Hm_IMAP_List::dump(false, true);
+            $this->user_config->set('imap_servers', $servers);
+            $this->session->set('user_data', $this->user_config->dump());
+        }
     }
 }
 
@@ -224,13 +260,44 @@ class Hm_Output_add_message_contacts extends Hm_Output_Module {
 /**
  * @subpackage contacts/output
  */
+class Hm_Output_gmail_contacts_list extends Hm_Output_Module {
+    protected function output() {
+        $contacts = $this->get('gmail_contacts');
+        $res = '';
+        if ($contacts) {
+            $contacts->sort('email_address');
+            $res .= '<table class="gmail_contacts contact_list">';
+            $res .= '<tr><td colspan="5" class="contact_list_title"><div class="server_title">'.$this->trans('Gmail Contacts').'</div></td></tr>';
+                foreach ($contacts->page(1, 20) as $id => $contact) {
+                    $res .= '<tr class="contact_row_'.$this->html_safe($id).'">'.
+                        '<td>'.$this->html_safe($contact->value('source')).'</td>'.
+                        '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
+                        '<td>'.$this->html_safe($contact->value('email_address')).'</td>'.
+                        '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
+                        '<td class="contact_controls">'.
+                            '<a data-id="'.$this->html_safe($id).'" class="delete_contact" title="Delete"><img alt="'.$this->trans('Delete').'" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
+                            '<a href="?page=compose&contact_id='.$this->html_safe($id).'" class="send_to_contact" title="Send to"><img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$doc.'" /></a>'.
+                            '<a href="?page=contacts&contact_id='.$this->html_safe($id).'" class="delete_contact" title="Edit"><img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>'.
+                        '</td>'.
+                        '</tr>';
+            }
+            $res .= '</table>';
+        }
+        return $res;
+    }
+}
+
+/**
+ * @subpackage contacts/output
+ */
 class Hm_Output_contacts_list extends Hm_Output_Module {
     protected function output() {
         $res = '<table class="contact_list">';
-        $res .= '<tr><td colspan="4" class="contact_list_title"><div class="server_title">'.$this->trans('Your Contacts').'</div></td></tr>';
+        $res .= '<tr><td colspan="4" class="contact_list_title"><div class="server_title">'.$this->trans('Local Contacts').'</div></td></tr>';
         $contacts = $this->get('contact_store');
+        $contacts->sort('email_address');
         if ($contacts) {
-            foreach ($contacts->page(1, 10) as $id => $contact) {
+            foreach ($contacts->page(1, 20) as $id => $contact) {
                 $res .= '<tr class="contact_row_'.$this->html_safe($id).'">'.
                     '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
                     '<td>'.$this->html_safe($contact->value('email_address')).'</td>'.
@@ -287,7 +354,7 @@ class Hm_Output_contacts_content_add_form extends Hm_Output_Module {
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
-        return '<div class="add_server"><div class="server_title">'.$this->trans('Add').'</div>'.
+        return '<div class="add_server"><div class="server_title">'.$this->trans('Add Local Contact').'</div>'.
             '<form class="add_contact_form" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="screen_reader" for="contact_email">'.$this->trans('E-mail Address').'</label>'.
@@ -302,3 +369,40 @@ class Hm_Output_contacts_content_add_form extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage contacts/functions
+ */
+function gmail_contacts_request($token, $url) {
+    $result = array();
+    $headers = array('Authorization: OAuth '.$token, 'GData-Version: 3.0');
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'hm3');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    return curl_exec($ch);
+}
+
+/**
+ * @subpackage contacts/functions
+ */
+function parse_contact_xml($xml, $source) {
+    $parser = new Hm_Gmail_Contact_XML($xml);
+    $results = array();
+    $exists = array();
+    foreach ($parser->parse() as $contact) {
+        if (!array_key_exists('email_address', $contact)) {
+            continue;
+        }
+        if (in_array($contact['email_address'], $exists, true)) {
+            continue;
+        }
+        if (!array_key_exists('display_name', $contact)) {
+            $contact['display_name'] = '';
+        }
+        $exists[] = $contact['email_address'];
+        $contact['source'] = $source;
+        $results[] = $contact;
+    }
+    return $results;
+}
