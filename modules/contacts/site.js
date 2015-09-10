@@ -36,22 +36,26 @@ var autocomplete_contact = function(e, class_name, list_div) {
             function(res) {
                 if (res.contact_suggestions) {
                     var i;
+                    var count = 0;
                     $(list_div).html('');
                     for (i in res.contact_suggestions) {
                         div.html(res.contact_suggestions[i]);
                         if ($(class_name).val().match(div.text())) {
                             continue;
                         }
-                        if (i == 0) {
+                        if (count == 0) {
                             first = 'first ';
                         }
                         else {
                             first = '';
                         }
+                        count++;
                         $(list_div).append('<a tabindex="1" href="#" class="'+first+'contact_suggestion unread_link">'+res.contact_suggestions[i]+'</a>');
                     }
-                    $(list_div).append('<a class="close_autocomplete" href="#">X</a>');
-                    setup_autocomplete_events(class_name, list_div, fld_val);
+                    if (count > 0) {
+                        $(list_div).append('<a class="close_autocomplete" href="#">X</a>');
+                        setup_autocomplete_events(class_name, list_div, fld_val);
+                    }
                 }
             }
         );
@@ -67,12 +71,10 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
             in_list = true;
         }
         else {
-            if ($(event.target).next().length) {
-                $(event.target).removeClass('selected_menu');
-                $(event.target).next().addClass('selected_menu');
-                $(event.target).next().focus();
-                in_list = true;
-            }
+            $(event.target).removeClass('selected_menu');
+            $(event.target).next().addClass('selected_menu');
+            $(event.target).next().focus();
+            in_list = true;
         }
         return false;
     }
