@@ -53,7 +53,7 @@ var autocomplete_contact = function(e, class_name, list_div) {
                         $(list_div).append('<a tabindex="1" href="#" class="'+first+'contact_suggestion unread_link">'+res.contact_suggestions[i]+'</a>');
                     }
                     if (count > 0) {
-                        $(list_div).append('<a class="close_autocomplete" href="#">X</a>');
+                        $(list_div).show();
                         setup_autocomplete_events(class_name, list_div, fld_val);
                     }
                 }
@@ -93,11 +93,13 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
     }
     else if (event.keyCode == 13) {
         $(class_name).focus();
+        $(list_div).hide();
         add_autocomplete(event, class_name, list_div, fld_val);
         return false;
     }
     else if (event.keyCode == 27) {
         $(list_div).html('');
+        $(list_div).hide();
         $(class_name).focus();
         return false;
     }
@@ -111,7 +113,7 @@ var setup_autocomplete_events = function(class_name, list_div, fld_val) {
     $('.contact_suggestion').click(function() { return add_autocomplete(event, class_name, list_div, fld_val); });
     $(class_name).keydown(function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
     $('.contact_suggestion').keydown(function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
-    $('.close_autocomplete').click(function() { $(list_div).html(''); $(class_name).focus(); return false; });
+    $(document).click(function() { $(list_div).hide(); });
 };
 
 var add_autocomplete = function(event, class_name, list_div, fld_val) {
@@ -123,6 +125,7 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
         existing = existing.replace(/[\s,]+$/, '')+', ';
     }
     $(list_div).html('');
+    $(list_div).hide();
     $(class_name).val(existing+new_address);
     return false;
 };
@@ -133,13 +136,8 @@ if (hm_page_name() == 'contacts') {
     });
 }
 else if (hm_page_name() == 'compose') {
-    $('.compose_to').keyup(function(e) {
-        autocomplete_contact(e, '.compose_to', '#to_contacts');
-    });
-    $('.compose_cc').keyup(function(e) {
-        autocomplete_contact(e, '.compose_cc', '#cc_contacts');
-    });
-    $('.compose_bcc').keyup(function(e) {
-        autocomplete_contact(e, '.compose_bcc', '#bcc_contacts');
-    });
+    $('.compose_to').keyup(function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
+    $('.compose_cc').keyup(function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
+    $('.compose_bcc').keyup(function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
+    $('.compose_to').focus();
 }
