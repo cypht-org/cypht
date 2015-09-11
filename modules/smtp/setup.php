@@ -44,6 +44,15 @@ add_handler('ajax_smtp_save_draft', 'close_session_early',  true, 'core');
 add_handler('ajax_smtp_save_draft', 'date', true, 'core');
 add_handler('ajax_smtp_save_draft', 'http_headers', true, 'core');
 
+/* attach file */
+add_handler('ajax_smtp_attach_file', 'login', false, 'core');
+add_handler('ajax_smtp_attach_file', 'load_user_data',  true, 'core');
+add_handler('ajax_smtp_attach_file', 'smtp_attach_file',  true);
+add_handler('ajax_smtp_attach_file', 'close_session_early',  true, 'core');
+add_handler('ajax_smtp_attach_file', 'date', true, 'core');
+add_handler('ajax_smtp_attach_file', 'http_headers', true, 'core');
+add_output('ajax_smtp_attach_file', 'filter_upload_file_details', true);
+
 /* folder list link */
 add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'logout_menu_item', 'before');
 
@@ -51,11 +60,15 @@ return array(
     'allowed_pages' => array(
         'ajax_smtp_debug',
         'ajax_smtp_save_draft',
+        'ajax_smtp_attach_file',
     ),
     'allowed_get' => array(
         'reply' => FILTER_VALIDATE_INT,
         'reply_all' => FILTER_VALIDATE_INT,
         'forward' => FILTER_VALIDATE_INT,
+    ),
+    'allowed_output' => array(
+        'file_details' => array(FILTER_UNSAFE_RAW, false)
     ),
     'allowed_post' => array(
         'smtp_compose_type_setting' => FILTER_VALIDATE_INT,

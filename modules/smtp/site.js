@@ -119,10 +119,40 @@ var reset_smtp_form = function() {
     save_compose_state();
 };
 
+var upload_file = function(file) {
+    Hm_Ajax.show_loading_icon();
+    var res = '';
+    var form = new FormData();
+    var xhr = new XMLHttpRequest;
+    form.append('upload_file', file);
+    form.append('hm_ajax_hook', 'ajax_smtp_attach_file');
+    form.append('hm_page_key', $('#hm_page_key').val());
+    xhr.open('POST', '', true);
+    xhr.setRequestHeader('X-Requested-With', 'xmlhttprequest');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4){ 
+            if (hm_encrypt_ajax_requests()) {
+                res = Hm_Utils.json_decode(xhr.responseText);
+                res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
+            }
+            else {
+                res = Hm_Utils.json_decode(xhr.responseText);
+            }
+            if (res.file_details) {
+                $('.uploaded_files').append(res.file_details);
+            }
+            Hm_Ajax.stop_loading_icon();
+        }
+    }
+    xhr.send(form);
+};
+
 if (hm_page_name() === 'compose') {
     Hm_Timer.add_job(save_compose_state, 30, true);
     $('.toggle_recipients').click(function() { return toggle_recip_flds(); });
     $('.smtp_reset').click(function() { reset_smtp_form(); });
+    $('.compose_attach_button').click(function() { $('.compose_attach_file').trigger('click'); });
+    $('.compose_attach_file').change(function() { upload_file(this.files[0]); });
     if ($('.compose_cc').val() || $('.compose_bcc').val()) {
         toggle_recip_flds();
     }
