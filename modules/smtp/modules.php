@@ -423,7 +423,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '</div>'.
             '<div id="bcc_contacts"></div>'.
             '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
-            '<textarea novalidate id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
+            '<textarea id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
             smtp_server_dropdown($this->module_output(), $this, $recip).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" /></form></div>';
