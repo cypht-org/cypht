@@ -48,7 +48,7 @@ add_handler('ajax_smtp_save_draft', 'http_headers', true, 'core');
 add_handler('ajax_smtp_attach_file', 'login', false, 'core');
 add_handler('ajax_smtp_attach_file', 'load_user_data',  true, 'core');
 add_handler('ajax_smtp_attach_file', 'smtp_attach_file',  true);
-add_handler('ajax_smtp_attach_file', 'close_session_early',  true, 'core');
+add_handler('ajax_smtp_attach_file', 'save_user_data',  true, 'core');
 add_handler('ajax_smtp_attach_file', 'date', true, 'core');
 add_handler('ajax_smtp_attach_file', 'http_headers', true, 'core');
 add_output('ajax_smtp_attach_file', 'filter_upload_file_details', true);
@@ -71,7 +71,7 @@ return array(
         'file_details' => array(FILTER_UNSAFE_RAW, false)
     ),
     'allowed_post' => array(
-        'smtp_compose_type_setting' => FILTER_VALIDATE_INT,
+        'smtp_compose_type' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_SANITIZE_STRING,
         'new_smtp_address' => FILTER_SANITIZE_STRING,
         'new_smtp_port' => FILTER_SANITIZE_STRING,

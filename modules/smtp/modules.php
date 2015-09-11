@@ -50,32 +50,20 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
 
 /**
  * @subpackage smtp/handler
- * @todo: update this for the new settings system
  */
 class Hm_Handler_process_compose_type extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'smtp_compose_type_setting'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if ($form['smtp_compose_type_setting'] == 0 || $form['smtp_compose_type_setting'] == 1) {
-                $new_settings['smtp_compose_type'] = $form['smtp_compose_type_setting'];
-            }
-            else {
-                $settings['smtp_compose_type'] = $this->user_config->get('smtp_compose_type', false);
-            }
-        }
-        else {
-            $settings['smtp_compose_type'] = $this->user_config->get('smtp_compose_type', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
+        function smtp_compose_type_callback($val) { return $val; }
+        process_site_setting('smtp_compose_type', $this, 'smtp_compose_type_callback');
     }
 }
 
 /**
  * @subpackage smtp/handler
+ * @todo:
+ * - hash the ciphertext
+ * - save file with the hash as a name in the attachments dir
+ * - save the hash and file details in the session
  */
 class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
     public function process() {
@@ -128,7 +116,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             }
         }
         $this->out('compose_draft', $this->session->get('compose_draft', array()), false);
-        $compose_type = $this->user_config->get('smtp_compose_type', 0);
+        $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
         }
@@ -489,7 +477,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_compose_type', $settings)) {
             $selected = $settings['smtp_compose_type'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select name="smtp_compose_type_setting">';
+        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select name="smtp_compose_type">';
         $res .= '<option ';
         if ($selected == 0) {
             $res .= 'selected="selected" ';
