@@ -53,6 +53,9 @@ class Hm_Request {
     /* invalid input fields */
     public $invalid_input_fields = array();
 
+    /* uploaded file details */
+    public $files = array();
+
     /**
      * Process request details
      * @param array $filters list of input filters from module sets
@@ -61,6 +64,7 @@ class Hm_Request {
     public function __construct($filters) {
         $this->filter_request_input($filters);
         $this->get_other_request_details($filters);
+        $this->files = $_FILES;
         $this->empty_super_globals();
 
         Hm_Debug::add('Using sapi: '.$this->sapi);
