@@ -673,6 +673,7 @@
 				<li><a href="class-Hm_Handler_setup_github_connect.html">Hm_Handler_setup_github_connect</a></li>
 				<li><a href="class-Hm_Handler_setup_nux.html">Hm_Handler_setup_nux</a></li>
 				<li><a href="class-Hm_Handler_setup_wordpress_connect.html">Hm_Handler_setup_wordpress_connect</a></li>
+				<li><a href="class-Hm_Handler_smtp_attach_file.html">Hm_Handler_smtp_attach_file</a></li>
 				<li><a href="class-Hm_Handler_smtp_connect.html">Hm_Handler_smtp_connect</a></li>
 				<li><a href="class-Hm_Handler_smtp_default_server.html">Hm_Handler_smtp_default_server</a></li>
 				<li><a href="class-Hm_Handler_smtp_delete.html">Hm_Handler_smtp_delete</a></li>
@@ -769,6 +770,7 @@
 				<li><a href="class-Hm_Output_filter_pop3_status_data.html">Hm_Output_filter_pop3_status_data</a></li>
 				<li><a href="class-Hm_Output_filter_service_select.html">Hm_Output_filter_service_select</a></li>
 				<li><a href="class-Hm_Output_filter_unread_data.html">Hm_Output_filter_unread_data</a></li>
+				<li><a href="class-Hm_Output_filter_upload_file_details.html">Hm_Output_filter_upload_file_details</a></li>
 				<li><a href="class-Hm_Output_filter_wp_freshly_pressed_data.html">Hm_Output_filter_wp_freshly_pressed_data</a></li>
 				<li><a href="class-Hm_Output_filter_wp_notice_data.html">Hm_Output_filter_wp_notice_data</a></li>
 				<li><a href="class-Hm_Output_filter_wp_notification_data.html">Hm_Output_filter_wp_notification_data</a></li>
@@ -1409,13 +1411,13 @@
 </span><span id="361" class="l"><a href="#361"> 361: </a><span class="php-keyword1">class</span> Hm_Output_page_js <span class="php-keyword1">extends</span> Hm_Output_Module {
 </span><span id="362" class="l"><a href="#362"> 362: </a>    <span class="php-comment">/**
 </span></span><span id="363" class="l"><a href="#363"> 363: </a><span class="php-comment">     * In debug mode adds each module js file to the page, otherwise uses the combined version.
-</span></span><span id="364" class="l"><a href="#364"> 364: </a><span class="php-comment">     * Includes the zepto library.
+</span></span><span id="364" class="l"><a href="#364"> 364: </a><span class="php-comment">     * Includes the zepto library, and the forge lib if it's needed.
 </span></span><span id="365" class="l"><a href="#365"> 365: </a><span class="php-comment">     */</span>
 </span><span id="366" class="l"><a href="#366"> 366: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
 </span><span id="367" class="l"><a href="#367"> 367: </a>        <span class="php-keyword1">if</span> (DEBUG_MODE) {
 </span><span id="368" class="l"><a href="#368"> 368: </a>            <span class="php-var">$res</span> = <span class="php-quote">''</span>;
 </span><span id="369" class="l"><a href="#369"> 369: </a>            <span class="php-var">$js_lib</span> = <span class="php-quote">'&lt;script type=&quot;text/javascript&quot; src=&quot;third_party/zepto.min.js&quot;&gt;&lt;/script&gt;'</span>;
-</span><span id="370" class="l"><a href="#370"> 370: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'encrypt_ajax_requests'</span>, <span class="php-keyword1">false</span>) || <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'encrypt_local_storage'</span>, <span class="php-keyword1">false</span>)) {
+</span><span id="370" class="l"><a href="#370"> 370: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'encrypt_ajax_requests'</span>, <span class="php-quote">''</span>) || <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'encrypt_local_storage'</span>, <span class="php-quote">''</span>)) {
 </span><span id="371" class="l"><a href="#371"> 371: </a>                <span class="php-var">$js_lib</span> .= <span class="php-quote">'&lt;script type=&quot;text/javascript&quot; src=&quot;third_party/forge.min.js&quot;&gt;&lt;/script&gt;'</span>;
 </span><span id="372" class="l"><a href="#372"> 372: </a>            }
 </span><span id="373" class="l"><a href="#373"> 373: </a>            <span class="php-var">$core</span> = <span class="php-keyword1">false</span>;
@@ -2367,6 +2369,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?cfe99acc7c4d1ead3f0186d58beed36074068696"></script>
+<script src="elementlist.js?a940bf690f96345ea26bc522d0d64bc93f941b38"></script>
 </body>
 </html>

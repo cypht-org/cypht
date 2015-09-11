@@ -673,6 +673,7 @@
 				<li><a href="class-Hm_Handler_setup_github_connect.html">Hm_Handler_setup_github_connect</a></li>
 				<li><a href="class-Hm_Handler_setup_nux.html">Hm_Handler_setup_nux</a></li>
 				<li><a href="class-Hm_Handler_setup_wordpress_connect.html">Hm_Handler_setup_wordpress_connect</a></li>
+				<li><a href="class-Hm_Handler_smtp_attach_file.html">Hm_Handler_smtp_attach_file</a></li>
 				<li><a href="class-Hm_Handler_smtp_connect.html">Hm_Handler_smtp_connect</a></li>
 				<li><a href="class-Hm_Handler_smtp_default_server.html">Hm_Handler_smtp_default_server</a></li>
 				<li><a href="class-Hm_Handler_smtp_delete.html">Hm_Handler_smtp_delete</a></li>
@@ -769,6 +770,7 @@
 				<li><a href="class-Hm_Output_filter_pop3_status_data.html">Hm_Output_filter_pop3_status_data</a></li>
 				<li><a href="class-Hm_Output_filter_service_select.html">Hm_Output_filter_service_select</a></li>
 				<li><a href="class-Hm_Output_filter_unread_data.html">Hm_Output_filter_unread_data</a></li>
+				<li><a href="class-Hm_Output_filter_upload_file_details.html">Hm_Output_filter_upload_file_details</a></li>
 				<li><a href="class-Hm_Output_filter_wp_freshly_pressed_data.html">Hm_Output_filter_wp_freshly_pressed_data</a></li>
 				<li><a href="class-Hm_Output_filter_wp_notice_data.html">Hm_Output_filter_wp_notice_data</a></li>
 				<li><a href="class-Hm_Output_filter_wp_notification_data.html">Hm_Output_filter_wp_notification_data</a></li>
@@ -1303,20 +1305,25 @@
 </span><span id="255" class="l"><a href="#255">255: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$tagname</span> == <span class="php-quote">'GD:FULLNAME'</span>) {
 </span><span id="256" class="l"><a href="#256">256: </a>            <span class="php-var">$this</span>-&gt;collect = <span class="php-keyword1">true</span>;
 </span><span id="257" class="l"><a href="#257">257: </a>        }
-</span><span id="258" class="l"><a href="#258">258: </a>    }
-</span><span id="259" class="l"><a href="#259">259: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> xml_end_element(<span class="php-var">$parser</span>, <span class="php-var">$tagname</span>) {
-</span><span id="260" class="l"><a href="#260">260: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$tagname</span> == <span class="php-quote">'ENTRY'</span>) {
-</span><span id="261" class="l"><a href="#261">261: </a>            <span class="php-var">$this</span>-&gt;index++;
+</span><span id="258" class="l"><a href="#258">258: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$tagname</span> == <span class="php-quote">'GD:PHONENUMBER'</span>) {
+</span><span id="259" class="l"><a href="#259">259: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'URI'</span>, <span class="php-var">$attrs</span>)) {
+</span><span id="260" class="l"><a href="#260">260: </a>                <span class="php-var">$this</span>-&gt;results[<span class="php-var">$this</span>-&gt;index][<span class="php-quote">'phone_number'</span>] = <span class="php-keyword2">substr</span>(<span class="php-var">$attrs</span>[<span class="php-quote">'URI'</span>], <span class="php-num">5</span>);
+</span><span id="261" class="l"><a href="#261">261: </a>            }
 </span><span id="262" class="l"><a href="#262">262: </a>        }
 </span><span id="263" class="l"><a href="#263">263: </a>    }
-</span><span id="264" class="l"><a href="#264">264: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> xml_character_data(<span class="php-var">$parser</span>, <span class="php-var">$data</span>) {
-</span><span id="265" class="l"><a href="#265">265: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;collect) {
-</span><span id="266" class="l"><a href="#266">266: </a>            <span class="php-var">$this</span>-&gt;results[<span class="php-var">$this</span>-&gt;index][<span class="php-quote">'display_name'</span>] = <span class="php-var">$data</span>;
-</span><span id="267" class="l"><a href="#267">267: </a>            <span class="php-var">$this</span>-&gt;collect = <span class="php-keyword1">false</span>;
-</span><span id="268" class="l"><a href="#268">268: </a>        }
-</span><span id="269" class="l"><a href="#269">269: </a>    }
-</span><span id="270" class="l"><a href="#270">270: </a>}
-</span><span id="271" class="l"><a href="#271">271: </a></span></code></pre>
+</span><span id="264" class="l"><a href="#264">264: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> xml_end_element(<span class="php-var">$parser</span>, <span class="php-var">$tagname</span>) {
+</span><span id="265" class="l"><a href="#265">265: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$tagname</span> == <span class="php-quote">'ENTRY'</span>) {
+</span><span id="266" class="l"><a href="#266">266: </a>            <span class="php-var">$this</span>-&gt;index++;
+</span><span id="267" class="l"><a href="#267">267: </a>        }
+</span><span id="268" class="l"><a href="#268">268: </a>    }
+</span><span id="269" class="l"><a href="#269">269: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> xml_character_data(<span class="php-var">$parser</span>, <span class="php-var">$data</span>) {
+</span><span id="270" class="l"><a href="#270">270: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;collect) {
+</span><span id="271" class="l"><a href="#271">271: </a>            <span class="php-var">$this</span>-&gt;results[<span class="php-var">$this</span>-&gt;index][<span class="php-quote">'display_name'</span>] = <span class="php-var">$data</span>;
+</span><span id="272" class="l"><a href="#272">272: </a>            <span class="php-var">$this</span>-&gt;collect = <span class="php-keyword1">false</span>;
+</span><span id="273" class="l"><a href="#273">273: </a>        }
+</span><span id="274" class="l"><a href="#274">274: </a>    }
+</span><span id="275" class="l"><a href="#275">275: </a>}
+</span><span id="276" class="l"><a href="#276">276: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1324,6 +1331,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?cfe99acc7c4d1ead3f0186d58beed36074068696"></script>
+<script src="elementlist.js?a940bf690f96345ea26bc522d0d64bc93f941b38"></script>
 </body>
 </html>
