@@ -77,6 +77,21 @@ class Hm_Handler_process_compose_type extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('upload_file', $this->request->files)) {
+            $file = $this->request->files['upload_file'];
+            if (is_readable($file['tmp_name'])) {
+                $content = Hm_Crypt::ciphertext(file_get_contents($file['tmp_name']), Hm_Request_Key::generate());
+                $this->out('upload_file_details', $file);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
     public function process() {
         $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
@@ -424,9 +439,18 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '<div id="bcc_contacts"></div>'.
             '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
             '<textarea id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
+            '<table class="uploaded_files">'.
+            '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
-            '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" /></form></div>';
+            '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
+            /*'<input class="compose_attach_button" value="'.$this->trans('Attach').'" name="compose_attach_button" type="button" />'.*/
+            '</form>'.
+            '<form enctype="multipart/form-data" class="compose_attach_form" />'.
+            '<input class="compose_attach_file" type="file" name="compose_attach_file" />'.
+            '<input type="hidden" name="compose_attach_page_id" value="ajax_smtp_attach_file" />'.
+            '</form>'.
+            '</div>';
         return $res;
     }
 }
@@ -476,6 +500,23 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         }
         $res .= 'value="1">'.$this->trans('HTML').'</option></select></td></tr>';
         return $res;
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_filter_upload_file_details extends Hm_Output_Module {
+    protected function output() {
+        $file = $this->get('upload_file_details', array());
+        if (!empty($file)) {
+            $this->out('file_details', 
+                sprintf('<tr><td><a href="#" class="delete_attachment">X</a></td><td>%s</td><td>%s</td><td>%s KB</td></tr>',
+                    $this->html_safe($file['name']),
+                    $this->html_safe($file['type']),
+                    $this->html_safe(round($file['size']/1024))
+            ));
+        }
     }
 }
 
