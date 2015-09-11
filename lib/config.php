@@ -59,6 +59,20 @@ abstract class Hm_Config {
     public function set_tz() {
         date_default_timezone_set($this->get('timezone_setting', 'UTC'));
     }
+
+    /**
+     * shuffle the config value order
+     * @return void
+     */
+    public function shuffle() {
+        $new_config = array();
+        $keys = array_keys($this->config);
+        shuffle($keys);
+        foreach ($keys as $key) {
+            $new_config[$key] = $this->config[$key];
+        }
+        $this->config = $new_config;
+    }
 }
 
 /**
@@ -125,6 +139,7 @@ class Hm_User_Config_File extends Hm_Config {
      * @return void
      */
     public function save($username, $key) {
+        $this->shuffle();
         $destination = $this->get_path($username);
         $data = Hm_Crypt::ciphertext(serialize($this->config), $key);
         file_put_contents($destination, $data);
@@ -209,6 +224,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return void
      */
     public function save($username, $key) {
+        $this->shuffle();
         $config = Hm_Crypt::ciphertext(serialize($this->config), $key);
         if (!$this->connect()) {
             return false;
