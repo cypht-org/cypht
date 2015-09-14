@@ -15,3 +15,4 @@
 .compose_attach_button { float: right; margin-right: 20px; margin-top: 10px; }
 .uploaded_files { width: 1%;  margin-left: 5px; }
 .uploaded_files td { padding-right: 10px; white-space: nowrap; }
+.uploaded_files img { opacity: .4; }

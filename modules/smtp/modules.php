@@ -60,18 +60,68 @@ class Hm_Handler_process_compose_type extends Hm_Handler_Module {
 
 /**
  * @subpackage smtp/handler
- * @todo:
- * - hash the ciphertext
- * - save file with the hash as a name in the attachments dir
- * - save the hash and file details in the session
+ */
+class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('attachment_id', $this->request->post)) {
+            $id = $this->request->post['attachment_id'];
+            $filename = false;
+            $remaining_files = array();
+            foreach ($this->session->get('uploaded_files', array()) as $file) {
+                if ($id == $file['basename']) {
+                    $filename = $file['filename'];
+                }
+                else {
+                    $remaining_files[] = $file;
+                }
+            }
+            if ($filename && @unlink($filename)) {
+                $this->session->set('uploaded_files', $remaining_files);
+                Hm_Msgs::add('Attachment deleted');
+            }
+            else {
+                Hm_Msgs::add('ERRAn error occurred trying to delete the attachment');
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
  */
 class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('upload_file', $this->request->files)) {
             $file = $this->request->files['upload_file'];
             if (is_readable($file['tmp_name'])) {
-                $content = Hm_Crypt::ciphertext(file_get_contents($file['tmp_name']), Hm_Request_Key::generate());
-                $this->out('upload_file_details', $file);
+                $content = file_get_contents($file['tmp_name']);
+                if ($content) {
+                    $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
+                    $filename = hash('sha512', $content); 
+                    $filepath = $this->config->get('attachment_dir');
+                    if ($filepath) {
+                        $filepath = rtrim($filepath, '/');
+                        if (@file_put_contents($filepath.'/'.$filename, $content)) {
+                            $file['filename'] = $filepath.'/'.$filename;
+                            $file['basename'] = $filename; 
+                            $files = $this->session->get('uploaded_files', array());
+                            $this->session->set('uploaded_files', array_merge($files, array($file)));
+                            $this->out('upload_file_details', $file);
+                        }
+                        else {
+                            Hm_Msgs::add('ERRAn error occurred saving the uploaded file.');
+                        }
+                    }
+                    else {
+                        Hm_Msgs::add('ERRNo directory configured for uploaded files.');
+                    }
+                }
+                else {
+                    Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
+                }
+            }
+            else {
+                Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
             }
         }
     }
@@ -85,6 +135,9 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
         $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
         $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
+        if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
+            delete_uploaded_files($this->session);
+        }
         $this->session->set('compose_draft', array('draft_to' => $to, 'draft_body' => $body, 'draft_subject' => $subject));
     }
 }
@@ -116,6 +169,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             }
         }
         $this->out('compose_draft', $this->session->get('compose_draft', array()), false);
+        $this->out('uploaded_files', $this->session->get('uploaded_files', array()));
         $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
@@ -342,6 +396,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
                         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0), $cc, $bcc, $in_reply_to);
+                        $mime->add_attachments($this->session->get('uploaded_files', array()));
                         $recipients = $mime->get_recipient_addresses();
                         if (empty($recipients)) {
                             Hm_Msgs::add("ERRNo valid receipts found");
@@ -353,6 +408,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                             }
                             else {
                                 $draft = array();
+                                delete_uploaded_files($this->session);
                                 Hm_Msgs::add("Message Sent");
                             }
                         }
@@ -378,6 +434,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $to = '';
         $subject = '';
         $body = '';
+        $files = $this->get('uploaded_files', array());
         $cc = '';
         $bcc = '';
         $in_reply_to = '';
@@ -389,7 +446,9 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $html = $this->get('smtp_compose_type', 0);
 
         if (!empty($reply)) {
-            list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields($reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
+            list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
+                $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
+
             if (array_key_exists('Envelope-to', $reply['msg_headers'])) {
                 $recip = $reply['msg_headers']['Envelope-to'];
             }
@@ -417,23 +476,27 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="hidden" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
-            '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
-            '<a href="#" class="toggle_recipients">+</a></div><div id="to_contacts"></div>'.
-            '<div class="recipient_fields">'.
-            '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" />'.
-            '<div id="cc_contacts"></div>'.
-            '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
-            '</div>'.
-            '<div id="bcc_contacts"></div>'.
-            '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
-            '<textarea id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
-            '<table class="uploaded_files">'.
-            '</table>'.
+            '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).
+            '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<a href="#" tabindex="-1" class="toggle_recipients">+</a></div><div id="to_contacts"></div>'.
+            '<div class="recipient_fields"><input autocomplete="off" value="'.$this->html_safe($cc).
+            '" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').
+            '" /><div id="cc_contacts"></div><input autocomplete="off" value="'.$this->html_safe($bcc).
+            '" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
+            '</div><div id="bcc_contacts"></div><input value="'.$this->html_safe($subject).
+            '" required name="compose_subject" class="compose_subject" type="text" placeholder="'.
+            $this->trans('Subject').'" /><textarea id="compose_body" name="compose_body" class="compose_body">'.
+            $this->html_safe($body).'</textarea><table class="uploaded_files">';
+
+        foreach ($files as $file) {
+            $res .= format_attachment_row($file, $this);
+        }
+        $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
-            /*'<input class="compose_attach_button" value="'.$this->trans('Attach').'" name="compose_attach_button" type="button" />'.*/
-            '</form>'.
+            '<input class="compose_attach_button" value="'.$this->trans('Attach').
+            '" name="compose_attach_button" type="button" /></form>'.
             '<form enctype="multipart/form-data" class="compose_attach_form" />'.
             '<input class="compose_attach_file" type="file" name="compose_attach_file" />'.
             '<input type="hidden" name="compose_attach_page_id" value="ajax_smtp_attach_file" />'.
@@ -498,12 +561,7 @@ class Hm_Output_filter_upload_file_details extends Hm_Output_Module {
     protected function output() {
         $file = $this->get('upload_file_details', array());
         if (!empty($file)) {
-            $this->out('file_details', 
-                sprintf('<tr><td><a href="#" class="delete_attachment">X</a></td><td>%s</td><td>%s</td><td>%s KB</td></tr>',
-                    $this->html_safe($file['name']),
-                    $this->html_safe($file['type']),
-                    $this->html_safe(round($file['size']/1024))
-            ));
+            $this->out('file_details', format_attachment_row($file, $this));
         }
     }
 }
@@ -536,9 +594,11 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<label class="screen_reader" for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label>'.
-                '<input '.$disabled.' class="credentials" id="smtp_user_'.$index.'" placeholder="'.$this->trans('Username').'" type="text" name="smtp_user" value="'.$user_pc.'"></span>'.
-                '<span> <label class="screen_reader" for="smtp_pass_'.$index.'">'.$this->trans('SMTP password').'</label>'.
-                '<input '.$disabled.' class="credentials smtp_password" placeholder="'.$pass_pc.'" type="password" id="smtp_pass_'.$index.'" name="smtp_pass"></span>';
+                '<input '.$disabled.' class="credentials" id="smtp_user_'.$index.'" placeholder="'.$this->trans('Username').
+                '" type="text" name="smtp_user" value="'.$user_pc.'"></span><span> <label class="screen_reader" for="smtp_pass_'.
+                $index.'">'.$this->trans('SMTP password').'</label><input '.$disabled.' class="credentials smtp_password" placeholder="'.
+                $pass_pc.'" type="password" id="smtp_pass_'.$index.'" name="smtp_pass"></span>';
+
             if (!$no_edit) {
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
@@ -636,5 +696,30 @@ function smtp_refresh_oauth2_token($server, $config) {
     return array();
 }
 
+/**
+ * @subpackage smtp/functions
+ */
+function delete_uploaded_files($session) {
+    foreach ($session->get('uploaded_files', array()) as $file) {
+        @unlink($file['filename']);
+    }
+    $session->set('uploaded_files', array());
+}
 
+/**
+ * @subpackage smtp/functions
+ */
+function format_attachment_row($file, $output_mod) {
+    return '<tr><td>'.
+        '<img src="'.Hm_Image_Sources::$paperclip.'" alt="" width="16" height="16" />'.
+        '</td><td>'.$output_mod->html_safe($file['name']).
+        '</td><td>'.$output_mod->html_safe($file['type']).'</td><td>'.
+        $output_mod->html_safe(round($file['size']/1024, 2)).'KB</td>'.
+        '<td>'.
+        '<a title="'.$output_mod->trans('Delete').'" href="#" data-id="'.$output_mod->html_safe($file['basename']).
+        '" class="delete_attachment"><img src="'.Hm_Image_Sources::$circle_x.'" alt="X" width="16" height="16" />'.
+        '</a>'.
+        '</td>'.
+        '</tr>';
+}
 
