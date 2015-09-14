@@ -19,7 +19,7 @@ add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_content_add_
 add_output('contacts', 'gmail_contacts_list', true, 'contacts', 'contacts_list', 'after');
 add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_content_add_form', 'after');
 
-add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'settings_menu_end', 'before');
+add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'logout_menu_item', 'before');
 
 add_handler('compose', 'process_send_to_contact', true, 'contacts', 'save_user_data', 'before');
 
