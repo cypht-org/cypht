@@ -105,5 +105,8 @@ function build_parent_mock($request_type='HTML5') {
     $parent->user_config = new Hm_Mock_Config();
     return $parent;
 }
+function delete_uploaded_files($obj) {
+    return true;
+}
 
 ?>
