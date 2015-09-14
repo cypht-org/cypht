@@ -73,7 +73,7 @@ var smtp_delete_action = function(event) {
     );
 };
 
-var save_compose_state = function() {
+var save_compose_state = function(no_files) {
     var body = $('.compose_body').val();
     var subject = $('.compose_subject').val();
     var to = $('.compose_to').val();
@@ -81,6 +81,7 @@ var save_compose_state = function() {
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
         {'name': 'draft_subject', 'value': subject},
+        {'name': 'delete_uploaded_files', 'value': no_files},
         {'name': 'draft_to', 'value': to}],
         function() { },
         [],
@@ -116,14 +117,15 @@ var reset_smtp_form = function() {
     $('.compose_cc').val('');
     $('.compose_bcc').val('');
     $('.ke-content', $('iframe').contents()).html('');
-    save_compose_state();
+    $('.uploaded_files').html('');
+    save_compose_state(true);
 };
 
 var upload_file = function(file) {
-    Hm_Ajax.show_loading_icon();
     var res = '';
     var form = new FormData();
     var xhr = new XMLHttpRequest;
+    Hm_Ajax.show_loading_icon();
     form.append('upload_file', file);
     form.append('hm_ajax_hook', 'ajax_smtp_attach_file');
     form.append('hm_page_key', $('#hm_page_key').val());
@@ -140,11 +142,24 @@ var upload_file = function(file) {
             }
             if (res.file_details) {
                 $('.uploaded_files').append(res.file_details);
+                $('.delete_attachment').click(function() { return delete_attachment($(this).data('id'), this); });
             }
             Hm_Ajax.stop_loading_icon();
+            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
+                Hm_Notices.show(res.router_user_msgs);
+            }
         }
     }
     xhr.send(form);
+};
+
+var delete_attachment = function(file, link) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_delete_attachment'},
+        {'name': 'attachment_id', 'value': file}],
+        function(res) { $(link).parent().parent().remove(); }
+    );
+    return false;
 };
 
 if (hm_page_name() === 'compose') {
@@ -156,4 +171,6 @@ if (hm_page_name() === 'compose') {
     if ($('.compose_cc').val() || $('.compose_bcc').val()) {
         toggle_recip_flds();
     }
+    $('.delete_attachment').click(function() { return delete_attachment($(this).data('id'), this); });
+
 }

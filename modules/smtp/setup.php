@@ -53,6 +53,14 @@ add_handler('ajax_smtp_attach_file', 'date', true, 'core');
 add_handler('ajax_smtp_attach_file', 'http_headers', true, 'core');
 add_output('ajax_smtp_attach_file', 'filter_upload_file_details', true);
 
+/* delete attached file */
+add_handler('ajax_smtp_delete_attachment', 'login', false, 'core');
+add_handler('ajax_smtp_delete_attachment', 'load_user_data',  true, 'core');
+add_handler('ajax_smtp_delete_attachment', 'smtp_delete_attached_file',  true);
+add_handler('ajax_smtp_delete_attachment', 'save_user_data',  true, 'core');
+add_handler('ajax_smtp_delete_attachment', 'date', true, 'core');
+add_handler('ajax_smtp_delete_attachment', 'http_headers', true, 'core');
+
 /* folder list link */
 add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'logout_menu_item', 'before');
 
@@ -61,6 +69,7 @@ return array(
         'ajax_smtp_debug',
         'ajax_smtp_save_draft',
         'ajax_smtp_attach_file',
+        'ajax_smtp_delete_attachment'
     ),
     'allowed_get' => array(
         'reply' => FILTER_VALIDATE_INT,
@@ -71,6 +80,7 @@ return array(
         'file_details' => array(FILTER_UNSAFE_RAW, false)
     ),
     'allowed_post' => array(
+        'attachment_id' => FILTER_SANITIZE_STRING,
         'smtp_compose_type' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_SANITIZE_STRING,
         'new_smtp_address' => FILTER_SANITIZE_STRING,
@@ -84,6 +94,7 @@ return array(
         'smtp_server_id' => FILTER_VALIDATE_INT,
         'smtp_user' => FILTER_SANITIZE_STRING,
         'smtp_pass' => FILTER_SANITIZE_STRING,
+        'delete_uploaded_files' => FILTER_VALIDATE_BOOLEAN,
         'compose_to' => FILTER_UNSAFE_RAW,
         'compose_body' => FILTER_UNSAFE_RAW,
         'compose_subject' => FILTER_SANITIZE_STRING,
