@@ -989,12 +989,18 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
     protected function output() {
         if ($this->get('custom_list_controls_type')) {
             if ($this->get('custom_list_controls_type') == 'remove') {
-                $custom = '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').'" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.$this->trans('Remove').'"/></a>';
-                $custom .= '<a style="display: none;" class="add_source" title="'.$this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+                $custom = '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
+                    '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.
+                    '" alt="'.$this->trans('Remove').'"/></a><a style="display: none;" class="add_source" title="'.
+                    $this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.
+                    $this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
             }
             else {
-                $custom = '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').'" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.$this->trans('Remove').'"/></a>';
-                $custom .= '<a class="add_source" title="'.$this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+                $custom = '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
+                    '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.
+                    $this->trans('Remove').'"/></a><a class="add_source" title="'.$this->trans('Add this folder to combined pages').
+                    '" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.
+                    Hm_Image_Sources::$circle_check.'" /></a>';
             }
             $this->out('custom_list_controls', $custom);
         }
@@ -1546,6 +1552,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if (!stristr($msg['flags'], 'seen')) {
            $flags[] = 'unseen';
         }
+        if (stristr($msg['flags'], 'attachment')) {
+            $flags[] = 'attachment';
+        }
         if (stristr($msg['flags'], 'deleted')) {
             $flags[] = 'deleted';
         }
@@ -1819,6 +1828,9 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
                         $msgs = array_slice($msgs, 0, $limit);
                     }
                     foreach ($imap->get_message_list($msgs) as $msg) {
+                        if (array_key_exists('content-type', $msg) && stristr($msg['content-type'], 'multipart/mixed')) {
+                            $msg['flags'] .= ' \Attachment';
+                        }
                         if (stristr($msg['flags'], 'deleted')) {
                             continue;
                         }
