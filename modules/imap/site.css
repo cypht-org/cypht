@@ -11,7 +11,7 @@
 .news_cell .from { font-size: 110%; }
 .chkbox_col { width: 32px; }
 .source_col { width: 8%; }
-.icon_col { width: 24px; }
+.icon_col { width: 60px; white-space: nowrap; }
 .subject_col { width: 55%; }
 .from_col { width: 15%; }
 .date_col { width: 19%; }
