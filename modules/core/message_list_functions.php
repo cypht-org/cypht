@@ -247,11 +247,18 @@ function date_callback($vals, $style, $output_mod) {
  * @return string
  */
 function icon_callback($vals, $style, $output_mod) {
+    $icons = '';
+    if (in_array('flagged', $vals[0])) {
+        $icons .= '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Flagged').'" />';
+    }
+    if (in_array('attachment', $vals[0])) {
+        $icons .= '<img src="'.Hm_Image_Sources::$paperclip.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" />';
+    }
     if ($style == 'email') {
-        return sprintf('<td class="icon">%s</td>', (in_array('flagged', $vals[0]) ? '<img src="'.Hm_Image_Sources::$star.'" alt="'.$output_mod->trans('Flagged').'" />' : ''));
+        return sprintf('<td class="icon">%s</td>', $icons);
     }
     elseif ($style == 'news') {
-        return sprintf('<div class="icon">%s</div>', (in_array('flagged', $vals[0]) ? '<img src="'.Hm_Image_Sources::$star.'" alt="'.$output_mod->trans('Flagged').'" />' : ''));
+        return sprintf('<div class="icon">%s</div>', $icons);
     }
 }
 
