@@ -228,6 +228,9 @@ class Hm_PHP_Session extends Hm_Session {
      * @return void
      */
     public function destroy($request) {
+        if (function_exists('delete_uploaded_files')) {
+            delete_uploaded_files($this);
+        }
         session_unset();
         @session_destroy();
         $params = session_get_cookie_params();
@@ -371,6 +374,9 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return void
      */
     public function destroy($request) {
+        if (function_exists('delete_uploaded_files')) {
+            delete_uploaded_files($this);
+        }
         if ($this->dbh) {
             $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
             $sql->execute(array($this->session_key));
