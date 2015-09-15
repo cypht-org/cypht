@@ -135,12 +135,12 @@ class Hm_Output_change_password extends Hm_Output_Module {
             $res .= '<div class="chg_pass_page"><div class="content_title">'.$this->trans('Change Password').'</div>'.
                 '<div class="change_pass"><form method="POST">'.
                 '<input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
+                '<label class="screen_reader" for="old_pass">'.$this->trans('Current password').'</label>'.
+                '<input required type="password" id="old_pass" name="old_pass" placeholder="'.$this->trans('Current password').'" /><br />'.
                 '<label class="screen_reader" for="new_pass1">'.$this->trans('New password').'</label>'.
                 '<input required type="password" id="new_pass1" name="new_pass1" placeholder="'.$this->trans('New password').'" /><br />'.
                 '<label class="screen_reader" for="new_pass2">'.$this->trans('New password again').'</label>'.
                 '<input required type="password" id="new_pass2" name="new_pass2" placeholder="'.$this->trans('New password again').'" /><br />'.
-                '<label class="screen_reader" for="old_pass">'.$this->trans('Current password').'</label>'.
-                '<input required type="password" id="old_pass" name="old_pass" placeholder="'.$this->trans('Current password').'" /><br />'.
                 '<input type="submit" name="change_password" value="'.$this->trans('Update').'" />';
             $res .= '</form></div></div>';
         }
