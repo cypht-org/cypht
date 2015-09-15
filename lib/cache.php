@@ -141,8 +141,12 @@ trait Hm_Uid_Cache {
      */
     public static function load($data) {
         if (is_array($data) && count($data) == 2) {
-            self::$read = array_combine($data[0], array_fill(0, count($data[0]), 0));
-            self::$unread = array_combine($data[1], array_fill(0, count($data[1]), 0));
+            if (count($data[0]) > 0) {
+                self::$read = array_combine($data[0], array_fill(0, count($data[0]), 0));
+            }
+            if (count($data[1]) > 0) {
+                self::$unread = array_combine($data[1], array_fill(0, count($data[1]), 0));
+            }
         }
     }
 
