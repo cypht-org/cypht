@@ -293,7 +293,7 @@ class Hm_SMTP {
         if(count($intersect) > 0) {
             return array_shift($intersect);
         }
-        return $requested[ count($requested) - 1 ];
+        return trim($this->supports_auth[0]);
     }
 
     /**
@@ -365,7 +365,7 @@ class Hm_SMTP {
                 break;
             default:
                 $result = 'FATAL: Unknown SMTP AUTH mechanism: '.$mech;
-                exit;
+                break;
         }
         if (!$result) {
             $result = 'An error occurred authenticating to the SMTP server';
