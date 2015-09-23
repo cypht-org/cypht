@@ -298,8 +298,8 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
                     '<td class="contact_controls">'.
                         '<a data-id="'.$this->html_safe($id).'" class="delete_contact" title="Delete"><img alt="'.$this->trans('Delete').'" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
-                        '<a href="?page=compose&contact_id='.$this->html_safe($id).'" class="send_to_contact" title="Send to"><img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$doc.'" /></a>'.
-                        '<a href="?page=contacts&contact_id='.$this->html_safe($id).'" class="delete_contact" title="Edit"><img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>'.
+                        '<a href="?page=compose&amp;contact_id='.$this->html_safe($id).'" class="send_to_contact" title="Send to"><img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$doc.'" /></a>'.
+                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'" class="delete_contact" title="Edit"><img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>'.
                     '</td>'.
                     '</tr>';
             }

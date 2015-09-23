@@ -66,7 +66,19 @@ var Hm_Ajax_Request = function() { return {
                 args.push({'name': name, 'value': extra[name]});
             }
         }
-        args.push({'name': 'hm_page_key', 'value': $('#hm_page_key').val()});
+        var key_found = false;
+        for (arg in args) {
+            if (args[arg].name == 'hm_page_key') {
+                key_found = true;
+                break;
+            }
+        }
+        if (!key_found) {
+            args.push({'name': 'hm_page_key', 'value': $('#hm_page_key').val()});
+        }
+        /*if (hm_encrypt_ajax_requests()) {
+            args = {'name': 'payload', 'value': Hm_Crypt.encrypt(Hm_Utils.json_encode(args))};
+        }*/
 
         var dt = new Date();
         this.start_time = dt.getTime();

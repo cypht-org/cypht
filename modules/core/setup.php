@@ -180,6 +180,7 @@ return array(
     ),
 
     'allowed_post' => array(
+        'payload' => FILTER_SANITIZE_STRING,
         'hm_page_key' => FILTER_SANITIZE_STRING,
         'logout' => FILTER_VALIDATE_BOOLEAN,
         'save_and_logout' => FILTER_VALIDATE_BOOLEAN,
