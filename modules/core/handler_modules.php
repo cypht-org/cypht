@@ -319,6 +319,10 @@ class Hm_Handler_login extends Hm_Handler_Module {
                 $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
             }
         }
+        Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
+        /*if ($this->config->get('encrypt_ajax_requests', false) && $this->request->is_ajax()) {
+            $this->request->post = decrypt_post_values($this->request);
+        }*/
         $this->process_key();
     }
 }

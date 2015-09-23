@@ -218,13 +218,9 @@ abstract class Hm_Handler_Module {
      * @return void
      */
     public function process_key() {
-
-        Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
-
         if (empty($this->request->post)) {
             return false;
         }
-
         $key = array_key_exists('hm_page_key', $this->request->post) ? $this->request->post['hm_page_key'] : false;
         $valid = Hm_Request_Key::validate($key);
         if (!$valid) {
