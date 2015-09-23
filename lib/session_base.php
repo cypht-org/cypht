@@ -17,7 +17,7 @@ trait Hm_Session_Fingerprint {
      * @return void
      */
     public function check_fingerprint($request) {
-        $id = $this->build_fingerprint($request);
+        $id = $this->build_fingerprint($request->server);
         $fingerprint = $this->get('fingerprint', false);
         if (!$fingerprint || $fingerprint !== $id) {
             $this->destroy($request);
@@ -27,11 +27,10 @@ trait Hm_Session_Fingerprint {
 
     /**
      * Build HTTP header "fingerprint"
-     * @param object $request request details
+     * @param array $env server env values
      * @return string fingerprint value
      */
-    public function build_fingerprint($request, $input='') {
-        $env = $request->server;
+    public function build_fingerprint($env, $input='') {
         $id = $input;
         $id .= (array_key_exists('REMOTE_ADDR', $env)) ? $env['REMOTE_ADDR'] : '';
         $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
@@ -48,7 +47,7 @@ trait Hm_Session_Fingerprint {
      * @return void
      */
     protected function set_fingerprint($request) {
-        $id = $this->build_fingerprint($request);
+        $id = $this->build_fingerprint($request->server);
         $this->set('fingerprint', $id);
     }
 }
