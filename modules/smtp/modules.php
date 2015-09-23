@@ -449,9 +449,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
                 $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
 
-            if (array_key_exists('Envelope-to', $reply['msg_headers'])) {
-                $recip = $reply['msg_headers']['Envelope-to'];
-            }
+            $recip = get_primary_recipients($reply['msg_headers'], $this->get('smtp_servers', array()));
         }
         elseif (!empty($draft)) {
             $to = $draft['draft_to'];
@@ -723,3 +721,27 @@ function format_attachment_row($file, $output_mod) {
         '</tr>';
 }
 
+/**
+ * @subpackage smtp/functions
+ */
+function get_primary_recipients($headers, $smtp_servers) {
+    $recip_headers = array('to', 'cc', 'envelope-to');
+    $lc_headers = array();
+    foreach ($headers as $name => $value) {
+        if (in_array(strtolower($name), $recip_headers, true)) {
+            $lc_headers[strtolower($name)] = $value;
+        }
+    }
+    if (array_key_exists('envelope-to', $lc_headers)) {
+        return $lc_headers['envelope-to'];
+    }
+    $users = array_map(function($a) { return $a['user']; }, $smtp_servers);
+    foreach ($users as $user) {
+        foreach ($lc_headers as $header) {
+            if (stristr($header, $user) !== false) {
+                return $user;
+            }
+        }
+    }
+    return false;
+}
