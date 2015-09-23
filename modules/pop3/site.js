@@ -2,6 +2,7 @@
 
 var pop3_test_action = function(event) {
     event.preventDefault();
+    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
@@ -12,6 +13,7 @@ var pop3_test_action = function(event) {
 
 var pop3_save_action = function(event) {
     event.preventDefault();
+    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
@@ -33,6 +35,7 @@ var pop3_save_action = function(event) {
 
 var pop3_forget_action = function(event) {
     event.preventDefault();
+    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
@@ -54,6 +57,7 @@ var pop3_forget_action = function(event) {
 
 var pop3_delete_action = function(event) {
     event.preventDefault();
+    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),

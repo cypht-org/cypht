@@ -3,6 +3,7 @@
 var smtp_test_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
+    Hm_Notices.hide(true);
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -15,6 +16,7 @@ var smtp_test_action = function(event) {
 var smtp_save_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
+    Hm_Notices.hide(true);
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -37,6 +39,7 @@ var smtp_save_action = function(event) {
 var smtp_forget_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
+    Hm_Notices.hide(true);
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -58,6 +61,7 @@ var smtp_forget_action = function(event) {
 
 var smtp_delete_action = function(event) {
     event.preventDefault();
+    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),

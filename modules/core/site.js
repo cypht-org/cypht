@@ -200,13 +200,11 @@ var Hm_Notices = {
         if (now) {
             $('.sys_messages').hide();
             $('.sys_messages').html('');
-            $('.sys_messages').show();
         }
         else {
             Hm_Notices.hide_id = setTimeout(function() {
                 $('.sys_messages').hide();
                 $('.sys_messages').html('');
-                $('.sys_messages').show();
             }, 5000);
         }
     }

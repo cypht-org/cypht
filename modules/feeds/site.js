@@ -2,6 +2,7 @@
 
 var feed_test_action = function(event) {
     event.preventDefault();
+    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
@@ -12,6 +13,7 @@ var feed_test_action = function(event) {
 
 var feed_delete_action = function(event) {
     event.preventDefault();
+    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
