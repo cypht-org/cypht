@@ -464,28 +464,6 @@ function setup_base_page($name, $source=false) {
 }
 
 /**
- * Decrypt, unpack, and filter ajax post values
- * @param object $request request object
- * @return array
- */
-function decrypt_post_values($request) {
-    $post = array();
-    if (array_key_exists('payload', $request->post)) {
-        $raw_post_vals = json_decode((Hm_Crypt::plaintext($request->post['payload'], Hm_Request_Key::generate())));
-        $post_vals = array();
-        if (is_array($raw_post_vals)) {
-            foreach ($raw_post_vals as $obj) {
-                $post_vals[$obj->name] = $obj->value;
-            }
-        }
-        if (array_key_exists('allowed_post', $request->filters)) {
-            $post = $request->filter_input(INPUT_POST, $post_vals, $request->filters['allowed_post']);
-        }
-        return $post;
-    }
-}
-
-/**
  * Merge array details for folder sources
  * @subpackage core/functions
  * @param array $folder_sources list of folder list entries
