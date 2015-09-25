@@ -83,10 +83,21 @@ add_handler('message', 'load_imap_servers_from_config', true, 'imap', 'load_user
 add_handler('message', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('message', 'imap_download_message', true, 'imap', 'imap_oauth2_token_check', 'after');
 add_handler('message', 'load_imap_servers_for_message_list', true, 'imap', 'imap_download_message', 'after');
-add_handler('message', 'imap_bust_cache',  true, 'imap', 'load_imap_servers_for_message_list', 'after');
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+
+/* ajax mark as read */
+add_handler('ajax_imap_mark_as_read', 'login', false, 'core');
+add_handler('ajax_imap_mark_as_read', 'load_user_data', true, 'core');
+add_handler('ajax_imap_mark_as_read', 'language', true, 'core');
+add_handler('ajax_imap_mark_as_read', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_mark_as_read', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_mark_as_read', 'imap_mark_as_read',  true);
+add_handler('ajax_imap_mark_as_read', 'save_imap_cache',  true);
+add_handler('ajax_imap_mark_as_read', 'save_imap_servers',  true);
+add_handler('ajax_imap_mark_as_read', 'date', true, 'core');
+add_handler('ajax_imap_mark_as_read', 'http_headers', true, 'core');
 
 /* page not found */
 add_handler('notfound', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
@@ -301,6 +312,7 @@ return array(
         'ajax_imap_delete_message',
         'ajax_imap_flag_message',
         'ajax_imap_update_combined_source',
+        'ajax_imap_mark_as_read',
     ),
 
     'allowed_output' => array(
