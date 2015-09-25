@@ -86,9 +86,9 @@ class Hm_Output_search_form extends Hm_Output_Module {
             ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
             '<input placeholder="'.$this->trans('Search Terms').'" id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
             ' <label class="screen_reader" for="search_fld">'.$this->trans('Search Field').'</label>'.
-            search_field_selection($this->get('search_fld', ''), $this).
+            search_field_selection($this->get('search_fld', 'TEXT'), $this).
             ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
-            message_since_dropdown($this->get('search_since', ''), 'search_since', $this).
+            message_since_dropdown($this->get('search_since', DEFAULT_SINCE), 'search_since', $this).
             ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" /></form></div>'.
             list_controls($refresh_link, false, $source_link).
             '</div>';

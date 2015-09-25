@@ -728,6 +728,8 @@ function Message_List() {
 
 /* folder list */
 var Hm_Folders = {
+    expand_after_update: false,
+
     save_folder_list: function() {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
     },
@@ -750,8 +752,9 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('hide_folder_list', '1');
         return false;
     },
-    reload_folders: function(force) {
+    reload_folders: function(force, expand_after_update) {
         if (document.cookie.indexOf('hm_reload_folders=1') > -1 || force) {
+            Hm_Folders.expand_after_update = expand_after_update;
             var ui_state = Hm_Utils.preserve_local_settings();
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
@@ -778,6 +781,10 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         Hm_Folders.hl_selected_menu();
         Hm_Folders.folder_list_events();
+        if (Hm_Folders.expand_after_update) {
+            Hm_Utils.toggle_section(Hm_Folders.expand_after_update);
+        }
+        Hm_Folders.expand_after_update = false;
     },
     update_folder_list: function() {
         Hm_Ajax.request(
