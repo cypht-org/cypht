@@ -23,7 +23,7 @@ trait Hm_Server_List {
      * @param mixed $cache cached connection data
      * @return bool true on success
      */
-    abstract public static function service_connect($id, $server, $user, $pass, $cache);
+    public abstract function service_connect($id, $server, $user, $pass, $cache);
 
     /**
      * Connect to a server
