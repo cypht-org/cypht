@@ -226,6 +226,7 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
             }
         }
         if ($msg) {
+            Hm_Debug::add($msg);
             $this->cached_response = true;
             $this->debug[] = $msg;
         }
