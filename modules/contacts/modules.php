@@ -289,6 +289,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         $res = '<table class="contact_list">';
         $res .= '<tr><td colspan="4" class="contact_list_title"><div class="server_title">'.$this->trans('Local Contacts').'</div></td></tr>';
         $contacts = $this->get('contact_store');
+        $total = count($contacts->dump());
         $contacts->sort('email_address');
         if ($contacts) {
             foreach ($contacts->page(1, 20) as $id => $contact) {
