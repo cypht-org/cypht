@@ -14,6 +14,26 @@ require APP_PATH.'modules/smtp/hm-mime-message.php';
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_load_smtp_reply_to_details extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('list_path', $this->request->get) &&
+            array_key_exists('uid', $this->request->get)) {
+
+            $cache_name = sprintf('reply_details_%s_%s',
+                $this->request->get['list_path'],
+                $this->request->get['uid']
+            );
+            $reply_details = $this->session->get($cache_name, false);
+            if ($reply_details) {
+                $this->out('reply_details', $reply_details);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('username', 'password'));
@@ -162,11 +182,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $reply_type = 'forward';
         }
         if ($reply_type) {
-            $details = $this->session->get('reply_details', array());
-            if (!empty($details)) {
-                $this->out('reply_details', $details);
-                $this->out('reply_type', $reply_type);
-            }
+            $this->out('reply_type', $reply_type);
         }
         $this->out('compose_draft', $this->session->get('compose_draft', array()), false);
         $this->out('uploaded_files', $this->session->get('uploaded_files', array()));
