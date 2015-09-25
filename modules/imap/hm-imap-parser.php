@@ -287,6 +287,9 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
                 if ($this->is_supported('LIST-EXTENDED')) {
                     $status .= 'CHILDREN ';
                 }
+                if ($this->is_supported('SPECIAL-USE')) {
+                    $status .= 'SPECIAL-USE ';
+                }
                 $status .= 'STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))';
             }
             else {
