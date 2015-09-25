@@ -10,6 +10,23 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require_once APP_PATH.'modules/imap/hm-imap.php';
 
+ /**
+ * Flag a message as read
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_mark_as_read extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
+        if ($success) {
+            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            if ($imap && $imap->select_mailbox($form['folder'])) {
+                $imap->message_action('READ', array($form['imap_msg_uid']));
+            }
+        }
+    }
+}
+
 /**
  * Process a request to change a combined page source
  * @subpackage imap/handler
@@ -922,9 +939,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     }
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%d&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
-                    if (!$prefetch) {
-                        $this->session->set('reply_details', array('msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
-                    }
+                    $this->session->set(sprintf('reply_details_imap_%d_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
+                        array('msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
                 }
             }
         }
@@ -1067,6 +1083,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt = '';
             $from = '';
             $small_headers = array('subject', 'date', 'from');
+            $reply_args = sprintf('&amp;list_path=imap_%d_%s&amp;uid=%d',
+                $this->html_safe($this->get('msg_server_id')),
+                $this->html_safe($this->get('msg_folder')),
+                $this->html_safe($this->get('msg_text_uid'))
+            );
             $headers = $this->get('msg_headers', array());
             $txt .= '<table class="msg_headers"><col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
@@ -1097,10 +1118,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="hlink header_toggle">'.$this->trans('all').'</a>'.
                 '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;reply=1">'.$this->trans('reply').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;reply_all=1">'.$this->trans('reply-all').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;forward=1">'.$this->trans('forward').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;attach=1">'.$this->trans('attach').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('reply').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('reply-all').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('forward').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;attach=1'.$reply_args.'">'.$this->trans('attach').'</a>'.
                 ' | <a class="hlink msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
 
             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
