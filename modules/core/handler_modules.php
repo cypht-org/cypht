@@ -529,6 +529,9 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
         $this->out('search_since', $this->session->get('search_since', DEFAULT_SINCE));
         $this->out('search_terms', $this->session->get('search_terms', ''));
         $this->out('search_fld', $this->session->get('search_fld', 'TEXT'));
+        if ($this->session->get('search_terms', false)) {
+            $this->out('run_search', 1);
+        }
     }
 }
 
