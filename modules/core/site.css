@@ -128,7 +128,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .src_title { font-size: 110%; padding: 5px; margin-bottom: 10px; }
 .del_src_link { padding: 3px; color: #666; margin-right: 5px; }
 .search_form { font-size: 80%; color: #999; display: inline; padding-left: 15px; }
-.search_form input, .search_form select { margin-right: 10px; margin-left: 3px; }
+.search_form input, .search_form select { margin-right: 3px; margin-left: 3px; }
 .search_terms { padding-left: 5px; }
 .folder_list .search_terms { width: 80%; }
 .search_content { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
