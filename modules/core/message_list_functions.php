@@ -357,7 +357,7 @@ function list_controls($refresh_link, $config_link, $source_link=false) {
 function validate_search_terms($terms) {
     $terms = trim(strip_tags($terms));
     if (!$terms) {
-        $terms = false;
+        $terms = '';
     }
     return $terms;
 }

@@ -73,10 +73,20 @@ add_output('message_list', 'message_list_end', true, 'core', 'message_list_start
 /* search page */
 setup_base_page('search');
 add_output('search', 'search_content_start', true, 'core', 'content_section_start', 'after');
-add_output('search', 'search_form', true, 'core', 'search_content_start', 'after');
-add_output('search', 'message_list_start', true, 'core', 'search_form', 'after');
+add_output('search', 'search_form_start', true, 'core', 'search_content_start', 'after');
+add_output('search', 'search_form_content', true, 'core', 'search_form_start', 'after');
+add_output('search', 'search_form_end', true, 'core', 'search_form_content', 'after');
+add_output('search', 'message_list_start', true, 'core', 'search_form_end', 'after');
 add_output('search', 'search_results_table_end', true, 'core', 'message_list_start', 'after');
 add_output('search', 'search_content_end', true, 'core', 'search_results_table_end', 'after');
+
+/* reset search form */
+add_handler('ajax_reset_search', 'login', false);
+add_handler('ajax_reset_search', 'load_user_data', true);
+add_handler('ajax_reset_search', 'reset_search', true);
+add_handler('ajax_reset_search', 'language',  true);
+add_handler('ajax_reset_search', 'date', true);
+add_handler('ajax_reset_search', 'http_headers', true);
 
 
 /* message view page */
@@ -126,6 +136,7 @@ return array(
         'servers',
         'ajax_hm_folders',
         'ajax_message_action',
+        'ajax_reset_search',
         'notfound',
         'search'
     ),
