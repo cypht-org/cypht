@@ -60,11 +60,6 @@ add_handler('contacts', 'load_imap_servers_from_config',  true, 'imap', 'load_us
 add_handler('contacts', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('contacts', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
 
-/* profiles page */
-add_handler('profiles', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
-add_handler('profiles', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('profiles', 'load_imap_servers_for_message_list', true, 'imap', 'load_imap_servers_from_config', 'after');
-
 /* dev page */
 add_handler('dev', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('dev', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
