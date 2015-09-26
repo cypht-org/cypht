@@ -863,7 +863,12 @@ var Hm_Utils = {
             Hm_Utils.save_to_local_storage(i, settings[i]);
         }
     },
-
+    reset_search_form: function() {
+        Hm_Utils.save_to_local_storage('formatted_search_data', '');
+        Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}],
+            function(res) { window.location = '?page=search'; }, false, true);
+        return false;
+    },
     confirm_logout: function() {
         if ($('#unsaved_changes').val() === "0") {
             $('#logout_without_saving').click();
@@ -1153,5 +1158,8 @@ $(function() {
     }
     if ($('.save_reminder').length) {
         $('.menu_save a').css('font-weight', 'bold');
+    }
+    if (hm_page_name() == 'search') {
+        $('.search_reset').click(Hm_Utils.reset_search_form);
     }
 });

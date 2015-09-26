@@ -9,6 +9,7 @@
 define('MAX_PER_SOURCE', 100);
 define('DEFAULT_PER_SOURCE', 20);
 define('DEFAULT_SINCE', '-1 week');
+define('DEFAULT_SEARCH_FLD', 'TEXT');
 
 require_once APP_PATH.'modules/core/functions.php';
 require APP_PATH.'modules/core/message_functions.php';

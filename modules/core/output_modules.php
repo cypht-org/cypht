@@ -55,6 +55,7 @@ class Hm_Output_search_content_end extends Hm_Output_Module {
 
 /**
  * Unsaved data reminder
+ * @subpackage core/output
  */
 class Hm_Output_save_reminder extends Hm_Output_Module {
     protected function output() {
@@ -67,32 +68,47 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
 }
 
 /**
- * Output the search form used on the search page
+ * Start the search form
  * @subpackage core/output
  */
-class Hm_Output_search_form extends Hm_Output_Module {
-    /**
-     * Closes one of the divs left open in Hm_Output_search_content_start
-     */
+class Hm_Output_search_form_start extends Hm_Output_Module {
+    protected function output() {
+        return '<div class="search_form"><form method="get">';
+    }
+}
+
+/**
+ * Search form content
+ * @subpackage core/output
+ */
+class Hm_Output_search_form_content extends Hm_Output_Module {
     protected function output() {
         $terms = $this->get('search_terms', '');
-        $source_link = false;
-        //$source_link = '<a href="#" title="Sources" class="source_link"><img alt="'.$this->trans('Sources').
-            //'" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
-        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
-            $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
-        $res = '<div class="search_form">'.
-            '<form method="get"><input type="hidden" name="page" value="search" />'.
+
+        return '<input type="hidden" name="page" value="search" />'.
             ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
-            '<input placeholder="'.$this->trans('Search Terms').'" id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
+            '<input required placeholder="'.$this->trans('Search Terms').
+            '" id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
             ' <label class="screen_reader" for="search_fld">'.$this->trans('Search Field').'</label>'.
-            search_field_selection($this->get('search_fld', 'TEXT'), $this).
+            search_field_selection($this->get('search_fld', DEFAULT_SEARCH_FLD), $this).
             ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
             message_since_dropdown($this->get('search_since', DEFAULT_SINCE), 'search_since', $this).
-            ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" /></form></div>'.
-            list_controls($refresh_link, false, $source_link).
-            '</div>';
-        return $res;
+            ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" />'.
+            ' <input type="button" class="search_reset" value="'.$this->trans('Reset').'" />';
+    }
+}
+
+/**
+ * Finish the search form
+ * @subpackage core/output
+ */
+class Hm_Output_search_form_end extends Hm_Output_Module {
+    protected function output() {
+        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
+            $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.
+            '" width="20" height="20" /></a>';
+        return '</form></div>'.
+            list_controls($refresh_link, false, false).'</div>';
     }
 }
 
@@ -329,7 +345,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
 }
 
 /**
- * Outputs CSS
+ * Output CSS
  * @subpackage core/output
  */
 class Hm_Output_header_css extends Hm_Output_Module {
