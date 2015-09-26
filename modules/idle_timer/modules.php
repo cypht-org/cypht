@@ -11,6 +11,35 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage idletimer/handler
  */
+class Hm_Handler_idle_time_check extends Hm_Handler_Module {
+    public function process() {
+        $logout = false;
+        if ($this->session->loaded) {
+            $this->session->set('idletime_start', time());
+        }
+        $start = $this->session->get('idletime_start', 0);
+        if (!$start) {
+            $logout = true;
+        }
+        else {
+            $max = $this->user_config->get('idle_time', 1)*60;
+            if ($max && (time() - $start) > $max) {
+                $logout = true;
+            }
+        }
+        if ($logout) {
+            Hm_Debug::add('Idle timer exceeded, logged out');
+            $this->session->destroy($this->request);
+        }
+        else {
+            $this->session->set('idletime_start', time());
+        }
+    }
+}
+
+/**
+ * @subpackage idletimer/handler
+ */
 class Hm_Handler_process_idle_time extends Hm_Handler_Module {
     public function process() {
         $idle_time = 0;
