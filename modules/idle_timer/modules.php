@@ -22,13 +22,13 @@ class Hm_Handler_idle_time_check extends Hm_Handler_Module {
             $logout = true;
         }
         else {
-            $max = $this->user_config->get('idle_time', 1)*60;
+            $max = $this->user_config->get('idle_time', 1)*60*60;
             if ($max && (time() - $start) > $max) {
                 $logout = true;
             }
         }
         if ($logout) {
-            Hm_Debug::add('Idle timer exceeded, logged out');
+            Hm_Debug::add('IDLETIMER: timer exceeded, logged out');
             $this->session->destroy($this->request);
         }
         else {
@@ -48,7 +48,7 @@ class Hm_Handler_process_idle_time extends Hm_Handler_Module {
         }
         $max = $this->user_config->get('idle_time', 1)*60;
         if ($max && $idle_time >= $max) {
-            Hm_Msgs::add('Logged out after idle period');
+            Hm_Debug::add('IDLETIMER: Logged out after idle period');
             $this->session->destroy($this->request);
         }
     }
