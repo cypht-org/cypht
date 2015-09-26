@@ -384,5 +384,6 @@ class Hm_DB_Session extends Hm_PHP_Session {
         $this->secure_cookie($request, $this->cname, '', time()-3600);
         $this->secure_cookie($request, 'hm_id', '', time()-3600);
         $this->active = false;
+        Hm_Request_Key::load($this, $request, false);
     }
 }
