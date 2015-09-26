@@ -3,13 +3,13 @@
 /**
  * Saved search modules
  * @package modules
- * @subpackage saved_searches
+ * @subpackage savedsearches
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
 
  /**
- * @subpackage saved_searches/handler
+ * @subpackage savedsearches/handler
  */
 class Hm_Handler_save_searches_data extends Hm_Handler_Module {
     public function process() {
@@ -26,7 +26,7 @@ class Hm_Handler_save_searches_data extends Hm_Handler_Module {
 }
 
  /**
- * @subpackage saved_searches/handler
+ * @subpackage savedsearches/handler
  */
 class Hm_Handler_saved_search_folder_data extends Hm_Handler_Module {
     public function process() {
@@ -35,8 +35,7 @@ class Hm_Handler_saved_search_folder_data extends Hm_Handler_Module {
 }
 
  /**
- * Try to save a search
- * @subpackage saved_searches/handler
+ * @subpackage savedsearches/handler
  */
 class Hm_Handler_update_search extends Hm_Handler_Module {
     public function process() {
@@ -59,8 +58,7 @@ class Hm_Handler_update_search extends Hm_Handler_Module {
 }
 
  /**
- * Try to save a search
- * @subpackage saved_searches/handler
+ * @subpackage savedsearches/handler
  */
 class Hm_Handler_delete_search extends Hm_Handler_Module {
     public function process() {
@@ -78,8 +76,7 @@ class Hm_Handler_delete_search extends Hm_Handler_Module {
 }
 
  /**
- * Try to save a search
- * @subpackage saved_searches/handler
+ * @subpackage savedsearches/handler
  */
 class Hm_Handler_save_search extends Hm_Handler_Module {
     public function process() {
@@ -102,7 +99,7 @@ class Hm_Handler_save_search extends Hm_Handler_Module {
 }
 
 /**
- * @subpackage saved_searches/output
+ * @subpackage savedsearches/output
  */
 class Hm_Output_search_name_fld extends Hm_Output_Module {
     protected function output() {
@@ -112,7 +109,7 @@ class Hm_Output_search_name_fld extends Hm_Output_Module {
 }
 
 /**
- * @subpackage saved_searches/output
+ * @subpackage savedsearches/output
  */
 class Hm_Output_filter_saved_search_result extends Hm_Output_Module {
     protected function output() {
@@ -126,7 +123,7 @@ class Hm_Output_filter_saved_search_result extends Hm_Output_Module {
 }
 
 /**
- * @subpackage saved_searches/output
+ * @subpackage savedsearches/output
  */
 class Hm_Output_update_search_icon extends Hm_Output_Module {
     protected function output() {
@@ -138,7 +135,7 @@ class Hm_Output_update_search_icon extends Hm_Output_Module {
 }
 
 /**
- * @subpackage saved_searches/output
+ * @subpackage savedsearches/output
  */
 class Hm_Output_delete_search_icon extends Hm_Output_Module {
     protected function output() {
@@ -152,7 +149,7 @@ class Hm_Output_delete_search_icon extends Hm_Output_Module {
 }
 
 /**
- * @subpackage saved_searches/output
+ * @subpackage savedsearches/output
  */
 class Hm_Output_save_search_icon extends Hm_Output_Module {
     protected function output() {
@@ -165,7 +162,7 @@ class Hm_Output_save_search_icon extends Hm_Output_Module {
 }
 
 /**
- * @subpackage saved_searches/output
+ * @subpackage savedsearches/output
  */
 class Hm_Output_save_searches_form extends Hm_Output_Module {
     protected function output() {
@@ -179,7 +176,7 @@ class Hm_Output_save_searches_form extends Hm_Output_Module {
 }
 
 /**
- * @subpackage saved_searches/output
+ * @subpackage savedsearches/output
  */
 class Hm_Output_search_folders extends Hm_Output_Module {
     protected function output() {
@@ -203,7 +200,7 @@ class Hm_Output_search_folders extends Hm_Output_Module {
 }
 
 /**
- * @subpackage saved_searches/lib
+ * @subpackage savedsearches/lib
  */
 class Hm_Saved_Searches {
 
@@ -250,7 +247,7 @@ class Hm_Saved_Searches {
 }
 
 /**
- * @subpackage saved_searches/functions
+ * @subpackage savedsearches/functions
  */
 function get_search_from_post($request) {
     return array(
@@ -262,7 +259,7 @@ function get_search_from_post($request) {
 }
 
 /**
- * @subpackage saved_searches/functions
+ * @subpackage savedsearches/functions
  */
 function get_search_from_url($request) {
     return array(
