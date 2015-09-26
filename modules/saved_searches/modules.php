@@ -88,7 +88,6 @@ class Hm_Handler_save_search extends Hm_Handler_Module {
                 $this->session->record_unsaved('Saved a search');
                 $this->user_config->set('saved_searches', $searches->dump());
                 $this->session->set('user_data', $this->user_config->dump());
-                Hm_Msgs::add('Search saved');
                 $this->out('saved_search', true);
             }
             else {
