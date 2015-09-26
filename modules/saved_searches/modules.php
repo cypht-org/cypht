@@ -249,6 +249,9 @@ class Hm_Saved_Searches {
     }
 }
 
+/**
+ * @subpackage saved_searches/functions
+ */
 function get_search_from_post($request) {
     return array(
         array_key_exists('search_terms', $request->post) ? $request->post['search_terms'] : '',
@@ -257,6 +260,10 @@ function get_search_from_post($request) {
         array_key_exists('search_name', $request->post) ? $request->post['search_name'] : '',
     );
 }
+
+/**
+ * @subpackage saved_searches/functions
+ */
 function get_search_from_url($request) {
     return array(
         array_key_exists('search_terms', $request->get) ? $request->get['search_terms'] : '',
