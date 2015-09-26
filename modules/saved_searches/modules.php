@@ -13,16 +13,15 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_save_searches_data extends Hm_Handler_Module {
     public function process() {
-        $search = '';
-        $data = get_search_terms($this->session, $this->request);
+        $name = array_key_exists('search_name', $this->request->get) ? $this->request->get['search_name'] : '';
         $searches = new Hm_Saved_Searches($this->user_config->get('saved_searches', array()));
-        foreach ($searches->dump() as $name => $args) {
-            if (empty(array_diff($args, $data))) {
-                $search = $name;
-                break;
-            }
+        $params = $name ? $searches->get($name, array()) : array();
+        $url_search = get_search_from_url($this->request);
+        if (!empty(array_diff_assoc($params, $url_search))) {
+            $this->out('search_param_update', true);
         }
-        $this->out('search_name', $search);
+        $this->out('search_name', $name);
+        $this->out('search_params', $params);
     }
 }
 
@@ -43,13 +42,14 @@ class Hm_Handler_update_search extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('search_name'));
         if ($success) {
-            $data = get_search_terms($this->session, $this->request);
+            $data = get_search_from_post($this->request);
             $searches = new Hm_Saved_Searches($this->user_config->get('saved_searches', array()));
             if ($searches->update($form['search_name'], $data)) {
                 $this->session->record_unsaved('Updated a search');
                 $this->user_config->set('saved_searches', $searches->dump());
                 $this->session->set('user_data', $this->user_config->dump());
-                Hm_Msgs::add('Search Updated');
+                $this->out('updated_search', true);
+                Hm_Msgs::add('Search updated');
             }
             else {
                 Hm_Msgs::add('ERRUnable to update the search paramaters');
@@ -71,10 +71,7 @@ class Hm_Handler_delete_search extends Hm_Handler_Module {
                 $this->session->record_unsaved('Deleted a search');
                 $this->user_config->set('saved_searches', $searches->dump());
                 $this->session->set('user_data', $this->user_config->dump());
-                Hm_Msgs::add('Search Deleted');
-            }
-            else {
-                Hm_Msgs::add('ERRUnable to delete the search');
+                $this->out('deleted_search', true);
             }
         }
     }
@@ -88,13 +85,14 @@ class Hm_Handler_save_search extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('search_name'));
         if ($success) {
-            $data = get_search_terms($this->session, $this->request);
+            $data = get_search_from_post($this->request);
             $searches = new Hm_Saved_Searches($this->user_config->get('saved_searches', array()));
             if ($searches->add($form['search_name'], $data)) {
                 $this->session->record_unsaved('Saved a search');
                 $this->user_config->set('saved_searches', $searches->dump());
                 $this->session->set('user_data', $this->user_config->dump());
                 Hm_Msgs::add('Search saved');
+                $this->out('saved_search', true);
             }
             else {
                 Hm_Msgs::add('ERRYou already have a search by that name');
@@ -106,19 +104,77 @@ class Hm_Handler_save_search extends Hm_Handler_Module {
 /**
  * @subpackage saved_searches/output
  */
+class Hm_Output_search_name_fld extends Hm_Output_Module {
+    protected function output() {
+        $name = $this->get('search_name', '');
+        return '<input type="hidden" class="search_name" name="search_name" value="'.$this->html_safe($name).'" />';
+    }
+}
+
+/**
+ * @subpackage saved_searches/output
+ */
+class Hm_Output_filter_saved_search_result extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('saved_search') || $this->get('updated_search') || $this->get('deleted_search')) {
+            $this->out('saved_search_result', 1);
+        }
+        else {
+            $this->out('saved_search_result', 0);
+        }
+    }
+}
+
+/**
+ * @subpackage saved_searches/output
+ */
+class Hm_Output_update_search_icon extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('search_param_update')) {
+            return '<a href="" class="update_search" title="'.$this->trans('Update saved search').'"><img width="20" height="20" alt="'.
+                $this->trans('Update search').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+        }
+    }
+}
+
+/**
+ * @subpackage saved_searches/output
+ */
+class Hm_Output_delete_search_icon extends Hm_Output_Module {
+    protected function output() {
+        $style = '';
+        if (!$this->get('search_name')) {
+            $style = 'style="display: none;"';
+        }
+        return '<a href="" '.$style.' class="delete_search" title="'.$this->trans('Delete saved search').'"><img width="20" height="20" alt="'.
+            $this->trans('Delete search').'" src="'.Hm_Image_Sources::$circle_x.'" /></a>';
+    }
+}
+
+/**
+ * @subpackage saved_searches/output
+ */
+class Hm_Output_save_search_icon extends Hm_Output_Module {
+    protected function output() {
+        $name = $this->get('search_name', '');
+        if (!$name) {
+            return '<a style="display: none;" href="" class="save_search" title="'.$this->trans('Save search').'"><img width="20" height="20" alt="'.
+                $this->trans('Save search').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+        }
+    }
+}
+
+/**
+ * @subpackage saved_searches/output
+ */
 class Hm_Output_save_searches_form extends Hm_Output_Module {
     protected function output() {
         $name = $this->get('search_name', '');
-        $res = '<form class="saved_searches_form"><input type="text" placeholder="'.$this->trans('Search Name').
-            '" class="search_name" name="search_name" value="';
-        if ($name) {
-            $res .= $this->html_safe($name).'" disabled="disabled" /><input type="submit" class="update_search" value="'.
-                $this->trans('Update').'" /><input type="submit" class="delete_search" value="'.$this->trans('Delete').'"/></form>';
+        if (!$name) {
+            return '<form style="display: none;" class="saved_searches_form"><input type="text" placeholder="'.$this->trans('Search Name').
+                '" class="new_search_name" name="search_name" value="" />'.
+                '<input type="submit" class="save_search" value="'.$this->trans('Save').'" /></form>';
         }
-        else {
-            $res .= '" /><input type="submit" class="save_search" value="'.$this->trans('Save').'" /></form>';
-        }
-        return $res;
     }
 }
 
@@ -131,10 +187,11 @@ class Hm_Output_search_folders extends Hm_Output_Module {
         $details = $this->get('saved_searches', array());
         if (!empty($details)) {
             foreach ($details as $name => $args) {
-                $url = sprintf('?page=search&amp;search_terms=%s&amp;search_fld=%s&amp;search_since=%s',
+                $url = sprintf('?page=search&amp;search_terms=%s&amp;search_fld=%s&amp;search_since=%s&amp;search_name=%s',
                     $this->html_safe(urlencode($args[0])),
                     $this->html_safe(urlencode($args[2])),
-                    $this->html_safe(urlencode($args[1]))
+                    $this->html_safe(urlencode($args[1])),
+                    $this->html_safe(urlencode($name))
                 );
                 $res .= '<li class="menu_search_'.$this->html_safe($name).'"><a class="unread_link" href="'.$url.'">'.
                     '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).
@@ -173,6 +230,12 @@ class Hm_Saved_Searches {
         }
         return false;
     }
+    public function get($name, $default=false) {
+        if (array_key_exists($name, $this->searches)) {
+            return $this->searches[$name];
+        }
+        return $default;
+    }
     public function delete($del_name) {
         $new_searches = array();
         $old_searches = $this->searches;
@@ -186,20 +249,20 @@ class Hm_Saved_Searches {
     }
 }
 
-function get_search_terms($session, $request) {
-    $data = array(
-        array_key_exists('search_terms', $request->get) ? $request->get['search_terms'] : false,
-        array_key_exists('search_terms', $request->get) ? $request->get['search_since'] : false,
-        array_key_exists('search_terms', $request->get) ? $request->get['search_fld'] : false
+function get_search_from_post($request) {
+    return array(
+        array_key_exists('search_terms', $request->post) ? $request->post['search_terms'] : '',
+        array_key_exists('search_since', $request->post) ? $request->post['search_since'] : DEFAULT_SINCE,
+        array_key_exists('search_fld', $request->post) ? $request->post['search_fld'] : DEFAULT_SEARCH_FLD,
+        array_key_exists('search_name', $request->post) ? $request->post['search_name'] : '',
     );
-    if ($data[0] === false) {
-        $data[0] = $session->get('search_terms', '');
-    }
-    if ($data[1] === false) {
-        $data[1] = $session->get('search_since', DEFAULT_SINCE);
-    }
-    if ($data[2] === false) {
-        $data[2] = $session->get('search_fld', 'TEXT');
-    }
-    return $data;
 }
+function get_search_from_url($request) {
+    return array(
+        array_key_exists('search_terms', $request->get) ? $request->get['search_terms'] : '',
+        array_key_exists('search_since', $request->get) ? $request->get['search_since'] : DEFAULT_SINCE,
+        array_key_exists('search_fld', $request->get) ? $request->get['search_fld'] : DEFAULT_SEARCH_FLD,
+        array_key_exists('search_name', $request->get) ? $request->get['search_name'] : '',
+    );
+}
+
