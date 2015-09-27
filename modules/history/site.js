@@ -7,6 +7,7 @@ var record_message = function(res) {
         $('th', $('.header_subject')).html(),
         $('td', $('.header_from')).html(),
         $('td', $('.header_date')).html(),
+        $('.content_title').html()
     ];
     Hm_Utils.save_to_local_storage('message_history', Hm_Utils.json_encode(history));
 };
@@ -24,7 +25,7 @@ var display_history_page_links = function() {
         if (history[msg][2] == null) {
             history[msg][2] = '';
         }
-        $('.history_links').append('<tr><td>'+history[msg][2]+'</td><td><a href="'+msg+'">'+history[msg][0]+'</a></td><td>'+history[msg][1]+'</td></tr>');
+        $('.history_links').append('<tr><td>'+history[msg][2]+'</td><td><a href="'+msg+'">'+history[msg][0]+'</a></td><td>'+history[msg][3]+'</td><td>'+history[msg][1]+'</td></tr>');
     }
 };
 
