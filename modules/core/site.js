@@ -521,7 +521,7 @@ function Message_List() {
             class_name = selected[index];
             row = $('.'+Hm_Utils.clean_selector(class_name));
             if (action_type == 'flag') {
-                $('.icon', row).html('&#9733;');
+                $('.icon', row).html('<img src="'+hm_flag_image_src()+'" />');
             }
             else {
                 $('.icon', row).empty();
