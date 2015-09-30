@@ -549,7 +549,7 @@ function Message_List() {
         }
         else {
             if (hm_page_name() == 'search') {
-                self.setup_combined_view('formatted_search_data');
+                self.setup_combined_view(Hm_Utils.build_search_cache_name());
             }
             else {
                 self.setup_combined_view(false);
@@ -723,7 +723,7 @@ function Message_List() {
     this.set_combined_inbox_state = function() { self.set_message_list_state('formatted_combined_inbox'); };
     this.set_flagged_state = function() { self.set_message_list_state('formatted_flagged_data'); };
     this.set_unread_state = function() { self.set_message_list_state('formatted_unread_data'); };
-    this.set_search_state = function() { self.set_message_list_state('formatted_search_data'); };
+    this.set_search_state = function() { self.set_message_list_state(Hm_Utils.build_search_cache_name()); };
 };
 
 /* folder list */
@@ -864,10 +864,16 @@ var Hm_Utils = {
         }
     },
     reset_search_form: function() {
-        Hm_Utils.save_to_local_storage('formatted_search_data', '');
+        Hm_Utils.save_to_local_storage(Hm_Utils.build_search_cache_name(), '');
         Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}],
             function(res) { window.location = '?page=search'; }, false, true);
         return false;
+    },
+    build_search_cache_name: function() {
+        var terms = $('.search_terms').val();
+        var fld = $('#search_fld').val();
+        var since = $('#search_since').val();
+        return ('formatted_search_data_'+terms+'_'+fld+'_'+since).replace(' ', '_');
     },
     confirm_logout: function() {
         if ($('#unsaved_changes').val() === "0") {
@@ -1160,6 +1166,7 @@ $(function() {
         $('.menu_save a').css('font-weight', 'bold');
     }
     if (hm_page_name() == 'search') {
+        elog(Hm_Utils.build_search_cache_name());
         $('.search_reset').click(Hm_Utils.reset_search_form);
     }
 });
