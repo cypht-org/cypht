@@ -508,6 +508,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
+            '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
             '<input class="compose_attach_button" value="'.$this->trans('Attach').
             '" name="compose_attach_button" type="button" /></form>'.
