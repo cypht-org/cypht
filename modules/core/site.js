@@ -1166,7 +1166,6 @@ $(function() {
         $('.menu_save a').css('font-weight', 'bold');
     }
     if (hm_page_name() == 'search') {
-        elog(Hm_Utils.build_search_cache_name());
         $('.search_reset').click(Hm_Utils.reset_search_form);
     }
 });
