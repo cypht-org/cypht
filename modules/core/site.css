@@ -11,7 +11,7 @@ td { vertical-align: top; }
 .subtitle { color: teal; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
 .title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
 .date { display: none; position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
-.sys_messages { min-height: 30px; cursor: pointer; display: none; background-color: #fff; color: teal; margin-top: 0px; text-align: center; background-color: #efefef; padding: 8px; padding-bottom: 0px; white-space: nowrap; border: solid 1px #ddd; }
+.sys_messages { position: absolute; left: 0px; top: 0px; right: 0px; min-height: 30px; cursor: pointer; display: none; background-color: #fff; color: teal; margin-top: 0px; text-align: center; background-color: #efefef; padding: 8px; padding-bottom: 0px; white-space: nowrap; border: solid 1px #ddd; }
 .logged_out { display: block !important; }
 #theme_setting, #timezone_setting { max-width: 200px; }
 .s_pre { color: #666}
