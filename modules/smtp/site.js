@@ -77,7 +77,12 @@ var smtp_delete_action = function(event) {
     );
 };
 
-var save_compose_state = function(no_files) {
+var save_compose_state = function(no_files, notice) {
+    var no_icon = true;
+    var callback = false;
+    if (notice) {
+        no_icon = false;
+    }
     var body = $('.compose_body').val();
     var subject = $('.compose_subject').val();
     var to = $('.compose_to').val();
@@ -89,7 +94,7 @@ var save_compose_state = function(no_files) {
         {'name': 'draft_to', 'value': to}],
         function() { },
         [],
-        true
+        no_icon
     );
 };
 
@@ -167,9 +172,10 @@ var delete_attachment = function(file, link) {
 };
 
 if (hm_page_name() === 'compose') {
-    Hm_Timer.add_job(save_compose_state, 30, true);
+    Hm_Timer.add_job(function() { save_compose_state(); }, 30, true);
     $('.toggle_recipients').click(function() { return toggle_recip_flds(); });
-    $('.smtp_reset').click(function() { reset_smtp_form(); });
+    $('.smtp_reset').click(reset_smtp_form);
+    $('.smtp_save').click(function() { save_compose_state(false, true); });
     $('.compose_attach_button').click(function() { $('.compose_attach_file').trigger('click'); });
     $('.compose_attach_file').change(function() { upload_file(this.files[0]); });
     if ($('.compose_cc').val() || $('.compose_bcc').val()) {
