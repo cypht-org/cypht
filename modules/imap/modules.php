@@ -1564,7 +1564,10 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $subject = $msg['subject'];
         $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
         $from = str_replace('"', '', $from);
-        if (!trim($from) && $style == 'email') {
+        if (!trim($from) && trim($msg['from'])) {
+            $from = $msg['from'];
+        }
+        elseif (!trim($from) && $style == 'email') {
             $from = '[No From]';
         }
         $timestamp = strtotime($msg['internal_date']);
