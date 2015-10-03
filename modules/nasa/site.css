@@ -7,3 +7,4 @@
 .apod_desc, .apod_image, .apod_title { margin-left: 30px; }
 .apod_date { float: right; margin-right: 20px; font-size: 75%; }
 .apod_date_fld { margin-right: 10px; }
+.apod_error { color: red; text-align: center; padding-top: 100px; }

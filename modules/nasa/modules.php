@@ -82,7 +82,6 @@ class Hm_Output_apod_content extends Hm_Output_Module {
     protected function output() {
         $data = $this->get('apod_data');
         $date = $this->get('apod_date', date('Y-m-d'));
-        elog($data);
         $res = '<div class="content_title">'.$this->trans('Astronomy Picture of the Day');
         $res .= '<form class="apod_date" method="get"><input name="apod_date" class="apod_date_fld" type="date" value="'.$date.'" />';
         $res .= '<input type="hidden" name="page" value="nasa_apod" />';
@@ -90,6 +89,14 @@ class Hm_Output_apod_content extends Hm_Output_Module {
         $res .= '</form>';
         $res .= '</div>';
         if (empty($data) || array_key_exists('error', $data)) {
+            $res .= '<div class="apod_error">';
+            if (array_key_exists('message', $data['error'])) {
+                $res .= $this->html_safe($data['error']['message']);
+            }
+            else {
+                $res .= $this->trans('Could not find a picture for the requested day');
+            }
+            $res .= '</div>';
         }
         else {
             if (array_key_exists('title', $data)) {
