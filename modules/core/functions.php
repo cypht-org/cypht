@@ -424,6 +424,21 @@ function filter_auth_servers($handler) {
 }
 
 /**
+ * Setup commonly used modules for an ajax request
+ * @subpackage core/functions
+ * @param string $name the page id
+ * @param string $source the module set name
+ * @return void
+ */
+function setup_base_ajax_page($name, $source=false) {
+    add_handler($name, 'login', false, $source);
+    add_handler($name, 'load_user_data', true, $source);
+    add_handler($name, 'language',  true, $source);
+    add_handler($name, 'date', true, $source);
+    add_handler($name, 'http_headers', true, $source);
+}
+
+/**
  * Setup commonly used modules for a page
  * @subpackage core/functions
  * @param string $name the page id
