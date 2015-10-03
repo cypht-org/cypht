@@ -39,7 +39,8 @@ class Hm_Handler_github_status extends Hm_Handler_Module {
                 if (in_array($form['github_repo'], $repos, true)) {
                     $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=1', $form['github_repo']);
                     $start = microtime(true);
-                    $data = github_fetch_content($details, $url);
+                    $api = new Hm_API_Curl();
+                    $data = $api->command($url, array('Authorization: token ' . $details['access_token']));
                     if (!empty($data)) {
                         $this->out('github_status', 'success');
                         $this->out('github_connect_time', (microtime(true) - $start));
@@ -115,7 +116,8 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
             $repo = substr($form['list_path'], 7);
             if (in_array($repo, $repos, true)) {
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $repo);
-                $data = github_fetch_content($details, $url);
+                $api = new Hm_API_Curl();
+                $data = $api->command($url, array('Authorization: token ' . $details['access_token']));
                 $event = array();
                 $uid = substr($form['github_uid'], 9);
                 if (is_array($data)) {
@@ -224,7 +226,8 @@ class Hm_Handler_github_process_add_repo extends Hm_Handler_Module {
             $details = $this->user_config->get('github_connect_details');
             if ($details) {
                 $url = sprintf('https://api.github.com/repos/%s/%s/events?page=1&per_page=1', urlencode($form['new_github_repo_owner']), urlencode($form['new_github_repo']));
-                $data = github_fetch_content($details, $url);
+                $api = new Hm_API_Curl();
+                $data = $api->command($url, array('Authorization: token ' . $details['access_token']));
                 if (!empty($data)) {
                     $repos = $this->user_config->get('github_repos', array());
                     $new_repo = urlencode($form['new_github_repo_owner']).'/'.urlencode($form['new_github_repo']);
@@ -286,7 +289,8 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
             $repos = $this->user_config->get('github_repos');
             if (in_array($form['github_repo'], $repos, true) && $details) {
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $form['github_repo']);
-                $this->out('github_data', github_fetch_content($details, $url));
+                $api = new Hm_API_Curl();
+                $this->out('github_data', $api->command($url, array('Authorization: token ' . $details['access_token'])));
                 $this->out('github_data_source', $form['github_repo']);
                 $this->out('github_data_source_id', array_search($form['github_repo'], $repos, true));
             }
@@ -736,23 +740,3 @@ function payload_search($data) {
     }
     return $res;
 }
-
-/**
- * @subpackage github/functions
- */
-function github_fetch_content($details, $url) {
-    $result = array();
-    $headers = array('Authorization: token ' . $details['access_token']);
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'hm3');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    $curl_result = curl_exec($ch);
-    if (substr($curl_result, 0, 1) == '[') {
-        $result = @json_decode($curl_result, true);
-    }
-    return $result;
-}
-
-
