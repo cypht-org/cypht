@@ -26,6 +26,11 @@
 
 						<ul>
 				<li>
+					<a href="package-framework.api.html">
+						api					</a>
+
+						</li>
+				<li>
 					<a href="package-framework.auth.html">
 						auth					</a>
 
@@ -535,6 +540,7 @@
 			<h3>Classes</h3>
 			<ul>
 				<li><a href="class-Hm_Address_Field.html">Hm_Address_Field</a></li>
+				<li><a href="class-Hm_API_Curl.html">Hm_API_Curl</a></li>
 				<li><a href="class-Hm_Auth.html">Hm_Auth</a></li>
 				<li><a href="class-Hm_Auth_DB.html">Hm_Auth_DB</a></li>
 				<li><a href="class-Hm_Auth_IMAP.html">Hm_Auth_IMAP</a></li>
@@ -987,7 +993,6 @@
 				<li><a href="function-get_search_from_url.html">get_search_from_url</a></li>
 				<li><a href="function-get_secondfactor_state.html">get_secondfactor_state</a></li>
 				<li><a href="function-github_connect_details.html">github_connect_details</a></li>
-				<li><a href="function-github_fetch_content.html">github_fetch_content</a></li>
 				<li><a href="function-github_parse_headers.html">github_parse_headers</a></li>
 				<li><a href="function-github_parse_payload.html">github_parse_payload</a></li>
 				<li><a href="function-gmail_contacts_request.html">gmail_contacts_request</a></li>
@@ -1631,35 +1636,14 @@
 </span></span><span id="529" class="l"><a href="#529">529: </a><span class="php-comment"> * @subpackage wordpress/functions
 </span></span><span id="530" class="l"><a href="#530">530: </a><span class="php-comment"> */</span>
 </span><span id="531" class="l"><a href="#531">531: </a><span class="php-keyword1">function</span> wp_fetch_content(<span class="php-var">$details</span>, <span class="php-var">$url</span>, <span class="php-var">$post</span>=<span class="php-keyword1">array</span>()) {
-</span><span id="532" class="l"><a href="#532">532: </a>    <span class="php-var">$result</span> = <span class="php-keyword1">array</span>();
-</span><span id="533" class="l"><a href="#533">533: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$details</span>) || <span class="php-keyword1">empty</span>(<span class="php-var">$details</span>) || !<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'access_token'</span>, <span class="php-var">$details</span>)) {
-</span><span id="534" class="l"><a href="#534">534: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
-</span><span id="535" class="l"><a href="#535">535: </a>    }
-</span><span id="536" class="l"><a href="#536">536: </a>    <span class="php-var">$headers</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'Authorization: Bearer '</span> . <span class="php-var">$details</span>[<span class="php-quote">'access_token'</span>]);
-</span><span id="537" class="l"><a href="#537">537: </a>    <span class="php-var">$ch</span> = <span class="php-keyword2">curl_init</span>();
-</span><span id="538" class="l"><a href="#538">538: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_URL, <span class="php-var">$url</span>);
-</span><span id="539" class="l"><a href="#539">539: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_HTTPHEADER, <span class="php-var">$headers</span>);
-</span><span id="540" class="l"><a href="#540">540: </a>    <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="php-num">1</span>);
-</span><span id="541" class="l"><a href="#541">541: </a>
-</span><span id="542" class="l"><a href="#542">542: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$post</span>)) {
-</span><span id="543" class="l"><a href="#543">543: </a>        <span class="php-var">$post_tmp</span> = <span class="php-keyword1">array</span>();
-</span><span id="544" class="l"><a href="#544">544: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$post</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
-</span><span id="545" class="l"><a href="#545">545: </a>            <span class="php-var">$post_tmp</span>[] = <span class="php-keyword2">urlencode</span>(<span class="php-var">$name</span>).<span class="php-quote">'='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-var">$value</span>);
-</span><span id="546" class="l"><a href="#546">546: </a>        }
-</span><span id="547" class="l"><a href="#547">547: </a>        <span class="php-var">$post_str</span> = <span class="php-keyword2">implode</span>(<span class="php-quote">'&amp;'</span>, <span class="php-var">$post_tmp</span>);
-</span><span id="548" class="l"><a href="#548">548: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>,CURLOPT_POST, <span class="php-keyword2">count</span>(<span class="php-var">$post</span>));
-</span><span id="549" class="l"><a href="#549">549: </a>        <span class="php-keyword2">curl_setopt</span>(<span class="php-var">$ch</span>,CURLOPT_POSTFIELDS, <span class="php-var">$post_str</span>);
-</span><span id="550" class="l"><a href="#550">550: </a>    }
-</span><span id="551" class="l"><a href="#551">551: </a>
-</span><span id="552" class="l"><a href="#552">552: </a>    <span class="php-var">$curl_result</span> = <span class="php-keyword2">curl_exec</span>(<span class="php-var">$ch</span>);
-</span><span id="553" class="l"><a href="#553">553: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">substr</span>(<span class="php-var">$curl_result</span>, <span class="php-num">0</span>, <span class="php-num">1</span>) == <span class="php-quote">'{'</span>) {
-</span><span id="554" class="l"><a href="#554">554: </a>        <span class="php-var">$result</span> = @<span class="php-keyword2">json_decode</span>(<span class="php-var">$curl_result</span>, <span class="php-keyword1">true</span>);
-</span><span id="555" class="l"><a href="#555">555: </a>    }
-</span><span id="556" class="l"><a href="#556">556: </a>    <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
-</span><span id="557" class="l"><a href="#557">557: </a>}
-</span><span id="558" class="l"><a href="#558">558: </a>
-</span><span id="559" class="l"><a href="#559">559: </a>
-</span><span id="560" class="l"><a href="#560">560: </a></span></code></pre>
+</span><span id="532" class="l"><a href="#532">532: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$details</span>) || <span class="php-keyword1">empty</span>(<span class="php-var">$details</span>) || !<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'access_token'</span>, <span class="php-var">$details</span>)) {
+</span><span id="533" class="l"><a href="#533">533: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>();
+</span><span id="534" class="l"><a href="#534">534: </a>    }
+</span><span id="535" class="l"><a href="#535">535: </a>    <span class="php-var">$api</span> = <span class="php-keyword1">new</span> Hm_API_Curl();
+</span><span id="536" class="l"><a href="#536">536: </a>    <span class="php-keyword1">return</span> <span class="php-var">$api</span>-&gt;command(<span class="php-var">$url</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'Authorization: Bearer '</span> . <span class="php-var">$details</span>[<span class="php-quote">'access_token'</span>]), <span class="php-var">$post</span>);
+</span><span id="537" class="l"><a href="#537">537: </a>}
+</span><span id="538" class="l"><a href="#538">538: </a>
+</span><span id="539" class="l"><a href="#539">539: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1667,6 +1651,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?78a95e1877310accb1439f48ee173b833eee7892"></script>
+<script src="elementlist.js?84f539132661e2a93871d68e590c179d2ce6602c"></script>
 </body>
 </html>

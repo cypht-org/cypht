@@ -26,6 +26,11 @@
 
 						<ul>
 				<li>
+					<a href="package-framework.api.html">
+						api					</a>
+
+						</li>
+				<li>
 					<a href="package-framework.auth.html">
 						auth					</a>
 
@@ -535,6 +540,7 @@
 			<h3>Classes</h3>
 			<ul>
 				<li><a href="class-Hm_Address_Field.html">Hm_Address_Field</a></li>
+				<li><a href="class-Hm_API_Curl.html">Hm_API_Curl</a></li>
 				<li><a href="class-Hm_Auth.html">Hm_Auth</a></li>
 				<li><a href="class-Hm_Auth_DB.html">Hm_Auth_DB</a></li>
 				<li><a href="class-Hm_Auth_IMAP.html">Hm_Auth_IMAP</a></li>
@@ -987,7 +993,6 @@
 				<li><a href="function-get_search_from_url.html">get_search_from_url</a></li>
 				<li><a href="function-get_secondfactor_state.html">get_secondfactor_state</a></li>
 				<li><a href="function-github_connect_details.html">github_connect_details</a></li>
-				<li><a href="function-github_fetch_content.html">github_fetch_content</a></li>
 				<li><a href="function-github_parse_headers.html">github_parse_headers</a></li>
 				<li><a href="function-github_parse_payload.html">github_parse_payload</a></li>
 				<li><a href="function-gmail_contacts_request.html">gmail_contacts_request</a></li>
@@ -1610,260 +1615,261 @@
 </span><span id="508" class="l"><a href="#508">508: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/table&gt;'</span>.
 </span><span id="509" class="l"><a href="#509">509: </a>            smtp_server_dropdown(<span class="php-var">$this</span>-&gt;module_output(), <span class="php-var">$this</span>, <span class="php-var">$recip</span>).
 </span><span id="510" class="l"><a href="#510">510: </a>            <span class="php-quote">'&lt;input class=&quot;smtp_send&quot; type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Send'</span>).<span class="php-quote">'&quot; name=&quot;smtp_send&quot; /&gt;'</span>.
-</span><span id="511" class="l"><a href="#511">511: </a>            <span class="php-quote">'&lt;input class=&quot;smtp_reset&quot; type=&quot;button&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Reset'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="512" class="l"><a href="#512">512: </a>            <span class="php-quote">'&lt;input class=&quot;compose_attach_button&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Attach'</span>).
-</span><span id="513" class="l"><a href="#513">513: </a>            <span class="php-quote">'&quot; name=&quot;compose_attach_button&quot; type=&quot;button&quot; /&gt;&lt;/form&gt;'</span>.
-</span><span id="514" class="l"><a href="#514">514: </a>            <span class="php-quote">'&lt;form enctype=&quot;multipart/form-data&quot; class=&quot;compose_attach_form&quot; /&gt;'</span>.
-</span><span id="515" class="l"><a href="#515">515: </a>            <span class="php-quote">'&lt;input class=&quot;compose_attach_file&quot; type=&quot;file&quot; name=&quot;compose_attach_file&quot; /&gt;'</span>.
-</span><span id="516" class="l"><a href="#516">516: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;compose_attach_page_id&quot; value=&quot;ajax_smtp_attach_file&quot; /&gt;'</span>.
-</span><span id="517" class="l"><a href="#517">517: </a>            <span class="php-quote">'&lt;/form&gt;'</span>.
-</span><span id="518" class="l"><a href="#518">518: </a>            <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="519" class="l"><a href="#519">519: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="520" class="l"><a href="#520">520: </a>    }
-</span><span id="521" class="l"><a href="#521">521: </a>}
-</span><span id="522" class="l"><a href="#522">522: </a>
-</span><span id="523" class="l"><a href="#523">523: </a><span class="php-comment">/**
-</span></span><span id="524" class="l"><a href="#524">524: </a><span class="php-comment"> * @subpackage smtp/output
-</span></span><span id="525" class="l"><a href="#525">525: </a><span class="php-comment"> */</span>
-</span><span id="526" class="l"><a href="#526">526: </a><span class="php-keyword1">class</span> Hm_Output_add_smtp_server_dialog <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="527" class="l"><a href="#527">527: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="528" class="l"><a href="#528">528: </a>        <span class="php-var">$count</span> = <span class="php-keyword2">count</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'smtp_servers'</span>, <span class="php-keyword1">array</span>()));
-</span><span id="529" class="l"><a href="#529">529: </a>        <span class="php-var">$count</span> = <span class="php-keyword2">sprintf</span>(<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'%d configured'</span>), <span class="php-var">$count</span>);
-</span><span id="530" class="l"><a href="#530">530: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;smtp_server_setup&quot;&gt;&lt;div data-target=&quot;.smtp_section&quot; class=&quot;server_section&quot;&gt;'</span>.
-</span><span id="531" class="l"><a href="#531">531: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$doc</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
-</span><span id="532" class="l"><a href="#532">532: </a>            <span class="php-quote">' '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP Servers'</span>).<span class="php-quote">' &lt;div class=&quot;server_count&quot;&gt;'</span>.<span class="php-var">$count</span>.<span class="php-quote">'&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;smtp_section&quot;&gt;&lt;form class=&quot;add_server&quot; method=&quot;POST&quot;&gt;'</span>.
-</span><span id="533" class="l"><a href="#533">533: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="534" class="l"><a href="#534">534: </a>            <span class="php-quote">'&lt;div class=&quot;subtitle&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add an SMTP Server'</span>).<span class="php-quote">'&lt;/div&gt;'</span>.
-</span><span id="535" class="l"><a href="#535">535: </a>            <span class="php-quote">'&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;label for=&quot;new_smtp_name&quot; class=&quot;screen_reader&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP account name'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
-</span><span id="536" class="l"><a href="#536">536: </a>            <span class="php-quote">'&lt;input required type=&quot;text&quot; id=&quot;new_smtp_name&quot; name=&quot;new_smtp_name&quot; class=&quot;txt_fld&quot; value=&quot;&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Account name'</span>).<span class="php-quote">'&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
-</span><span id="537" class="l"><a href="#537">537: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;label for=&quot;new_smtp_address&quot; class=&quot;screen_reader&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP server address'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
-</span><span id="538" class="l"><a href="#538">538: </a>            <span class="php-quote">'&lt;input required type=&quot;text&quot; id=&quot;new_smtp_address&quot; name=&quot;new_smtp_address&quot; class=&quot;txt_fld&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP server address'</span>).<span class="php-quote">'&quot; value=&quot;&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
-</span><span id="539" class="l"><a href="#539">539: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;label for=&quot;new_smtp_port&quot; class=&quot;screen_reader&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP port'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
-</span><span id="540" class="l"><a href="#540">540: </a>            <span class="php-quote">'&lt;input required type=&quot;number&quot; id=&quot;new_smtp_port&quot; name=&quot;new_smtp_port&quot; class=&quot;port_fld&quot; value=&quot;&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Port'</span>).<span class="php-quote">'&quot;&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
-</span><span id="541" class="l"><a href="#541">541: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td&gt;&lt;input type=&quot;checkbox&quot; name=&quot;tls&quot; value=&quot;1&quot; id=&quot;smtp_tls&quot; checked=&quot;checked&quot; /&gt; &lt;label for=&quot;smtp_tls&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Use TLS'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
-</span><span id="542" class="l"><a href="#542">542: </a>            <span class="php-quote">'&lt;td&gt;&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add'</span>).<span class="php-quote">'&quot; name=&quot;submit_smtp_server&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
-</span><span id="543" class="l"><a href="#543">543: </a>            <span class="php-quote">'&lt;/table&gt;&lt;/form&gt;'</span>;
-</span><span id="544" class="l"><a href="#544">544: </a>    }
-</span><span id="545" class="l"><a href="#545">545: </a>}
-</span><span id="546" class="l"><a href="#546">546: </a>
-</span><span id="547" class="l"><a href="#547">547: </a><span class="php-comment">/**
-</span></span><span id="548" class="l"><a href="#548">548: </a><span class="php-comment"> * @subpackage smtp/output
-</span></span><span id="549" class="l"><a href="#549">549: </a><span class="php-comment"> */</span>
-</span><span id="550" class="l"><a href="#550">550: </a><span class="php-keyword1">class</span> Hm_Output_compose_type_setting <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="551" class="l"><a href="#551">551: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="552" class="l"><a href="#552">552: </a>        <span class="php-var">$selected</span> = <span class="php-num">2</span>;
-</span><span id="553" class="l"><a href="#553">553: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
-</span><span id="554" class="l"><a href="#554">554: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'smtp_compose_type'</span>, <span class="php-var">$settings</span>)) {
-</span><span id="555" class="l"><a href="#555">555: </a>            <span class="php-var">$selected</span> = <span class="php-var">$settings</span>[<span class="php-quote">'smtp_compose_type'</span>];
-</span><span id="556" class="l"><a href="#556">556: </a>        }
-</span><span id="557" class="l"><a href="#557">557: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;tr class=&quot;general_setting&quot;&gt;&lt;td&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Outbound mail format'</span>).<span class="php-quote">'&lt;/td&gt;&lt;td&gt;&lt;select name=&quot;smtp_compose_type&quot;&gt;'</span>;
-</span><span id="558" class="l"><a href="#558">558: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
-</span><span id="559" class="l"><a href="#559">559: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$selected</span> == <span class="php-num">0</span>) {
-</span><span id="560" class="l"><a href="#560">560: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
-</span><span id="561" class="l"><a href="#561">561: </a>        }
-</span><span id="562" class="l"><a href="#562">562: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;0&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Plain text'</span>).<span class="php-quote">'&lt;/option&gt;&lt;option '</span>;
-</span><span id="563" class="l"><a href="#563">563: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$selected</span> == <span class="php-num">1</span>) {
-</span><span id="564" class="l"><a href="#564">564: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
-</span><span id="565" class="l"><a href="#565">565: </a>        }
-</span><span id="566" class="l"><a href="#566">566: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;1&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'HTML'</span>).<span class="php-quote">'&lt;/option&gt;&lt;/select&gt;&lt;/td&gt;&lt;/tr&gt;'</span>;
-</span><span id="567" class="l"><a href="#567">567: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="568" class="l"><a href="#568">568: </a>    }
-</span><span id="569" class="l"><a href="#569">569: </a>}
-</span><span id="570" class="l"><a href="#570">570: </a>
-</span><span id="571" class="l"><a href="#571">571: </a><span class="php-comment">/**
-</span></span><span id="572" class="l"><a href="#572">572: </a><span class="php-comment"> * @subpackage smtp/output
-</span></span><span id="573" class="l"><a href="#573">573: </a><span class="php-comment"> */</span>
-</span><span id="574" class="l"><a href="#574">574: </a><span class="php-keyword1">class</span> Hm_Output_filter_upload_file_details <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="575" class="l"><a href="#575">575: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="576" class="l"><a href="#576">576: </a>        <span class="php-var">$file</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'upload_file_details'</span>, <span class="php-keyword1">array</span>());
-</span><span id="577" class="l"><a href="#577">577: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$file</span>)) {
-</span><span id="578" class="l"><a href="#578">578: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'file_details'</span>, format_attachment_row(<span class="php-var">$file</span>, <span class="php-var">$this</span>));
-</span><span id="579" class="l"><a href="#579">579: </a>        }
-</span><span id="580" class="l"><a href="#580">580: </a>    }
-</span><span id="581" class="l"><a href="#581">581: </a>}
-</span><span id="582" class="l"><a href="#582">582: </a>
-</span><span id="583" class="l"><a href="#583">583: </a><span class="php-comment">/**
-</span></span><span id="584" class="l"><a href="#584">584: </a><span class="php-comment"> * @subpackage smtp/output
-</span></span><span id="585" class="l"><a href="#585">585: </a><span class="php-comment"> */</span>
-</span><span id="586" class="l"><a href="#586">586: </a><span class="php-keyword1">class</span> Hm_Output_display_configured_smtp_servers <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="587" class="l"><a href="#587">587: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="588" class="l"><a href="#588">588: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="589" class="l"><a href="#589">589: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'smtp_servers'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
-</span><span id="590" class="l"><a href="#590">590: </a>
-</span><span id="591" class="l"><a href="#591">591: </a>            <span class="php-var">$no_edit</span> = <span class="php-keyword1">false</span>;
-</span><span id="592" class="l"><a href="#592">592: </a>
-</span><span id="593" class="l"><a href="#593">593: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$vals</span>[<span class="php-quote">'user'</span>])) {
-</span><span id="594" class="l"><a href="#594">594: </a>                <span class="php-var">$disabled</span> = <span class="php-quote">'disabled=&quot;disabled&quot;'</span>;
-</span><span id="595" class="l"><a href="#595">595: </a>                <span class="php-var">$user_pc</span> = <span class="php-var">$vals</span>[<span class="php-quote">'user'</span>];
-</span><span id="596" class="l"><a href="#596">596: </a>                <span class="php-var">$pass_pc</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'[saved]'</span>);
-</span><span id="597" class="l"><a href="#597">597: </a>            }
-</span><span id="598" class="l"><a href="#598">598: </a>            <span class="php-keyword1">else</span> {
-</span><span id="599" class="l"><a href="#599">599: </a>                <span class="php-var">$user_pc</span> = <span class="php-quote">''</span>;
-</span><span id="600" class="l"><a href="#600">600: </a>                <span class="php-var">$pass_pc</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>);
-</span><span id="601" class="l"><a href="#601">601: </a>                <span class="php-var">$disabled</span> = <span class="php-quote">''</span>;
-</span><span id="602" class="l"><a href="#602">602: </a>            }
-</span><span id="603" class="l"><a href="#603">603: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;configured_server&quot;&gt;'</span>;
-</span><span id="604" class="l"><a href="#604">604: </a>            <span class="php-var">$res</span> .= <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;server_title&quot;&gt;%s&lt;/div&gt;&lt;div class=&quot;server_subtitle&quot;&gt;%s/%d %s&lt;/div&gt;'</span>,
-</span><span id="605" class="l"><a href="#605">605: </a>                <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-quote">'name'</span>]), <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-quote">'server'</span>]), <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-quote">'port'</span>]), <span class="php-var">$vals</span>[<span class="php-quote">'tls'</span>] ? <span class="php-quote">'TLS'</span> : <span class="php-quote">''</span> );
-</span><span id="606" class="l"><a href="#606">606: </a>            <span class="php-var">$res</span> .= 
-</span><span id="607" class="l"><a href="#607">607: </a>                <span class="php-quote">'&lt;form class=&quot;smtp_connect&quot; method=&quot;POST&quot;&gt;'</span>.
-</span><span id="608" class="l"><a href="#608">608: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
-</span><span id="609" class="l"><a href="#609">609: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;smtp_server_id&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$index</span>).<span class="php-quote">'&quot; /&gt;&lt;span&gt; '</span>.
-</span><span id="610" class="l"><a href="#610">610: </a>                <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;smtp_user_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP username'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
-</span><span id="611" class="l"><a href="#611">611: </a>                <span class="php-quote">'&lt;input '</span>.<span class="php-var">$disabled</span>.<span class="php-quote">' class=&quot;credentials&quot; id=&quot;smtp_user_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Username'</span>).
-</span><span id="612" class="l"><a href="#612">612: </a>                <span class="php-quote">'&quot; type=&quot;text&quot; name=&quot;smtp_user&quot; value=&quot;'</span>.<span class="php-var">$user_pc</span>.<span class="php-quote">'&quot;&gt;&lt;/span&gt;&lt;span&gt; &lt;label class=&quot;screen_reader&quot; for=&quot;smtp_pass_'</span>.
-</span><span id="613" class="l"><a href="#613">613: </a>                <span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP password'</span>).<span class="php-quote">'&lt;/label&gt;&lt;input '</span>.<span class="php-var">$disabled</span>.<span class="php-quote">' class=&quot;credentials smtp_password&quot; placeholder=&quot;'</span>.
-</span><span id="614" class="l"><a href="#614">614: </a>                <span class="php-var">$pass_pc</span>.<span class="php-quote">'&quot; type=&quot;password&quot; id=&quot;smtp_pass_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot; name=&quot;smtp_pass&quot;&gt;&lt;/span&gt;'</span>;
-</span><span id="615" class="l"><a href="#615">615: </a>
-</span><span id="616" class="l"><a href="#616">616: </a>            <span class="php-keyword1">if</span> (!<span class="php-var">$no_edit</span>) {
-</span><span id="617" class="l"><a href="#617">617: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Test'</span>).<span class="php-quote">'&quot; class=&quot;test_smtp_connect&quot; /&gt;'</span>;
-</span><span id="618" class="l"><a href="#618">618: </a>                <span class="php-keyword1">if</span> (!<span class="php-keyword1">isset</span>(<span class="php-var">$vals</span>[<span class="php-quote">'user'</span>]) || !<span class="php-var">$vals</span>[<span class="php-quote">'user'</span>]) {
-</span><span id="619" class="l"><a href="#619">619: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot; class=&quot;delete_smtp_connection&quot; /&gt;'</span>;
-</span><span id="620" class="l"><a href="#620">620: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save'</span>).<span class="php-quote">'&quot; class=&quot;save_smtp_connection&quot; /&gt;'</span>;
-</span><span id="621" class="l"><a href="#621">621: </a>                }
-</span><span id="622" class="l"><a href="#622">622: </a>                <span class="php-keyword1">else</span> {
-</span><span id="623" class="l"><a href="#623">623: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot; class=&quot;delete_smtp_connection&quot; /&gt;'</span>;
-</span><span id="624" class="l"><a href="#624">624: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Forget'</span>).<span class="php-quote">'&quot; class=&quot;forget_smtp_connection&quot; /&gt;'</span>;
-</span><span id="625" class="l"><a href="#625">625: </a>                }
-</span><span id="626" class="l"><a href="#626">626: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; value=&quot;ajax_smtp_debug&quot; name=&quot;hm_ajax_hook&quot; /&gt;'</span>;
-</span><span id="627" class="l"><a href="#627">627: </a>            }
-</span><span id="628" class="l"><a href="#628">628: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;'</span>;
-</span><span id="629" class="l"><a href="#629">629: </a>        }
-</span><span id="630" class="l"><a href="#630">630: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;br class=&quot;clear_float&quot; /&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
-</span><span id="631" class="l"><a href="#631">631: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="632" class="l"><a href="#632">632: </a>    }
-</span><span id="633" class="l"><a href="#633">633: </a>}
-</span><span id="634" class="l"><a href="#634">634: </a>
-</span><span id="635" class="l"><a href="#635">635: </a><span class="php-comment">/**
-</span></span><span id="636" class="l"><a href="#636">636: </a><span class="php-comment"> * @subpackage smtp/output
-</span></span><span id="637" class="l"><a href="#637">637: </a><span class="php-comment"> */</span>
-</span><span id="638" class="l"><a href="#638">638: </a><span class="php-keyword1">class</span> Hm_Output_compose_page_link <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="639" class="l"><a href="#639">639: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="640" class="l"><a href="#640">640: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_compose&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=compose&quot;&gt;'</span>.
-</span><span id="641" class="l"><a href="#641">641: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$doc</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Compose'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="642" class="l"><a href="#642">642: </a>
-</span><span id="643" class="l"><a href="#643">643: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
-</span><span id="644" class="l"><a href="#644">644: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="645" class="l"><a href="#645">645: </a>        }
-</span><span id="646" class="l"><a href="#646">646: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
-</span><span id="647" class="l"><a href="#647">647: </a>    }
-</span><span id="648" class="l"><a href="#648">648: </a>}
-</span><span id="649" class="l"><a href="#649">649: </a>
-</span><span id="650" class="l"><a href="#650">650: </a><span class="php-comment">/**
-</span></span><span id="651" class="l"><a href="#651">651: </a><span class="php-comment"> * @subpackage smtp/functions
-</span></span><span id="652" class="l"><a href="#652">652: </a><span class="php-comment"> */</span>
-</span><span id="653" class="l"><a href="#653">653: </a><span class="php-keyword1">function</span> smtp_server_dropdown(<span class="php-var">$data</span>, <span class="php-var">$output_mod</span>, <span class="php-var">$recip</span>) {
-</span><span id="654" class="l"><a href="#654">654: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;select name=&quot;smtp_server_id&quot; class=&quot;compose_server&quot;&gt;'</span>;
-</span><span id="655" class="l"><a href="#655">655: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'smtp_servers'</span>, <span class="php-var">$data</span>)) {
-</span><span id="656" class="l"><a href="#656">656: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$data</span>[<span class="php-quote">'smtp_servers'</span>] <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$vals</span>) {
-</span><span id="657" class="l"><a href="#657">657: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
-</span><span id="658" class="l"><a href="#658">658: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$recip</span> &amp;&amp; <span class="php-keyword2">trim</span>(<span class="php-var">$recip</span>) == <span class="php-keyword2">trim</span>(<span class="php-var">$vals</span>[<span class="php-quote">'user'</span>])) {
-</span><span id="659" class="l"><a href="#659">659: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
-</span><span id="660" class="l"><a href="#660">660: </a>            }
-</span><span id="661" class="l"><a href="#661">661: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;%s - %s&quot;</span>, <span class="php-var">$vals</span>[<span class="php-quote">'name'</span>], <span class="php-var">$vals</span>[<span class="php-quote">'server'</span>])).<span class="php-quote">'&lt;/option&gt;'</span>;
-</span><span id="662" class="l"><a href="#662">662: </a>        }
-</span><span id="663" class="l"><a href="#663">663: </a>    }
-</span><span id="664" class="l"><a href="#664">664: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/select&gt;'</span>;
-</span><span id="665" class="l"><a href="#665">665: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="666" class="l"><a href="#666">666: </a>}
-</span><span id="667" class="l"><a href="#667">667: </a>
-</span><span id="668" class="l"><a href="#668">668: </a><span class="php-comment">/**
-</span></span><span id="669" class="l"><a href="#669">669: </a><span class="php-comment"> * @subpackage smtp/functions
-</span></span><span id="670" class="l"><a href="#670">670: </a><span class="php-comment"> */</span>
-</span><span id="671" class="l"><a href="#671">671: </a><span class="php-keyword1">function</span> build_mime_msg(<span class="php-var">$to</span>, <span class="php-var">$subject</span>, <span class="php-var">$body</span>, <span class="php-var">$from</span>) {
-</span><span id="672" class="l"><a href="#672">672: </a>    <span class="php-var">$headers</span> = <span class="php-keyword1">array</span>(
-</span><span id="673" class="l"><a href="#673">673: </a>        <span class="php-quote">'from'</span> =&gt; <span class="php-var">$from</span>,
-</span><span id="674" class="l"><a href="#674">674: </a>        <span class="php-quote">'to'</span> =&gt; <span class="php-var">$to</span>,
-</span><span id="675" class="l"><a href="#675">675: </a>        <span class="php-quote">'subject'</span> =&gt; <span class="php-var">$subject</span>,
-</span><span id="676" class="l"><a href="#676">676: </a>        <span class="php-quote">'date'</span> =&gt; <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>)
-</span><span id="677" class="l"><a href="#677">677: </a>    );
-</span><span id="678" class="l"><a href="#678">678: </a>    <span class="php-var">$body</span> = <span class="php-keyword1">array</span>(
-</span><span id="679" class="l"><a href="#679">679: </a>        <span class="php-num">1</span> =&gt; <span class="php-keyword1">array</span>(
-</span><span id="680" class="l"><a href="#680">680: </a>            <span class="php-quote">'type'</span> =&gt; TYPETEXT,
-</span><span id="681" class="l"><a href="#681">681: </a>            <span class="php-quote">'subtype'</span> =&gt; <span class="php-quote">'plain'</span>,
-</span><span id="682" class="l"><a href="#682">682: </a>            <span class="php-quote">'contents.data'</span> =&gt; <span class="php-var">$body</span>
-</span><span id="683" class="l"><a href="#683">683: </a>        )
-</span><span id="684" class="l"><a href="#684">684: </a>    );
-</span><span id="685" class="l"><a href="#685">685: </a>    <span class="php-keyword1">return</span> <span class="php-keyword2">imap_mail_compose</span>(<span class="php-var">$headers</span>, <span class="php-var">$body</span>);
-</span><span id="686" class="l"><a href="#686">686: </a>}
-</span><span id="687" class="l"><a href="#687">687: </a>
-</span><span id="688" class="l"><a href="#688">688: </a><span class="php-comment">/**
-</span></span><span id="689" class="l"><a href="#689">689: </a><span class="php-comment"> * Check for and do an Oauth2 token reset if needed
-</span></span><span id="690" class="l"><a href="#690">690: </a><span class="php-comment"> * @param array $server imap server data
-</span></span><span id="691" class="l"><a href="#691">691: </a><span class="php-comment"> * @param object $config site config object
-</span></span><span id="692" class="l"><a href="#692">692: </a><span class="php-comment"> * @return mixed
-</span></span><span id="693" class="l"><a href="#693">693: </a><span class="php-comment"> */</span>
-</span><span id="694" class="l"><a href="#694">694: </a><span class="php-keyword1">function</span> smtp_refresh_oauth2_token(<span class="php-var">$server</span>, <span class="php-var">$config</span>) {
-</span><span id="695" class="l"><a href="#695">695: </a>
-</span><span id="696" class="l"><a href="#696">696: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'expiration'</span>, <span class="php-var">$server</span>) &amp;&amp; (int) <span class="php-var">$server</span>[<span class="php-quote">'expiration'</span>] &lt;= <span class="php-keyword2">time</span>()) {
-</span><span id="697" class="l"><a href="#697">697: </a>        <span class="php-var">$oauth2_data</span> = get_oauth2_data(<span class="php-var">$config</span>);
-</span><span id="698" class="l"><a href="#698">698: </a>        <span class="php-var">$details</span> = <span class="php-keyword1">array</span>();
-</span><span id="699" class="l"><a href="#699">699: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$server</span>[<span class="php-quote">'server'</span>] == <span class="php-quote">'smtp.gmail.com'</span>) {
-</span><span id="700" class="l"><a href="#700">700: </a>            <span class="php-var">$details</span> = <span class="php-var">$oauth2_data</span>[<span class="php-quote">'gmail'</span>];
-</span><span id="701" class="l"><a href="#701">701: </a>        }
-</span><span id="702" class="l"><a href="#702">702: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
-</span><span id="703" class="l"><a href="#703">703: </a>            <span class="php-var">$oauth2</span> = <span class="php-keyword1">new</span> Hm_Oauth2(<span class="php-var">$details</span>[<span class="php-quote">'client_id'</span>], <span class="php-var">$details</span>[<span class="php-quote">'client_secret'</span>], <span class="php-var">$details</span>[<span class="php-quote">'client_uri'</span>]);
-</span><span id="704" class="l"><a href="#704">704: </a>            <span class="php-var">$result</span> = <span class="php-var">$oauth2</span>-&gt;refresh_token(<span class="php-var">$details</span>[<span class="php-quote">'refresh_uri'</span>], <span class="php-var">$server</span>[<span class="php-quote">'refresh_token'</span>]);
-</span><span id="705" class="l"><a href="#705">705: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'access_token'</span>, <span class="php-var">$result</span>)) {
-</span><span id="706" class="l"><a href="#706">706: </a>                <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(<span class="php-keyword2">strtotime</span>(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'+%d seconds'</span>, <span class="php-var">$result</span>[<span class="php-quote">'expires_in'</span>])), <span class="php-var">$result</span>[<span class="php-quote">'access_token'</span>]);
-</span><span id="707" class="l"><a href="#707">707: </a>            }
-</span><span id="708" class="l"><a href="#708">708: </a>        }
-</span><span id="709" class="l"><a href="#709">709: </a>    }
-</span><span id="710" class="l"><a href="#710">710: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>();
-</span><span id="711" class="l"><a href="#711">711: </a>}
-</span><span id="712" class="l"><a href="#712">712: </a>
-</span><span id="713" class="l"><a href="#713">713: </a><span class="php-comment">/**
-</span></span><span id="714" class="l"><a href="#714">714: </a><span class="php-comment"> * @subpackage smtp/functions
-</span></span><span id="715" class="l"><a href="#715">715: </a><span class="php-comment"> */</span>
-</span><span id="716" class="l"><a href="#716">716: </a><span class="php-keyword1">function</span> delete_uploaded_files(<span class="php-var">$session</span>) {
-</span><span id="717" class="l"><a href="#717">717: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$session</span>-&gt;get(<span class="php-quote">'uploaded_files'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$file</span>) {
-</span><span id="718" class="l"><a href="#718">718: </a>        @<span class="php-keyword2">unlink</span>(<span class="php-var">$file</span>[<span class="php-quote">'filename'</span>]);
-</span><span id="719" class="l"><a href="#719">719: </a>    }
-</span><span id="720" class="l"><a href="#720">720: </a>    <span class="php-var">$session</span>-&gt;set(<span class="php-quote">'uploaded_files'</span>, <span class="php-keyword1">array</span>());
-</span><span id="721" class="l"><a href="#721">721: </a>}
-</span><span id="722" class="l"><a href="#722">722: </a>
-</span><span id="723" class="l"><a href="#723">723: </a><span class="php-comment">/**
-</span></span><span id="724" class="l"><a href="#724">724: </a><span class="php-comment"> * @subpackage smtp/functions
-</span></span><span id="725" class="l"><a href="#725">725: </a><span class="php-comment"> */</span>
-</span><span id="726" class="l"><a href="#726">726: </a><span class="php-keyword1">function</span> format_attachment_row(<span class="php-var">$file</span>, <span class="php-var">$output_mod</span>) {
-</span><span id="727" class="l"><a href="#727">727: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td&gt;'</span>.
-</span><span id="728" class="l"><a href="#728">728: </a>        <span class="php-quote">'&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$paperclip</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
-</span><span id="729" class="l"><a href="#729">729: </a>        <span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$file</span>[<span class="php-quote">'name'</span>]).
-</span><span id="730" class="l"><a href="#730">730: </a>        <span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$file</span>[<span class="php-quote">'type'</span>]).<span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.
-</span><span id="731" class="l"><a href="#731">731: </a>        <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">round</span>(<span class="php-var">$file</span>[<span class="php-quote">'size'</span>]/<span class="php-num">1024</span>, <span class="php-num">2</span>)).<span class="php-quote">'KB&lt;/td&gt;'</span>.
-</span><span id="732" class="l"><a href="#732">732: </a>        <span class="php-quote">'&lt;td&gt;'</span>.
-</span><span id="733" class="l"><a href="#733">733: </a>        <span class="php-quote">'&lt;a title=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot; href=&quot;#&quot; data-id=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$file</span>[<span class="php-quote">'basename'</span>]).
-</span><span id="734" class="l"><a href="#734">734: </a>        <span class="php-quote">'&quot; class=&quot;delete_attachment&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$circle_x</span>.<span class="php-quote">'&quot; alt=&quot;X&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
-</span><span id="735" class="l"><a href="#735">735: </a>        <span class="php-quote">'&lt;/a&gt;'</span>.
-</span><span id="736" class="l"><a href="#736">736: </a>        <span class="php-quote">'&lt;/td&gt;'</span>.
-</span><span id="737" class="l"><a href="#737">737: </a>        <span class="php-quote">'&lt;/tr&gt;'</span>;
-</span><span id="738" class="l"><a href="#738">738: </a>}
-</span><span id="739" class="l"><a href="#739">739: </a>
-</span><span id="740" class="l"><a href="#740">740: </a><span class="php-comment">/**
-</span></span><span id="741" class="l"><a href="#741">741: </a><span class="php-comment"> * @subpackage smtp/functions
-</span></span><span id="742" class="l"><a href="#742">742: </a><span class="php-comment"> */</span>
-</span><span id="743" class="l"><a href="#743">743: </a><span class="php-keyword1">function</span> get_primary_recipients(<span class="php-var">$headers</span>, <span class="php-var">$smtp_servers</span>) {
-</span><span id="744" class="l"><a href="#744">744: </a>    <span class="php-var">$recip_headers</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'to'</span>, <span class="php-quote">'cc'</span>, <span class="php-quote">'envelope-to'</span>);
-</span><span id="745" class="l"><a href="#745">745: </a>    <span class="php-var">$lc_headers</span> = <span class="php-keyword1">array</span>();
-</span><span id="746" class="l"><a href="#746">746: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$headers</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
-</span><span id="747" class="l"><a href="#747">747: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-keyword2">strtolower</span>(<span class="php-var">$name</span>), <span class="php-var">$recip_headers</span>, <span class="php-keyword1">true</span>)) {
-</span><span id="748" class="l"><a href="#748">748: </a>            <span class="php-var">$lc_headers</span>[<span class="php-keyword2">strtolower</span>(<span class="php-var">$name</span>)] = <span class="php-var">$value</span>;
-</span><span id="749" class="l"><a href="#749">749: </a>        }
-</span><span id="750" class="l"><a href="#750">750: </a>    }
-</span><span id="751" class="l"><a href="#751">751: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'envelope-to'</span>, <span class="php-var">$lc_headers</span>)) {
-</span><span id="752" class="l"><a href="#752">752: </a>        <span class="php-keyword1">return</span> <span class="php-var">$lc_headers</span>[<span class="php-quote">'envelope-to'</span>];
-</span><span id="753" class="l"><a href="#753">753: </a>    }
-</span><span id="754" class="l"><a href="#754">754: </a>    <span class="php-var">$users</span> = <span class="php-keyword2">array_map</span>(<span class="php-keyword1">function</span>(<span class="php-var">$a</span>) { <span class="php-keyword1">return</span> <span class="php-var">$a</span>[<span class="php-quote">'user'</span>]; }, <span class="php-var">$smtp_servers</span>);
-</span><span id="755" class="l"><a href="#755">755: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$users</span> <span class="php-keyword1">as</span> <span class="php-var">$user</span>) {
-</span><span id="756" class="l"><a href="#756">756: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$lc_headers</span> <span class="php-keyword1">as</span> <span class="php-var">$header</span>) {
-</span><span id="757" class="l"><a href="#757">757: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$header</span>, <span class="php-var">$user</span>) !== <span class="php-keyword1">false</span>) {
-</span><span id="758" class="l"><a href="#758">758: </a>                <span class="php-keyword1">return</span> <span class="php-var">$user</span>;
-</span><span id="759" class="l"><a href="#759">759: </a>            }
-</span><span id="760" class="l"><a href="#760">760: </a>        }
-</span><span id="761" class="l"><a href="#761">761: </a>    }
-</span><span id="762" class="l"><a href="#762">762: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="763" class="l"><a href="#763">763: </a>}
-</span><span id="764" class="l"><a href="#764">764: </a></span></code></pre>
+</span><span id="511" class="l"><a href="#511">511: </a>            <span class="php-quote">'&lt;input class=&quot;smtp_save&quot; type=&quot;button&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="512" class="l"><a href="#512">512: </a>            <span class="php-quote">'&lt;input class=&quot;smtp_reset&quot; type=&quot;button&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Reset'</span>).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="513" class="l"><a href="#513">513: </a>            <span class="php-quote">'&lt;input class=&quot;compose_attach_button&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Attach'</span>).
+</span><span id="514" class="l"><a href="#514">514: </a>            <span class="php-quote">'&quot; name=&quot;compose_attach_button&quot; type=&quot;button&quot; /&gt;&lt;/form&gt;'</span>.
+</span><span id="515" class="l"><a href="#515">515: </a>            <span class="php-quote">'&lt;form enctype=&quot;multipart/form-data&quot; class=&quot;compose_attach_form&quot; /&gt;'</span>.
+</span><span id="516" class="l"><a href="#516">516: </a>            <span class="php-quote">'&lt;input class=&quot;compose_attach_file&quot; type=&quot;file&quot; name=&quot;compose_attach_file&quot; /&gt;'</span>.
+</span><span id="517" class="l"><a href="#517">517: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;compose_attach_page_id&quot; value=&quot;ajax_smtp_attach_file&quot; /&gt;'</span>.
+</span><span id="518" class="l"><a href="#518">518: </a>            <span class="php-quote">'&lt;/form&gt;'</span>.
+</span><span id="519" class="l"><a href="#519">519: </a>            <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="520" class="l"><a href="#520">520: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="521" class="l"><a href="#521">521: </a>    }
+</span><span id="522" class="l"><a href="#522">522: </a>}
+</span><span id="523" class="l"><a href="#523">523: </a>
+</span><span id="524" class="l"><a href="#524">524: </a><span class="php-comment">/**
+</span></span><span id="525" class="l"><a href="#525">525: </a><span class="php-comment"> * @subpackage smtp/output
+</span></span><span id="526" class="l"><a href="#526">526: </a><span class="php-comment"> */</span>
+</span><span id="527" class="l"><a href="#527">527: </a><span class="php-keyword1">class</span> Hm_Output_add_smtp_server_dialog <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="528" class="l"><a href="#528">528: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="529" class="l"><a href="#529">529: </a>        <span class="php-var">$count</span> = <span class="php-keyword2">count</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'smtp_servers'</span>, <span class="php-keyword1">array</span>()));
+</span><span id="530" class="l"><a href="#530">530: </a>        <span class="php-var">$count</span> = <span class="php-keyword2">sprintf</span>(<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'%d configured'</span>), <span class="php-var">$count</span>);
+</span><span id="531" class="l"><a href="#531">531: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;smtp_server_setup&quot;&gt;&lt;div data-target=&quot;.smtp_section&quot; class=&quot;server_section&quot;&gt;'</span>.
+</span><span id="532" class="l"><a href="#532">532: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$doc</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
+</span><span id="533" class="l"><a href="#533">533: </a>            <span class="php-quote">' '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP Servers'</span>).<span class="php-quote">' &lt;div class=&quot;server_count&quot;&gt;'</span>.<span class="php-var">$count</span>.<span class="php-quote">'&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;smtp_section&quot;&gt;&lt;form class=&quot;add_server&quot; method=&quot;POST&quot;&gt;'</span>.
+</span><span id="534" class="l"><a href="#534">534: </a>            <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="535" class="l"><a href="#535">535: </a>            <span class="php-quote">'&lt;div class=&quot;subtitle&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add an SMTP Server'</span>).<span class="php-quote">'&lt;/div&gt;'</span>.
+</span><span id="536" class="l"><a href="#536">536: </a>            <span class="php-quote">'&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;label for=&quot;new_smtp_name&quot; class=&quot;screen_reader&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP account name'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
+</span><span id="537" class="l"><a href="#537">537: </a>            <span class="php-quote">'&lt;input required type=&quot;text&quot; id=&quot;new_smtp_name&quot; name=&quot;new_smtp_name&quot; class=&quot;txt_fld&quot; value=&quot;&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Account name'</span>).<span class="php-quote">'&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
+</span><span id="538" class="l"><a href="#538">538: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;label for=&quot;new_smtp_address&quot; class=&quot;screen_reader&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP server address'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
+</span><span id="539" class="l"><a href="#539">539: </a>            <span class="php-quote">'&lt;input required type=&quot;text&quot; id=&quot;new_smtp_address&quot; name=&quot;new_smtp_address&quot; class=&quot;txt_fld&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP server address'</span>).<span class="php-quote">'&quot; value=&quot;&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
+</span><span id="540" class="l"><a href="#540">540: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;label for=&quot;new_smtp_port&quot; class=&quot;screen_reader&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP port'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
+</span><span id="541" class="l"><a href="#541">541: </a>            <span class="php-quote">'&lt;input required type=&quot;number&quot; id=&quot;new_smtp_port&quot; name=&quot;new_smtp_port&quot; class=&quot;port_fld&quot; value=&quot;&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Port'</span>).<span class="php-quote">'&quot;&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
+</span><span id="542" class="l"><a href="#542">542: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td&gt;&lt;input type=&quot;checkbox&quot; name=&quot;tls&quot; value=&quot;1&quot; id=&quot;smtp_tls&quot; checked=&quot;checked&quot; /&gt; &lt;label for=&quot;smtp_tls&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Use TLS'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
+</span><span id="543" class="l"><a href="#543">543: </a>            <span class="php-quote">'&lt;td&gt;&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add'</span>).<span class="php-quote">'&quot; name=&quot;submit_smtp_server&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
+</span><span id="544" class="l"><a href="#544">544: </a>            <span class="php-quote">'&lt;/table&gt;&lt;/form&gt;'</span>;
+</span><span id="545" class="l"><a href="#545">545: </a>    }
+</span><span id="546" class="l"><a href="#546">546: </a>}
+</span><span id="547" class="l"><a href="#547">547: </a>
+</span><span id="548" class="l"><a href="#548">548: </a><span class="php-comment">/**
+</span></span><span id="549" class="l"><a href="#549">549: </a><span class="php-comment"> * @subpackage smtp/output
+</span></span><span id="550" class="l"><a href="#550">550: </a><span class="php-comment"> */</span>
+</span><span id="551" class="l"><a href="#551">551: </a><span class="php-keyword1">class</span> Hm_Output_compose_type_setting <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="552" class="l"><a href="#552">552: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="553" class="l"><a href="#553">553: </a>        <span class="php-var">$selected</span> = <span class="php-num">2</span>;
+</span><span id="554" class="l"><a href="#554">554: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>, <span class="php-keyword1">array</span>());
+</span><span id="555" class="l"><a href="#555">555: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'smtp_compose_type'</span>, <span class="php-var">$settings</span>)) {
+</span><span id="556" class="l"><a href="#556">556: </a>            <span class="php-var">$selected</span> = <span class="php-var">$settings</span>[<span class="php-quote">'smtp_compose_type'</span>];
+</span><span id="557" class="l"><a href="#557">557: </a>        }
+</span><span id="558" class="l"><a href="#558">558: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;tr class=&quot;general_setting&quot;&gt;&lt;td&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Outbound mail format'</span>).<span class="php-quote">'&lt;/td&gt;&lt;td&gt;&lt;select name=&quot;smtp_compose_type&quot;&gt;'</span>;
+</span><span id="559" class="l"><a href="#559">559: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
+</span><span id="560" class="l"><a href="#560">560: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$selected</span> == <span class="php-num">0</span>) {
+</span><span id="561" class="l"><a href="#561">561: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
+</span><span id="562" class="l"><a href="#562">562: </a>        }
+</span><span id="563" class="l"><a href="#563">563: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;0&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Plain text'</span>).<span class="php-quote">'&lt;/option&gt;&lt;option '</span>;
+</span><span id="564" class="l"><a href="#564">564: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$selected</span> == <span class="php-num">1</span>) {
+</span><span id="565" class="l"><a href="#565">565: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
+</span><span id="566" class="l"><a href="#566">566: </a>        }
+</span><span id="567" class="l"><a href="#567">567: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;1&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'HTML'</span>).<span class="php-quote">'&lt;/option&gt;&lt;/select&gt;&lt;/td&gt;&lt;/tr&gt;'</span>;
+</span><span id="568" class="l"><a href="#568">568: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="569" class="l"><a href="#569">569: </a>    }
+</span><span id="570" class="l"><a href="#570">570: </a>}
+</span><span id="571" class="l"><a href="#571">571: </a>
+</span><span id="572" class="l"><a href="#572">572: </a><span class="php-comment">/**
+</span></span><span id="573" class="l"><a href="#573">573: </a><span class="php-comment"> * @subpackage smtp/output
+</span></span><span id="574" class="l"><a href="#574">574: </a><span class="php-comment"> */</span>
+</span><span id="575" class="l"><a href="#575">575: </a><span class="php-keyword1">class</span> Hm_Output_filter_upload_file_details <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="576" class="l"><a href="#576">576: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="577" class="l"><a href="#577">577: </a>        <span class="php-var">$file</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'upload_file_details'</span>, <span class="php-keyword1">array</span>());
+</span><span id="578" class="l"><a href="#578">578: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$file</span>)) {
+</span><span id="579" class="l"><a href="#579">579: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'file_details'</span>, format_attachment_row(<span class="php-var">$file</span>, <span class="php-var">$this</span>));
+</span><span id="580" class="l"><a href="#580">580: </a>        }
+</span><span id="581" class="l"><a href="#581">581: </a>    }
+</span><span id="582" class="l"><a href="#582">582: </a>}
+</span><span id="583" class="l"><a href="#583">583: </a>
+</span><span id="584" class="l"><a href="#584">584: </a><span class="php-comment">/**
+</span></span><span id="585" class="l"><a href="#585">585: </a><span class="php-comment"> * @subpackage smtp/output
+</span></span><span id="586" class="l"><a href="#586">586: </a><span class="php-comment"> */</span>
+</span><span id="587" class="l"><a href="#587">587: </a><span class="php-keyword1">class</span> Hm_Output_display_configured_smtp_servers <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="588" class="l"><a href="#588">588: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="589" class="l"><a href="#589">589: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="590" class="l"><a href="#590">590: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'smtp_servers'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
+</span><span id="591" class="l"><a href="#591">591: </a>
+</span><span id="592" class="l"><a href="#592">592: </a>            <span class="php-var">$no_edit</span> = <span class="php-keyword1">false</span>;
+</span><span id="593" class="l"><a href="#593">593: </a>
+</span><span id="594" class="l"><a href="#594">594: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$vals</span>[<span class="php-quote">'user'</span>])) {
+</span><span id="595" class="l"><a href="#595">595: </a>                <span class="php-var">$disabled</span> = <span class="php-quote">'disabled=&quot;disabled&quot;'</span>;
+</span><span id="596" class="l"><a href="#596">596: </a>                <span class="php-var">$user_pc</span> = <span class="php-var">$vals</span>[<span class="php-quote">'user'</span>];
+</span><span id="597" class="l"><a href="#597">597: </a>                <span class="php-var">$pass_pc</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'[saved]'</span>);
+</span><span id="598" class="l"><a href="#598">598: </a>            }
+</span><span id="599" class="l"><a href="#599">599: </a>            <span class="php-keyword1">else</span> {
+</span><span id="600" class="l"><a href="#600">600: </a>                <span class="php-var">$user_pc</span> = <span class="php-quote">''</span>;
+</span><span id="601" class="l"><a href="#601">601: </a>                <span class="php-var">$pass_pc</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Password'</span>);
+</span><span id="602" class="l"><a href="#602">602: </a>                <span class="php-var">$disabled</span> = <span class="php-quote">''</span>;
+</span><span id="603" class="l"><a href="#603">603: </a>            }
+</span><span id="604" class="l"><a href="#604">604: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;configured_server&quot;&gt;'</span>;
+</span><span id="605" class="l"><a href="#605">605: </a>            <span class="php-var">$res</span> .= <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;server_title&quot;&gt;%s&lt;/div&gt;&lt;div class=&quot;server_subtitle&quot;&gt;%s/%d %s&lt;/div&gt;'</span>,
+</span><span id="606" class="l"><a href="#606">606: </a>                <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-quote">'name'</span>]), <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-quote">'server'</span>]), <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-quote">'port'</span>]), <span class="php-var">$vals</span>[<span class="php-quote">'tls'</span>] ? <span class="php-quote">'TLS'</span> : <span class="php-quote">''</span> );
+</span><span id="607" class="l"><a href="#607">607: </a>            <span class="php-var">$res</span> .= 
+</span><span id="608" class="l"><a href="#608">608: </a>                <span class="php-quote">'&lt;form class=&quot;smtp_connect&quot; method=&quot;POST&quot;&gt;'</span>.
+</span><span id="609" class="l"><a href="#609">609: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>.
+</span><span id="610" class="l"><a href="#610">610: </a>                <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;smtp_server_id&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$index</span>).<span class="php-quote">'&quot; /&gt;&lt;span&gt; '</span>.
+</span><span id="611" class="l"><a href="#611">611: </a>                <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;smtp_user_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP username'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
+</span><span id="612" class="l"><a href="#612">612: </a>                <span class="php-quote">'&lt;input '</span>.<span class="php-var">$disabled</span>.<span class="php-quote">' class=&quot;credentials&quot; id=&quot;smtp_user_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Username'</span>).
+</span><span id="613" class="l"><a href="#613">613: </a>                <span class="php-quote">'&quot; type=&quot;text&quot; name=&quot;smtp_user&quot; value=&quot;'</span>.<span class="php-var">$user_pc</span>.<span class="php-quote">'&quot;&gt;&lt;/span&gt;&lt;span&gt; &lt;label class=&quot;screen_reader&quot; for=&quot;smtp_pass_'</span>.
+</span><span id="614" class="l"><a href="#614">614: </a>                <span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'SMTP password'</span>).<span class="php-quote">'&lt;/label&gt;&lt;input '</span>.<span class="php-var">$disabled</span>.<span class="php-quote">' class=&quot;credentials smtp_password&quot; placeholder=&quot;'</span>.
+</span><span id="615" class="l"><a href="#615">615: </a>                <span class="php-var">$pass_pc</span>.<span class="php-quote">'&quot; type=&quot;password&quot; id=&quot;smtp_pass_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot; name=&quot;smtp_pass&quot;&gt;&lt;/span&gt;'</span>;
+</span><span id="616" class="l"><a href="#616">616: </a>
+</span><span id="617" class="l"><a href="#617">617: </a>            <span class="php-keyword1">if</span> (!<span class="php-var">$no_edit</span>) {
+</span><span id="618" class="l"><a href="#618">618: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Test'</span>).<span class="php-quote">'&quot; class=&quot;test_smtp_connect&quot; /&gt;'</span>;
+</span><span id="619" class="l"><a href="#619">619: </a>                <span class="php-keyword1">if</span> (!<span class="php-keyword1">isset</span>(<span class="php-var">$vals</span>[<span class="php-quote">'user'</span>]) || !<span class="php-var">$vals</span>[<span class="php-quote">'user'</span>]) {
+</span><span id="620" class="l"><a href="#620">620: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot; class=&quot;delete_smtp_connection&quot; /&gt;'</span>;
+</span><span id="621" class="l"><a href="#621">621: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Save'</span>).<span class="php-quote">'&quot; class=&quot;save_smtp_connection&quot; /&gt;'</span>;
+</span><span id="622" class="l"><a href="#622">622: </a>                }
+</span><span id="623" class="l"><a href="#623">623: </a>                <span class="php-keyword1">else</span> {
+</span><span id="624" class="l"><a href="#624">624: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot; class=&quot;delete_smtp_connection&quot; /&gt;'</span>;
+</span><span id="625" class="l"><a href="#625">625: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Forget'</span>).<span class="php-quote">'&quot; class=&quot;forget_smtp_connection&quot; /&gt;'</span>;
+</span><span id="626" class="l"><a href="#626">626: </a>                }
+</span><span id="627" class="l"><a href="#627">627: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; value=&quot;ajax_smtp_debug&quot; name=&quot;hm_ajax_hook&quot; /&gt;'</span>;
+</span><span id="628" class="l"><a href="#628">628: </a>            }
+</span><span id="629" class="l"><a href="#629">629: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;'</span>;
+</span><span id="630" class="l"><a href="#630">630: </a>        }
+</span><span id="631" class="l"><a href="#631">631: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;br class=&quot;clear_float&quot; /&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
+</span><span id="632" class="l"><a href="#632">632: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="633" class="l"><a href="#633">633: </a>    }
+</span><span id="634" class="l"><a href="#634">634: </a>}
+</span><span id="635" class="l"><a href="#635">635: </a>
+</span><span id="636" class="l"><a href="#636">636: </a><span class="php-comment">/**
+</span></span><span id="637" class="l"><a href="#637">637: </a><span class="php-comment"> * @subpackage smtp/output
+</span></span><span id="638" class="l"><a href="#638">638: </a><span class="php-comment"> */</span>
+</span><span id="639" class="l"><a href="#639">639: </a><span class="php-keyword1">class</span> Hm_Output_compose_page_link <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="640" class="l"><a href="#640">640: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="641" class="l"><a href="#641">641: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_compose&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=compose&quot;&gt;'</span>.
+</span><span id="642" class="l"><a href="#642">642: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$doc</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Compose'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="643" class="l"><a href="#643">643: </a>
+</span><span id="644" class="l"><a href="#644">644: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
+</span><span id="645" class="l"><a href="#645">645: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="646" class="l"><a href="#646">646: </a>        }
+</span><span id="647" class="l"><a href="#647">647: </a>        <span class="php-var">$this</span>-&gt;concat(<span class="php-quote">'formatted_folder_list'</span>, <span class="php-var">$res</span>);
+</span><span id="648" class="l"><a href="#648">648: </a>    }
+</span><span id="649" class="l"><a href="#649">649: </a>}
+</span><span id="650" class="l"><a href="#650">650: </a>
+</span><span id="651" class="l"><a href="#651">651: </a><span class="php-comment">/**
+</span></span><span id="652" class="l"><a href="#652">652: </a><span class="php-comment"> * @subpackage smtp/functions
+</span></span><span id="653" class="l"><a href="#653">653: </a><span class="php-comment"> */</span>
+</span><span id="654" class="l"><a href="#654">654: </a><span class="php-keyword1">function</span> smtp_server_dropdown(<span class="php-var">$data</span>, <span class="php-var">$output_mod</span>, <span class="php-var">$recip</span>) {
+</span><span id="655" class="l"><a href="#655">655: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;select name=&quot;smtp_server_id&quot; class=&quot;compose_server&quot;&gt;'</span>;
+</span><span id="656" class="l"><a href="#656">656: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'smtp_servers'</span>, <span class="php-var">$data</span>)) {
+</span><span id="657" class="l"><a href="#657">657: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$data</span>[<span class="php-quote">'smtp_servers'</span>] <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$vals</span>) {
+</span><span id="658" class="l"><a href="#658">658: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
+</span><span id="659" class="l"><a href="#659">659: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$recip</span> &amp;&amp; <span class="php-keyword2">trim</span>(<span class="php-var">$recip</span>) == <span class="php-keyword2">trim</span>(<span class="php-var">$vals</span>[<span class="php-quote">'user'</span>])) {
+</span><span id="660" class="l"><a href="#660">660: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
+</span><span id="661" class="l"><a href="#661">661: </a>            }
+</span><span id="662" class="l"><a href="#662">662: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;%s - %s&quot;</span>, <span class="php-var">$vals</span>[<span class="php-quote">'name'</span>], <span class="php-var">$vals</span>[<span class="php-quote">'server'</span>])).<span class="php-quote">'&lt;/option&gt;'</span>;
+</span><span id="663" class="l"><a href="#663">663: </a>        }
+</span><span id="664" class="l"><a href="#664">664: </a>    }
+</span><span id="665" class="l"><a href="#665">665: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/select&gt;'</span>;
+</span><span id="666" class="l"><a href="#666">666: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="667" class="l"><a href="#667">667: </a>}
+</span><span id="668" class="l"><a href="#668">668: </a>
+</span><span id="669" class="l"><a href="#669">669: </a><span class="php-comment">/**
+</span></span><span id="670" class="l"><a href="#670">670: </a><span class="php-comment"> * @subpackage smtp/functions
+</span></span><span id="671" class="l"><a href="#671">671: </a><span class="php-comment"> */</span>
+</span><span id="672" class="l"><a href="#672">672: </a><span class="php-keyword1">function</span> build_mime_msg(<span class="php-var">$to</span>, <span class="php-var">$subject</span>, <span class="php-var">$body</span>, <span class="php-var">$from</span>) {
+</span><span id="673" class="l"><a href="#673">673: </a>    <span class="php-var">$headers</span> = <span class="php-keyword1">array</span>(
+</span><span id="674" class="l"><a href="#674">674: </a>        <span class="php-quote">'from'</span> =&gt; <span class="php-var">$from</span>,
+</span><span id="675" class="l"><a href="#675">675: </a>        <span class="php-quote">'to'</span> =&gt; <span class="php-var">$to</span>,
+</span><span id="676" class="l"><a href="#676">676: </a>        <span class="php-quote">'subject'</span> =&gt; <span class="php-var">$subject</span>,
+</span><span id="677" class="l"><a href="#677">677: </a>        <span class="php-quote">'date'</span> =&gt; <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>)
+</span><span id="678" class="l"><a href="#678">678: </a>    );
+</span><span id="679" class="l"><a href="#679">679: </a>    <span class="php-var">$body</span> = <span class="php-keyword1">array</span>(
+</span><span id="680" class="l"><a href="#680">680: </a>        <span class="php-num">1</span> =&gt; <span class="php-keyword1">array</span>(
+</span><span id="681" class="l"><a href="#681">681: </a>            <span class="php-quote">'type'</span> =&gt; TYPETEXT,
+</span><span id="682" class="l"><a href="#682">682: </a>            <span class="php-quote">'subtype'</span> =&gt; <span class="php-quote">'plain'</span>,
+</span><span id="683" class="l"><a href="#683">683: </a>            <span class="php-quote">'contents.data'</span> =&gt; <span class="php-var">$body</span>
+</span><span id="684" class="l"><a href="#684">684: </a>        )
+</span><span id="685" class="l"><a href="#685">685: </a>    );
+</span><span id="686" class="l"><a href="#686">686: </a>    <span class="php-keyword1">return</span> <span class="php-keyword2">imap_mail_compose</span>(<span class="php-var">$headers</span>, <span class="php-var">$body</span>);
+</span><span id="687" class="l"><a href="#687">687: </a>}
+</span><span id="688" class="l"><a href="#688">688: </a>
+</span><span id="689" class="l"><a href="#689">689: </a><span class="php-comment">/**
+</span></span><span id="690" class="l"><a href="#690">690: </a><span class="php-comment"> * Check for and do an Oauth2 token reset if needed
+</span></span><span id="691" class="l"><a href="#691">691: </a><span class="php-comment"> * @param array $server imap server data
+</span></span><span id="692" class="l"><a href="#692">692: </a><span class="php-comment"> * @param object $config site config object
+</span></span><span id="693" class="l"><a href="#693">693: </a><span class="php-comment"> * @return mixed
+</span></span><span id="694" class="l"><a href="#694">694: </a><span class="php-comment"> */</span>
+</span><span id="695" class="l"><a href="#695">695: </a><span class="php-keyword1">function</span> smtp_refresh_oauth2_token(<span class="php-var">$server</span>, <span class="php-var">$config</span>) {
+</span><span id="696" class="l"><a href="#696">696: </a>
+</span><span id="697" class="l"><a href="#697">697: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'expiration'</span>, <span class="php-var">$server</span>) &amp;&amp; (int) <span class="php-var">$server</span>[<span class="php-quote">'expiration'</span>] &lt;= <span class="php-keyword2">time</span>()) {
+</span><span id="698" class="l"><a href="#698">698: </a>        <span class="php-var">$oauth2_data</span> = get_oauth2_data(<span class="php-var">$config</span>);
+</span><span id="699" class="l"><a href="#699">699: </a>        <span class="php-var">$details</span> = <span class="php-keyword1">array</span>();
+</span><span id="700" class="l"><a href="#700">700: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$server</span>[<span class="php-quote">'server'</span>] == <span class="php-quote">'smtp.gmail.com'</span>) {
+</span><span id="701" class="l"><a href="#701">701: </a>            <span class="php-var">$details</span> = <span class="php-var">$oauth2_data</span>[<span class="php-quote">'gmail'</span>];
+</span><span id="702" class="l"><a href="#702">702: </a>        }
+</span><span id="703" class="l"><a href="#703">703: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
+</span><span id="704" class="l"><a href="#704">704: </a>            <span class="php-var">$oauth2</span> = <span class="php-keyword1">new</span> Hm_Oauth2(<span class="php-var">$details</span>[<span class="php-quote">'client_id'</span>], <span class="php-var">$details</span>[<span class="php-quote">'client_secret'</span>], <span class="php-var">$details</span>[<span class="php-quote">'client_uri'</span>]);
+</span><span id="705" class="l"><a href="#705">705: </a>            <span class="php-var">$result</span> = <span class="php-var">$oauth2</span>-&gt;refresh_token(<span class="php-var">$details</span>[<span class="php-quote">'refresh_uri'</span>], <span class="php-var">$server</span>[<span class="php-quote">'refresh_token'</span>]);
+</span><span id="706" class="l"><a href="#706">706: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'access_token'</span>, <span class="php-var">$result</span>)) {
+</span><span id="707" class="l"><a href="#707">707: </a>                <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(<span class="php-keyword2">strtotime</span>(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'+%d seconds'</span>, <span class="php-var">$result</span>[<span class="php-quote">'expires_in'</span>])), <span class="php-var">$result</span>[<span class="php-quote">'access_token'</span>]);
+</span><span id="708" class="l"><a href="#708">708: </a>            }
+</span><span id="709" class="l"><a href="#709">709: </a>        }
+</span><span id="710" class="l"><a href="#710">710: </a>    }
+</span><span id="711" class="l"><a href="#711">711: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>();
+</span><span id="712" class="l"><a href="#712">712: </a>}
+</span><span id="713" class="l"><a href="#713">713: </a>
+</span><span id="714" class="l"><a href="#714">714: </a><span class="php-comment">/**
+</span></span><span id="715" class="l"><a href="#715">715: </a><span class="php-comment"> * @subpackage smtp/functions
+</span></span><span id="716" class="l"><a href="#716">716: </a><span class="php-comment"> */</span>
+</span><span id="717" class="l"><a href="#717">717: </a><span class="php-keyword1">function</span> delete_uploaded_files(<span class="php-var">$session</span>) {
+</span><span id="718" class="l"><a href="#718">718: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$session</span>-&gt;get(<span class="php-quote">'uploaded_files'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$file</span>) {
+</span><span id="719" class="l"><a href="#719">719: </a>        @<span class="php-keyword2">unlink</span>(<span class="php-var">$file</span>[<span class="php-quote">'filename'</span>]);
+</span><span id="720" class="l"><a href="#720">720: </a>    }
+</span><span id="721" class="l"><a href="#721">721: </a>    <span class="php-var">$session</span>-&gt;set(<span class="php-quote">'uploaded_files'</span>, <span class="php-keyword1">array</span>());
+</span><span id="722" class="l"><a href="#722">722: </a>}
+</span><span id="723" class="l"><a href="#723">723: </a>
+</span><span id="724" class="l"><a href="#724">724: </a><span class="php-comment">/**
+</span></span><span id="725" class="l"><a href="#725">725: </a><span class="php-comment"> * @subpackage smtp/functions
+</span></span><span id="726" class="l"><a href="#726">726: </a><span class="php-comment"> */</span>
+</span><span id="727" class="l"><a href="#727">727: </a><span class="php-keyword1">function</span> format_attachment_row(<span class="php-var">$file</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="728" class="l"><a href="#728">728: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td&gt;'</span>.
+</span><span id="729" class="l"><a href="#729">729: </a>        <span class="php-quote">'&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$paperclip</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
+</span><span id="730" class="l"><a href="#730">730: </a>        <span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$file</span>[<span class="php-quote">'name'</span>]).
+</span><span id="731" class="l"><a href="#731">731: </a>        <span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$file</span>[<span class="php-quote">'type'</span>]).<span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.
+</span><span id="732" class="l"><a href="#732">732: </a>        <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">round</span>(<span class="php-var">$file</span>[<span class="php-quote">'size'</span>]/<span class="php-num">1024</span>, <span class="php-num">2</span>)).<span class="php-quote">'KB&lt;/td&gt;'</span>.
+</span><span id="733" class="l"><a href="#733">733: </a>        <span class="php-quote">'&lt;td&gt;'</span>.
+</span><span id="734" class="l"><a href="#734">734: </a>        <span class="php-quote">'&lt;a title=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot; href=&quot;#&quot; data-id=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$file</span>[<span class="php-quote">'basename'</span>]).
+</span><span id="735" class="l"><a href="#735">735: </a>        <span class="php-quote">'&quot; class=&quot;delete_attachment&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$circle_x</span>.<span class="php-quote">'&quot; alt=&quot;X&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;'</span>.
+</span><span id="736" class="l"><a href="#736">736: </a>        <span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="737" class="l"><a href="#737">737: </a>        <span class="php-quote">'&lt;/td&gt;'</span>.
+</span><span id="738" class="l"><a href="#738">738: </a>        <span class="php-quote">'&lt;/tr&gt;'</span>;
+</span><span id="739" class="l"><a href="#739">739: </a>}
+</span><span id="740" class="l"><a href="#740">740: </a>
+</span><span id="741" class="l"><a href="#741">741: </a><span class="php-comment">/**
+</span></span><span id="742" class="l"><a href="#742">742: </a><span class="php-comment"> * @subpackage smtp/functions
+</span></span><span id="743" class="l"><a href="#743">743: </a><span class="php-comment"> */</span>
+</span><span id="744" class="l"><a href="#744">744: </a><span class="php-keyword1">function</span> get_primary_recipients(<span class="php-var">$headers</span>, <span class="php-var">$smtp_servers</span>) {
+</span><span id="745" class="l"><a href="#745">745: </a>    <span class="php-var">$recip_headers</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'to'</span>, <span class="php-quote">'cc'</span>, <span class="php-quote">'envelope-to'</span>);
+</span><span id="746" class="l"><a href="#746">746: </a>    <span class="php-var">$lc_headers</span> = <span class="php-keyword1">array</span>();
+</span><span id="747" class="l"><a href="#747">747: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$headers</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span> =&gt; <span class="php-var">$value</span>) {
+</span><span id="748" class="l"><a href="#748">748: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-keyword2">strtolower</span>(<span class="php-var">$name</span>), <span class="php-var">$recip_headers</span>, <span class="php-keyword1">true</span>)) {
+</span><span id="749" class="l"><a href="#749">749: </a>            <span class="php-var">$lc_headers</span>[<span class="php-keyword2">strtolower</span>(<span class="php-var">$name</span>)] = <span class="php-var">$value</span>;
+</span><span id="750" class="l"><a href="#750">750: </a>        }
+</span><span id="751" class="l"><a href="#751">751: </a>    }
+</span><span id="752" class="l"><a href="#752">752: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'envelope-to'</span>, <span class="php-var">$lc_headers</span>)) {
+</span><span id="753" class="l"><a href="#753">753: </a>        <span class="php-keyword1">return</span> <span class="php-var">$lc_headers</span>[<span class="php-quote">'envelope-to'</span>];
+</span><span id="754" class="l"><a href="#754">754: </a>    }
+</span><span id="755" class="l"><a href="#755">755: </a>    <span class="php-var">$users</span> = <span class="php-keyword2">array_map</span>(<span class="php-keyword1">function</span>(<span class="php-var">$a</span>) { <span class="php-keyword1">return</span> <span class="php-var">$a</span>[<span class="php-quote">'user'</span>]; }, <span class="php-var">$smtp_servers</span>);
+</span><span id="756" class="l"><a href="#756">756: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$users</span> <span class="php-keyword1">as</span> <span class="php-var">$user</span>) {
+</span><span id="757" class="l"><a href="#757">757: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$lc_headers</span> <span class="php-keyword1">as</span> <span class="php-var">$header</span>) {
+</span><span id="758" class="l"><a href="#758">758: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$header</span>, <span class="php-var">$user</span>) !== <span class="php-keyword1">false</span>) {
+</span><span id="759" class="l"><a href="#759">759: </a>                <span class="php-keyword1">return</span> <span class="php-var">$user</span>;
+</span><span id="760" class="l"><a href="#760">760: </a>            }
+</span><span id="761" class="l"><a href="#761">761: </a>        }
+</span><span id="762" class="l"><a href="#762">762: </a>    }
+</span><span id="763" class="l"><a href="#763">763: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="764" class="l"><a href="#764">764: </a>}
+</span><span id="765" class="l"><a href="#765">765: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1871,6 +1877,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?78a95e1877310accb1439f48ee173b833eee7892"></script>
+<script src="elementlist.js?84f539132661e2a93871d68e590c179d2ce6602c"></script>
 </body>
 </html>
