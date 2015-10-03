@@ -529,31 +529,10 @@ function wp_get_freshly_pressed($details) {
  * @subpackage wordpress/functions
  */
 function wp_fetch_content($details, $url, $post=array()) {
-    $result = array();
     if (!is_array($details) || empty($details) || !array_key_exists('access_token', $details)) {
-        return $result;
+        return array();
     }
-    $headers = array('Authorization: Bearer ' . $details['access_token']);
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-    if (!empty($post)) {
-        $post_tmp = array();
-        foreach ($post as $name => $value) {
-            $post_tmp[] = urlencode($name).'='.urlencode($value);
-        }
-        $post_str = implode('&', $post_tmp);
-        curl_setopt($ch,CURLOPT_POST, count($post));
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $post_str);
-    }
-
-    $curl_result = curl_exec($ch);
-    if (substr($curl_result, 0, 1) == '{') {
-        $result = @json_decode($curl_result, true);
-    }
-    return $result;
+    $api = new Hm_API_Curl();
+    return $api->command($url, array('Authorization: Bearer ' . $details['access_token']), $post);
 }
-
 
