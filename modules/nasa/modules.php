@@ -1,7 +1,5 @@
 <?php
 
-define('APOD_URL', 'https://api.nasa.gov/planetary/apod?concept_tags=True&api_key=%s');
-
 /**
  * NASA API modules
  * @package modules
@@ -9,6 +7,7 @@ define('APOD_URL', 'https://api.nasa.gov/planetary/apod?concept_tags=True&api_ke
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
+define('APOD_URL', 'https://api.nasa.gov/planetary/apod?concept_tags=True&api_key=%s');
 
 /**
  * @subpackage nasa/handler
