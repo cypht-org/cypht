@@ -66,6 +66,7 @@ class Hm_Mock_Request {
 }
 class Hm_Functions {
         public static $exists = true;
+        public static $exec_res = '{"unit":"test"}';
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
         public static function header($header) { return true; }
         public static function cease() { return true; }
@@ -73,7 +74,7 @@ class Hm_Functions {
         public static function error_log() { return true; }
         public static function c_init() { return true; }
         public static function c_setopt() { return true; }
-        public static function c_exec() { return '{"unit":"test"}'; }
+        public static function c_exec() { return self::$exec_res; }
         public static function function_exists($func) { return self::$exists; }
 }
 
