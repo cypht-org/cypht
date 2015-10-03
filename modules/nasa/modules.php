@@ -83,10 +83,7 @@ class Hm_Output_apod_content extends Hm_Output_Module {
         $data = $this->get('apod_data');
         $date = $this->get('apod_date', date('Y-m-d'));
         $res = '<div class="content_title">'.$this->trans('Astronomy Picture of the Day');
-        $res .= '<form class="apod_date" method="get"><input name="apod_date" class="apod_date_fld" type="date" value="'.$date.'" />';
-        $res .= '<input type="hidden" name="page" value="nasa_apod" />';
-        $res .= '<input type="submit" value="'.$this->trans('Update').'" />';
-        $res .= '</form>';
+        $res .= apod_date_form($date, $this);
         $res .= '</div>';
         if (empty($data) || array_key_exists('error', $data)) {
             $res .= '<div class="apod_error">';
@@ -102,8 +99,11 @@ class Hm_Output_apod_content extends Hm_Output_Module {
             if (array_key_exists('title', $data)) {
                 $res .= '<div class="apod_title">'.$this->html_safe($data['title']).'</div>';
             }
-            if (array_key_exists('url', $data)) {
-                $res .= '<div class="apod_image"><img src="'.$this->html_safe($data['url']).'" /></div>';
+            if (array_key_exists('media_type', $data) && $data['media_type'] == 'image' && array_key_exists('url', $data)) {
+                $res .= '<div class="apod_image"><img alt="'.$this->trans('Picutre of the day').'" src="'.$this->html_safe($data['url']).'" /></div>';
+            }
+            if (array_key_exists('media_type', $data) && $data['media_type'] == 'video' && array_key_exists('url', $data)) {
+                $res .= '<div class="apod_video"><a target="_blank" href="'.$this->html_safe($data['url']).'">YouTube</a></div>';
             }
             if (array_key_exists('explanation', $data)) {
                 $res .= '<div class="apod_desc">'.$this->html_safe($data['explanation']).'</div>';
@@ -152,3 +152,23 @@ class Hm_Output_nasa_folders extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage nasa/functions
+ */
+function apod_date_form($date, $output_mod) {
+    $next = '';
+    if (strtotime(date('Y-m-d')) > strtotime($date)) {
+        $next = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', strtotime('+1 days', strtotime($date))));
+    }
+    $prev = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', strtotime('-1 days', strtotime($date))));
+    $res = '<form class="apod_date" method="get">';
+    $res .= '<a href="'.$prev.'">Previous</a>';
+    $res .= '<input name="apod_date" class="apod_date_fld" type="date" value="'.$date.'" />';
+    $res .= '<input type="hidden" name="page" value="nasa_apod" />';
+    $res .= '<input type="submit" value="'.$output_mod->trans('Update').'" />';
+    if ($next) {
+        $res .= '<a href="'.$next.'">Next</a>';
+    }
+    $res .= '</form>';
+    return $res;
+}
