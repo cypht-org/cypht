@@ -102,7 +102,7 @@ trait Hm_Modules {
             self::$module_list[$page] = array();
         }
         if (array_key_exists($page, self::$module_list) && array_key_exists($module, self::$module_list[$page])) {
-            Hm_Debug::add(sprintf("Already registered module re-attempted: %s", $module));
+            Hm_Debug::add(sprintf("Already registered module for %s re-attempted: %s", $page, $module));
             return;
         }
         if (!$source) {
