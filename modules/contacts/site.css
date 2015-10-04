@@ -1,6 +1,6 @@
 .add_contact_form input { margin: 5px; margin-left: 0px; }
 .add_contact_form { white-space: nowrap; padding-top: 10px; display: block; }
-.contact_list  { margin-left: 10px; margin-right: 10px; margin-top: 20px; width: 50%; }
+.contact_list { margin-left: 35px; margin-right: 10px; margin-top: 20px; width: 50%; }
 .contact_list td { white-space: nowrap; padding-right: 20px; padding-bottom: 5px; vertical-align: -5px; padding-top: 5px; border-bottom: solid 1px #ddd; }
 .gmail_contacts { margin-top: 50px; }
 .contact_list_title { padding-top: 0px !important; padding-bottom: 10px; }
