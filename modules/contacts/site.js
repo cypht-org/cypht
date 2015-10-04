@@ -127,6 +127,7 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
     $(list_div).html('');
     $(list_div).hide();
     $(class_name).val(existing+new_address);
+    $(class_name).focus();
     return false;
 };
 
