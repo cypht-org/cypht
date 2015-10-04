@@ -81,13 +81,8 @@ add_output('search', 'search_results_table_end', true, 'core', 'message_list_sta
 add_output('search', 'search_content_end', true, 'core', 'search_results_table_end', 'after');
 
 /* reset search form */
-add_handler('ajax_reset_search', 'login', false);
-add_handler('ajax_reset_search', 'load_user_data', true);
-add_handler('ajax_reset_search', 'reset_search', true);
-add_handler('ajax_reset_search', 'language',  true);
-add_handler('ajax_reset_search', 'date', true);
-add_handler('ajax_reset_search', 'http_headers', true);
-
+setup_base_ajax_page('ajax_reset_search', 'core');
+add_handler('ajax_reset_search', 'reset_search', true, 'core', 'load_user_data', 'after');
 
 /* message view page */
 setup_base_page('message');
@@ -99,18 +94,10 @@ setup_base_page('notfound');
 add_output('notfound', 'notfound_content', true, 'core', 'content_section_start', 'after');
 
 /* message action ajax request */
-add_handler('ajax_message_action', 'login', false);
-add_handler('ajax_message_action', 'load_user_data', true);
-add_handler('ajax_message_action', 'language',  true);
-add_handler('ajax_message_action', 'date', true);
-add_handler('ajax_message_action', 'http_headers', true);
+setup_base_ajax_page('ajax_message_action', 'core');
 
 /* folder list update ajax request */
-add_handler('ajax_hm_folders', 'login', false);
-add_handler('ajax_hm_folders', 'load_user_data', true);
-add_handler('ajax_hm_folders', 'language',  true);
-add_handler('ajax_hm_folders', 'date', true);
-add_handler('ajax_hm_folders', 'http_headers', true);
+setup_base_ajax_page('ajax_hm_folders', 'core');
 add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
 add_output('ajax_hm_folders', 'search_from_folder_list', true);
