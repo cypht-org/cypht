@@ -61,6 +61,7 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('contact_id', $this->request->get)) {
             $contacts = new Hm_Contact_Store($this->user_config);
+            $contacts = fetch_gmail_contacts($this->config, $contacts);
             $contact = $contacts->get($this->request->get['contact_id']);
             if ($contact) {
                 $to = sprintf('"%s" <%s>', $contact->value('display_name'), $contact->value('email_address'));
@@ -96,7 +97,6 @@ class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
         if (strpos($this->config->get('modules', ''), 'imap') !== false) {
             $updated = false;
             $contact_store = new Hm_Contact_Store($this->user_config);
-            $contact_store->reset();
             $contact_store = fetch_gmail_contacts($this->config, $contact_store);
         }
         if (!empty($contact_store->dump())) {
@@ -252,12 +252,18 @@ class Hm_Output_gmail_contacts_list extends Hm_Output_Module {
             $res .= '<table class="gmail_contacts contact_list">';
             $res .= '<tr><td colspan="5" class="contact_list_title"><div class="server_title">'.$this->trans('Gmail Contacts').'</div></td></tr>';
                 foreach ($contacts->page(1, 20) as $id => $contact) {
+                    if (!$contact->value('source')) {
+                        continue;
+                    }
                     $res .= '<tr class="contact_row_'.$this->html_safe($id).'">'.
                         '<td>'.$this->html_safe($contact->value('source')).'</td>'.
                         '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
                         '<td>'.$this->html_safe($contact->value('email_address')).'</td>'.
                         '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
-                        '<td class="contact_controls"></td>'.
+                        '<td class="contact_controls"><a href="?page=compose&amp;contact_id='.$this->html_safe($id).
+                        '" class="send_to_contact" title="Send to"><img alt="'.$this->trans('Send To').
+                        '" width="16" height="16" src="'.Hm_Image_Sources::$doc.'" /></a>'.
+                        '</td>'.
                         '</tr>';
             }
             $res .= '</table>';
@@ -410,6 +416,7 @@ function fetch_gmail_contacts($config, $contact_store) {
             }
         }
     }
+    elog($contact_store->dump());
     return $contact_store;
 }
 
