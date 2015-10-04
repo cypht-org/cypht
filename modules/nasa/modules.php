@@ -161,12 +161,12 @@ function apod_date_form($date, $output_mod) {
     }
     $prev = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', strtotime('-1 days', strtotime($date))));
     $res = '<form class="apod_date" method="get">';
-    $res .= '<a href="'.$prev.'">Previous</a>';
+    $res .= '<a href="'.$prev.'">'.$output_mod->trans('Previous').'</a>';
     $res .= '<input name="apod_date" class="apod_date_fld" type="date" value="'.$date.'" />';
     $res .= '<input type="hidden" name="page" value="nasa_apod" />';
     $res .= '<input type="submit" value="'.$output_mod->trans('Update').'" />';
     if ($next) {
-        $res .= '<a href="'.$next.'">Next</a>';
+        $res .= '<a href="'.$next.'">'.$output_mod->trans('Next').'</a>';
     }
     $res .= '</form>';
     return $res;
