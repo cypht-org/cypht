@@ -138,6 +138,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .msg_text_inner p { padding: 5px; }
 .save_reminder { clear: both; float: right; margin-right: 25px; }
 .save_reminder img { opacity: .4; }
+.reply_quote { color: #999; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }

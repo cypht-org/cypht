@@ -62,7 +62,8 @@ function format_msg_text($str, $output_mod, $links=true) {
         $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,\[\]%[:alnum:]])+)/m";
         $str = preg_replace($link_regex, "<a target=\"_blank\" href=\"$1\">$1</a>", $str);
     }
-    return str_replace('<wbr>', '&#160;<wbr>', $str);
+    $str = str_replace('<wbr>', '&#160;<wbr>', $str);
+    return preg_replace("/^(&gt;.*<br \/>)/m", "<span class=\"reply_quote\">$1</span>", $str);
 }
 
 /**
