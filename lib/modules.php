@@ -15,6 +15,12 @@
  */
 trait Hm_Modules {
 
+    /* number of allowed queued module retries */
+    private static $queue_limit = 2;
+
+    /* number of queue processing attempts */
+    private static $queue_attempts = 0;
+
     /* holds the module to page assignment list */
     private static $module_list = array();
 
@@ -94,7 +100,7 @@ trait Hm_Modules {
      * @param string $placement "before" or "after" the $marker module
      * @param bool $queue true to attempt to re-insert the module later on failure
      * @param string $source the module set containing this module
-     * @return void
+     * @return bool true if the module was added or was already registered
      */
     public static function add($page, $module, $logged_in, $marker=false, $placement='after', $queue=true, $source=false) {
         $inserted = false;
@@ -103,7 +109,7 @@ trait Hm_Modules {
         }
         if (array_key_exists($page, self::$module_list) && array_key_exists($module, self::$module_list[$page])) {
             Hm_Debug::add(sprintf("Already registered module for %s re-attempted: %s", $page, $module));
-            return;
+            return true;
         }
         if (!$source) {
             $source = self::$source;
@@ -123,6 +129,7 @@ trait Hm_Modules {
                 Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
             }
         }
+        return $inserted;
     }
 
     /**
@@ -200,9 +207,18 @@ trait Hm_Modules {
      * @return void
      */
     public static function try_queued_modules() {
-        foreach (self::$module_queue as $vals) {
-            self::add($vals[0], $vals[1], $vals[2], $vals[3], $vals[4], false, $vals[5]);
+        $requeue = true;
+        $new_queue = array();
+        if (self::$queue_attempts >= self::$queue_limit) {
+            $requeue = false;
         }
+        foreach (self::$module_queue as $vals) {
+            if (!self::add($vals[0], $vals[1], $vals[2], $vals[3], $vals[4], $requeue, $vals[5])) {
+                $new_queue[] = $vals;
+            }
+        }
+        self::$module_queue = $new_queue;
+        self::$queue_attempts++;
     }
 
     /**
