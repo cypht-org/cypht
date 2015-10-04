@@ -61,7 +61,8 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
     protected function output() {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
-            return '<div class="save_reminder"><a title="You have unsaved changes." href="?page=save"><img alt="'.$this->trans('Save').'" src="'.Hm_Image_Sources::$save.'" width="20" height="20" /></a></div>';
+            return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
+                '" href="?page=save"><img alt="'.$this->trans('Save').'" src="'.Hm_Image_Sources::$save.'" width="20" height="20" /></a></div>';
         }
         return '';
     }

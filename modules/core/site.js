@@ -785,6 +785,7 @@ var Hm_Folders = {
             Hm_Utils.toggle_section(Hm_Folders.expand_after_update);
         }
         Hm_Folders.expand_after_update = false;
+        hl_save_link();
     },
     update_folder_list: function() {
         Hm_Ajax.request(
@@ -1119,6 +1120,14 @@ var elog = function(val) {
         console.log(val);
     }
 };
+var hl_save_link = function() {
+    if ($('.save_reminder').length) {
+        $('.menu_save a').css('font-weight', 'bold');
+    }
+    else {
+        $('.menu_save a').css('font-weight', 'normal');
+    }
+};
 
 /* executes before onload, but after the DOM (just before the closing body tag) */
 
@@ -1162,9 +1171,7 @@ $(function() {
             Hm_Folders.save_folder_list();
         }
     }
-    if ($('.save_reminder').length) {
-        $('.menu_save a').css('font-weight', 'bold');
-    }
+    hl_save_link();
     if (hm_page_name() == 'search') {
         $('.search_reset').click(Hm_Utils.reset_search_form);
     }
