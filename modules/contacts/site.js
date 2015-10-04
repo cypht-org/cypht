@@ -134,6 +134,9 @@ if (hm_page_name() == 'contacts') {
     $('.delete_contact').click(function() {
         delete_contact($(this).data('id'));
     });
+    $('.reset_contact').click(function() {
+        window.location.href = '?page=contacts';
+    });
 }
 else if (hm_page_name() == 'compose') {
     $('.compose_to').keyup(function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });

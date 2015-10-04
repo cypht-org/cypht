@@ -116,7 +116,7 @@ class Hm_Contact_Store {
 
     public function sort($fld) {
         $this->sort_fld = $fld;
-        usort($this->contacts, array($this, 'sort_callback'));
+        uasort($this->contacts, array($this, 'sort_callback'));
     }
 
     public function sort_callback($a, $b) {
