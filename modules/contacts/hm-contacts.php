@@ -39,11 +39,16 @@ class Hm_Contact_Store {
 
     public function search($flds) {
         $res = array();
+        $found = array();
         foreach ($flds as $fld => $term) {
             foreach ($this->contacts as $id => $contact) {
+                if (array_key_exists($contact->value('email_address'), $found)) {
+                    continue;
+                }
                 if ($this->search_contact($contact, $fld, $term)) {
                     $res[$id] = $contact;
                 }
+                $found[$contact->value('email_address')] = 1;
             }
         }
         return $res;
