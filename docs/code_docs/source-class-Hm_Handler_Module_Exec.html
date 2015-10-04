@@ -998,6 +998,7 @@
 				<li><a href="function-display_value.html">display_value</a></li>
 				<li><a href="function-elog.html">elog</a></li>
 				<li><a href="function-email_is_active.html">email_is_active</a></li>
+				<li><a href="function-fetch_gmail_contacts.html">fetch_gmail_contacts</a></li>
 				<li><a href="function-filter_auth_servers.html">filter_auth_servers</a></li>
 				<li><a href="function-format_attachment_row.html">format_attachment_row</a></li>
 				<li><a href="function-format_data_sources.html">format_data_sources</a></li>
@@ -1433,42 +1434,43 @@
 </span><span id="296" class="l"><a href="#296">296: </a>        }
 </span><span id="297" class="l"><a href="#297">297: </a>        <span class="php-var">$class</span>::try_queued_modules();
 </span><span id="298" class="l"><a href="#298">298: </a>        <span class="php-var">$class</span>::process_all_page_queue();
-</span><span id="299" class="l"><a href="#299">299: </a>    }
-</span><span id="300" class="l"><a href="#300">300: </a>
-</span><span id="301" class="l"><a href="#301">301: </a>    <span class="php-comment">/**
-</span></span><span id="302" class="l"><a href="#302">302: </a><span class="php-comment">     * Load all module sets and include required modules.php files
-</span></span><span id="303" class="l"><a href="#303">303: </a><span class="php-comment">     * @param string $page page id
-</span></span><span id="304" class="l"><a href="#304">304: </a><span class="php-comment">     * @return void
-</span></span><span id="305" class="l"><a href="#305">305: </a><span class="php-comment">     */</span>
-</span><span id="306" class="l"><a href="#306">306: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> load_module_sets(<span class="php-var">$page</span>) {
-</span><span id="307" class="l"><a href="#307">307: </a>
-</span><span id="308" class="l"><a href="#308">308: </a>        <span class="php-var">$this</span>-&gt;load_modules(<span class="php-quote">'Hm_Handler_Modules'</span>, <span class="php-var">$this</span>-&gt;handlers, <span class="php-var">$page</span>);
-</span><span id="309" class="l"><a href="#309">309: </a>        <span class="php-var">$this</span>-&gt;load_modules(<span class="php-quote">'Hm_Output_Modules'</span>, <span class="php-var">$this</span>-&gt;outputs, <span class="php-var">$page</span>);
-</span><span id="310" class="l"><a href="#310">310: </a>        <span class="php-var">$active_mods</span> = <span class="php-keyword2">array_unique</span>(<span class="php-keyword2">array_merge</span>(<span class="php-var">$this</span>-&gt;get_active_mods(Hm_Output_Modules::get_for_page(<span class="php-var">$page</span>)),
-</span><span id="311" class="l"><a href="#311">311: </a>            <span class="php-var">$this</span>-&gt;get_active_mods(Hm_Handler_Modules::get_for_page(<span class="php-var">$page</span>))));
-</span><span id="312" class="l"><a href="#312">312: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword2">count</span>(<span class="php-var">$active_mods</span>)) {
-</span><span id="313" class="l"><a href="#313">313: </a>            Hm_Functions::cease(<span class="php-quote">'No module assignments found'</span>);
-</span><span id="314" class="l"><a href="#314">314: </a>        }
-</span><span id="315" class="l"><a href="#315">315: </a>        <span class="php-var">$mods</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">','</span>, <span class="php-var">$this</span>-&gt;site_config-&gt;get(<span class="php-quote">'modules'</span>, <span class="php-quote">''</span>)); 
-</span><span id="316" class="l"><a href="#316">316: </a>        <span class="php-var">$this</span>-&gt;load_module_set_files(<span class="php-var">$mods</span>, <span class="php-var">$active_mods</span>);
-</span><span id="317" class="l"><a href="#317">317: </a>    }
-</span><span id="318" class="l"><a href="#318">318: </a>
-</span><span id="319" class="l"><a href="#319">319: </a>    <span class="php-comment">/**
-</span></span><span id="320" class="l"><a href="#320">320: </a><span class="php-comment">     * Load module set definition files
-</span></span><span id="321" class="l"><a href="#321">321: </a><span class="php-comment">     * @param array $mods modules to load
-</span></span><span id="322" class="l"><a href="#322">322: </a><span class="php-comment">     * @param array $active_mods list of active modules
-</span></span><span id="323" class="l"><a href="#323">323: </a><span class="php-comment">     * @return void
-</span></span><span id="324" class="l"><a href="#324">324: </a><span class="php-comment">     */</span>
-</span><span id="325" class="l"><a href="#325">325: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> load_module_set_files(<span class="php-var">$mods</span>, <span class="php-var">$active_mods</span>) {
-</span><span id="326" class="l"><a href="#326">326: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$mods</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span>) {
-</span><span id="327" class="l"><a href="#327">327: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-var">$name</span>, <span class="php-var">$active_mods</span>, <span class="php-keyword1">true</span>) &amp;&amp; <span class="php-keyword2">is_readable</span>(<span class="php-keyword2">sprintf</span>(APP_PATH.<span class="php-quote">'modules/%s/modules.php'</span>, <span class="php-var">$name</span>))) {
-</span><span id="328" class="l"><a href="#328">328: </a>                <span class="php-keyword1">require</span> <span class="php-keyword2">sprintf</span>(APP_PATH.<span class="php-quote">'modules/%s/modules.php'</span>, <span class="php-var">$name</span>);
-</span><span id="329" class="l"><a href="#329">329: </a>            }
-</span><span id="330" class="l"><a href="#330">330: </a>        }
-</span><span id="331" class="l"><a href="#331">331: </a>    }
-</span><span id="332" class="l"><a href="#332">332: </a>}
-</span><span id="333" class="l"><a href="#333">333: </a>
-</span><span id="334" class="l"><a href="#334">334: </a></span></code></pre>
+</span><span id="299" class="l"><a href="#299">299: </a>        <span class="php-var">$class</span>::try_queued_modules();
+</span><span id="300" class="l"><a href="#300">300: </a>    }
+</span><span id="301" class="l"><a href="#301">301: </a>
+</span><span id="302" class="l"><a href="#302">302: </a>    <span class="php-comment">/**
+</span></span><span id="303" class="l"><a href="#303">303: </a><span class="php-comment">     * Load all module sets and include required modules.php files
+</span></span><span id="304" class="l"><a href="#304">304: </a><span class="php-comment">     * @param string $page page id
+</span></span><span id="305" class="l"><a href="#305">305: </a><span class="php-comment">     * @return void
+</span></span><span id="306" class="l"><a href="#306">306: </a><span class="php-comment">     */</span>
+</span><span id="307" class="l"><a href="#307">307: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> load_module_sets(<span class="php-var">$page</span>) {
+</span><span id="308" class="l"><a href="#308">308: </a>
+</span><span id="309" class="l"><a href="#309">309: </a>        <span class="php-var">$this</span>-&gt;load_modules(<span class="php-quote">'Hm_Handler_Modules'</span>, <span class="php-var">$this</span>-&gt;handlers, <span class="php-var">$page</span>);
+</span><span id="310" class="l"><a href="#310">310: </a>        <span class="php-var">$this</span>-&gt;load_modules(<span class="php-quote">'Hm_Output_Modules'</span>, <span class="php-var">$this</span>-&gt;outputs, <span class="php-var">$page</span>);
+</span><span id="311" class="l"><a href="#311">311: </a>        <span class="php-var">$active_mods</span> = <span class="php-keyword2">array_unique</span>(<span class="php-keyword2">array_merge</span>(<span class="php-var">$this</span>-&gt;get_active_mods(Hm_Output_Modules::get_for_page(<span class="php-var">$page</span>)),
+</span><span id="312" class="l"><a href="#312">312: </a>            <span class="php-var">$this</span>-&gt;get_active_mods(Hm_Handler_Modules::get_for_page(<span class="php-var">$page</span>))));
+</span><span id="313" class="l"><a href="#313">313: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword2">count</span>(<span class="php-var">$active_mods</span>)) {
+</span><span id="314" class="l"><a href="#314">314: </a>            Hm_Functions::cease(<span class="php-quote">'No module assignments found'</span>);
+</span><span id="315" class="l"><a href="#315">315: </a>        }
+</span><span id="316" class="l"><a href="#316">316: </a>        <span class="php-var">$mods</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">','</span>, <span class="php-var">$this</span>-&gt;site_config-&gt;get(<span class="php-quote">'modules'</span>, <span class="php-quote">''</span>)); 
+</span><span id="317" class="l"><a href="#317">317: </a>        <span class="php-var">$this</span>-&gt;load_module_set_files(<span class="php-var">$mods</span>, <span class="php-var">$active_mods</span>);
+</span><span id="318" class="l"><a href="#318">318: </a>    }
+</span><span id="319" class="l"><a href="#319">319: </a>
+</span><span id="320" class="l"><a href="#320">320: </a>    <span class="php-comment">/**
+</span></span><span id="321" class="l"><a href="#321">321: </a><span class="php-comment">     * Load module set definition files
+</span></span><span id="322" class="l"><a href="#322">322: </a><span class="php-comment">     * @param array $mods modules to load
+</span></span><span id="323" class="l"><a href="#323">323: </a><span class="php-comment">     * @param array $active_mods list of active modules
+</span></span><span id="324" class="l"><a href="#324">324: </a><span class="php-comment">     * @return void
+</span></span><span id="325" class="l"><a href="#325">325: </a><span class="php-comment">     */</span>
+</span><span id="326" class="l"><a href="#326">326: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> load_module_set_files(<span class="php-var">$mods</span>, <span class="php-var">$active_mods</span>) {
+</span><span id="327" class="l"><a href="#327">327: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$mods</span> <span class="php-keyword1">as</span> <span class="php-var">$name</span>) {
+</span><span id="328" class="l"><a href="#328">328: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-var">$name</span>, <span class="php-var">$active_mods</span>, <span class="php-keyword1">true</span>) &amp;&amp; <span class="php-keyword2">is_readable</span>(<span class="php-keyword2">sprintf</span>(APP_PATH.<span class="php-quote">'modules/%s/modules.php'</span>, <span class="php-var">$name</span>))) {
+</span><span id="329" class="l"><a href="#329">329: </a>                <span class="php-keyword1">require</span> <span class="php-keyword2">sprintf</span>(APP_PATH.<span class="php-quote">'modules/%s/modules.php'</span>, <span class="php-var">$name</span>);
+</span><span id="330" class="l"><a href="#330">330: </a>            }
+</span><span id="331" class="l"><a href="#331">331: </a>        }
+</span><span id="332" class="l"><a href="#332">332: </a>    }
+</span><span id="333" class="l"><a href="#333">333: </a>}
+</span><span id="334" class="l"><a href="#334">334: </a>
+</span><span id="335" class="l"><a href="#335">335: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1476,6 +1478,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?5348eff020f38daca30088d7b3903c4f51e6bd5c"></script>
+<script src="elementlist.js?7f80dbdda44f63bf3f4fd3dd5af1c88cf6268a3a"></script>
 </body>
 </html>

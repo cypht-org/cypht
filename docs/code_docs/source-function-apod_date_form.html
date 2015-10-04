@@ -998,6 +998,7 @@
 				<li><a href="function-display_value.html">display_value</a></li>
 				<li><a href="function-elog.html">elog</a></li>
 				<li><a href="function-email_is_active.html">email_is_active</a></li>
+				<li><a href="function-fetch_gmail_contacts.html">fetch_gmail_contacts</a></li>
 				<li><a href="function-filter_auth_servers.html">filter_auth_servers</a></li>
 				<li><a href="function-format_attachment_row.html">format_attachment_row</a></li>
 				<li><a href="function-format_data_sources.html">format_data_sources</a></li>
@@ -1298,12 +1299,12 @@
 </span><span id="161" class="l"><a href="#161">161: </a>    }
 </span><span id="162" class="l"><a href="#162">162: </a>    <span class="php-var">$prev</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'?page=nasa_apod&amp;amp;apod_date=%s'</span>, <span class="php-keyword2">date</span>(<span class="php-quote">'Y-m-d'</span>, <span class="php-keyword2">strtotime</span>(<span class="php-quote">'-1 days'</span>, <span class="php-keyword2">strtotime</span>(<span class="php-var">$date</span>))));
 </span><span id="163" class="l"><a href="#163">163: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;form class=&quot;apod_date&quot; method=&quot;get&quot;&gt;'</span>;
-</span><span id="164" class="l"><a href="#164">164: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;'</span>.<span class="php-var">$prev</span>.<span class="php-quote">'&quot;&gt;Previous&lt;/a&gt;'</span>;
+</span><span id="164" class="l"><a href="#164">164: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;'</span>.<span class="php-var">$prev</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Previous'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
 </span><span id="165" class="l"><a href="#165">165: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input name=&quot;apod_date&quot; class=&quot;apod_date_fld&quot; type=&quot;date&quot; value=&quot;'</span>.<span class="php-var">$date</span>.<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="166" class="l"><a href="#166">166: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;page&quot; value=&quot;nasa_apod&quot; /&gt;'</span>;
 </span><span id="167" class="l"><a href="#167">167: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Update'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="168" class="l"><a href="#168">168: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$next</span>) {
-</span><span id="169" class="l"><a href="#169">169: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;'</span>.<span class="php-var">$next</span>.<span class="php-quote">'&quot;&gt;Next&lt;/a&gt;'</span>;
+</span><span id="169" class="l"><a href="#169">169: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;'</span>.<span class="php-var">$next</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Next'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
 </span><span id="170" class="l"><a href="#170">170: </a>    }
 </span><span id="171" class="l"><a href="#171">171: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/form&gt;'</span>;
 </span><span id="172" class="l"><a href="#172">172: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
@@ -1316,6 +1317,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?5348eff020f38daca30088d7b3903c4f51e6bd5c"></script>
+<script src="elementlist.js?7f80dbdda44f63bf3f4fd3dd5af1c88cf6268a3a"></script>
 </body>
 </html>

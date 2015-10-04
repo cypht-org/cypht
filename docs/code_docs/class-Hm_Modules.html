@@ -661,7 +661,7 @@ and produce output to the browser.</p>
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.modules.html">modules</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Modules.html#9-240" title="Go to source code">modules.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Modules.html#9-256" title="Go to source code">modules.php</a>
 		<br>
 	</div>
 
@@ -681,7 +681,7 @@ and produce output to the browser.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_queue_module_for_all_pages">#</a>
-		<code><a href="source-class-Hm_Modules.html#30-41" title="Go to source code">queue_module_for_all_pages</a>( <span>string <var>$module</var></span>, <span>boolean <var>$logged_in</var></span>, <span>string <var>$marker</var></span>, <span>string <var>$placement</var></span>, <span>string <var>$source</var></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#36-47" title="Go to source code">queue_module_for_all_pages</a>( <span>string <var>$module</var></span>, <span>boolean <var>$logged_in</var></span>, <span>string <var>$marker</var></span>, <span>string <var>$placement</var></span>, <span>string <var>$source</var></span> )</code>
 
 		<div class="description short">
 			<p>Queue a module to be added to all defined pages</p>
@@ -725,7 +725,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_process_all_page_queue">#</a>
-		<code><a href="source-class-Hm_Modules.html#43-51" title="Go to source code">process_all_page_queue</a>( )</code>
+		<code><a href="source-class-Hm_Modules.html#49-57" title="Go to source code">process_all_page_queue</a>( )</code>
 
 		<div class="description short">
 			<p>Process queued modules and add them to all pages</p>
@@ -755,7 +755,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_load">#</a>
-		<code><a href="source-class-Hm_Modules.html#53-60" title="Go to source code">load</a>( <span>array <var>$mod_list</var></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#59-66" title="Go to source code">load</a>( <span>array <var>$mod_list</var></span> )</code>
 
 		<div class="description short">
 			<p>Load a complete formatted module list</p>
@@ -790,7 +790,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_set_source">#</a>
-		<code><a href="source-class-Hm_Modules.html#62-69" title="Go to source code">set_source</a>( <span>string <var>$source</var></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#68-75" title="Go to source code">set_source</a>( <span>string <var>$source</var></span> )</code>
 
 		<div class="description short">
 			<p>Assign the module set name</p>
@@ -825,7 +825,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_add_to_all_pages">#</a>
-		<code><a href="source-class-Hm_Modules.html#71-86" title="Go to source code">add_to_all_pages</a>( <span>string <var>$module</var></span>, <span>boolean <var>$logged_in</var></span>, <span>string <var>$marker</var></span>, <span>string <var>$placement</var></span>, <span>string <var>$source</var></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#77-92" title="Go to source code">add_to_all_pages</a>( <span>string <var>$module</var></span>, <span>boolean <var>$logged_in</var></span>, <span>string <var>$marker</var></span>, <span>string <var>$placement</var></span>, <span>string <var>$source</var></span> )</code>
 
 		<div class="description short">
 			<p>Add a module to every defined page</p>
@@ -861,14 +861,14 @@ return void</p></dd>
 		<td class="attributes"><code>
 			 public static
 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_add">#</a>
-		<code><a href="source-class-Hm_Modules.html#88-126" title="Go to source code">add</a>( <span>string <var>$page</var></span>, <span>string <var>$module</var></span>, <span>boolean <var>$logged_in</var></span>, <span>string <var>$marker</var> = <span class="php-keyword1">false</span></span>, <span>string <var>$placement</var> = <span class="php-quote">'after'</span></span>, <span>boolean <var>$queue</var> = <span class="php-keyword1">true</span></span>, <span>string <var>$source</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#94-133" title="Go to source code">add</a>( <span>string <var>$page</var></span>, <span>string <var>$module</var></span>, <span>boolean <var>$logged_in</var></span>, <span>string <var>$marker</var> = <span class="php-keyword1">false</span></span>, <span>string <var>$placement</var> = <span class="php-quote">'after'</span></span>, <span>boolean <var>$queue</var> = <span class="php-keyword1">true</span></span>, <span>string <var>$source</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>Add a module to a single page</p>
@@ -896,6 +896,10 @@ return void</p></dd>
 					<dd>the module set containing this module</dd>
 				</dl></div>
 
+				<h4>Returns</h4>
+				<div class="list">
+					boolean<br>true if the module was added or was already registered
+				</div>
 
 
 
@@ -915,7 +919,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_insert_at_marker">#</a>
-		<code><a href="source-class-Hm_Modules.html#128-153" title="Go to source code">insert_at_marker</a>( <span>string <var>$marker</var></span>, <span>string <var>$page</var></span>, <span>string <var>$module</var></span>, <span>boolean <var>$logged_in</var></span>, <span>string <var>$placement</var></span>, <span>string <var>$source</var></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#135-160" title="Go to source code">insert_at_marker</a>( <span>string <var>$marker</var></span>, <span>string <var>$page</var></span>, <span>string <var>$module</var></span>, <span>boolean <var>$logged_in</var></span>, <span>string <var>$placement</var></span>, <span>string <var>$source</var></span> )</code>
 
 		<div class="description short">
 			<p>Insert a module before or after another one</p>
@@ -960,7 +964,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_replace">#</a>
-		<code><a href="source-class-Hm_Modules.html#155-175" title="Go to source code">replace</a>( <span>string <var>$target</var></span>, <span>string <var>$replacement</var></span>, <span>string <var>$page</var> = <span class="php-keyword1">false</span></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#162-182" title="Go to source code">replace</a>( <span>string <var>$target</var></span>, <span>string <var>$replacement</var></span>, <span>string <var>$page</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			<p>Replace an already assigned module with a different one</p>
@@ -999,7 +1003,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_swap_key">#</a>
-		<code><a href="source-class-Hm_Modules.html#177-196" title="Go to source code">swap_key</a>( <span>string <var>$target</var></span>, <span>string <var>$replacement</var></span>, <span>array <var>$modules</var></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#184-203" title="Go to source code">swap_key</a>( <span>string <var>$target</var></span>, <span>string <var>$replacement</var></span>, <span>array <var>$modules</var></span> )</code>
 
 		<div class="description short">
 			<p>Helper function to swap the key of an array and maintain it's value</p>
@@ -1042,7 +1046,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_try_queued_modules">#</a>
-		<code><a href="source-class-Hm_Modules.html#198-206" title="Go to source code">try_queued_modules</a>( )</code>
+		<code><a href="source-class-Hm_Modules.html#205-222" title="Go to source code">try_queued_modules</a>( )</code>
 
 		<div class="description short">
 			<p>Attempt to insert modules that initially failed</p>
@@ -1072,7 +1076,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_del">#</a>
-		<code><a href="source-class-Hm_Modules.html#208-218" title="Go to source code">del</a>( <span>string <var>$page</var></span>, <span>string <var>$module</var></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#224-234" title="Go to source code">del</a>( <span>string <var>$page</var></span>, <span>string <var>$module</var></span> )</code>
 
 		<div class="description short">
 			<p>Delete a module from the internal list</p>
@@ -1109,7 +1113,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_get_for_page">#</a>
-		<code><a href="source-class-Hm_Modules.html#220-231" title="Go to source code">get_for_page</a>( <span>string <var>$page</var></span> )</code>
+		<code><a href="source-class-Hm_Modules.html#236-247" title="Go to source code">get_for_page</a>( <span>string <var>$page</var></span> )</code>
 
 		<div class="description short">
 			<p>Return all the modules assigned to a given page</p>
@@ -1148,7 +1152,7 @@ return void</p></dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_dump">#</a>
-		<code><a href="source-class-Hm_Modules.html#233-239" title="Go to source code">dump</a>( )</code>
+		<code><a href="source-class-Hm_Modules.html#249-255" title="Go to source code">dump</a>( )</code>
 
 		<div class="description short">
 			<p>Return all modules for all pages</p>
@@ -1185,6 +1189,56 @@ return void</p></dd>
 
 	<table class="summary properties" id="properties">
 	<caption>Properties summary</caption>
+	<tr data-order="queue_limit" id="$queue_limit">
+		<td class="attributes"><code>
+			private static 
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Modules.html#19" title="Go to source code"><var>$queue_limit</var></a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#$queue_limit" class="anchor">#</a>
+				<code><span class="php-num">2</span></code>
+			</div>
+		</td>
+	</tr>
+	<tr data-order="queue_attempts" id="$queue_attempts">
+		<td class="attributes"><code>
+			private static 
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Modules.html#22" title="Go to source code"><var>$queue_attempts</var></a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#$queue_attempts" class="anchor">#</a>
+				<code><span class="php-num">0</span></code>
+			</div>
+		</td>
+	</tr>
 	<tr data-order="module_list" id="$module_list">
 		<td class="attributes"><code>
 			private static 
@@ -1192,7 +1246,7 @@ return void</p></dd>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Modules.html#19" title="Go to source code"><var>$module_list</var></a>
+				<a href="source-class-Hm_Modules.html#25" title="Go to source code"><var>$module_list</var></a>
 
 			<div class="description short">
 				
@@ -1217,7 +1271,7 @@ return void</p></dd>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Modules.html#22" title="Go to source code"><var>$source</var></a>
+				<a href="source-class-Hm_Modules.html#28" title="Go to source code"><var>$source</var></a>
 
 			<div class="description short">
 				
@@ -1242,7 +1296,7 @@ return void</p></dd>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Modules.html#25" title="Go to source code"><var>$module_queue</var></a>
+				<a href="source-class-Hm_Modules.html#31" title="Go to source code"><var>$module_queue</var></a>
 
 			<div class="description short">
 				
@@ -1267,7 +1321,7 @@ return void</p></dd>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Modules.html#28" title="Go to source code"><var>$all_page_queue</var></a>
+				<a href="source-class-Hm_Modules.html#34" title="Go to source code"><var>$all_page_queue</var></a>
 
 			<div class="description short">
 				
