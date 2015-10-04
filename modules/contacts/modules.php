@@ -20,6 +20,7 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
         if ($success) {
             $val = trim($form['contact_value']);
             $contacts = new Hm_Contact_Store($this->user_config);
+            $contacts = fetch_gmail_contacts($this->config, $contacts);
             $contacts->sort('email_address');
             $results = array_slice($contacts->search(array(
                 'display_name' => $val,
@@ -96,23 +97,7 @@ class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
             $updated = false;
             $contact_store = new Hm_Contact_Store($this->user_config);
             $contact_store->reset();
-            foreach(Hm_IMAP_List::dump(false, true) as $id => $server) {
-                if ($server['server'] == 'imap.gmail.com' && array_key_exists('auth', $server) && $server['auth'] == 'xoauth2') {
-                    $results = imap_refresh_oauth2_token($server, $this->config);
-                    if (!empty($results)) {
-                        if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
-                            Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $server_id));
-                            $updated++;
-                            $server = Hm_IMAP_List::dump($id);
-                        }
-                    }
-                    $url = 'https://www.google.com/m8/feeds/contacts/'.$server['user'].'/full';
-                    $contacts = parse_contact_xml(gmail_contacts_request($server['pass'], $url), $server['name']);
-                    if (!empty($contacts)) {
-                        $contact_store->import($contacts);
-                    }
-                }
-            }
+            $contact_store = fetch_gmail_contacts($this->config, $contact_store);
         }
         if (!empty($contact_store->dump())) {
             $this->out('gmail_contacts', $contact_store);
@@ -403,3 +388,28 @@ function parse_contact_xml($xml, $source) {
     }
     return $results;
 }
+
+/**
+ * @subpackage contacts/functions
+ */
+function fetch_gmail_contacts($config, $contact_store) {
+    foreach(Hm_IMAP_List::dump(false, true) as $id => $server) {
+        if ($server['server'] == 'imap.gmail.com' && array_key_exists('auth', $server) && $server['auth'] == 'xoauth2') {
+            $results = imap_refresh_oauth2_token($server, $config);
+            if (!empty($results)) {
+                if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
+                    Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $server_id));
+                    $updated++;
+                    $server = Hm_IMAP_List::dump($id);
+                }
+            }
+            $url = 'https://www.google.com/m8/feeds/contacts/'.$server['user'].'/full';
+            $contacts = parse_contact_xml(gmail_contacts_request($server['pass'], $url), $server['name']);
+            if (!empty($contacts)) {
+                $contact_store->import($contacts);
+            }
+        }
+    }
+    return $contact_store;
+}
+
