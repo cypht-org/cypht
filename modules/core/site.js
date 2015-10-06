@@ -899,6 +899,9 @@ var Hm_Utils = {
         if (!path_type) {
             path_type = Hm_Utils.get_path_type(path);
         }
+        if (path.indexOf(' ') != -1) {
+            path = path.split(' ')[0];
+        }
         var type = false;
         var server_id = false;
         var uid = false;
