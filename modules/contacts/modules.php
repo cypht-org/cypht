@@ -416,7 +416,6 @@ function fetch_gmail_contacts($config, $contact_store) {
             }
         }
     }
-    elog($contact_store->dump());
     return $contact_store;
 }
 
