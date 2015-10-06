@@ -156,7 +156,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .rtl_page .list_controls { left: 0px; padding-left: 10px; top: 0px; padding-top: 10px; right: auto; background-color: #fff; }
 .rtl_page .toggle_link { margin-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
-.unseen, .unseen .subject { font-weight: 700; }
+div.unseen, .unseen .subject { font-weight: 700; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }
