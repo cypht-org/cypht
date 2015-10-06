@@ -142,10 +142,15 @@ function human_readable_interval($date_str) {
  * @param string $id unique id for the message
  * @param string $style message list style (news or email)
  * @param object $output_mod Hm_Output_Module
+ * @param string $row_class optional table row css class
  * @return array
  */
-function message_list_row($values, $id, $style, $output_mod) {
-    $res = '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id)).'">';
+function message_list_row($values, $id, $style, $output_mod, $row_class='') {
+    $res = '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id));
+    if ($row_class) {
+        $res .= ' '.$output_mod->html_safe($row_class);
+    }
+    $res .= '">';
     if ($style == 'news') {
         $res .= '<td class="news_cell checkbox_cell">';
     }

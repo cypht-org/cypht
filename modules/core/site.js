@@ -334,6 +334,9 @@ function Message_List() {
             }
             $('tr[class^='+type+'_'+parts[0]+'_]', msg_rows).filter(function() {
                 var id = this.className;
+                if (id.indexOf(' ') != -1) {
+                    id = id.split(' ')[0];
+                }
                 if (!parts[1] || parts[1].exec(id)) {
                     if ($.inArray(id, msg_ids) == -1) {
                         count--;
