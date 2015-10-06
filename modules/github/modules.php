@@ -427,6 +427,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                 $flags = array();
             }
             else {
+                $row_class .= ' unseen';
                 $flags = array('unseen');
             }
             if ($unread_only && !in_array('unseen', $flags)) {
