@@ -1551,6 +1551,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         return $msg_list;
     }
     foreach($msg_list as $msg) {
+        $row_class = 'email';
         if (!$parent_list) {
             $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
         }
@@ -1575,6 +1576,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $flags = array();
         if (!stristr($msg['flags'], 'seen')) {
            $flags[] = 'unseen';
+           $row_class .= ' unseen';
         }
         if (stristr($msg['flags'], 'attachment')) {
             $flags[] = 'attachment';
@@ -1586,6 +1588,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $flags[] = 'flagged';
         }
         $source = $msg['server_name'];
+        $row_class .= ' '.str_replace(' ', '_', $source);
         if ($msg['folder'] && $msg['folder'] != 'INBOX') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', $msg['folder']);
         }
@@ -1601,7 +1604,8 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 ),
                 $id,
                 $style,
-                $output_module
+                $output_module,
+                $row_class
             );
         }
         else {
@@ -1615,7 +1619,8 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 ),
                 $id,
                 $style,
-                $output_module
+                $output_module,
+                $row_class
             );
         }
     }

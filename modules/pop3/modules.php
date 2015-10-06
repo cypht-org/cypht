@@ -929,6 +929,7 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
 function format_pop3_message_list($msg_list, $output_module, $style, $login_time, $list_parent) {
     $res = array();
     foreach($msg_list as $msg_id => $msg) {
+        $row_class = 'email';
         if ($msg['server_name'] == 'Default-Auth-Server') {
             $msg['server_name'] = 'Default';
         }
@@ -949,6 +950,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         }
         elseif (Hm_POP3_Uid_Cache::is_unread($id)) {
             $flags = array('unseen');
+            $row_class .= ' unseen';
         }
         elseif (isset($msg['date']) && $login_time && strtotime($msg['date']) <= $login_time) {
             $flags = array();
@@ -956,6 +958,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         else {
             $flags = array('unseen');
         }
+        $row_class .= str_replace(' ', '_', $msg['server_name']);
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
@@ -967,7 +970,8 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
                 ),
                 $id,
                 $style,
-                $output_module
+                $output_module,
+                $row_class
             );
         }
         else {
@@ -981,7 +985,8 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
                 ),
                 $id,
                 $style,
-                $output_module
+                $output_module,
+                $row_class
             );
         }
     }

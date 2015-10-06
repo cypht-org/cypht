@@ -320,7 +320,8 @@ class Hm_Output_filter_wp_freshly_pressed_data extends Hm_Output_Module {
                     ),
                     $id,
                     $style,
-                    $this
+                    $this,
+                    'wordpress freshly_pressed'
                 );
             }
             else {
@@ -334,7 +335,8 @@ class Hm_Output_filter_wp_freshly_pressed_data extends Hm_Output_Module {
                     ),
                     $id,
                     $style,
-                    $this
+                    $this,
+                    'wordpress freshly_pressed'
                 );
             }
         }
@@ -360,6 +362,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
             $cutoff = 0;
         }
         foreach ($this->get('wp_notice_data', array()) as $vals) {
+            $row_class = 'wordpress notifications';
             if (array_key_exists('id', $vals)) {
                 $id = 'wordpress_0_'.$vals['id'];
                 $url = '?page=message&list_path=wp_notifications&uid='.$this->html_safe($id);;
@@ -379,6 +382,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 }
                 $flags = array();
                 if ((int) $vals['unread'] > 0) {
+                    $row_class .= ' unseen';
                     $flags[] = 'unseen';
                 }
                 if ($unread_only && !in_array('unseen', $flags, true)) {
@@ -396,7 +400,8 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                         ),
                         $id,
                         $style,
-                        $this
+                        $this,
+                        $row_class
                     );
                 }
                 else {
@@ -410,7 +415,8 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                         ),
                         $id,
                         $style,
-                        $this
+                        $this,
+                        $row_class
                     );
                 }
             }

@@ -404,6 +404,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             $cutoff = 0;
         }
         foreach ($this->get('github_data', array()) as $event) {
+            $row_class = 'github';
             $id = 'github_'.$repo_id.'_'.$event['id'];
             $subject = build_github_subject($event, $this);
             $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
@@ -420,6 +421,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             }
             elseif (Hm_Github_Uid_Cache::is_unread($event['id'])) {
                 $flags = array('unseen');
+                $row_class .= ' unseen';
             }
             elseif ($ts && $login_time && $ts <= $login_time) {
                 $flags = array();
@@ -435,6 +437,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             if ($this->get('is_mobile')) {
                 $style = 'news';
             }
+            $row_class .= ' '.$repo;
             if ($style == 'news') {
                 $res[$id] = message_list_row(array(
                         array('checkbox_callback', $id),
@@ -446,7 +449,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                     ),
                     $id,
                     $style,
-                    $this
+                    $this,
+                    $row_class
                 );
             }
             else {
@@ -460,7 +464,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                     ),
                     $id,
                     $style,
-                    $this
+                    $this,
+                    $row_class
                 );
             }
         }
