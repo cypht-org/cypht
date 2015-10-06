@@ -39,7 +39,7 @@ class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
         $contacts = array();
         $existing = new Hm_Contact_Store($this->user_config);
         $addr_headers = array('to', 'cc', 'bcc', 'sender', 'reply-to', 'from');
-        $headers = $this->get('msg_headers');
+        $headers = $this->get('msg_headers', array());
         $addresses = array();
         foreach ($headers as $name => $value) {
             if (in_array(strtolower($name), $addr_headers, true)) {
