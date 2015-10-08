@@ -933,6 +933,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     }
                     $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);
                     $this->out('msg_headers', $msg_headers);
+                    $this->out('imap_prefecth', $prefetch);
                     $this->out('imap_msg_part', "$part");
                     if ($msg_struct_current) {
                         $this->out('msg_struct_current', $msg_struct_current);
@@ -1137,7 +1138,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $this->out('msg_headers', $txt, false);
         }
-        else {
+        elseif (!$this->get('imap_prefetch')) {
             Hm_Msgs::add('ERR'.$this->trans('Could not fetch the message, it was moved or deleted'));
         }
     }
