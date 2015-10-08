@@ -507,9 +507,11 @@ function Message_List() {
             row = $('.'+Hm_Utils.clean_selector(class_name));
             if (action_type == 'read') {
                 $('.subject > div', row).removeClass('unseen');
+                row.removeClass('unseen');
             }
             else {
                 $('.subject > div', row).addClass('unseen');
+                row.addClass('unseen');
             }
             read++;
         }
