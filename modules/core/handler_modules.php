@@ -465,7 +465,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         if (array_key_exists('uid', $this->request->get) && preg_match("/\d+/", $this->request->get['uid'])) {
             $uid = $this->request->get['uid'];
         }
-        $list_style = $this->user_config->get('list_style', false);
+        $list_style = $this->user_config->get('list_style_setting', false);
         if ($this->get('is_mobile', false)) {
             $list_style = 'news_style';
         }
