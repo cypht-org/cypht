@@ -202,7 +202,6 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
         if (isset($this->request->post['submit_smtp_server'])) {
             list($success, $form) = $this->process_form(array('new_smtp_name', 'new_smtp_address', 'new_smtp_port'));
             if (!$success) {
-                $this->out('old_form', $form);
                 Hm_Msgs::add('ERRYou must supply a name, a server and a port');
             }
             else {
@@ -210,7 +209,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                 if (isset($this->request->post['tls'])) {
                     $tls = true;
                 }
-                if ($con = fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
+                if ($con = @fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
                     Hm_SMTP_List::add( array(
                         'name' => $form['new_smtp_name'],
                         'server' => $form['new_smtp_address'],
@@ -220,9 +219,14 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                     $this->session->record_unsaved('SMTP server added');
                 }
                 else {
+                    $this->session->set('add_form_vals', $form);
                     Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));
                 }
             }
+        }
+        else {
+            $this->out('add_form_vals', $this->session->get('add_form_vals', array()));
+            $this->session->set('add_form_vals', array());
         }
     }
 }
@@ -288,9 +292,6 @@ class Hm_Handler_smtp_forget extends Hm_Handler_Module {
                 Hm_Msgs::add('Server credentials forgotten');
                 $this->session->record_unsaved('SMTP server credentials forgotten');
             }
-            else {
-                $this->out('old_form', $form);
-            }
         }
         $this->out('just_forgot_credentials', $just_forgot_credentials);
     }
@@ -310,9 +311,6 @@ class Hm_Handler_smtp_delete extends Hm_Handler_Module {
                     Hm_Msgs::add('Server deleted');
                     $this->session->record_unsaved('SMTP server deleted');
                 }
-            }
-            else {
-                $this->out(old_form, $form);
             }
         }
     }
@@ -528,17 +526,30 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
     protected function output() {
         $count = count($this->get('smtp_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
+        $name = '';
+        $address = '';
+        $port = 465;
+        $add_form_vals = $this->get('add_form_vals', array());
+        if (array_key_exists('new_smtp_name', $add_form_vals)) {
+            $name = $this->html_safe($add_form_vals['new_smtp_name']);
+        }
+        if (array_key_exists('new_smtp_address', $add_form_vals)) {
+            $address = $this->html_safe($add_form_vals['new_smtp_address']);
+        }
+        if (array_key_exists('new_smtp_port', $add_form_vals)) {
+            $port = $this->html_safe($add_form_vals['new_smtp_port']);
+        }
         return '<div class="smtp_server_setup"><div data-target=".smtp_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" />'.
             ' '.$this->trans('SMTP Servers').' <div class="server_count">'.$count.'</div></div><div class="smtp_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="subtitle">'.$this->trans('Add an SMTP Server').'</div>'.
             '<table><tr><td colspan="2"><label for="new_smtp_name" class="screen_reader">'.$this->trans('SMTP account name').'</label>'.
-            '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
+            '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld" value="'.$name.'" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_address" class="screen_reader">'.$this->trans('SMTP server address').'</label>'.
-            '<input required type="text" id="new_smtp_address" name="new_smtp_address" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" value=""/></td></tr>'.
+            '<input required type="text" id="new_smtp_address" name="new_smtp_address" value="'.$address.'" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" value=""/></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_port" class="screen_reader">'.$this->trans('SMTP port').'</label>'.
-            '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="465" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="'.$port.'" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" id="smtp_tls" checked="checked" /> <label for="smtp_tls">'.$this->trans('Use TLS').'</label></td>'.
             '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" /></td></tr>'.
             '</table></form>';
