@@ -625,7 +625,7 @@ function Message_List() {
     };
 
     this.message_action = function(action_type) {
-        var msg_list = $('.message_list');
+        var msg_list = $('.message_table');
         var selected = [];
         $('input[type=checkbox]', msg_list).each(function() {
             if (this.checked) {

@@ -36,7 +36,8 @@ class Hm_Output_search_content_start extends Hm_Output_Module {
      * Leaves two open div tags that are closed in Hm_Output_search_content_end and Hm_Output_search_form
      */
     protected function output() {
-        return '<div class="search_content"><div class="content_title">'.$this->trans('Search');
+        return '<div class="search_content"><div class="content_title">'.
+            message_controls($this).$this->trans('Search');
     }
 }
 
