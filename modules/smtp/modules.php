@@ -670,7 +670,7 @@ function smtp_server_dropdown($data, $output_mod, $recip) {
             if ($recip && trim($recip) == trim($vals['user'])) {
                 $res .= 'selected="selected" ';
             }
-            $res .= 'value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['name'], $vals['server'])).'</option>';
+            $res .= 'value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name'])).'</option>';
         }
     }
     $res .= '</select>';
