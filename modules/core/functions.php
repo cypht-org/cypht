@@ -328,7 +328,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
 function process_since_argument($val, $validate=false) {
     $date = false;
     $valid = false;
-    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'), true)) {
+    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year', '-5 years'), true)) {
         $valid = $val;
         $date = date('j-M-Y', strtotime($val));
     }
