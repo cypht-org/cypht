@@ -66,7 +66,8 @@ function message_list_meta($input, $output_mod) {
         '-4 weeks' => 'Last 4 weeks',
         '-6 weeks' => 'Last 6 weeks',
         '-6 months' => 'Last 6 months',
-        '-1 year' => 'Last year'
+        '-1 year' => 'Last year',
+        '-5 years' => 'Last 5 years'
     );
     if (array_key_exists('per_source_limit', $input)) {
         $limit = $input['per_source_limit'];
@@ -299,7 +300,8 @@ function message_since_dropdown($since, $name, $output_mod) {
         '-4 weeks' => 'Last 4 weeks',
         '-6 weeks' => 'Last 6 weeks',
         '-6 months' => 'Last 6 months',
-        '-1 year' => 'Last year'
+        '-1 year' => 'Last year',
+        '-5 years' => 'Last 5 years'
     );
     $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since">';
     foreach ($times as $val => $label) {
