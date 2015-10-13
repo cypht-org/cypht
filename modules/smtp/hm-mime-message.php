@@ -112,7 +112,7 @@ class Hm_MIME_Msg {
             }
             else {
                 if ($email && strpos($v, '@') !== false && is_email($v)) {
-                    $res[] = '<'.$v.'>';
+                    $res[] = '<'.trim($v, " \t\n\r\0\x0B><").'>';
                 }
                 else {
                     $res[] = $v;

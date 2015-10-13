@@ -178,6 +178,7 @@ if (hm_page_name() === 'compose') {
     $('.smtp_save').click(function() { save_compose_state(false, true); });
     $('.compose_attach_button').click(function() { $('.compose_attach_file').trigger('click'); });
     $('.compose_attach_file').change(function() { upload_file(this.files[0]); });
+    $('.compose_form').submit(function() { Hm_Ajax.show_loading_icon(); return true; });
     if ($('.compose_cc').val() || $('.compose_bcc').val()) {
         toggle_recip_flds();
     }
