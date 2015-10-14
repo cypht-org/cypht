@@ -18,7 +18,7 @@ Nux_Quick_Services::add('gmail', array(
     'tls' => true,
     'port' => 993,
     'name' => 'Gmail',
-    'scope' => ' https://mail.google.com/',
+    'scope' => 'https://www.google.com/m8/feeds https://mail.google.com/',
     'smtp' => array(
         'server' => 'smtp.gmail.com',
         'port' => 465,

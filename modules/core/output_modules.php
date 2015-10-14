@@ -36,7 +36,8 @@ class Hm_Output_search_content_start extends Hm_Output_Module {
      * Leaves two open div tags that are closed in Hm_Output_search_content_end and Hm_Output_search_form
      */
     protected function output() {
-        return '<div class="search_content"><div class="content_title">'.$this->trans('Search');
+        return '<div class="search_content"><div class="content_title">'.
+            message_controls($this).$this->trans('Search');
     }
 }
 
@@ -55,44 +56,61 @@ class Hm_Output_search_content_end extends Hm_Output_Module {
 
 /**
  * Unsaved data reminder
+ * @subpackage core/output
  */
 class Hm_Output_save_reminder extends Hm_Output_Module {
     protected function output() {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
-            return '<div class="save_reminder"><a title="You have unsaved changes." href="?page=save"><img alt="'.$this->trans('Save').'" src="'.Hm_Image_Sources::$save.'" width="20" height="20" /></a></div>';
+            return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
+                '" href="?page=save"><img alt="'.$this->trans('Save').'" src="'.Hm_Image_Sources::$save.'" width="20" height="20" /></a></div>';
         }
         return '';
     }
 }
 
 /**
- * Output the search form used on the search page
+ * Start the search form
  * @subpackage core/output
  */
-class Hm_Output_search_form extends Hm_Output_Module {
-    /**
-     * Closes one of the divs left open in Hm_Output_search_content_start
-     */
+class Hm_Output_search_form_start extends Hm_Output_Module {
+    protected function output() {
+        return '<div class="search_form"><form method="get">';
+    }
+}
+
+/**
+ * Search form content
+ * @subpackage core/output
+ */
+class Hm_Output_search_form_content extends Hm_Output_Module {
     protected function output() {
         $terms = $this->get('search_terms', '');
-        $source_link = false;
-        //$source_link = '<a href="#" title="Sources" class="source_link"><img alt="'.$this->trans('Sources').
-            //'" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
-        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
-            $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
-        $res = '<div class="search_form">'.
-            '<form method="get"><input type="hidden" name="page" value="search" />'.
+
+        return '<input type="hidden" name="page" value="search" />'.
             ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
-            '<input placeholder="'.$this->trans('Search Terms').'" id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
+            '<input required placeholder="'.$this->trans('Search Terms').
+            '" id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
             ' <label class="screen_reader" for="search_fld">'.$this->trans('Search Field').'</label>'.
-            search_field_selection($this->get('search_fld', ''), $this).
+            search_field_selection($this->get('search_fld', DEFAULT_SEARCH_FLD), $this).
             ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
-            message_since_dropdown($this->get('search_since', ''), 'search_since', $this).
-            ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" /></form></div>'.
-            list_controls($refresh_link, false, $source_link).
-            '</div>';
-        return $res;
+            message_since_dropdown($this->get('search_since', DEFAULT_SINCE), 'search_since', $this).
+            ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" />'.
+            ' <input type="button" class="search_reset" value="'.$this->trans('Reset').'" />';
+    }
+}
+
+/**
+ * Finish the search form
+ * @subpackage core/output
+ */
+class Hm_Output_search_form_end extends Hm_Output_Module {
+    protected function output() {
+        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
+            $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.
+            '" width="20" height="20" /></a>';
+        return '</form></div>'.
+            list_controls($refresh_link, false, false).'</div>';
     }
 }
 
@@ -329,7 +347,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
 }
 
 /**
- * Outputs CSS
+ * Output CSS
  * @subpackage core/output
  */
 class Hm_Output_header_css extends Hm_Output_Module {
@@ -361,13 +379,13 @@ class Hm_Output_header_css extends Hm_Output_Module {
 class Hm_Output_page_js extends Hm_Output_Module {
     /**
      * In debug mode adds each module js file to the page, otherwise uses the combined version.
-     * Includes the zepto library.
+     * Includes the zepto library, and the forge lib if it's needed.
      */
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
             $js_lib = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
-            if ($this->get('encrypt_ajax_requests', false) || $this->get('encrypt_local_storage', false)) {
+            if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
                 $js_lib .= '<script type="text/javascript" src="third_party/forge.min.js"></script>';
             }
             $core = false;
@@ -429,6 +447,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_msg_uid = function() { return "'.$this->html_safe($this->get('uid', '')).'"; };'.
             'var hm_encrypt_ajax_requests = function() { return "'.$this->html_safe($this->get('encrypt_ajax_requests', '')).'"; };'.
             'var hm_encrypt_local_storage = function() { return "'.$this->html_safe($this->get('encrypt_local_storage', '')).'"; };'.
+            'var hm_flag_image_src = function() { return "'.Hm_Image_Sources::$star.'"; };'.
             format_data_sources($this->get('data_sources', array()), $this).
             '</script>';
     }
@@ -882,9 +901,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         if (array_key_exists('email_folders', merge_folder_list_details($this->get('folder_sources', array())))) {
             $email = true;
         }
-        $res = '<li class="menu_home"><a class="unread_link" href="?page=home">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$this->trans('Home').'</a></li>'.
-            '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
+        $res = '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> '.$this->trans('Everything').
             '</a><span class="combined_inbox_count"></span></li>';
         $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
@@ -977,6 +994,8 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
         $res = '<div class="src_name" data-source=".settings">'.$this->trans('Settings').
             '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
             '</div><ul style="display: none;" class="settings folders">';
+        $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$this->trans('Home').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1284,7 +1303,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             $refresh_link = '';
         }
         $res = '';
-        $res .= '<div class="message_list"><div class="content_title">';
+        $res .= '<div class="message_list '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title">';
         $res .= message_controls($this).
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->html_safe($v); },
                 $this->get('mailbox_list_title', array())));

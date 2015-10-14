@@ -22,6 +22,7 @@ add_handler('ajax_message_action', 'github_message_action', true, 'github', 'loa
 
 add_handler('ajax_github_data', 'login', false, 'core');
 add_handler('ajax_github_data', 'load_user_data', true, 'core');
+add_handler('ajax_github_data', 'message_list_type', true, 'core');
 add_handler('ajax_github_data', 'language', true, 'core');
 add_handler('ajax_github_data', 'github_list_data', true);
 add_handler('ajax_github_data', 'close_session_early',  true, 'core');

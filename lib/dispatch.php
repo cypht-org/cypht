@@ -161,6 +161,7 @@ class Hm_Dispatch {
             $this->page = 'home';
         }
         $this->module_exec->page = $this->page;
+        Hm_Debug::add('Page ID: '.$this->page);
     }
 
     /**

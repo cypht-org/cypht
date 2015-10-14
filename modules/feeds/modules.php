@@ -595,6 +595,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
             $login_time = $this->get('login_time');
         }
         foreach ($this->get('feed_list_data', array()) as $item) {
+            $row_style = 'feeds';
             if (isset($item['id']) && !isset($item['guid'])) {
                 $item['guid'] = $item['id'];
                 unset($item['id']);
@@ -641,6 +642,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 }
                 elseif (Hm_Feed_Uid_Cache::is_unread(md5($item['guid']))) {
                     $flags = array('unseen');
+                    $row_style .= ' unseen';
                 }
                 elseif ($timestamp && $login_time && $timestamp <= $login_time) {
                     $flags = array();
@@ -663,6 +665,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 else {
                     $from = '';
                 }
+                $row_style .= ' '.str_replace(' ', '_', $item['server_name']);
                 if ($style == 'news') {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
@@ -674,7 +677,8 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                         ),
                         $id,
                         $style,
-                        $this
+                        $this,
+                        $row_style
                     );
                 }
                 else {
@@ -688,7 +692,8 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                         ),
                         $id,
                         $style,
-                        $this
+                        $this,
+                        $row_style
                     );
                 }
             }

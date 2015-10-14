@@ -12,6 +12,7 @@ var display_next_nux_step = function(res) {
 };
 
 var nux_add_account = function() {
+    var nux_border = $('.nux_username').css('border');
     $('.nux_password').css('border', nux_border);
     var service = $('#nux_service').val();
     var name = $('.nux_name').val();
@@ -44,6 +45,7 @@ var display_final_nux_step = function(res) {
 };
 
 var nux_service_select = function() {
+    var nux_border = $('.nux_username').css('border');
     var el = document.getElementById('service_select');
     var service = el.options[el.selectedIndex].value;
     var email = $('.nux_username').val();
@@ -100,7 +102,6 @@ var expand_server_settings = function() {
 $(function() {
     if (hm_page_name() === 'servers') {
         expand_server_settings();
-        var nux_border = $('.nux_username').css('border');
         $('.nux_next_button').click(nux_service_select);
     }
     else if (hm_page_name() === 'message_list') {

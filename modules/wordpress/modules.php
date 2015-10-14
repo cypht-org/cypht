@@ -320,7 +320,8 @@ class Hm_Output_filter_wp_freshly_pressed_data extends Hm_Output_Module {
                     ),
                     $id,
                     $style,
-                    $this
+                    $this,
+                    'wordpress freshly_pressed'
                 );
             }
             else {
@@ -334,7 +335,8 @@ class Hm_Output_filter_wp_freshly_pressed_data extends Hm_Output_Module {
                     ),
                     $id,
                     $style,
-                    $this
+                    $this,
+                    'wordpress freshly_pressed'
                 );
             }
         }
@@ -360,6 +362,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
             $cutoff = 0;
         }
         foreach ($this->get('wp_notice_data', array()) as $vals) {
+            $row_class = 'wordpress notifications';
             if (array_key_exists('id', $vals)) {
                 $id = 'wordpress_0_'.$vals['id'];
                 $url = '?page=message&list_path=wp_notifications&uid='.$this->html_safe($id);;
@@ -379,6 +382,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 }
                 $flags = array();
                 if ((int) $vals['unread'] > 0) {
+                    $row_class .= ' unseen';
                     $flags[] = 'unseen';
                 }
                 if ($unread_only && !in_array('unseen', $flags, true)) {
@@ -396,7 +400,8 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                         ),
                         $id,
                         $style,
-                        $this
+                        $this,
+                        $row_class
                     );
                 }
                 else {
@@ -410,7 +415,8 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                         ),
                         $id,
                         $style,
-                        $this
+                        $this,
+                        $row_class
                     );
                 }
             }
@@ -529,31 +535,10 @@ function wp_get_freshly_pressed($details) {
  * @subpackage wordpress/functions
  */
 function wp_fetch_content($details, $url, $post=array()) {
-    $result = array();
     if (!is_array($details) || empty($details) || !array_key_exists('access_token', $details)) {
-        return $result;
+        return array();
     }
-    $headers = array('Authorization: Bearer ' . $details['access_token']);
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-    if (!empty($post)) {
-        $post_tmp = array();
-        foreach ($post as $name => $value) {
-            $post_tmp[] = urlencode($name).'='.urlencode($value);
-        }
-        $post_str = implode('&', $post_tmp);
-        curl_setopt($ch,CURLOPT_POST, count($post));
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $post_str);
-    }
-
-    $curl_result = curl_exec($ch);
-    if (substr($curl_result, 0, 1) == '{') {
-        $result = @json_decode($curl_result, true);
-    }
-    return $result;
+    $api = new Hm_API_Curl();
+    return $api->command($url, array('Authorization: Bearer ' . $details['access_token']), $post);
 }
-
 

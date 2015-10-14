@@ -66,7 +66,8 @@ function message_list_meta($input, $output_mod) {
         '-4 weeks' => 'Last 4 weeks',
         '-6 weeks' => 'Last 6 weeks',
         '-6 months' => 'Last 6 months',
-        '-1 year' => 'Last year'
+        '-1 year' => 'Last year',
+        '-5 years' => 'Last 5 years'
     );
     if (array_key_exists('per_source_limit', $input)) {
         $limit = $input['per_source_limit'];
@@ -142,10 +143,15 @@ function human_readable_interval($date_str) {
  * @param string $id unique id for the message
  * @param string $style message list style (news or email)
  * @param object $output_mod Hm_Output_Module
+ * @param string $row_class optional table row css class
  * @return array
  */
-function message_list_row($values, $id, $style, $output_mod) {
-    $res = '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id)).'">';
+function message_list_row($values, $id, $style, $output_mod, $row_class='') {
+    $res = '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id));
+    if ($row_class) {
+        $res .= ' '.$output_mod->html_safe($row_class);
+    }
+    $res .= '">';
     if ($style == 'news') {
         $res .= '<td class="news_cell checkbox_cell">';
     }
@@ -247,11 +253,18 @@ function date_callback($vals, $style, $output_mod) {
  * @return string
  */
 function icon_callback($vals, $style, $output_mod) {
+    $icons = '';
+    if (in_array('flagged', $vals[0])) {
+        $icons .= '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Flagged').'" />';
+    }
+    if (in_array('attachment', $vals[0])) {
+        $icons .= '<img src="'.Hm_Image_Sources::$paperclip.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" />';
+    }
     if ($style == 'email') {
-        return sprintf('<td class="icon">%s</td>', (in_array('flagged', $vals[0]) ? '<img src="'.Hm_Image_Sources::$star.'" alt="'.$output_mod->trans('Flagged').'" />' : ''));
+        return sprintf('<td class="icon">%s</td>', $icons);
     }
     elseif ($style == 'news') {
-        return sprintf('<div class="icon">%s</div>', (in_array('flagged', $vals[0]) ? '<img src="'.Hm_Image_Sources::$star.'" alt="'.$output_mod->trans('Flagged').'" />' : ''));
+        return sprintf('<div class="icon">%s</div>', $icons);
     }
 }
 
@@ -287,7 +300,8 @@ function message_since_dropdown($since, $name, $output_mod) {
         '-4 weeks' => 'Last 4 weeks',
         '-6 weeks' => 'Last 6 weeks',
         '-6 months' => 'Last 6 months',
-        '-1 year' => 'Last year'
+        '-1 year' => 'Last year',
+        '-5 years' => 'Last 5 years'
     );
     $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since">';
     foreach ($times as $val => $label) {
@@ -350,7 +364,7 @@ function list_controls($refresh_link, $config_link, $source_link=false) {
 function validate_search_terms($terms) {
     $terms = trim(strip_tags($terms));
     if (!$terms) {
-        $terms = false;
+        $terms = '';
     }
     return $terms;
 }

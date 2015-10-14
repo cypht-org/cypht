@@ -319,6 +319,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
                 $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
             }
         }
+        Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
         $this->process_key();
     }
 }
@@ -464,7 +465,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         if (array_key_exists('uid', $this->request->get) && preg_match("/\d+/", $this->request->get['uid'])) {
             $uid = $this->request->get['uid'];
         }
-        $list_style = $this->user_config->get('list_style', false);
+        $list_style = $this->user_config->get('list_style_setting', false);
         if ($this->get('is_mobile', false)) {
             $list_style = 'news_style';
         }
@@ -507,6 +508,17 @@ class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
 }
 
 /**
+ * @subpackage core/handler
+ */
+class Hm_Handler_reset_search extends Hm_Handler_Module {
+    public function process() {
+        $this->session->set('search_terms', '');
+        $this->session->set('search_since', DEFAULT_SINCE);
+        $this->session->set('search_fld', DEFAULT_SEARCH_FLD);
+    }
+}
+
+/**
  * Process search terms from a URL
  * @subpackage core/handler
  */
@@ -515,8 +527,8 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
      * validate and set search tems in the session
      */
     public function process() {
-        if (array_key_exists('search_terms', $this->request->get)) {
-            $this->out('run_search', 1);
+        if (array_key_exists('search_terms', $this->request->get) && $this->request->get['search_terms']) {
+            $this->out('run_search', 1, false);
             $this->session->set('search_terms', validate_search_terms($this->request->get['search_terms']));
         }
         if (array_key_exists('search_since', $this->request->get)) {
@@ -527,7 +539,10 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
         }
         $this->out('search_since', $this->session->get('search_since', DEFAULT_SINCE));
         $this->out('search_terms', $this->session->get('search_terms', ''));
-        $this->out('search_fld', $this->session->get('search_fld', 'TEXT'));
+        $this->out('search_fld', $this->session->get('search_fld', DEFAULT_SEARCH_FLD));
+        if ($this->session->get('search_terms')) {
+            $this->out('run_search', 1);
+        }
     }
 }
 

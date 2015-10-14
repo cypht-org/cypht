@@ -10,6 +10,23 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require_once APP_PATH.'modules/imap/hm-imap.php';
 
+ /**
+ * Flag a message as read
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_mark_as_read extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
+        if ($success) {
+            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            if ($imap && $imap->select_mailbox($form['folder'])) {
+                $imap->message_action('READ', array($form['imap_msg_uid']));
+            }
+        }
+    }
+}
+
 /**
  * Process a request to change a combined page source
  * @subpackage imap/handler
@@ -916,15 +933,15 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     }
                     $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);
                     $this->out('msg_headers', $msg_headers);
+                    $this->out('imap_prefecth', $prefetch);
                     $this->out('imap_msg_part', "$part");
                     if ($msg_struct_current) {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%d&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
-                    if (!$prefetch) {
-                        $this->session->set('reply_details', array('msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
-                    }
+                    $this->session->set(sprintf('reply_details_imap_%d_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
+                        array('msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
                 }
             }
         }
@@ -989,12 +1006,18 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
     protected function output() {
         if ($this->get('custom_list_controls_type')) {
             if ($this->get('custom_list_controls_type') == 'remove') {
-                $custom = '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').'" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.$this->trans('Remove').'"/></a>';
-                $custom .= '<a style="display: none;" class="add_source" title="'.$this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+                $custom = '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
+                    '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.
+                    '" alt="'.$this->trans('Remove').'"/></a><a style="display: none;" class="add_source" title="'.
+                    $this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.
+                    $this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
             }
             else {
-                $custom = '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').'" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.$this->trans('Remove').'"/></a>';
-                $custom .= '<a class="add_source" title="'.$this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+                $custom = '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
+                    '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.
+                    $this->trans('Remove').'"/></a><a class="add_source" title="'.$this->trans('Add this folder to combined pages').
+                    '" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.
+                    Hm_Image_Sources::$circle_check.'" /></a>';
             }
             $this->out('custom_list_controls', $custom);
         }
@@ -1061,6 +1084,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt = '';
             $from = '';
             $small_headers = array('subject', 'date', 'from');
+            $reply_args = sprintf('&amp;list_path=imap_%d_%s&amp;uid=%d',
+                $this->html_safe($this->get('msg_server_id')),
+                $this->html_safe($this->get('msg_folder')),
+                $this->html_safe($this->get('msg_text_uid'))
+            );
             $headers = $this->get('msg_headers', array());
             $txt .= '<table class="msg_headers"><col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
@@ -1091,9 +1119,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><th colspan="2" class="header_links">'.
                 '<a href="#" class="hlink header_toggle">'.$this->trans('all').'</a>'.
                 '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;reply=1">'.$this->trans('reply').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;forward=1">'.$this->trans('forward').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;attach=1">'.$this->trans('attach').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('reply').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('reply-all').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('forward').'</a>'.
+                ' | <a class="hlink" href="?page=compose&amp;attach=1'.$reply_args.'">'.$this->trans('attach').'</a>'.
                 ' | <a class="hlink msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
 
             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
@@ -1109,7 +1138,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $this->out('msg_headers', $txt, false);
         }
-        else {
+        elseif (!$this->get('imap_prefetch')) {
             Hm_Msgs::add('ERR'.$this->trans('Could not fetch the message, it was moved or deleted'));
         }
     }
@@ -1205,7 +1234,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_address">'.$this->trans('Server address').'</label>'.
             '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld" placeholder="'.$this->trans('IMAP server address').'" value=""/></td></tr>'.
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('IMAP port').'</label>'.
-            '<input required type="number" id="new_imap_port" name="new_imap_port" class="port_fld" value="" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<input required type="number" id="new_imap_port" name="new_imap_port" class="port_fld" value="993" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr><td colspan="2"><input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="" value="1">'.
             '<label for="new_imap_hidden">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" id="imap_tls" checked="checked" /> <label for="imap_tls">'.$this->trans('Use TLS').'</label></td>'.
@@ -1523,6 +1552,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         return $msg_list;
     }
     foreach($msg_list as $msg) {
+        $row_class = 'email';
         if (!$parent_list) {
             $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
         }
@@ -1536,7 +1566,10 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $subject = $msg['subject'];
         $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
         $from = str_replace('"', '', $from);
-        if (!trim($from) && $style == 'email') {
+        if (!trim($from) && trim($msg['from'])) {
+            $from = $msg['from'];
+        }
+        elseif (!trim($from) && $style == 'email') {
             $from = '[No From]';
         }
         $timestamp = strtotime($msg['internal_date']);
@@ -1544,6 +1577,10 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $flags = array();
         if (!stristr($msg['flags'], 'seen')) {
            $flags[] = 'unseen';
+           $row_class .= ' unseen';
+        }
+        if (stristr($msg['flags'], 'attachment')) {
+            $flags[] = 'attachment';
         }
         if (stristr($msg['flags'], 'deleted')) {
             $flags[] = 'deleted';
@@ -1552,6 +1589,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $flags[] = 'flagged';
         }
         $source = $msg['server_name'];
+        $row_class .= ' '.str_replace(' ', '_', $source);
         if ($msg['folder'] && $msg['folder'] != 'INBOX') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', $msg['folder']);
         }
@@ -1567,7 +1605,8 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 ),
                 $id,
                 $style,
-                $output_module
+                $output_module,
+                $row_class
             );
         }
         else {
@@ -1581,7 +1620,8 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 ),
                 $id,
                 $style,
-                $output_module
+                $output_module,
+                $row_class
             );
         }
     }
@@ -1818,6 +1858,9 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
                         $msgs = array_slice($msgs, 0, $limit);
                     }
                     foreach ($imap->get_message_list($msgs) as $msg) {
+                        if (array_key_exists('content-type', $msg) && stristr($msg['content-type'], 'multipart/mixed')) {
+                            $msg['flags'] .= ' \Attachment';
+                        }
                         if (stristr($msg['flags'], 'deleted')) {
                             continue;
                         }

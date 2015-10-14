@@ -14,6 +14,26 @@ require APP_PATH.'modules/smtp/hm-mime-message.php';
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_load_smtp_reply_to_details extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('list_path', $this->request->get) &&
+            array_key_exists('uid', $this->request->get)) {
+
+            $cache_name = sprintf('reply_details_%s_%s',
+                $this->request->get['list_path'],
+                $this->request->get['uid']
+            );
+            $reply_details = $this->session->get($cache_name, false);
+            if ($reply_details) {
+                $this->out('reply_details', $reply_details);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('username', 'password'));
@@ -50,27 +70,80 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
 
 /**
  * @subpackage smtp/handler
- * @todo: update this for the new settings system
  */
 class Hm_Handler_process_compose_type extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'smtp_compose_type_setting'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
+        function smtp_compose_type_callback($val) { return $val; }
+        process_site_setting('smtp_compose_type', $this, 'smtp_compose_type_callback');
+    }
+}
 
-        if ($success) {
-            if ($form['smtp_compose_type_setting'] == 0 || $form['smtp_compose_type_setting'] == 1) {
-                $new_settings['smtp_compose_type'] = $form['smtp_compose_type_setting'];
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('attachment_id', $this->request->post)) {
+            $id = $this->request->post['attachment_id'];
+            $filename = false;
+            $remaining_files = array();
+            foreach ($this->session->get('uploaded_files', array()) as $file) {
+                if ($id == $file['basename']) {
+                    $filename = $file['filename'];
+                }
+                else {
+                    $remaining_files[] = $file;
+                }
+            }
+            if ($filename && @unlink($filename)) {
+                $this->session->set('uploaded_files', $remaining_files);
+                Hm_Msgs::add('Attachment deleted');
             }
             else {
-                $settings['smtp_compose_type'] = $this->user_config->get('smtp_compose_type', false);
+                Hm_Msgs::add('ERRAn error occurred trying to delete the attachment');
             }
         }
-        else {
-            $settings['smtp_compose_type'] = $this->user_config->get('smtp_compose_type', false);
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('upload_file', $this->request->files)) {
+            $file = $this->request->files['upload_file'];
+            if (is_readable($file['tmp_name'])) {
+                $content = file_get_contents($file['tmp_name']);
+                if ($content) {
+                    $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
+                    $filename = hash('sha512', $content); 
+                    $filepath = $this->config->get('attachment_dir');
+                    if ($filepath) {
+                        $filepath = rtrim($filepath, '/');
+                        if (@file_put_contents($filepath.'/'.$filename, $content)) {
+                            $file['filename'] = $filepath.'/'.$filename;
+                            $file['basename'] = $filename; 
+                            $files = $this->session->get('uploaded_files', array());
+                            $this->session->set('uploaded_files', array_merge($files, array($file)));
+                            $this->out('upload_file_details', $file);
+                        }
+                        else {
+                            Hm_Msgs::add('ERRAn error occurred saving the uploaded file.');
+                        }
+                    }
+                    else {
+                        Hm_Msgs::add('ERRNo directory configured for uploaded files.');
+                    }
+                }
+                else {
+                    Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
+                }
+            }
+            else {
+                Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
+            }
         }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
     }
 }
 
@@ -82,6 +155,9 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
         $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
         $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
+        if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
+            delete_uploaded_files($this->session);
+        }
         $this->session->set('compose_draft', array('draft_to' => $to, 'draft_body' => $body, 'draft_subject' => $subject));
     }
 }
@@ -99,18 +175,18 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if (array_key_exists('reply', $this->request->get) && $this->request->get['reply']) {
             $reply_type = 'reply';
         }
+        elseif (array_key_exists('reply_all', $this->request->get) && $this->request->get['reply_all']) {
+            $reply_type = 'reply_all';
+        }
         elseif (array_key_exists('forward', $this->request->get) && $this->request->get['forward']) {
             $reply_type = 'forward';
         }
         if ($reply_type) {
-            $details = $this->session->get('reply_details', array());
-            if (!empty($details)) {
-                $this->out('reply_details', $details);
-                $this->out('reply_type', $reply_type);
-            }
+            $this->out('reply_type', $reply_type);
         }
         $this->out('compose_draft', $this->session->get('compose_draft', array()), false);
-        $compose_type = $this->user_config->get('smtp_compose_type', 0);
+        $this->out('uploaded_files', $this->session->get('uploaded_files', array()));
+        $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
         }
@@ -126,7 +202,6 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
         if (isset($this->request->post['submit_smtp_server'])) {
             list($success, $form) = $this->process_form(array('new_smtp_name', 'new_smtp_address', 'new_smtp_port'));
             if (!$success) {
-                $this->out('old_form', $form);
                 Hm_Msgs::add('ERRYou must supply a name, a server and a port');
             }
             else {
@@ -134,7 +209,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                 if (isset($this->request->post['tls'])) {
                     $tls = true;
                 }
-                if ($con = fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
+                if ($con = @fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
                     Hm_SMTP_List::add( array(
                         'name' => $form['new_smtp_name'],
                         'server' => $form['new_smtp_address'],
@@ -144,9 +219,14 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                     $this->session->record_unsaved('SMTP server added');
                 }
                 else {
+                    $this->session->set('add_form_vals', $form);
                     Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));
                 }
             }
+        }
+        else {
+            $this->out('add_form_vals', $this->session->get('add_form_vals', array()));
+            $this->session->set('add_form_vals', array());
         }
     }
 }
@@ -212,9 +292,6 @@ class Hm_Handler_smtp_forget extends Hm_Handler_Module {
                 Hm_Msgs::add('Server credentials forgotten');
                 $this->session->record_unsaved('SMTP server credentials forgotten');
             }
-            else {
-                $this->out('old_form', $form);
-            }
         }
         $this->out('just_forgot_credentials', $just_forgot_credentials);
     }
@@ -234,9 +311,6 @@ class Hm_Handler_smtp_delete extends Hm_Handler_Module {
                     Hm_Msgs::add('Server deleted');
                     $this->session->record_unsaved('SMTP server deleted');
                 }
-            }
-            else {
-                $this->out(old_form, $form);
             }
         }
     }
@@ -302,6 +376,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 $from = '';
                 $cc = '';
                 $bcc = '';
+                $in_reply_to = '';
                 if (array_key_exists('compose_body', $this->request->post)) {
                     $body = $this->request->post['compose_body'];
                     $draft['draft_body'] = $this->request->post['compose_body'];
@@ -313,6 +388,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 if (array_key_exists('compose_bcc', $this->request->post)) {
                     $bcc = $this->request->post['compose_bcc'];
                     $draft['draft_bcc'] = $this->request->post['compose_bcc'];
+                }
+                if (array_key_exists('compose_in_reply_to', $this->request->post)) {
+                    $in_reply_to = $this->request->post['compose_in_reply_to'];
+                    $draft['draft_in_reply_to'] = $this->request->post['compose_in_reply_to'];
                 }
                 $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
                 if ($smtp_details) {
@@ -330,7 +409,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     }
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
-                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0), $cc, $bcc);
+                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0), $cc, $bcc, $in_reply_to);
+                        $mime->add_attachments($this->session->get('uploaded_files', array()));
                         $recipients = $mime->get_recipient_addresses();
                         if (empty($recipients)) {
                             Hm_Msgs::add("ERRNo valid receipts found");
@@ -342,6 +422,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                             }
                             else {
                                 $draft = array();
+                                delete_uploaded_files($this->session);
                                 Hm_Msgs::add("Message Sent");
                             }
                         }
@@ -367,8 +448,10 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $to = '';
         $subject = '';
         $body = '';
+        $files = $this->get('uploaded_files', array());
         $cc = '';
         $bcc = '';
+        $in_reply_to = '';
         $recip = '';
 
         $draft = $this->get('compose_draft', array());
@@ -377,10 +460,11 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $html = $this->get('smtp_compose_type', 0);
 
         if (!empty($reply)) {
-            list($to, $subject, $body) = format_reply_fields($reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
-            if (array_key_exists('Envelope-to', $reply['msg_headers'])) {
-                $recip = $reply['msg_headers']['Envelope-to'];
-            }
+            list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
+                $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type,
+                Hm_SMTP_List::address_list());
+
+            $recip = get_primary_recipients($reply['msg_headers'], $this->get('smtp_servers', array()));
         }
         elseif (!empty($draft)) {
             $to = $draft['draft_to'];
@@ -404,18 +488,34 @@ class Hm_Output_compose_form extends Hm_Output_Module {
         $res .= '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
             '<form class="compose_form" method="post" action="?page=compose">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<div class="to_outer"><input value="'.$this->html_safe($to).'" list="to_contacts" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
-            '<a href="#" class="toggle_recipients">+</a></div>'.
-            '<datalist id="to_contacts"></datalist>'.
-            '<div class="recipient_fields">'.
-            '<input value="'.$this->html_safe($cc).'" list="to_contacts" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" />'.
-            '<input value="'.$this->html_safe($bcc).'" list="to_contacts" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
-            '</div>'.
-            '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject" type="text" placeholder="'.$this->trans('Subject').'" />'.
-            '<textarea novalidate id="compose_body" name="compose_body" class="compose_body">'.$this->html_safe($body).'</textarea>'.
+            '<input type="hidden" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
+            '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).
+            '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<a href="#" tabindex="-1" class="toggle_recipients">+</a></div><div id="to_contacts"></div>'.
+            '<div class="recipient_fields"><input autocomplete="off" value="'.$this->html_safe($cc).
+            '" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').
+            '" /><div id="cc_contacts"></div><input autocomplete="off" value="'.$this->html_safe($bcc).
+            '" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
+            '</div><div id="bcc_contacts"></div><input value="'.$this->html_safe($subject).
+            '" required name="compose_subject" class="compose_subject" type="text" placeholder="'.
+            $this->trans('Subject').'" /><textarea id="compose_body" name="compose_body" class="compose_body">'.
+            $this->html_safe($body).'</textarea><table class="uploaded_files">';
+
+        foreach ($files as $file) {
+            $res .= format_attachment_row($file, $this);
+        }
+        $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
-            '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" /></form></div>';
+            '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
+            '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
+            '<input class="compose_attach_button" value="'.$this->trans('Attach').
+            '" name="compose_attach_button" type="button" /></form>'.
+            '<form enctype="multipart/form-data" class="compose_attach_form" />'.
+            '<input class="compose_attach_file" type="file" name="compose_attach_file" />'.
+            '<input type="hidden" name="compose_attach_page_id" value="ajax_smtp_attach_file" />'.
+            '</form>'.
+            '</div>';
         return $res;
     }
 }
@@ -427,17 +527,30 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
     protected function output() {
         $count = count($this->get('smtp_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
+        $name = '';
+        $address = '';
+        $port = 465;
+        $add_form_vals = $this->get('add_form_vals', array());
+        if (array_key_exists('new_smtp_name', $add_form_vals)) {
+            $name = $this->html_safe($add_form_vals['new_smtp_name']);
+        }
+        if (array_key_exists('new_smtp_address', $add_form_vals)) {
+            $address = $this->html_safe($add_form_vals['new_smtp_address']);
+        }
+        if (array_key_exists('new_smtp_port', $add_form_vals)) {
+            $port = $this->html_safe($add_form_vals['new_smtp_port']);
+        }
         return '<div class="smtp_server_setup"><div data-target=".smtp_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" />'.
             ' '.$this->trans('SMTP Servers').' <div class="server_count">'.$count.'</div></div><div class="smtp_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="subtitle">'.$this->trans('Add an SMTP Server').'</div>'.
             '<table><tr><td colspan="2"><label for="new_smtp_name" class="screen_reader">'.$this->trans('SMTP account name').'</label>'.
-            '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
+            '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld" value="'.$name.'" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_address" class="screen_reader">'.$this->trans('SMTP server address').'</label>'.
-            '<input required type="text" id="new_smtp_address" name="new_smtp_address" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" value=""/></td></tr>'.
+            '<input required type="text" id="new_smtp_address" name="new_smtp_address" value="'.$address.'" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" value=""/></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_port" class="screen_reader">'.$this->trans('SMTP port').'</label>'.
-            '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="'.$port.'" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" id="smtp_tls" checked="checked" /> <label for="smtp_tls">'.$this->trans('Use TLS').'</label></td>'.
             '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" /></td></tr>'.
             '</table></form>';
@@ -454,7 +567,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_compose_type', $settings)) {
             $selected = $settings['smtp_compose_type'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select name="smtp_compose_type_setting">';
+        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select name="smtp_compose_type">';
         $res .= '<option ';
         if ($selected == 0) {
             $res .= 'selected="selected" ';
@@ -465,6 +578,18 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         }
         $res .= 'value="1">'.$this->trans('HTML').'</option></select></td></tr>';
         return $res;
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_filter_upload_file_details extends Hm_Output_Module {
+    protected function output() {
+        $file = $this->get('upload_file_details', array());
+        if (!empty($file)) {
+            $this->out('file_details', format_attachment_row($file, $this));
+        }
     }
 }
 
@@ -496,9 +621,11 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<label class="screen_reader" for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label>'.
-                '<input '.$disabled.' class="credentials" id="smtp_user_'.$index.'" placeholder="'.$this->trans('Username').'" type="text" name="smtp_user" value="'.$user_pc.'"></span>'.
-                '<span> <label class="screen_reader" for="smtp_pass_'.$index.'">'.$this->trans('SMTP password').'</label>'.
-                '<input '.$disabled.' class="credentials smtp_password" placeholder="'.$pass_pc.'" type="password" id="smtp_pass_'.$index.'" name="smtp_pass"></span>';
+                '<input '.$disabled.' class="credentials" id="smtp_user_'.$index.'" placeholder="'.$this->trans('Username').
+                '" type="text" name="smtp_user" value="'.$user_pc.'"></span><span> <label class="screen_reader" for="smtp_pass_'.
+                $index.'">'.$this->trans('SMTP password').'</label><input '.$disabled.' class="credentials smtp_password" placeholder="'.
+                $pass_pc.'" type="password" id="smtp_pass_'.$index.'" name="smtp_pass"></span>';
+
             if (!$no_edit) {
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
@@ -544,7 +671,7 @@ function smtp_server_dropdown($data, $output_mod, $recip) {
             if ($recip && trim($recip) == trim($vals['user'])) {
                 $res .= 'selected="selected" ';
             }
-            $res .= 'value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['name'], $vals['server'])).'</option>';
+            $res .= 'value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name'])).'</option>';
         }
     }
     $res .= '</select>';
@@ -596,5 +723,54 @@ function smtp_refresh_oauth2_token($server, $config) {
     return array();
 }
 
+/**
+ * @subpackage smtp/functions
+ */
+function delete_uploaded_files($session) {
+    foreach ($session->get('uploaded_files', array()) as $file) {
+        @unlink($file['filename']);
+    }
+    $session->set('uploaded_files', array());
+}
 
+/**
+ * @subpackage smtp/functions
+ */
+function format_attachment_row($file, $output_mod) {
+    return '<tr><td>'.
+        '<img src="'.Hm_Image_Sources::$paperclip.'" alt="" width="16" height="16" />'.
+        '</td><td>'.$output_mod->html_safe($file['name']).
+        '</td><td>'.$output_mod->html_safe($file['type']).'</td><td>'.
+        $output_mod->html_safe(round($file['size']/1024, 2)).'KB</td>'.
+        '<td>'.
+        '<a title="'.$output_mod->trans('Delete').'" href="#" data-id="'.$output_mod->html_safe($file['basename']).
+        '" class="delete_attachment"><img src="'.Hm_Image_Sources::$circle_x.'" alt="X" width="16" height="16" />'.
+        '</a>'.
+        '</td>'.
+        '</tr>';
+}
 
+/**
+ * @subpackage smtp/functions
+ */
+function get_primary_recipients($headers, $smtp_servers) {
+    $recip_headers = array('to', 'cc', 'envelope-to');
+    $lc_headers = array();
+    foreach ($headers as $name => $value) {
+        if (in_array(strtolower($name), $recip_headers, true)) {
+            $lc_headers[strtolower($name)] = $value;
+        }
+    }
+    if (array_key_exists('envelope-to', $lc_headers)) {
+        return $lc_headers['envelope-to'];
+    }
+    $users = array_map(function($a) { return $a['user']; }, $smtp_servers);
+    foreach ($users as $user) {
+        foreach ($lc_headers as $header) {
+            if (stristr($header, $user) !== false) {
+                return $user;
+            }
+        }
+    }
+    return false;
+}

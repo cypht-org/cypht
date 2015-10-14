@@ -34,6 +34,13 @@ class Hm_SMTP_List {
     public static function get_cache($session, $id) {
         return false;
     }
+    public static function address_list() {
+        $addrs = array();
+        foreach (self::$server_list as $server) {
+            $addrs[] = $server['user'];
+        }
+        return $addrs;
+    }
 }
 
 /**
@@ -293,7 +300,7 @@ class Hm_SMTP {
         if(count($intersect) > 0) {
             return array_shift($intersect);
         }
-        return $requested[ count($requested) - 1 ];
+        return trim($this->supports_auth[0]);
     }
 
     /**
@@ -365,7 +372,7 @@ class Hm_SMTP {
                 break;
             default:
                 $result = 'FATAL: Unknown SMTP AUTH mechanism: '.$mech;
-                exit;
+                break;
         }
         if (!$result) {
             $result = 'An error occurred authenticating to the SMTP server';

@@ -24,6 +24,7 @@ add_handler('home', 'process_wordpress_authorization', true, 'wordpress', 'load_
 
 add_handler('ajax_wordpess_notifications', 'login', false, 'core');
 add_handler('ajax_wordpess_notifications', 'load_user_data', true, 'core');
+add_handler('ajax_wordpess_notifications', 'message_list_type', true, 'core');
 add_handler('ajax_wordpess_notifications', 'language', true, 'core');
 add_handler('ajax_wordpess_notifications', 'wordpress_list_type', true, 'core');
 add_handler('ajax_wordpess_notifications', 'wp_notification_data',  true);
@@ -42,6 +43,7 @@ add_output('ajax_wp_notice_display', 'filter_wp_notice_data', true);
 
 add_handler('ajax_wordpess_freshly_pressed', 'login', false, 'core');
 add_handler('ajax_wordpess_freshly_pressed', 'load_user_data', true, 'core');
+add_handler('ajax_wordpess_freshly_pressed', 'message_list_type', true, 'core');
 add_handler('ajax_wordpess_freshly_pressed', 'language', true, 'core');
 add_handler('ajax_wordpess_freshly_pressed', 'wordpress_list_type', true, 'core');
 add_handler('ajax_wordpess_freshly_pressed', 'wp_freshly_pressed_data',  true);
