@@ -461,7 +461,8 @@ class Hm_Output_compose_form extends Hm_Output_Module {
 
         if (!empty($reply)) {
             list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
-                $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
+                $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type,
+                Hm_SMTP_List::address_list());
 
             $recip = get_primary_recipients($reply['msg_headers'], $this->get('smtp_servers', array()));
         }
