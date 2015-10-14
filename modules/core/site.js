@@ -66,8 +66,16 @@ var Hm_Ajax_Request = function() { return {
                 args.push({'name': name, 'value': extra[name]});
             }
         }
-        args.push({'name': 'hm_page_key', 'value': $('#hm_page_key').val()});
-
+        var key_found = false;
+        for (arg in args) {
+            if (args[arg].name == 'hm_page_key') {
+                key_found = true;
+                break;
+            }
+        }
+        if (!key_found) {
+            args.push({'name': 'hm_page_key', 'value': $('#hm_page_key').val()});
+        }
         var dt = new Date();
         this.start_time = dt.getTime();
         $.ajax({
@@ -192,13 +200,11 @@ var Hm_Notices = {
         if (now) {
             $('.sys_messages').hide();
             $('.sys_messages').html('');
-            $('.sys_messages').show();
         }
         else {
             Hm_Notices.hide_id = setTimeout(function() {
                 $('.sys_messages').hide();
                 $('.sys_messages').html('');
-                $('.sys_messages').show();
             }, 5000);
         }
     }
@@ -328,6 +334,9 @@ function Message_List() {
             }
             $('tr[class^='+type+'_'+parts[0]+'_]', msg_rows).filter(function() {
                 var id = this.className;
+                if (id.indexOf(' ') != -1) {
+                    id = id.split(' ')[0];
+                }
                 if (!parts[1] || parts[1].exec(id)) {
                     if ($.inArray(id, msg_ids) == -1) {
                         count--;
@@ -498,9 +507,11 @@ function Message_List() {
             row = $('.'+Hm_Utils.clean_selector(class_name));
             if (action_type == 'read') {
                 $('.subject > div', row).removeClass('unseen');
+                row.removeClass('unseen');
             }
             else {
                 $('.subject > div', row).addClass('unseen');
+                row.addClass('unseen');
             }
             read++;
         }
@@ -515,7 +526,7 @@ function Message_List() {
             class_name = selected[index];
             row = $('.'+Hm_Utils.clean_selector(class_name));
             if (action_type == 'flag') {
-                $('.icon', row).html('&#9733;');
+                $('.icon', row).html('<img src="'+hm_flag_image_src()+'" />');
             }
             else {
                 $('.icon', row).empty();
@@ -543,7 +554,7 @@ function Message_List() {
         }
         else {
             if (hm_page_name() == 'search') {
-                self.setup_combined_view('formatted_search_data');
+                self.setup_combined_view(Hm_Utils.build_search_cache_name());
             }
             else {
                 self.setup_combined_view(false);
@@ -614,7 +625,7 @@ function Message_List() {
     };
 
     this.message_action = function(action_type) {
-        var msg_list = $('.message_list');
+        var msg_list = $('.message_table');
         var selected = [];
         $('input[type=checkbox]', msg_list).each(function() {
             if (this.checked) {
@@ -717,11 +728,13 @@ function Message_List() {
     this.set_combined_inbox_state = function() { self.set_message_list_state('formatted_combined_inbox'); };
     this.set_flagged_state = function() { self.set_message_list_state('formatted_flagged_data'); };
     this.set_unread_state = function() { self.set_message_list_state('formatted_unread_data'); };
-    this.set_search_state = function() { self.set_message_list_state('formatted_search_data'); };
+    this.set_search_state = function() { self.set_message_list_state(Hm_Utils.build_search_cache_name()); };
 };
 
 /* folder list */
 var Hm_Folders = {
+    expand_after_update: false,
+
     save_folder_list: function() {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
     },
@@ -744,8 +757,9 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('hide_folder_list', '1');
         return false;
     },
-    reload_folders: function(force) {
+    reload_folders: function(force, expand_after_update) {
         if (document.cookie.indexOf('hm_reload_folders=1') > -1 || force) {
+            Hm_Folders.expand_after_update = expand_after_update;
             var ui_state = Hm_Utils.preserve_local_settings();
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
@@ -772,6 +786,11 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         Hm_Folders.hl_selected_menu();
         Hm_Folders.folder_list_events();
+        if (Hm_Folders.expand_after_update) {
+            Hm_Utils.toggle_section(Hm_Folders.expand_after_update);
+        }
+        Hm_Folders.expand_after_update = false;
+        hl_save_link();
     },
     update_folder_list: function() {
         Hm_Ajax.request(
@@ -850,7 +869,18 @@ var Hm_Utils = {
             Hm_Utils.save_to_local_storage(i, settings[i]);
         }
     },
-
+    reset_search_form: function() {
+        Hm_Utils.save_to_local_storage(Hm_Utils.build_search_cache_name(), '');
+        Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}],
+            function(res) { window.location = '?page=search'; }, false, true);
+        return false;
+    },
+    build_search_cache_name: function() {
+        var terms = $('.search_terms').val();
+        var fld = $('#search_fld').val();
+        var since = $('#search_since').val();
+        return ('formatted_search_data_'+terms+'_'+fld+'_'+since).replace(' ', '_');
+    },
     confirm_logout: function() {
         if ($('#unsaved_changes').val() === "0") {
             $('#logout_without_saving').click();
@@ -870,6 +900,9 @@ var Hm_Utils = {
     parse_folder_path: function(path, path_type) {
         if (!path_type) {
             path_type = Hm_Utils.get_path_type(path);
+        }
+        if (path.indexOf(' ') != -1) {
+            path = path.split(' ')[0];
         }
         var type = false;
         var server_id = false;
@@ -1070,7 +1103,6 @@ var Hm_Crypt = {
     },
 
     encrypt: function(plaintext) {
-        elog(plaintext);
         try {
             var secret = $('#hm_page_key').val();
             var salt = forge.random.getBytesSync(128);
@@ -1094,6 +1126,14 @@ var Hm_Crypt = {
 var elog = function(val) {
     if (hm_debug()) {
         console.log(val);
+    }
+};
+var hl_save_link = function() {
+    if ($('.save_reminder').length) {
+        $('.menu_save a').css('font-weight', 'bold');
+    }
+    else {
+        $('.menu_save a').css('font-weight', 'normal');
     }
 };
 
@@ -1139,7 +1179,8 @@ $(function() {
             Hm_Folders.save_folder_list();
         }
     }
-    if ($('.save_reminder').length) {
-        $('.menu_save a').css('font-weight', 'bold');
+    hl_save_link();
+    if (hm_page_name() == 'search') {
+        $('.search_reset').click(Hm_Utils.reset_search_form);
     }
 });

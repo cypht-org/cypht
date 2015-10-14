@@ -11,7 +11,7 @@
 .news_cell .from { font-size: 110%; }
 .chkbox_col { width: 32px; }
 .source_col { width: 8%; }
-.icon_col { width: 24px; }
+.icon_col { width: 60px; white-space: nowrap; }
 .subject_col { width: 55%; }
 .from_col { width: 15%; }
 .date_col { width: 19%; }
@@ -54,7 +54,6 @@
 .header_links{ font-variant: small-caps; }
 .selected_part { background-color: #f5f5f5; }
 .imap_server_setup { table-layout: fixed; width: 100%; display: table; background-color: #fff; }
-.unseen { font-weight: 700; }
 .checkbox_row { padding-right: 10px !important; }
 .checkbox_header img { padding-left: 3px; padding-right: 0px; }
 .toggle_link img { opacity: .6; vertical-align: -2px; }

@@ -634,7 +634,7 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
             '<tr><td colspan="2"><label class="screen_reader" for="new_pop3_address">'.$this->trans('POP3 server address').'</label>'.
             '<input required type="text" id="new_pop3_address" name="new_pop3_address" class="txt_fld" placeholder="'.$this->trans('POP3 server address').'" value=""/></td></tr>'.
             '<tr><td colspan="2"><label for="new_pop3_port" class="screen_reader">'.$this->trans('POP3 port').'</label>'.
-            '<input required type="number" id="new_pop3_port" name="new_pop3_port" class="port_fld" value="" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<input required type="number" id="new_pop3_port" name="new_pop3_port" class="port_fld" value="995" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" id="pop3_tls" checked="checked" /> <label for="pop3_tls">'.$this->trans('Use TLS').'</label></td>'.
             '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_pop3_server" /></td></tr>'.
             '</table></form>';
@@ -929,6 +929,7 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
 function format_pop3_message_list($msg_list, $output_module, $style, $login_time, $list_parent) {
     $res = array();
     foreach($msg_list as $msg_id => $msg) {
+        $row_class = 'email';
         if ($msg['server_name'] == 'Default-Auth-Server') {
             $msg['server_name'] = 'Default';
         }
@@ -949,6 +950,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         }
         elseif (Hm_POP3_Uid_Cache::is_unread($id)) {
             $flags = array('unseen');
+            $row_class .= ' unseen';
         }
         elseif (isset($msg['date']) && $login_time && strtotime($msg['date']) <= $login_time) {
             $flags = array();
@@ -956,6 +958,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         else {
             $flags = array('unseen');
         }
+        $row_class .= str_replace(' ', '_', $msg['server_name']);
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
@@ -967,7 +970,8 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
                 ),
                 $id,
                 $style,
-                $output_module
+                $output_module,
+                $row_class
             );
         }
         else {
@@ -981,7 +985,8 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
                 ),
                 $id,
                 $style,
-                $output_module
+                $output_module,
+                $row_class
             );
         }
     }

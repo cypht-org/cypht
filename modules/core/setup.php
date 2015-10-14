@@ -73,11 +73,16 @@ add_output('message_list', 'message_list_end', true, 'core', 'message_list_start
 /* search page */
 setup_base_page('search');
 add_output('search', 'search_content_start', true, 'core', 'content_section_start', 'after');
-add_output('search', 'search_form', true, 'core', 'search_content_start', 'after');
-add_output('search', 'message_list_start', true, 'core', 'search_form', 'after');
+add_output('search', 'search_form_start', true, 'core', 'search_content_start', 'after');
+add_output('search', 'search_form_content', true, 'core', 'search_form_start', 'after');
+add_output('search', 'search_form_end', true, 'core', 'search_form_content', 'after');
+add_output('search', 'message_list_start', true, 'core', 'search_form_end', 'after');
 add_output('search', 'search_results_table_end', true, 'core', 'message_list_start', 'after');
 add_output('search', 'search_content_end', true, 'core', 'search_results_table_end', 'after');
 
+/* reset search form */
+setup_base_ajax_page('ajax_reset_search', 'core');
+add_handler('ajax_reset_search', 'reset_search', true, 'core', 'load_user_data', 'after');
 
 /* message view page */
 setup_base_page('message');
@@ -89,18 +94,10 @@ setup_base_page('notfound');
 add_output('notfound', 'notfound_content', true, 'core', 'content_section_start', 'after');
 
 /* message action ajax request */
-add_handler('ajax_message_action', 'login', false);
-add_handler('ajax_message_action', 'load_user_data', true);
-add_handler('ajax_message_action', 'language',  true);
-add_handler('ajax_message_action', 'date', true);
-add_handler('ajax_message_action', 'http_headers', true);
+setup_base_ajax_page('ajax_message_action', 'core');
 
 /* folder list update ajax request */
-add_handler('ajax_hm_folders', 'login', false);
-add_handler('ajax_hm_folders', 'load_user_data', true);
-add_handler('ajax_hm_folders', 'language',  true);
-add_handler('ajax_hm_folders', 'date', true);
-add_handler('ajax_hm_folders', 'http_headers', true);
+setup_base_ajax_page('ajax_hm_folders', 'core');
 add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
 add_output('ajax_hm_folders', 'search_from_folder_list', true);
@@ -126,6 +123,7 @@ return array(
         'servers',
         'ajax_hm_folders',
         'ajax_message_action',
+        'ajax_reset_search',
         'notfound',
         'search'
     ),
@@ -180,6 +178,7 @@ return array(
     ),
 
     'allowed_post' => array(
+        'payload' => FILTER_SANITIZE_STRING,
         'hm_page_key' => FILTER_SANITIZE_STRING,
         'logout' => FILTER_VALIDATE_BOOLEAN,
         'save_and_logout' => FILTER_VALIDATE_BOOLEAN,

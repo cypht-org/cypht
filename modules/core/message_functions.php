@@ -62,7 +62,8 @@ function format_msg_text($str, $output_mod, $links=true) {
         $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,\[\]%[:alnum:]])+)/m";
         $str = preg_replace($link_regex, "<a target=\"_blank\" href=\"$1\">$1</a>", $str);
     }
-    return str_replace('<wbr>', '&#160;<wbr>', $str);
+    $str = str_replace('<wbr>', '&#160;<wbr>', $str);
+    return preg_replace("/^(&gt;.*<br \/>)/m", "<span class=\"reply_quote\">$1</span>", $str);
 }
 
 /**
@@ -90,10 +91,12 @@ function format_reply_text($txt) {
  * @subpackage core/functions
  * @param array $headers message headers
  * @param string $type type (forward, reply, reply_all)
+ * @param array $excluded list of email addresses to exclude from reply-all
  * @return string
  */
-function reply_to_address($headers, $type) {
+function reply_to_address($headers, $type, $excluded) {
     $msg_to = '';
+    $msg_cc = '';
     if ($type == 'forward') {
         return $msg_to;
     }
@@ -109,7 +112,113 @@ function reply_to_address($headers, $type) {
     elseif (array_key_exists('Return-path', $headers)) {
         $msg_to = $headers['Return-path'];
     }
-    return $msg_to;
+    if ($type == 'reply_all') {
+        if (array_key_exists('CC', $headers)) {
+            $msg_cc = $headers['CC'];
+        }
+        if (array_key_exists('To', $headers)) {
+            $recips = format_reply_all_address($headers['To'], $excluded);
+            if ($recips) {
+                if ($msg_cc) {
+                    $msg_cc .= ', '.$recips;
+                }
+                else {
+                    $msg_cc = $recips;
+                }
+            }
+        }
+    }
+    return array($msg_to, $msg_cc);
+}
+
+function format_reply_all_address($fld, $excluded) {
+    $addr = process_address_fld($fld);
+    $res = array();
+    foreach ($addr as $vals) {
+        $skip = false;
+        foreach ($excluded as $v) {
+            if (strtolower(trim($vals['email'], '<>')) == strtolower(trim($v, '<>'))) {
+                $skip = true;
+            }
+        }
+        if (!$skip) {
+            $res[] = $vals;
+        }
+    }
+    if ($res) {
+        return implode(', ', array_map(function($v) { return $v['label'].' '.$v['email']; }, $res));
+    }
+    return '';
+}
+
+/**
+ * Split an E-mail address header in to a list
+ * @param string $str value to split
+ * @return array
+ */
+function split_address_fld($str) {
+    $str = trim($str);
+    $pos = 0;
+    $index = 0;
+    $output = array();
+    $in_quotes = false;
+    $end = strlen($str);
+    $substr = '';
+
+    while ($pos < $end) {
+        if (!$in_quotes && ($str{$pos} == '"' || $str{$pos} == "'")) {
+            $substr = $str{$pos};
+            $in_quotes = $str{$pos};
+        }
+        elseif ($in_quotes && $str{$pos} == $in_quotes) {
+            $substr .= $str{$pos};
+            $in_quotes = false;
+        }
+        elseif ($in_quotes) {
+            $substr .= $str{$pos};
+        }
+        elseif (!$in_quotes && $str{$pos} == ' ') {
+            if ($substr) {
+                $output[$index][] = $substr;
+            }
+            $substr = '';
+        }
+        elseif (!$in_quotes && $str{$pos} == ',') {
+            $output[$index][] = $substr;
+            $substr = '';
+            $index++;
+        }
+        else {
+            $substr .= $str{$pos};
+        }
+        $pos++;
+    }
+    $output[$index][] = $substr;
+    return $output;
+}
+
+/**
+ * Break up an address field into something usable
+ * @param string $fld address field to parse
+ * @return array
+ */
+function process_address_fld($fld) {
+    $res = array();
+    $data = split_address_fld($fld);
+
+    foreach ($data as $vals) {
+        $parts = array();
+        foreach ($vals as $i => $v) {
+            if (is_email($v)) {
+                $parts['email'] = $v;
+                array_splice($vals, $i, 1);
+                $parts['label'] = implode(' ', $vals);
+                $res[] = $parts;
+                break;
+            }
+        }
+    }
+    return $res;
 }
 
 /**
@@ -256,6 +365,27 @@ function format_reply_as_text($body, $type, $reply_type, $lead_in) {
 }
 
 /**
+ * Get the in-reply-to message id for replied
+ * @subpackage core/functions
+ * @param array $headers message headers
+ * @param string $type reply type
+ * @return string
+ */
+function reply_to_id($headers, $type) {
+    $id = '';
+    if ($type != 'forward' && array_key_exists('Message-Id', $headers)) {
+        $id = $headers['Message-Id'];
+    }
+    elseif ($type != 'forward' && array_key_exists('Message-id', $headers)) {
+        $id = $headers['Message-id'];
+    }
+    elseif ($type != 'forward' && array_key_exists('Message-ID', $headers)) {
+        $id = $headers['Message-ID'];
+    }
+    return $id;
+}
+
+/**
  * Get reply field details
  * @subpackage core/functions
  * @param string $body message body
@@ -264,15 +394,18 @@ function format_reply_as_text($body, $type, $reply_type, $lead_in) {
  * @param int $html set to 1 if the output should be HTML
  * @param string $type optional type (forward, reply, reply_all)
  * @param object $output_mod output module object
+ * @param string $type the reply type
+ * @param array $excluded list of email addresses to exclude from reply-all
  * @return array
  */
-function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type='reply') {
+function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type='reply', $excluded) {
     $msg_to = '';
     $msg = '';
     $subject = reply_to_subject($headers, $type);
-    $msg_to = reply_to_address($headers, $type);
+    $msg_id = reply_to_id($headers, $type);
+    list($msg_to, $msg_cc) = reply_to_address($headers, $type, $excluded);
     $lead_in = reply_lead_in($headers, $type, $msg_to, $output_mod);
     $msg = reply_format_body($headers, $body, $lead_in, $type, $struct, $html);
-    return array($msg_to, $subject, $msg);
+    return array($msg_to, $msg_cc, $subject, $msg, $msg_id);
 }
 

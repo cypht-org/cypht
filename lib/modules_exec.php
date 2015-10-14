@@ -296,6 +296,7 @@ class Hm_Module_Exec {
         }
         $class::try_queued_modules();
         $class::process_all_page_queue();
+        $class::try_queued_modules();
     }
 
     /**

@@ -109,7 +109,10 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         Hm_Test_Module_List::add('test', 'queued', false, 'not_added_yet', 'after', true, 'core');
         $this->assertEquals(1, count(Hm_Test_Module_List::get_for_page('test')));
         Hm_Test_Module_List::add('test', 'not_added_yet', false, 'date', 'after', false, 'core');
-        Hm_Test_Module_List::add('test', 'queued', false, 'never_added', 'after', false, 'core');
+        Hm_Test_Module_List::add('test', 'queued', false, 'never_added', 'after', true, 'core');
+        Hm_Test_Module_List::add('test', 'notqueued', false, 'never_added', 'after', true, 'core');
+        Hm_Test_Module_List::try_queued_modules();
+        Hm_Test_Module_List::try_queued_modules();
         Hm_Test_Module_List::try_queued_modules();
         $this->assertEquals(3, count(Hm_Test_Module_List::get_for_page('test')));
     }

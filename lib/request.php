@@ -53,14 +53,22 @@ class Hm_Request {
     /* invalid input fields */
     public $invalid_input_fields = array();
 
+    /* uploaded file details */
+    public $files = array();
+
+    /* module filters */
+    public $filters = array();
+
     /**
      * Process request details
      * @param array $filters list of input filters from module sets
      * @return void
      */
     public function __construct($filters) {
-        $this->filter_request_input($filters);
-        $this->get_other_request_details($filters);
+        $this->filters = $filters;
+        $this->filter_request_input();
+        $this->get_other_request_details();
+        $this->files = $_FILES;
         $this->empty_super_globals();
 
         Hm_Debug::add('Using sapi: '.$this->sapi);
@@ -72,33 +80,31 @@ class Hm_Request {
 
     /**
      * Sanitize and filter user and server input
-     * @param array $filters list of input filters from module sets
      * @return void
      */
-    private function filter_request_input($filters) {
-        if (array_key_exists('allowed_server', $filters)) {
-            $this->server = $this->filter_input(INPUT_SERVER, $_SERVER, $filters['allowed_server']);
+    private function filter_request_input() {
+        if (array_key_exists('allowed_server', $this->filters)) {
+            $this->server = $this->filter_input(INPUT_SERVER, $_SERVER, $this->filters['allowed_server']);
         }
-        if (array_key_exists('allowed_post', $filters)) {
-            $this->post = $this->filter_input(INPUT_POST, $_POST, $filters['allowed_post']);
+        if (array_key_exists('allowed_post', $this->filters)) {
+            $this->post = $this->filter_input(INPUT_POST, $_POST, $this->filters['allowed_post']);
         }
-        if (array_key_exists('allowed_get', $filters)) {
-            $this->get = $this->filter_input(INPUT_GET, $_GET, $filters['allowed_get']);
+        if (array_key_exists('allowed_get', $this->filters)) {
+            $this->get = $this->filter_input(INPUT_GET, $_GET, $this->filters['allowed_get']);
         }
-        if (array_key_exists('allowed_cookie', $filters)) {
-            $this->cookie = $this->filter_input(INPUT_COOKIE, $_COOKIE, $filters['allowed_cookie']);
+        if (array_key_exists('allowed_cookie', $this->filters)) {
+            $this->cookie = $this->filter_input(INPUT_COOKIE, $_COOKIE, $this->filters['allowed_cookie']);
         }
     }
 
     /**
      * Collect other useful details about a request
-     * @param array $filters list of input filters from module sets
      * @return void
      */
-    private function get_other_request_details($filters) {
+    private function get_other_request_details() {
         $this->sapi = php_sapi_name();
-        if (array_key_exists('allowed_output', $filters)) {
-            $this->allowed_output = $filters['allowed_output'];
+        if (array_key_exists('allowed_output', $this->filters)) {
+            $this->allowed_output = $this->filters['allowed_output'];
         }
         if (array_key_exists('REQUEST_URI', $this->server)) {
             $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
@@ -130,7 +136,7 @@ class Hm_Request {
      * @param filters array list of input filters from module sets
      * @return array filtered input data
      */
-    private function filter_input($type, $data, $filters) {
+    public function filter_input($type, $data, $filters) {
         $data = filter_var_array($data, $filters, false);
         if (!$data) {
             return array();
@@ -194,7 +200,7 @@ class Hm_Request {
      * Determine if a request is an AJAX call
      * @return bool true if the request is from an AJAX call
      */
-    private function is_ajax() {
+    public function is_ajax() {
         return array_key_exists('HTTP_X_REQUESTED_WITH', $this->server) && strtolower($this->server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 

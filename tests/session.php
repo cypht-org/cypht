@@ -19,7 +19,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
     public function test_build_fingerprint() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
-        $this->assertEquals('f60ed56a9c8275894022fe5a7a1625c33bdb55b729bb4e38962af4d1613eda25', $session->build_fingerprint($request));
+        $this->assertEquals('f60ed56a9c8275894022fe5a7a1625c33bdb55b729bb4e38962af4d1613eda25', $session->build_fingerprint($request->server));
         $session->destroy($request);
     }
     /**

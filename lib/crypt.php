@@ -28,7 +28,7 @@ class Hm_Request_Key {
         else {
             $user = '';
         }
-        self::$site_hash = $session->build_fingerprint($request, $user.SITE_ID);
+        self::$site_hash = $session->build_fingerprint($request->server, $user.SITE_ID);
     }
 
     /**

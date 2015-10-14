@@ -1,0 +1,11 @@
+.nasa_connect_section { padding: 20px; padding-bottom: 40px; display: none; padding-left: 40px; }
+.nasa_connect_section div { padding-bottom: 20px; }
+.nasa_connect_section input { margin-right: 10px; }
+.apod_title { color: #666; margin: 20px; font-size: 125%; }
+.apod_image { margin: 20px; }
+.apod_desc { margin: 20px; max-width: 1024px; }
+.apod_video, .apod_desc, .apod_image, .apod_title { margin-left: 30px; }
+.apod_date { float: right; margin-right: 20px; font-size: 75%; }
+.apod_date_fld { margin-right: 10px; }
+.apod_error { color: red; text-align: center; padding-top: 100px; }
+.apod_date a { padding-right: 10px; padding-left: 10px; }

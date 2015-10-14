@@ -22,6 +22,7 @@ require APP_PATH.'lib/output.php';
 require APP_PATH.'lib/crypt.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
+require APP_PATH.'lib/api.php';
 
 if (!class_exists('Hm_Functions')) {
     /**

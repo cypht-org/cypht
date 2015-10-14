@@ -75,6 +75,15 @@ trait Hm_Module_Output {
     }
 
     /**
+     * Sanitize input string
+     * @param string $string text to sanitize
+     * @return string sanitized value
+     */
+    public function html_safe($string) {
+        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
+    /**
      * Concatenate a value
      * @param string $name name to add to
      * @param string $value value to add
@@ -218,13 +227,9 @@ abstract class Hm_Handler_Module {
      * @return void
      */
     public function process_key() {
-
-        Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
-
         if (empty($this->request->post)) {
             return false;
         }
-
         $key = array_key_exists('hm_page_key', $this->request->post) ? $this->request->post['hm_page_key'] : false;
         $valid = Hm_Request_Key::validate($key);
         if (!$valid) {
@@ -347,15 +352,6 @@ abstract class Hm_Output_Module {
             $this->dir = $lang_str['interface_direction'];
         }
         return $this->output($format);
-    }
-
-    /**
-     * Sanitize input string
-     * @param string $string text to sanitize
-     * @return string sanitized value
-     */
-    public function html_safe($string) {
-        return htmlspecialchars($string, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     /**

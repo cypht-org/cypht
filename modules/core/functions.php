@@ -328,7 +328,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
 function process_since_argument($val, $validate=false) {
     $date = false;
     $valid = false;
-    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year'), true)) {
+    if (in_array($val, array('-1 week', '-2 weeks', '-4 weeks', '-6 weeks', '-6 months', '-1 year', '-5 years'), true)) {
         $valid = $val;
         $date = date('j-M-Y', strtotime($val));
     }
@@ -421,6 +421,21 @@ function filter_auth_servers($handler) {
         }
     }
     $handler->user_config->reload($config);
+}
+
+/**
+ * Setup commonly used modules for an ajax request
+ * @subpackage core/functions
+ * @param string $name the page id
+ * @param string $source the module set name
+ * @return void
+ */
+function setup_base_ajax_page($name, $source=false) {
+    add_handler($name, 'login', false, $source);
+    add_handler($name, 'load_user_data', true, $source);
+    add_handler($name, 'language',  true, $source);
+    add_handler($name, 'date', true, $source);
+    add_handler($name, 'http_headers', true, $source);
 }
 
 /**

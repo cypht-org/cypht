@@ -14,6 +14,7 @@ class Hm_Oauth2 {
     private $client_id;
     private $client_secret;
     private $redirect_uri;
+    private $api;
 
     /**
      * Load default settings
@@ -26,6 +27,7 @@ class Hm_Oauth2 {
         $this->client_id = $id;
         $this->client_secret = $secret;
         $this->redirect_uri = $uri;
+        $this->api = new Hm_API_Curl();
     }
 
     /**
@@ -53,11 +55,8 @@ class Hm_Oauth2 {
      * @return array
      */
     public function request_token($url, $authorization_code) {
-        $flds = sprintf('code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code',
-            urlencode($authorization_code), urlencode($this->client_id), urlencode($this->client_secret),
-            urlencode($this->redirect_uri));
-
-        return $this->curl_post($url, $flds);
+        return $this->api->command($url, array(), array( 'code' => $authorization_code, 'client_id' => $this->client_id,
+            'client_secret' => $this->client_secret, 'redirect_uri' => $this->redirect_uri, 'grant_type' => 'authorization_code'));
     }
 
     /**
@@ -67,33 +66,7 @@ class Hm_Oauth2 {
      * @return array
      */
     public function refresh_token($url, $refresh_token) {
-        $flds = sprintf('client_id=%s&client_secret=%s&refresh_token=%s&grant_type=refresh_token',
-            urlencode($this->client_id), urlencode($this->client_secret), urlencode($refresh_token));
-
-        return $this->curl_post($url, $flds);
-    }
-
-    /**
-     * post to an oauth2 endpoint
-     * @param string $url url to post to
-     * @param array $flds post data
-     * @return array
-     */
-    private function curl_post($url, $flds) {
-        $result = array();
-        $ch = Hm_Functions::c_init();
-        Hm_Functions::c_setopt($ch, CURLOPT_URL, $url);
-        Hm_Functions::c_setopt($ch, CURLOPT_POST, 5);
-        Hm_Functions::c_setopt($ch, CURLOPT_POSTFIELDS, $flds);
-        Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        Hm_Functions::c_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Accept: application/json'
-        ));
-
-        $curl_result = Hm_Functions::c_exec($ch);
-        if (substr($curl_result, 0, 1) == '{') {
-            $result = @json_decode($curl_result, true);
-        }
-        return $result;
+        return $this->api->command($url, array(), array( 'client_id' => $this->client_id, 'client_secret' => $this->client_secret,
+            'refresh_token' => $refresh_token, 'grant_type' => 'refresh_token'));
     }
 }

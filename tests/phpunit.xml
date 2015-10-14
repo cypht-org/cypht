@@ -41,6 +41,9 @@
     <testsuite name="servers">
         <file>./servers.php</file>
     </testsuite>
+    <testsuite name="api">
+        <file>./api.php</file>
+    </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false" processUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">../lib</directory>

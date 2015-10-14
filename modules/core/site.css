@@ -11,7 +11,7 @@ td { vertical-align: top; }
 .subtitle { color: teal; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
 .title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
 .date { display: none; position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
-.sys_messages { min-height: 37px; cursor: pointer; display: none; position: absolute; opacity: .8; background-color: #fff; color: teal; left: 0px; right: 0px; margin-top: 0px; text-align: center; background-color: #efefef; padding: 8px; white-space: nowrap; border: solid 1px #ddd; z-index: 100}
+.sys_messages { position: absolute; left: 0px; top: 0px; right: 0px; min-height: 30px; cursor: pointer; display: none; background-color: #fff; color: teal; margin-top: 0px; text-align: center; background-color: #efefef; padding: 8px; padding-bottom: 0px; white-space: nowrap; border: solid 1px #ddd; z-index: 100; }
 .logged_out { display: block !important; }
 #theme_setting, #timezone_setting { max-width: 200px; }
 .s_pre { color: #666}
@@ -44,7 +44,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
 .inner_list { margin-bottom: 10px; } 
-.folders a { color: #555; text-decoration: none; line-height: 1.25em; }
+.folders a, .unread_link { color: #555; text-decoration: none; line-height: 1.25em; }
 .folder_list { background-color: #fff; margin-right: 20px; padding-right: 15px; padding-bottom: 40px; min-width: 200px; padding-top: 0px; }
 .folder_cell { vertical-align: top; height: 100%; max-width: 15%; display: table-cell; padding: 0px; margin: 0px; }
 .content_cell { vertical-align: top; height: 100%;  width: 100%; padding: 0px; margin: 0px; display: table-cell; background-color: #fff; padding-top: 0px; }
@@ -128,7 +128,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .src_title { font-size: 110%; padding: 5px; margin-bottom: 10px; }
 .del_src_link { padding: 3px; color: #666; margin-right: 5px; }
 .search_form { font-size: 80%; color: #999; display: inline; padding-left: 15px; }
-.search_form input, .search_form select { margin-right: 10px; margin-left: 3px; }
+.search_form input, .search_form select { margin-right: 3px; margin-left: 3px; }
 .search_terms { padding-left: 5px; }
 .folder_list .search_terms { width: 80%; }
 .search_content { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
@@ -138,6 +138,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .msg_text_inner p { padding: 5px; }
 .save_reminder { clear: both; float: right; margin-right: 25px; }
 .save_reminder img { opacity: .4; }
+.reply_quote { color: #999; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
@@ -155,6 +156,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .rtl_page .list_controls { left: 0px; padding-left: 10px; top: 0px; padding-top: 10px; right: auto; background-color: #fff; }
 .rtl_page .toggle_link { margin-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
+div.unseen, .unseen .subject { font-weight: 700; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }
@@ -174,6 +176,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .msg_text_inner { font-size: 140%; }
     .list_meta { display: none; }
     .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
+    .header_subject th { max-width: 360px; white-space: normal !important; word-break: break-all; word-wrap: break-word; overflow: hidden !important; }
+    .msg_headers th { padding-left: 10px !important; }
+    .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
 }
 @media screen and (max-device-width:1080px) and (orientation : landscape) {
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
@@ -190,6 +195,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .msg_text_inner { font-size: 140%; }
     .msg_controls { position: absolute; background-color: #fff !important; }
     .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
+    .header_subject th { max-width: 360px; white-space: normal !important; word-break: break-all; word-wrap: break-word; overflow: hidden !important; }
+    .msg_headers th { padding-left: 10px !important; }
+    .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
 }
 @media screen and (max-device-width:480px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
@@ -198,7 +206,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .list_controls { margin-top: -20px; position: relative; float: right; padding-right: 10px; }
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
     .folder_list { display: none; width: 340px; }
-    .content_cell { min-width: 360px; max-width: 480px; word-break: break-all; word-wrap: break-word;}
+    .content_cell { min-width: 360px; max-width: 480px; }
+    .msg_parts { padding-left: 5px !important; }
+    .msg_parts td { font-size: 90%; padding: 0px !important; padding-right: 5px !important; }
     .content_title { padding-left: 30px; padding-top: 20px; margin-bottom: 5px; }
     .folder_toggle { display: block; top: 19px; left: 0px; }
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
@@ -208,13 +218,20 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
     .folder_toggle img { width: 24px; height: 24px; }
     .update_message_list { margin-right: 20px; }
     .msg_text { max-width: 360px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
-    .msg_text_inner { font-size: 100%; }
     .msg_controls { position: absolute; background-color: #fff !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; }
-    .header_subject th { max-width: 360px; white-space: normal !important; word-break: break-all; word-wrap: break-word; overflow: visible !important; }
+    .header_subject th { white-space: normal !important; word-break: break-all !important; word-wrap: break-word !important; }
     .msg_headers th { padding-left: 10px !important; }
-    .msg_text_inner { padding-left: 10px !important; font-size: 120%; }
+    .nlink, .plink, .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
+    .msg_text_inner { padding-left: 10px !important; font-size: 120%; padding: 10px !important; }
     .list_meta { display: none; }
     .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
+    .header_links, .nlink { white-space: normal !important; word-break: break-all; word-wrap: break-word; }
+    .search_form select, .search_form button, .search_form input { display: block; margin-left: 0px !important; margin: 0px; margin-top: 5px; }
+    .search_form label { display: none; }
+    .search_update { float: right; }
+    .search_content .refresh_list { display: none; }
+    .search_content .content_title { max-height: 500px; }
+
 }
 .debug {
     -webkit-mask-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .3) 70%);
