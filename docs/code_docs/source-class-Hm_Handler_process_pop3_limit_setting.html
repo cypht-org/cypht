@@ -1010,6 +1010,7 @@
 				<li><a href="function-format_msg_part_section.html">format_msg_part_section</a></li>
 				<li><a href="function-format_msg_text.html">format_msg_text</a></li>
 				<li><a href="function-format_pop3_message_list.html">format_pop3_message_list</a></li>
+				<li><a href="function-format_reply_all_address.html">format_reply_all_address</a></li>
 				<li><a href="function-format_reply_as_html.html">format_reply_as_html</a></li>
 				<li><a href="function-format_reply_as_text.html">format_reply_as_text</a></li>
 				<li><a href="function-format_reply_fields.html">format_reply_fields</a></li>
@@ -1052,6 +1053,7 @@
 				<li><a href="function-parse_contact_xml.html">parse_contact_xml</a></li>
 				<li><a href="function-payload_search.html">payload_search</a></li>
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
+				<li><a href="function-process_address_fld.html">process_address_fld</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
 				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
 				<li><a href="function-process_site_setting.html">process_site_setting</a></li>
@@ -1075,6 +1077,7 @@
 				<li><a href="function-smtp_refresh_oauth2_token.html">smtp_refresh_oauth2_token</a></li>
 				<li><a href="function-smtp_server_dropdown.html">smtp_server_dropdown</a></li>
 				<li><a href="function-sort_by_internal_date.html">sort_by_internal_date</a></li>
+				<li><a href="function-split_address_fld.html">split_address_fld</a></li>
 				<li><a href="function-start_api.html">start_api</a></li>
 				<li><a href="function-subject_callback.html">subject_callback</a></li>
 				<li><a href="function-translate_time_str.html">translate_time_str</a></li>
@@ -1772,7 +1775,7 @@
 </span><span id="634" class="l"><a href="#634"> 634: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;label class=&quot;screen_reader&quot; for=&quot;new_pop3_address&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'POP3 server address'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
 </span><span id="635" class="l"><a href="#635"> 635: </a>            <span class="php-quote">'&lt;input required type=&quot;text&quot; id=&quot;new_pop3_address&quot; name=&quot;new_pop3_address&quot; class=&quot;txt_fld&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'POP3 server address'</span>).<span class="php-quote">'&quot; value=&quot;&quot;/&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
 </span><span id="636" class="l"><a href="#636"> 636: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;label for=&quot;new_pop3_port&quot; class=&quot;screen_reader&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'POP3 port'</span>).<span class="php-quote">'&lt;/label&gt;'</span>.
-</span><span id="637" class="l"><a href="#637"> 637: </a>            <span class="php-quote">'&lt;input required type=&quot;number&quot; id=&quot;new_pop3_port&quot; name=&quot;new_pop3_port&quot; class=&quot;port_fld&quot; value=&quot;&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Port'</span>).<span class="php-quote">'&quot;&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
+</span><span id="637" class="l"><a href="#637"> 637: </a>            <span class="php-quote">'&lt;input required type=&quot;number&quot; id=&quot;new_pop3_port&quot; name=&quot;new_pop3_port&quot; class=&quot;port_fld&quot; value=&quot;995&quot; placeholder=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Port'</span>).<span class="php-quote">'&quot;&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
 </span><span id="638" class="l"><a href="#638"> 638: </a>            <span class="php-quote">'&lt;tr&gt;&lt;td&gt;&lt;input type=&quot;checkbox&quot; name=&quot;tls&quot; value=&quot;1&quot; id=&quot;pop3_tls&quot; checked=&quot;checked&quot; /&gt; &lt;label for=&quot;pop3_tls&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Use TLS'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
 </span><span id="639" class="l"><a href="#639"> 639: </a>            <span class="php-quote">'&lt;td&gt;&lt;input type=&quot;submit&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add'</span>).<span class="php-quote">'&quot; name=&quot;submit_pop3_server&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>.
 </span><span id="640" class="l"><a href="#640"> 640: </a>            <span class="php-quote">'&lt;/table&gt;&lt;/form&gt;'</span>;
@@ -2067,94 +2070,99 @@
 </span><span id="929" class="l"><a href="#929"> 929: </a><span class="php-keyword1">function</span> format_pop3_message_list(<span class="php-var">$msg_list</span>, <span class="php-var">$output_module</span>, <span class="php-var">$style</span>, <span class="php-var">$login_time</span>, <span class="php-var">$list_parent</span>) {
 </span><span id="930" class="l"><a href="#930"> 930: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
 </span><span id="931" class="l"><a href="#931"> 931: </a>    <span class="php-keyword1">foreach</span>(<span class="php-var">$msg_list</span> <span class="php-keyword1">as</span> <span class="php-var">$msg_id</span> =&gt; <span class="php-var">$msg</span>) {
-</span><span id="932" class="l"><a href="#932"> 932: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>] == <span class="php-quote">'Default-Auth-Server'</span>) {
-</span><span id="933" class="l"><a href="#933"> 933: </a>            <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>] = <span class="php-quote">'Default'</span>;
-</span><span id="934" class="l"><a href="#934"> 934: </a>        }
-</span><span id="935" class="l"><a href="#935"> 935: </a>        <span class="php-var">$id</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;pop3_%s_%s&quot;</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_id'</span>], <span class="php-var">$msg_id</span>);
-</span><span id="936" class="l"><a href="#936"> 936: </a>        <span class="php-var">$subject</span> = display_value(<span class="php-quote">'subject'</span>, <span class="php-var">$msg</span>);;
-</span><span id="937" class="l"><a href="#937"> 937: </a>        <span class="php-var">$from</span> = display_value(<span class="php-quote">'from'</span>, <span class="php-var">$msg</span>);
-</span><span id="938" class="l"><a href="#938"> 938: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span> &amp;&amp; !<span class="php-var">$from</span>) {
-</span><span id="939" class="l"><a href="#939"> 939: </a>            <span class="php-var">$from</span> = <span class="php-quote">'[No From]'</span>;
-</span><span id="940" class="l"><a href="#940"> 940: </a>        }
-</span><span id="941" class="l"><a href="#941"> 941: </a>        <span class="php-var">$date</span> = display_value(<span class="php-quote">'date'</span>, <span class="php-var">$msg</span>);
-</span><span id="942" class="l"><a href="#942"> 942: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$date</span>) {
-</span><span id="943" class="l"><a href="#943"> 943: </a>            <span class="php-var">$date</span> = translate_time_str(<span class="php-var">$date</span>, <span class="php-var">$output_module</span>);
-</span><span id="944" class="l"><a href="#944"> 944: </a>        }
-</span><span id="945" class="l"><a href="#945"> 945: </a>        <span class="php-var">$timestamp</span> = display_value(<span class="php-quote">'date'</span>, <span class="php-var">$msg</span>, <span class="php-quote">'time'</span>);
-</span><span id="946" class="l"><a href="#946"> 946: </a>        <span class="php-var">$url</span> = <span class="php-quote">'?page=message&amp;uid='</span>.<span class="php-var">$msg_id</span>.<span class="php-quote">'&amp;list_path='</span>.<span class="php-keyword2">sprintf</span>(<span class="php-quote">'pop3_%d'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_id'</span>]).<span class="php-quote">'&amp;list_parent='</span>.<span class="php-var">$list_parent</span>;
-</span><span id="947" class="l"><a href="#947"> 947: </a>        <span class="php-keyword1">if</span> (Hm_POP3_Uid_Cache::is_read(<span class="php-var">$id</span>)) {
-</span><span id="948" class="l"><a href="#948"> 948: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
-</span><span id="949" class="l"><a href="#949"> 949: </a>        }
-</span><span id="950" class="l"><a href="#950"> 950: </a>        <span class="php-keyword1">elseif</span> (Hm_POP3_Uid_Cache::is_unread(<span class="php-var">$id</span>)) {
-</span><span id="951" class="l"><a href="#951"> 951: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
-</span><span id="952" class="l"><a href="#952"> 952: </a>        }
-</span><span id="953" class="l"><a href="#953"> 953: </a>        <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$msg</span>[<span class="php-quote">'date'</span>]) &amp;&amp; <span class="php-var">$login_time</span> &amp;&amp; <span class="php-keyword2">strtotime</span>(<span class="php-var">$msg</span>[<span class="php-quote">'date'</span>]) &lt;= <span class="php-var">$login_time</span>) {
-</span><span id="954" class="l"><a href="#954"> 954: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
-</span><span id="955" class="l"><a href="#955"> 955: </a>        }
-</span><span id="956" class="l"><a href="#956"> 956: </a>        <span class="php-keyword1">else</span> {
-</span><span id="957" class="l"><a href="#957"> 957: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
-</span><span id="958" class="l"><a href="#958"> 958: </a>        }
-</span><span id="959" class="l"><a href="#959"> 959: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
-</span><span id="960" class="l"><a href="#960"> 960: </a>            <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
-</span><span id="961" class="l"><a href="#961"> 961: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
-</span><span id="962" class="l"><a href="#962"> 962: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>),
-</span><span id="963" class="l"><a href="#963"> 963: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
-</span><span id="964" class="l"><a href="#964"> 964: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>]),
-</span><span id="965" class="l"><a href="#965"> 965: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
-</span><span id="966" class="l"><a href="#966"> 966: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, <span class="php-var">$date</span>, <span class="php-var">$timestamp</span>),
-</span><span id="967" class="l"><a href="#967"> 967: </a>                ),
-</span><span id="968" class="l"><a href="#968"> 968: </a>                <span class="php-var">$id</span>,
-</span><span id="969" class="l"><a href="#969"> 969: </a>                <span class="php-var">$style</span>,
-</span><span id="970" class="l"><a href="#970"> 970: </a>                <span class="php-var">$output_module</span>
-</span><span id="971" class="l"><a href="#971"> 971: </a>            );
-</span><span id="972" class="l"><a href="#972"> 972: </a>        }
-</span><span id="973" class="l"><a href="#973"> 973: </a>        <span class="php-keyword1">else</span> {
-</span><span id="974" class="l"><a href="#974"> 974: </a>            <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
-</span><span id="975" class="l"><a href="#975"> 975: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
-</span><span id="976" class="l"><a href="#976"> 976: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>]),
-</span><span id="977" class="l"><a href="#977"> 977: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
-</span><span id="978" class="l"><a href="#978"> 978: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
-</span><span id="979" class="l"><a href="#979"> 979: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, <span class="php-var">$date</span>, <span class="php-var">$timestamp</span>),
-</span><span id="980" class="l"><a href="#980"> 980: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>)
-</span><span id="981" class="l"><a href="#981"> 981: </a>                ),
-</span><span id="982" class="l"><a href="#982"> 982: </a>                <span class="php-var">$id</span>,
-</span><span id="983" class="l"><a href="#983"> 983: </a>                <span class="php-var">$style</span>,
-</span><span id="984" class="l"><a href="#984"> 984: </a>                <span class="php-var">$output_module</span>
-</span><span id="985" class="l"><a href="#985"> 985: </a>            );
-</span><span id="986" class="l"><a href="#986"> 986: </a>        }
-</span><span id="987" class="l"><a href="#987"> 987: </a>    }
-</span><span id="988" class="l"><a href="#988"> 988: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="989" class="l"><a href="#989"> 989: </a>}
-</span><span id="990" class="l"><a href="#990"> 990: </a>
-</span><span id="991" class="l"><a href="#991"> 991: </a><span class="php-comment">/**
-</span></span><span id="992" class="l"><a href="#992"> 992: </a><span class="php-comment"> * Search a POP3 message
-</span></span><span id="993" class="l"><a href="#993"> 993: </a><span class="php-comment"> * @subpackage pop3/functions
-</span></span><span id="994" class="l"><a href="#994"> 994: </a><span class="php-comment"> * @param string $body message body
-</span></span><span id="995" class="l"><a href="#995"> 995: </a><span class="php-comment"> * @param array $headers message headers
-</span></span><span id="996" class="l"><a href="#996"> 996: </a><span class="php-comment"> * @param string $terms search terms
-</span></span><span id="997" class="l"><a href="#997"> 997: </a><span class="php-comment"> * @param string $fld field to search
-</span></span><span id="998" class="l"><a href="#998"> 998: </a><span class="php-comment"> * @return bool
-</span></span><span id="999" class="l"><a href="#999"> 999: </a><span class="php-comment"> */</span>
-</span><span id="1000" class="l"><a href="#1000">1000: </a><span class="php-keyword1">function</span> search_pop3_msg(<span class="php-var">$body</span>, <span class="php-var">$headers</span>, <span class="php-var">$terms</span>, <span class="php-var">$fld</span>) {
-</span><span id="1001" class="l"><a href="#1001">1001: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$fld</span> == <span class="php-quote">'TEXT'</span>) {
-</span><span id="1002" class="l"><a href="#1002">1002: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$body</span>, <span class="php-var">$terms</span>)) {
-</span><span id="1003" class="l"><a href="#1003">1003: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
-</span><span id="1004" class="l"><a href="#1004">1004: </a>        }
-</span><span id="1005" class="l"><a href="#1005">1005: </a>    }
-</span><span id="1006" class="l"><a href="#1006">1006: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$fld</span> == <span class="php-quote">'SUBJECT'</span>) {
-</span><span id="1007" class="l"><a href="#1007">1007: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'subject'</span>, <span class="php-var">$headers</span>) &amp;&amp; <span class="php-keyword2">stristr</span>(<span class="php-var">$headers</span>[<span class="php-quote">'subject'</span>], <span class="php-var">$terms</span>)) {
+</span><span id="932" class="l"><a href="#932"> 932: </a>        <span class="php-var">$row_class</span> = <span class="php-quote">'email'</span>;
+</span><span id="933" class="l"><a href="#933"> 933: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>] == <span class="php-quote">'Default-Auth-Server'</span>) {
+</span><span id="934" class="l"><a href="#934"> 934: </a>            <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>] = <span class="php-quote">'Default'</span>;
+</span><span id="935" class="l"><a href="#935"> 935: </a>        }
+</span><span id="936" class="l"><a href="#936"> 936: </a>        <span class="php-var">$id</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;pop3_%s_%s&quot;</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_id'</span>], <span class="php-var">$msg_id</span>);
+</span><span id="937" class="l"><a href="#937"> 937: </a>        <span class="php-var">$subject</span> = display_value(<span class="php-quote">'subject'</span>, <span class="php-var">$msg</span>);;
+</span><span id="938" class="l"><a href="#938"> 938: </a>        <span class="php-var">$from</span> = display_value(<span class="php-quote">'from'</span>, <span class="php-var">$msg</span>);
+</span><span id="939" class="l"><a href="#939"> 939: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span> &amp;&amp; !<span class="php-var">$from</span>) {
+</span><span id="940" class="l"><a href="#940"> 940: </a>            <span class="php-var">$from</span> = <span class="php-quote">'[No From]'</span>;
+</span><span id="941" class="l"><a href="#941"> 941: </a>        }
+</span><span id="942" class="l"><a href="#942"> 942: </a>        <span class="php-var">$date</span> = display_value(<span class="php-quote">'date'</span>, <span class="php-var">$msg</span>);
+</span><span id="943" class="l"><a href="#943"> 943: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$date</span>) {
+</span><span id="944" class="l"><a href="#944"> 944: </a>            <span class="php-var">$date</span> = translate_time_str(<span class="php-var">$date</span>, <span class="php-var">$output_module</span>);
+</span><span id="945" class="l"><a href="#945"> 945: </a>        }
+</span><span id="946" class="l"><a href="#946"> 946: </a>        <span class="php-var">$timestamp</span> = display_value(<span class="php-quote">'date'</span>, <span class="php-var">$msg</span>, <span class="php-quote">'time'</span>);
+</span><span id="947" class="l"><a href="#947"> 947: </a>        <span class="php-var">$url</span> = <span class="php-quote">'?page=message&amp;uid='</span>.<span class="php-var">$msg_id</span>.<span class="php-quote">'&amp;list_path='</span>.<span class="php-keyword2">sprintf</span>(<span class="php-quote">'pop3_%d'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_id'</span>]).<span class="php-quote">'&amp;list_parent='</span>.<span class="php-var">$list_parent</span>;
+</span><span id="948" class="l"><a href="#948"> 948: </a>        <span class="php-keyword1">if</span> (Hm_POP3_Uid_Cache::is_read(<span class="php-var">$id</span>)) {
+</span><span id="949" class="l"><a href="#949"> 949: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
+</span><span id="950" class="l"><a href="#950"> 950: </a>        }
+</span><span id="951" class="l"><a href="#951"> 951: </a>        <span class="php-keyword1">elseif</span> (Hm_POP3_Uid_Cache::is_unread(<span class="php-var">$id</span>)) {
+</span><span id="952" class="l"><a href="#952"> 952: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
+</span><span id="953" class="l"><a href="#953"> 953: </a>            <span class="php-var">$row_class</span> .= <span class="php-quote">' unseen'</span>;
+</span><span id="954" class="l"><a href="#954"> 954: </a>        }
+</span><span id="955" class="l"><a href="#955"> 955: </a>        <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$msg</span>[<span class="php-quote">'date'</span>]) &amp;&amp; <span class="php-var">$login_time</span> &amp;&amp; <span class="php-keyword2">strtotime</span>(<span class="php-var">$msg</span>[<span class="php-quote">'date'</span>]) &lt;= <span class="php-var">$login_time</span>) {
+</span><span id="956" class="l"><a href="#956"> 956: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
+</span><span id="957" class="l"><a href="#957"> 957: </a>        }
+</span><span id="958" class="l"><a href="#958"> 958: </a>        <span class="php-keyword1">else</span> {
+</span><span id="959" class="l"><a href="#959"> 959: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
+</span><span id="960" class="l"><a href="#960"> 960: </a>        }
+</span><span id="961" class="l"><a href="#961"> 961: </a>        <span class="php-var">$row_class</span> .= <span class="php-keyword2">str_replace</span>(<span class="php-quote">' '</span>, <span class="php-quote">'_'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>]);
+</span><span id="962" class="l"><a href="#962"> 962: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="963" class="l"><a href="#963"> 963: </a>            <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
+</span><span id="964" class="l"><a href="#964"> 964: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
+</span><span id="965" class="l"><a href="#965"> 965: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>),
+</span><span id="966" class="l"><a href="#966"> 966: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
+</span><span id="967" class="l"><a href="#967"> 967: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>]),
+</span><span id="968" class="l"><a href="#968"> 968: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
+</span><span id="969" class="l"><a href="#969"> 969: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, <span class="php-var">$date</span>, <span class="php-var">$timestamp</span>),
+</span><span id="970" class="l"><a href="#970"> 970: </a>                ),
+</span><span id="971" class="l"><a href="#971"> 971: </a>                <span class="php-var">$id</span>,
+</span><span id="972" class="l"><a href="#972"> 972: </a>                <span class="php-var">$style</span>,
+</span><span id="973" class="l"><a href="#973"> 973: </a>                <span class="php-var">$output_module</span>,
+</span><span id="974" class="l"><a href="#974"> 974: </a>                <span class="php-var">$row_class</span>
+</span><span id="975" class="l"><a href="#975"> 975: </a>            );
+</span><span id="976" class="l"><a href="#976"> 976: </a>        }
+</span><span id="977" class="l"><a href="#977"> 977: </a>        <span class="php-keyword1">else</span> {
+</span><span id="978" class="l"><a href="#978"> 978: </a>            <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
+</span><span id="979" class="l"><a href="#979"> 979: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
+</span><span id="980" class="l"><a href="#980"> 980: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>]),
+</span><span id="981" class="l"><a href="#981"> 981: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
+</span><span id="982" class="l"><a href="#982"> 982: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-var">$subject</span>, <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
+</span><span id="983" class="l"><a href="#983"> 983: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, <span class="php-var">$date</span>, <span class="php-var">$timestamp</span>),
+</span><span id="984" class="l"><a href="#984"> 984: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>)
+</span><span id="985" class="l"><a href="#985"> 985: </a>                ),
+</span><span id="986" class="l"><a href="#986"> 986: </a>                <span class="php-var">$id</span>,
+</span><span id="987" class="l"><a href="#987"> 987: </a>                <span class="php-var">$style</span>,
+</span><span id="988" class="l"><a href="#988"> 988: </a>                <span class="php-var">$output_module</span>,
+</span><span id="989" class="l"><a href="#989"> 989: </a>                <span class="php-var">$row_class</span>
+</span><span id="990" class="l"><a href="#990"> 990: </a>            );
+</span><span id="991" class="l"><a href="#991"> 991: </a>        }
+</span><span id="992" class="l"><a href="#992"> 992: </a>    }
+</span><span id="993" class="l"><a href="#993"> 993: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="994" class="l"><a href="#994"> 994: </a>}
+</span><span id="995" class="l"><a href="#995"> 995: </a>
+</span><span id="996" class="l"><a href="#996"> 996: </a><span class="php-comment">/**
+</span></span><span id="997" class="l"><a href="#997"> 997: </a><span class="php-comment"> * Search a POP3 message
+</span></span><span id="998" class="l"><a href="#998"> 998: </a><span class="php-comment"> * @subpackage pop3/functions
+</span></span><span id="999" class="l"><a href="#999"> 999: </a><span class="php-comment"> * @param string $body message body
+</span></span><span id="1000" class="l"><a href="#1000">1000: </a><span class="php-comment"> * @param array $headers message headers
+</span></span><span id="1001" class="l"><a href="#1001">1001: </a><span class="php-comment"> * @param string $terms search terms
+</span></span><span id="1002" class="l"><a href="#1002">1002: </a><span class="php-comment"> * @param string $fld field to search
+</span></span><span id="1003" class="l"><a href="#1003">1003: </a><span class="php-comment"> * @return bool
+</span></span><span id="1004" class="l"><a href="#1004">1004: </a><span class="php-comment"> */</span>
+</span><span id="1005" class="l"><a href="#1005">1005: </a><span class="php-keyword1">function</span> search_pop3_msg(<span class="php-var">$body</span>, <span class="php-var">$headers</span>, <span class="php-var">$terms</span>, <span class="php-var">$fld</span>) {
+</span><span id="1006" class="l"><a href="#1006">1006: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$fld</span> == <span class="php-quote">'TEXT'</span>) {
+</span><span id="1007" class="l"><a href="#1007">1007: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$body</span>, <span class="php-var">$terms</span>)) {
 </span><span id="1008" class="l"><a href="#1008">1008: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
 </span><span id="1009" class="l"><a href="#1009">1009: </a>        }
 </span><span id="1010" class="l"><a href="#1010">1010: </a>    }
-</span><span id="1011" class="l"><a href="#1011">1011: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$fld</span> == <span class="php-quote">'FROM'</span>) {
-</span><span id="1012" class="l"><a href="#1012">1012: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'from'</span>, <span class="php-var">$headers</span>) &amp;&amp; <span class="php-keyword2">stristr</span>(<span class="php-var">$headers</span>[<span class="php-quote">'from'</span>], <span class="php-var">$terms</span>)) {
+</span><span id="1011" class="l"><a href="#1011">1011: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$fld</span> == <span class="php-quote">'SUBJECT'</span>) {
+</span><span id="1012" class="l"><a href="#1012">1012: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'subject'</span>, <span class="php-var">$headers</span>) &amp;&amp; <span class="php-keyword2">stristr</span>(<span class="php-var">$headers</span>[<span class="php-quote">'subject'</span>], <span class="php-var">$terms</span>)) {
 </span><span id="1013" class="l"><a href="#1013">1013: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
 </span><span id="1014" class="l"><a href="#1014">1014: </a>        }
 </span><span id="1015" class="l"><a href="#1015">1015: </a>    }
-</span><span id="1016" class="l"><a href="#1016">1016: </a>}
-</span><span id="1017" class="l"><a href="#1017">1017: </a>
-</span><span id="1018" class="l"><a href="#1018">1018: </a>
-</span><span id="1019" class="l"><a href="#1019">1019: </a></span></code></pre>
+</span><span id="1016" class="l"><a href="#1016">1016: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$fld</span> == <span class="php-quote">'FROM'</span>) {
+</span><span id="1017" class="l"><a href="#1017">1017: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'from'</span>, <span class="php-var">$headers</span>) &amp;&amp; <span class="php-keyword2">stristr</span>(<span class="php-var">$headers</span>[<span class="php-quote">'from'</span>], <span class="php-var">$terms</span>)) {
+</span><span id="1018" class="l"><a href="#1018">1018: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="1019" class="l"><a href="#1019">1019: </a>        }
+</span><span id="1020" class="l"><a href="#1020">1020: </a>    }
+</span><span id="1021" class="l"><a href="#1021">1021: </a>}
+</span><span id="1022" class="l"><a href="#1022">1022: </a>
+</span><span id="1023" class="l"><a href="#1023">1023: </a>
+</span><span id="1024" class="l"><a href="#1024">1024: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -2162,6 +2170,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?7f80dbdda44f63bf3f4fd3dd5af1c88cf6268a3a"></script>
+<script src="elementlist.js?f517b7df0a3f53758db4bbd59ffd8d6faf8b7230"></script>
 </body>
 </html>

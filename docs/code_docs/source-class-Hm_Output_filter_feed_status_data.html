@@ -1010,6 +1010,7 @@
 				<li><a href="function-format_msg_part_section.html">format_msg_part_section</a></li>
 				<li><a href="function-format_msg_text.html">format_msg_text</a></li>
 				<li><a href="function-format_pop3_message_list.html">format_pop3_message_list</a></li>
+				<li><a href="function-format_reply_all_address.html">format_reply_all_address</a></li>
 				<li><a href="function-format_reply_as_html.html">format_reply_as_html</a></li>
 				<li><a href="function-format_reply_as_text.html">format_reply_as_text</a></li>
 				<li><a href="function-format_reply_fields.html">format_reply_fields</a></li>
@@ -1052,6 +1053,7 @@
 				<li><a href="function-parse_contact_xml.html">parse_contact_xml</a></li>
 				<li><a href="function-payload_search.html">payload_search</a></li>
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
+				<li><a href="function-process_address_fld.html">process_address_fld</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
 				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
 				<li><a href="function-process_site_setting.html">process_site_setting</a></li>
@@ -1075,6 +1077,7 @@
 				<li><a href="function-smtp_refresh_oauth2_token.html">smtp_refresh_oauth2_token</a></li>
 				<li><a href="function-smtp_server_dropdown.html">smtp_server_dropdown</a></li>
 				<li><a href="function-sort_by_internal_date.html">sort_by_internal_date</a></li>
+				<li><a href="function-split_address_fld.html">split_address_fld</a></li>
 				<li><a href="function-start_api.html">start_api</a></li>
 				<li><a href="function-subject_callback.html">subject_callback</a></li>
 				<li><a href="function-translate_time_str.html">translate_time_str</a></li>
@@ -1733,309 +1736,314 @@
 </span><span id="595" class="l"><a href="#595">595: </a>            <span class="php-var">$login_time</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'login_time'</span>);
 </span><span id="596" class="l"><a href="#596">596: </a>        }
 </span><span id="597" class="l"><a href="#597">597: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_list_data'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$item</span>) {
-</span><span id="598" class="l"><a href="#598">598: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'id'</span>]) &amp;&amp; !<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>])) {
-</span><span id="599" class="l"><a href="#599">599: </a>                <span class="php-var">$item</span>[<span class="php-quote">'guid'</span>] = <span class="php-var">$item</span>[<span class="php-quote">'id'</span>];
-</span><span id="600" class="l"><a href="#600">600: </a>                <span class="php-keyword1">unset</span>(<span class="php-var">$item</span>[<span class="php-quote">'id'</span>]);
-</span><span id="601" class="l"><a href="#601">601: </a>            }
-</span><span id="602" class="l"><a href="#602">602: </a>            <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]) &amp;&amp; !<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>])) {
-</span><span id="603" class="l"><a href="#603">603: </a>                <span class="php-var">$item</span>[<span class="php-quote">'guid'</span>] = <span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]);
-</span><span id="604" class="l"><a href="#604">604: </a>            }
-</span><span id="605" class="l"><a href="#605">605: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>])) {
-</span><span id="606" class="l"><a href="#606">606: </a>
-</span><span id="607" class="l"><a href="#607">607: </a>                <span class="php-var">$id</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;feeds_%s_%s&quot;</span>, <span class="php-var">$item</span>[<span class="php-quote">'server_id'</span>], <span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>]));
-</span><span id="608" class="l"><a href="#608">608: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'dc:date'</span>])) {
-</span><span id="609" class="l"><a href="#609">609: </a>                    <span class="php-var">$date</span> = display_value(<span class="php-quote">'dc:date'</span>, <span class="php-var">$item</span>, <span class="php-quote">'date'</span>);
-</span><span id="610" class="l"><a href="#610">610: </a>                    <span class="php-var">$timestamp</span> = display_value(<span class="php-quote">'dc:date'</span>, <span class="php-var">$item</span>, <span class="php-quote">'time'</span>);
-</span><span id="611" class="l"><a href="#611">611: </a>                }
-</span><span id="612" class="l"><a href="#612">612: </a>                <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'pubdate'</span>])) {
-</span><span id="613" class="l"><a href="#613">613: </a>                    <span class="php-var">$date</span> = display_value(<span class="php-quote">'pubdate'</span>, <span class="php-var">$item</span>, <span class="php-quote">'date'</span>);
-</span><span id="614" class="l"><a href="#614">614: </a>                    <span class="php-var">$timestamp</span> = display_value(<span class="php-quote">'pubdate'</span>, <span class="php-var">$item</span>, <span class="php-quote">'time'</span>);
-</span><span id="615" class="l"><a href="#615">615: </a>                }
-</span><span id="616" class="l"><a href="#616">616: </a>                <span class="php-keyword1">else</span> {
-</span><span id="617" class="l"><a href="#617">617: </a>                    <span class="php-var">$date</span> = <span class="php-quote">''</span>;
-</span><span id="618" class="l"><a href="#618">618: </a>                    <span class="php-var">$timestamp</span> = <span class="php-num">0</span>;
-</span><span id="619" class="l"><a href="#619">619: </a>                }
-</span><span id="620" class="l"><a href="#620">620: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$date</span>) {
-</span><span id="621" class="l"><a href="#621">621: </a>                    <span class="php-var">$date</span> = translate_time_str(<span class="php-var">$date</span>, <span class="php-var">$this</span>);
-</span><span id="622" class="l"><a href="#622">622: </a>                }
-</span><span id="623" class="l"><a href="#623">623: </a>                <span class="php-var">$url</span> = <span class="php-quote">'?page=message&amp;uid='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>])).<span class="php-quote">'&amp;list_path=feeds_'</span>.<span class="php-var">$item</span>[<span class="php-quote">'server_id'</span>];
-</span><span id="624" class="l"><a href="#624">624: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;in(<span class="php-quote">'feed_list_parent'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'combined_inbox'</span>, <span class="php-quote">'unread'</span>, <span class="php-quote">'feeds'</span>, <span class="php-quote">'search'</span>))) {
-</span><span id="625" class="l"><a href="#625">625: </a>                    <span class="php-var">$url</span> .= <span class="php-quote">'&amp;list_parent='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_list_parent'</span>, <span class="php-quote">''</span>));
-</span><span id="626" class="l"><a href="#626">626: </a>                }
-</span><span id="627" class="l"><a href="#627">627: </a>                <span class="php-keyword1">else</span> {
-</span><span id="628" class="l"><a href="#628">628: </a>                    <span class="php-var">$url</span> .= <span class="php-quote">'&amp;list_parent=feeds_'</span>.<span class="php-var">$item</span>[<span class="php-quote">'server_id'</span>];
-</span><span id="629" class="l"><a href="#629">629: </a>                }
-</span><span id="630" class="l"><a href="#630">630: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'news_list_style'</span>)) {
-</span><span id="631" class="l"><a href="#631">631: </a>                    <span class="php-var">$style</span> = <span class="php-quote">'news'</span>;
-</span><span id="632" class="l"><a href="#632">632: </a>                }
-</span><span id="633" class="l"><a href="#633">633: </a>                <span class="php-keyword1">else</span> {
-</span><span id="634" class="l"><a href="#634">634: </a>                    <span class="php-var">$style</span> = <span class="php-quote">'email'</span>;
-</span><span id="635" class="l"><a href="#635">635: </a>                }
-</span><span id="636" class="l"><a href="#636">636: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_mobile'</span>)) {
-</span><span id="637" class="l"><a href="#637">637: </a>                    <span class="php-var">$style</span> = <span class="php-quote">'news'</span>;
-</span><span id="638" class="l"><a href="#638">638: </a>                }
-</span><span id="639" class="l"><a href="#639">639: </a>                <span class="php-keyword1">if</span> (Hm_Feed_Uid_Cache::is_read(<span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>]))) {
-</span><span id="640" class="l"><a href="#640">640: </a>                    <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
-</span><span id="641" class="l"><a href="#641">641: </a>                }
-</span><span id="642" class="l"><a href="#642">642: </a>                <span class="php-keyword1">elseif</span> (Hm_Feed_Uid_Cache::is_unread(<span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>]))) {
-</span><span id="643" class="l"><a href="#643">643: </a>                    <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
-</span><span id="644" class="l"><a href="#644">644: </a>                }
-</span><span id="645" class="l"><a href="#645">645: </a>                <span class="php-keyword1">elseif</span> (<span class="php-var">$timestamp</span> &amp;&amp; <span class="php-var">$login_time</span> &amp;&amp; <span class="php-var">$timestamp</span> &lt;= <span class="php-var">$login_time</span>) {
-</span><span id="646" class="l"><a href="#646">646: </a>                    <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
-</span><span id="647" class="l"><a href="#647">647: </a>                }
-</span><span id="648" class="l"><a href="#648">648: </a>                <span class="php-keyword1">else</span> {
-</span><span id="649" class="l"><a href="#649">649: </a>                    <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
-</span><span id="650" class="l"><a href="#650">650: </a>                }
-</span><span id="651" class="l"><a href="#651">651: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'author'</span>])) {
-</span><span id="652" class="l"><a href="#652">652: </a>                    <span class="php-var">$from</span> = display_value(<span class="php-quote">'author'</span>, <span class="php-var">$item</span>, <span class="php-quote">'from'</span>);
-</span><span id="653" class="l"><a href="#653">653: </a>                }
-</span><span id="654" class="l"><a href="#654">654: </a>                <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'name'</span>])) {
-</span><span id="655" class="l"><a href="#655">655: </a>                    <span class="php-var">$from</span> = display_value(<span class="php-quote">'name'</span>, <span class="php-var">$item</span>, <span class="php-quote">'from'</span>);
-</span><span id="656" class="l"><a href="#656">656: </a>                }
-</span><span id="657" class="l"><a href="#657">657: </a>                <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'dc:creator'</span>])) {
-</span><span id="658" class="l"><a href="#658">658: </a>                    <span class="php-var">$from</span> = display_value(<span class="php-quote">'dc:creator'</span>, <span class="php-var">$item</span>, <span class="php-quote">'from'</span>);
-</span><span id="659" class="l"><a href="#659">659: </a>                }
-</span><span id="660" class="l"><a href="#660">660: </a>                <span class="php-keyword1">elseif</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
-</span><span id="661" class="l"><a href="#661">661: </a>                    <span class="php-var">$from</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'[No From]'</span>);
-</span><span id="662" class="l"><a href="#662">662: </a>                }
-</span><span id="663" class="l"><a href="#663">663: </a>                <span class="php-keyword1">else</span> {
-</span><span id="664" class="l"><a href="#664">664: </a>                    <span class="php-var">$from</span> = <span class="php-quote">''</span>;
-</span><span id="665" class="l"><a href="#665">665: </a>                }
-</span><span id="666" class="l"><a href="#666">666: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
-</span><span id="667" class="l"><a href="#667">667: </a>                    <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
-</span><span id="668" class="l"><a href="#668">668: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
-</span><span id="669" class="l"><a href="#669">669: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>),
-</span><span id="670" class="l"><a href="#670">670: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-keyword2">strip_tags</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]), <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
-</span><span id="671" class="l"><a href="#671">671: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-var">$item</span>[<span class="php-quote">'server_name'</span>]),
-</span><span id="672" class="l"><a href="#672">672: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
-</span><span id="673" class="l"><a href="#673">673: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, <span class="php-var">$date</span>, <span class="php-var">$timestamp</span>),
-</span><span id="674" class="l"><a href="#674">674: </a>                        ),
-</span><span id="675" class="l"><a href="#675">675: </a>                        <span class="php-var">$id</span>,
-</span><span id="676" class="l"><a href="#676">676: </a>                        <span class="php-var">$style</span>,
-</span><span id="677" class="l"><a href="#677">677: </a>                        <span class="php-var">$this</span>
-</span><span id="678" class="l"><a href="#678">678: </a>                    );
-</span><span id="679" class="l"><a href="#679">679: </a>                }
-</span><span id="680" class="l"><a href="#680">680: </a>                <span class="php-keyword1">else</span> {
-</span><span id="681" class="l"><a href="#681">681: </a>                    <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
-</span><span id="682" class="l"><a href="#682">682: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
-</span><span id="683" class="l"><a href="#683">683: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-var">$item</span>[<span class="php-quote">'server_name'</span>]),
-</span><span id="684" class="l"><a href="#684">684: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
-</span><span id="685" class="l"><a href="#685">685: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-keyword2">strip_tags</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]), <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
-</span><span id="686" class="l"><a href="#686">686: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, <span class="php-var">$date</span>, <span class="php-var">$timestamp</span>),
-</span><span id="687" class="l"><a href="#687">687: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>)
-</span><span id="688" class="l"><a href="#688">688: </a>                        ),
-</span><span id="689" class="l"><a href="#689">689: </a>                        <span class="php-var">$id</span>,
-</span><span id="690" class="l"><a href="#690">690: </a>                        <span class="php-var">$style</span>,
-</span><span id="691" class="l"><a href="#691">691: </a>                        <span class="php-var">$this</span>
-</span><span id="692" class="l"><a href="#692">692: </a>                    );
-</span><span id="693" class="l"><a href="#693">693: </a>                }
-</span><span id="694" class="l"><a href="#694">694: </a>            }
-</span><span id="695" class="l"><a href="#695">695: </a>        }
-</span><span id="696" class="l"><a href="#696">696: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'formatted_message_list'</span>, <span class="php-var">$res</span>);
-</span><span id="697" class="l"><a href="#697">697: </a>    }
-</span><span id="698" class="l"><a href="#698">698: </a>}
-</span><span id="699" class="l"><a href="#699">699: </a>
-</span><span id="700" class="l"><a href="#700">700: </a><span class="php-comment">/**
-</span></span><span id="701" class="l"><a href="#701">701: </a><span class="php-comment"> * @subpackage feeds/output
-</span></span><span id="702" class="l"><a href="#702">702: </a><span class="php-comment"> */</span>
-</span><span id="703" class="l"><a href="#703">703: </a><span class="php-keyword1">class</span> Hm_Output_filter_feed_folders <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="704" class="l"><a href="#704">704: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="705" class="l"><a href="#705">705: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="706" class="l"><a href="#706">706: </a>        <span class="php-var">$folders</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_folders'</span>, <span class="php-keyword1">array</span>());
-</span><span id="707" class="l"><a href="#707">707: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$folders</span>) &amp;&amp; !<span class="php-keyword1">empty</span>(<span class="php-var">$folders</span>)) {
-</span><span id="708" class="l"><a href="#708">708: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_feeds&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=feeds&quot;&gt;'</span>.
-</span><span id="709" class="l"><a href="#709">709: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$rss_alt</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'All'</span>).<span class="php-quote">'&lt;/a&gt; &lt;span class=&quot;unread_feed_count&quot;&gt;&lt;/span&gt;&lt;/li&gt;'</span>;
-</span><span id="710" class="l"><a href="#710">710: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_folders'</span>) <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$folder</span>) {
-</span><span id="711" class="l"><a href="#711">711: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;feeds_'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>.
-</span><span id="712" class="l"><a href="#712">712: </a>                    <span class="php-quote">'&lt;a data-id=&quot;feeds_'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot; href=&quot;?page=message_list&amp;list_path=feeds_'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>.
-</span><span id="713" class="l"><a href="#713">713: </a>                    <span class="php-quote">'&lt;img class=&quot;account_icon&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Load Feed'</span>).<span class="php-quote">'&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$rss</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.
-</span><span id="714" class="l"><a href="#714">714: </a>                    <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$folder</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="715" class="l"><a href="#715">715: </a>            }
-</span><span id="716" class="l"><a href="#716">716: </a>        }
-</span><span id="717" class="l"><a href="#717">717: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$res</span>) {
-</span><span id="718" class="l"><a href="#718">718: </a>            <span class="php-var">$this</span>-&gt;append(<span class="php-quote">'folder_sources'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'feeds_folders'</span>, <span class="php-var">$res</span>));
-</span><span id="719" class="l"><a href="#719">719: </a>        }
-</span><span id="720" class="l"><a href="#720">720: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
-</span><span id="721" class="l"><a href="#721">721: </a>    }
-</span><span id="722" class="l"><a href="#722">722: </a>}
-</span><span id="723" class="l"><a href="#723">723: </a>
-</span><span id="724" class="l"><a href="#724">724: </a><span class="php-comment">/**
-</span></span><span id="725" class="l"><a href="#725">725: </a><span class="php-comment"> * @subpackage feeds/output
-</span></span><span id="726" class="l"><a href="#726">726: </a><span class="php-comment"> */</span>
-</span><span id="727" class="l"><a href="#727">727: </a><span class="php-keyword1">class</span> Hm_Output_display_feeds_status <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="728" class="l"><a href="#728">728: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="729" class="l"><a href="#729">729: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="730" class="l"><a href="#730">730: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feeds'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
-</span><span id="731" class="l"><a href="#731">731: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr&gt;&lt;td&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'FEED'</span>).<span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-quote">'name'</span>]).<span class="php-quote">'&lt;/td&gt;&lt;td class=&quot;feeds_status_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;&lt;/td&gt;'</span>.
-</span><span id="732" class="l"><a href="#732">732: </a>                <span class="php-quote">'&lt;td class=&quot;feeds_detail_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;&lt;/td&gt;&lt;/tr&gt;'</span>;
-</span><span id="733" class="l"><a href="#733">733: </a>        }
-</span><span id="734" class="l"><a href="#734">734: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="735" class="l"><a href="#735">735: </a>    }
-</span><span id="736" class="l"><a href="#736">736: </a>}
-</span><span id="737" class="l"><a href="#737">737: </a>
-</span><span id="738" class="l"><a href="#738">738: </a><span class="php-comment">/**
-</span></span><span id="739" class="l"><a href="#739">739: </a><span class="php-comment"> * @subpackage feeds/output
-</span></span><span id="740" class="l"><a href="#740">740: </a><span class="php-comment"> */</span>
-</span><span id="741" class="l"><a href="#741">741: </a><span class="php-keyword1">class</span> Hm_Output_unread_feeds_included <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="742" class="l"><a href="#742">742: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="743" class="l"><a href="#743">743: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
-</span><span id="744" class="l"><a href="#744">744: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'unread_exclude_feeds'</span>, <span class="php-var">$settings</span>) &amp;&amp; <span class="php-var">$settings</span>[<span class="php-quote">'unread_exclude_feeds'</span>]) {
-</span><span id="745" class="l"><a href="#745">745: </a>            <span class="php-var">$checked</span> = <span class="php-quote">' checked=&quot;checked&quot;'</span>;
-</span><span id="746" class="l"><a href="#746">746: </a>        }
-</span><span id="747" class="l"><a href="#747">747: </a>        <span class="php-keyword1">else</span> {
-</span><span id="748" class="l"><a href="#748">748: </a>            <span class="php-var">$checked</span> = <span class="php-quote">''</span>;
-</span><span id="749" class="l"><a href="#749">749: </a>        }
-</span><span id="750" class="l"><a href="#750">750: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr class=&quot;unread_setting&quot;&gt;&lt;td&gt;&lt;label for=&quot;unread_exclude_feeds&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Exclude unread feed items'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
-</span><span id="751" class="l"><a href="#751">751: </a>            <span class="php-quote">'&lt;td&gt;&lt;input type=&quot;checkbox&quot; '</span>.<span class="php-var">$checked</span>.<span class="php-quote">' value=&quot;1&quot; id=&quot;unread_exclude_feeds&quot; name=&quot;unread_exclude_feeds&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>;
-</span><span id="752" class="l"><a href="#752">752: </a>    }
-</span><span id="753" class="l"><a href="#753">753: </a>}
-</span><span id="754" class="l"><a href="#754">754: </a>
-</span><span id="755" class="l"><a href="#755">755: </a><span class="php-comment">/**
-</span></span><span id="756" class="l"><a href="#756">756: </a><span class="php-comment"> * @subpackage feeds/output
-</span></span><span id="757" class="l"><a href="#757">757: </a><span class="php-comment"> */</span>
-</span><span id="758" class="l"><a href="#758">758: </a><span class="php-keyword1">class</span> Hm_Output_filter_feed_status_data <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="759" class="l"><a href="#759">759: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="760" class="l"><a href="#760">760: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_status'</span>) == <span class="php-quote">'Connected'</span>) {
-</span><span id="761" class="l"><a href="#761">761: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'feed_status_display'</span>, <span class="php-quote">'&lt;span class=&quot;online&quot;&gt;'</span>.
-</span><span id="762" class="l"><a href="#762">762: </a>                <span class="php-var">$this</span>-&gt;trans(<span class="php-keyword2">ucwords</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_status'</span>))).<span class="php-quote">'&lt;/span&gt; in '</span>.<span class="php-keyword2">round</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_time'</span>), <span class="php-num">3</span>));
-</span><span id="763" class="l"><a href="#763">763: </a>        }
-</span><span id="764" class="l"><a href="#764">764: </a>        <span class="php-keyword1">else</span> {
-</span><span id="765" class="l"><a href="#765">765: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'feed_status_display'</span>, <span class="php-quote">'&lt;span class=&quot;down&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Down'</span>).<span class="php-quote">'&lt;/span&gt;'</span>);
-</span><span id="766" class="l"><a href="#766">766: </a>        }
-</span><span id="767" class="l"><a href="#767">767: </a>    }
-</span><span id="768" class="l"><a href="#768">768: </a>}
-</span><span id="769" class="l"><a href="#769">769: </a>
-</span><span id="770" class="l"><a href="#770">770: </a><span class="php-comment">/**
-</span></span><span id="771" class="l"><a href="#771">771: </a><span class="php-comment"> * @subpackage feeds/output
-</span></span><span id="772" class="l"><a href="#772">772: </a><span class="php-comment"> */</span>
-</span><span id="773" class="l"><a href="#773">773: </a><span class="php-keyword1">class</span> Hm_Output_start_feed_settings <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="774" class="l"><a href="#774">774: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="775" class="l"><a href="#775">775: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot; data-target=&quot;.feeds_setting&quot; class=&quot;settings_subtitle&quot;&gt;'</span>.
-</span><span id="776" class="l"><a href="#776">776: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$rss</span>.<span class="php-quote">'&quot; /&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Feed Settings'</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
-</span><span id="777" class="l"><a href="#777">777: </a>    }
-</span><span id="778" class="l"><a href="#778">778: </a>}
-</span><span id="779" class="l"><a href="#779">779: </a>
-</span><span id="780" class="l"><a href="#780">780: </a><span class="php-comment">/**
-</span></span><span id="781" class="l"><a href="#781">781: </a><span class="php-comment"> * @subpackage feeds/output
-</span></span><span id="782" class="l"><a href="#782">782: </a><span class="php-comment"> */</span>
-</span><span id="783" class="l"><a href="#783">783: </a><span class="php-keyword1">class</span> Hm_Output_feed_since_setting <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="784" class="l"><a href="#784">784: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="785" class="l"><a href="#785">785: </a>        <span class="php-var">$since</span> = <span class="php-keyword1">false</span>;
-</span><span id="786" class="l"><a href="#786">786: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
-</span><span id="787" class="l"><a href="#787">787: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'feed_since'</span>, <span class="php-var">$settings</span>)) {
-</span><span id="788" class="l"><a href="#788">788: </a>            <span class="php-var">$since</span> = <span class="php-var">$settings</span>[<span class="php-quote">'feed_since'</span>];
-</span><span id="789" class="l"><a href="#789">789: </a>        }
-</span><span id="790" class="l"><a href="#790">790: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr class=&quot;feeds_setting&quot;&gt;&lt;td&gt;&lt;label for=&quot;feed_since&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Show feed items received since'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
-</span><span id="791" class="l"><a href="#791">791: </a>            <span class="php-quote">'&lt;td&gt;'</span>.message_since_dropdown(<span class="php-var">$since</span>, <span class="php-quote">'feed_since'</span>, <span class="php-var">$this</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
-</span><span id="792" class="l"><a href="#792">792: </a>    }
-</span><span id="793" class="l"><a href="#793">793: </a>}
-</span><span id="794" class="l"><a href="#794">794: </a>
-</span><span id="795" class="l"><a href="#795">795: </a><span class="php-comment">/**
-</span></span><span id="796" class="l"><a href="#796">796: </a><span class="php-comment"> * @subpackage feeds/output
-</span></span><span id="797" class="l"><a href="#797">797: </a><span class="php-comment"> */</span>
-</span><span id="798" class="l"><a href="#798">798: </a><span class="php-keyword1">class</span> Hm_Output_feed_limit_setting <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="799" class="l"><a href="#799">799: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="800" class="l"><a href="#800">800: </a>        <span class="php-var">$limit</span> = DEFAULT_PER_SOURCE;
-</span><span id="801" class="l"><a href="#801">801: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
-</span><span id="802" class="l"><a href="#802">802: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'feed_limit'</span>, <span class="php-var">$settings</span>)) {
-</span><span id="803" class="l"><a href="#803">803: </a>            <span class="php-var">$limit</span> = <span class="php-var">$settings</span>[<span class="php-quote">'feed_limit'</span>];
-</span><span id="804" class="l"><a href="#804">804: </a>        }
-</span><span id="805" class="l"><a href="#805">805: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr class=&quot;feeds_setting&quot;&gt;&lt;td&gt;&lt;label for=&quot;feed_limit&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Max feed items to display'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
-</span><span id="806" class="l"><a href="#806">806: </a>            <span class="php-quote">'&lt;td&gt;&lt;input type=&quot;text&quot; id=&quot;feed_limit&quot; name=&quot;feed_limit&quot; size=&quot;2&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$limit</span>).<span class="php-quote">'&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>;
-</span><span id="807" class="l"><a href="#807">807: </a>    }
-</span><span id="808" class="l"><a href="#808">808: </a>}
-</span><span id="809" class="l"><a href="#809">809: </a>
-</span><span id="810" class="l"><a href="#810">810: </a><span class="php-comment">/**
-</span></span><span id="811" class="l"><a href="#811">811: </a><span class="php-comment"> * @subpackage feeds/functions
-</span></span><span id="812" class="l"><a href="#812">812: </a><span class="php-comment"> */</span>
-</span><span id="813" class="l"><a href="#813">813: </a><span class="php-keyword1">function</span> address_from_url(<span class="php-var">$str</span>) {
-</span><span id="814" class="l"><a href="#814">814: </a>    <span class="php-var">$res</span> = <span class="php-var">$str</span>;
-</span><span id="815" class="l"><a href="#815">815: </a>    <span class="php-var">$url_bits</span> = <span class="php-keyword2">parse_url</span>(<span class="php-var">$str</span>);
-</span><span id="816" class="l"><a href="#816">816: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$url_bits</span>[<span class="php-quote">'scheme'</span>]) &amp;&amp; <span class="php-keyword1">isset</span>(<span class="php-var">$url_bits</span>[<span class="php-quote">'host'</span>])) {
-</span><span id="817" class="l"><a href="#817">817: </a>        <span class="php-var">$res</span> = <span class="php-var">$url_bits</span>[<span class="php-quote">'host'</span>];
-</span><span id="818" class="l"><a href="#818">818: </a>    }
-</span><span id="819" class="l"><a href="#819">819: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="820" class="l"><a href="#820">820: </a>}
-</span><span id="821" class="l"><a href="#821">821: </a>
-</span><span id="822" class="l"><a href="#822">822: </a><span class="php-comment">/**
-</span></span><span id="823" class="l"><a href="#823">823: </a><span class="php-comment"> * @subpackage feeds/functions
-</span></span><span id="824" class="l"><a href="#824">824: </a><span class="php-comment"> */</span>
-</span><span id="825" class="l"><a href="#825">825: </a><span class="php-keyword1">function</span> is_feed(<span class="php-var">$url</span>, <span class="php-var">$limit</span>=<span class="php-num">20</span>) {
-</span><span id="826" class="l"><a href="#826">826: </a>    <span class="php-var">$feed</span> = <span class="php-keyword1">new</span> Hm_Feed();
-</span><span id="827" class="l"><a href="#827">827: </a>    <span class="php-var">$feed</span>-&gt;limit = <span class="php-var">$limit</span>;
-</span><span id="828" class="l"><a href="#828">828: </a>    <span class="php-var">$feed</span>-&gt;parse_feed(<span class="php-var">$url</span>);
-</span><span id="829" class="l"><a href="#829">829: </a>    <span class="php-var">$feed_data</span> = <span class="php-keyword2">array_filter</span>(<span class="php-var">$feed</span>-&gt;parsed_data);
-</span><span id="830" class="l"><a href="#830">830: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$feed_data</span>)) {
-</span><span id="831" class="l"><a href="#831">831: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="832" class="l"><a href="#832">832: </a>    }
-</span><span id="833" class="l"><a href="#833">833: </a>    <span class="php-keyword1">else</span> {
-</span><span id="834" class="l"><a href="#834">834: </a>        <span class="php-keyword1">return</span> <span class="php-var">$feed</span>;
-</span><span id="835" class="l"><a href="#835">835: </a>    }
-</span><span id="836" class="l"><a href="#836">836: </a>}
-</span><span id="837" class="l"><a href="#837">837: </a>
-</span><span id="838" class="l"><a href="#838">838: </a><span class="php-comment">/**
-</span></span><span id="839" class="l"><a href="#839">839: </a><span class="php-comment"> * @subpackage feeds/functions
-</span></span><span id="840" class="l"><a href="#840">840: </a><span class="php-comment"> */</span>
-</span><span id="841" class="l"><a href="#841">841: </a><span class="php-keyword1">function</span> search_for_feeds(<span class="php-var">$html</span>) {
-</span><span id="842" class="l"><a href="#842">842: </a>    <span class="php-var">$type</span> = <span class="php-keyword1">false</span>;
-</span><span id="843" class="l"><a href="#843">843: </a>    <span class="php-var">$href</span> = <span class="php-keyword1">false</span>;
-</span><span id="844" class="l"><a href="#844">844: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match_all</span>(<span class="php-quote">&quot;/&lt;link.+&gt;/U&quot;</span>, <span class="php-var">$html</span>, <span class="php-var">$matches</span>)) {
-</span><span id="845" class="l"><a href="#845">845: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$matches</span>[<span class="php-num">0</span>] <span class="php-keyword1">as</span> <span class="php-var">$link_tag</span>) {
-</span><span id="846" class="l"><a href="#846">846: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$link_tag</span>, <span class="php-quote">'alternate'</span>)) {
-</span><span id="847" class="l"><a href="#847">847: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/type=(\&quot;|'|)(.+)(\&quot;|'|\&gt;| )/U&quot;</span>, <span class="php-var">$link_tag</span>, <span class="php-var">$types</span>)) {
-</span><span id="848" class="l"><a href="#848">848: </a>                    <span class="php-var">$type</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$types</span>[<span class="php-num">2</span>]);
-</span><span id="849" class="l"><a href="#849">849: </a>                }
-</span><span id="850" class="l"><a href="#850">850: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/href=(\&quot;|'|)(.+)(\&quot;|'|\&gt;| )/U&quot;</span>, <span class="php-var">$link_tag</span>, <span class="php-var">$hrefs</span>)) {
-</span><span id="851" class="l"><a href="#851">851: </a>                    <span class="php-var">$href</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$hrefs</span>[<span class="php-num">2</span>]);
-</span><span id="852" class="l"><a href="#852">852: </a>                }
-</span><span id="853" class="l"><a href="#853">853: </a>            }
-</span><span id="854" class="l"><a href="#854">854: </a>        }
-</span><span id="855" class="l"><a href="#855">855: </a>    }
-</span><span id="856" class="l"><a href="#856">856: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(<span class="php-var">$type</span>, <span class="php-var">$href</span>);
-</span><span id="857" class="l"><a href="#857">857: </a>}
-</span><span id="858" class="l"><a href="#858">858: </a>
-</span><span id="859" class="l"><a href="#859">859: </a><span class="php-comment">/**
-</span></span><span id="860" class="l"><a href="#860">860: </a><span class="php-comment"> * @subpackage feeds/functions
-</span></span><span id="861" class="l"><a href="#861">861: </a><span class="php-comment"> */</span>
-</span><span id="862" class="l"><a href="#862">862: </a><span class="php-keyword1">function</span> search_feed_item(<span class="php-var">$item</span>, <span class="php-var">$terms</span>, <span class="php-var">$since</span>, <span class="php-var">$fld</span>) {
+</span><span id="598" class="l"><a href="#598">598: </a>            <span class="php-var">$row_style</span> = <span class="php-quote">'feeds'</span>;
+</span><span id="599" class="l"><a href="#599">599: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'id'</span>]) &amp;&amp; !<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>])) {
+</span><span id="600" class="l"><a href="#600">600: </a>                <span class="php-var">$item</span>[<span class="php-quote">'guid'</span>] = <span class="php-var">$item</span>[<span class="php-quote">'id'</span>];
+</span><span id="601" class="l"><a href="#601">601: </a>                <span class="php-keyword1">unset</span>(<span class="php-var">$item</span>[<span class="php-quote">'id'</span>]);
+</span><span id="602" class="l"><a href="#602">602: </a>            }
+</span><span id="603" class="l"><a href="#603">603: </a>            <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]) &amp;&amp; !<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>])) {
+</span><span id="604" class="l"><a href="#604">604: </a>                <span class="php-var">$item</span>[<span class="php-quote">'guid'</span>] = <span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]);
+</span><span id="605" class="l"><a href="#605">605: </a>            }
+</span><span id="606" class="l"><a href="#606">606: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>])) {
+</span><span id="607" class="l"><a href="#607">607: </a>
+</span><span id="608" class="l"><a href="#608">608: </a>                <span class="php-var">$id</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">&quot;feeds_%s_%s&quot;</span>, <span class="php-var">$item</span>[<span class="php-quote">'server_id'</span>], <span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>]));
+</span><span id="609" class="l"><a href="#609">609: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'dc:date'</span>])) {
+</span><span id="610" class="l"><a href="#610">610: </a>                    <span class="php-var">$date</span> = display_value(<span class="php-quote">'dc:date'</span>, <span class="php-var">$item</span>, <span class="php-quote">'date'</span>);
+</span><span id="611" class="l"><a href="#611">611: </a>                    <span class="php-var">$timestamp</span> = display_value(<span class="php-quote">'dc:date'</span>, <span class="php-var">$item</span>, <span class="php-quote">'time'</span>);
+</span><span id="612" class="l"><a href="#612">612: </a>                }
+</span><span id="613" class="l"><a href="#613">613: </a>                <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'pubdate'</span>])) {
+</span><span id="614" class="l"><a href="#614">614: </a>                    <span class="php-var">$date</span> = display_value(<span class="php-quote">'pubdate'</span>, <span class="php-var">$item</span>, <span class="php-quote">'date'</span>);
+</span><span id="615" class="l"><a href="#615">615: </a>                    <span class="php-var">$timestamp</span> = display_value(<span class="php-quote">'pubdate'</span>, <span class="php-var">$item</span>, <span class="php-quote">'time'</span>);
+</span><span id="616" class="l"><a href="#616">616: </a>                }
+</span><span id="617" class="l"><a href="#617">617: </a>                <span class="php-keyword1">else</span> {
+</span><span id="618" class="l"><a href="#618">618: </a>                    <span class="php-var">$date</span> = <span class="php-quote">''</span>;
+</span><span id="619" class="l"><a href="#619">619: </a>                    <span class="php-var">$timestamp</span> = <span class="php-num">0</span>;
+</span><span id="620" class="l"><a href="#620">620: </a>                }
+</span><span id="621" class="l"><a href="#621">621: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$date</span>) {
+</span><span id="622" class="l"><a href="#622">622: </a>                    <span class="php-var">$date</span> = translate_time_str(<span class="php-var">$date</span>, <span class="php-var">$this</span>);
+</span><span id="623" class="l"><a href="#623">623: </a>                }
+</span><span id="624" class="l"><a href="#624">624: </a>                <span class="php-var">$url</span> = <span class="php-quote">'?page=message&amp;uid='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>])).<span class="php-quote">'&amp;list_path=feeds_'</span>.<span class="php-var">$item</span>[<span class="php-quote">'server_id'</span>];
+</span><span id="625" class="l"><a href="#625">625: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;in(<span class="php-quote">'feed_list_parent'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'combined_inbox'</span>, <span class="php-quote">'unread'</span>, <span class="php-quote">'feeds'</span>, <span class="php-quote">'search'</span>))) {
+</span><span id="626" class="l"><a href="#626">626: </a>                    <span class="php-var">$url</span> .= <span class="php-quote">'&amp;list_parent='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_list_parent'</span>, <span class="php-quote">''</span>));
+</span><span id="627" class="l"><a href="#627">627: </a>                }
+</span><span id="628" class="l"><a href="#628">628: </a>                <span class="php-keyword1">else</span> {
+</span><span id="629" class="l"><a href="#629">629: </a>                    <span class="php-var">$url</span> .= <span class="php-quote">'&amp;list_parent=feeds_'</span>.<span class="php-var">$item</span>[<span class="php-quote">'server_id'</span>];
+</span><span id="630" class="l"><a href="#630">630: </a>                }
+</span><span id="631" class="l"><a href="#631">631: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'news_list_style'</span>)) {
+</span><span id="632" class="l"><a href="#632">632: </a>                    <span class="php-var">$style</span> = <span class="php-quote">'news'</span>;
+</span><span id="633" class="l"><a href="#633">633: </a>                }
+</span><span id="634" class="l"><a href="#634">634: </a>                <span class="php-keyword1">else</span> {
+</span><span id="635" class="l"><a href="#635">635: </a>                    <span class="php-var">$style</span> = <span class="php-quote">'email'</span>;
+</span><span id="636" class="l"><a href="#636">636: </a>                }
+</span><span id="637" class="l"><a href="#637">637: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_mobile'</span>)) {
+</span><span id="638" class="l"><a href="#638">638: </a>                    <span class="php-var">$style</span> = <span class="php-quote">'news'</span>;
+</span><span id="639" class="l"><a href="#639">639: </a>                }
+</span><span id="640" class="l"><a href="#640">640: </a>                <span class="php-keyword1">if</span> (Hm_Feed_Uid_Cache::is_read(<span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>]))) {
+</span><span id="641" class="l"><a href="#641">641: </a>                    <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
+</span><span id="642" class="l"><a href="#642">642: </a>                }
+</span><span id="643" class="l"><a href="#643">643: </a>                <span class="php-keyword1">elseif</span> (Hm_Feed_Uid_Cache::is_unread(<span class="php-keyword2">md5</span>(<span class="php-var">$item</span>[<span class="php-quote">'guid'</span>]))) {
+</span><span id="644" class="l"><a href="#644">644: </a>                    <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
+</span><span id="645" class="l"><a href="#645">645: </a>                    <span class="php-var">$row_style</span> .= <span class="php-quote">' unseen'</span>;
+</span><span id="646" class="l"><a href="#646">646: </a>                }
+</span><span id="647" class="l"><a href="#647">647: </a>                <span class="php-keyword1">elseif</span> (<span class="php-var">$timestamp</span> &amp;&amp; <span class="php-var">$login_time</span> &amp;&amp; <span class="php-var">$timestamp</span> &lt;= <span class="php-var">$login_time</span>) {
+</span><span id="648" class="l"><a href="#648">648: </a>                    <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>();
+</span><span id="649" class="l"><a href="#649">649: </a>                }
+</span><span id="650" class="l"><a href="#650">650: </a>                <span class="php-keyword1">else</span> {
+</span><span id="651" class="l"><a href="#651">651: </a>                    <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
+</span><span id="652" class="l"><a href="#652">652: </a>                }
+</span><span id="653" class="l"><a href="#653">653: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'author'</span>])) {
+</span><span id="654" class="l"><a href="#654">654: </a>                    <span class="php-var">$from</span> = display_value(<span class="php-quote">'author'</span>, <span class="php-var">$item</span>, <span class="php-quote">'from'</span>);
+</span><span id="655" class="l"><a href="#655">655: </a>                }
+</span><span id="656" class="l"><a href="#656">656: </a>                <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'name'</span>])) {
+</span><span id="657" class="l"><a href="#657">657: </a>                    <span class="php-var">$from</span> = display_value(<span class="php-quote">'name'</span>, <span class="php-var">$item</span>, <span class="php-quote">'from'</span>);
+</span><span id="658" class="l"><a href="#658">658: </a>                }
+</span><span id="659" class="l"><a href="#659">659: </a>                <span class="php-keyword1">elseif</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$item</span>[<span class="php-quote">'dc:creator'</span>])) {
+</span><span id="660" class="l"><a href="#660">660: </a>                    <span class="php-var">$from</span> = display_value(<span class="php-quote">'dc:creator'</span>, <span class="php-var">$item</span>, <span class="php-quote">'from'</span>);
+</span><span id="661" class="l"><a href="#661">661: </a>                }
+</span><span id="662" class="l"><a href="#662">662: </a>                <span class="php-keyword1">elseif</span> (<span class="php-var">$style</span> == <span class="php-quote">'email'</span>) {
+</span><span id="663" class="l"><a href="#663">663: </a>                    <span class="php-var">$from</span> = <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'[No From]'</span>);
+</span><span id="664" class="l"><a href="#664">664: </a>                }
+</span><span id="665" class="l"><a href="#665">665: </a>                <span class="php-keyword1">else</span> {
+</span><span id="666" class="l"><a href="#666">666: </a>                    <span class="php-var">$from</span> = <span class="php-quote">''</span>;
+</span><span id="667" class="l"><a href="#667">667: </a>                }
+</span><span id="668" class="l"><a href="#668">668: </a>                <span class="php-var">$row_style</span> .= <span class="php-quote">' '</span>.<span class="php-keyword2">str_replace</span>(<span class="php-quote">' '</span>, <span class="php-quote">'_'</span>, <span class="php-var">$item</span>[<span class="php-quote">'server_name'</span>]);
+</span><span id="669" class="l"><a href="#669">669: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
+</span><span id="670" class="l"><a href="#670">670: </a>                    <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
+</span><span id="671" class="l"><a href="#671">671: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
+</span><span id="672" class="l"><a href="#672">672: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>),
+</span><span id="673" class="l"><a href="#673">673: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-keyword2">strip_tags</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]), <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
+</span><span id="674" class="l"><a href="#674">674: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-var">$item</span>[<span class="php-quote">'server_name'</span>]),
+</span><span id="675" class="l"><a href="#675">675: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
+</span><span id="676" class="l"><a href="#676">676: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, <span class="php-var">$date</span>, <span class="php-var">$timestamp</span>),
+</span><span id="677" class="l"><a href="#677">677: </a>                        ),
+</span><span id="678" class="l"><a href="#678">678: </a>                        <span class="php-var">$id</span>,
+</span><span id="679" class="l"><a href="#679">679: </a>                        <span class="php-var">$style</span>,
+</span><span id="680" class="l"><a href="#680">680: </a>                        <span class="php-var">$this</span>,
+</span><span id="681" class="l"><a href="#681">681: </a>                        <span class="php-var">$row_style</span>
+</span><span id="682" class="l"><a href="#682">682: </a>                    );
+</span><span id="683" class="l"><a href="#683">683: </a>                }
+</span><span id="684" class="l"><a href="#684">684: </a>                <span class="php-keyword1">else</span> {
+</span><span id="685" class="l"><a href="#685">685: </a>                    <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
+</span><span id="686" class="l"><a href="#686">686: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),
+</span><span id="687" class="l"><a href="#687">687: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'source'</span>, <span class="php-var">$item</span>[<span class="php-quote">'server_name'</span>]),
+</span><span id="688" class="l"><a href="#688">688: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'safe_output_callback'</span>, <span class="php-quote">'from'</span>, <span class="php-var">$from</span>),
+</span><span id="689" class="l"><a href="#689">689: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'subject_callback'</span>, <span class="php-keyword2">strip_tags</span>(<span class="php-var">$item</span>[<span class="php-quote">'title'</span>]), <span class="php-var">$url</span>, <span class="php-var">$flags</span>),
+</span><span id="690" class="l"><a href="#690">690: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'date_callback'</span>, <span class="php-var">$date</span>, <span class="php-var">$timestamp</span>),
+</span><span id="691" class="l"><a href="#691">691: </a>                            <span class="php-keyword1">array</span>(<span class="php-quote">'icon_callback'</span>, <span class="php-var">$flags</span>)
+</span><span id="692" class="l"><a href="#692">692: </a>                        ),
+</span><span id="693" class="l"><a href="#693">693: </a>                        <span class="php-var">$id</span>,
+</span><span id="694" class="l"><a href="#694">694: </a>                        <span class="php-var">$style</span>,
+</span><span id="695" class="l"><a href="#695">695: </a>                        <span class="php-var">$this</span>,
+</span><span id="696" class="l"><a href="#696">696: </a>                        <span class="php-var">$row_style</span>
+</span><span id="697" class="l"><a href="#697">697: </a>                    );
+</span><span id="698" class="l"><a href="#698">698: </a>                }
+</span><span id="699" class="l"><a href="#699">699: </a>            }
+</span><span id="700" class="l"><a href="#700">700: </a>        }
+</span><span id="701" class="l"><a href="#701">701: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'formatted_message_list'</span>, <span class="php-var">$res</span>);
+</span><span id="702" class="l"><a href="#702">702: </a>    }
+</span><span id="703" class="l"><a href="#703">703: </a>}
+</span><span id="704" class="l"><a href="#704">704: </a>
+</span><span id="705" class="l"><a href="#705">705: </a><span class="php-comment">/**
+</span></span><span id="706" class="l"><a href="#706">706: </a><span class="php-comment"> * @subpackage feeds/output
+</span></span><span id="707" class="l"><a href="#707">707: </a><span class="php-comment"> */</span>
+</span><span id="708" class="l"><a href="#708">708: </a><span class="php-keyword1">class</span> Hm_Output_filter_feed_folders <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="709" class="l"><a href="#709">709: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="710" class="l"><a href="#710">710: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="711" class="l"><a href="#711">711: </a>        <span class="php-var">$folders</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_folders'</span>, <span class="php-keyword1">array</span>());
+</span><span id="712" class="l"><a href="#712">712: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$folders</span>) &amp;&amp; !<span class="php-keyword1">empty</span>(<span class="php-var">$folders</span>)) {
+</span><span id="713" class="l"><a href="#713">713: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_feeds&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;amp;list_path=feeds&quot;&gt;'</span>.
+</span><span id="714" class="l"><a href="#714">714: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$rss_alt</span>).<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'All'</span>).<span class="php-quote">'&lt;/a&gt; &lt;span class=&quot;unread_feed_count&quot;&gt;&lt;/span&gt;&lt;/li&gt;'</span>;
+</span><span id="715" class="l"><a href="#715">715: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_folders'</span>) <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$folder</span>) {
+</span><span id="716" class="l"><a href="#716">716: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;feeds_'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>.
+</span><span id="717" class="l"><a href="#717">717: </a>                    <span class="php-quote">'&lt;a data-id=&quot;feeds_'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot; href=&quot;?page=message_list&amp;list_path=feeds_'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>.
+</span><span id="718" class="l"><a href="#718">718: </a>                    <span class="php-quote">'&lt;img class=&quot;account_icon&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Load Feed'</span>).<span class="php-quote">'&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$rss</span>.<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.
+</span><span id="719" class="l"><a href="#719">719: </a>                    <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$folder</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="720" class="l"><a href="#720">720: </a>            }
+</span><span id="721" class="l"><a href="#721">721: </a>        }
+</span><span id="722" class="l"><a href="#722">722: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$res</span>) {
+</span><span id="723" class="l"><a href="#723">723: </a>            <span class="php-var">$this</span>-&gt;append(<span class="php-quote">'folder_sources'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'feeds_folders'</span>, <span class="php-var">$res</span>));
+</span><span id="724" class="l"><a href="#724">724: </a>        }
+</span><span id="725" class="l"><a href="#725">725: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
+</span><span id="726" class="l"><a href="#726">726: </a>    }
+</span><span id="727" class="l"><a href="#727">727: </a>}
+</span><span id="728" class="l"><a href="#728">728: </a>
+</span><span id="729" class="l"><a href="#729">729: </a><span class="php-comment">/**
+</span></span><span id="730" class="l"><a href="#730">730: </a><span class="php-comment"> * @subpackage feeds/output
+</span></span><span id="731" class="l"><a href="#731">731: </a><span class="php-comment"> */</span>
+</span><span id="732" class="l"><a href="#732">732: </a><span class="php-keyword1">class</span> Hm_Output_display_feeds_status <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="733" class="l"><a href="#733">733: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="734" class="l"><a href="#734">734: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="735" class="l"><a href="#735">735: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feeds'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$index</span> =&gt; <span class="php-var">$vals</span>) {
+</span><span id="736" class="l"><a href="#736">736: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr&gt;&lt;td&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'FEED'</span>).<span class="php-quote">'&lt;/td&gt;&lt;td&gt;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-quote">'name'</span>]).<span class="php-quote">'&lt;/td&gt;&lt;td class=&quot;feeds_status_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;&lt;/td&gt;'</span>.
+</span><span id="737" class="l"><a href="#737">737: </a>                <span class="php-quote">'&lt;td class=&quot;feeds_detail_'</span>.<span class="php-var">$index</span>.<span class="php-quote">'&quot;&gt;&lt;/td&gt;&lt;/tr&gt;'</span>;
+</span><span id="738" class="l"><a href="#738">738: </a>        }
+</span><span id="739" class="l"><a href="#739">739: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="740" class="l"><a href="#740">740: </a>    }
+</span><span id="741" class="l"><a href="#741">741: </a>}
+</span><span id="742" class="l"><a href="#742">742: </a>
+</span><span id="743" class="l"><a href="#743">743: </a><span class="php-comment">/**
+</span></span><span id="744" class="l"><a href="#744">744: </a><span class="php-comment"> * @subpackage feeds/output
+</span></span><span id="745" class="l"><a href="#745">745: </a><span class="php-comment"> */</span>
+</span><span id="746" class="l"><a href="#746">746: </a><span class="php-keyword1">class</span> Hm_Output_unread_feeds_included <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="747" class="l"><a href="#747">747: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="748" class="l"><a href="#748">748: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
+</span><span id="749" class="l"><a href="#749">749: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'unread_exclude_feeds'</span>, <span class="php-var">$settings</span>) &amp;&amp; <span class="php-var">$settings</span>[<span class="php-quote">'unread_exclude_feeds'</span>]) {
+</span><span id="750" class="l"><a href="#750">750: </a>            <span class="php-var">$checked</span> = <span class="php-quote">' checked=&quot;checked&quot;'</span>;
+</span><span id="751" class="l"><a href="#751">751: </a>        }
+</span><span id="752" class="l"><a href="#752">752: </a>        <span class="php-keyword1">else</span> {
+</span><span id="753" class="l"><a href="#753">753: </a>            <span class="php-var">$checked</span> = <span class="php-quote">''</span>;
+</span><span id="754" class="l"><a href="#754">754: </a>        }
+</span><span id="755" class="l"><a href="#755">755: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr class=&quot;unread_setting&quot;&gt;&lt;td&gt;&lt;label for=&quot;unread_exclude_feeds&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Exclude unread feed items'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
+</span><span id="756" class="l"><a href="#756">756: </a>            <span class="php-quote">'&lt;td&gt;&lt;input type=&quot;checkbox&quot; '</span>.<span class="php-var">$checked</span>.<span class="php-quote">' value=&quot;1&quot; id=&quot;unread_exclude_feeds&quot; name=&quot;unread_exclude_feeds&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>;
+</span><span id="757" class="l"><a href="#757">757: </a>    }
+</span><span id="758" class="l"><a href="#758">758: </a>}
+</span><span id="759" class="l"><a href="#759">759: </a>
+</span><span id="760" class="l"><a href="#760">760: </a><span class="php-comment">/**
+</span></span><span id="761" class="l"><a href="#761">761: </a><span class="php-comment"> * @subpackage feeds/output
+</span></span><span id="762" class="l"><a href="#762">762: </a><span class="php-comment"> */</span>
+</span><span id="763" class="l"><a href="#763">763: </a><span class="php-keyword1">class</span> Hm_Output_filter_feed_status_data <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="764" class="l"><a href="#764">764: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="765" class="l"><a href="#765">765: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_status'</span>) == <span class="php-quote">'Connected'</span>) {
+</span><span id="766" class="l"><a href="#766">766: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'feed_status_display'</span>, <span class="php-quote">'&lt;span class=&quot;online&quot;&gt;'</span>.
+</span><span id="767" class="l"><a href="#767">767: </a>                <span class="php-var">$this</span>-&gt;trans(<span class="php-keyword2">ucwords</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_status'</span>))).<span class="php-quote">'&lt;/span&gt; in '</span>.<span class="php-keyword2">round</span>(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'feed_connect_time'</span>), <span class="php-num">3</span>));
+</span><span id="768" class="l"><a href="#768">768: </a>        }
+</span><span id="769" class="l"><a href="#769">769: </a>        <span class="php-keyword1">else</span> {
+</span><span id="770" class="l"><a href="#770">770: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'feed_status_display'</span>, <span class="php-quote">'&lt;span class=&quot;down&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Down'</span>).<span class="php-quote">'&lt;/span&gt;'</span>);
+</span><span id="771" class="l"><a href="#771">771: </a>        }
+</span><span id="772" class="l"><a href="#772">772: </a>    }
+</span><span id="773" class="l"><a href="#773">773: </a>}
+</span><span id="774" class="l"><a href="#774">774: </a>
+</span><span id="775" class="l"><a href="#775">775: </a><span class="php-comment">/**
+</span></span><span id="776" class="l"><a href="#776">776: </a><span class="php-comment"> * @subpackage feeds/output
+</span></span><span id="777" class="l"><a href="#777">777: </a><span class="php-comment"> */</span>
+</span><span id="778" class="l"><a href="#778">778: </a><span class="php-keyword1">class</span> Hm_Output_start_feed_settings <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="779" class="l"><a href="#779">779: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="780" class="l"><a href="#780">780: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr&gt;&lt;td colspan=&quot;2&quot; data-target=&quot;.feeds_setting&quot; class=&quot;settings_subtitle&quot;&gt;'</span>.
+</span><span id="781" class="l"><a href="#781">781: </a>            <span class="php-quote">'&lt;img alt=&quot;&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$rss</span>.<span class="php-quote">'&quot; /&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Feed Settings'</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
+</span><span id="782" class="l"><a href="#782">782: </a>    }
+</span><span id="783" class="l"><a href="#783">783: </a>}
+</span><span id="784" class="l"><a href="#784">784: </a>
+</span><span id="785" class="l"><a href="#785">785: </a><span class="php-comment">/**
+</span></span><span id="786" class="l"><a href="#786">786: </a><span class="php-comment"> * @subpackage feeds/output
+</span></span><span id="787" class="l"><a href="#787">787: </a><span class="php-comment"> */</span>
+</span><span id="788" class="l"><a href="#788">788: </a><span class="php-keyword1">class</span> Hm_Output_feed_since_setting <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="789" class="l"><a href="#789">789: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="790" class="l"><a href="#790">790: </a>        <span class="php-var">$since</span> = <span class="php-keyword1">false</span>;
+</span><span id="791" class="l"><a href="#791">791: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
+</span><span id="792" class="l"><a href="#792">792: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'feed_since'</span>, <span class="php-var">$settings</span>)) {
+</span><span id="793" class="l"><a href="#793">793: </a>            <span class="php-var">$since</span> = <span class="php-var">$settings</span>[<span class="php-quote">'feed_since'</span>];
+</span><span id="794" class="l"><a href="#794">794: </a>        }
+</span><span id="795" class="l"><a href="#795">795: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr class=&quot;feeds_setting&quot;&gt;&lt;td&gt;&lt;label for=&quot;feed_since&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Show feed items received since'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
+</span><span id="796" class="l"><a href="#796">796: </a>            <span class="php-quote">'&lt;td&gt;'</span>.message_since_dropdown(<span class="php-var">$since</span>, <span class="php-quote">'feed_since'</span>, <span class="php-var">$this</span>).<span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
+</span><span id="797" class="l"><a href="#797">797: </a>    }
+</span><span id="798" class="l"><a href="#798">798: </a>}
+</span><span id="799" class="l"><a href="#799">799: </a>
+</span><span id="800" class="l"><a href="#800">800: </a><span class="php-comment">/**
+</span></span><span id="801" class="l"><a href="#801">801: </a><span class="php-comment"> * @subpackage feeds/output
+</span></span><span id="802" class="l"><a href="#802">802: </a><span class="php-comment"> */</span>
+</span><span id="803" class="l"><a href="#803">803: </a><span class="php-keyword1">class</span> Hm_Output_feed_limit_setting <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="804" class="l"><a href="#804">804: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="805" class="l"><a href="#805">805: </a>        <span class="php-var">$limit</span> = DEFAULT_PER_SOURCE;
+</span><span id="806" class="l"><a href="#806">806: </a>        <span class="php-var">$settings</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'user_settings'</span>);
+</span><span id="807" class="l"><a href="#807">807: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'feed_limit'</span>, <span class="php-var">$settings</span>)) {
+</span><span id="808" class="l"><a href="#808">808: </a>            <span class="php-var">$limit</span> = <span class="php-var">$settings</span>[<span class="php-quote">'feed_limit'</span>];
+</span><span id="809" class="l"><a href="#809">809: </a>        }
+</span><span id="810" class="l"><a href="#810">810: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;tr class=&quot;feeds_setting&quot;&gt;&lt;td&gt;&lt;label for=&quot;feed_limit&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Max feed items to display'</span>).<span class="php-quote">'&lt;/label&gt;&lt;/td&gt;'</span>.
+</span><span id="811" class="l"><a href="#811">811: </a>            <span class="php-quote">'&lt;td&gt;&lt;input type=&quot;text&quot; id=&quot;feed_limit&quot; name=&quot;feed_limit&quot; size=&quot;2&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$limit</span>).<span class="php-quote">'&quot; /&gt;&lt;/td&gt;&lt;/tr&gt;'</span>;
+</span><span id="812" class="l"><a href="#812">812: </a>    }
+</span><span id="813" class="l"><a href="#813">813: </a>}
+</span><span id="814" class="l"><a href="#814">814: </a>
+</span><span id="815" class="l"><a href="#815">815: </a><span class="php-comment">/**
+</span></span><span id="816" class="l"><a href="#816">816: </a><span class="php-comment"> * @subpackage feeds/functions
+</span></span><span id="817" class="l"><a href="#817">817: </a><span class="php-comment"> */</span>
+</span><span id="818" class="l"><a href="#818">818: </a><span class="php-keyword1">function</span> address_from_url(<span class="php-var">$str</span>) {
+</span><span id="819" class="l"><a href="#819">819: </a>    <span class="php-var">$res</span> = <span class="php-var">$str</span>;
+</span><span id="820" class="l"><a href="#820">820: </a>    <span class="php-var">$url_bits</span> = <span class="php-keyword2">parse_url</span>(<span class="php-var">$str</span>);
+</span><span id="821" class="l"><a href="#821">821: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$url_bits</span>[<span class="php-quote">'scheme'</span>]) &amp;&amp; <span class="php-keyword1">isset</span>(<span class="php-var">$url_bits</span>[<span class="php-quote">'host'</span>])) {
+</span><span id="822" class="l"><a href="#822">822: </a>        <span class="php-var">$res</span> = <span class="php-var">$url_bits</span>[<span class="php-quote">'host'</span>];
+</span><span id="823" class="l"><a href="#823">823: </a>    }
+</span><span id="824" class="l"><a href="#824">824: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="825" class="l"><a href="#825">825: </a>}
+</span><span id="826" class="l"><a href="#826">826: </a>
+</span><span id="827" class="l"><a href="#827">827: </a><span class="php-comment">/**
+</span></span><span id="828" class="l"><a href="#828">828: </a><span class="php-comment"> * @subpackage feeds/functions
+</span></span><span id="829" class="l"><a href="#829">829: </a><span class="php-comment"> */</span>
+</span><span id="830" class="l"><a href="#830">830: </a><span class="php-keyword1">function</span> is_feed(<span class="php-var">$url</span>, <span class="php-var">$limit</span>=<span class="php-num">20</span>) {
+</span><span id="831" class="l"><a href="#831">831: </a>    <span class="php-var">$feed</span> = <span class="php-keyword1">new</span> Hm_Feed();
+</span><span id="832" class="l"><a href="#832">832: </a>    <span class="php-var">$feed</span>-&gt;limit = <span class="php-var">$limit</span>;
+</span><span id="833" class="l"><a href="#833">833: </a>    <span class="php-var">$feed</span>-&gt;parse_feed(<span class="php-var">$url</span>);
+</span><span id="834" class="l"><a href="#834">834: </a>    <span class="php-var">$feed_data</span> = <span class="php-keyword2">array_filter</span>(<span class="php-var">$feed</span>-&gt;parsed_data);
+</span><span id="835" class="l"><a href="#835">835: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword1">empty</span>(<span class="php-var">$feed_data</span>)) {
+</span><span id="836" class="l"><a href="#836">836: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="837" class="l"><a href="#837">837: </a>    }
+</span><span id="838" class="l"><a href="#838">838: </a>    <span class="php-keyword1">else</span> {
+</span><span id="839" class="l"><a href="#839">839: </a>        <span class="php-keyword1">return</span> <span class="php-var">$feed</span>;
+</span><span id="840" class="l"><a href="#840">840: </a>    }
+</span><span id="841" class="l"><a href="#841">841: </a>}
+</span><span id="842" class="l"><a href="#842">842: </a>
+</span><span id="843" class="l"><a href="#843">843: </a><span class="php-comment">/**
+</span></span><span id="844" class="l"><a href="#844">844: </a><span class="php-comment"> * @subpackage feeds/functions
+</span></span><span id="845" class="l"><a href="#845">845: </a><span class="php-comment"> */</span>
+</span><span id="846" class="l"><a href="#846">846: </a><span class="php-keyword1">function</span> search_for_feeds(<span class="php-var">$html</span>) {
+</span><span id="847" class="l"><a href="#847">847: </a>    <span class="php-var">$type</span> = <span class="php-keyword1">false</span>;
+</span><span id="848" class="l"><a href="#848">848: </a>    <span class="php-var">$href</span> = <span class="php-keyword1">false</span>;
+</span><span id="849" class="l"><a href="#849">849: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match_all</span>(<span class="php-quote">&quot;/&lt;link.+&gt;/U&quot;</span>, <span class="php-var">$html</span>, <span class="php-var">$matches</span>)) {
+</span><span id="850" class="l"><a href="#850">850: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$matches</span>[<span class="php-num">0</span>] <span class="php-keyword1">as</span> <span class="php-var">$link_tag</span>) {
+</span><span id="851" class="l"><a href="#851">851: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$link_tag</span>, <span class="php-quote">'alternate'</span>)) {
+</span><span id="852" class="l"><a href="#852">852: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/type=(\&quot;|'|)(.+)(\&quot;|'|\&gt;| )/U&quot;</span>, <span class="php-var">$link_tag</span>, <span class="php-var">$types</span>)) {
+</span><span id="853" class="l"><a href="#853">853: </a>                    <span class="php-var">$type</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$types</span>[<span class="php-num">2</span>]);
+</span><span id="854" class="l"><a href="#854">854: </a>                }
+</span><span id="855" class="l"><a href="#855">855: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/href=(\&quot;|'|)(.+)(\&quot;|'|\&gt;| )/U&quot;</span>, <span class="php-var">$link_tag</span>, <span class="php-var">$hrefs</span>)) {
+</span><span id="856" class="l"><a href="#856">856: </a>                    <span class="php-var">$href</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$hrefs</span>[<span class="php-num">2</span>]);
+</span><span id="857" class="l"><a href="#857">857: </a>                }
+</span><span id="858" class="l"><a href="#858">858: </a>            }
+</span><span id="859" class="l"><a href="#859">859: </a>        }
+</span><span id="860" class="l"><a href="#860">860: </a>    }
+</span><span id="861" class="l"><a href="#861">861: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(<span class="php-var">$type</span>, <span class="php-var">$href</span>);
+</span><span id="862" class="l"><a href="#862">862: </a>}
 </span><span id="863" class="l"><a href="#863">863: </a>
-</span><span id="864" class="l"><a href="#864">864: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'pubdate'</span>, <span class="php-var">$item</span>)) {
-</span><span id="865" class="l"><a href="#865">865: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strtotime</span>(<span class="php-var">$item</span>[<span class="php-quote">'pubdate'</span>]) &lt; <span class="php-keyword2">strtotime</span>(<span class="php-var">$since</span>)) {
-</span><span id="866" class="l"><a href="#866">866: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="867" class="l"><a href="#867">867: </a>        }
-</span><span id="868" class="l"><a href="#868">868: </a>    }
-</span><span id="869" class="l"><a href="#869">869: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'dc:date'</span>, <span class="php-var">$item</span>)) {
-</span><span id="870" class="l"><a href="#870">870: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strtotime</span>(<span class="php-var">$item</span>[<span class="php-quote">'dc:date'</span>]) &lt; <span class="php-keyword2">strtotime</span>(<span class="php-var">$since</span>)) {
+</span><span id="864" class="l"><a href="#864">864: </a><span class="php-comment">/**
+</span></span><span id="865" class="l"><a href="#865">865: </a><span class="php-comment"> * @subpackage feeds/functions
+</span></span><span id="866" class="l"><a href="#866">866: </a><span class="php-comment"> */</span>
+</span><span id="867" class="l"><a href="#867">867: </a><span class="php-keyword1">function</span> search_feed_item(<span class="php-var">$item</span>, <span class="php-var">$terms</span>, <span class="php-var">$since</span>, <span class="php-var">$fld</span>) {
+</span><span id="868" class="l"><a href="#868">868: </a>
+</span><span id="869" class="l"><a href="#869">869: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'pubdate'</span>, <span class="php-var">$item</span>)) {
+</span><span id="870" class="l"><a href="#870">870: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strtotime</span>(<span class="php-var">$item</span>[<span class="php-quote">'pubdate'</span>]) &lt; <span class="php-keyword2">strtotime</span>(<span class="php-var">$since</span>)) {
 </span><span id="871" class="l"><a href="#871">871: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
 </span><span id="872" class="l"><a href="#872">872: </a>        }
 </span><span id="873" class="l"><a href="#873">873: </a>    }
-</span><span id="874" class="l"><a href="#874">874: </a>    <span class="php-keyword1">switch</span> (<span class="php-var">$fld</span>) {
-</span><span id="875" class="l"><a href="#875">875: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'BODY'</span>:
-</span><span id="876" class="l"><a href="#876">876: </a>            <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'description'</span>);
-</span><span id="877" class="l"><a href="#877">877: </a>            <span class="php-keyword1">break</span>;
-</span><span id="878" class="l"><a href="#878">878: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'FROM'</span>:
-</span><span id="879" class="l"><a href="#879">879: </a>            <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'dc:creator'</span>);
-</span><span id="880" class="l"><a href="#880">880: </a>            <span class="php-keyword1">break</span>;
-</span><span id="881" class="l"><a href="#881">881: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'SUBJECT'</span>:
-</span><span id="882" class="l"><a href="#882">882: </a>            <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'title'</span>);
-</span><span id="883" class="l"><a href="#883">883: </a>            <span class="php-keyword1">break</span>;
-</span><span id="884" class="l"><a href="#884">884: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'TEXT'</span>:
-</span><span id="885" class="l"><a href="#885">885: </a>        <span class="php-keyword1">default</span>:
-</span><span id="886" class="l"><a href="#886">886: </a>            <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'description'</span>, <span class="php-quote">'title'</span>, <span class="php-quote">'dc:creator'</span>, <span class="php-quote">'guid'</span>);
-</span><span id="887" class="l"><a href="#887">887: </a>            <span class="php-keyword1">break</span>;
-</span><span id="888" class="l"><a href="#888">888: </a>    }
-</span><span id="889" class="l"><a href="#889">889: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$flds</span> <span class="php-keyword1">as</span> <span class="php-var">$fld</span>) {
-</span><span id="890" class="l"><a href="#890">890: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$fld</span>, <span class="php-var">$item</span>)) {
-</span><span id="891" class="l"><a href="#891">891: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$item</span>[<span class="php-var">$fld</span>], <span class="php-var">$terms</span>)) {
-</span><span id="892" class="l"><a href="#892">892: </a>                <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
-</span><span id="893" class="l"><a href="#893">893: </a>            }
-</span><span id="894" class="l"><a href="#894">894: </a>        }
-</span><span id="895" class="l"><a href="#895">895: </a>    }
-</span><span id="896" class="l"><a href="#896">896: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="897" class="l"><a href="#897">897: </a>}
-</span><span id="898" class="l"><a href="#898">898: </a>
-</span><span id="899" class="l"><a href="#899">899: </a>
-</span><span id="900" class="l"><a href="#900">900: </a></span></code></pre>
+</span><span id="874" class="l"><a href="#874">874: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'dc:date'</span>, <span class="php-var">$item</span>)) {
+</span><span id="875" class="l"><a href="#875">875: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">strtotime</span>(<span class="php-var">$item</span>[<span class="php-quote">'dc:date'</span>]) &lt; <span class="php-keyword2">strtotime</span>(<span class="php-var">$since</span>)) {
+</span><span id="876" class="l"><a href="#876">876: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="877" class="l"><a href="#877">877: </a>        }
+</span><span id="878" class="l"><a href="#878">878: </a>    }
+</span><span id="879" class="l"><a href="#879">879: </a>    <span class="php-keyword1">switch</span> (<span class="php-var">$fld</span>) {
+</span><span id="880" class="l"><a href="#880">880: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'BODY'</span>:
+</span><span id="881" class="l"><a href="#881">881: </a>            <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'description'</span>);
+</span><span id="882" class="l"><a href="#882">882: </a>            <span class="php-keyword1">break</span>;
+</span><span id="883" class="l"><a href="#883">883: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'FROM'</span>:
+</span><span id="884" class="l"><a href="#884">884: </a>            <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'dc:creator'</span>);
+</span><span id="885" class="l"><a href="#885">885: </a>            <span class="php-keyword1">break</span>;
+</span><span id="886" class="l"><a href="#886">886: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'SUBJECT'</span>:
+</span><span id="887" class="l"><a href="#887">887: </a>            <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'title'</span>);
+</span><span id="888" class="l"><a href="#888">888: </a>            <span class="php-keyword1">break</span>;
+</span><span id="889" class="l"><a href="#889">889: </a>        <span class="php-keyword1">case</span> <span class="php-quote">'TEXT'</span>:
+</span><span id="890" class="l"><a href="#890">890: </a>        <span class="php-keyword1">default</span>:
+</span><span id="891" class="l"><a href="#891">891: </a>            <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'description'</span>, <span class="php-quote">'title'</span>, <span class="php-quote">'dc:creator'</span>, <span class="php-quote">'guid'</span>);
+</span><span id="892" class="l"><a href="#892">892: </a>            <span class="php-keyword1">break</span>;
+</span><span id="893" class="l"><a href="#893">893: </a>    }
+</span><span id="894" class="l"><a href="#894">894: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$flds</span> <span class="php-keyword1">as</span> <span class="php-var">$fld</span>) {
+</span><span id="895" class="l"><a href="#895">895: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$fld</span>, <span class="php-var">$item</span>)) {
+</span><span id="896" class="l"><a href="#896">896: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">stristr</span>(<span class="php-var">$item</span>[<span class="php-var">$fld</span>], <span class="php-var">$terms</span>)) {
+</span><span id="897" class="l"><a href="#897">897: </a>                <span class="php-keyword1">return</span> <span class="php-keyword1">true</span>;
+</span><span id="898" class="l"><a href="#898">898: </a>            }
+</span><span id="899" class="l"><a href="#899">899: </a>        }
+</span><span id="900" class="l"><a href="#900">900: </a>    }
+</span><span id="901" class="l"><a href="#901">901: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="902" class="l"><a href="#902">902: </a>}
+</span><span id="903" class="l"><a href="#903">903: </a>
+</span><span id="904" class="l"><a href="#904">904: </a>
+</span><span id="905" class="l"><a href="#905">905: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -2043,6 +2051,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?7f80dbdda44f63bf3f4fd3dd5af1c88cf6268a3a"></script>
+<script src="elementlist.js?f517b7df0a3f53758db4bbd59ffd8d6faf8b7230"></script>
 </body>
 </html>
