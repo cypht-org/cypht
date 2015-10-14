@@ -34,6 +34,13 @@ class Hm_SMTP_List {
     public static function get_cache($session, $id) {
         return false;
     }
+    public static function address_list() {
+        $addrs = array();
+        foreach (self::$server_list as $server) {
+            $addrs[] = $server['user'];
+        }
+        return $addrs;
+    }
 }
 
 /**
