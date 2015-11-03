@@ -33,7 +33,6 @@ add_handler('search', 'load_imap_servers_for_search',  true, 'imap', 'message_li
 add_handler('search', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 
 /* message list pages */
-add_handler('message_list', 'imap_bust_cache',  true, 'imap', 'message_list_type', 'after');
 add_handler('message_list', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message_list', 'imap_custom_controls', true, 'imap', 'message_list_heading', 'before');
 
@@ -157,6 +156,8 @@ add_handler('ajax_imap_folder_display', 'imap_message_list_type', true);
 add_handler('ajax_imap_folder_display', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_folder_display', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_folder_display', 'imap_folder_page',  true);
+add_handler('ajax_imap_folder_display', 'save_imap_cache',  true);
+add_handler('ajax_imap_folder_display', 'close_session_early',  true, 'core');
 add_output('ajax_imap_folder_display', 'filter_folder_page', true);
 
 /* search results */
