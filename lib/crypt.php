@@ -138,9 +138,7 @@ class Hm_Crypt {
      */
     public static function generate_salt() {
         /* generate random bytes */
-        $res = openssl_random_pseudo_bytes(128, $strong);
-        self::$strong = $strong;
-        return $res;
+        return self::random(128);
     }
 
     /**
@@ -243,5 +241,22 @@ class Hm_Crypt {
      */
     public static function unique_id($size=128) {
         return base64_encode(openssl_random_pseudo_bytes($size));
+    }
+
+    /**
+     * Generate a random string
+     * @param int $size
+     * @return string
+     */
+    public static function random($size=128) {
+        if (function_exists('mcrypt_create_iv') && defined('MCRYPT_DEV_URANDOM')) {
+            $res = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
+            self::$strong = true;
+        }
+        else {
+            $res = openssl_random_pseudo_bytes(128, $strong);
+            self::$strong = $strong;
+        }
+        return $res;
     }
 }
