@@ -245,7 +245,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             }
             $path = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
             $details = Hm_IMAP_List::dump($form['imap_server_id']);
-            $cache = false; //Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 $this->out('imap_mailbox_page_path', $path);
