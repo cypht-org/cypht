@@ -99,7 +99,7 @@ class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
             $contact_store = new Hm_Contact_Store($this->user_config);
             $contact_store = fetch_gmail_contacts($this->config, $contact_store);
         }
-        if (!empty($contact_store->dump())) {
+        if (count($contact_store->dump()) > 0) {
             $this->out('gmail_contacts', $contact_store);
         }
         if ($updated > 0) {
