@@ -322,7 +322,7 @@ function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $htm
  */
 function format_reply_as_html($body, $type, $reply_type, $lead_in) {
     if ($type == 'textplain') {
-        if ($reply_type == 'reply') {
+        if ($reply_type == 'reply' || $reply_type == 'reply_all') {
             $msg = nl2br($lead_in.format_reply_text($body));
         }
         elseif ($reply_type == 'forward') {
@@ -346,7 +346,7 @@ function format_reply_as_html($body, $type, $reply_type, $lead_in) {
  */
 function format_reply_as_text($body, $type, $reply_type, $lead_in) {
     if ($type == 'texthtml') {
-        if ($reply_type == 'reply') {
+        if ($reply_type == 'reply' || $reply_type == 'reply_all') {
             $msg = $lead_in.format_reply_text(convert_html_to_text($body));
         }
         elseif ($reply_type == 'forward') {
