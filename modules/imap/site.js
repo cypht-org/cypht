@@ -495,7 +495,8 @@ var imap_prefetch_msgs = function() {
 
 var imap_setup_message_view_page = function() {
     var msg_content = get_local_message_content();
-    if (!msg_content || !msg_content.length) {
+    elog(msg_content);
+    if (!msg_content || !msg_content.length || msg_content == '<div class="msg_text_inner"></div>') {
         get_message_content();
     }
     else {
