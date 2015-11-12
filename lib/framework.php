@@ -62,5 +62,8 @@ if (!class_exists('Hm_Functions')) {
         public static function function_exists($func) {
             return function_exists($func);
         }
+        public static function random_bytes($size) {
+            return random_bytes($size);
+        }
     }
 }
