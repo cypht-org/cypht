@@ -51,7 +51,6 @@ class Hm_Request_Key {
 
 class Hm_Crypt {
 
-    static public $strong = true;
     static private $method = 'aes-256-cbc';
     static private $hmac = 'sha512';
     static private $password_rounds = 86000;
@@ -115,7 +114,6 @@ class Hm_Crypt {
     public static function ciphertext($string, $key) {
         /* generate a strong salt */
         $salt = self::generate_salt();
-        self::random_bytes_check();
 
         /* build required keys */
         $iv = self::pbkdf2($key, $salt, 16, self::$encryption_rounds, self::$hmac);
@@ -139,17 +137,6 @@ class Hm_Crypt {
     public static function generate_salt() {
         /* generate random bytes */
         return self::random(128);
-    }
-
-    /**
-     * Output a debug message if openssl_random_pseudo_bytes is borked
-     * @return bool
-     */
-    public static function random_bytes_check() {
-        if (!self::$strong) {
-            Hm_Debug::add('WARNING: openssl_random_pseudo_bytes not cryptographically strong');
-        }
-        return self::$strong;
     }
 
     /**
@@ -211,7 +198,6 @@ class Hm_Crypt {
     public static function hash_password($password, $salt=false, $count=false, $algo='sha512') {
         if (!$salt) {
             $salt = self::generate_salt();
-            self::random_bytes_check();
         }
         if (!$count) {
             $count = self::$password_rounds;
@@ -249,13 +235,15 @@ class Hm_Crypt {
      * @return string
      */
     public static function random($size=128) {
-        if (function_exists('mcrypt_create_iv') && defined('MCRYPT_DEV_URANDOM')) {
-            $res = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
-            self::$strong = true;
+        $res = false;
+        try {
+            $res = random_bytes($size);
         }
-        else {
-            $res = openssl_random_pseudo_bytes(128, $strong);
-            self::$strong = $strong;
+        catch (Error $e) {
+            throw($e);
+        }
+        catch (Exception $e) {
+            Hm_Functions::cease('No reliable random byte source found');
         }
         return $res;
     }
