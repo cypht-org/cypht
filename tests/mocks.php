@@ -65,6 +65,7 @@ class Hm_Mock_Request {
     }
 }
 class Hm_Functions {
+        public static $rand_bytes = 'good';
         public static $exists = true;
         public static $exec_res = '{"unit":"test"}';
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
@@ -76,6 +77,17 @@ class Hm_Functions {
         public static function c_setopt() { return true; }
         public static function c_exec() { return self::$exec_res; }
         public static function function_exists($func) { return self::$exists; }
+        public static function random_bytes($size) {
+            if (self::$rand_bytes == 'good') {
+                return random_bytes($size);
+            }
+            else if (self::$rand_bytes == 'bad') {
+                throw(new Error());
+            }
+            else if (self::$rand_bytes == 'ugly') {
+                throw(new Exception());
+            }
+        }
 }
 
 function setup_db($config) {
