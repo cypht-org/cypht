@@ -55,7 +55,7 @@ else {
 }
 
 /* open base dir */
-$base = dirname(dirname(__FILE__)).PATH_SEPARATOR.'/tmp';
+$base = dirname(dirname(__FILE__)).PATH_SEPARATOR.'/tmp'.PATH_SEPARATOR.'/dev/urandom';
 if ($config->get('app_data_dir', false) && is_readable($config->get('app_data_dir', false))) {
     $base .= PATH_SEPARATOR.$config->get('app_data_dir', false);
 }
