@@ -237,7 +237,7 @@ class Hm_Crypt {
     public static function random($size=128) {
         $res = false;
         try {
-            $res = random_bytes($size);
+            $res = Hm_Functions::random_bytes($size);
         }
         catch (Error $e) {
             throw($e);
