@@ -24,6 +24,10 @@ require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
 
+if (!function_exists('random_bytes')) {
+    require APP_PATH.'third_party/random_compat/lib/random.php';
+}
+
 if (!class_exists('Hm_Functions')) {
     /**
      * Used to override built in functions that break unit tests
