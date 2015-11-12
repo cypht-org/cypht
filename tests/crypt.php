@@ -12,6 +12,28 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_random() {
+        $bytes = Hm_Crypt::random(10);
+        $this->assertTrue(strlen($bytes) == 10);
+        Hm_Functions::$rand_bytes = 'bad';
+        try {
+            Hm_Crypt::random(10);
+        }
+        catch(Error $e) {
+            $this->assertTrue(true);
+        }
+        Hm_Functions::$rand_bytes = 'ugly';
+        try {
+            Hm_Crypt::random(10);
+        }
+        catch(Exception $e) {
+            $this->assertTrue(true);
+        }
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_ciphertext() {
         $cipher = Hm_Crypt::ciphertext('test', 'testkey');
         $this->assertFalse($cipher == 'test');
@@ -78,15 +100,6 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
         $this->assertEquals(24, strlen(base64_decode(Hm_Crypt::unique_id(24))));
         $this->assertEquals(48, strlen(base64_decode(Hm_Crypt::unique_id(48))));
         $this->assertEquals(128, strlen(base64_decode(Hm_Crypt::unique_id())));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_random_bytes_check() {
-        $this->assertTrue(Hm_Crypt::random_bytes_check());
-        Hm_Crypt::$strong = false;
-        $this->assertFalse(Hm_Crypt::random_bytes_check());
     }
 }
 
