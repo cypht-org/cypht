@@ -892,7 +892,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 }
             }
             if (isset($struct['attributes']['charset']) && $struct['attributes']['charset']) {
-                $res = mb_convert_encoding($res, 'UTF-8', $struct['attributes']['charset']);
+                if ($struct['attributes']['charset'] != 'us-ascii') {
+                    $res = mb_convert_encoding($res, 'UTF-8', $struct['attributes']['charset']);
+                }
             }
         }
         if ($status) {
