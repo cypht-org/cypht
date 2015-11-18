@@ -97,27 +97,28 @@ function format_reply_text($txt) {
 function reply_to_address($headers, $type, $excluded) {
     $msg_to = '';
     $msg_cc = '';
+    $headers = lc_headers($headers);
     if ($type == 'forward') {
         return $msg_to;
     }
-    if (array_key_exists('Reply-to', $headers)) {
-        $msg_to = $headers['Reply-to'];
+    if (array_key_exists('reply-to', $headers)) {
+        $msg_to = $headers['reply-to'];
     }
-    elseif (array_key_exists('From', $headers)) {
-        $msg_to = $headers['From'];
+    elseif (array_key_exists('from', $headers)) {
+        $msg_to = $headers['from'];
     }
-    elseif (array_key_exists('Sender', $headers)) {
-        $msg_to = $headers['Sender'];
+    elseif (array_key_exists('sender', $headers)) {
+        $msg_to = $headers['sender'];
     }
-    elseif (array_key_exists('Return-path', $headers)) {
-        $msg_to = $headers['Return-path'];
+    elseif (array_key_exists('return-path', $headers)) {
+        $msg_to = $headers['return-path'];
     }
     if ($type == 'reply_all') {
-        if (array_key_exists('CC', $headers)) {
-            $msg_cc = $headers['CC'];
+        if (array_key_exists('cc', $headers)) {
+            $msg_cc = $headers['cc'];
         }
-        if (array_key_exists('To', $headers)) {
-            $recips = format_reply_all_address($headers['To'], $excluded);
+        if (array_key_exists('to', $headers)) {
+            $recips = format_reply_all_address($headers['to'], $excluded);
             if ($recips) {
                 if ($msg_cc) {
                     $msg_cc .= ', '.$recips;
@@ -365,6 +366,15 @@ function format_reply_as_text($body, $type, $reply_type, $lead_in) {
 }
 
 /**
+ * Convert header keys to lowercase versions
+ * @param array $headers message headers
+ * @return array
+ */
+function lc_headers($headers) {
+    return array_change_key_case($headers, CASE_LOWER);
+}
+
+/**
  * Get the in-reply-to message id for replied
  * @subpackage core/functions
  * @param array $headers message headers
@@ -373,15 +383,11 @@ function format_reply_as_text($body, $type, $reply_type, $lead_in) {
  */
 function reply_to_id($headers, $type) {
     $id = '';
-    if ($type != 'forward' && array_key_exists('Message-Id', $headers)) {
-        $id = $headers['Message-Id'];
+    $headers = lc_headers($headers);
+    if ($type != 'forward' && array_key_exists('message-id', $headers)) {
+        $id = $headers['message-id'];
     }
-    elseif ($type != 'forward' && array_key_exists('Message-id', $headers)) {
-        $id = $headers['Message-id'];
-    }
-    elseif ($type != 'forward' && array_key_exists('Message-ID', $headers)) {
-        $id = $headers['Message-ID'];
-    }
+    elog($id);
     return $id;
 }
 
