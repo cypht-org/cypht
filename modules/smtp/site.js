@@ -175,9 +175,11 @@ if (hm_page_name() === 'compose') {
     Hm_Timer.add_job(function() { save_compose_state(); }, 30, true);
     $('.toggle_recipients').click(function() { return toggle_recip_flds(); });
     $('.smtp_reset').click(reset_smtp_form);
+    $('.draft_list').click(function() { $('.list_sources').toggle(); return false; });
     $('.smtp_save').click(function() { save_compose_state(false, true); });
     $('.compose_attach_button').click(function() { $('.compose_attach_file').trigger('click'); });
     $('.compose_attach_file').change(function() { upload_file(this.files[0]); });
+    $('.compose_form').on('submit', function() { $('.smtp_send').addClass('disabled_input'); $('.smtp_send').click(function() { return false; }); });
     $('.compose_form').submit(function() { Hm_Ajax.show_loading_icon(); return true; });
     if ($('.compose_cc').val() || $('.compose_bcc').val()) {
         toggle_recip_flds();
