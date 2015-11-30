@@ -77,6 +77,7 @@ class Hm_Functions {
         public static function c_setopt() { return true; }
         public static function c_exec() { return self::$exec_res; }
         public static function function_exists($func) { return self::$exists; }
+        public static function class_exists($func) { return self::$exists; }
         public static function random_bytes($size) {
             if (self::$rand_bytes == 'good') {
                 return random_bytes($size);

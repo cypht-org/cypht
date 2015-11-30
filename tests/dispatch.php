@@ -11,6 +11,15 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_is_php_setup() {
+        $this->assertTrue(Hm_Dispatch::is_php_setup());
+        Hm_Functions::$exists = false;
+        $this->assertFalse(Hm_Dispatch::is_php_setup());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_process_request() {
         ob_start();
         ob_start();
