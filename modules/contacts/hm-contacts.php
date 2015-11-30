@@ -47,14 +47,15 @@ class Hm_Contact_Store {
                 }
                 if ($this->search_contact($contact, $fld, $term)) {
                     $res[$id] = $contact;
+                    $found[$contact->value('email_address')] = 1;
                 }
-                $found[$contact->value('email_address')] = 1;
             }
         }
         return $res;
     }
 
     protected function search_contact($contact, $fld, $term) {
+        elog($fld);
         if (stristr($contact->value($fld, ''), $term)) {
             return true;
         }
