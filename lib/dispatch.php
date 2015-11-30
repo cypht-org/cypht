@@ -191,10 +191,10 @@ class Hm_Dispatch {
      */
     static public function is_php_setup() {
         return
-            function_exists('mb_strpos') &&
-            function_exists('curl_exec') &&
-            function_exists('openssl_random_pseudo_bytes') &&
-            class_exists('PDO');
+            Hm_Functions::function_exists('mb_strpos') &&
+            Hm_Functions::function_exists('curl_exec') &&
+            Hm_Functions::function_exists('openssl_random_pseudo_bytes') &&
+            Hm_Functions::class_exists('PDO');
 
     }
 }
