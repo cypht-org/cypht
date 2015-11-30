@@ -26,6 +26,15 @@ build_config();
  * @return void
  */
 function build_config() {
+    if (!Hm_Dispatch::is_php_setup()) {
+        printf("\nPHP is not correctly configured\n");
+        printf("\nMbstring:   %s\n", function_exists('mb_strpos') ? 'yes' : 'no');
+        printf("Curl:       %s\n", function_exists('curl_exec') ? 'yes' : 'no');
+        printf("Openssl:    %s\n", function_exists('openssl_random_pseudo_bytes') ? 'yes' : 'no');
+        printf("PDO:        %s\n\n", class_exists('PDO') ? 'yes' : 'no');
+        exit;
+    }
+
     /* get the site settings */
     $settings = parse_ini_file(APP_PATH.'hm3.ini');
 

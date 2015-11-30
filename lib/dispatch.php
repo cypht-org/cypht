@@ -184,4 +184,17 @@ class Hm_Dispatch {
         Hm_Functions::header('Location: '.$url);
         return Hm_Functions::cease();
     }
+
+    /**
+     * Check to see if PHP is configured properly
+     * @return bool
+     */
+    static public function is_php_setup() {
+        return
+            function_exists('mb_strpos') &&
+            function_exists('curl_exec') &&
+            function_exists('openssl_random_pseudo_bytes') &&
+            class_exists('PDO');
+
+    }
 }
