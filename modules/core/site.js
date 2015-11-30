@@ -997,10 +997,14 @@ var Hm_Utils = {
         return results;
     },
     get_from_local_storage: function(key) {
+        var res = false;
         if (hm_encrypt_local_storage()) {
-            return Hm_Crypt.decrypt(sessionStorage.getItem(key));
+             res = Hm_Crypt.decrypt(sessionStorage.getItem(key));
         }
-        return sessionStorage.getItem(key);
+        else {
+            res = sessionStorage.getItem(key);
+        }
+        return res;
     },
     save_to_local_storage: function(key, val) {
         if (hm_encrypt_local_storage()) {
@@ -1008,10 +1012,13 @@ var Hm_Utils = {
         }
         if (Storage !== void(0)) {
             try { sessionStorage.setItem(key, val); } catch(e) {
-                if (e.code == 22) {
-                    sessionStorage.clear();
-                    sessionStorage.setItem(key, val);
-                }}
+                sessionStorage.clear();
+                sessionStorage.setItem(key, val);
+            }
+            if (sessionStorage.getItem(key) === null) {
+                sessionStorage.clear();
+                sessionStorage.setItem(key, val);
+            }
         }
         return false;
     },
