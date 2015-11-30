@@ -7,7 +7,7 @@ var record_message = function(res) {
         $('th', $('.header_subject')).html(),
         $('td', $('.header_from')).html(),
         $('td', $('.header_date')).html(),
-        $('.content_title').html()
+        $('a', $('.content_title')).text()
     ];
     Hm_Utils.save_to_local_storage('message_history', Hm_Utils.json_encode(history));
 };
