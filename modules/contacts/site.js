@@ -29,7 +29,7 @@ var autocomplete_contact = function(e, class_name, list_div) {
     if (addresses.length > 1) {
         fld_val = addresses.pop();
     }
-    if (fld_val.length > 3) {
+    if (fld_val.length > 2) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_autocomplete_contact'},
             {'name': 'contact_value', 'value': fld_val}],
