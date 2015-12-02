@@ -55,7 +55,6 @@ class Hm_Contact_Store {
     }
 
     protected function search_contact($contact, $fld, $term) {
-        elog($fld);
         if (stristr($contact->value($fld, ''), $term)) {
             return true;
         }
