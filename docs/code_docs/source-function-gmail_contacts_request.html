@@ -1038,6 +1038,7 @@
 				<li><a href="function-interface_langs.html">interface_langs</a></li>
 				<li><a href="function-is_email.html">is_email</a></li>
 				<li><a href="function-is_feed.html">is_feed</a></li>
+				<li><a href="function-lc_headers.html">lc_headers</a></li>
 				<li><a href="function-list_controls.html">list_controls</a></li>
 				<li><a href="function-list_sources.html">list_sources</a></li>
 				<li><a href="function-load_user_config_object.html">load_user_config_object</a></li>
@@ -1240,7 +1241,7 @@
 </span><span id="99" class="l"><a href="#99"> 99: </a>            <span class="php-var">$contact_store</span> = <span class="php-keyword1">new</span> Hm_Contact_Store(<span class="php-var">$this</span>-&gt;user_config);
 </span><span id="100" class="l"><a href="#100">100: </a>            <span class="php-var">$contact_store</span> = fetch_gmail_contacts(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$contact_store</span>);
 </span><span id="101" class="l"><a href="#101">101: </a>        }
-</span><span id="102" class="l"><a href="#102">102: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$contact_store</span>-&gt;dump())) {
+</span><span id="102" class="l"><a href="#102">102: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$contact_store</span>-&gt;dump()) &gt; <span class="php-num">0</span>) {
 </span><span id="103" class="l"><a href="#103">103: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'gmail_contacts'</span>, <span class="php-var">$contact_store</span>);
 </span><span id="104" class="l"><a href="#104">104: </a>        }
 </span><span id="105" class="l"><a href="#105">105: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$updated</span> &gt; <span class="php-num">0</span>) {
@@ -1568,6 +1569,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?f517b7df0a3f53758db4bbd59ffd8d6faf8b7230"></script>
+<script src="elementlist.js?2f047e9183c220a1faf3e554723a7b91b6bb6252"></script>
 </body>
 </html>
