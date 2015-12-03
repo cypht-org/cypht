@@ -13,6 +13,7 @@ define('DEBUG_MODE', false);
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
+chdir(APP_PATH);
 
 /* get the framework */
 require APP_PATH.'lib/framework.php';
