@@ -84,9 +84,9 @@ class Hm_Output_apod_content extends Hm_Output_Module {
         $res = '<div class="content_title">'.$this->trans('Astronomy Picture of the Day');
         $res .= apod_date_form($date, $this);
         $res .= '</div>';
-        if (empty($data) || array_key_exists('error', $data)) {
+        if (!$data || $data == array() || array_key_exists('error', $data)) {
             $res .= '<div class="apod_error">';
-            if (array_key_exists('message', $data['error'])) {
+            if (is_array($data) && array_key_exists('error', $data) && array_key_exists('message', $data['error'])) {
                 $res .= $this->html_safe($data['error']['message']);
             }
             else {
