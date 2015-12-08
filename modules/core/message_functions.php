@@ -46,7 +46,7 @@ function convert_html_to_text($html) {
  * return string
  */
 function format_msg_image($str, $mime_type) {
-    return '<img alt="" src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
+    return '<img class="msg_img" alt="" src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
 }
 
 /**
@@ -387,7 +387,6 @@ function reply_to_id($headers, $type) {
     if ($type != 'forward' && array_key_exists('message-id', $headers)) {
         $id = $headers['message-id'];
     }
-    elog($id);
     return $id;
 }
 
