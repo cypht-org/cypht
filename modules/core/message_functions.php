@@ -260,7 +260,7 @@ function reply_to_subject($headers, $type) {
  */
 function reply_lead_in($headers, $type, $to, $output_mod) {
     $lead_in = '';
-    if ($type == 'reply') {
+    if ($type == 'reply' || $type == 'reply_all') {
         if (array_key_exists('Date', $headers)) {
             if ($to) {
                 $lead_in = sprintf($output_mod->trans('On %s %s said')."\n\n", $headers['Date'], $to);
