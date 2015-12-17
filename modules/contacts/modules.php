@@ -85,28 +85,15 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
                 $this->out('current_contact', $current);
             }
         }
-        $this->out('contact_store', $contacts);
-    }
-}
-
-/**
- * @subpackage contacts/handler
- */
-class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
-    public function process() {
+        $page = 1;
+        if (array_key_exists('contact_page', $this->request->get)) {
+            $page = $this->request->get['contact_page'];
+        }
+        $this->out('contact_page', $page);
         if (strpos($this->config->get('modules', ''), 'imap') !== false) {
-            $updated = false;
-            $contact_store = new Hm_Contact_Store($this->user_config);
-            $contact_store = fetch_gmail_contacts($this->config, $contact_store);
+            $contact_store = fetch_gmail_contacts($this->config, $contacts);
         }
-        if (count($contact_store->dump()) > 0) {
-            $this->out('gmail_contacts', $contact_store);
-        }
-        if ($updated > 0) {
-            $servers = Hm_IMAP_List::dump(false, true);
-            $this->user_config->set('imap_servers', $servers);
-            $this->session->set('user_data', $this->user_config->dump());
-        }
+        $this->out('contact_store', $contacts);
     }
 }
 
@@ -243,48 +230,19 @@ class Hm_Output_add_message_contacts extends Hm_Output_Module {
 /**
  * @subpackage contacts/output
  */
-class Hm_Output_gmail_contacts_list extends Hm_Output_Module {
-    protected function output() {
-        $contacts = $this->get('gmail_contacts');
-        $res = '';
-        if ($contacts) {
-            $contacts->sort('email_address');
-            $res .= '<table class="gmail_contacts contact_list">';
-            $res .= '<tr><td colspan="5" class="contact_list_title"><div class="server_title">'.$this->trans('Gmail Contacts').'</div></td></tr>';
-                foreach ($contacts->page(1, 20) as $id => $contact) {
-                    if (!$contact->value('source')) {
-                        continue;
-                    }
-                    $res .= '<tr class="contact_row_'.$this->html_safe($id).'">'.
-                        '<td>'.$this->html_safe($contact->value('source')).'</td>'.
-                        '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
-                        '<td>'.$this->html_safe($contact->value('email_address')).'</td>'.
-                        '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
-                        '<td class="contact_controls"><a href="?page=compose&amp;contact_id='.$this->html_safe($id).
-                        '" class="send_to_contact" title="Send to"><img alt="'.$this->trans('Send To').
-                        '" width="16" height="16" src="'.Hm_Image_Sources::$doc.'" /></a>'.
-                        '</td>'.
-                        '</tr>';
-            }
-            $res .= '</table>';
-        }
-        return $res;
-    }
-}
-
-/**
- * @subpackage contacts/output
- */
 class Hm_Output_contacts_list extends Hm_Output_Module {
     protected function output() {
+        $per_page = 25;
+        $current_page = $this->get('contact_page', 1);
         $res = '<table class="contact_list">';
-        $res .= '<tr><td colspan="4" class="contact_list_title"><div class="server_title">'.$this->trans('Local Contacts').'</div></td></tr>';
+        $res .= '<tr><td colspan="5" class="contact_list_title"><div class="server_title">'.$this->trans('Local Contacts').'</div></td></tr>';
         $contacts = $this->get('contact_store');
-        $total = count($contacts->dump());
-        $contacts->sort('email_address');
         if ($contacts) {
-            foreach ($contacts->page(1, 20) as $id => $contact) {
+            $total = count($contacts->dump());
+            $contacts->sort('email_address');
+            foreach ($contacts->page($current_page, $per_page) as $id => $contact) {
                 $res .= '<tr class="contact_row_'.$this->html_safe($id).'">'.
+                    '<td>'.($contact->value('source') ? $this->html_safe($contact->value('source')) : $this->trans('local')).'</td>'.
                     '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
                     '<td>'.$this->html_safe($contact->value('email_address')).'</td>'.
                     '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
@@ -295,6 +253,14 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '</td>'.
                     '</tr>';
             }
+            $res .= '<tr><td class="contact_pages" colspan="5">';
+            if ($current_page > 1) {
+                $res .= '<a href="?page=contacts&contact_page='.($current_page-1).'">Previous</a>';
+            }
+            if ($total > ($current_page * $per_page)) {
+                $res .= ' <a href="?page=contacts&contact_page='.($current_page+1).'">Next</a>';
+            }
+            $res .= '</td></tr>';
         }
         $res .= '</table>';
         return $res;

@@ -14,3 +14,4 @@
 .contact_suggestion { display: block; }
 .close_autocomplete { float: right; }
 #cc_contacts, #bcc_contacts, #to_contacts { display: none; left: 34px; margin-top: -5px; position: absolute; background-color: #fff; border: solid 1px #ddd; padding: 10px; border-radius: 3px 3px 3px 3px; border-top: none; }
+.contact_pages { text-align: center; border-bottom: none !important; }
