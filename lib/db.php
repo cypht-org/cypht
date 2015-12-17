@@ -59,7 +59,6 @@ class Hm_DB {
      * @return object database connection on success
      */
     static public function connect($site_config) {
-
         self::parse_config($site_config);
         $key = self::db_key();
 
