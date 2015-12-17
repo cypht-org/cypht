@@ -1,5 +1,3 @@
-/* globals Hm_Ajax,Hm_Message_List,Hm_Utils,Hm_Folders,hm_list_path,hm_msg_uid,hm_search_terms,hm_list_parent,hm_page_name,Message_List,Hm_Timer,hm_data_sources_background: true */
-/* exported imap_all_mail_content,imap_search_page_content,imap_combined_unread_content,imap_combined_flagged_content,imap_combined_inbox_content,display_reply_content,imap_background_unread_content */
 
 var imap_delete_action = function(event) {
     event.preventDefault();
