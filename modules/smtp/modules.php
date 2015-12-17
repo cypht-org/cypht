@@ -81,6 +81,16 @@ class Hm_Handler_process_compose_type extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
+    public function process() {
+        function smtp_auto_bcc_callback($val) { return $val; }
+        process_site_setting('smtp_auto_bcc', $this, 'smtp_auto_bcc_callback', false, true);
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('attachment_id', $this->request->post)) {
@@ -409,6 +419,15 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     }
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
+                        $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
+                        if ($auto_bcc) {
+                            if ($bcc) {
+                                $bcc .= ', '.$from;
+                            }
+                            else {
+                                $bcc = $from;
+                            }
+                        }
                         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0), $cc, $bcc, $in_reply_to);
                         $mime->add_attachments($this->session->get('uploaded_files', array()));
                         $recipients = $mime->get_recipient_addresses();
@@ -577,6 +596,25 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
             $res .= 'selected="selected" ';
         }
         $res .= 'value="1">'.$this->trans('HTML').'</option></select></td></tr>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
+    protected function output() {
+        $auto = false;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('smtp_auto_bcc', $settings)) {
+            $auto = $settings['smtp_auto_bcc'];
+        }
+        $res = '<tr class="general_setting"><td>'.$this->trans('Always BCC sending address').'</td><td><input value="1" type="checkbox" name="smtp_auto_bcc"';
+        if ($auto) {
+            $res .= ' checked="checked"';
+        }
+        $res .= '></td></tr>';
         return $res;
     }
 }
