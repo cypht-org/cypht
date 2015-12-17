@@ -1402,7 +1402,7 @@
 </span></span><span id="260" class="l"><a href="#260">260: </a><span class="php-comment"> */</span>
 </span><span id="261" class="l"><a href="#261">261: </a><span class="php-keyword1">function</span> reply_lead_in(<span class="php-var">$headers</span>, <span class="php-var">$type</span>, <span class="php-var">$to</span>, <span class="php-var">$output_mod</span>) {
 </span><span id="262" class="l"><a href="#262">262: </a>    <span class="php-var">$lead_in</span> = <span class="php-quote">''</span>;
-</span><span id="263" class="l"><a href="#263">263: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$type</span> == <span class="php-quote">'reply'</span>) {
+</span><span id="263" class="l"><a href="#263">263: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$type</span> == <span class="php-quote">'reply'</span> || <span class="php-var">$type</span> == <span class="php-quote">'reply_all'</span>) {
 </span><span id="264" class="l"><a href="#264">264: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'Date'</span>, <span class="php-var">$headers</span>)) {
 </span><span id="265" class="l"><a href="#265">265: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$to</span>) {
 </span><span id="266" class="l"><a href="#266">266: </a>                <span class="php-var">$lead_in</span> = <span class="php-keyword2">sprintf</span>(<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'On %s %s said'</span>).<span class="php-quote">&quot;\n\n&quot;</span>, <span class="php-var">$headers</span>[<span class="php-quote">'Date'</span>], <span class="php-var">$to</span>);

@@ -1201,28 +1201,27 @@
 </span></span><span id="59" class="l"><a href="#59">59: </a><span class="php-comment">     * @return object database connection on success
 </span></span><span id="60" class="l"><a href="#60">60: </a><span class="php-comment">     */</span>
 </span><span id="61" class="l"><a href="#61">61: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> connect(<span class="php-var">$site_config</span>) {
-</span><span id="62" class="l"><a href="#62">62: </a>
-</span><span id="63" class="l"><a href="#63">63: </a>        self::parse_config(<span class="php-var">$site_config</span>);
-</span><span id="64" class="l"><a href="#64">64: </a>        <span class="php-var">$key</span> = self::db_key();
-</span><span id="65" class="l"><a href="#65">65: </a>
-</span><span id="66" class="l"><a href="#66">66: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$key</span>, self::<span class="php-var">$dbh</span>) &amp;&amp; self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>]) {
-</span><span id="67" class="l"><a href="#67">67: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>];
-</span><span id="68" class="l"><a href="#68">68: </a>        }
-</span><span id="69" class="l"><a href="#69">69: </a>        <span class="php-var">$dsn</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'%s:host=%s;dbname=%s'</span>, self::<span class="php-var">$config</span>[<span class="php-quote">'db_driver'</span>], self::<span class="php-var">$config</span>[<span class="php-quote">'db_host'</span>], self::<span class="php-var">$config</span>[<span class="php-quote">'db_name'</span>]);
-</span><span id="70" class="l"><a href="#70">70: </a>        <span class="php-keyword1">try</span> {
-</span><span id="71" class="l"><a href="#71">71: </a>            self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>] = <span class="php-keyword1">new</span> PDO(<span class="php-var">$dsn</span>, self::<span class="php-var">$config</span>[<span class="php-quote">'db_user'</span>], self::<span class="php-var">$config</span>[<span class="php-quote">'db_pass'</span>]);
-</span><span id="72" class="l"><a href="#72">72: </a>            Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Connecting to dsn: %s'</span>, <span class="php-var">$dsn</span>));
-</span><span id="73" class="l"><a href="#73">73: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>];
-</span><span id="74" class="l"><a href="#74">74: </a>        }
-</span><span id="75" class="l"><a href="#75">75: </a>        <span class="php-keyword1">catch</span> (Exception <span class="php-var">$oops</span>) {
-</span><span id="76" class="l"><a href="#76">76: </a>            Hm_Debug::add(<span class="php-var">$oops</span>-&gt;getMessage());
-</span><span id="77" class="l"><a href="#77">77: </a>            Hm_Msgs::add(<span class="php-quote">&quot;An error occurred communicating with the database&quot;</span>);
-</span><span id="78" class="l"><a href="#78">78: </a>            self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>] = <span class="php-keyword1">false</span>;
-</span><span id="79" class="l"><a href="#79">79: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="80" class="l"><a href="#80">80: </a>        }
-</span><span id="81" class="l"><a href="#81">81: </a>    }
-</span><span id="82" class="l"><a href="#82">82: </a>}
-</span><span id="83" class="l"><a href="#83">83: </a></span></code></pre>
+</span><span id="62" class="l"><a href="#62">62: </a>        self::parse_config(<span class="php-var">$site_config</span>);
+</span><span id="63" class="l"><a href="#63">63: </a>        <span class="php-var">$key</span> = self::db_key();
+</span><span id="64" class="l"><a href="#64">64: </a>
+</span><span id="65" class="l"><a href="#65">65: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$key</span>, self::<span class="php-var">$dbh</span>) &amp;&amp; self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>]) {
+</span><span id="66" class="l"><a href="#66">66: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>];
+</span><span id="67" class="l"><a href="#67">67: </a>        }
+</span><span id="68" class="l"><a href="#68">68: </a>        <span class="php-var">$dsn</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'%s:host=%s;dbname=%s'</span>, self::<span class="php-var">$config</span>[<span class="php-quote">'db_driver'</span>], self::<span class="php-var">$config</span>[<span class="php-quote">'db_host'</span>], self::<span class="php-var">$config</span>[<span class="php-quote">'db_name'</span>]);
+</span><span id="69" class="l"><a href="#69">69: </a>        <span class="php-keyword1">try</span> {
+</span><span id="70" class="l"><a href="#70">70: </a>            self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>] = <span class="php-keyword1">new</span> PDO(<span class="php-var">$dsn</span>, self::<span class="php-var">$config</span>[<span class="php-quote">'db_user'</span>], self::<span class="php-var">$config</span>[<span class="php-quote">'db_pass'</span>]);
+</span><span id="71" class="l"><a href="#71">71: </a>            Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Connecting to dsn: %s'</span>, <span class="php-var">$dsn</span>));
+</span><span id="72" class="l"><a href="#72">72: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>];
+</span><span id="73" class="l"><a href="#73">73: </a>        }
+</span><span id="74" class="l"><a href="#74">74: </a>        <span class="php-keyword1">catch</span> (Exception <span class="php-var">$oops</span>) {
+</span><span id="75" class="l"><a href="#75">75: </a>            Hm_Debug::add(<span class="php-var">$oops</span>-&gt;getMessage());
+</span><span id="76" class="l"><a href="#76">76: </a>            Hm_Msgs::add(<span class="php-quote">&quot;An error occurred communicating with the database&quot;</span>);
+</span><span id="77" class="l"><a href="#77">77: </a>            self::<span class="php-var">$dbh</span>[<span class="php-var">$key</span>] = <span class="php-keyword1">false</span>;
+</span><span id="78" class="l"><a href="#78">78: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="79" class="l"><a href="#79">79: </a>        }
+</span><span id="80" class="l"><a href="#80">80: </a>    }
+</span><span id="81" class="l"><a href="#81">81: </a>}
+</span><span id="82" class="l"><a href="#82">82: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
