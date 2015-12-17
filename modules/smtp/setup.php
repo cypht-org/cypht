@@ -21,7 +21,9 @@ add_output('servers', 'add_smtp_server_dialog', true, 'smtp', 'server_content_st
 add_output('servers', 'display_configured_smtp_servers', true, 'smtp', 'add_smtp_server_dialog', 'after');
 
 add_handler('settings', 'process_compose_type', true, 'smtp', 'save_user_settings', 'before');
+add_handler('settings', 'process_auto_bcc', true, 'smtp', 'save_user_settings', 'before');
 add_output('settings', 'compose_type_setting', true, 'smtp', 'start_general_settings', 'after');
+add_output('settings', 'auto_bcc_setting', true, 'smtp', 'compose_type_setting', 'after');
 
 /* ajax server setup callback data */
 add_handler('ajax_smtp_debug', 'login', false, 'core');
@@ -104,7 +106,8 @@ return array(
         'compose_bcc' => FILTER_SANITIZE_STRING,
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_SANITIZE_STRING,
-        'draft_to' => FILTER_UNSAFE_RAW
+        'draft_to' => FILTER_UNSAFE_RAW,
+        'smtp_auto_bcc' => FILTER_VALIDATE_INT,
     )
 );
 
