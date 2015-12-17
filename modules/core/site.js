@@ -859,7 +859,7 @@ var Hm_Utils = {
         var result = {};
         for (i in sessionStorage) {
             if (i.match(/\..+(_setting|_section)/)) {
-                result[i] = sessionStorage[i];
+                result[i] = Hm_Utils.get_from_local_storage(i);
             }
         }
         return result;
