@@ -60,6 +60,7 @@ var Hm_Ajax_Request = function() { return {
 
     make_request: function(args, callback, extra) {
         var name;
+        var arg;
         this.callback = callback;
         if (extra) {
             for (name in extra) {
@@ -1173,7 +1174,7 @@ Hm_Folders.toggle_folders_event();
 Hm_Timer.fire();
 
 /* create a default message list object */
-Hm_Message_List = new Message_List();
+var Hm_Message_List = new Message_List();
 
 /* executes on real onload, has access to other module code */
 $(function() {
