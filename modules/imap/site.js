@@ -433,6 +433,10 @@ var imap_message_view_finished = function() {
         else if (hm_list_parent() === 'flagged') {
             Hm_Message_List.prev_next_links('formatted_flagged_data', class_name);
         }
+        else {
+            var key = 'imap_'+get_imap_page_number()+'_'+hm_list_path();
+            Hm_Message_List.prev_next_links(key, class_name);
+        }
     }
     if (class_name) {
         Hm_Message_List.track_read_messages(class_name);
