@@ -162,7 +162,11 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                 }
                 $this->out('custom_list_controls_type', $custom_link);
                 if (!empty($details)) {
-                    $this->out('mailbox_list_title', array('IMAP', $details['name'], $parts[2]));
+                    $title = array('IMAP', $details['name'], $parts[2]);
+                    if ($this->get('list_page', 0)) {
+                        $title[] = sprintf('Page %d', $this->get('list_page', 0));
+                    }
+                    $this->out('mailbox_list_title', $title);
                 }
             }
         }
@@ -1594,6 +1598,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', $msg['folder']);
         }
         $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
+        if ($output_module->get('list_page', 0)) {
+            $url .= '&list_page='.$output_module->html_safe($output_module->get('list_page', 1));
+        }
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
