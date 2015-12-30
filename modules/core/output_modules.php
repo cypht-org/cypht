@@ -1177,7 +1177,11 @@ class Hm_Output_message_start extends Hm_Output_Module {
             }
         }
         elseif ($this->get('mailbox_list_title')) {
-            $title = '<a href="?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
+            $url = '?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path'));
+            if ($this->get('list_page', 0)) {
+                $url .= '&list_page='.$this->html_safe($this->get('list_page'));
+            }
+            $title = '<a href="'.$url.'">'.
                 implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />',
                     array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()))).'</a>';
         }
