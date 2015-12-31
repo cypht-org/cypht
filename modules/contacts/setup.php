@@ -38,6 +38,7 @@ add_output('ajax_autocomplete_contact', 'filter_autocomplete_list', true, 'conta
 
 setup_base_ajax_page('ajax_delete_contact', 'core');
 add_handler('ajax_delete_contact', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
+add_handler('ajax_delete_contact', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_delete_contact', 'process_delete_contact', true, 'contacts', 'load_contacts', 'after');
 add_handler('ajax_delete_contact', 'save_user_data', true, 'core', 'language', 'after');
 
