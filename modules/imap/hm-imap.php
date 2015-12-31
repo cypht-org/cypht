@@ -1421,6 +1421,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                     $command = "UID STORE $uid_string -FLAGS (\Deleted)\r\n";
                     break;
                 case 'CUSTOM':
+                    /* TODO: check permanentflags of the selected mailbox to
+                     * make sure custom keywords are supported */
                     if ($keyword && $this->is_clean($keyword, 'mailbox')) {
                         $command = "UID STORE $uid_string +FLAGS ($keyword)\r\n";
                     }
