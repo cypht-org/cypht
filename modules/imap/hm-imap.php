@@ -1371,8 +1371,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      *                       UNFLAG, ANSWERED, DELETE, UNDELETE, EXPUNGE, or COPY
      * @param mixed $uids an array of uids or a valid IMAP sequence set as a string
      * @param string $mailbox destination IMAP mailbox name for operations the require one
+     * @param string $keyword optional custom keyword flag
      */
-    public function message_action($action, $uids, $mailbox=false) {
+    public function message_action($action, $uids, $mailbox=false, $keyword=false) {
         $status = false;
         $uid_strings = array();
         if (is_array($uids)) {
@@ -1418,6 +1419,11 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                     break;
                 case 'UNDELETE':
                     $command = "UID STORE $uid_string -FLAGS (\Deleted)\r\n";
+                    break;
+                case 'CUSTOM':
+                    if ($keyword && $this->is_clean($keyword, 'mailbox')) {
+                        $command = "UID STORE $uid_string +FLAGS ($keyword)\r\n";
+                    }
                     break;
                 case 'EXPUNGE':
                     $command = "EXPUNGE\r\n";
