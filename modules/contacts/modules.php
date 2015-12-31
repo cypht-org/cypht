@@ -147,7 +147,6 @@ class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
                 $details['phone_number'] = $this->request->post['contact_phone'];
             }
             if ($contacts->update_contact($form['contact_id'], $details)) {
-                elog($contacts);
                 $contacts->save($this->user_config);
                 $this->session->record_unsaved('Contact updated');
                 Hm_Msgs::add('Contact Updated');
