@@ -99,7 +99,9 @@ class Hm_Contact_Store {
     }
 
     public function export() {
-        return array_map(function($contact) { return $contact->export(); }, $this->contacts);
+        return array_map(function($contact) { return $contact->export(); },
+            array_filter($this->contacts, function($contact) { return ! $contact->value('source'); })
+        );
     }
 
     public function import($data) {
