@@ -280,7 +280,7 @@ abstract class Hm_Handler_Module {
      * @return bool
      */
     public function module_is_supported($name) {
-        return strpos($this->config->get('modules', ''), 'imap') !== false;
+        return strpos(strtolower($this->config->get('modules', '')), strtolower($name)) !== false;
     }
 
     /**
