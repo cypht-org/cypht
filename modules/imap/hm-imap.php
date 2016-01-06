@@ -322,7 +322,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
             $this->debug['CAPS'] = $this->capability;
             $this->parse_extensions_from_capability();
-            elog($this->supported_extensions);
             return $this->capability;
         }
     }
