@@ -132,6 +132,14 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_module_is_supported() {
+        $this->assertFalse($this->handler_mod->module_is_supported('core'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_process_form() {
         list($success, $form) = $this->handler_mod->process_form(array('fld1', 'fld2'));
         $this->assertTrue($success);
