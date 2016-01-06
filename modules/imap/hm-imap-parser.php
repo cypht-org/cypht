@@ -84,7 +84,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
     protected function parse_extensions_from_capability() {
         $extensions = array();
         foreach (explode(' ', $this->capability) as $word) {
-            if (!in_array(strtolower($word), array('ok', 'completed', 'imap4rev1', 'capability'))) {
+            if (!in_array(strtolower($word), array('*', 'ok', 'completed', 'imap4rev1', 'capability'), true)) {
                 $extensions[] = strtolower($word);
             }
         }
