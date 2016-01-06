@@ -275,6 +275,15 @@ abstract class Hm_Handler_Module {
     }
 
     /**
+     * Determine if a module set is enabled
+     * @param string $name the module set name to check for
+     * @return bool
+     */
+    public function module_is_supported($name) {
+        return strpos($this->config->get('modules', ''), 'imap') !== false;
+    }
+
+    /**
      * Handler modules need to override this method to do work
      */
     abstract public function process();
