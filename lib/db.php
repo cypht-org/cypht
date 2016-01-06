@@ -54,6 +54,17 @@ class Hm_DB {
     }
 
     /**
+     * Build a DSN to connect to the db with
+     * @return string
+     */
+    static public function build_dsn() {
+        if (self::$config['db_driver'] == 'sqlite') {
+            return sprintf('%s:%s', self::$config['db_driver'], self::$config['db_host']);
+        }
+        return sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
+    }
+
+    /**
      * Connect to a DB server
      * @param object $site_config site settings
      * @return object database connection on success
@@ -65,7 +76,7 @@ class Hm_DB {
         if (array_key_exists($key, self::$dbh) && self::$dbh[$key]) {
             return self::$dbh[$key];
         }
-        $dsn = sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
+        $dsn = self::build_dsn();
         try {
             self::$dbh[$key] = new PDO($dsn, self::$config['db_user'], self::$config['db_pass']);
             Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn));
