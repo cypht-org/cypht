@@ -90,7 +90,7 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
             $page = $this->request->get['contact_page'];
         }
         $this->out('contact_page', $page);
-        if (strpos($this->config->get('modules', ''), 'imap') !== false) {
+        if ($this->module_is_supported('imap')) {
             $contact_store = fetch_gmail_contacts($this->config, $contacts);
         }
         $this->out('contact_store', $contacts);
