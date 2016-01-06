@@ -648,7 +648,6 @@
 				<li><a href="class-Hm_Handler_load_feeds_for_search.html">Hm_Handler_load_feeds_for_search</a></li>
 				<li><a href="class-Hm_Handler_load_feeds_from_config.html">Hm_Handler_load_feeds_from_config</a></li>
 				<li><a href="class-Hm_Handler_load_github_repos.html">Hm_Handler_load_github_repos</a></li>
-				<li><a href="class-Hm_Handler_load_gmail_contacts.html">Hm_Handler_load_gmail_contacts</a></li>
 				<li><a href="class-Hm_Handler_load_imap_folders.html">Hm_Handler_load_imap_folders</a></li>
 				<li><a href="class-Hm_Handler_load_imap_servers_for_message_list.html">Hm_Handler_load_imap_servers_for_message_list</a></li>
 				<li><a href="class-Hm_Handler_load_imap_servers_for_search.html">Hm_Handler_load_imap_servers_for_search</a></li>
@@ -856,7 +855,6 @@
 				<li><a href="class-Hm_Output_github_add_repo.html">Hm_Output_github_add_repo</a></li>
 				<li><a href="class-Hm_Output_github_connect_section.html">Hm_Output_github_connect_section</a></li>
 				<li><a href="class-Hm_Output_github_folders.html">Hm_Output_github_folders</a></li>
-				<li><a href="class-Hm_Output_gmail_contacts_list.html">Hm_Output_gmail_contacts_list</a></li>
 				<li><a href="class-Hm_Output_header_content.html">Hm_Output_header_content</a></li>
 				<li><a href="class-Hm_Output_header_css.html">Hm_Output_header_css</a></li>
 				<li><a href="class-Hm_Output_header_end.html">Hm_Output_header_end</a></li>
@@ -1228,7 +1226,7 @@
 </span><span id="84" class="l"><a href="#84"> 84: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> parse_extensions_from_capability() {
 </span><span id="85" class="l"><a href="#85"> 85: </a>        <span class="php-var">$extensions</span> = <span class="php-keyword1">array</span>();
 </span><span id="86" class="l"><a href="#86"> 86: </a>        <span class="php-keyword1">foreach</span> (<span class="php-keyword2">explode</span>(<span class="php-quote">' '</span>, <span class="php-var">$this</span>-&gt;capability) <span class="php-keyword1">as</span> <span class="php-var">$word</span>) {
-</span><span id="87" class="l"><a href="#87"> 87: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword2">in_array</span>(<span class="php-keyword2">strtolower</span>(<span class="php-var">$word</span>), <span class="php-keyword1">array</span>(<span class="php-quote">'ok'</span>, <span class="php-quote">'completed'</span>, <span class="php-quote">'imap4rev1'</span>, <span class="php-quote">'capability'</span>))) {
+</span><span id="87" class="l"><a href="#87"> 87: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword2">in_array</span>(<span class="php-keyword2">strtolower</span>(<span class="php-var">$word</span>), <span class="php-keyword1">array</span>(<span class="php-quote">'*'</span>, <span class="php-quote">'ok'</span>, <span class="php-quote">'completed'</span>, <span class="php-quote">'imap4rev1'</span>, <span class="php-quote">'capability'</span>), <span class="php-keyword1">true</span>)) {
 </span><span id="88" class="l"><a href="#88"> 88: </a>                <span class="php-var">$extensions</span>[] = <span class="php-keyword2">strtolower</span>(<span class="php-var">$word</span>);
 </span><span id="89" class="l"><a href="#89"> 89: </a>            }
 </span><span id="90" class="l"><a href="#90"> 90: </a>        }
@@ -1501,6 +1499,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?2ce08f24c8e7bffb1e0ce782c6611903f905aaf2"></script>
+<script src="elementlist.js?d9d2562664ba9fd9b3132be72113f2b8a11f0833"></script>
 </body>
 </html>
