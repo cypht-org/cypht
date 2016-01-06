@@ -217,6 +217,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @return bool true on sucessful login
      */
     public function authenticate($username, $password) {
+        $this->get_capability();
         if (!$this->tls) {
             $this->starttls();
         }
@@ -309,19 +310,20 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @return string capability response
      */
     public function get_capability() {
-        if ( $this->capability ) {
-            return $this->capability;
-        }
-        else {
-            if (!$this->no_caps) {
-                $command = "CAPABILITY\r\n";
-                $this->send_command($command);
-                $response = $this->get_response();
-                $this->capability = $response[0];
-                $this->debug['CAPS'] = $this->capability;
-                $this->parse_extensions_from_capability();
-                return $this->capability;
+        if (!$this->no_caps) {
+            $command = "CAPABILITY\r\n";
+            $this->send_command($command);
+            $response = $this->get_response();
+            foreach ($response as $line) {
+                if (stristr($line, '* CAPABILITY')) {
+                    $this->capability = $line;
+                    break;
+                }
             }
+            $this->debug['CAPS'] = $this->capability;
+            $this->parse_extensions_from_capability();
+            elog($this->supported_extensions);
+            return $this->capability;
         }
     }
 
