@@ -223,7 +223,7 @@ class Hm_Output_add_message_contacts extends Hm_Output_Module {
             $res .= '</select> <input onclick="return add_contact_from_message_view()" class="add_contact_button" type="button" value="'.$this->trans('Add').'"></span></div>';
             $headers = $headers.$res;
         }
-        $this->out('msg_headers', $headers);
+        $this->out('msg_headers', $headers, false);
     }
 }
 
