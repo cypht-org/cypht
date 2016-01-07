@@ -714,13 +714,13 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                             if (($tags[strtoupper($vals[$i])] == 'flags' || $tags[strtoupper($vals[$i])] == 'google_labels' ) && $vals[$i + 1] == '(') {
                                 $n = 2;
                                 while (isset($vals[$i + $n]) && $vals[$i + $n] != ')') {
-                                    $$tags[strtoupper($vals[$i])] .= ' '.$vals[$i + $n];
+                                    ${$tags[strtoupper($vals[$i])]} .= ' '.$vals[$i + $n];
                                     $n++;
                                 }
                                 $i += $n;
                             }
                             else {
-                                $$tags[strtoupper($vals[$i])] = $vals[($i + 1)];
+                                ${$tags[strtoupper($vals[$i])]} = $vals[($i + 1)];
                                 $i++;
                             }
                         }
