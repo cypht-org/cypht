@@ -1087,7 +1087,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
         if ($this->get('msg_headers')) {
             $txt = '';
             $from = '';
-            $small_headers = array('subject', 'date', 'from', 'to', 'cc');
+            $small_headers = array('subject', 'date', 'from', 'to', 'cc', 'flags');
             $reply_args = sprintf('&amp;list_path=imap_%d_%s&amp;uid=%d',
                 $this->html_safe($this->get('msg_server_id')),
                 $this->html_safe($this->get('msg_folder')),
@@ -1109,6 +1109,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
                         else {
+                            if (strtolower($name) == 'flags') {
+                                $name = $this->trans('Tags');
+                                $value = str_replace('\\', '', $value);
+                            }
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                         }
                         break;
@@ -1143,7 +1147,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $this->out('msg_headers', $txt, false);
         }
         elseif (!$this->get('imap_prefetch')) {
-            Hm_Msgs::add('ERR'.$this->trans('Could not fetch the message, it was moved or deleted'));
+            //Hm_Msgs::add('ERR'.$this->trans('Could not fetch the message, it was moved or deleted'));
         }
     }
 }
