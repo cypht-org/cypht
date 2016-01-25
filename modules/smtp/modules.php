@@ -49,7 +49,7 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
                     }
                     Hm_SMTP_List::add( $server, $index );
                 }
-                Hm_SMTP_List::add(array(
+                $attributes = array(
                     'name' => $this->config->get('default_smtp_name', 'Default'),
                     'default' => true,
                     'server' => $smtp_server,
@@ -57,7 +57,11 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
                     'tls' => $smtp_tls,
                     'user' => $form['username'],
                     'pass' => $form['password']
-                ));
+                );
+                if ($this->config->get('default_smtp_no_auth', false)) {
+                    $attributes['no_auth'] = true;
+                }
+                Hm_SMTP_List::add($attributes);
                 $smtp_servers = Hm_SMTP_List::dump(false, true);
                 $this->user_config->set('smtp_servers', $smtp_servers);
                 $user_data = $this->user_config->dump();
