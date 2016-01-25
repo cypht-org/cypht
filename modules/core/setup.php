@@ -106,7 +106,9 @@ add_output('ajax_hm_folders', 'logout_menu_item', true);
 add_output('ajax_hm_folders', 'main_menu_end', true);
 add_output('ajax_hm_folders', 'email_menu_content', true);
 add_output('ajax_hm_folders', 'settings_menu_start', true);
-add_output('ajax_hm_folders', 'settings_menu_content', true);
+add_output('ajax_hm_folders', 'settings_servers_link', true);
+add_output('ajax_hm_folders', 'settings_site_link', true);
+add_output('ajax_hm_folders', 'settings_save_link', true);
 add_output('ajax_hm_folders', 'settings_menu_end', true);
 add_output('ajax_hm_folders', 'folder_list_content_end', true);
 
