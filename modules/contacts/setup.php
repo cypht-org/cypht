@@ -26,6 +26,7 @@ add_output('ajax_imap_message_content', 'add_message_contacts', true, 'contacts'
 
 setup_base_ajax_page('ajax_add_contact', 'core');
 add_handler('ajax_add_contact', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
+add_handler('ajax_add_contact', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_add_contact', 'process_add_contact_from_message', true, 'contacts', 'load_contacts', 'after');
 add_handler('ajax_add_contact', 'save_user_data', true, 'core', 'language', 'after');
 
