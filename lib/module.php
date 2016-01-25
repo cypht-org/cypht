@@ -370,3 +370,10 @@ abstract class Hm_Output_Module {
      */
     abstract protected function output();
 }
+
+/**
+ * Placeholder classes for disabling a module in a set. These allow a module set
+ * to replace another module set's assignments with "false" to disable them
+ */
+class Hm_Output_ extends Hm_Output_Module { protected function output() {} }
+class Hm_Handler_ extends Hm_Handler_Module { public function process() {} }
