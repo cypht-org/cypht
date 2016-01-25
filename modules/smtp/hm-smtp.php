@@ -25,6 +25,9 @@ class Hm_SMTP_List {
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];
         }
+        if (array_key_exists('no_auth', $server)) {
+            $config['no_auth'] = true;
+        }
         self::$server_list[$id]['object'] = new Hm_SMTP($config);
         if (!self::$server_list[$id]['object']->connect()) {
             return self::$server_list[$id]['object'];
@@ -103,9 +106,12 @@ class Hm_SMTP {
         if (isset($conf['auth'])) {
             array_unshift($this->request_auths, $conf['auth']);
         }
+        $this->auth = true;
+        if (isset($conf['no_auth'])) {
+            $this->auth = false;
+        }
         $this->smtp_err = '';
         $this->supports_tls = false;
-        $this->auth = true;
         $this->supports_auth = array();
         $this->handle = false;
         $this->state = 'started';
