@@ -19,7 +19,7 @@ add_output('change_password', 'change_password', true, 'account', 'content_secti
 /* folder list link */
 add_handler('ajax_hm_folders', 'check_internal_users', true, 'account', 'login', 'after');
 add_output('ajax_hm_folders', 'create_account_link', true, 'account', 'settings_menu_end', 'before');
-add_output('ajax_hm_folders', 'change_password_link', true, 'account', 'settings_menu_content', 'after');
+add_output('ajax_hm_folders', 'change_password_link', true, 'account', 'settings_save_link', 'after');
 
 /* input/output */
 return array(

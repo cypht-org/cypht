@@ -1043,26 +1043,49 @@ class Hm_Output_save_form extends Hm_Output_Module {
 }
 
 /**
- * Content for the Settings menu section of the folder list
+ * Servers link for the Settings menu section of the folder list
  * @subpackage core/output
  */
-class Hm_Output_settings_menu_content extends Hm_Output_Module {
+class Hm_Output_settings_servers_link extends Hm_Output_Module {
     /**
      * Outputs links to the Servers and Site Settings pages
      */
     protected function output() {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).
-            '" alt="" width="16" height="16" /> '.$this->trans('Servers').'</a></li>'.
-            '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
+            '" alt="" width="16" height="16" /> '.$this->trans('Servers').'</a></li>';
+        $this->concat('formatted_folder_list', $res);
+    }
+}
+
+/**
+ * Site link for the Settings menu section of the folder list
+ * @subpackage core/output
+ */
+class Hm_Output_settings_site_link extends Hm_Output_Module {
+    /**
+     * Outputs links to the Servers and Site Settings pages
+     */
+    protected function output() {
+        $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).
-            '" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>'.
-            '<li class="menu_save"><a class="unread_link" href="?page=save">'.
+            '" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>';
+        $this->concat('formatted_folder_list', $res);
+    }
+}
+
+/**
+ * Save link for the Settings menu section of the folder list
+ * @subpackage core/output
+ */
+class Hm_Output_settings_save_link extends Hm_Output_Module {
+    /**
+     * Outputs links to the Servers and Site Settings pages
+     */
+    protected function output() {
+        $res = '<li class="menu_save"><a class="unread_link" href="?page=save">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$save).
             '" alt="" width="16" height="16" /> '.$this->trans('Save').'</a></li>';
-        if ($this->format == 'HTML5') {
-            return $res;
-        }
         $this->concat('formatted_folder_list', $res);
     }
 }
