@@ -232,7 +232,7 @@ function process_address_fld($fld) {
 function reply_to_subject($headers, $type) {
     $subject = '';
     if (array_key_exists('Subject', $headers)) {
-        if ($type == 'reply') {
+        if ($type == 'reply' || $type == 'reply_all') {
             if (!preg_match("/^re:/i", trim($headers['Subject']))) {
                 $subject = sprintf("Re: %s", $headers['Subject']);
             }
