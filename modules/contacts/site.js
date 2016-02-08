@@ -56,6 +56,9 @@ var autocomplete_contact = function(e, class_name, list_div) {
                         $(list_div).show();
                         setup_autocomplete_events(class_name, list_div, fld_val);
                     }
+                    else {
+                        $(list_div).hide();
+                    }
                 }
             }
         );
@@ -102,6 +105,12 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
         $(list_div).hide();
         $(class_name).focus();
         return false;
+    }
+    else if (event.keyCode == 9) {
+        $(list_div).html('');
+        $(list_div).hide();
+        $(class_name).focusout();
+        return true;
     }
     if (in_list) {
         return false;
