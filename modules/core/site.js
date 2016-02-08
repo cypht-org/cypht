@@ -45,7 +45,6 @@ var Hm_Ajax = {
         Hm_Ajax.callback_hooks[callback] = hook_function;
     },
 
-
     stop_loading_icon : function(loading_id) {
         clearTimeout(loading_id);
         $('.loading_icon').hide();
@@ -261,6 +260,8 @@ function Message_List() {
     this.range_start = '',
     this.sources = [];
     this.deleted = [];
+    this.completed_count = 0;
+    this.callbacks = [];
 
     this.page_caches = {
         'feeds': 'formatted_feed_data',
@@ -270,12 +271,30 @@ function Message_List() {
         'flagged': 'formatted_flagged_data'
     };
 
+    this.run_callbacks = function (completed) {
+        var func;
+        if (completed) {
+            for (index in this.callbacks) {
+                func = this.callbacks[index];
+                try { func(); } catch(e) { console.log(e); }
+            }
+        }
+    };
+
     this.update = function(ids, msgs, type, cache) {
+        var completed = false;
+        this.completed_count++;
+        if (this.completed_count == this.sources.length) {
+            this.completed_count = 0;
+            completed = true;
+        }
         if ($('input[type=checkbox]').filter(function() {return this.checked; }).length > 0) {
+            this.run_callbacks(completed);
             Hm_Ajax.aborted = true;
             return 0;
         }
         if (msgs[0] === "") {
+            this.run_callbacks(completed);
             return 0;
         }
         var msg_rows;
@@ -290,6 +309,7 @@ function Message_List() {
         }
         var msg_ids = this.add_rows(msgs, msg_rows);
         var count = this.remove_rows(ids, msg_ids, type, msg_rows);
+        this.run_callbacks(completed);
         return count;
     };
 
