@@ -138,7 +138,13 @@ var imap_delete_message = function(state) {
             {'name': 'folder', 'value': detail.folder}],
             function(res) {
                 if (!res.imap_delete_error) {
-                    window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                    var nlink = $('.nlink');
+                    if (nlink.length) {
+                        window.location.href = nlink.attr('href');
+                    }
+                    else {
+                        window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                    }
                 }
             }
         );
