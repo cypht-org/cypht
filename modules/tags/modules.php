@@ -29,14 +29,13 @@ class Hm_Handler_mod_env extends Hm_Handler_Module {
  */
 class Hm_Handler_tag_data extends Hm_Handler_Module {
     public function process() {
-        elog($this->get('mod_support'));
     }
 }
 
 /**
  * @subpackage tags/output
  */
-class hm_output_tag_folders extends hm_output_module {
+class Hm_Output_tag_folders extends hm_output_module {
     protected function output() {
         $this->append('folder_sources', array('tags_folders', ''));
     }
@@ -45,9 +44,10 @@ class hm_output_tag_folders extends hm_output_module {
 /**
  * @subpackage tags/output
  */
-class hm_output_tag_bar extends hm_output_module {
+class Hm_Output_tag_bar extends hm_output_module {
     protected function output() {
         $headers = $this->get('msg_headers');
-        $this->out('msg_headers', $headers.'<img class="tag_icon refresh_list" src="'.Hm_Image_Sources::$tags.'" alt="'.$this->trans('Tags').'" width="24" height="24" />');
+        $this->out('msg_headers', $headers.'<img class="tag_icon refresh_list" src="'.
+            Hm_Image_Sources::$tags.'" alt="'.$this->trans('Tags').'" width="24" height="24" />');
     }
 }
