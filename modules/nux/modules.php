@@ -24,6 +24,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
         $res = array();
         Hm_Functions::c_setopt($ch, CURLOPT_URL, 'http://cypht.org/git.txt');
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
         $curl_result = Hm_Functions::c_exec($ch);
         if (trim($curl_result)) {
             foreach (explode("\n", $curl_result) as $line) {
