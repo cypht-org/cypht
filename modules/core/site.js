@@ -765,20 +765,19 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('hide_folder_list', '');
         return false;
     },
-    hide_folder_list: function() {
-        var hide;
+    toggle_folder_list: function() {
         if ($('.folder_list').css('display') == 'none') {
-            $('.folder_list').show();
-            $('.folder_toggle').hide();
-            hide = 0;
+            Hm_Folders.open_folder_list();
         }
         else {
-            $('.folder_list').hide();
-            $('.folder_toggle').show();
-            hide = 1;
+            Hm_Folders.hide_folder_list();
         }
+    },
+    hide_folder_list: function() {
+        $('.folder_list').hide();
+        $('.folder_toggle').show();
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
-        Hm_Utils.save_to_local_storage('hide_folder_list', hide);
+        Hm_Utils.save_to_local_storage('hide_folder_list', '1');
         return false;
     },
     reload_folders: function(force, expand_after_update) {
