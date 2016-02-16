@@ -11,6 +11,9 @@ add_handler('info', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_se
 add_output('info', 'display_pop3_status', true, 'pop3', 'server_status_start', 'after');
 add_output('info', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
+/* profile page */
+add_handler('profiles', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
+
 /* message list page */
 add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
 add_handler('message_list', 'load_pop3_servers_for_message_list', true, 'pop3', 'load_pop3_servers_from_config', 'after');
