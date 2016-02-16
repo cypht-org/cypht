@@ -766,16 +766,19 @@ var Hm_Folders = {
         return false;
     },
     hide_folder_list: function() {
+        var hide;
         if ($('.folder_list').css('display') == 'none') {
             $('.folder_list').show();
             $('.folder_toggle').hide();
+            hide = 0;
         }
         else {
             $('.folder_list').hide();
             $('.folder_toggle').show();
+            hide = 1;
         }
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
-        Hm_Utils.save_to_local_storage('hide_folder_list', '1');
+        Hm_Utils.save_to_local_storage('hide_folder_list', hide);
         return false;
     },
     reload_folders: function(force, expand_after_update) {
