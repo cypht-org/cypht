@@ -1,0 +1,4 @@
+.profile_details { padding-left: 30px; margin-top: 20px; }
+.profile_details th { color: #666; padding: 5px; padding-bottom: 2px; border-bottom: solid 1px #eee; font-weight: normal; text-align: left; }
+.profile_details td { padding: 10px; }
+.profile_details td img { opacity: .6; }
