@@ -110,7 +110,7 @@ var display_feeds_combined_inbox = function(res) {
     Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
 };
 
-var feed_item_view = function(uid, list_path) {
+var feed_item_view = function(uid, list_path, callback) {
     if (!uid) {
         uid = hm_msg_uid();
     }
@@ -122,7 +122,10 @@ var feed_item_view = function(uid, list_path) {
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_item_content'},
         {'name': 'feed_list_path', 'value': list_path},
         {'name': 'feed_uid', 'value': uid}],
-        display_feed_item_content
+        display_feed_item_content,
+        [],
+        false,
+        callback
     );
     return false;
 };
