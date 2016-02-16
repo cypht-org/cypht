@@ -1,24 +1,20 @@
 engines:
-    rubocop:
+    phpcodesniffer:
         enabled: true
-    eslint:
+    phpmd:
         enabled: true
-    csslint:
+    duplication:
         enabled: true
-    bundler-audit:
-        enabled: true
+
 
 ratings:
     paths:
         - "lib/*.php"
-        - "modules/*/*.php"
-        - "modules/*/*.js"
-        - "modules/*/*.css"
 
 exclude_paths:
-    - "modules/*"
-    - "tests/*"
-    - "third_party/*"
-    - "docs/*"
-    - "language/*"
-    - "website/*"
+- "modules/*"
+- "tests/*"
+- "third_party/*"
+- "docs/*"
+- "language/*"
+- "website/*"
