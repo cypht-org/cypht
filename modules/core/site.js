@@ -773,11 +773,13 @@ var Hm_Folders = {
             Hm_Folders.hide_folder_list();
         }
     },
-    hide_folder_list: function() {
+    hide_folder_list: function(forget) {
         $('.folder_list').hide();
         $('.folder_toggle').show();
-        Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
-        Hm_Utils.save_to_local_storage('hide_folder_list', '1');
+        if (!forget) {
+            Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+            Hm_Utils.save_to_local_storage('hide_folder_list', '1');
+        }
         return false;
     },
     reload_folders: function(force, expand_after_update) {
