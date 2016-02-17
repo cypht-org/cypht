@@ -44,6 +44,7 @@ var get_inline_msg_details = function(link) {
 var inline_msg_loaded_callback = function() {
     $('.header_subject th').append('<span class="close_inline_msg">X</span>');
     $('.close_inline_msg').click(function() {
+        Hm_Message_List.load_sources();
         Hm_Folders.open_folder_list();
         $('.msg_text').remove();
         $('.message_table').css('width', '100%');
