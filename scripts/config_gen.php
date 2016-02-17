@@ -18,8 +18,36 @@ chdir(APP_PATH);
 /* get the framework */
 require APP_PATH.'lib/framework.php';
 
+/* check for proper php support */
+check_php();
+
 /* create site */
 build_config();
+
+
+/**
+ * Check PHP for correct support
+ *
+ * @return void
+ * */
+function check_php() {
+    $version = phpversion();
+    if (substr($version, 0, 3) < 5.4) {
+        die('Cypht requires PHP version 5.4 or greater');
+    }
+    if (!function_exists('mb_strpos')) {
+        die('Cypht requires PHP MB support');
+    }
+    if (!function_exists('curl_exec')) {
+        die('Cypht requires PHP cURL support');
+    }
+    if (!function_exists('openssl_random_pseudo_bytes')) {
+        die('Cypht requires PHP OpenSSL support');
+    }
+    if (!class_exists('PDO')) {
+        echo "WARNING: No PHP PDO support found, database featueres will not work\n";
+    }
+}
 
 /**
  * Entry point into the configuration process
