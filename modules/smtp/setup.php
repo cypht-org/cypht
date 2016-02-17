@@ -12,6 +12,9 @@ add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp
 add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('compose', 'compose_form', true, 'smtp', 'content_section_start', 'after');
 
+add_handler('profiles', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
+add_handler('profiles', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
+
 /* servers page */
 add_handler('servers', 'load_smtp_servers_from_config', true, 'smtp', 'language', 'after');
 add_handler('servers', 'process_add_smtp_server', true, 'smtp', 'load_smtp_servers_from_config', 'after');
