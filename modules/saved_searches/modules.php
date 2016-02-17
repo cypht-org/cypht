@@ -17,7 +17,8 @@ class Hm_Handler_save_searches_data extends Hm_Handler_Module {
         $searches = new Hm_Saved_Searches($this->user_config->get('saved_searches', array()));
         $params = $name ? $searches->get($name, array()) : array();
         $url_search = get_search_from_url($this->request);
-        if (!empty(array_diff_assoc($params, $url_search))) {
+        $diff = array_diff_assoc($params, $url_search);
+        if (count($diff) > 0) {
             $this->out('search_param_update', true);
         }
         $this->out('search_name', $name);
