@@ -23,3 +23,4 @@ ul li:before { margin-left: -2em; color: #aaa; content: '\229A'; padding-right: 
 h3 { margin: 10px; margin-left: 0px; margin-top: 30px; padding: 0px; }
 .top { margin-top: 0px !important; }
 .logo { color: #fff; }
+pre { padding: 10px; font-size: 12px; line-height: 12px; background-color: #f5f5f5; }

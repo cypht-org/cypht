@@ -24,15 +24,77 @@
       <h3 class="top">Requirements</h3>
       Cypht requires at least PHP 5.4, with the <a href="http://php.net/manual/en/book.openssl.php">OpenSSL</a> and <a href="http://php.net/manual/en/book.curl.php">cURL</a> extensions. You will also need <a href="http://php.net/manual/en/book.pdo.php">PDO</a> support if using any databases features. Testing is done on <a href="https://www.debian.org/">Debian</a> and <a href="http://www.ubuntu.com/">Ubuntu</a> platforms with <a href="http://nginx.com/">Nginx</a>, <a href="http://httpd.apache.org/">Apache</a>, standard PHP, and <a href="http://hhvm.com/">HHVM</a>.
       <h3>Steps</h3>
-      <ul>
-          <li><a href="https://github.com/jasonmunro/hm3/archive/master.zip">Download</a> and extract the program somewhere</li>
-          <li>Copy the <a href="https://github.com/jasonmunro/hm3/blob/master/hm3.sample.ini">hm3.sample.ini</a> file to "hm3.ini" and edit to your liking. Setup the storage directories and DB configuration for your needs. See the comments in the ini file for more information.</li>
-          <li>Run "php ./scripts/config_gen.php" from the main directory to generate the production site. If you change the hm3.ini file, you need to re-run this command for your changes to take effect.</li>
-          <li>Sym-link or move the newly created files in the "site" directory to the web-server where you want to host the software.</li>
-          <li>You can enable a debug site by sym-linking or moving the main download directory to the web-server document root and accessing it's index.php file. DON'T DO THIS IN PRODUCTION. IT WOULD BE BAD.</li>
-          <li>If you are using the DB option for user authentication, you can create and delete users, as well as change their passwords, with the commands in the scripts/ directory</li>
-          <li>Installation is still a bit tricky. If you run into problems contact me at jason <span class="e_hl">[at]</span> hastymail <span class="e_hl">[dot]</span> org, or hop into our IRC channel #hastymail at freenode.net.</li>
-      </ul>
+      <h4>1. Download and prepare the code</h4>
+      <p>It's important to consider where you put the Cypht source. The web-server will need read-only access to it, and moving it from one place to another requires re-running the configuration script. Do NOT put the source in the document root as this could create a security risk. On Debian, it's common to use the /usr/share/ sub-directory for a situation like this. Here is short bash script that will download the latest code, setup the correct permissions and ownership, put the source in /usr/share/cypht, and create a default hm3.ini file. It requires sudo access:
+
+
+      </p><pre>
+#!/bin/bash
+
+DESTINATION="/usr/share/cypht"
+
+# create working directory
+mkdir hm3-temp
+cd hm3-temp
+
+# grab latest code
+wget https://github.com/jasonmunro/hm3/archive/master.zip
+
+# unpack the archive
+unzip master.zip
+
+# create a vanilla ini file
+cp hm3-master/hm3.sample.ini hm3-master/hm3.ini
+
+# fix permissions and ownership
+find hm3-master -type d -print | xargs chmod 755
+find hm3-master -type f -print | xargs chmod 644
+sudo chown -R root:root hm3-master
+
+# copy to destination folder
+sudo mv hm3-master $DESTINATION
+
+# remove working directory
+cd ..
+sudo rm -rf hm3-temp
+</pre>
+      <h4>2. Configure the program</h4>
+      <p>To configure Cypht for your environment, you must first edit the <a href="https://github.com/jasonmunro/hm3/blob/master/hm3.sample.ini">hm3.ini</a> file to your liking, then run the config_gen.php script to generate the optimized configuration file and assets used at run-time.</p>
+
+      <p>First edit the hm3.ini file to configure Cypht for your environment. If you choose to use a database for any of the 3 available purposes (authentication, sessions, or user settings), you will need to complete the "DB support" section and create the required tables. SQL to do so can be found in the hm3.sample.ini file. The ini file has lots of comments explaining what each option does.</p>
+
+      <p>Cypht needs read, and read-write access to a few directories on the server. For security reasons these should NOT be inside the web-server document root. A good place for these is under the /var/lib/ sub-directory. Here are the commands To create the required directories per the default values in the ini file (assuming your web-server software runs as the "www-data" user).</p>
+
+      <pre>sudo mkdir /var/lib/hm3
+sudo mkdir /var/lib/hm3/attachments
+sudo mkdir /var/lib/hm3/users
+
+chown -R www-data /var/lib/hm3/
+      </pre>
+      <p>The /var/lib/hm3/users directory is only required if you are using the file-system and not a database to store user settings (user_config_type = file in the hm3.ini). You can put these directories anywhere, just make sure the values in the ini file point to the right place.
+      </p>
+      <h4>3. Generate the run-time configuration</h4>
+      <p>Cypht uses a build process to create an optimized configuration, and to combine and minimize page assets. Once you have edited your hm3.ini file, generate the configuration with:</p>
+
+      <pre>cd /usr/share/cypht  (or wherever you put the code in section 1)
+sudo php ./script/config_gen.php</pre>
+
+      <p>This will create a sub-directory called site that contains the code and page assets that need to be inside the document root, and it creates an optimized configuration file called hm3.rc in the current directory. Anytime you change the ini file settings, or move the source location, you will need to re-run the config_gen script to update the program.</p>
+
+
+      <h4>4. Enable the program in your web-server</h4>
+      <p>The easiest way to serve Cypht is to symlink it to the web-server document root.  You can also copy the generated files to your web-server location, but then you will need to re-copy them anytime the config_gen script is run. If the source is located at /usr/share/cypht, and the web-server document root is at /var/www/html, the following command will make Cypht available under the "mail" path of the
+      web-server:</p>
+
+      <pre>sudo ln -s /usr/share/cypht/site /var/www/html/mail</pre>
+
+      <p>Now going to https://your-server/mail/ should load the Cypht login page. Note that If you use a symlink, your web-server must be configured to follow symlinks.</p>
+      <h4>5. Debug mode</h4>
+      <p>Cypht has a debug or developer mode that can be used to troubleshoot problems or enable faster development of modules. To enable the debug version of Cypht, just sym-link the entire source directory instead of the site sub-directory:</p>
+
+      <pre>sudo ln -s /usr/share/cypht /var/www/html/mail-debug</pre>
+
+      <p>Debug mode is not as efficient as the normal version, and it is NOT designed to be secure. DO NOT RUN DEBUG MODE IN PRODUCTION. You have been warned! Debug mode outputs lots of information to the PHP error log that can be useful for trouble-shooting problems. The location of the error log varies based on your php.ini settings and web-server software.</p>
   </div>
   </body>
 </html>
