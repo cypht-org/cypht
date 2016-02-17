@@ -60,7 +60,7 @@ var capture_subject_click = function() {
         var list_path = msg_details[1];
 
         if (list_path && uid) {
-            Hm_Folders.hide_folder_list();
+            Hm_Folders.hide_folder_list(true);
             var details = Hm_Utils.parse_folder_path(list_path);
             if (details['type'] == 'feeds') {
                 inline_feed_msg(uid, list_path);
