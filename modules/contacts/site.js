@@ -17,47 +17,55 @@ var add_contact_from_message_view = function() {
     }
 };
 
-var autocomplete_contact = function(e, class_name, list_div) {
-    var key_code = e.keyCode;
-    if (key_code >= 37 && key_code <= 40) {
-        return;
-    }
-    var div = $('<div></div>');
+var get_search_term = function(class_name) {
     var fld_val = $(class_name).val();
     var addresses = fld_val.split(' ');
     var first = '';
     if (addresses.length > 1) {
         fld_val = addresses.pop();
     }
+    return fld_val;
+};
+
+var autocomplete_contact = function(e, class_name, list_div) {
+    var key_code = e.keyCode;
+    if (key_code >= 37 && key_code <= 40) {
+        return;
+    }
+    var div = $('<div></div>');
+    var fld_val = get_search_term(class_name);
     if (fld_val.length > 0) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_autocomplete_contact'},
             {'name': 'contact_value', 'value': fld_val}],
             function(res) {
-                if (res.contact_suggestions) {
-                    var i;
-                    var count = 0;
-                    $(list_div).html('');
-                    for (i in res.contact_suggestions) {
-                        div.html(res.contact_suggestions[i]);
-                        if ($(class_name).val().match(div.text())) {
-                            continue;
+                var active = $(document.activeElement).attr('class');
+                if (active == 'compose_to' || active == 'compose_bcc' || active == 'compose_cc') {
+                    if (res.contact_suggestions) {
+                        var i;
+                        var count = 0;
+                        $(list_div).html('');
+                        for (i in res.contact_suggestions) {
+                            div.html(res.contact_suggestions[i]);
+                            if ($(class_name).val().match(div.text())) {
+                                continue;
+                            }
+                            if (count == 0) {
+                                first = 'first ';
+                            }
+                            else {
+                                first = '';
+                            }
+                            count++;
+                            $(list_div).append('<a tabindex="1" href="#" class="'+first+'contact_suggestion unread_link">'+res.contact_suggestions[i]+'</a>');
                         }
-                        if (count == 0) {
-                            first = 'first ';
+                        if (count > 0) {
+                            $(list_div).show();
+                            setup_autocomplete_events(class_name, list_div, fld_val);
                         }
                         else {
-                            first = '';
+                            $(list_div).hide();
                         }
-                        count++;
-                        $(list_div).append('<a tabindex="1" href="#" class="'+first+'contact_suggestion unread_link">'+res.contact_suggestions[i]+'</a>');
-                    }
-                    if (count > 0) {
-                        $(list_div).show();
-                        setup_autocomplete_events(class_name, list_div, fld_val);
-                    }
-                    else {
-                        $(list_div).hide();
                     }
                 }
             }
@@ -97,7 +105,7 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
     else if (event.keyCode == 13) {
         $(class_name).focus();
         $(list_div).hide();
-        add_autocomplete(event, class_name, list_div, fld_val);
+        add_autocomplete(event, class_name, list_div);
         return false;
     }
     else if (event.keyCode == 27) {
@@ -119,15 +127,20 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
 };
 
 var setup_autocomplete_events = function(class_name, list_div, fld_val) {
-    $('.contact_suggestion').click(function() { return add_autocomplete(event, class_name, list_div, fld_val); });
+    $('.contact_suggestion').click(function() { return add_autocomplete(event, class_name, list_div); });
     $(class_name).keydown(function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
     $('.contact_suggestion').keydown(function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
     $(document).click(function() { $(list_div).hide(); });
 };
 
 var add_autocomplete = function(event, class_name, list_div, fld_val) {
+    if (!fld_val) {
+        fld_val = get_search_term(class_name);
+    }
     var new_address = $(event.target).text()
     var existing = $(class_name).val();
+    elog(fld_val);
+    elog(existing);
     var re = new RegExp(fld_val+'$');
     existing = existing.replace(re, '');
     if (existing.length) {
