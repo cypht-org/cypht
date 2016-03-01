@@ -4,11 +4,11 @@
 /*.compose_to { width: calc(100% - 25px); }*/
 .toggle_recipients { background-color: #fff; position: absolute; padding-left: 5px; right: 9px; top: 28px; font-size: 120%; }
 .compose_body { width: 100%; min-height: 300px; padding: 5px; margin: 5px; }
-.smtp_send { color: #666; font-size: 125%; padding: 10px; margin-top: 10px; }
+.smtp_send { cursor: pointer; color: #666; font-size: 125%; padding: 10px; margin-top: 10px; }
 .smtp_section { display: none; }
 .smtp_server_setup .content_title { cursor: pointer; }
 .compose_server, .compose_server option { width: 100%; padding: 5px; margin: 5px; }
-.compose_attach_button, .smtp_save, .smtp_reset { margin-left: 10px; float: right; margin-top: 10px; }
+.compose_attach_button, .smtp_save, .smtp_reset { cursor: pointer; margin-left: 10px; float: right; margin-top: 10px; }
 .ke-container { margin-left: 5px !important; border-radius: 3px 3px 3px; margin-top: 5px !important; margin-bottom: 5px !important; padding-right: 0px !important; }
 .recipient_fields { display: none; }
 .compose_attach_file { width: 0px; opacity: 0; }
