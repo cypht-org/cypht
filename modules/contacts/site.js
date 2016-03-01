@@ -139,8 +139,6 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
     }
     var new_address = $(event.target).text()
     var existing = $(class_name).val();
-    elog(fld_val);
-    elog(existing);
     var re = new RegExp(fld_val+'$');
     existing = existing.replace(re, '');
     if (existing.length) {
