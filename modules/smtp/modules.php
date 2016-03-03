@@ -390,7 +390,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 $from = '';
                 $cc = '';
                 $bcc = '';
+                $from_name = '';
                 $in_reply_to = '';
+                $reply_to = '';
                 if (array_key_exists('compose_body', $this->request->post)) {
                     $body = $this->request->post['compose_body'];
                     $draft['draft_body'] = $this->request->post['compose_body'];
@@ -408,8 +410,13 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     $draft['draft_in_reply_to'] = $this->request->post['compose_in_reply_to'];
                 }
                 $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
+                $profiles = $this->get('compose_profiles', array());
                 if ($smtp_details) {
                     $from = $smtp_details['user'];
+                    if (array_key_exists($form['smtp_server_id'], $profiles)) {
+                        $from_name = $profiles[$form['smtp_server_id']]['profile_name'];
+                        $reply_to = $profiles[$form['smtp_server_id']]['profile_replyto'];
+                    }
                     if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
                         $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                         if (!empty($results)) {
@@ -432,7 +439,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                                 $bcc = $from;
                             }
                         }
-                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0), $cc, $bcc, $in_reply_to);
+                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0),
+                            $cc, $bcc, $in_reply_to, $from_name, $reply_to);
                         $mime->add_attachments($this->session->get('uploaded_files', array()));
                         $recipients = $mime->get_recipient_addresses();
                         if (empty($recipients)) {
@@ -466,7 +474,38 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 /**
  * @subpackage smtp/output
  */
-class Hm_Output_compose_form extends Hm_Output_Module {
+class Hm_Output_compose_form_start extends Hm_Output_Module {
+    protected function output() {
+        return'<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
+            '<form class="compose_form" method="post" action="?page=compose">';
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_compose_form_end extends Hm_Output_Module {
+    protected function output() {
+        return '</form>';
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_compose_form_attach extends Hm_Output_Module {
+    protected function output() {
+        return '<form enctype="multipart/form-data" class="compose_attach_form">'.
+            '<input class="compose_attach_file" type="file" name="compose_attach_file" />'.
+            '<input type="hidden" name="compose_attach_page_id" value="ajax_smtp_attach_file" />'.
+            '</form></div>';
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_compose_form_content extends Hm_Output_Module {
     protected function output() {
         $to = '';
         $subject = '';
@@ -508,9 +547,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
                 ",basePath: 'modules/smtp/assets/kindeditor/'".
                 '})});;</script>';
         }
-        $res .= '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
-            '<form class="compose_form" method="post" action="?page=compose">'.
-            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="hidden" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
             '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).
             '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
@@ -533,12 +570,7 @@ class Hm_Output_compose_form extends Hm_Output_Module {
             '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
             '<input class="compose_attach_button" value="'.$this->trans('Attach').
-            '" name="compose_attach_button" type="button" /></form>'.
-            '<form enctype="multipart/form-data" class="compose_attach_form" />'.
-            '<input class="compose_attach_file" type="file" name="compose_attach_file" />'.
-            '<input type="hidden" name="compose_attach_page_id" value="ajax_smtp_attach_file" />'.
-            '</form>'.
-            '</div>';
+            '" name="compose_attach_button" type="button" />';
         return $res;
     }
 }
@@ -707,13 +739,24 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
  */
 function smtp_server_dropdown($data, $output_mod, $recip) {
     $res = '<select name="smtp_server_id" class="compose_server">';
+    $profiles = array();
+    if (array_key_exists('compose_profiles', $data)) {
+        $profiles = $data['compose_profiles'];
+    }
     if (array_key_exists('smtp_servers', $data)) {
         foreach ($data['smtp_servers'] as $id => $vals) {
             $res .= '<option ';
             if ($recip && trim($recip) == trim($vals['user'])) {
                 $res .= 'selected="selected" ';
             }
-            $res .= 'value="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name'])).'</option>';
+            $res .= 'value="'.$output_mod->html_safe($id).'">';
+            if (array_key_exists($id, $profiles)) {
+                $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profiles[$id]['profile_name'], $vals['user'], $vals['name']));
+            }
+            else {
+                $res .= $output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name']));
+            }
+            $res .= '</option>';
         }
     }
     $res .= '</select>';
