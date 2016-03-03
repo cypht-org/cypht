@@ -30,6 +30,23 @@ class Hm_Handler_profile_edit_data extends Hm_Handler_Module {
 /**
  * @subpackage profile/handler
  */
+class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
+    public function process() {
+        $profiles = array();
+        foreach ($this->user_config->dump() as $name => $vals) {
+            if (preg_match("/^profile_/", $name) && is_array($vals)) {
+                if (array_key_exists('profile_smtp', $vals)) {
+                    $profiles[$vals['profile_smtp']] = $vals;
+                }
+            }
+        }
+        $this->out('compose_profiles', $profiles);
+    }
+}
+
+/**
+ * @subpackage profile/handler
+ */
 class Hm_Handler_process_profile_update extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('profile_id'));
@@ -89,7 +106,14 @@ class Hm_Handler_profile_data extends Hm_Handler_Module {
                 $accounts[] = $server;
             }
         }
+        $used_smtp_servers = array();
+        foreach ($accounts as $account) {
+            if ($account['profile_details']['profile_smtp'] != '') {
+                $used_smtp_servers[] = $account['profile_details']['profile_smtp'];
+            }
+        }
         $this->out('account_profiles', $accounts);
+        $this->out('used_smtp_servers', $used_smtp_servers);
     }
 }
 
@@ -101,6 +125,7 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
         $res = '<div class="profile_content"><div class="content_title">'.$this->trans('Profiles');
         $smtp_servers = $this->get('smtp_servers', array());
         if ($this->get('edit_profile')) {
+            $used = $this->get('used_smtp_servers', array());
             $data = $this->get('edit_profile');
             $id = $this->get('edit_profile_id');
             $profile = $data['profile_details'];
@@ -117,6 +142,9 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
             $res .= '<tr><th>'.$this->trans('SMTP Server').'</th><td><select name="profile_smtp">';
             foreach ($smtp_servers as $id => $server) {
                 $res .= '<option ';
+                if (in_array($id, $used, true)) {
+                    $res .= 'disabled="disabled" ';
+                }
                 if ($id == $profile['profile_smtp']) {
                     $res .= 'selected="selected"';
                 }
@@ -147,6 +175,32 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
+    }
+}
+
+/**
+ * @subpackage profile/output
+ */
+class Hm_Output_compose_signature_button extends Hm_Output_Module {
+    protected function output() {
+        return '<input class="compose_sign" type="button" value="'.$this->trans('Sign').'" />';
+    }
+}
+
+/**
+ * @subpackage profile/output
+ */
+class Hm_Output_compose_signature_values extends Hm_Output_Module {
+    protected function output() {
+        $res = '<script type="text/javascript">var profile_signatures = {';
+        $sigs = array();
+        foreach ($this->get('compose_profiles', array()) as $smtp_id => $vals) {
+            if (strlen(trim($vals['profile_sig']))) {
+                $sigs[] = sprintf("%s: \"\\n%s\\n\"", $smtp_id, $this->html_safe(str_replace("\r\n", "\\n", $vals['profile_sig'])));
+            }
+        }
+        $res .= implode(', ', $sigs).'}</script>';
+        return $res;
     }
 }
 

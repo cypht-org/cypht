@@ -5,3 +5,4 @@
 .edit_profile table { width: 20%; padding: 20px; }
 .edit_profile table th { white-space: nowrap; font-weight: normal; text-align: right; padding-right: 10px; }
 .edit_profile table th, .edit_profile table td { padding-bottom: 10px; }
+.compose_sign { cursor: pointer; margin-left: 10px; float: right; margin-top: 10px; }
