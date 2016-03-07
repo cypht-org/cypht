@@ -430,15 +430,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     }
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
-                        $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
-                        if ($auto_bcc) {
-                            if ($bcc) {
-                                $bcc .= ', '.$from;
-                            }
-                            else {
-                                $bcc = $from;
-                            }
-                        }
                         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0),
                             $cc, $bcc, $in_reply_to, $from_name, $reply_to);
                         $mime->add_attachments($this->session->get('uploaded_files', array()));
@@ -452,6 +443,11 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                                 Hm_Msgs::add(sprintf("ERR%s", $err_msg));
                             }
                             else {
+                                $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
+                                if ($auto_bcc) {
+                                    $mime->set_auto_bcc($from);
+                                    $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
+                                }
                                 $draft = array();
                                 delete_uploaded_files($this->session);
                                 Hm_Msgs::add("Message Sent");
