@@ -90,6 +90,11 @@ class Hm_MIME_Msg {
         return $res;
     }
 
+    function set_auto_bcc($addr) {
+        $this->headers['Bcc'] = $addr;
+        $this->headers['X-Auto-Bcc'] = 'cypht';
+    }
+
     function encode_header_fld($input, $email=true) {
         $res = array();
         $input = trim($input, ',; ');
@@ -235,39 +240,7 @@ class Hm_MIME_Msg {
     }
 
     function qp_encode($string) {
-        $string = str_replace("\r\n", "\n", $string);
-        $lines = explode("\n", $string);
-        $new_lines = array();
-        foreach ($lines as $v) {
-            $new_line = '';
-            $char_count = 0;
-            while ($v) {
-                $char = substr($v, 0, 1);
-                $ord = ord($char);
-                $v = substr($v, 1);
-                switch (true) {
-                    case ($ord > 32 && $ord < 61) || ($ord > 61 && $ord < 127):
-                        $new_line .= $char;
-                        $char_count++;
-                        break;
-                    case $ord == 9:
-                    case $ord == 32:
-                        $new_line .= $char;
-                        break;
-                    default:
-                        $new_line .= '='.strtoupper(dechex($ord));
-                        $char_count += 3;
-                        break;
-                }
-                if ($char_count > 72) {
-                    $new_lines[] = $new_line.'=';
-                    $char_count = 0;
-                    $new_line = '';
-                }
-            }
-            $new_lines[] = $new_line;
-        }
-        return implode("\r\n", $new_lines);
+        return quoted_printable_encode($string);
     }
 }
 
