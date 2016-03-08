@@ -104,11 +104,6 @@ class Hm_PHP_Session extends Hm_Session {
         list($secure, $path, $domain) = $this->set_session_params($request);
         session_set_cookie_params(0, $path, $domain, $secure);
         Hm_Functions::session_start();
-
-        if ($request->type == 'HTTP' && ! array_key_exists( 'logout', $request->post)) {
-            session_regenerate_id(true);
-            $this->cname = session_id();
-        }
         if (array_key_exists('data', $_SESSION)) {
             $data = $this->plaintext($_SESSION['data']);
             if (is_array($data)) {
