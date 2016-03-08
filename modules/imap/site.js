@@ -227,6 +227,10 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
     return false;
 };
 
+var imap_sent_content = function(id, folder) {
+    return imap_message_list_content(id, folder, 'ajax_imap_sent');
+};
+
 var imap_all_mail_content = function(id, folder) {
     return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_all_mail_state);
 };

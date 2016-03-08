@@ -979,12 +979,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         if ($cache !== false) {
             return $cache;
         }
-        elog($command);
         $this->send_command($command);
         $result = $this->get_response(false, true);
         $status = $this->check_response($result, true);
         $res = array();
-        elog($result);
         $esearch_res = array();
         if ($status) {
             array_pop($result);

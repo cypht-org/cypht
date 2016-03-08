@@ -177,6 +177,19 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
 }
 
 /**
+ * Determine if auto-bcc is active
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_auto_bcc_check extends Hm_Handler_Module {
+    /**
+     * Set the auto bcc state for output modules to use
+     */
+    public function process() {
+        $this->out('auto_bcc_enabled', $this->user_config->get('smtp_auto_bcc_setting', false));
+    }
+}
+
+/**
  * Expand an IMAP folder section
  * @subpackage imap/handler
  */
@@ -431,6 +444,31 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
 }
 
 /**
+ * Get message headers for the Sent page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_sent extends Hm_Handler_Module {
+    /**
+     * Returns list of message data for the Everthing page
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_SINCE));
+            $ids = explode(',', $form['imap_server_ids']);
+            $folder = 'INBOX';
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array($folder), $limit, array('SINCE' => $date), true);
+            $this->out('imap_sent_data', $msg_list);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
+        }
+    }
+}
+
+/**
  * Get message headers for the Everthing page
  * @subpackage imap/handler
  */
@@ -671,6 +709,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 break;
             case 'email':
                 $callback = 'imap_all_mail_content';
+                break;
+            case 'sent':
+                $callback = 'imap_sent_content';
                 break;
             default:
                 $callback = 'imap_background_unread_content';
@@ -1404,6 +1445,24 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
 }
 
 /**
+ * Format message headers for the Sent E-mail page
+ * @subpackage imap/output
+ */
+class Hm_Output_filter_sent_data extends Hm_Output_Module {
+    /**
+     * Build ajax response for the All E-mail message list
+     */
+    protected function output() {
+        if ($this->get('imap_sent_data')) {
+            prepare_imap_message_list($this->get('imap_sent_data'), $this, 'sent');
+        }
+        else {
+            $this->out('formatted_message_list', array());
+        }
+    }
+}
+
+/**
  * Format message headers for the All E-mail page
  * @subpackage imap/output
  */
@@ -1464,9 +1523,11 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
  */
 class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_history"><a class="unread_link" href="?page=message_list&amp;list_path=sent">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$this->trans('Sent').'</a></li>';
-        $this->concat('formatted_folder_list', $res);
+        if ($this->get('auto_bcc_enabled', false)) {
+            $res = '<li class="menu_history"><a class="unread_link" href="?page=message_list&amp;list_path=sent">'.
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$this->trans('Sent').'</a></li>';
+            $this->concat('formatted_folder_list', $res);
+        }
     }
 }
 
@@ -1858,9 +1919,10 @@ function sort_by_internal_date($a, $b) {
  * @param array $folders list of folders to search
  * @param int $limit max results
  * @param array $terms list of search terms
+ * @param bool $sent flag to fetch auto-bcc'ed messages
  * @return array
  */
-function merge_imap_search_results($ids, $search_type, $session, $folders = array('INBOX'), $limit=0, $terms=array()) {
+function merge_imap_search_results($ids, $search_type, $session, $folders = array('INBOX'), $limit=0, $terms=array(), $sent=false) {
     $msg_list = array();
     $connection_failed = false;
     foreach($ids as $index => $id) {
@@ -1872,7 +1934,12 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
             $folder = $folders[$index];
             if ($imap->select_mailbox($folder)) {
                 if (!empty($terms)) {
-                    $msgs = $imap->search($search_type, false, $terms);
+                    if ($sent) {
+                        $msgs = $imap->search($search_type, false, $terms, array(), true, false, true);
+                    }
+                    else {
+                        $msgs = $imap->search($search_type, false, $terms);
+                    }
                 }
                 else {
                     $msgs = $imap->search($search_type);
