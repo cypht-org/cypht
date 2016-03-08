@@ -914,9 +914,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param string $term optional search term
      * @param bool $exclude_deleted extra argument to exclude messages with the deleted flag
      * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
+     * @param bool $only_auto_bcc only include auto-bcc'ed messages
      * @return array list of IMAP message UIDs that match the search
      */
-    public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true) {
+    public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
         if (!$this->is_clean($this->search_charset, 'charset') || !$this->is_clean($target, 'keyword')) {
             return array();
         }
@@ -958,6 +959,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         if ($exclude_deleted) {
             $fld .= ' NOT DELETED';
         }
+        if ($only_auto_bcc) {
+           $fld .= ' HEADER X-Auto-Bcc cypht';
+        }
         if ($exclude_auto_bcc) {
            $fld .= ' NOT HEADER X-Auto-Bcc cypht';
         }
@@ -975,10 +979,12 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         if ($cache !== false) {
             return $cache;
         }
+        elog($command);
         $this->send_command($command);
         $result = $this->get_response(false, true);
         $status = $this->check_response($result, true);
         $res = array();
+        elog($result);
         $esearch_res = array();
         if ($status) {
             array_pop($result);
