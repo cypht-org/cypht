@@ -30,7 +30,7 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
                 $parts = explode('_', $path, 2);
                 $details = Hm_Feed_List::dump(intval($parts[1]));
                 if (!empty($details)) {
-                    $this->out('mailbox_list_title', array($details['name']));
+                    $this->out('mailbox_list_title', array('Feeds', $details['name']));
                 }
             }
         }

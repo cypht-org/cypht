@@ -324,8 +324,11 @@ class Hm_Output_header_content extends Hm_Output_Module {
         if (!$this->get('router_login_state')) {
             $title = $this->get('router_app_name');
         }
+        elseif ($this->exists('page_title')) {
+            $title .= $this->get('page_title');
+        }
         elseif ($this->exists('mailbox_list_title')) {
-            $title .= ' '.implode('-', array_slice($this->get('mailbox_list_title', array()), 1));
+            $title .= ' '.implode('-', $this->get('mailbox_list_title', array()));
         }
         if (!trim($title) && $this->exists('router_page_name')) {
             $title = '';
