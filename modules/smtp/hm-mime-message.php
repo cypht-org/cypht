@@ -19,6 +19,7 @@ class Hm_MIME_Msg {
     private $text_body = '';
     private $html = false;
     private $allow_unqualified_addresses = false;
+    private $final_msg = '';
 
     /* build mime message data */
     function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $in_reply_to_id='', $from_name='', $reply_to='') {
@@ -74,20 +75,27 @@ class Hm_MIME_Msg {
     function get_mime_msg() {
         $this->prep_message_body();
         $res = '';
+        $headers = '';
         foreach ($this->headers as $name => $val) {
             if (!trim($val)) {
                 continue;
             }
-            $res .= sprintf("%s: %s\r\n", $name, $val);
+            $headers .= sprintf("%s: %s\r\n", $name, $val);
         }
-        if ($this->html) {
-            $res .= $this->text_body;
+        if (!$this->final_msg) {
+            if ($this->html) {
+                $res .= $this->text_body;
+            }
+            $res .="\r\n".$this->body;
+            if (!empty($this->attachments)) {
+                $res .= $this->process_attachments();
+            }
         }
-        $res .="\r\n".$this->body;
-        if (!empty($this->attachments)) {
-            $res .= $this->process_attachments();
+        else {
+            $res = $this->final_msg;
         }
-        return $res;
+        $this->final_msg = $res;
+        return $headers.$res;
     }
 
     function set_auto_bcc($addr) {
