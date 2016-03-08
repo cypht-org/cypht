@@ -1195,11 +1195,14 @@ class Hm_Output_message_start extends Hm_Output_Module {
             }
             $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 0) {
-                $mb_title = $this->get('mailbox_list_title', array());
+                $mb_title = array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()));
+                if (($key = array_search($list_name, $mb_title)) !== false) {
+                    unset($mb_title[$key]);
+                }
                 $title .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
                     '<a href="?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
-                implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />',
-                    array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()))).'</a>';
+                    implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />',
+                    array_map( function($v) { return $this->trans($v); }, $mb_title)).'</a>';
             }
         }
         elseif ($this->get('mailbox_list_title')) {
@@ -1209,7 +1212,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
             }
             $title = '<a href="'.$url.'">'.
                 implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />',
-                    array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()))).'</a>';
+                array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()))).'</a>';
         }
         else {
             $title = '';
