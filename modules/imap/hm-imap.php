@@ -912,9 +912,11 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param mixed $uids an array of uids or a valid IMAP sequence set as a string (or false for ALL)
      * @param string $fld optional field to search
      * @param string $term optional search term
+     * @param bool $exclude_deleted extra argument to exclude messages with the deleted flag
+     * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
      * @return array list of IMAP message UIDs that match the search
      */
-    public function search($target='ALL', $uids=false, $terms=array(), $esearch=array()) {
+    public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true) {
         if (!$this->is_clean($this->search_charset, 'charset') || !$this->is_clean($target, 'keyword')) {
             return array();
         }
@@ -952,6 +954,12 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         }
         else {
             $fld = '';
+        }
+        if ($exclude_deleted) {
+            $fld .= ' NOT DELETED';
+        }
+        if ($exclude_auto_bcc) {
+           $fld .= ' NOT HEADER X-Auto-Bcc cypht';
         }
         $esearch_enabled = false;
         $command = 'UID SEARCH ';
