@@ -59,6 +59,7 @@ add_handler('ajax_hm_folders', 'imap_oauth2_token_check', true, 'imap', 'load_im
 add_handler('ajax_hm_folders', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_hm_folders', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('ajax_hm_folders', 'filter_imap_folders',  true, 'imap', 'folder_list_content_start', 'before');
+add_output('ajax_hm_folders', 'sent_folder_link', true, 'imap', 'logout_menu_item', 'before');
 
 /* ajax server setup callback data */
 setup_base_ajax_page('ajax_imap_debug', 'core');
@@ -91,6 +92,16 @@ add_handler('ajax_imap_message_content', 'save_imap_servers',  true);
 add_output('ajax_imap_message_content', 'filter_message_headers', true);
 add_output('ajax_imap_message_content', 'filter_message_body', true);
 add_output('ajax_imap_message_content', 'filter_message_struct', true);
+
+/* ajax sent callback data */
+setup_base_ajax_page('ajax_imap_sent', 'core');
+add_handler('ajax_imap_sent', 'message_list_type', true, 'core');
+add_handler('ajax_imap_sent', 'imap_message_list_type', true);
+add_handler('ajax_imap_sent', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_sent', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_sent', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_sent', 'imap_sent',  true);
+add_output('ajax_imap_sent', 'filter_sent_data', true);
 
 /* ajax unread callback data */
 setup_base_ajax_page('ajax_imap_unread', 'core');
@@ -196,6 +207,7 @@ return array(
         'ajax_imap_debug',
         'ajax_imap_status',
         'ajax_imap_unread',
+        'ajax_imap_sent',
         'ajax_imap_flagged',
         'ajax_imap_folder_expand',
         'ajax_imap_folder_display',
