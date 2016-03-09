@@ -24,7 +24,7 @@ td { vertical-align: top; }
 .logout_form a {}
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .placeholder { width: 100px !important; }
-.loading_icon { background-position: 0px 0px; background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==') repeat-x top left; opacity: .25; text-align: center; display: none; position: absolute; right: 18px; top: 8px; width: 80px; height: 5px; z-index: 100; }
+.loading_icon { background-position: 0px 0px; background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==') repeat-x top left; background-size: cover; opacity: .5; text-align: center; display: none; position: absolute; right: 0px; top: 0px; left: 0px; height: 7px; z-index: 100; }
 .logout { margin: 2px; margin-left: 5px; display: block; padding: 5px; float: right; clear: none; color: #333; text-decoration: none; border: none !important; }
 .logout:hover { background-color: #eee; }
 .logout { cursor: pointer; background: #fff; font-size: 100%; }
@@ -153,7 +153,6 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .rtl_page .server_section img, .rtl_page .settings_subtitle img { padding-left: 10px; padding-right: 0px !important; }
 .rtl_page .save_settings, .rtl_page .password_notice { float: right !important; }
 .rtl_page .save_settings_password { float: right; margin-left: 0px; padding: 4px; }
-.rtl_page .loading_icon { left: 18px; right: auto; }
 .rtl_page .debug { float: left !important; }
 .rtl_page .list_meta { margin-left: 120px; float: left; }
 .rtl_page .list_controls { left: 0px; padding-left: 10px; top: 0px; padding-top: 10px; right: auto; background-color: #fff; }
@@ -168,7 +167,6 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .folder_toggle{ top: 24px; left: 0px; }
     .folders a { font-size: 125%; }
     .folders li { padding-bottom: 5px; padding-top: 5px; }
-    .loading_icon { top: 8px; left: 35px; right: auto; height: 5px; }
     .content_title { padding-left: 35px; }
     .checkbox_cell { padding-left: 15px !important; }
     .folder_list { min-width: 150px; }
@@ -188,7 +186,6 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .folder_toggle img { width: 24px; height: 24px; }
     .folder_toggle{ display: block; top: 16px; left: 0px; }
     .folders a { font-size: 115%; }
-    .loading_icon { top: 1px; left: 30px; right: auto; }
     .content_title { padding-left: 35px; }
     .checkbox_cell { padding-left: 15px !important; }
     .folder_list { display: none; width: 150px; }

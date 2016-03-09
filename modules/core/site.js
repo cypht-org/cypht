@@ -25,7 +25,7 @@ var Hm_Ajax = {
         var hm_loading_pos = 0;
         $('.loading_icon').show();
         function move_background_image() {
-            hm_loading_pos = hm_loading_pos + 5;
+            hm_loading_pos = hm_loading_pos + ($('.loading_icon').width()/20);
             $('.loading_icon').css('background-position', hm_loading_pos+'px 0');
             Hm_Ajax.icon_loading_id = setTimeout(move_background_image, 100);
         }
