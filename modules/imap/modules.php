@@ -11,6 +11,28 @@ if (!defined('DEBUG_MODE')) { die(); }
 require_once APP_PATH.'modules/imap/hm-imap.php';
 
  /**
+ * Flag a message as answered
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_mark_as_answered extends Hm_Handler_Module {
+    public function process() {
+        if ($this->get('msg_sent')) {
+            list($success, $form) = $this->process_form(array('compose_msg_uid', 'compose_msg_path'));
+            if ($success) {
+                $path = explode('_', $form['compose_msg_path']);
+                if (count($path) == 3 && $path[0] == 'imap') {
+                    $cache = Hm_IMAP_List::get_cache($this->session, $path[1]);
+                    $imap = Hm_IMAP_List::connect($path[1], $cache);
+                    if ($imap && $imap->select_mailbox($path[2])) {
+                        $imap->message_action('ANSWERED', array($form['compose_msg_uid']));
+                    }
+                }
+            }
+        }
+    }
+}
+
+ /**
  * Flag a message as read
  * @subpackage imap/handler
  */
@@ -1670,6 +1692,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         if (stristr($msg['flags'], 'flagged')) {
             $flags[] = 'flagged';
+        }
+        if (stristr($msg['flags'], 'answered')) {
+            $flags[] = 'answered';
         }
         $source = $msg['server_name'];
         $row_class .= ' '.str_replace(' ', '_', $source);
