@@ -164,6 +164,7 @@ return array(
     'Poison Mist' => false,
     'A Bunch Of Browns' => false,
     'VT100' => false,
+    'Hacker News' => false,
     'Calendar' => false,
     'More info' => false,
     'Sunday' => false,
@@ -321,10 +322,15 @@ return array(
     'Send To' => false,
     'local' => false,
     'Add Local Contact' => false,
-    'Delete search',
-    'Delete saved search',
-    'Save search',
-    'Github repo',
+    'Delete search' => false,
+    'Delete saved search' => false,
+    'Save search' => false,
+    'Github repo' => false,
+    'Github' => false,
+    'Accounts' => false,
+    'NASA' => false,
+    'You have unsaved changes' => false,
+    'APOD' => false,
 ); 
 
 ?>
