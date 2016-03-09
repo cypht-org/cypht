@@ -1337,9 +1337,9 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         }
         $res = '';
         $res .= '<div class="message_list '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title">';
-        $res .= message_controls($this).
+        $res .= message_controls($this).'<div class="mailbox_list_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->html_safe($v); },
-                $this->get('mailbox_list_title', array())));
+                $this->get('mailbox_list_title', array()))).'</div>';
         $res .= list_controls($refresh_link, $config_link, $source_link);
 	    $res .= message_list_meta($this->module_output(), $this);
         $res .= list_sources($this->get('data_sources', array()), $this);
