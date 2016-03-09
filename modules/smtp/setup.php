@@ -105,6 +105,8 @@ return array(
         'smtp_pass' => FILTER_SANITIZE_STRING,
         'delete_uploaded_files' => FILTER_VALIDATE_BOOLEAN,
         'compose_to' => FILTER_UNSAFE_RAW,
+        'compose_msg_path' => FILTER_SANITIZE_STRING,
+        'compose_msg_uid' => FILTER_VALIDATE_INT,
         'compose_body' => FILTER_UNSAFE_RAW,
         'compose_subject' => FILTER_SANITIZE_STRING,
         'compose_in_reply_to' => FILTER_UNSAFE_RAW,
