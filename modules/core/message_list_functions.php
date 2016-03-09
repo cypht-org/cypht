@@ -14,7 +14,7 @@
  * @return array
  */
 function get_message_list_settings($path, $handler) {
-    $list_path = '';
+    $list_path = $path;
     $mailbox_list_title = array();
     $message_list_since = DEFAULT_SINCE;
     $per_source_limit = DEFAULT_PER_SOURCE;
@@ -147,7 +147,7 @@ function human_readable_interval($date_str) {
  * @return array
  */
 function message_list_row($values, $id, $style, $output_mod, $row_class='') {
-    $res = '<tr style="display: none;" class="'.$output_mod->html_safe(str_replace(' ', '-', $id));
+    $res = '<tr class="'.$output_mod->html_safe(str_replace(' ', '-', $id));
     if ($row_class) {
         $res .= ' '.$output_mod->html_safe($row_class);
     }
@@ -256,6 +256,9 @@ function icon_callback($vals, $style, $output_mod) {
     $icons = '';
     if (in_array('flagged', $vals[0])) {
         $icons .= '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Flagged').'" />';
+    }
+    if (in_array('answered', $vals[0])) {
+        $icons .= '<img src="'.Hm_Image_Sources::$circle_check.'" width="16" height="16" alt="'.$output_mod->trans('Answered').'" />';
     }
     if (in_array('attachment', $vals[0])) {
         $icons .= '<img src="'.Hm_Image_Sources::$paperclip.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" />';

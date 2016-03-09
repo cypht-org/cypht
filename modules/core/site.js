@@ -389,12 +389,7 @@ function Message_List() {
                 $('.'+Hm_Utils.clean_selector(id), msg_rows).show();
             }
             else {
-                timestr = $('.msg_date', $(row)).html();
-                subject = $('.subject', $(row)).html();
-                timeint = $('.msg_timestamp', $(row)).val();
-                $('.msg_date', $('.'+Hm_Utils.clean_selector(id), msg_rows)).html(timestr);
-                $('.subject', $('.'+Hm_Utils.clean_selector(id), msg_rows)).html(subject);
-                $('.msg_timestamp', $('.'+Hm_Utils.clean_selector(id), msg_rows)).val(timeint);
+                $('.'+Hm_Utils.clean_selector(id), msg_rows).replaceWith(row)
             }
             msg_ids.push(id);
         }
