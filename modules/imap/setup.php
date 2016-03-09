@@ -27,6 +27,7 @@ add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+add_handler('compose', 'imap_mark_as_answered', true, 'imap', 'process_compose_form_submit', 'after');
 
 /* search page data */
 add_handler('search', 'load_imap_servers_for_search',  true, 'imap', 'message_list_type', 'after');
