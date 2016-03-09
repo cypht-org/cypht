@@ -100,14 +100,14 @@ class Hm_Output_apod_content extends Hm_Output_Module {
             }
             if (array_key_exists('media_type', $data)) {
                 if ($data['media_type'] == 'image' && array_key_exists('url', $data)) {
-                    $res .= '<div class="apod_image"><img class="msg_img" alt="'.$this->trans('Picutre of the day').'" src="'.$this->html_safe($data['url']).'" /></div>';
+                    $res .= '<div class="apod_image"><img class="msg_img" alt="'.$this->trans('Picture of the day').'" src="'.$this->html_safe($data['url']).'" /></div>';
                 }
                 elseif ($data['media_type'] == 'video' && array_key_exists('url', $data)) {
                     $res .= '<div class="apod_video"><a target="_blank" href="'.$this->html_safe($data['url']).'">YouTube</a></div>';
                 }
             }
             elseif (array_key_exists('url', $data) && preg_match("/jpg$/i", $data['url'])) {
-                $res .= '<div class="apod_image"><img class="msg_img" alt="'.$this->trans('Picutre of the day').'" src="'.$this->html_safe($data['url']).'" /></div>';
+                $res .= '<div class="apod_image"><img class="msg_img" alt="'.$this->trans('Picture of the day').'" src="'.$this->html_safe($data['url']).'" /></div>';
             }
             if (array_key_exists('explanation', $data)) {
                 $res .= '<div class="apod_desc">'.$this->html_safe($data['explanation']).'</div>';
