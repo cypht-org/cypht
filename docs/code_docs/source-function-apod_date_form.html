@@ -687,6 +687,7 @@
 				<li><a href="class-Hm_Handler_hello_world_page_handler.html">Hm_Handler_hello_world_page_handler</a></li>
 				<li><a href="class-Hm_Handler_http_headers.html">Hm_Handler_http_headers</a></li>
 				<li><a href="class-Hm_Handler_idle_time_check.html">Hm_Handler_idle_time_check</a></li>
+				<li><a href="class-Hm_Handler_imap_auto_bcc_check.html">Hm_Handler_imap_auto_bcc_check</a></li>
 				<li><a href="class-Hm_Handler_imap_bust_cache.html">Hm_Handler_imap_bust_cache</a></li>
 				<li><a href="class-Hm_Handler_imap_combined_inbox.html">Hm_Handler_imap_combined_inbox</a></li>
 				<li><a href="class-Hm_Handler_imap_connect.html">Hm_Handler_imap_connect</a></li>
@@ -698,6 +699,7 @@
 				<li><a href="class-Hm_Handler_imap_folder_page.html">Hm_Handler_imap_folder_page</a></li>
 				<li><a href="class-Hm_Handler_imap_forget.html">Hm_Handler_imap_forget</a></li>
 				<li><a href="class-Hm_Handler_imap_hide.html">Hm_Handler_imap_hide</a></li>
+				<li><a href="class-Hm_Handler_imap_mark_as_answered.html">Hm_Handler_imap_mark_as_answered</a></li>
 				<li><a href="class-Hm_Handler_imap_mark_as_read.html">Hm_Handler_imap_mark_as_read</a></li>
 				<li><a href="class-Hm_Handler_imap_message_action.html">Hm_Handler_imap_message_action</a></li>
 				<li><a href="class-Hm_Handler_imap_message_content.html">Hm_Handler_imap_message_content</a></li>
@@ -705,6 +707,7 @@
 				<li><a href="class-Hm_Handler_imap_oauth2_token_check.html">Hm_Handler_imap_oauth2_token_check</a></li>
 				<li><a href="class-Hm_Handler_imap_save.html">Hm_Handler_imap_save</a></li>
 				<li><a href="class-Hm_Handler_imap_search.html">Hm_Handler_imap_search</a></li>
+				<li><a href="class-Hm_Handler_imap_sent.html">Hm_Handler_imap_sent</a></li>
 				<li><a href="class-Hm_Handler_imap_status.html">Hm_Handler_imap_status</a></li>
 				<li><a href="class-Hm_Handler_imap_unread.html">Hm_Handler_imap_unread</a></li>
 				<li><a href="class-Hm_Handler_language.html">Hm_Handler_language</a></li>
@@ -919,6 +922,7 @@
 				<li><a href="class-Hm_Output_filter_pop3_message_list.html">Hm_Output_filter_pop3_message_list</a></li>
 				<li><a href="class-Hm_Output_filter_pop3_status_data.html">Hm_Output_filter_pop3_status_data</a></li>
 				<li><a href="class-Hm_Output_filter_saved_search_result.html">Hm_Output_filter_saved_search_result</a></li>
+				<li><a href="class-Hm_Output_filter_sent_data.html">Hm_Output_filter_sent_data</a></li>
 				<li><a href="class-Hm_Output_filter_service_select.html">Hm_Output_filter_service_select</a></li>
 				<li><a href="class-Hm_Output_filter_unread_data.html">Hm_Output_filter_unread_data</a></li>
 				<li><a href="class-Hm_Output_filter_upload_file_details.html">Hm_Output_filter_upload_file_details</a></li>
@@ -1330,14 +1334,14 @@
 </span><span id="100" class="l"><a href="#100">100: </a>            }
 </span><span id="101" class="l"><a href="#101">101: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'media_type'</span>, <span class="php-var">$data</span>)) {
 </span><span id="102" class="l"><a href="#102">102: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$data</span>[<span class="php-quote">'media_type'</span>] == <span class="php-quote">'image'</span> &amp;&amp; <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'url'</span>, <span class="php-var">$data</span>)) {
-</span><span id="103" class="l"><a href="#103">103: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;apod_image&quot;&gt;&lt;img class=&quot;msg_img&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Picutre of the day'</span>).<span class="php-quote">'&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$data</span>[<span class="php-quote">'url'</span>]).<span class="php-quote">'&quot; /&gt;&lt;/div&gt;'</span>;
+</span><span id="103" class="l"><a href="#103">103: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;apod_image&quot;&gt;&lt;img class=&quot;msg_img&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Picture of the day'</span>).<span class="php-quote">'&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$data</span>[<span class="php-quote">'url'</span>]).<span class="php-quote">'&quot; /&gt;&lt;/div&gt;'</span>;
 </span><span id="104" class="l"><a href="#104">104: </a>                }
 </span><span id="105" class="l"><a href="#105">105: </a>                <span class="php-keyword1">elseif</span> (<span class="php-var">$data</span>[<span class="php-quote">'media_type'</span>] == <span class="php-quote">'video'</span> &amp;&amp; <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'url'</span>, <span class="php-var">$data</span>)) {
 </span><span id="106" class="l"><a href="#106">106: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;apod_video&quot;&gt;&lt;a target=&quot;_blank&quot; href=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$data</span>[<span class="php-quote">'url'</span>]).<span class="php-quote">'&quot;&gt;YouTube&lt;/a&gt;&lt;/div&gt;'</span>;
 </span><span id="107" class="l"><a href="#107">107: </a>                }
 </span><span id="108" class="l"><a href="#108">108: </a>            }
 </span><span id="109" class="l"><a href="#109">109: </a>            <span class="php-keyword1">elseif</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'url'</span>, <span class="php-var">$data</span>) &amp;&amp; <span class="php-keyword2">preg_match</span>(<span class="php-quote">&quot;/jpg</span><span class="php-var">$</span><span class="php-quote">/i&quot;</span>, <span class="php-var">$data</span>[<span class="php-quote">'url'</span>])) {
-</span><span id="110" class="l"><a href="#110">110: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;apod_image&quot;&gt;&lt;img class=&quot;msg_img&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Picutre of the day'</span>).<span class="php-quote">'&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$data</span>[<span class="php-quote">'url'</span>]).<span class="php-quote">'&quot; /&gt;&lt;/div&gt;'</span>;
+</span><span id="110" class="l"><a href="#110">110: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;apod_image&quot;&gt;&lt;img class=&quot;msg_img&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Picture of the day'</span>).<span class="php-quote">'&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$data</span>[<span class="php-quote">'url'</span>]).<span class="php-quote">'&quot; /&gt;&lt;/div&gt;'</span>;
 </span><span id="111" class="l"><a href="#111">111: </a>            }
 </span><span id="112" class="l"><a href="#112">112: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'explanation'</span>, <span class="php-var">$data</span>)) {
 </span><span id="113" class="l"><a href="#113">113: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;apod_desc&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$data</span>[<span class="php-quote">'explanation'</span>]).<span class="php-quote">'&lt;/div&gt;'</span>;
@@ -1414,6 +1418,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?b9501dcbb240ecef9a5aafbd11979463dc6f6102"></script>
+<script src="elementlist.js?704e1f939edb21dbf7fbfc0d2880e09872a356d5"></script>
 </body>
 </html>

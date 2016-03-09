@@ -687,6 +687,7 @@
 				<li><a href="class-Hm_Handler_hello_world_page_handler.html">Hm_Handler_hello_world_page_handler</a></li>
 				<li><a href="class-Hm_Handler_http_headers.html">Hm_Handler_http_headers</a></li>
 				<li><a href="class-Hm_Handler_idle_time_check.html">Hm_Handler_idle_time_check</a></li>
+				<li><a href="class-Hm_Handler_imap_auto_bcc_check.html">Hm_Handler_imap_auto_bcc_check</a></li>
 				<li><a href="class-Hm_Handler_imap_bust_cache.html">Hm_Handler_imap_bust_cache</a></li>
 				<li><a href="class-Hm_Handler_imap_combined_inbox.html">Hm_Handler_imap_combined_inbox</a></li>
 				<li><a href="class-Hm_Handler_imap_connect.html">Hm_Handler_imap_connect</a></li>
@@ -698,6 +699,7 @@
 				<li><a href="class-Hm_Handler_imap_folder_page.html">Hm_Handler_imap_folder_page</a></li>
 				<li><a href="class-Hm_Handler_imap_forget.html">Hm_Handler_imap_forget</a></li>
 				<li><a href="class-Hm_Handler_imap_hide.html">Hm_Handler_imap_hide</a></li>
+				<li><a href="class-Hm_Handler_imap_mark_as_answered.html">Hm_Handler_imap_mark_as_answered</a></li>
 				<li><a href="class-Hm_Handler_imap_mark_as_read.html">Hm_Handler_imap_mark_as_read</a></li>
 				<li><a href="class-Hm_Handler_imap_message_action.html">Hm_Handler_imap_message_action</a></li>
 				<li><a href="class-Hm_Handler_imap_message_content.html">Hm_Handler_imap_message_content</a></li>
@@ -705,6 +707,7 @@
 				<li><a href="class-Hm_Handler_imap_oauth2_token_check.html">Hm_Handler_imap_oauth2_token_check</a></li>
 				<li><a href="class-Hm_Handler_imap_save.html">Hm_Handler_imap_save</a></li>
 				<li><a href="class-Hm_Handler_imap_search.html">Hm_Handler_imap_search</a></li>
+				<li><a href="class-Hm_Handler_imap_sent.html">Hm_Handler_imap_sent</a></li>
 				<li><a href="class-Hm_Handler_imap_status.html">Hm_Handler_imap_status</a></li>
 				<li><a href="class-Hm_Handler_imap_unread.html">Hm_Handler_imap_unread</a></li>
 				<li><a href="class-Hm_Handler_language.html">Hm_Handler_language</a></li>
@@ -919,6 +922,7 @@
 				<li><a href="class-Hm_Output_filter_pop3_message_list.html">Hm_Output_filter_pop3_message_list</a></li>
 				<li><a href="class-Hm_Output_filter_pop3_status_data.html">Hm_Output_filter_pop3_status_data</a></li>
 				<li><a href="class-Hm_Output_filter_saved_search_result.html">Hm_Output_filter_saved_search_result</a></li>
+				<li><a href="class-Hm_Output_filter_sent_data.html">Hm_Output_filter_sent_data</a></li>
 				<li><a href="class-Hm_Output_filter_service_select.html">Hm_Output_filter_service_select</a></li>
 				<li><a href="class-Hm_Output_filter_unread_data.html">Hm_Output_filter_unread_data</a></li>
 				<li><a href="class-Hm_Output_filter_upload_file_details.html">Hm_Output_filter_upload_file_details</a></li>
@@ -1743,7 +1747,7 @@
 </span><span id="513" class="l"><a href="#513">513: </a>        <span class="php-var">$details</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'github_event_detail'</span>, <span class="php-keyword1">array</span>());
 </span><span id="514" class="l"><a href="#514">514: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$details</span>)) {
 </span><span id="515" class="l"><a href="#515">515: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'payload'</span>, <span class="php-var">$details</span>)) {
-</span><span id="516" class="l"><a href="#516">516: </a>                <span class="php-var">$body</span> = github_parse_payload(<span class="php-var">$details</span>[<span class="php-quote">'payload'</span>], <span class="php-var">$this</span>);
+</span><span id="516" class="l"><a href="#516">516: </a>                <span class="php-var">$body</span> = github_parse_payload(<span class="php-var">$details</span>, <span class="php-var">$this</span>);
 </span><span id="517" class="l"><a href="#517">517: </a>                <span class="php-var">$headers</span> = github_parse_headers(<span class="php-var">$details</span>, <span class="php-var">$this</span>);
 </span><span id="518" class="l"><a href="#518">518: </a>            }
 </span><span id="519" class="l"><a href="#519">519: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'github_msg_text'</span>, <span class="php-var">$headers</span>.<span class="php-var">$body</span>);
@@ -1933,50 +1937,55 @@
 </span></span><span id="703" class="l"><a href="#703">703: </a><span class="php-comment"> * @subpackage github/functions
 </span></span><span id="704" class="l"><a href="#704">704: </a><span class="php-comment"> */</span>
 </span><span id="705" class="l"><a href="#705">705: </a><span class="php-keyword1">function</span> github_parse_payload(<span class="php-var">$data</span>, <span class="php-var">$output_mod</span>) {
-</span><span id="706" class="l"><a href="#706">706: </a>    <span class="php-var">$content</span> = payload_search(<span class="php-var">$data</span>);
-</span><span id="707" class="l"><a href="#707">707: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;msg_text_inner&quot;&gt;'</span>;
-</span><span id="708" class="l"><a href="#708">708: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$content</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
-</span><span id="709" class="l"><a href="#709">709: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;github_para&quot;&gt;'</span>;
-</span><span id="710" class="l"><a href="#710">710: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$vals</span>) == <span class="php-num">2</span>) {
-</span><span id="711" class="l"><a href="#711">711: </a>            <span class="php-var">$res</span> .= <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;github_link&quot;&gt;&lt;a target=&quot;_blank&quot; href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/div&gt;'</span>, <span class="php-var">$vals</span>[<span class="php-num">1</span>], <span class="php-var">$vals</span>[<span class="php-num">1</span>]);
-</span><span id="712" class="l"><a href="#712">712: </a>        }
-</span><span id="713" class="l"><a href="#713">713: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$vals</span>) ==<span class="php-num">1</span>) {
-</span><span id="714" class="l"><a href="#714">714: </a>            <span class="php-var">$res</span> .= <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="715" class="l"><a href="#715">715: </a>        }
-</span><span id="716" class="l"><a href="#716">716: </a>    }
-</span><span id="717" class="l"><a href="#717">717: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="718" class="l"><a href="#718">718: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="719" class="l"><a href="#719">719: </a>}
-</span><span id="720" class="l"><a href="#720">720: </a>
-</span><span id="721" class="l"><a href="#721">721: </a><span class="php-comment">/**
-</span></span><span id="722" class="l"><a href="#722">722: </a><span class="php-comment"> * @subpackage github/functions
-</span></span><span id="723" class="l"><a href="#723">723: </a><span class="php-comment"> */</span>
-</span><span id="724" class="l"><a href="#724">724: </a><span class="php-keyword1">function</span> payload_search(<span class="php-var">$data</span>) {
-</span><span id="725" class="l"><a href="#725">725: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
-</span><span id="726" class="l"><a href="#726">726: </a>    <span class="php-var">$data_flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'body'</span>, <span class="php-quote">'description'</span>, <span class="php-quote">'message'</span>);
-</span><span id="727" class="l"><a href="#727">727: </a>    <span class="php-keyword1">foreach</span>(<span class="php-var">$data</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
-</span><span id="728" class="l"><a href="#728">728: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$vals</span>)) {
-</span><span id="729" class="l"><a href="#729">729: </a>            <span class="php-var">$item</span> = <span class="php-keyword1">array</span>();
-</span><span id="730" class="l"><a href="#730">730: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$data_flds</span> <span class="php-keyword1">as</span> <span class="php-var">$fld</span>) {
-</span><span id="731" class="l"><a href="#731">731: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$fld</span>, <span class="php-var">$vals</span>)) {
-</span><span id="732" class="l"><a href="#732">732: </a>                    <span class="php-var">$item</span>[] = <span class="php-var">$vals</span>[<span class="php-var">$fld</span>];
-</span><span id="733" class="l"><a href="#733">733: </a>                    <span class="php-keyword1">break</span>;
-</span><span id="734" class="l"><a href="#734">734: </a>                }
-</span><span id="735" class="l"><a href="#735">735: </a>            }
-</span><span id="736" class="l"><a href="#736">736: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$item</span>)) {
-</span><span id="737" class="l"><a href="#737">737: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'html_url'</span>, <span class="php-var">$data</span>)) {
-</span><span id="738" class="l"><a href="#738">738: </a>                    <span class="php-var">$item</span>[] = <span class="php-var">$vals</span>[<span class="php-quote">'html_url'</span>];
+</span><span id="706" class="l"><a href="#706">706: </a>    <span class="php-var">$type</span> = <span class="php-keyword1">false</span>;
+</span><span id="707" class="l"><a href="#707">707: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'type'</span>, <span class="php-var">$data</span>)) {
+</span><span id="708" class="l"><a href="#708">708: </a>        <span class="php-var">$type</span> = <span class="php-var">$data</span>[<span class="php-quote">'type'</span>];
+</span><span id="709" class="l"><a href="#709">709: </a>    }
+</span><span id="710" class="l"><a href="#710">710: </a>    <span class="php-var">$data</span> = <span class="php-var">$data</span>[<span class="php-quote">'payload'</span>];
+</span><span id="711" class="l"><a href="#711">711: </a>    <span class="php-var">$content</span> = payload_search(<span class="php-var">$data</span>);
+</span><span id="712" class="l"><a href="#712">712: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;msg_text_inner&quot;&gt;'</span>;
+</span><span id="713" class="l"><a href="#713">713: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$content</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="714" class="l"><a href="#714">714: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;github_para&quot;&gt;'</span>;
+</span><span id="715" class="l"><a href="#715">715: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$vals</span>) == <span class="php-num">2</span>) {
+</span><span id="716" class="l"><a href="#716">716: </a>            <span class="php-var">$res</span> .= <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&lt;div class=&quot;github_link&quot;&gt;&lt;a target=&quot;_blank&quot; href=&quot;%s&quot;&gt;%s&lt;/a&gt;&lt;/div&gt;'</span>, <span class="php-var">$vals</span>[<span class="php-num">1</span>], <span class="php-var">$vals</span>[<span class="php-num">1</span>]);
+</span><span id="717" class="l"><a href="#717">717: </a>        }
+</span><span id="718" class="l"><a href="#718">718: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$vals</span>) ==<span class="php-num">1</span>) {
+</span><span id="719" class="l"><a href="#719">719: </a>            <span class="php-var">$res</span> .= <span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$vals</span>[<span class="php-num">0</span>]).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="720" class="l"><a href="#720">720: </a>        }
+</span><span id="721" class="l"><a href="#721">721: </a>    }
+</span><span id="722" class="l"><a href="#722">722: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="723" class="l"><a href="#723">723: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="724" class="l"><a href="#724">724: </a>}
+</span><span id="725" class="l"><a href="#725">725: </a>
+</span><span id="726" class="l"><a href="#726">726: </a><span class="php-comment">/**
+</span></span><span id="727" class="l"><a href="#727">727: </a><span class="php-comment"> * @subpackage github/functions
+</span></span><span id="728" class="l"><a href="#728">728: </a><span class="php-comment"> */</span>
+</span><span id="729" class="l"><a href="#729">729: </a><span class="php-keyword1">function</span> payload_search(<span class="php-var">$data</span>) {
+</span><span id="730" class="l"><a href="#730">730: </a>    <span class="php-var">$res</span> = <span class="php-keyword1">array</span>();
+</span><span id="731" class="l"><a href="#731">731: </a>    <span class="php-var">$data_flds</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'body'</span>, <span class="php-quote">'description'</span>, <span class="php-quote">'message'</span>);
+</span><span id="732" class="l"><a href="#732">732: </a>    <span class="php-keyword1">foreach</span>(<span class="php-var">$data</span> <span class="php-keyword1">as</span> <span class="php-var">$vals</span>) {
+</span><span id="733" class="l"><a href="#733">733: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$vals</span>)) {
+</span><span id="734" class="l"><a href="#734">734: </a>            <span class="php-var">$item</span> = <span class="php-keyword1">array</span>();
+</span><span id="735" class="l"><a href="#735">735: </a>            <span class="php-keyword1">foreach</span> (<span class="php-var">$data_flds</span> <span class="php-keyword1">as</span> <span class="php-var">$fld</span>) {
+</span><span id="736" class="l"><a href="#736">736: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$fld</span>, <span class="php-var">$vals</span>)) {
+</span><span id="737" class="l"><a href="#737">737: </a>                    <span class="php-var">$item</span>[] = <span class="php-var">$vals</span>[<span class="php-var">$fld</span>];
+</span><span id="738" class="l"><a href="#738">738: </a>                    <span class="php-keyword1">break</span>;
 </span><span id="739" class="l"><a href="#739">739: </a>                }
 </span><span id="740" class="l"><a href="#740">740: </a>            }
-</span><span id="741" class="l"><a href="#741">741: </a>            <span class="php-keyword1">else</span> {
-</span><span id="742" class="l"><a href="#742">742: </a>                <span class="php-var">$res</span> = <span class="php-keyword2">array_merge</span>(<span class="php-var">$res</span>, payload_search(<span class="php-var">$vals</span>));
-</span><span id="743" class="l"><a href="#743">743: </a>            }
-</span><span id="744" class="l"><a href="#744">744: </a>            <span class="php-var">$res</span>[] = <span class="php-var">$item</span>;
-</span><span id="745" class="l"><a href="#745">745: </a>        }
-</span><span id="746" class="l"><a href="#746">746: </a>    }
-</span><span id="747" class="l"><a href="#747">747: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="748" class="l"><a href="#748">748: </a>}
-</span><span id="749" class="l"><a href="#749">749: </a></span></code></pre>
+</span><span id="741" class="l"><a href="#741">741: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$item</span>)) {
+</span><span id="742" class="l"><a href="#742">742: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'html_url'</span>, <span class="php-var">$data</span>)) {
+</span><span id="743" class="l"><a href="#743">743: </a>                    <span class="php-var">$item</span>[] = <span class="php-var">$vals</span>[<span class="php-quote">'html_url'</span>];
+</span><span id="744" class="l"><a href="#744">744: </a>                }
+</span><span id="745" class="l"><a href="#745">745: </a>            }
+</span><span id="746" class="l"><a href="#746">746: </a>            <span class="php-keyword1">else</span> {
+</span><span id="747" class="l"><a href="#747">747: </a>                <span class="php-var">$res</span> = <span class="php-keyword2">array_merge</span>(<span class="php-var">$res</span>, payload_search(<span class="php-var">$vals</span>));
+</span><span id="748" class="l"><a href="#748">748: </a>            }
+</span><span id="749" class="l"><a href="#749">749: </a>            <span class="php-var">$res</span>[] = <span class="php-var">$item</span>;
+</span><span id="750" class="l"><a href="#750">750: </a>        }
+</span><span id="751" class="l"><a href="#751">751: </a>    }
+</span><span id="752" class="l"><a href="#752">752: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="753" class="l"><a href="#753">753: </a>}
+</span><span id="754" class="l"><a href="#754">754: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1984,6 +1993,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?b9501dcbb240ecef9a5aafbd11979463dc6f6102"></script>
+<script src="elementlist.js?704e1f939edb21dbf7fbfc0d2880e09872a356d5"></script>
 </body>
 </html>
