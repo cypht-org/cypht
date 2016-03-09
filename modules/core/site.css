@@ -11,6 +11,7 @@ td { vertical-align: top; }
 .subtitle { color: teal; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
 .title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
 .date { display: none; position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
+.mailbox_list_title { display: inline; }
 .sys_messages { position: absolute; left: 0px; top: 0px; right: 0px; min-height: 30px; cursor: pointer; display: none; background-color: #fff; color: teal; margin-top: 0px; text-align: center; background-color: #efefef; padding: 8px; padding-bottom: 0px; white-space: nowrap; border: solid 1px #ddd; z-index: 100; }
 .logged_out { display: block !important; }
 #theme_setting, #timezone_setting { max-width: 200px; }
@@ -173,7 +174,6 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .folder_list { min-width: 150px; }
     .src_name, .content_title { font-size: 140%; padding-bottom: 15px; padding-top: 25px; max-height: 50px; }
     body { font-size: 150%; }
-    .list_controls { margin-top: -20px; position: relative; float: right; padding-right: 10px; }
     .msg_text { font-size: 125%; }
     .msg_text_inner { font-size: 140%; }
     .list_meta { display: none; }
@@ -193,7 +193,6 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .checkbox_cell { padding-left: 15px !important; }
     .folder_list { display: none; width: 150px; }
     .src_name, .content_title { font-size: 125%; max-height: 50px; }
-    .list_controls { margin-top: -20px; position: relative; float: right; padding-right: 10px; }
     .msg_text_inner { font-size: 140%; }
     .msg_controls { position: absolute; background-color: #fff !important; }
     .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
@@ -205,8 +204,8 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
     body { font-size: 90%; min-width: 100%; }
     .list_meta { display: block; }
-    .list_controls { margin-top: -20px; position: relative; float: right; padding-right: 10px; }
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
+    .mailbox_list_title { font-size: 90%; }
     .folder_list { display: none; width: 340px; }
     .content_cell { min-width: 360px; max-width: 480px; }
     .msg_parts { padding-left: 5px !important; }
