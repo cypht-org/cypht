@@ -531,7 +531,7 @@ var imap_prefetch_msgs = function() {
 
 var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     var msg_content = get_local_message_content(uid, list_path);
-    if (!msg_content || !msg_content.length || msg_content == '<div class="msg_text_inner"></div>') {
+    if (!msg_content || !msg_content.length || msg_content.indexOf('<div class="msg_text_inner"></div>') > -1) {
         get_message_content(false, uid, list_path, details, callback);
     }
     else {
