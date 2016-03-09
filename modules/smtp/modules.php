@@ -448,6 +448,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                                     $mime->set_auto_bcc($from);
                                     $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
                                 }
+                                $this->out('msg_sent', true);
                                 $draft = array();
                                 delete_uploaded_files($this->session);
                                 Hm_Msgs::add("Message Sent");
@@ -516,7 +517,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $reply = $this->get('reply_details', array());
         $reply_type = $this->get('reply_type', '');
         $html = $this->get('smtp_compose_type', 0);
-
+        $msg_path = $this->get('list_path', '');
+        $msg_uid = $this->get('uid', '');
         if (!empty($reply)) {
             list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
                 $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type,
@@ -544,6 +546,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '})});;</script>';
         }
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+            '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
+            '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
             '<input type="hidden" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
             '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).
             '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
