@@ -351,7 +351,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         else {
             $res .= sprintf($this->trans('Your timezone is set to %s'), $this->html_safe($tz));
         }
-        $res .= ' <a href="?page=settings#general_setting">Update</a></div></div>';
+        $res .= ' <a href="?page=settings#general_setting">'.$this->trans('Update').'</a></div></div>';
         return $res;
     }
 }
