@@ -331,6 +331,19 @@ return array(
     'NASA' => false,
     'You have unsaved changes' => false,
     'APOD' => false,
+    '%s services are not enabled for this site. Sorry about that!' => false,
+    'January, %s' => false,
+    'February, %s' => false,
+    'March, %s' => false,
+    'April, %s' => false,
+    'May, %s' => false,
+    'June, %s' => false,
+    'July, %s' => false,
+    'August, %s' => false,
+    'September, %s' => false,
+    'October, %s' => false,
+    'November, %s' => false,
+    'December, %s' => false,
 );
 
 ?>
