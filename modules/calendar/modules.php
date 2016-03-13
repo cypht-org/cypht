@@ -136,7 +136,11 @@ class Hm_Cal_Output {
     }
     private function title() {
         list($prev, $next) = $this->prev_next();
-        return '<div class="month_label">'.$prev.' '.date('F, Y', strtotime($this->year.'-'.$this->month)).' '.$next.'</div>';
+        $year = date('Y', strtotime($this->year.'-'.$this->month));
+        $month = date('F', strtotime($this->year.'-'.$this->month));
+        $title = sprintf('%s, %%s', $month);
+        $title = sprintf($this->output_mod->trans($title), $year);
+        return '<div class="month_label">'.$prev.' '.$title.' '.$next.'</div>';
     }
     private function output_month($month) {
         $res = $this->title();
