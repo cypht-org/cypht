@@ -43,7 +43,7 @@ function display_value($name, $haystack, $type=false, $default='') {
 }
 
 /**
- * Valid interface langs (supported by Google Translate API)
+ * Valid interface langs
  * @subpackage core/functions
  * @return array
  */
