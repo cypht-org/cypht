@@ -95,6 +95,38 @@ sudo php ./script/config_gen.php</pre>
       <pre>sudo ln -s /usr/share/cypht /var/www/html/mail-debug</pre>
 
       <p>Debug mode is not as efficient as the normal version, and it is NOT designed to be secure. DO NOT RUN DEBUG MODE IN PRODUCTION. You have been warned! Debug mode outputs lots of information to the PHP error log that can be useful for trouble-shooting problems. The location of the error log varies based on your php.ini settings and web-server software.</p>
+      <h4>6. Other INI files</h4>
+      <p>Some Cypht modules require additional ini files to be configured. These should NOT be inside the web-server document root. Cypht will look for them in the location defined by "app_data_dir" in the hm3.ini file. A sample ini file for each module set that requires one is included in the source for that module. To configure them you must create the Oauth2 API credentials at the service you are connecting to, update the example ini files with the API credentials, then put them in the folder defined by app_data_dir.
+      <ul>
+          <li><b>Github</b><p>Cypht can connect to github and aggregate notification data about repository activity.<br /><br />
+              Example github.ini file:<br />
+              <a href="https://github.com/jasonmunro/hm3/blob/master/modules/github/github.ini">https://github.com/jasonmunro/hm3/blob/master/modules/github/github.ini</a><br /><br />
+              Authorize an application for github:<br />
+              <a href="https://github.com/settings/developers">https://github.com/settings/developers</a>
+              </p></li>
+              <li><b>OAUTH2 over IMAP</b><p>Gmail and Outlook.com support OAUTH2 authentication over IMAP. This is preferable to normal IMAP authentication because Cypht never has access to your account password.<br /><br />
+              Example oauth2 ini file:<br />
+              <a href="https://github.com/jasonmunro/hm3/blob/master/modules/imap/oauth2.ini">https://github.com/jasonmunro/hm3/blob/master/modules/imap/oauth2.ini</a><br /><br />
+              Authorize an application for gmail</br />
+              <a href="https://console.developers.google.com/project">https://console.developers.google.com/project</a><br /><br />
+              Authorize an application for outlook.com<br />
+              <a href="https://account.live.com/developers/applications/">https://account.live.com/developers/applications/</a><br /><br />
+              </p></li>
+              <li><b>Swipe Identity</b><p>This is a free two factor authentication service that sends a code via text messaging to your phone before you can login.<br /><br />
+              Example swipeidentity.ini file:
+              <a href="https://github.com/jasonmunro/hm3/blob/master/modules/imap/oauth2.ini">https://github.com/jasonmunro/hm3/blob/master/modules/imap/oauth2.ini</a><br /><br />
+              Swipe Identity home page:
+              <a href="http://www.swipeidentity.com/">http://www.swipeidentity.com/</a>
+              </p></li>
+              <li><b>WordPress</b><p>Cypht can aggregate WordPress.com notifications.<br /><br />
+              Example wordpress.ini file:<br />
+              <a href="https://github.com/jasonmunro/hm3/blob/master/modules/wordpress/wordpress.ini">https://github.com/jasonmunro/hm3/blob/master/modules/wordpress/wordpress.ini</a><br /><br />
+              Authorize an application for WordPress.com:<br />
+              <a href="https://developer.wordpress.com/apps/">https://developer.wordpress.com/apps/</a>
+              </p></li>
+      </ul>
+
+      </p>
       <h4>Having problems?</h4>
       I'm happy to help trouble-shoot any installation issues you run into. Send a message to jason <span class="e_hl">[at]</span> hastymail <span class="e_hl">[dot]</span> org and I will get back to you as soon as I can.
   </div>
