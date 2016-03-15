@@ -24,13 +24,24 @@ var display_wordpress_notices = function(res) {
     Hm_Message_List.set_message_list_state('formatted_wp_notice_data')
 };
 
-var wp_notice_view = function() {
+var wp_notice_view = function(uid, callback) {
+    if (!uid) {
+        uid = hm_msg_uid();
+    }
     $('.msg_text_inner').html('');
-    Hm_Ajax.request( [{'name': 'hm_ajax_hook', 'value': 'ajax_wp_notice_display'}], display_wp_notice);
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_wp_notice_display'},
+        {'name': 'wp_uid', 'value': uid}],
+        display_wp_notice,
+        [],
+        false,
+        callback
+    );
     return false;
 };
 
 var display_wp_notice = function(res) {
+    elog(res);
     $('.msg_text').html('');
     $('.msg_text').append(res.wp_notice_headers);
     $('.msg_text').append(res.wp_notice_text);

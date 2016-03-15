@@ -62,7 +62,8 @@ return array(
     ),
     'allowed_post' => array(
         'wp_disconnect' => FILTER_SANITIZE_STRING,
-        'unread_exclude_wordpress' => FILTER_VALIDATE_INT
+        'unread_exclude_wordpress' => FILTER_VALIDATE_INT,
+        'wp_uid' => FILTER_SANITIZE_STRING
     ),
     'allowed_output' => array(
         'wp_notice_text' => array(FILTER_UNSAFE_RAW, false),

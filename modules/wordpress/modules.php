@@ -98,14 +98,14 @@ class Hm_Handler_wordpress_folders_data extends Hm_Handler_Module {
  */
 class Hm_Handler_get_wp_notice_data extends Hm_Handler_Module {
     public function process() {
-        if (array_key_exists('uid', $this->request->get)) {
+        if (array_key_exists('wp_uid', $this->request->post)) {
             $wp_details = $this->user_config->get('wp_connect_details', array());
             if ($wp_details) {
-                $details = wp_get_notice_detail($wp_details, $this->request->get['uid']);
+                $parts = explode('_', $this->request->post['wp_uid'], 3);
+                $wp_id = $parts[2];
+                $details = wp_get_notice_detail($wp_details, $wp_id);
                 if (is_array($details) && !empty($details)) {
-                    if (preg_match("/^wordpress_0_(\d)+$/", $this->request->get['uid'])) {
-                        $parts = explode('_', $this->request->get['uid'], 3);
-                        $wp_id = $parts[2];
+                    if (preg_match("/^wordpress_0_(\d)+$/", $this->request->post['wp_uid'])) {
                         $post = array('counts['.$wp_id.']' => 5);
                         $res = wp_fetch_content($wp_details, WPCOM_READ_URL, $post);
                         if (!is_array($res) || !array_key_exists('success', $res) || $res['success'] != 1) {
