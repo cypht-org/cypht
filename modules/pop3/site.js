@@ -1,5 +1,3 @@
-/* globals Hm_Ajax,Hm_Message_List,Hm_Utils,Hm_Folders,Hm_Background_Unread,hm_list_path,hm_msg_uid,hm_search_terms,hm_list_parent,hm_page_name,Message_List,Hm_Timer: true */
-
 var pop3_test_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
@@ -90,13 +88,22 @@ var load_pop3_list = function(id) {
     return false;
 };
 
-var pop3_message_view = function() {
+var pop3_message_view = function(uid, list_path, callback) {
+    if (!uid) {
+        uid = hm_msg_uid();
+    }
+    if (!list_path) {
+        list_path = hm_list_path();
+    }
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_message_display'},
-        {'name': 'pop3_list_path', 'value': hm_list_path()},
-        {'name': 'pop3_uid', 'value': hm_msg_uid()}],
-        display_pop3_message
+        {'name': 'pop3_list_path', 'value': list_path},
+        {'name': 'pop3_uid', 'value': uid}],
+        display_pop3_message,
+        [],
+        false,
+        callback
     );
     return false;
 };

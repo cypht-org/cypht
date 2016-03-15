@@ -958,7 +958,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         else {
             $flags = array('unseen');
         }
-        $row_class .= str_replace(' ', '_', $msg['server_name']);
+        $row_class .= ' '.str_replace(' ', '_', $msg['server_name']);
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
