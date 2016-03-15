@@ -1,3 +1,19 @@
+var inline_pop3_msg = function(details, uid, list_path) {
+    details['uid'] = uid;
+    path = '.'+details['type']+'_'+details['server_id']+'_'+uid;
+    $('.msg_text').html('');
+    $('.msg_text').remove();
+    $('tr').removeClass('hl');
+    $('.content_title').after('<div class="msg_text"></div>');
+    $('.message_table').css('width', '50%');
+    $(path).addClass('hl');
+    pop3_message_view(uid, list_path, inline_msg_loaded_callback);
+    $(path).removeClass('unseen');
+    $('div', $(path)).removeClass('unseen');
+    elog(path);
+    return false;
+};
+
 var inline_wp_msg = function(uid, list_path) {
     $('.msg_text').html('');
     $('.msg_text').remove();
@@ -96,6 +112,10 @@ var capture_subject_click = function() {
                 inline_imap_msg(details, uid, list_path);
                 return false;
             }
+            else if (details['type'] == 'pop3') {
+                inline_pop3_msg(details, uid, list_path);
+                return false;
+            }
             else if (list_path.substr(0, 6) == 'github') {
                 inline_github_msg(uid, list_path);
                 return false;
@@ -104,6 +124,8 @@ var capture_subject_click = function() {
                 inline_wp_msg(uid, list_path);
                 return false;
             }
+            elog(details);
+            return false;
         }
         return true;
     });
