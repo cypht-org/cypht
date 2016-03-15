@@ -1,3 +1,16 @@
+var inline_wp_msg = function(uid, list_path) {
+    $('.msg_text').html('');
+    $('.msg_text').remove();
+    $('tr').removeClass('hl');
+    $('.content_title').after('<div class="msg_text"></div>');
+    $('.message_table').css('width', '50%');
+    $('.'+uid).addClass('hl');
+    wp_notice_view(uid, inline_msg_loaded_callback);
+    $('.'+uid).removeClass('unseen');
+    $('div', $('.'+uid)).removeClass('unseen');
+    return false;
+};
+
 var inline_github_msg = function(uid, list_path) {
     $('.msg_text').html('');
     $('.msg_text').remove();
@@ -85,6 +98,10 @@ var capture_subject_click = function() {
             }
             else if (list_path.substr(0, 6) == 'github') {
                 inline_github_msg(uid, list_path);
+                return false;
+            }
+            else if (list_path.substr(0, 3) == 'wp_') {
+                inline_wp_msg(uid, list_path);
                 return false;
             }
         }
