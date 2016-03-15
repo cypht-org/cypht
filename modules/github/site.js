@@ -33,13 +33,22 @@ var cache_github_all = function() {
     }
 };
 
-var github_item_view = function() {
+var github_item_view = function(list_path, uid, callback) {
+    if (!list_path) {
+        list_path = hm_list_path();
+    }
+    if (!uid) {
+        uid = hm_msg_uid();
+    }
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_github_event_detail'},
-        {'name': 'list_path', 'value': hm_list_path()},
-        {'name': 'github_uid', 'value': hm_msg_uid()}],
-        display_github_item_content
+        {'name': 'list_path', 'value': list_path},
+        {'name': 'github_uid', 'value': uid}],
+        display_github_item_content,
+        [],
+        false,
+        callback
     );
     return false;
 };
