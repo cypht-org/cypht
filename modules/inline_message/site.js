@@ -1,3 +1,16 @@
+var inline_github_msg = function(uid, list_path) {
+    $('.msg_text').html('');
+    $('.msg_text').remove();
+    $('tr').removeClass('hl');
+    $('.content_title').after('<div class="msg_text"></div>');
+    $('.message_table').css('width', '50%');
+    $('.'+uid).addClass('hl');
+    github_item_view(list_path, uid, inline_msg_loaded_callback);
+    $('.'+uid).removeClass('unseen');
+    $('div', $('.'+uid)).removeClass('unseen');
+    return false;
+};
+
 var inline_feed_msg = function(uid, list_path) {
     $('.msg_text').html('');
     $('.msg_text').remove();
@@ -66,8 +79,12 @@ var capture_subject_click = function() {
                 inline_feed_msg(uid, list_path);
                 return false;
             }
-            if (details['type'] == 'imap') {
+            else if (details['type'] == 'imap') {
                 inline_imap_msg(details, uid, list_path);
+                return false;
+            }
+            else if (list_path.substr(0, 6) == 'github') {
+                inline_github_msg(uid, list_path);
                 return false;
             }
         }
