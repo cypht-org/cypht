@@ -8,6 +8,7 @@ a { color: #222 !important; }
 .msg_controls a, textarea, select, input, .toggle_link { color: #aaa; background-color: #fff !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list { background-color: #f6f6ef !important; }
+.mailbox_list_title { color: #000; }
 .confirm_logout, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #f6f6ef !important; }
 .src_name { color: #666 !important; background: none !important; background-color: #f6f6ef !important; }
 .content_title { color: #333; background: none !important; background-color: rgb(255, 102, 0) !important; font-size: 140%; font-weight: bold; padding-bottom: 5px; padding-top: 5px; }
@@ -23,7 +24,6 @@ a { color: #222 !important; }
 .sys_messages { background-color: transparent !important; color: #222 !important; }
 .message_list tr td { border: none; }
 ::-webkit-input-placeholder { color: #999; }
-.list_controls { margin-top: -12px; }
 .subject a { font-size: 120% !important; }
 .msg_date { float: left !important; clear: none !important; padding-top: 0px !important; padding-left: 10px; margin: 0px; }
 .source { font-style: normal; padding: 0px; margin: 0px; }

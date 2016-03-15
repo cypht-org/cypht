@@ -28,3 +28,4 @@ a { color: green !important; }
 .msg_text_inner, .msg_text_inner * { text-transform: none !important; font-variant: normal !important; }
 .src_name { padding-left: 15px; padding-bottom: 0px; }
 .sys_messages { background-color: #000 !important; }
+.loading_icon { background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAHCAIAAABx4H/3AAAACXBIWXMAAA4mAAAN/wHwU+XzAAAAB3RJTUUH4AMPFRwFSaMT7QAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAEBSURBVEjHpVQxAoMwCDywX+jWuf//oFwHKlITI7FMJMAFDoi83k8RgUJckqKqAFwHoKpuhQiA5bFbVVVEAOxRgbPI120D33EAXQSb2EqSAGgwM5I0ADAzAFzpely6QtJ1uhg2kB9PN+ZXXCGJiE3hXdHQPPt8zGGtFQUJt9a/m9MYtg05Ley84G5gsRz9N63N2nWIy2wdQPGqyClyA9A349D+HF58V7vvOW42xUr6Ds52JjuICK3azCn6ipgt+PRktfX356ucfc7gCK7TQ/QPlfG7ndFanayBX/zZh9viAzfomB2NbkdvsFzcR52udvg31Vno8nLZucv5HSOcgRT38QP/MeNRBRCW8gAAAABJRU5ErkJggg==') repeat-x top left; background-size: cover; background-position: 0px; 0px; }
