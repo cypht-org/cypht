@@ -18,3 +18,4 @@ textarea, select, input, .toggle_link, .msg_controls a { color: #ddd !important;
 .online { color: #1b491b !important; }
 .down { color: #a21d1d !important; }
 .checkbox_cell input[type="checkbox"]:checked + label { background-color: #79562d !important; }
+.save_reminder { margin-top: 10px; }
