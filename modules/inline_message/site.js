@@ -1,4 +1,4 @@
-var inline_pop3_msg = function(details, uid, list_path) {
+var inline_pop3_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
     path = '.'+details['type']+'_'+details['server_id']+'_'+uid;
     $('.msg_text').html('');
@@ -10,11 +10,10 @@ var inline_pop3_msg = function(details, uid, list_path) {
     pop3_message_view(uid, list_path, inline_msg_loaded_callback);
     $(path).removeClass('unseen');
     $('div', $(path)).removeClass('unseen');
-    elog(path);
     return false;
 };
 
-var inline_wp_msg = function(uid, list_path) {
+var inline_wp_msg = function(uid, list_path, inline_msg_loaded_callback) {
     $('.msg_text').html('');
     $('.msg_text').remove();
     $('tr').removeClass('hl');
@@ -27,7 +26,7 @@ var inline_wp_msg = function(uid, list_path) {
     return false;
 };
 
-var inline_github_msg = function(uid, list_path) {
+var inline_github_msg = function(uid, list_path, inline_msg_loaded_callback) {
     $('.msg_text').html('');
     $('.msg_text').remove();
     $('tr').removeClass('hl');
@@ -40,7 +39,7 @@ var inline_github_msg = function(uid, list_path) {
     return false;
 };
 
-var inline_feed_msg = function(uid, list_path) {
+var inline_feed_msg = function(uid, list_path, inline_msg_loaded_callback) {
     $('.msg_text').html('');
     $('.msg_text').remove();
     $('tr').removeClass('hl');
@@ -52,7 +51,7 @@ var inline_feed_msg = function(uid, list_path) {
     return false;
 };
 
-var inline_imap_msg = function(details, uid, list_path) {
+var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
     path = '.'+details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
     $('.msg_text').html('');
@@ -83,48 +82,46 @@ var get_inline_msg_details = function(link) {
     return [uid, list_path];
 };
 
-var inline_msg_loaded_callback = function() {
-    $('.header_subject th').append('<span class="close_inline_msg">X</span>');
-    $('.close_inline_msg').click(function() {
-        Hm_Message_List.load_sources();
-        Hm_Folders.open_folder_list();
-        $('.msg_text').remove();
-        $('.message_table').css('width', '100%');
-        $('tr').removeClass('hl');
-    });
-    $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
-};
-
 var capture_subject_click = function() {
     $('a', $('.subject')).click(function(e) {
         var msg_details = get_inline_msg_details(this); 
         var uid = msg_details[0];
         var list_path = msg_details[1];
+        var inline_msg_loaded_callback = function() {
+            $('.header_subject th').append('<span class="close_inline_msg">X</span>');
+            $('.close_inline_msg').click(function() {
+                Hm_Message_List.load_sources();
+                Hm_Folders.open_folder_list();
+                $('.msg_text').remove();
+                $('.message_table').css('width', '100%');
+                $('tr').removeClass('hl');
+            });
+            $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
+        };
 
         if (list_path && uid) {
             Hm_Folders.hide_folder_list(true);
             var details = Hm_Utils.parse_folder_path(list_path);
             if (details['type'] == 'feeds') {
-                inline_feed_msg(uid, list_path);
+                inline_feed_msg(uid, list_path, inline_msg_loaded_callback);
                 return false;
             }
             else if (details['type'] == 'imap') {
-                inline_imap_msg(details, uid, list_path);
+                inline_imap_msg(details, uid, list_path, inline_msg_loaded_callback);
                 return false;
             }
             else if (details['type'] == 'pop3') {
-                inline_pop3_msg(details, uid, list_path);
+                inline_pop3_msg(details, uid, list_path, inline_msg_loaded_callback);
                 return false;
             }
-            else if (list_path.substr(0, 6) == 'github') {
+            else if (list_path.substr(0, 6) == 'github', inline_msg_loaded_callback) {
                 inline_github_msg(uid, list_path);
                 return false;
             }
-            else if (list_path.substr(0, 3) == 'wp_') {
+            else if (list_path.substr(0, 3) == 'wp_', inline_msg_loaded_callback) {
                 inline_wp_msg(uid, list_path);
                 return false;
             }
-            elog(details);
             return false;
         }
         return true;
