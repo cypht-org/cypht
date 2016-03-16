@@ -13,7 +13,7 @@ var record_message = function(res) {
 
     history[window.location.href] = [
         $('th', $('.header_subject')).html(),
-        $('td', $('.header_from')).html(),
+        $('td', $('.header_from')).text(),
         dt_str,
         $('a', $('.content_title')).html()
     ];
@@ -35,7 +35,7 @@ var display_history_page_links = function() {
         if (history[msg][2] == null) {
             history[msg][2] = '';
         }
-        $('.history_links').append('<tr><td>'+history[msg][2]+'</td><td><a href="'+msg+'">'+history[msg][0]+'</a></td><td>'+history[msg][3]+'</td><td>'+history[msg][1]+'</td></tr>');
+        $('.message_table tbody').append('<tr><td class="source">'+history[msg][3]+'</td><td class="from">'+history[msg][1]+'</td><td class="subject"><a href="'+msg+'">'+history[msg][0]+'</a></td><td class="msg_date">'+history[msg][2]+'</td></tr>');
     }
     if (count === 0) {
         $('.history_content').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
