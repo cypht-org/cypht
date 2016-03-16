@@ -41,7 +41,6 @@ var wp_notice_view = function(uid, callback) {
 };
 
 var display_wp_notice = function(res) {
-    elog(res);
     $('.msg_text').html('');
     $('.msg_text').append(res.wp_notice_headers);
     $('.msg_text').append(res.wp_notice_text);
