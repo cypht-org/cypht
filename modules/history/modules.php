@@ -26,7 +26,7 @@ class Hm_Output_history_page_link extends Hm_Output_Module {
 class Hm_Output_history_heading  extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="content_title">'.$this->trans('Message history').'</div>'.
-               '<table class="history_links"></table>';
+               '<div class="history_content"><table class="history_links"></table></div>';
         return $res;
     }
 }
