@@ -343,6 +343,7 @@ function format_reply_as_html($body, $type, $reply_type, $lead_in) {
  * @return string
  */
 function format_reply_as_text($body, $type, $reply_type, $lead_in) {
+    $msg = '';
     if ($type == 'texthtml') {
         if ($reply_type == 'reply' || $reply_type == 'reply_all') {
             $msg = $lead_in.format_reply_text(convert_html_to_text($body));
