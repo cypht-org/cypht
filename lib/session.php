@@ -316,17 +316,27 @@ class Hm_DB_Session extends Hm_PHP_Session {
      */
     public function start_existing_session($request, $key) {
         $this->session_key = $key;
+        $data = $this->get_session_data($key);
+        if (is_array($data)) {
+            $this->active = true;
+            $this->data = $data;
+        }
+    }
+
+    /**
+     * Get session data from the DB
+     * @param string $key session key
+     * @return mixed array results or false on failure
+     */
+    public function get_session_data($key) {
         $sql = $this->dbh->prepare('select data from hm_user_session where hm_id=?');
-        if ($sql->execute(array($this->session_key))) {
+        if ($sql->execute(array($key))) {
             $results = $sql->fetch();
             if (is_array($results) && array_key_exists('data', $results)) {
-                $data = $this->plaintext($results['data']);
-                if (is_array($data)) {
-                    $this->active = true;
-                    $this->data = $data;
-                }
+                return $this->plaintext($results['data']);
             }
         }
+        return false;
     }
 
     /**
