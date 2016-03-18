@@ -1043,7 +1043,7 @@ var Hm_Utils = {
         return false;
     },
     clean_selector: function(str) {
-        return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1").replace(/ /, '-');
+        return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
     },
     toggle_long_headers: function() {
         $('.long_header').toggle();

@@ -335,7 +335,7 @@ function list_sources($sources, $output_mod) {
             $folder = '';
         }
         else {
-            $folder = '_'.$src['folder'];
+            $folder = '_'.hex2bin($src['folder']);
         }
         $res .= '<div class="list_src">'.$output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']);
         $res .= ' '.$output_mod->html_safe(str_replace('_', '', $folder));

@@ -592,6 +592,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             return $this->cache_return_val($result, $command);
 
         }
+        else {
+            Hm_Debug::add(sprintf('Unselectable folder %s', $box));
+        }
         return $result;
     }
 
