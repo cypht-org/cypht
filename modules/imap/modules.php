@@ -67,7 +67,7 @@ class Hm_Handler_process_imap_source_update extends Hm_Handler_Module {
                 $this->session->record_unsaved('Added folder to combined pages');
             }
             else {
-                if (array_key_exists($form['list_path'], $sources)) {
+                if (is_array($sources) && array_key_exists($form['list_path'], $sources)) {
                     unset($sources[$form['list_path']]);
                 }
                 else {
@@ -76,8 +76,7 @@ class Hm_Handler_process_imap_source_update extends Hm_Handler_Module {
                 Hm_Msgs::add('Folder removed from combined pages');
                 $this->session->record_unsaved('Removed folder from combined pages');
             }
-            $this->user_config->set('custom_imap_sources', $sources);
-            $this->session->set('user_data', $this->user_config->dump());
+            $this->session->set('custom_imap_sources', $sources, true);
         }
     }
 }
