@@ -342,7 +342,7 @@ var setup_imap_folder_page = function() {
     select_imap_folder(hm_list_path());
     $('.remove_source').click(remove_imap_combined_source);
     $('.add_source').click(add_imap_combined_source);
-    $('.refresh_list').click(function() { select_imap_folder(hm_list_path()); });
+    $('.refresh_link').click(function() { select_imap_folder(hm_list_path()); });
 };
 
 var display_imap_mailbox = function(res) {
