@@ -147,7 +147,7 @@ function human_readable_interval($date_str) {
  * @return array
  */
 function message_list_row($values, $id, $style, $output_mod, $row_class='') {
-    $res = '<tr class="'.$output_mod->html_safe(str_replace(' ', '-', $id));
+    $res = '<tr class="'.$output_mod->html_safe($id);
     if ($row_class) {
         $res .= ' '.$output_mod->html_safe($row_class);
     }
