@@ -76,7 +76,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     public $read_only = false;
 
     /* convert folder names to utf7 */
-    public $utf7_folders = false;
+    public $utf7_folders = true;
 
     /* defaults to LOGIN, CRAM-MD5 also supported but experimental */
     public $auth = false;
