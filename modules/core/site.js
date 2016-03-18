@@ -474,6 +474,9 @@ function Message_List() {
         if (action_type == 'read' && hm_list_path() == 'unread') {
             remove = true;
         }
+        if (action_type == 'unflag' && hm_list_path() == 'flagged') {
+            remove = true;
+        }
         else if (action_type == 'delete') {
             remove = true;
         }
