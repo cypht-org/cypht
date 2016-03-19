@@ -513,7 +513,7 @@ class Hm_Output_filter_github_event_detail extends Hm_Output_Module {
         $details = $this->get('github_event_detail', array());
         if (!empty($details)) {
             if (array_key_exists('payload', $details)) {
-                $body = github_parse_payload($details['payload'], $this);
+                $body = github_parse_payload($details, $this);
                 $headers = github_parse_headers($details, $this);
             }
             $this->out('github_msg_text', $headers.$body);
@@ -703,6 +703,11 @@ function github_parse_headers($data, $output_mod) {
  * @subpackage github/functions
  */
 function github_parse_payload($data, $output_mod) {
+    $type = false;
+    if (array_key_exists('type', $data)) {
+        $type = $data['type'];
+    }
+    $data = $data['payload'];
     $content = payload_search($data);
     $res = '<div class="msg_text_inner">';
     foreach ($content as $vals) {
