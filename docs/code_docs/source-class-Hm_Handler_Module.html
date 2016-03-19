@@ -1314,7 +1314,7 @@
 </span></span><span id="80" class="l"><a href="#80"> 80: </a><span class="php-comment">     * @return string sanitized value
 </span></span><span id="81" class="l"><a href="#81"> 81: </a><span class="php-comment">     */</span>
 </span><span id="82" class="l"><a href="#82"> 82: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> html_safe(<span class="php-var">$string</span>) {
-</span><span id="83" class="l"><a href="#83"> 83: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">htmlspecialchars</span>(<span class="php-var">$string</span>, ENT_QUOTES | ENT_HTML5, <span class="php-quote">'UTF-8'</span>);
+</span><span id="83" class="l"><a href="#83"> 83: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">htmlentities</span>(<span class="php-var">$string</span>, ENT_QUOTES | ENT_IGNORE, <span class="php-quote">&quot;UTF-8&quot;</span>);
 </span><span id="84" class="l"><a href="#84"> 84: </a>    }
 </span><span id="85" class="l"><a href="#85"> 85: </a>
 </span><span id="86" class="l"><a href="#86"> 86: </a>    <span class="php-comment">/**

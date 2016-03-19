@@ -1550,73 +1550,83 @@
 </span></span><span id="316" class="l"><a href="#316">316: </a><span class="php-comment">     */</span>
 </span><span id="317" class="l"><a href="#317">317: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> start_existing_session(<span class="php-var">$request</span>, <span class="php-var">$key</span>) {
 </span><span id="318" class="l"><a href="#318">318: </a>        <span class="php-var">$this</span>-&gt;session_key = <span class="php-var">$key</span>;
-</span><span id="319" class="l"><a href="#319">319: </a>        <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">'select data from hm_user_session where hm_id=?'</span>);
-</span><span id="320" class="l"><a href="#320">320: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$this</span>-&gt;session_key))) {
-</span><span id="321" class="l"><a href="#321">321: </a>            <span class="php-var">$results</span> = <span class="php-var">$sql</span>-&gt;fetch();
-</span><span id="322" class="l"><a href="#322">322: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$results</span>) &amp;&amp; <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'data'</span>, <span class="php-var">$results</span>)) {
-</span><span id="323" class="l"><a href="#323">323: </a>                <span class="php-var">$data</span> = <span class="php-var">$this</span>-&gt;plaintext(<span class="php-var">$results</span>[<span class="php-quote">'data'</span>]);
-</span><span id="324" class="l"><a href="#324">324: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$data</span>)) {
-</span><span id="325" class="l"><a href="#325">325: </a>                    <span class="php-var">$this</span>-&gt;active = <span class="php-keyword1">true</span>;
-</span><span id="326" class="l"><a href="#326">326: </a>                    <span class="php-var">$this</span>-&gt;data = <span class="php-var">$data</span>;
-</span><span id="327" class="l"><a href="#327">327: </a>                }
-</span><span id="328" class="l"><a href="#328">328: </a>            }
-</span><span id="329" class="l"><a href="#329">329: </a>        }
-</span><span id="330" class="l"><a href="#330">330: </a>    }
-</span><span id="331" class="l"><a href="#331">331: </a>
-</span><span id="332" class="l"><a href="#332">332: </a>    <span class="php-comment">/**
-</span></span><span id="333" class="l"><a href="#333">333: </a><span class="php-comment">     * End a session after a page request is complete. This only closes the session and
-</span></span><span id="334" class="l"><a href="#334">334: </a><span class="php-comment">     * does not destroy it
-</span></span><span id="335" class="l"><a href="#335">335: </a><span class="php-comment">     * @return void
-</span></span><span id="336" class="l"><a href="#336">336: </a><span class="php-comment">     */</span>
-</span><span id="337" class="l"><a href="#337">337: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <span class="php-keyword2">end</span>() {
-</span><span id="338" class="l"><a href="#338">338: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;session_closed) {
-</span><span id="339" class="l"><a href="#339">339: </a>            <span class="php-var">$this</span>-&gt;save_data();
-</span><span id="340" class="l"><a href="#340">340: </a>        }
-</span><span id="341" class="l"><a href="#341">341: </a>        <span class="php-var">$this</span>-&gt;active = <span class="php-keyword1">false</span>;
-</span><span id="342" class="l"><a href="#342">342: </a>    }
-</span><span id="343" class="l"><a href="#343">343: </a>
-</span><span id="344" class="l"><a href="#344">344: </a>    <span class="php-comment">/**
-</span></span><span id="345" class="l"><a href="#345">345: </a><span class="php-comment">     * Write session data to the db
-</span></span><span id="346" class="l"><a href="#346">346: </a><span class="php-comment">     * @return void
-</span></span><span id="347" class="l"><a href="#347">347: </a><span class="php-comment">     */</span>
-</span><span id="348" class="l"><a href="#348">348: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> save_data() {
-</span><span id="349" class="l"><a href="#349">349: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;dbh) {
-</span><span id="350" class="l"><a href="#350">350: </a>            <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">&quot;update hm_user_session set data=? where hm_id=?&quot;</span>);
-</span><span id="351" class="l"><a href="#351">351: </a>            <span class="php-var">$enc_data</span> = <span class="php-var">$this</span>-&gt;ciphertext(<span class="php-var">$this</span>-&gt;data);
-</span><span id="352" class="l"><a href="#352">352: </a>            <span class="php-keyword1">return</span> <span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$enc_data</span>, <span class="php-var">$this</span>-&gt;session_key));
-</span><span id="353" class="l"><a href="#353">353: </a>        }
-</span><span id="354" class="l"><a href="#354">354: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="355" class="l"><a href="#355">355: </a>    }
-</span><span id="356" class="l"><a href="#356">356: </a>
-</span><span id="357" class="l"><a href="#357">357: </a>    <span class="php-comment">/**
-</span></span><span id="358" class="l"><a href="#358">358: </a><span class="php-comment">     * Close a session early, but don't destroy it
-</span></span><span id="359" class="l"><a href="#359">359: </a><span class="php-comment">     * @return void
-</span></span><span id="360" class="l"><a href="#360">360: </a><span class="php-comment">     */</span>
-</span><span id="361" class="l"><a href="#361">361: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> close_early() {
-</span><span id="362" class="l"><a href="#362">362: </a>        <span class="php-var">$this</span>-&gt;session_closed = <span class="php-keyword1">true</span>;
-</span><span id="363" class="l"><a href="#363">363: </a>        <span class="php-var">$this</span>-&gt;save_data();
-</span><span id="364" class="l"><a href="#364">364: </a>    }
-</span><span id="365" class="l"><a href="#365">365: </a>
-</span><span id="366" class="l"><a href="#366">366: </a>    <span class="php-comment">/**
-</span></span><span id="367" class="l"><a href="#367">367: </a><span class="php-comment">     * Destroy a session for good
-</span></span><span id="368" class="l"><a href="#368">368: </a><span class="php-comment">     * @param object $request request details
+</span><span id="319" class="l"><a href="#319">319: </a>        <span class="php-var">$data</span> = <span class="php-var">$this</span>-&gt;get_session_data(<span class="php-var">$key</span>);
+</span><span id="320" class="l"><a href="#320">320: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$data</span>)) {
+</span><span id="321" class="l"><a href="#321">321: </a>            <span class="php-var">$this</span>-&gt;active = <span class="php-keyword1">true</span>;
+</span><span id="322" class="l"><a href="#322">322: </a>            <span class="php-var">$this</span>-&gt;data = <span class="php-var">$data</span>;
+</span><span id="323" class="l"><a href="#323">323: </a>        }
+</span><span id="324" class="l"><a href="#324">324: </a>    }
+</span><span id="325" class="l"><a href="#325">325: </a>
+</span><span id="326" class="l"><a href="#326">326: </a>    <span class="php-comment">/**
+</span></span><span id="327" class="l"><a href="#327">327: </a><span class="php-comment">     * Get session data from the DB
+</span></span><span id="328" class="l"><a href="#328">328: </a><span class="php-comment">     * @param string $key session key
+</span></span><span id="329" class="l"><a href="#329">329: </a><span class="php-comment">     * @return mixed array results or false on failure
+</span></span><span id="330" class="l"><a href="#330">330: </a><span class="php-comment">     */</span>
+</span><span id="331" class="l"><a href="#331">331: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> get_session_data(<span class="php-var">$key</span>) {
+</span><span id="332" class="l"><a href="#332">332: </a>        <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">'select data from hm_user_session where hm_id=?'</span>);
+</span><span id="333" class="l"><a href="#333">333: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$key</span>))) {
+</span><span id="334" class="l"><a href="#334">334: </a>            <span class="php-var">$results</span> = <span class="php-var">$sql</span>-&gt;fetch();
+</span><span id="335" class="l"><a href="#335">335: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_array</span>(<span class="php-var">$results</span>) &amp;&amp; <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'data'</span>, <span class="php-var">$results</span>)) {
+</span><span id="336" class="l"><a href="#336">336: </a>                <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;plaintext(<span class="php-var">$results</span>[<span class="php-quote">'data'</span>]);
+</span><span id="337" class="l"><a href="#337">337: </a>            }
+</span><span id="338" class="l"><a href="#338">338: </a>        }
+</span><span id="339" class="l"><a href="#339">339: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="340" class="l"><a href="#340">340: </a>    }
+</span><span id="341" class="l"><a href="#341">341: </a>
+</span><span id="342" class="l"><a href="#342">342: </a>    <span class="php-comment">/**
+</span></span><span id="343" class="l"><a href="#343">343: </a><span class="php-comment">     * End a session after a page request is complete. This only closes the session and
+</span></span><span id="344" class="l"><a href="#344">344: </a><span class="php-comment">     * does not destroy it
+</span></span><span id="345" class="l"><a href="#345">345: </a><span class="php-comment">     * @return void
+</span></span><span id="346" class="l"><a href="#346">346: </a><span class="php-comment">     */</span>
+</span><span id="347" class="l"><a href="#347">347: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <span class="php-keyword2">end</span>() {
+</span><span id="348" class="l"><a href="#348">348: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;session_closed) {
+</span><span id="349" class="l"><a href="#349">349: </a>            <span class="php-var">$this</span>-&gt;save_data();
+</span><span id="350" class="l"><a href="#350">350: </a>        }
+</span><span id="351" class="l"><a href="#351">351: </a>        <span class="php-var">$this</span>-&gt;active = <span class="php-keyword1">false</span>;
+</span><span id="352" class="l"><a href="#352">352: </a>    }
+</span><span id="353" class="l"><a href="#353">353: </a>
+</span><span id="354" class="l"><a href="#354">354: </a>    <span class="php-comment">/**
+</span></span><span id="355" class="l"><a href="#355">355: </a><span class="php-comment">     * Write session data to the db
+</span></span><span id="356" class="l"><a href="#356">356: </a><span class="php-comment">     * @return void
+</span></span><span id="357" class="l"><a href="#357">357: </a><span class="php-comment">     */</span>
+</span><span id="358" class="l"><a href="#358">358: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> save_data() {
+</span><span id="359" class="l"><a href="#359">359: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;dbh) {
+</span><span id="360" class="l"><a href="#360">360: </a>            <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">&quot;update hm_user_session set data=? where hm_id=?&quot;</span>);
+</span><span id="361" class="l"><a href="#361">361: </a>            <span class="php-var">$enc_data</span> = <span class="php-var">$this</span>-&gt;ciphertext(<span class="php-var">$this</span>-&gt;data);
+</span><span id="362" class="l"><a href="#362">362: </a>            <span class="php-keyword1">return</span> <span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$enc_data</span>, <span class="php-var">$this</span>-&gt;session_key));
+</span><span id="363" class="l"><a href="#363">363: </a>        }
+</span><span id="364" class="l"><a href="#364">364: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="365" class="l"><a href="#365">365: </a>    }
+</span><span id="366" class="l"><a href="#366">366: </a>
+</span><span id="367" class="l"><a href="#367">367: </a>    <span class="php-comment">/**
+</span></span><span id="368" class="l"><a href="#368">368: </a><span class="php-comment">     * Close a session early, but don't destroy it
 </span></span><span id="369" class="l"><a href="#369">369: </a><span class="php-comment">     * @return void
 </span></span><span id="370" class="l"><a href="#370">370: </a><span class="php-comment">     */</span>
-</span><span id="371" class="l"><a href="#371">371: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> destroy(<span class="php-var">$request</span>) {
-</span><span id="372" class="l"><a href="#372">372: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">function_exists</span>(<span class="php-quote">'delete_uploaded_files'</span>)) {
-</span><span id="373" class="l"><a href="#373">373: </a>            delete_uploaded_files(<span class="php-var">$this</span>);
-</span><span id="374" class="l"><a href="#374">374: </a>        }
-</span><span id="375" class="l"><a href="#375">375: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;dbh) {
-</span><span id="376" class="l"><a href="#376">376: </a>            <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">&quot;delete from hm_user_session where hm_id=?&quot;</span>);
-</span><span id="377" class="l"><a href="#377">377: </a>            <span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$this</span>-&gt;session_key));
-</span><span id="378" class="l"><a href="#378">378: </a>        }
-</span><span id="379" class="l"><a href="#379">379: </a>        <span class="php-var">$this</span>-&gt;secure_cookie(<span class="php-var">$request</span>, <span class="php-var">$this</span>-&gt;cname, <span class="php-quote">''</span>, <span class="php-keyword2">time</span>()-<span class="php-num">3600</span>);
-</span><span id="380" class="l"><a href="#380">380: </a>        <span class="php-var">$this</span>-&gt;secure_cookie(<span class="php-var">$request</span>, <span class="php-quote">'hm_id'</span>, <span class="php-quote">''</span>, <span class="php-keyword2">time</span>()-<span class="php-num">3600</span>);
-</span><span id="381" class="l"><a href="#381">381: </a>        <span class="php-var">$this</span>-&gt;active = <span class="php-keyword1">false</span>;
-</span><span id="382" class="l"><a href="#382">382: </a>        Hm_Request_Key::load(<span class="php-var">$this</span>, <span class="php-var">$request</span>, <span class="php-keyword1">false</span>);
-</span><span id="383" class="l"><a href="#383">383: </a>    }
-</span><span id="384" class="l"><a href="#384">384: </a>}
-</span><span id="385" class="l"><a href="#385">385: </a></span></code></pre>
+</span><span id="371" class="l"><a href="#371">371: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> close_early() {
+</span><span id="372" class="l"><a href="#372">372: </a>        <span class="php-var">$this</span>-&gt;session_closed = <span class="php-keyword1">true</span>;
+</span><span id="373" class="l"><a href="#373">373: </a>        <span class="php-var">$this</span>-&gt;save_data();
+</span><span id="374" class="l"><a href="#374">374: </a>    }
+</span><span id="375" class="l"><a href="#375">375: </a>
+</span><span id="376" class="l"><a href="#376">376: </a>    <span class="php-comment">/**
+</span></span><span id="377" class="l"><a href="#377">377: </a><span class="php-comment">     * Destroy a session for good
+</span></span><span id="378" class="l"><a href="#378">378: </a><span class="php-comment">     * @param object $request request details
+</span></span><span id="379" class="l"><a href="#379">379: </a><span class="php-comment">     * @return void
+</span></span><span id="380" class="l"><a href="#380">380: </a><span class="php-comment">     */</span>
+</span><span id="381" class="l"><a href="#381">381: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> destroy(<span class="php-var">$request</span>) {
+</span><span id="382" class="l"><a href="#382">382: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">function_exists</span>(<span class="php-quote">'delete_uploaded_files'</span>)) {
+</span><span id="383" class="l"><a href="#383">383: </a>            delete_uploaded_files(<span class="php-var">$this</span>);
+</span><span id="384" class="l"><a href="#384">384: </a>        }
+</span><span id="385" class="l"><a href="#385">385: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;dbh) {
+</span><span id="386" class="l"><a href="#386">386: </a>            <span class="php-var">$sql</span> = <span class="php-var">$this</span>-&gt;dbh-&gt;prepare(<span class="php-quote">&quot;delete from hm_user_session where hm_id=?&quot;</span>);
+</span><span id="387" class="l"><a href="#387">387: </a>            <span class="php-var">$sql</span>-&gt;execute(<span class="php-keyword1">array</span>(<span class="php-var">$this</span>-&gt;session_key));
+</span><span id="388" class="l"><a href="#388">388: </a>        }
+</span><span id="389" class="l"><a href="#389">389: </a>        <span class="php-var">$this</span>-&gt;secure_cookie(<span class="php-var">$request</span>, <span class="php-var">$this</span>-&gt;cname, <span class="php-quote">''</span>, <span class="php-keyword2">time</span>()-<span class="php-num">3600</span>);
+</span><span id="390" class="l"><a href="#390">390: </a>        <span class="php-var">$this</span>-&gt;secure_cookie(<span class="php-var">$request</span>, <span class="php-quote">'hm_id'</span>, <span class="php-quote">''</span>, <span class="php-keyword2">time</span>()-<span class="php-num">3600</span>);
+</span><span id="391" class="l"><a href="#391">391: </a>        <span class="php-var">$this</span>-&gt;active = <span class="php-keyword1">false</span>;
+</span><span id="392" class="l"><a href="#392">392: </a>        Hm_Request_Key::load(<span class="php-var">$this</span>, <span class="php-var">$request</span>, <span class="php-keyword1">false</span>);
+</span><span id="393" class="l"><a href="#393">393: </a>    }
+</span><span id="394" class="l"><a href="#394">394: </a>}
+</span><span id="395" class="l"><a href="#395">395: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>

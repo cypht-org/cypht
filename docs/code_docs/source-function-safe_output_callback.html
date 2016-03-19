@@ -1381,7 +1381,7 @@
 </span></span><span id="147" class="l"><a href="#147">147: </a><span class="php-comment"> * @return array
 </span></span><span id="148" class="l"><a href="#148">148: </a><span class="php-comment"> */</span>
 </span><span id="149" class="l"><a href="#149">149: </a><span class="php-keyword1">function</span> message_list_row(<span class="php-var">$values</span>, <span class="php-var">$id</span>, <span class="php-var">$style</span>, <span class="php-var">$output_mod</span>, <span class="php-var">$row_class</span>=<span class="php-quote">''</span>) {
-</span><span id="150" class="l"><a href="#150">150: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;tr class=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">str_replace</span>(<span class="php-quote">' '</span>, <span class="php-quote">'-'</span>, <span class="php-var">$id</span>));
+</span><span id="150" class="l"><a href="#150">150: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;tr class=&quot;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$id</span>);
 </span><span id="151" class="l"><a href="#151">151: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$row_class</span>) {
 </span><span id="152" class="l"><a href="#152">152: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$row_class</span>);
 </span><span id="153" class="l"><a href="#153">153: </a>    }
@@ -1569,7 +1569,7 @@
 </span><span id="335" class="l"><a href="#335">335: </a>            <span class="php-var">$folder</span> = <span class="php-quote">''</span>;
 </span><span id="336" class="l"><a href="#336">336: </a>        }
 </span><span id="337" class="l"><a href="#337">337: </a>        <span class="php-keyword1">else</span> {
-</span><span id="338" class="l"><a href="#338">338: </a>            <span class="php-var">$folder</span> = <span class="php-quote">'_'</span>.<span class="php-var">$src</span>[<span class="php-quote">'folder'</span>];
+</span><span id="338" class="l"><a href="#338">338: </a>            <span class="php-var">$folder</span> = <span class="php-quote">'_'</span>.<span class="php-keyword2">hex2bin</span>(<span class="php-var">$src</span>[<span class="php-quote">'folder'</span>]);
 </span><span id="339" class="l"><a href="#339">339: </a>        }
 </span><span id="340" class="l"><a href="#340">340: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;list_src&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$src</span>[<span class="php-quote">'type'</span>]).<span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$src</span>[<span class="php-quote">'name'</span>]);
 </span><span id="341" class="l"><a href="#341">341: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">str_replace</span>(<span class="php-quote">'_'</span>, <span class="php-quote">''</span>, <span class="php-var">$folder</span>));

@@ -1247,7 +1247,7 @@
 </span></span><span id="13" class="l"><a href="#13">13: </a><span class="php-comment"> */</span>
 </span><span id="14" class="l"><a href="#14">14: </a><span class="php-keyword1">class</span> Hm_Handler_get_inline_message_setting <span class="php-keyword1">extends</span> Hm_Handler_Module {
 </span><span id="15" class="l"><a href="#15">15: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="16" class="l"><a href="#16">16: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'inline_message_setting'</span>, <span class="php-var">$this</span>-&gt;user_config-&gt;get(<span class="php-quote">'inline_message_setting'</span>, <span class="php-num">0</span>));
+</span><span id="16" class="l"><a href="#16">16: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'inline_message_setting'</span>, <span class="php-var">$this</span>-&gt;user_config-&gt;get(<span class="php-quote">'inline_message_setting'</span>, <span class="php-keyword1">false</span>));
 </span><span id="17" class="l"><a href="#17">17: </a>    }
 </span><span id="18" class="l"><a href="#18">18: </a>}
 </span><span id="19" class="l"><a href="#19">19: </a>
@@ -1268,7 +1268,7 @@
 </span><span id="34" class="l"><a href="#34">34: </a><span class="php-keyword1">class</span> Hm_Output_inline_message_flag <span class="php-keyword1">extends</span> Hm_Output_Module {
 </span><span id="35" class="l"><a href="#35">35: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
 </span><span id="36" class="l"><a href="#36">36: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;script type=&quot;text/javascript&quot;&gt;var inline_msg = function() { return '</span>.
-</span><span id="37" class="l"><a href="#37">37: </a>            (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'inline_message_setting'</span>, <span class="php-num">0</span>) &amp;&amp; !<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_mobile'</span>, <span class="php-keyword1">false</span>) ? <span class="php-quote">'true'</span> : <span class="php-quote">'false'</span>).
+</span><span id="37" class="l"><a href="#37">37: </a>            (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'inline_message_setting'</span>, <span class="php-keyword1">false</span>) &amp;&amp; !<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'is_mobile'</span>, <span class="php-keyword1">false</span>) ? <span class="php-quote">'true'</span> : <span class="php-quote">'false'</span>).
 </span><span id="38" class="l"><a href="#38">38: </a>            <span class="php-quote">';};&lt;/script&gt;'</span>;
 </span><span id="39" class="l"><a href="#39">39: </a>    }
 </span><span id="40" class="l"><a href="#40">40: </a>}

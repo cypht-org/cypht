@@ -1430,7 +1430,7 @@
 </span><span id="196" class="l"><a href="#196">196: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">preg_match</span>(<span class="php-quote">'/&lt;feed .+atom/i'</span>, <span class="php-var">$this</span>-&gt;xml_data)) {
 </span><span id="197" class="l"><a href="#197">197: </a>            <span class="php-var">$this</span>-&gt;feed_type = <span class="php-quote">'atom'</span>;
 </span><span id="198" class="l"><a href="#198">198: </a>        }
-</span><span id="199" class="l"><a href="#199">199: </a>        <span class="php-var">$xml_parser</span> = <span class="php-keyword2">xml_parser_create</span>( <span class="php-quote">'UTF-8'</span>);
+</span><span id="199" class="l"><a href="#199">199: </a>        <span class="php-var">$xml_parser</span> = <span class="php-keyword2">xml_parser_create</span>(<span class="php-quote">'UTF-8'</span>);
 </span><span id="200" class="l"><a href="#200">200: </a>        <span class="php-keyword2">xml_set_object</span>(<span class="php-var">$xml_parser</span>, <span class="php-var">$this</span>);
 </span><span id="201" class="l"><a href="#201">201: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;feed_type == <span class="php-quote">'atom'</span> || <span class="php-var">$this</span>-&gt;feed_type == <span class="php-quote">'rss'</span>) {
 </span><span id="202" class="l"><a href="#202">202: </a>            <span class="php-keyword2">xml_set_element_handler</span>(<span class="php-var">$xml_parser</span>, <span class="php-var">$this</span>-&gt;feed_type.<span class="php-quote">'_start_element'</span>, <span class="php-var">$this</span>-&gt;feed_type.<span class="php-quote">'_end_element'</span>);

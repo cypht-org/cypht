@@ -2192,7 +2192,7 @@
 </span><span id="958" class="l"><a href="#958"> 958: </a>        <span class="php-keyword1">else</span> {
 </span><span id="959" class="l"><a href="#959"> 959: </a>            <span class="php-var">$flags</span> = <span class="php-keyword1">array</span>(<span class="php-quote">'unseen'</span>);
 </span><span id="960" class="l"><a href="#960"> 960: </a>        }
-</span><span id="961" class="l"><a href="#961"> 961: </a>        <span class="php-var">$row_class</span> .= <span class="php-keyword2">str_replace</span>(<span class="php-quote">' '</span>, <span class="php-quote">'_'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>]);
+</span><span id="961" class="l"><a href="#961"> 961: </a>        <span class="php-var">$row_class</span> .= <span class="php-quote">' '</span>.<span class="php-keyword2">str_replace</span>(<span class="php-quote">' '</span>, <span class="php-quote">'_'</span>, <span class="php-var">$msg</span>[<span class="php-quote">'server_name'</span>]);
 </span><span id="962" class="l"><a href="#962"> 962: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$style</span> == <span class="php-quote">'news'</span>) {
 </span><span id="963" class="l"><a href="#963"> 963: </a>            <span class="php-var">$res</span>[<span class="php-var">$id</span>] = message_list_row(<span class="php-keyword1">array</span>(
 </span><span id="964" class="l"><a href="#964"> 964: </a>                    <span class="php-keyword1">array</span>(<span class="php-quote">'checkbox_callback'</span>, <span class="php-var">$id</span>),

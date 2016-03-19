@@ -1585,7 +1585,7 @@
 </span><span id="351" class="l"><a href="#351">351: </a>        <span class="php-keyword1">else</span> {
 </span><span id="352" class="l"><a href="#352">352: </a>            <span class="php-var">$res</span> .= <span class="php-keyword2">sprintf</span>(<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Your timezone is set to %s'</span>), <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$tz</span>));
 </span><span id="353" class="l"><a href="#353">353: </a>        }
-</span><span id="354" class="l"><a href="#354">354: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' &lt;a href=&quot;?page=settings#general_setting&quot;&gt;Update&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
+</span><span id="354" class="l"><a href="#354">354: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' &lt;a href=&quot;?page=settings#general_setting&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Update'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
 </span><span id="355" class="l"><a href="#355">355: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="356" class="l"><a href="#356">356: </a>    }
 </span><span id="357" class="l"><a href="#357">357: </a>}

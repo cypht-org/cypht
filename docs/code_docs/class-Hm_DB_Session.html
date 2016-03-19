@@ -731,7 +731,7 @@ use PHP session handlers at all and is a completely indenpendant session system.
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.session.html">session</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_DB_Session.html#239-384" title="Go to source code">session.php</a>
+			<b>Located at</b> <a href="source-class-Hm_DB_Session.html#239-394" title="Go to source code">session.php</a>
 		<br>
 	</div>
 
@@ -891,7 +891,7 @@ use PHP session handlers at all and is a completely indenpendant session system.
 
 		<td class="name"><div>
 		<a class="anchor" href="#_start_existing_session">#</a>
-		<code><a href="source-class-Hm_DB_Session.html#311-330" title="Go to source code">start_existing_session</a>( <span>object <var>$request</var></span>, <span>string <var>$key</var></span> )</code>
+		<code><a href="source-class-Hm_DB_Session.html#311-324" title="Go to source code">start_existing_session</a>( <span>object <var>$request</var></span>, <span>string <var>$key</var></span> )</code>
 
 		<div class="description short">
 			<p>Continue an existing session</p>
@@ -916,6 +916,45 @@ use PHP session handlers at all and is a completely indenpendant session system.
 		</div>
 		</div></td>
 	</tr>
+	<tr data-order="get_session_data" id="_get_session_data">
+
+		<td class="attributes"><code>
+			 public 
+
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_get_session_data">#</a>
+		<code><a href="source-class-Hm_DB_Session.html#326-340" title="Go to source code">get_session_data</a>( <span>string <var>$key</var></span> )</code>
+
+		<div class="description short">
+			<p>Get session data from the DB</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Get session data from the DB</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd>session key</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					mixed<br>array results or false on failure
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
 	<tr data-order="end" id="_end">
 
 		<td class="attributes"><code>
@@ -928,7 +967,7 @@ use PHP session handlers at all and is a completely indenpendant session system.
 
 		<td class="name"><div>
 		<a class="anchor" href="#_end">#</a>
-		<code><a href="source-class-Hm_DB_Session.html#332-342" title="Go to source code">end</a>( )</code>
+		<code><a href="source-class-Hm_DB_Session.html#342-352" title="Go to source code">end</a>( )</code>
 
 		<div class="description short">
 			<p>End a session after a page request is complete. This only closes the session and
@@ -962,7 +1001,7 @@ does not destroy it</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_save_data">#</a>
-		<code><a href="source-class-Hm_DB_Session.html#344-355" title="Go to source code">save_data</a>( )</code>
+		<code><a href="source-class-Hm_DB_Session.html#354-365" title="Go to source code">save_data</a>( )</code>
 
 		<div class="description short">
 			<p>Write session data to the db</p>
@@ -994,7 +1033,7 @@ does not destroy it</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_close_early">#</a>
-		<code><a href="source-class-Hm_DB_Session.html#357-364" title="Go to source code">close_early</a>( )</code>
+		<code><a href="source-class-Hm_DB_Session.html#367-374" title="Go to source code">close_early</a>( )</code>
 
 		<div class="description short">
 			<p>Close a session early, but don't destroy it</p>
@@ -1026,7 +1065,7 @@ does not destroy it</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_destroy">#</a>
-		<code><a href="source-class-Hm_DB_Session.html#366-383" title="Go to source code">destroy</a>( <span>object <var>$request</var></span> )</code>
+		<code><a href="source-class-Hm_DB_Session.html#376-393" title="Go to source code">destroy</a>( <span>object <var>$request</var></span> )</code>
 
 		<div class="description short">
 			<p>Destroy a session for good</p>
