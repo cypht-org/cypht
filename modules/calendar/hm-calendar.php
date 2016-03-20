@@ -121,7 +121,109 @@ class Hm_Cal_Output {
 /**
  * @subpackage calendar/lib
  */
+class Hm_Cal_Event_Store {
+    private $data = array();
+
+    public function __construct() {
+    }
+    public function load($data) {
+        foreach ($data as $event) {
+            $event = new Hm_Cal_Event($event);
+            if ($event->is_valid()) {
+                $this->data[] = $event;
+            }
+        }
+    }
+    public function import($data) {
+    }
+    public function export() {
+    }
+    public function save($session) {
+    }
+    public function in_date_range($start, $end) {
+    }
+}
+
+/**
+ * @subpackage calendar/lib
+ */
 class Hm_Cal_Event {
+    private $data = array(
+        'title' => NULL,
+        'description' => NULL,
+        'date' => NULL,
+        'repeat_interval' => NULL,
+    );
+    public function __construct($data) {
+        if (is_array($data)) {
+            foreach ($this->data as $name => $value) {
+                if (array_key_exists($name, $data)) {
+                    $this->data[$name] = $data[$name];
+                }
+            }
+        }
+    }
+    public function is_valid() {
+        return $this->get('date');
+    }
+    private function get($name, $default=false) {
+        if (array_key_exists($name, $this->data)) {
+            return $this->data[$name];
+        }
+        return $default;
+    }
+    private function check_start_date($start, $end) {
+        $ts = false;
+        if ($this->get('date')) {
+            $ts = strtotime($this->get('date'));
+            if ($ts) {
+                return $ts;
+            }
+        }
+        return $ts;
+    }
+    private function fast_forward_repeat_event($ts, $interval, $limit) {
+        while ($ts < $limit) {
+            $ts = strtotime('+1 '.$interval, $ts);
+        }
+        return $ts;
+    }
+    private function collect_repeat_events($ts, $interval, $limit) {
+        $times = array();
+        while ($ts < $limit) {
+            $times[] = $ts;
+            $ts = strtotime('+1 '.$interval, $ts);
+        }
+        return $times;
+    }
+    private function check_repeat($start, $end, $ts) {
+        $times = array();
+        if ($this->get('repeat_interval')) {
+            if (strtotime('+1 '.$this->get('repeat_interval'), $ts)) {
+                $ts = $this->fast_forward_repeat_event($ts, $this->get('repeat_interval'), $start);
+                if ($ts < $end) {
+                    $times = array_merge($times, $this->collect_repeat_events($ts, $this->get('repeat_interval'), $end));
+                }
+            }
+        }
+        return $times;
+    }
+    public function in_date_range($start_date, $end_date) {
+        $start = strtotime($start_date);
+        $end = strtotime($end_date);
+        $times = array();
+
+        if ($start && $end) {
+            $ts = $this->check_start_date($start, $end);
+            if ($ts) {
+                if ($ts > $start && $ts < $end) {
+                    $times[] = $ts;
+                }
+                $times = array_merge($times, $this->check_repeat($start, $end, $ts));
+            }
+        }
+        return array_unique($times);
+    }
 }
 
 /**
