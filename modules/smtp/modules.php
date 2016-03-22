@@ -851,8 +851,14 @@ function get_primary_recipients($headers, $smtp_servers) {
     }
     $users = array_map(function($a) { return $a['user']; }, $smtp_servers);
     foreach ($users as $user) {
+        if (strpos($user, '@') !== false) {
+            $testuser = explode('@', $user)[1];
+        }
+        else {
+            $testuser = $user;
+        }
         foreach ($lc_headers as $header) {
-            if (stristr($header, $user) !== false) {
+            if (stristr($header, $testuser) !== false) {
                 return $user;
             }
         }
