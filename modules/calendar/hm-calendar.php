@@ -14,13 +14,15 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Cal_Output {
 
     private $output_mod;
+    private $events;
     private $today;
     private $month;
     private $year;
     private $format;
     private $date;
 
-    public function __construct($output_mod) {
+    public function __construct($output_mod, $events) {
+        $this->events = $events;
         $this->output_mod = $output_mod;
         $this->today = date('Y-m-d');
     }
@@ -48,7 +50,41 @@ class Hm_Cal_Output {
         if ($this->month != (int) date('n', strtotime($day))) {
             $res .= 'offmonth ';
         }
-        $res .= '">'.date('d', strtotime($day)).'</td>';
+        $res .= '">'.date('d', strtotime($day));
+        $res .= $this->output_event($day);
+        $res .= '</td>';
+        return $res;
+    }
+    private function output_event($day) {
+        if (array_key_exists($day, $this->events)) {
+            usort($this->events[$day], function($a, $b) {
+                if ($a['ts'] == $b['ts']) {
+                    return 0;
+                }
+                return ($a['ts'] < $b['ts']) ? -1 : 1;
+            });
+            $res = '';
+            foreach ($this->events[$day] as $event) {
+                $res .= '<div class="cal_event">'.
+                    $this->output_mod->html_safe(date('H:i', $event['ts'])).
+                    ' <a class="cal_title">'.$this->output_mod->html_safe($event['title']).
+                    '</a>'.$this->output_event_details($event).
+                    '</div>';
+            }
+            return $res;
+        }
+        return '';
+    }
+    private function output_event_details($event) {
+        $res = '<div class="event_details">'.
+            '<div class="event_title">'.$this->output_mod->html_safe($event['title']).'</div>';
+        if (strlen(trim($event['description']))) {
+            $res .= '<div class="event_detail">'.$this->output_mod->html_safe($event['description']).'</div>';
+        }
+        if (strlen(trim($event['repeat_interval']))) {
+            $res .= '<div class="event_repeat">'.$this->output_mod->trans(sprintf('Repeats every %s', $event['repeat_interval'])).'</div>';
+        }
+        $res .= '</div>';
         return $res;
     }
 
@@ -147,13 +183,21 @@ class Hm_Cal_Event_Store {
         }
     }
 
-    public function import($data) {
+    public function add($data) {
+        $event = new Hm_Cal_Event($data);
+        if ($event->is_valid()) {
+            $this->data[] = $event;
+            return true;
+        }
+        return false;
     }
 
-    public function export() {
-    }
-
-    public function save($session) {
+    public function dump() {
+        $res = array();
+        foreach ($this->data as $event) {
+            $res[] = $event->dump();
+        }
+        return $res;
     }
 
     public function in_date_range($start, $end) {
@@ -161,7 +205,14 @@ class Hm_Cal_Event_Store {
         foreach ($this->data as $event) {
             $event_data = $event->in_date_range($start, $end);
             if (count($event_data)) {
-                $events = array_merge($events, $event_data);
+                foreach ($event_data as $event) {
+                    if (array_key_exists($event['date'], $events)) {
+                        $events[$event['date']][] = $event;
+                    }
+                    else {
+                        $events[$event['date']] = array($event);
+                    }
+                }
             }
         }
         return $events;
@@ -200,11 +251,14 @@ class Hm_Cal_Event {
         }
         return $default;
     }
+    public function dump() {
+        return $this->data;
+    }
 
     private function check_start_date($start, $end) {
         $ts = false;
         if ($this->get('date')) {
-            $ts = strtotime($this->get('date'));
+            $ts = $this->get('date');
             if ($ts) {
                 return $ts;
             }
@@ -263,10 +317,12 @@ class Hm_Cal_Event {
         $results = array();
         foreach ($times as $time) {
             $result_item = array();
+            $day = date('Y-m-d', $time);
             foreach ($this->data as $name => $val) {
                 $result_item[$name] = $val;
             }
             $result_item['ts'] = $time;
+            $result_item['date'] = date('Y-m-d', $time);
             $results[] = $result_item;
         }
         return $results;
