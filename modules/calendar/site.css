@@ -10,8 +10,11 @@
 .cal_label { text-align: right; padding-right: 20px; }
 .event_submit { padding-top: 15px !important; }
 .cal_event { position: relative; margin-top: 5px; color: #666; }
-.event_details { z-index: 100; display: none; position: absolute; width: 300px; border: solid 1px #ddd; background-color: #fff; padding: 10px; }
+.event_details { cursor: pointer; z-index: 100; display: none; position: absolute; width: 300px; border: solid 1px #ddd; background-color: #fff; padding: 10px; }
 .event_details td { padding: 5px; border: none;  height: auto; }
+.cal_title { cursor: pointer; }
 .event_title { border-bottom: solid 1px #eee; font-size: 120%; margin-bottom: 10px; }
 .event_detail { padding: 10px; padding-bottom: 15px; }
 .event_repeat { font-size: 90%; font-style: italic; text-align: right; }
+.event_date { float: right; }
+.event_delete { float: left; font-size: 90%; }
