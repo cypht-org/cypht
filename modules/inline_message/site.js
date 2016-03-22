@@ -136,7 +136,7 @@ $(function() {
             Hm_Message_List.callbacks.push(capture_subject_click);
             if (hm_list_path().substr(0, 4) === 'imap') {
                 Hm_Ajax.add_callback_hook(select_imap_folder, capture_subject_click);
-                $('.refresh_list').click(function() { select_imap_folder(hm_list_path(), capture_subject_click); });
+                $('.refresh_link').click(function() { select_imap_folder(hm_list_path(), capture_subject_click); });
             }
         }
     }
