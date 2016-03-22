@@ -55,6 +55,7 @@ class Hm_Cal_Output {
         $res .= '</td>';
         return $res;
     }
+
     private function output_event($day) {
         if (array_key_exists($day, $this->events)) {
             usort($this->events[$day], function($a, $b) {
@@ -66,24 +67,30 @@ class Hm_Cal_Output {
             $res = '';
             foreach ($this->events[$day] as $event) {
                 $res .= '<div class="cal_event">'.
+                    $this->output_event_details($event).
                     $this->output_mod->html_safe(date('H:i', $event['ts'])).
                     ' <a class="cal_title">'.$this->output_mod->html_safe($event['title']).
-                    '</a>'.$this->output_event_details($event).
-                    '</div>';
+                    '</a></div>';
             }
             return $res;
         }
         return '';
     }
+
     private function output_event_details($event) {
         $res = '<div class="event_details">'.
-            '<div class="event_title">'.$this->output_mod->html_safe($event['title']).'</div>';
+            '<div class="event_title">'.$this->output_mod->html_safe($event['title']).
+            '<div class="event_date">'.$this->output_mod->html_safe(date('H:i A', $event['ts'])).'</div></div>';
         if (strlen(trim($event['description']))) {
             $res .= '<div class="event_detail">'.$this->output_mod->html_safe($event['description']).'</div>';
         }
         if (strlen(trim($event['repeat_interval']))) {
             $res .= '<div class="event_repeat">'.$this->output_mod->trans(sprintf('Repeats every %s', $event['repeat_interval'])).'</div>';
         }
+            $res .= '<form method="post"><input name="delete_title" type="hidden" value="'.$this->output_mod->html_safe($event['title']).'" />'.
+                '<input type="hidden" name="delete_ts" value="'.$this->output_mod->html_safe($event['ts']).'" />'.
+                '<input type="hidden" name="hm_page_key" value="'.$this->output_mod->html_safe(Hm_Request_Key::generate()).'" />'.
+                '<div class="event_delete"><a>Delete</a></div></form>';
         $res .= '</div>';
         return $res;
     }
@@ -217,6 +224,20 @@ class Hm_Cal_Event_Store {
         }
         return $events;
     }
+
+    public function delete($title, $ts) {
+        $events = array();
+        $deleted = false;
+        foreach ($this->data as $event) {
+            if ($event->get('title') == $title && $event->get('date') == $ts) {
+                $deleted = true;
+                continue;
+            }
+            $events[] = $event;
+        }
+        $this->data = $events;
+        return $deleted;
+    }
 }
 
 /**
@@ -245,7 +266,7 @@ class Hm_Cal_Event {
         return $this->get('date');
     }
 
-    private function get($name, $default=false) {
+    public function get($name, $default=false) {
         if (array_key_exists($name, $this->data)) {
             return $this->data[$name];
         }

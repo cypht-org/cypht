@@ -15,6 +15,25 @@ require_once APP_PATH.'modules/calendar/hm-calendar.php';
  */
 class Hm_Handler_process_add_event extends Hm_Handler_Module {
     public function process() {
+        list($success, $form) = $this->process_form(array('delete_title', 'delete_ts'));
+        if ($success) {
+            $cal_events = $this->get('cal_events');
+            if (is_object($cal_events)) {
+                if ($cal_events->delete($form['delete_title'], $form['delete_ts'])) {
+                    Hm_Msgs::add('Event Deleted');
+                    $this->session->record_unsaved('Calendar updated');
+                    $this->user_config->set('calendar_events', $cal_events->dump());
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage calendar/handler
+ */
+class Hm_Handler_process_delete_event extends Hm_Handler_Module {
+    public function process() {
         list($success, $form) = $this->process_form(array('event_title',
             'event_date', 'event_time', 'event_repeat'));
         if ($success) {
@@ -37,6 +56,7 @@ class Hm_Handler_process_add_event extends Hm_Handler_Module {
                         'repeat_interval' => $repeat
                         ))) {
                         Hm_Msgs::add('Event Created');
+                        $this->session->record_unsaved('Calendar updated');
                         $this->user_config->set('calendar_events', $cal_events->dump());
                     }
                 }
