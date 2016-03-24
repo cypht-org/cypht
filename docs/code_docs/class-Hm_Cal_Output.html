@@ -623,6 +623,8 @@
 			<h3>Classes</h3>
 			<ul>
 				<li><a href="class-Hm_Cal_Data.html">Hm_Cal_Data</a></li>
+				<li><a href="class-Hm_Cal_Event.html">Hm_Cal_Event</a></li>
+				<li><a href="class-Hm_Cal_Event_Store.html">Hm_Cal_Event_Store</a></li>
 				<li class="active"><a href="class-Hm_Cal_Output.html">Hm_Cal_Output</a></li>
 			</ul>
 
@@ -695,7 +697,7 @@
 		
 		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.calendar.html">calendar</a>\<a href="package-modules.calendar.lib.html">lib</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Cal_Output.html#61-169" title="Go to source code">calendar/modules.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Cal_Output.html#11-173" title="Go to source code">calendar/hm-calendar.php</a>
 		<br>
 	</div>
 
@@ -715,7 +717,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#73-76" title="Go to source code">__construct</a>( <span> <var>$output_mod</var></span> )</code>
+		<code><a href="source-class-Hm_Cal_Output.html#24-28" title="Go to source code">__construct</a>( <span> <var>$output_mod</var></span>, <span> <var>$events</var></span> )</code>
 
 		<div class="description short">
 			
@@ -745,7 +747,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#77-90" title="Go to source code">output</a>( <span> <var>$data</var></span>, <span> <var>$date</var></span>, <span> <var>$format</var></span> )</code>
+		<code><a href="source-class-Hm_Cal_Output.html#30-43" title="Go to source code">output</a>( <span> <var>$data</var></span>, <span> <var>$date</var></span>, <span> <var>$format</var></span> )</code>
 
 		<div class="description short">
 			
@@ -775,7 +777,67 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output_day">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#91-101" title="Go to source code">output_day</a>( <span> <var>$day</var></span> )</code>
+		<code><a href="source-class-Hm_Cal_Output.html#45-57" title="Go to source code">output_day</a>( <span> <var>$day</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="output_event" id="_output_event">
+
+		<td class="attributes"><code>
+			 private 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_output_event">#</a>
+		<code><a href="source-class-Hm_Cal_Output.html#59-78" title="Go to source code">output_event</a>( <span> <var>$day</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="output_event_details" id="_output_event_details">
+
+		<td class="attributes"><code>
+			 private 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_output_event_details">#</a>
+		<code><a href="source-class-Hm_Cal_Output.html#80-96" title="Go to source code">output_event_details</a>( <span> <var>$event</var></span> )</code>
 
 		<div class="description short">
 			
@@ -805,157 +867,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output_week">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#102-118" title="Go to source code">output_week</a>( <span> <var>$week</var></span> )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="prev_next_week" id="_prev_next_week">
-
-		<td class="attributes"><code>
-			 private 
-
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_prev_next_week">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#119-122" title="Go to source code">prev_next_week</a>( )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="prev_next_month" id="_prev_next_month">
-
-		<td class="attributes"><code>
-			 private 
-
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_prev_next_month">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#123-126" title="Go to source code">prev_next_month</a>( )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="prev_next_year" id="_prev_next_year">
-
-		<td class="attributes"><code>
-			 private 
-
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_prev_next_year">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#127-130" title="Go to source code">prev_next_year</a>( )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="prev_next" id="_prev_next">
-
-		<td class="attributes"><code>
-			 private 
-
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_prev_next">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#131-136" title="Go to source code">prev_next</a>( )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="title" id="_title">
-
-		<td class="attributes"><code>
-			 private 
-
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_title">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#137-144" title="Go to source code">title</a>( )</code>
+		<code><a href="source-class-Hm_Cal_Output.html#98-114" title="Go to source code">output_week</a>( <span> <var>$week</var></span> )</code>
 
 		<div class="description short">
 			
@@ -985,7 +897,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output_month">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#145-154" title="Go to source code">output_month</a>( <span> <var>$month</var></span> )</code>
+		<code><a href="source-class-Hm_Cal_Output.html#116-125" title="Go to source code">output_month</a>( <span> <var>$month</var></span> )</code>
 
 		<div class="description short">
 			
@@ -1015,7 +927,157 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output_year">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#155-163" title="Go to source code">output_year</a>( <span> <var>$year</var></span> )</code>
+		<code><a href="source-class-Hm_Cal_Output.html#127-135" title="Go to source code">output_year</a>( <span> <var>$year</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="prev_next_week" id="_prev_next_week">
+
+		<td class="attributes"><code>
+			 private 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_prev_next_week">#</a>
+		<code><a href="source-class-Hm_Cal_Output.html#137-140" title="Go to source code">prev_next_week</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="prev_next_month" id="_prev_next_month">
+
+		<td class="attributes"><code>
+			 private 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_prev_next_month">#</a>
+		<code><a href="source-class-Hm_Cal_Output.html#142-145" title="Go to source code">prev_next_month</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="prev_next_year" id="_prev_next_year">
+
+		<td class="attributes"><code>
+			 private 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_prev_next_year">#</a>
+		<code><a href="source-class-Hm_Cal_Output.html#147-150" title="Go to source code">prev_next_year</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="prev_next" id="_prev_next">
+
+		<td class="attributes"><code>
+			 private 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_prev_next">#</a>
+		<code><a href="source-class-Hm_Cal_Output.html#152-157" title="Go to source code">prev_next</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="title" id="_title">
+
+		<td class="attributes"><code>
+			 private 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_title">#</a>
+		<code><a href="source-class-Hm_Cal_Output.html#159-166" title="Go to source code">title</a>( )</code>
 
 		<div class="description short">
 			
@@ -1045,7 +1107,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_output_heading">#</a>
-		<code><a href="source-class-Hm_Cal_Output.html#164-168" title="Go to source code">output_heading</a>( )</code>
+		<code><a href="source-class-Hm_Cal_Output.html#168-172" title="Go to source code">output_heading</a>( )</code>
 
 		<div class="description short">
 			
@@ -1085,7 +1147,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Cal_Output.html#66" title="Go to source code"><var>$output_mod</var></a>
+				<a href="source-class-Hm_Cal_Output.html#16" title="Go to source code"><var>$output_mod</var></a>
 
 			<div class="description short">
 				
@@ -1103,6 +1165,31 @@
 			</div>
 		</td>
 	</tr>
+	<tr data-order="events" id="$events">
+		<td class="attributes"><code>
+			private  
+			
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Hm_Cal_Output.html#17" title="Go to source code"><var>$events</var></a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#$events" class="anchor">#</a>
+				<code></code>
+			</div>
+		</td>
+	</tr>
 	<tr data-order="today" id="$today">
 		<td class="attributes"><code>
 			private  
@@ -1110,7 +1197,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Cal_Output.html#67" title="Go to source code"><var>$today</var></a>
+				<a href="source-class-Hm_Cal_Output.html#18" title="Go to source code"><var>$today</var></a>
 
 			<div class="description short">
 				
@@ -1135,7 +1222,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Cal_Output.html#68" title="Go to source code"><var>$month</var></a>
+				<a href="source-class-Hm_Cal_Output.html#19" title="Go to source code"><var>$month</var></a>
 
 			<div class="description short">
 				
@@ -1160,7 +1247,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Cal_Output.html#69" title="Go to source code"><var>$year</var></a>
+				<a href="source-class-Hm_Cal_Output.html#20" title="Go to source code"><var>$year</var></a>
 
 			<div class="description short">
 				
@@ -1185,7 +1272,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Cal_Output.html#70" title="Go to source code"><var>$format</var></a>
+				<a href="source-class-Hm_Cal_Output.html#21" title="Go to source code"><var>$format</var></a>
 
 			<div class="description short">
 				
@@ -1210,7 +1297,7 @@
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Hm_Cal_Output.html#71" title="Go to source code"><var>$date</var></a>
+				<a href="source-class-Hm_Cal_Output.html#22" title="Go to source code"><var>$date</var></a>
 
 			<div class="description short">
 				
