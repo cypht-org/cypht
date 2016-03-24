@@ -18,6 +18,7 @@ function format_msg_html($str) {
     $config->set('Cache.DefinitionImpl', null);
     $config->set('URI.DisableExternalResources', true);
     $config->set('HTML.TargetBlank', true);
+    $config->set('URI.AllowedSchemes', array('data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
     $purifier = new HTMLPurifier($config);
     $res = @$purifier->purify($str);
