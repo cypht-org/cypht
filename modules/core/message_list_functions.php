@@ -85,7 +85,7 @@ function message_list_meta($input, $output_mod) {
     $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
     return '<div class="list_meta">'.
-        $output_mod->html_safe($date).
+        $date.
         '<b>-</b>'.
         '<span class="src_count"></span> '.$max.
         '<b>-</b>'.
