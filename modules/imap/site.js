@@ -348,6 +348,7 @@ var setup_imap_folder_page = function() {
 var display_imap_mailbox = function(res) {
     var ids = [res.imap_server_id];
     Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+    Hm_Message_List.check_empty_list();
     if (res.page_links) {
         $('.page_links').html(res.page_links);
     }
