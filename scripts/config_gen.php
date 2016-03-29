@@ -100,11 +100,16 @@ function build_config() {
 function compress($string, $command) {
     if ($command) {
         exec("echo ".escapeshellarg($string)." | $command", $output);
-        return join('', $output);
+        $result = join('', $output);
     }
     else {
-        return str_replace('\\\\', '\\', $string); //preg_replace("/\s{2,}/", ' ', $string);
+        $result = str_replace('\\\\', '\\', $string); //preg_replace("/\s{2,}/", ' ', $string);
     }
+    if (!trim($result)) {
+        printf("WARNING: Compression command failed: %s\n", $command);
+        return $string;
+    }
+    return $result;
 }
 
 /**
