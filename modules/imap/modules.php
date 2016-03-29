@@ -1158,6 +1158,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $this->html_safe($this->get('msg_folder')),
                 $this->html_safe($this->get('msg_text_uid'))
             );
+            $msg_part = $this->get('imap_msg_part');
             $headers = $this->get('msg_headers', array());
             $txt .= '<table class="msg_headers"><col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
@@ -1195,9 +1196,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 ' | <a class="hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('reply').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('reply-all').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('forward').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;attach=1'.$reply_args.'">'.$this->trans('attach').'</a>'.
-                ' | <a class="hlink msg_part_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
-
+                ' | <a class="hlink" href="?page=compose&amp;attach=1'.$reply_args.'">'.$this->trans('attach').'</a>';
+            if ($msg_part === '0') {
+                $txt .= ' | <a class="hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
+            }
+            else {
+                $txt .= ' | <a class="hlink msg_part_link raw_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
+            }
             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
                 $txt .= ' | <a style="display: none;" class="hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
                 $txt .= '<a id="unflag_msg" class="hlink" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
