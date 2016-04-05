@@ -1167,39 +1167,37 @@ var hl_save_link = function() {
     }
 };
 
-/* executes before onload, but after the DOM (just before the closing body tag) */
-
-/* load folder list */
-if (!Hm_Folders.load_from_local_storage()) {
-    Hm_Folders.update_folder_list();
-}
-
-/* setup settings and server pages */
-if (hm_page_name() == 'settings') {
-    Hm_Utils.expand_core_settings();
-    $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-    Hm_Folders.reload_folders();
-}
-else if (hm_page_name() == 'servers') {
-    $('.server_section').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-    Hm_Folders.reload_folders();
-}
-
-/* show any pending notices */
-Hm_Utils.show_sys_messages();
-
-/* setup a few page wide event handlers */
-Hm_Utils.cancel_logout_event();
-Hm_Folders.toggle_folders_event();
-
-/* fire up the job scheduler */
-Hm_Timer.fire();
-
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 
-/* executes on real onload, has access to other module code */
+/* executes on onload, has access to other module code */
 $(function() {
+
+    /* setup settings and server pages */
+    if (hm_page_name() == 'settings') {
+        Hm_Utils.expand_core_settings();
+        $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+        Hm_Folders.reload_folders();
+    }
+    else if (hm_page_name() == 'servers') {
+        $('.server_section').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+        Hm_Folders.reload_folders();
+    }
+
+    /* show any pending notices */
+    Hm_Utils.show_sys_messages();
+
+    /* setup a few page wide event handlers */
+    Hm_Utils.cancel_logout_event();
+    Hm_Folders.toggle_folders_event();
+
+    /* fire up the job scheduler */
+    Hm_Timer.fire();
+
+    /* load folder list */
+    if (!Hm_Folders.load_from_local_storage()) {
+        Hm_Folders.update_folder_list();
+    }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         Hm_Message_List.select_combined_view();
         $('.content_cell').swipeDown(function() { Hm_Message_List.load_sources(); });
