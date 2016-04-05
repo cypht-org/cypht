@@ -1,5 +1,3 @@
-/* globals Hm_Ajax,Hm_Message_List,Hm_Utils,Hm_Folders,Hm_Background_Unread,hm_list_path,hm_msg_uid,hm_search_terms,hm_list_parent,hm_page_name,Message_List,Hm_Timer: true */
-
 var feed_test_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
@@ -131,6 +129,9 @@ var feed_item_view = function(uid, list_path, callback) {
 };
 
 var display_feed_item_content = function(res) {
+    if (!res.feed_msg_headers) {
+        return;
+    }
     var msg_uid = hm_msg_uid();
     $('.msg_text').html('');
     $('.msg_text').append(res.feed_msg_headers);
