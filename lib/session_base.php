@@ -73,17 +73,17 @@ abstract class Hm_Session {
     /* key used to encrypt session data */
     public $enc_key = '';
 
+    /* authentication class name */
+    public $auth_class = false;
+
+    /* site config object */
+    public $site_config = false;
+
     /* session data */
     protected $data = array();
 
     /* session cookie name */
     protected $cname = false;
-
-    /* site config object */
-    protected $site_config = false;
-
-    /* authentication class name */
-    protected $auth_class = false;
 
     /* authentication object */
     protected $auth_mech = false;
