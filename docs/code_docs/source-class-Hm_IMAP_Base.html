@@ -218,6 +218,34 @@
 						</li>
 							</ul></li>
 				<li>
+					<a href="package-modules.dynamic.html">
+						dynamic<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.dynamic.login.html">
+						login<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.dynamic.login.handler.html">
+						handler					</a>
+
+						</li>
+				<li>
+					<a href="package-modules.dynamic.login.lib.html">
+						lib					</a>
+
+						</li>
+				<li>
+					<a href="package-modules.dynamic.login.output.html">
+						output					</a>
+
+						</li>
+							</ul></li></ul></li>
+				<li>
 					<a href="package-modules.feeds.html">
 						feeds<span></span>
 					</a>
@@ -641,6 +669,7 @@
 				<li><a href="class-Hm_DB.html">Hm_DB</a></li>
 				<li><a href="class-Hm_DB_Session.html">Hm_DB_Session</a></li>
 				<li><a href="class-Hm_Debug.html">Hm_Debug</a></li>
+				<li><a href="class-Hm_Discover_Services.html">Hm_Discover_Services</a></li>
 				<li><a href="class-Hm_Dispatch.html">Hm_Dispatch</a></li>
 				<li><a href="class-Hm_Feed.html">Hm_Feed</a></li>
 				<li><a href="class-Hm_Feed_List.html">Hm_Feed_List</a></li>
@@ -768,6 +797,7 @@
 				<li><a href="class-Hm_Handler_process_create_account.html">Hm_Handler_process_create_account</a></li>
 				<li><a href="class-Hm_Handler_process_delete_contact.html">Hm_Handler_process_delete_contact</a></li>
 				<li><a href="class-Hm_Handler_process_delete_event.html">Hm_Handler_process_delete_event</a></li>
+				<li><a href="class-Hm_Handler_process_dynamic_login.html">Hm_Handler_process_dynamic_login</a></li>
 				<li><a href="class-Hm_Handler_process_edit_contact.html">Hm_Handler_process_edit_contact</a></li>
 				<li><a href="class-Hm_Handler_process_feed_limit_setting.html">Hm_Handler_process_feed_limit_setting</a></li>
 				<li><a href="class-Hm_Handler_process_feed_since_setting.html">Hm_Handler_process_feed_since_setting</a></li>
@@ -830,6 +860,7 @@
 				<li><a href="class-Hm_Handler_tag_data.html">Hm_Handler_tag_data</a></li>
 				<li><a href="class-Hm_Handler_title.html">Hm_Handler_title</a></li>
 				<li><a href="class-Hm_Handler_update_search.html">Hm_Handler_update_search</a></li>
+				<li><a href="class-Hm_Handler_vcalendar_check.html">Hm_Handler_vcalendar_check</a></li>
 				<li><a href="class-Hm_Handler_wordpress_disconnect.html">Hm_Handler_wordpress_disconnect</a></li>
 				<li><a href="class-Hm_Handler_wordpress_folders_data.html">Hm_Handler_wordpress_folders_data</a></li>
 				<li><a href="class-Hm_Handler_wordpress_list_type.html">Hm_Handler_wordpress_list_type</a></li>
@@ -898,6 +929,7 @@
 				<li><a href="class-Hm_Output_display_github_status.html">Hm_Output_display_github_status</a></li>
 				<li><a href="class-Hm_Output_display_imap_status.html">Hm_Output_display_imap_status</a></li>
 				<li><a href="class-Hm_Output_display_pop3_status.html">Hm_Output_display_pop3_status</a></li>
+				<li><a href="class-Hm_Output_dynamic_login.html">Hm_Output_dynamic_login</a></li>
 				<li><a href="class-Hm_Output_email_menu_content.html">Hm_Output_email_menu_content</a></li>
 				<li><a href="class-Hm_Output_end_settings_form.html">Hm_Output_end_settings_form</a></li>
 				<li><a href="class-Hm_Output_feed_ids.html">Hm_Output_feed_ids</a></li>
@@ -1038,6 +1070,7 @@
 				<li><a href="class-Hm_Output_unread_source_max_setting.html">Hm_Output_unread_source_max_setting</a></li>
 				<li><a href="class-Hm_Output_unread_wp_included_setting.html">Hm_Output_unread_wp_included_setting</a></li>
 				<li><a href="class-Hm_Output_update_search_icon.html">Hm_Output_update_search_icon</a></li>
+				<li><a href="class-Hm_Output_vcalendar_add_output.html">Hm_Output_vcalendar_add_output</a></li>
 				<li><a href="class-Hm_Output_welcome_dialog.html">Hm_Output_welcome_dialog</a></li>
 				<li><a href="class-Hm_Output_wordpress_connect_section.html">Hm_Output_wordpress_connect_section</a></li>
 				<li><a href="class-Hm_Output_wordpress_folders.html">Hm_Output_wordpress_folders</a></li>
@@ -1232,9 +1265,6 @@
 				</li>
 		</ul>
 		<ul>
-			<li>
-				<a href="-API-documentation.zip" title="Download documentation as ZIP archive"><span>Download</span></a>
-			</li>
 		</ul>
 	</div>
 
@@ -1269,7 +1299,7 @@
 </span><span id="29" class="l"><a href="#29"> 29: </a>    <span class="php-keyword1">protected</span> <span class="php-var">$capability</span> = <span class="php-keyword1">false</span>;             <span class="php-comment">// IMAP CAPABILITY response</span>
 </span><span id="30" class="l"><a href="#30"> 30: </a>    <span class="php-keyword1">protected</span> <span class="php-var">$server_id</span> = <span class="php-keyword1">array</span>();            <span class="php-comment">// server ID response values</span>
 </span><span id="31" class="l"><a href="#31"> 31: </a>    <span class="php-keyword1">protected</span> <span class="php-var">$literal_overflow</span> = <span class="php-keyword1">false</span>;
-</span><span id="32" class="l"><a href="#32"> 32: </a>    <span class="php-keyword1">protected</span> <span class="php-var">$struct_object</span> = <span class="php-keyword1">false</span>;          
+</span><span id="32" class="l"><a href="#32"> 32: </a>    <span class="php-keyword1">public</span> <span class="php-var">$struct_object</span> = <span class="php-keyword1">false</span>;          
 </span><span id="33" class="l"><a href="#33"> 33: </a>
 </span><span id="34" class="l"><a href="#34"> 34: </a>
 </span><span id="35" class="l"><a href="#35"> 35: </a>    <span class="php-comment">/* attributes that can be set for the IMAP connaction */</span>
@@ -1777,6 +1807,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?b41070bbd191bf61a9890bfab0db62b36f21ae74"></script>
+<script src="elementlist.js?686c1bafc7ae5917dcdfc2bbb46f3c0e724b6307"></script>
 </body>
 </html>
