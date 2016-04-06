@@ -296,7 +296,7 @@ function setup_session($config) {
 
     $session_type = $config->get('session_type', false);
     $auth_type = $config->get('auth_type', false);
-    if ($auth_type) {
+    if ($auth_type && $auth_type != 'dynamic') {
         $auth_class = sprintf('Hm_Auth_%s', $auth_type);
     }
     else {
