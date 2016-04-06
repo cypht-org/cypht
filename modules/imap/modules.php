@@ -781,8 +781,14 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
         if (!$added) {
             $auth_server = $this->session->get('imap_auth_server_settings', array());
             if (!empty($auth_server)) {
+                if (array_key_exists('name', $auth_server)) {
+                    $name = $auth_server['name'];
+                }
+                else {
+                    $name = $this->config->get('imap_auth_name', 'Default');
+                }
                 Hm_IMAP_List::add(array( 
-                    'name' => $this->config->get('imap_auth_name', 'Default'),
+                    'name' => $name,
                     'default' => true,
                     'server' => $auth_server['server'],
                     'port' => $auth_server['port'],
