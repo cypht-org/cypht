@@ -224,9 +224,9 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .list_meta { display: none; }
     .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
     .header_links, .nlink { white-space: normal !important; word-break: break-all; word-wrap: break-word; }
-    .search_form select, .search_form button, .search_form input { display: block; margin-left: 0px !important; margin: 0px; margin-top: 5px; }
+    .search_form select, .search_form button, .search_form input { margin-left: 0px !important; margin: 0px; margin-top: 5px; }
     .search_form label { display: none; }
-    .search_update { float: right; }
+    .search_update { clear: both; }
     .search_content .refresh_list { display: none; }
     .search_content .content_title { max-height: 500px; }
 
