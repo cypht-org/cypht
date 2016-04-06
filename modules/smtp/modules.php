@@ -47,7 +47,7 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
                     if ($server['server'] == $smtp_server && $server['tls'] == $smtp_tls && $server['port'] == $smtp_port) {
                         continue;
                     }
-                    Hm_SMTP_List::add( $server, $index );
+                    Hm_SMTP_List::add($server, $index);
                 }
                 $attributes = array(
                     'name' => $this->config->get('default_smtp_name', 'Default'),
