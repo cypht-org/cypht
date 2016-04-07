@@ -1,3 +1,4 @@
+'use strict'
 var record_message = function(res) {
     var history = Hm_Utils.json_decode(Hm_Utils.get_from_local_storage('message_history'));
     if (!history) {

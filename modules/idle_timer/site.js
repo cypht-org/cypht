@@ -1,3 +1,4 @@
+'use strict'
 var Hm_No_Op = {
     'interval': 300,
     'idle_time': 0,
