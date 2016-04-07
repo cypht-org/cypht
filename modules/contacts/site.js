@@ -33,6 +33,7 @@ var autocomplete_contact = function(e, class_name, list_div) {
     if (key_code >= 37 && key_code <= 40) {
         return;
     }
+    var first;
     var div = $('<div></div>');
     var fld_val = get_search_term(class_name);
     if (fld_val.length > 0) {
