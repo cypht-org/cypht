@@ -1,3 +1,4 @@
+'use strict'
 
 var imap_delete_action = function(event) {
     event.preventDefault();
@@ -562,7 +563,7 @@ var imap_background_unread_content_result = function(res) {
     var ids = [res.imap_server_id];
     var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
     var count = $('tr', cache).length;
-    Hm_Background_Unread.update(ids, res.formatted_message_list, 'imap', cache);
+    globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'imap', cache);
     Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
     if ($('tr', cache).length > count) {
         $('.menu_unread > a').css('font-weight', 'bold');
@@ -597,9 +598,9 @@ else if (hm_page_name() === 'info') {
 $(function() {
     if (hm_list_path() !== 'unread') {
         if (typeof hm_data_sources_background === 'function') {
-            Hm_Background_Unread = new Message_List();
-            Hm_Background_Unread.add_sources(hm_data_sources_background());
-            Hm_Timer.add_job(Hm_Background_Unread.load_sources, 43, true);
+            globals.Hm_Background_Unread = new Message_List();
+            globals.Hm_Background_Unread.add_sources(hm_data_sources_background());
+            Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, 43, true);
         }
     }
     Hm_Timer.add_job(imap_prefetch_msgs, 83, true);

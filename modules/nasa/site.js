@@ -1,3 +1,4 @@
+'use strict'
 var nasa_disconnect = function(event) {
     event.preventDefault();
     Hm_Ajax.request(

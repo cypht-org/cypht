@@ -1,3 +1,4 @@
+'use strict'
 var feed_test_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);

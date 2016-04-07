@@ -1,3 +1,4 @@
+'use strict'
 var display_next_nux_step = function(res) {
     $('.nux_step_two').html(res.nux_service_step_two);
     $('.nux_step_one').hide();

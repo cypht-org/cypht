@@ -1,3 +1,4 @@
+'use strict'
 if (hm_page_name() == 'compose') {
     $('.compose_sign').click(function() {
         var server_id = $('.compose_server').val();

@@ -1,3 +1,4 @@
+'use strict'
 var pop3_test_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
