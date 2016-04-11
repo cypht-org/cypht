@@ -244,7 +244,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
             $res .= '</table>';
         }
         else {
-            $res .= '<div>'.$this->trans('No IMAP or POP3 servers configured').'</div>';
+            $res .= '<div class="profiles_empty">'.$this->trans('No IMAP or POP3 servers configured').'</div>';
         }
         $res .= '</div>';
         return $res;
