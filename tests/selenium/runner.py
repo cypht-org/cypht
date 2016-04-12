@@ -23,6 +23,6 @@ def test_runner(obj, tests):
     print
     print '%s%s of %s PASSED%s' % (GREEN, passed, len(tests), END)
     if (len(tests) > passed):
-        print '%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), RED)
+        print '%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), END)
     print
     obj.end()
