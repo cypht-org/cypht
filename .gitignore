@@ -3,5 +3,6 @@
 /site.js
 /site.css
 /site/
+*.pyc
 
 .DS_Store
