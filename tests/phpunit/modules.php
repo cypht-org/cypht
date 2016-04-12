@@ -175,8 +175,8 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_run_output_module() {
-        require '../modules/core/setup.php';
-        require '../modules/core/modules.php';
+        require '../../modules/core/setup.php';
+        require '../../modules/core/modules.php';
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         Hm_Output_Modules::add('test', 'date', false, false, false, true, 'core');
@@ -191,8 +191,8 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_run_handler_modules() {
-        require '../modules/core/setup.php';
-        require '../modules/core/modules.php';
+        require '../../modules/core/setup.php';
+        require '../../modules/core/modules.php';
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         Hm_Handler_Modules::add('test', 'date', false, false, false, true, 'core');

@@ -9,7 +9,7 @@ if (!defined('DEBUG_MODE')) {
 }
 
 /* determine current absolute path used for require statements */
-define('APP_PATH', dirname(dirname(__FILE__)).'/');
+define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
 
 /* random id */
 define('SITE_ID', 'randomid');
@@ -18,12 +18,12 @@ define('SITE_ID', 'randomid');
 define('CACHE_ID', 'asdf');
 
 /* get mock objects */
-require APP_PATH.'tests/mocks.php';
+require APP_PATH.'tests/phpunit/mocks.php';
 
 /* get the framework */
 require APP_PATH.'lib/framework.php';
 
 /* get the stubs */
-require APP_PATH.'tests/stubs.php';
+require APP_PATH.'tests/phpunit/stubs.php';
 
 ?>
