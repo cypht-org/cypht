@@ -7,6 +7,7 @@ from selenium.common import exceptions
 DRIVER_LOCATION = '/usr/lib/chromium/chromedriver'
 DRIVER = webdriver.Chrome
 SITE_URL = 'http://localhost/hm3'
+SLEEP_INT = 1
 
 class WebTest:
 
@@ -23,7 +24,7 @@ class WebTest:
         self.driver.get(url)
 
     def rest(self):
-        sleep(2)
+        sleep(SLEEP_INT)
 
     def login(self, user, password):
         user_el = self.by_name('username')
