@@ -8,6 +8,9 @@ DRIVER_LOCATION = '/usr/lib/chromium/chromedriver'
 DRIVER = webdriver.Chrome
 SITE_URL = 'http://localhost/hm3'
 SLEEP_INT = 1
+USER = 'testuser'
+PASS = 'testuser'
+
 
 class WebTest:
 
@@ -40,7 +43,9 @@ class WebTest:
 
     def logout(self):
         self.driver.find_element_by_class_name('logout_link').click()
-        self.driver.find_element_by_id('logout_without_saving').click()
+        logout = self.by_id('logout_without_saving')
+        if logout:
+            logout.click()
 
     def end(self):
         self.driver.quit()
