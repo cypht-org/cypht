@@ -18,3 +18,4 @@
 .event_repeat { font-size: 90%; font-style: italic; text-align: right; }
 .event_date { float: right; }
 .event_delete { float: left; font-size: 90%; }
+.add_vcal { padding-right: 35px; float: right; margin-top: 10px; }

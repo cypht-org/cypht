@@ -13,6 +13,23 @@ require_once APP_PATH.'modules/calendar/hm-calendar.php';
 /**
  * @subpackage calendar/handler
  */
+class Hm_Handler_vcalendar_check extends Hm_Handler_Module {
+    public function process() {
+        $struct = $this->get('msg_struct', array());
+        if (count($struct) > 0 && class_exists('Hm_IMAP')) {
+            $imap = new Hm_IMAP();
+            $imap->struct_object = new Hm_IMAP_Struct(array(), $imap);
+            $cal_struct = $imap->search_bodystructure($struct, array('subtype' => 'calendar'));
+            if (is_array($cal_struct) && count($cal_struct) > 0) {
+                $this->out('imap_calendar_struct', $cal_struct);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage calendar/handler
+ */
 class Hm_Handler_process_add_event extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('delete_title', 'delete_ts'));
@@ -93,6 +110,18 @@ class Hm_Handler_get_calendar_date extends Hm_Handler_Module {
         }
         $this->out('cal_events', $cal_events);
         $this->out('calendar_date', $date);
+    }
+}
+
+/**
+ * @subpackage calendar/output
+ */
+class Hm_Output_vcalendar_add_output extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('imap_calendar_struct')) {
+            $link = '<a class="add_vcal" href="">Add to calendar</a>';
+            $this->concat('msg_headers', $link);
+        }
     }
 }
 
