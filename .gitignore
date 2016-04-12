@@ -4,5 +4,8 @@
 /site.css
 /site/
 *.pyc
+apigen4.sh
+commit_check.sh
+website/docs
 
 .DS_Store
