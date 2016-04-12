@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from sys import exc_info
+from traceback import print_exception
 
 GREEN = '\033[92m'
 RED = '\033[91m'
@@ -17,10 +18,11 @@ def test_runner(obj, tests):
             passed += 1
         except Exception:
             print '%s %sFAILED%s' % (name, RED, END)
-            print exc_info()
+            exc_type, exc_value, exc_traceback = exc_info()
+            print_exception(exc_type, exc_value, exc_traceback)
     print
     print '%s%s of %s PASSED%s' % (GREEN, passed, len(tests), END)
     if (len(tests) > passed):
         print '%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), RED)
     print
-    obj.browser.end()
+    obj.end()
