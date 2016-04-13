@@ -45,7 +45,12 @@ var display_history_page_links = function() {
 
 $(function() {
     if (hm_page_name() == 'message') {
-        Hm_Ajax.add_callback_hook(get_message_content, record_message);
+        Hm_Ajax.add_callback_hook('ajax_imap_message_content', record_message);
+        Hm_Ajax.add_callback_hook('ajax_imap_mark_as_read', record_message);
+        Hm_Ajax.add_callback_hook('ajax_feed_item_content', record_message);
+        Hm_Ajax.add_callback_hook('ajax_pop3_message_display', record_message);
+        Hm_Ajax.add_callback_hook('ajax_github_event_detail', record_message);
+        Hm_Ajax.add_callback_hook('ajax_wp_notice_display', record_message);
     }
     else if (hm_page_name() == 'history') {
         display_history_page_links();

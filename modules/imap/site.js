@@ -438,7 +438,7 @@ var imap_mark_as_read = function(uid, detail) {
             {'name': 'imap_msg_uid', 'value': uid},
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
-            false,
+            function() {},
             false,
             true
         );
