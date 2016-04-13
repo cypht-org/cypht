@@ -54,7 +54,7 @@ var inline_feed_msg = function(uid, list_path, inline_msg_loaded_callback) {
 
 var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
-    path = '.'+details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
+    var path = '.'+details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
     $('.msg_text').html('');
     $('.msg_text').remove();
     $('tr').removeClass('hl');
@@ -67,6 +67,7 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
 };
 
 var get_inline_msg_details = function(link) {
+    var index;
     var pair;
     var uid = false;
     var list_path = false;
@@ -115,12 +116,12 @@ var capture_subject_click = function() {
                 inline_pop3_msg(details, uid, list_path, inline_msg_loaded_callback);
                 return false;
             }
-            else if (list_path.substr(0, 6) == 'github', inline_msg_loaded_callback) {
-                inline_github_msg(uid, list_path);
+            else if (list_path.substr(0, 6) == 'github') {
+                inline_github_msg(uid, list_path, inline_msg_loaded_callback);
                 return false;
             }
-            else if (list_path.substr(0, 3) == 'wp_', inline_msg_loaded_callback) {
-                inline_wp_msg(uid, list_path);
+            else if (list_path.substr(0, 3) == 'wp_') {
+                inline_wp_msg(uid, list_path, inline_msg_loaded_callback);
                 return false;
             }
             return false;
@@ -136,7 +137,7 @@ $(function() {
             $('tr').removeClass('hl');
             Hm_Message_List.callbacks.push(capture_subject_click);
             if (hm_list_path().substr(0, 4) === 'imap') {
-                Hm_Ajax.add_callback_hook(select_imap_folder, capture_subject_click);
+                Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
                 $('.refresh_link').click(function() { select_imap_folder(hm_list_path(), capture_subject_click); });
             }
         }

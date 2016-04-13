@@ -2,12 +2,23 @@
 /* ajax multiplexer */
 var Hm_Ajax = {
     request_count: 0,
-    callback_hooks: {},
+    callback_hooks: [],
     aborted: false,
     batch_callback: false,
     icon_loading_id: 0,
 
+    get_ajax_hook_name: function(args) {
+        var index;
+        for (index in args) {
+            if (args[index]['name'] == 'hm_ajax_hook') {
+                return args[index]['value'];
+            }
+        }
+        return;
+    },
+
     request: function(args, callback, extra, no_icon, batch_callback) {
+        var name = Hm_Ajax.get_ajax_hook_name(args);
         var ajax = new Hm_Ajax_Request();
         if (Hm_Ajax.request_count === 0) {
             if (!no_icon) {
@@ -19,7 +30,7 @@ var Hm_Ajax = {
         if (batch_callback) {
             Hm_Ajax.batch_callback = batch_callback;
         }
-        return ajax.make_request(args, callback, extra);
+        return ajax.make_request(args, callback, extra, name);
     },
 
     show_loading_icon: function() {
@@ -33,17 +44,21 @@ var Hm_Ajax = {
         move_background_image();
     },
 
-    process_callback_hooks: function(res) {
+    process_callback_hooks: function(name, res) {
         var hook;
+        var func;
         var i;
         for (i in Hm_Ajax.callback_hooks) {
             hook = Hm_Ajax.callback_hooks[i];
-            hook(res);
+            if (hook[0] == name) {
+                func = hook[1];
+                func(res);
+            }
         }
     },
 
-    add_callback_hook: function(callback, hook_function) {
-        Hm_Ajax.callback_hooks[callback] = hook_function;
+    add_callback_hook: function(request_name, hook_function) {
+        Hm_Ajax.callback_hooks.push([request_name, hook_function]);
     },
 
     stop_loading_icon : function(loading_id) {
@@ -55,12 +70,14 @@ var Hm_Ajax = {
 /* ajax request wrapper */
 var Hm_Ajax_Request = function() { return { 
     callback: false,
+    name: false,
     index: 0,
     start_time: 0,
 
-    make_request: function(args, callback, extra) {
+    make_request: function(args, callback, extra, request_name) {
         var name;
         var arg;
+        this.name = request_name;
         this.callback = callback;
         if (extra) {
             for (name in extra) {
@@ -120,8 +137,8 @@ var Hm_Ajax_Request = function() { return {
             }
             if (this.callback) {
                 this.callback(res);
-                Hm_Ajax.process_callback_hooks(res);
             }
+            Hm_Ajax.process_callback_hooks(this.name, res);
         }
     },
 
@@ -140,7 +157,7 @@ var Hm_Ajax_Request = function() { return {
         if (Hm_Ajax.request_count === 0) {
             Hm_Message_List.set_checkbox_callback();
             Hm_Ajax.aborted = false;
-            Hm_Ajax.callback_hooks = {};
+            Hm_Ajax.callback_hooks = [];
             if (Hm_Ajax.batch_callback) {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
@@ -274,6 +291,7 @@ function Message_List() {
 
     this.run_callbacks = function (completed) {
         var func;
+        var index;
         if (completed) {
             for (index in this.callbacks) {
                 func = this.callbacks[index];
