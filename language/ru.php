@@ -104,7 +104,7 @@ return array(
     'New password' => 'Новый пароль',
     'New password again' => 'Подтверди пароль',
     'Exclude unread feed items' => 'Исключить непрочитанное',
-    'Feed Settings' => 'Параметры ленты'
+    'Feed Settings' => 'Параметры ленты',
     'Show feed items received since' => 'Показать сообщения в ленте',
     'Max feed items to display' => 'Максимальное количество элементов в ленте',
     'POP3 Settings' => 'Настройки POP3',
@@ -159,7 +159,7 @@ return array(
     'All Email' => 'Все email',
     'POP3 username' => 'Пользователь POP3',
     'POP3 password' => 'Пароль POP3',
-    'White Bread (Default)' => 'White Bread (по умолчанию)'
+    'White Bread (Default)' => 'White Bread (по умолчанию)',
     'Boring Blues' => false,
     'Dark But Not Too Dark' => false,
     'More Gray Than White Bread' => false,
