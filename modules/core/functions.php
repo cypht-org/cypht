@@ -52,6 +52,7 @@ function interface_langs() {
         'en' => 'English',
         'de' => 'German',
         'it' => 'Italian',
+        'ru' => 'Russian',
     );
 }
 
