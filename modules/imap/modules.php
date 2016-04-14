@@ -1002,6 +1002,19 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
                         $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
                         $msg_struct_current = array_shift($struct);
+                        if (!trim($msg_text)) {
+                            if (array_key_exists('subtype', $msg_struct_current)) {
+                                if ($msg_struct_current['subtype'] == 'plain') {
+                                    $subtype = 'html';
+                                }
+                                else {
+                                    $subtype = 'plain';
+                                }
+                                list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', $subtype, $msg_struct);
+                                $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
+                                $msg_struct_current = array_shift($struct);
+                            }
+                        }
                     }
                     if (isset($msg_struct_current['subtype']) && strtolower($msg_struct_current['subtype'] == 'html')) {
                         $msg_text = add_attached_images($msg_text, $form['imap_msg_uid'], $msg_struct, $imap);
