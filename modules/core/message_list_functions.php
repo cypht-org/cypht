@@ -280,11 +280,11 @@ function icon_callback($vals, $style, $output_mod) {
 function message_controls($output_mod) {
     $res = '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
         '<div class="msg_controls">'.
-        '<a href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
-        '<a href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
-        '<a href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
-        '<a href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
-        '<a href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>';
+        '<a class="core_msg_control" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
+        '<a class="core_msg_control" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
+        '<a class="core_msg_control" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
+        '<a class="core_msg_control" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
+        '<a class="core_msg_control" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>';
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
     }

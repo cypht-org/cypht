@@ -90,7 +90,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .news_cell .msg_date { clear: both; }
 .msg_img { max-width: 100%; }
 .wait { }
-.msg_controls { display: none; padding-left: 0px; margin-right: 20px; }
+.msg_controls { position: relative; display: none; padding-left: 0px; margin-right: 20px; }
 .msg_controls_visible { display: inline; }
 .msg_controls a, .toggle_link { font-size: .6em; letter-spacing: 0px; color: #666; background-color: #fff; border: solid 1px #ede8e6; padding: 3px; width: 30px; border-radius: 3px; vertical-align: 3px; }
 .msg_controls a { margin-right: 3px; }
