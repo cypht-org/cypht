@@ -59,9 +59,7 @@ add_handler('ajax_hm_folders', 'load_imap_servers_from_config',  true, 'imap', '
 add_handler('ajax_hm_folders', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_hm_folders', 'load_imap_folders',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_hm_folders', 'add_imap_servers_to_page_data',  true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('ajax_hm_folders', 'imap_auto_bcc_check',  true, 'imap', 'load_imap_servers_from_config', 'after');
 add_output('ajax_hm_folders', 'filter_imap_folders',  true, 'imap', 'folder_list_content_start', 'before');
-add_output('ajax_hm_folders', 'sent_folder_link', true, 'imap', 'logout_menu_item', 'before');
 
 /* ajax server setup callback data */
 setup_base_ajax_page('ajax_imap_debug', 'core');
