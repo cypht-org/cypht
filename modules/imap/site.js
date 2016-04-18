@@ -176,7 +176,10 @@ var imap_flag_message = function(state) {
                     $('#flag_msg').hide();
                     $('#unflag_msg').show();
                 }
+                $('.next').remove();
+                $('.prev').remove();
                 set_message_content();
+                imap_message_view_finished();
             }
         );
     }
@@ -571,6 +574,41 @@ var imap_background_unread_content_result = function(res) {
     }
 };
 
+
+var check_select_for_imap = function() {
+    $('input[type=checkbox]').unbind('change'); 
+    $('input[type=checkbox]').change(function(e) { search_selected_for_imap(); });
+};
+
+var search_selected_for_imap = function() {
+    var imap_selected = false;
+    $('input[type=checkbox]').each(function() {
+        if (this.checked && this.id.search('imap') != -1) {
+            imap_selected = true;
+            return false;
+        }
+    });
+    if (imap_selected) {
+        $('.imap_move').removeClass('disabled_input');
+        $('.imap_move').unbind('click');
+        $('.imap_move').click(function(e) {return imap_move_copy($(this).data('action'));});
+    }
+    else {
+        $('.imap_move').addClass('disabled_input');
+        $('.imap_move').unbind('click');
+        $('.imap_move').click(function() { return false; });
+    }
+};
+
+var imap_move_copy = function(action) {
+    $('main').attr('disable', true);
+    $('main').addClass('disabled_input');
+    $('main').css('opacity', '.1');
+    $('.src_name').each(function(e) { Hm_Utils.toggle_section($(this).data('source'), false, true); });
+    Hm_Utils.toggle_section('.email_folders');
+    return false;
+};
+
 var imap_background_unread_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
@@ -596,6 +634,13 @@ else if (hm_page_name() === 'info') {
 }
 
 $(function() {
+    if ($('.imap_move').length > 0) {
+        check_select_for_imap();
+        Hm_Ajax.add_callback_hook('ajax_imap_folder_display', check_select_for_imap);
+        Hm_Message_List.callbacks.push(check_select_for_imap);
+        $('.imap_move').click(function() { return false; });
+    }
+
     if (hm_list_path() !== 'unread') {
         if (typeof hm_data_sources_background === 'function') {
             globals.Hm_Background_Unread = new Message_List();
