@@ -598,7 +598,7 @@ function Message_List() {
                 self.setup_combined_view(false);
             }
         }
-        $('.msg_controls > a').click(function() { return self.message_action($(this).data('action')); });
+        $('.core_msg_control').click(function() { return self.message_action($(this).data('action')); });
         $('.toggle_link').click(function() { return self.toggle_rows(); });
         $('.refresh_link').click(function() { return self.load_sources(); });
     };
@@ -812,8 +812,18 @@ var Hm_Folders = {
     },
     sort_list: function(class_name, exclude_name) {
         var folder = $('.'+class_name+' ul');
-        var listitems = $('li:not(.'+exclude_name+')', folder);
+        var listitems;
+        if (exclude_name) {
+            listitems = $('li:not(.'+exclude_name+')', folder);
+        }
+        else {
+            listitems = $('li', folder);
+        }
         listitems.sort(function(a, b) {
+            if ($(b).attr('class') == 'menu_logout') {
+                elog('here');
+                return false;
+            }
             if ($(b).text().toUpperCase() == 'ALL') {
                 return true;
             }
@@ -825,6 +835,7 @@ var Hm_Folders = {
         $('.folder_list').html(res.formatted_folder_list);
         Hm_Folders.sort_list('email_folders', 'menu_email');
         Hm_Folders.sort_list('feeds_folders', 'menu_feeds');
+        Hm_Folders.sort_list('main', '');
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         Hm_Folders.hl_selected_menu();
         Hm_Folders.folder_list_events();

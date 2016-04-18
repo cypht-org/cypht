@@ -928,7 +928,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
  */
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
     protected function output() {
-        $res =  '<li><a class="unread_link logout_link" href="#"><img class="account_icon" src="'.
+        $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#"><img class="account_icon" src="'.
             $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a></li>';
 
         if ($this->format == 'HTML5') {
