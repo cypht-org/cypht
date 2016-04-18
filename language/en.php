@@ -182,7 +182,6 @@ return array(
     'You have %d %s source' => false,
     'You have %d %s sources' => false,
     'Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, POP3, or SMTP access - which most do.' => false,
-    'Add An E-mail Account' => false,
     'Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP/POP3 sections below.' => false,
     'Select an E-mail provider' => false,
     'AOL' => false,
@@ -344,6 +343,20 @@ return array(
     'October, %s' => false,
     'November, %s' => false,
     'December, %s' => false,
+    'all headers' => false,
+    'small headers' => false,
+    'Contact Deleted' => false,
+    'Contact Updated' => false,
+    'Contact Added' => false,
+    'Update Local Contact' => false,
+    'Add an Event' => false,
+    'Time' => false,
+    'Repeat' => false,
+    'Title' => false,
+    'Detail' => false,
+    'Event Created' => false,
+    'Repeats every %s' => false,
+    'Event Deleted',
 ); 
 
 ?>
