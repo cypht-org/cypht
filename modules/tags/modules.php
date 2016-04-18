@@ -18,7 +18,6 @@ class Hm_Handler_mod_env extends Hm_Handler_Module {
             $this->module_is_supported('pop3') ? 'pop3' : false,
             $this->module_is_supported('feeds') ? 'feeds' : false,
             $this->module_is_supported('github') ? 'github' : false,
-            $this->module_is_supported('nasa') ? 'nasa' : false,
             $this->module_is_supported('wordpress') ? 'wordpress' : false
         )));
     }
