@@ -172,6 +172,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             if (preg_match("/^imap_\d+_.+$/", $path)) {
                 $this->out('list_meta', false, false);
                 $this->out('list_path', $path, false);
+                $this->out('move_copy_controls', true);
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump(intval($parts[1]));
                 $custom_link = 'add';
@@ -726,6 +727,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 break;
         }
         if ($callback) {
+            if ($callback != 'imap_background_unread_content') {
+                $this->out('move_copy_controls', true);
+            }
             foreach (imap_data_sources($callback, $this->user_config->get('custom_imap_sources', array())) as $vals) {
                 if ($callback == 'imap_background_unread_content') {
                     $vals['group'] = 'background';
@@ -1184,8 +1188,15 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             if (strtolower($name) == 'flags') {
                                 $name = $this->trans('Tags');
                                 $value = str_replace('\\', '', $value);
+                                $new_value = array();
+                                foreach (explode(' ', $value) as $v) {
+                                    elog($v);
+                                    $new_value[] = $this->trans(trim($v));
+                                }
+                                $value = implode(', ', $new_value);
+
                             }
-                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$value.'</td></tr>';
                         }
                         break;
                     }
@@ -1197,8 +1208,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
-                '<a href="#" class="hlink header_toggle">'.$this->trans('all').'</a>'.
-                '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small').'</a>'.
+                '<a href="#" class="hlink header_toggle">'.$this->trans('all headers').'</a>'.
+                '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small headers').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('reply').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('reply-all').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('forward').'</a>'.
@@ -1373,6 +1384,20 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
             ksort($folder_data);
             $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this);
             $this->out('imap_expanded_folder_formatted', $res);
+        }
+    }
+}
+
+/**
+ * Add move/copy dialog to the message list controls
+ * @subpackage imap/output
+ */
+class Hm_Output_move_copy_controls extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('move_copy_controls', false)) {
+            $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
+            $res .= '<a class="imap_move disabled_input" href="#" data-action="move">'.$this->trans('Move').'</a>';
+            $this->concat('msg_controls_extra', $res);
         }
     }
 }

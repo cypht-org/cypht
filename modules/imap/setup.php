@@ -36,6 +36,7 @@ add_handler('search', 'imap_message_list_type', true, 'imap', 'message_list_type
 /* message list pages */
 add_handler('message_list', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message_list', 'imap_custom_controls', true, 'imap', 'message_list_heading', 'before');
+//add_output('message_list', 'move_copy_controls', true, 'imap', 'message_list_heading', 'before');
 
 /* message view page */
 add_handler('message', 'imap_download_message', true, 'imap', 'message_list_type', 'after');
