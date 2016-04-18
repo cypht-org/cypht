@@ -469,6 +469,32 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 }
 
 /**
+ * Determine if auto-bcc is active
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_smtp_auto_bcc_check extends Hm_Handler_Module {
+    /**
+     * Set the auto bcc state for output modules to use
+     */
+    public function process() {
+        $this->out('auto_bcc_enabled', $this->user_config->get('smtp_auto_bcc_setting', 0));
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_sent_folder_link extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('auto_bcc_enabled', 0)) {
+            $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">'.
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> '.$this->trans('Sent').'</a></li>';
+            $this->concat('formatted_folder_list', $res);
+        }
+    }
+}
+
+/**
  * @subpackage smtp/output
  */
 class Hm_Output_compose_form_start extends Hm_Output_Module {
