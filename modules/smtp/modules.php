@@ -603,7 +603,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
             '<table><tr><td colspan="2"><label for="new_smtp_name" class="screen_reader">'.$this->trans('SMTP account name').'</label>'.
             '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld" value="'.$name.'" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_address" class="screen_reader">'.$this->trans('SMTP server address').'</label>'.
-            '<input required type="text" id="new_smtp_address" name="new_smtp_address" value="'.$address.'" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" value=""/></td></tr>'.
+            '<input required type="text" id="new_smtp_address" name="new_smtp_address" value="'.$address.'" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" /></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_port" class="screen_reader">'.$this->trans('SMTP port').'</label>'.
             '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="'.$port.'" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr><td><input type="checkbox" name="tls" value="1" id="smtp_tls" checked="checked" /> <label for="smtp_tls">'.$this->trans('Use TLS').'</label></td>'.

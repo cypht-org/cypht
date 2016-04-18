@@ -499,7 +499,7 @@ class Hm_Output_github_add_repo extends Hm_Output_Module {
                     '<input type="hidden" name="github_repo" value="'.$this->html_safe($repo).'" />'.
                     '<input type="submit" name="github_remove_repo" value="'.$this->trans('Remove').'" class="github_remove_repo" />'.$this->html_safe($repo).'</form></div>';
             }
-            $res .= '</div></div></div>';
+            $res .= '</div></div><div class="end_float"></div></div>';
         }
         return $res;
     }
