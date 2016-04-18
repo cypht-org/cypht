@@ -340,7 +340,7 @@ abstract class Hm_Output_Module {
         else {
             Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string));
         }
-        return $this->html_safe($string);
+        return str_replace('\n', '<br />', $this->html_safe($string));
     }
 
     /**
