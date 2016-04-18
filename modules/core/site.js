@@ -649,15 +649,15 @@ function Message_List() {
             document.title = count+' Flagged';
         }
         else if (hm_list_path() == 'combined_inbox') {
-            count = $('.unseen', $('.message_table tbody')).length;
+            count = $('tr .unseen', $('.message_table tbody')).length;
             document.title = count+' Unread in Everything';
         }
         else if (hm_list_path() == 'email') {
-            count = $('.unseen', $('.message_table tbody')).length;
+            count = $('tr .unseen', $('.message_table tbody')).length;
             document.title = count+' Unread in Email';
         }
         else if (hm_list_path() == 'feeds') {
-            count = $('.unseen', $('.message_table tbody')).length;
+            count = $('tr .unseen', $('.message_table tbody')).length;
             document.title = count+' Unread in Feeds';
         }
     };
@@ -999,8 +999,11 @@ var Hm_Utils = {
         }
         return false;
     },
-    toggle_section: function(class_name, force_on) {
+    toggle_section: function(class_name, force_on, force_off) {
         if ($(class_name).length) {
+            if (force_off) {
+                $(class_name).css('display', 'block');
+            }
             if (force_on) {
                 $(class_name).css('display', 'none');
             }
