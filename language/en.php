@@ -152,7 +152,6 @@ return array(
     'forward' => false,
     'attach' => false,
     'raw' => false,
-    'flag' => false,
     'unflag' => false,
     'All Email' => false,
     'POP3 username' => false,
