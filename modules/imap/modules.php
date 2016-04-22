@@ -11,6 +11,68 @@ if (!defined('DEBUG_MODE')) { die(); }
 require_once APP_PATH.'modules/imap/hm-imap.php';
 
  /**
+ * Process an IMAP move/copy action
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_process_move extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_move_to', 'imap_move_action', 'imap_move_ids'));
+        if ($success) {
+            $msg_ids = explode(',', $form['imap_move_ids']);
+            $same_server_ids = array();
+            $other_server_ids = array();
+            $dest_path = explode('_', $form['imap_move_to']);
+            if (count($dest_path) == 3 && $dest_path[0] == 'imap' && in_array($form['imap_move_action'], array('move', 'copy'), true)) {
+                foreach ($msg_ids as $msg_id) {
+                    $path = explode('_', $msg_id);
+                    if (count($path) == 4 && $path[0] == 'imap') {
+                        if (sprintf('%s_%s', $path[0], $path[1]) == sprintf('%s_%s', $dest_path[0], $dest_path[1])) {
+                            $same_server_ids[$path[1]][$path[3]][] = $path[2];
+                        }
+                        else {
+                            $other_server_ids[$path[1]][$path[3]][] = $path[2];
+                        }
+                    }
+                }
+            }
+            $count = 0;
+            if (count($same_server_ids) > 0) {
+                $keys = array_keys($same_server_ids);
+                $server_id = array_pop($keys);
+                $cache = Hm_IMAP_List::get_cache($this->session, $server_id);
+                $imap = Hm_IMAP_List::connect($server_id, $cache);
+                foreach ($same_server_ids[$server_id] as $folder => $msgs) {
+                    if ($imap && $imap->select_mailbox(hex2bin($folder))) {
+                        $imap->message_action(strtoupper($form['imap_move_action']), $msgs, hex2bin($dest_path[2]));
+                        $count++;
+                    }
+                }
+            }
+            if (count($other_server_ids) > 0) {
+                /* connect to destination server and select mailbox
+                 * loop through other server ids 
+                 * connect to other server id
+                 * loop through folders 
+                 * select folder
+                 * get size for msg
+                 * append the message
+                 * increment $count
+                 */
+            }
+            if ($count > 0 && count($msg_ids) == $count) {
+                Hm_Msgs::add('All messages moved');
+            }
+            elseif ($count > 0) {
+                Hm_Msgs::add('Some messages moved (only IMAP message types can be moved)');
+            }
+            elseif ($count == 0) {
+                Hm_Msgs::add('ERRUnable to move any selected messages');
+            }
+        }
+    }
+}
+
+ /**
  * Flag a message as answered
  * @subpackage imap/handler
  */
@@ -1192,7 +1254,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 $value = str_replace('\\', '', $value);
                                 $new_value = array();
                                 foreach (explode(' ', $value) as $v) {
-                                    elog($v);
                                     $new_value[] = $this->trans(trim($v));
                                 }
                                 $value = implode(', ', $new_value);
@@ -1399,6 +1460,8 @@ class Hm_Output_move_copy_controls extends Hm_Output_Module {
         if ($this->get('move_copy_controls', false)) {
             $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
             $res .= '<a class="imap_move disabled_input" href="#" data-action="move">'.$this->trans('Move').'</a>';
+            $res .= '<div class="move_to_location"></div>';
+            $res .= '<input type="hidden" class="move_to_type" value="" />';
             $this->concat('msg_controls_extra', $res);
         }
     }

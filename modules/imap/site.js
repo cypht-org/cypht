@@ -365,15 +365,15 @@ var display_imap_mailbox = function(res) {
 
 var expand_imap_mailbox = function(res) {
     if (res.imap_expanded_folder_path) {
-        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path)).append(res.imap_expanded_folder_formatted);
-        $('.imap_folder_link').unbind('click');
-        $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
+        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.email_folders')).append(res.imap_expanded_folder_formatted);
+        $('.imap_folder_link', $('.email_folders')).unbind('click');
+        $('.imap_folder_link', $('.email_folders')).click(function() { return expand_imap_folders($(this).data('target')); });
     }
 };
 
 var expand_imap_folders = function(path) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
-    var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder));
+    var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.email_folders'));
     if ($('li', list).length === 0) {
         $('.expand_link', list).html('-');
         if (detail) {
@@ -601,11 +601,72 @@ var search_selected_for_imap = function() {
 };
 
 var imap_move_copy = function(action) {
-    $('main').attr('disable', true);
-    $('main').addClass('disabled_input');
-    $('main').css('opacity', '.1');
-    $('.src_name').each(function(e) { Hm_Utils.toggle_section($(this).data('source'), false, true); });
-    Hm_Utils.toggle_section('.email_folders');
+    var move_to = $('.move_to_location');
+    var folders = $('.email_folders').clone(false);
+    folders.removeClass('email_folders');
+    folders.show();
+    $('.imap_folder_link', folders).addClass('imap_move_folder_link').removeClass('imap_folder_link');
+    move_to.html(folders);
+    $('.imap_move_folder_link', move_to).click(function() { return expand_imap_move_to_folders($(this).data('target')); });
+    $('a', move_to).not('.imap_move_folder_link').unbind('click');
+    $('a', move_to).not('.imap_move_folder_link').click(function() { imap_perform_move_copy($(this).data('id')); return false; });
+    $('.move_to_type').val(action);
+    move_to.show();
+    return false;
+};
+
+var imap_perform_move_copy = function(dest_id) {
+    var action = $('.move_to_type').val();
+    var ids = [];
+    $('.move_to_location').html('');
+    $('.move_to_location').hide();
+    $('input[type=checkbox]').each(function() {
+        if (this.checked && this.id.search('imap') != -1) {
+            ids.push(this.id);
+        }
+    });
+    if (ids.length) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_move_copy_action'},
+            {'name': 'imap_move_ids', 'value': ids.join(',')},
+            {'name': 'imap_move_to', 'value': dest_id},
+            {'name': 'imap_move_action', 'value': action}],
+            function(res) {
+                /* TODO: remove moved messages if need be */
+            }
+        );
+    }
+};
+
+var expand_imap_move_to_mailbox = function(res) {
+    if (res.imap_expanded_folder_path) {
+        var move_to = $('.move_to_location');
+        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.move_to_location')).append(res.imap_expanded_folder_formatted);
+        $('.imap_folder_link', move_to).unbind('click');
+        $('.imap_folder_link', move_to).click(function() { return expand_imap_move_to_folders($(this).data('target')); });
+        $('a', move_to).not('.imap_move_folder_link').unbind('click');
+        $('a', move_to).not('.imap_move_folder_link').click(function() { imap_perform_move_copy($(this).data('id')); return false; });
+    }
+};
+
+var expand_imap_move_to_folders = function(path) {
+    var detail = Hm_Utils.parse_folder_path(path, 'imap');
+    var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.move_to_location'));
+    if ($('li', list).length === 0) {
+        $('.expand_link', list).html('-');
+        if (detail) {
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
+                {'name': 'imap_server_id', 'value': detail.server_id},
+                {'name': 'folder', 'value': detail.folder}],
+                expand_imap_move_to_mailbox
+            );
+        }
+    }
+    else {
+        $('.expand_link', list).html('+');
+        $('ul', list).remove();
+    }
     return false;
 };
 
