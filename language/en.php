@@ -356,7 +356,7 @@ return array(
     'Detail' => false,
     'Event Created' => false,
     'Repeats every %s' => false,
-    'Event Deleted',
+    'Event Deleted' => false,
 ); 
 
 ?>
