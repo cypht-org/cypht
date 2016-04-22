@@ -193,6 +193,8 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             }
             elseif ($path == 'sent') {
                 $this->out('mailbox_list_title', array('Sent'));
+                $this->out('per_source_limit', 100);
+                $this->out('message_list_since', '-5 years');
             }
         }
     }
@@ -463,8 +465,8 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_SINCE));
+            $limit = 100;
+            $date = process_since_argument('-5 years');
             $ids = explode(',', $form['imap_server_ids']);
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
