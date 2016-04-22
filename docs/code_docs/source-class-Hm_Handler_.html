@@ -713,6 +713,7 @@
 				<li><a href="class-Hm_Handler_imap_message_content.html">Hm_Handler_imap_message_content</a></li>
 				<li><a href="class-Hm_Handler_imap_message_list_type.html">Hm_Handler_imap_message_list_type</a></li>
 				<li><a href="class-Hm_Handler_imap_oauth2_token_check.html">Hm_Handler_imap_oauth2_token_check</a></li>
+				<li><a href="class-Hm_Handler_imap_process_move.html">Hm_Handler_imap_process_move</a></li>
 				<li><a href="class-Hm_Handler_imap_save.html">Hm_Handler_imap_save</a></li>
 				<li><a href="class-Hm_Handler_imap_search.html">Hm_Handler_imap_search</a></li>
 				<li><a href="class-Hm_Handler_imap_sent.html">Hm_Handler_imap_sent</a></li>
@@ -1584,7 +1585,7 @@
 </span><span id="340" class="l"><a href="#340">340: </a>        <span class="php-keyword1">else</span> {
 </span><span id="341" class="l"><a href="#341">341: </a>            Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'TRANSLATION NOT FOUND :%s:'</span>, <span class="php-var">$string</span>));
 </span><span id="342" class="l"><a href="#342">342: </a>        }
-</span><span id="343" class="l"><a href="#343">343: </a>        <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$string</span>);
+</span><span id="343" class="l"><a href="#343">343: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">str_replace</span>(<span class="php-quote">'\n'</span>, <span class="php-quote">'&lt;br /&gt;'</span>, <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$string</span>));
 </span><span id="344" class="l"><a href="#344">344: </a>    }
 </span><span id="345" class="l"><a href="#345">345: </a>
 </span><span id="346" class="l"><a href="#346">346: </a>    <span class="php-comment">/**
@@ -1629,6 +1630,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?f8aa28d32678aa9fa4990ff2eea9abd7b82f934a"></script>
+<script src="elementlist.js?fcd287d8cd305dbe50d979bd87dcdb81c94852a3"></script>
 </body>
 </html>
