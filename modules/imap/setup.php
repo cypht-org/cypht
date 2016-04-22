@@ -128,6 +128,13 @@ add_handler('ajax_imap_status', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_status', 'imap_status',  true);
 add_output('ajax_imap_status', 'filter_imap_status_data', true);
 
+/* move/copy callback */
+setup_base_ajax_page('ajax_imap_move_copy_action', 'core');
+add_handler('ajax_imap_move_copy_action', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_move_copy_action', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_move_copy_action', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_move_copy_action', 'imap_process_move',  true);
+
 /* ajax flagged callback data */
 setup_base_ajax_page('ajax_imap_flagged', 'core');
 add_handler('ajax_imap_flagged', 'message_list_type', true, 'core');
@@ -222,6 +229,7 @@ return array(
         'ajax_imap_flag_message',
         'ajax_imap_update_combined_source',
         'ajax_imap_mark_as_read',
+        'ajax_imap_move_copy_action'
     ),
 
     'allowed_output' => array(
@@ -276,6 +284,9 @@ return array(
         'imap_flag_state' => FILTER_SANITIZE_STRING,
         'combined_source_state' => FILTER_VALIDATE_INT,
         'list_path' => FILTER_SANITIZE_STRING,
+        'imap_move_ids' => FILTER_SANITIZE_STRING,
+        'imap_move_to' => FILTER_SANITIZE_STRING,
+        'imap_move_action' => FILTER_SANITIZE_STRING
     )
 );
 
