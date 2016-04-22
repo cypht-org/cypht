@@ -821,7 +821,6 @@ var Hm_Folders = {
         }
         listitems.sort(function(a, b) {
             if ($(b).attr('class') == 'menu_logout') {
-                elog('here');
                 return false;
             }
             if ($(b).text().toUpperCase() == 'ALL') {
