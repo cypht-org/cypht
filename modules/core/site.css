@@ -216,7 +216,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .folder_toggle img { width: 24px; height: 24px; }
     .update_message_list { margin-right: 20px; }
     .msg_text { max-width: 360px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
-    .msg_controls { position: absolute; background-color: #fff !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; }
+    .msg_controls { position: absolute; z-index: 100; right: -20px; height: 39px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; padding-left: 10px; padding-top: 20px; top: 0px; left: 60px !important; }
     .header_subject th { white-space: normal !important; word-break: break-all !important; word-wrap: break-word !important; }
     .msg_headers th { padding-left: 10px !important; }
     .nlink, .plink, .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
