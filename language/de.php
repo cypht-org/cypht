@@ -361,7 +361,7 @@ return array(
     'Move to ...' => 'Verschiebe nach...',
     'Copy to ...' => 'Kopiere nach...',
     'Removed non-IMAP messages from selection. They cannot be moved or copied' => 'Nicht-IMAP E-Mail aus dieser Ansicht entfernt. Sie können nicht verschoben oder Kopiert werden.',
-	'Messages moved' => 'E-Mails verschoben',
+    'Messages moved' => 'E-Mails verschoben',
     'Messages copied' => 'E-Mails Kopiert',
     'Some messages moved (only IMAP message types can be moved)' => 'Paar E-Mail verschoben (nur IMAP E-Mails können verschoben werden)',
     'Some messages copied (only IMAP message types can be copied)' => 'Paar E-Mail kopiert (nur IMAP E-Mail können Kopiert werden)',
