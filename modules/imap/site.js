@@ -611,20 +611,25 @@ var unselect_non_imap_messages = function() {
         }
     });
     if (unselected > 0) {
-        /* TODO: translate */
-        Hm_Notices.show({0: 'ERRRemoved non-IMAP messages from selection. They cannot be moved or copied'});
+        Hm_Notices.show({0: 'ERR'+$('.move_to_string3').val()});
     }
 };
 
 var imap_move_copy = function(action) {
     unselect_non_imap_messages();
+    var label;
     var move_to = $('.move_to_location');
     var folders = $('.email_folders').clone(false);
     folders.removeClass('email_folders');
     folders.show();
     $('.imap_folder_link', folders).addClass('imap_move_folder_link').removeClass('imap_folder_link');
-    /* TODO: translate */
-    folders.prepend('<div class="move_to_title">'+action+' to ...<span><a class="close_move_to" href="#">X</a></span></div>');
+    if (action == 'move') {
+        label = $('.move_to_string1').val(); 
+    }
+    else {
+        label = $('.move_to_string2').val();
+    }
+    folders.prepend('<div class="move_to_title">'+label+'<span><a class="close_move_to" href="#">X</a></span></div>');
     move_to.html(folders);
     $('.imap_move_folder_link', move_to).click(function() { return expand_imap_move_to_folders($(this).data('target')); });
     $('a', move_to).not('.imap_move_folder_link').not('.close_move_to').unbind('click');

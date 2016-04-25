@@ -1443,6 +1443,9 @@ class Hm_Output_move_copy_controls extends Hm_Output_Module {
             $res .= '<a class="imap_move disabled_input" href="#" data-action="move">'.$this->trans('Move').'</a>';
             $res .= '<div class="move_to_location"></div>';
             $res .= '<input type="hidden" class="move_to_type" value="" />';
+            $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
+            $res .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
+            $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
             $this->concat('msg_controls_extra', $res);
         }
     }
