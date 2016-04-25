@@ -620,6 +620,7 @@ var imap_move_copy = function(action) {
     var label;
     var move_to = $('.move_to_location');
     var folders = $('.email_folders').clone(false);
+    $('.menu_email', folders).remove();
     folders.removeClass('email_folders');
     folders.show();
     $('.imap_folder_link', folders).addClass('imap_move_folder_link').removeClass('imap_folder_link');
