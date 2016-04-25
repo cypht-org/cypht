@@ -18,56 +18,37 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_move_to', 'imap_move_action', 'imap_move_ids'));
         if ($success) {
-            $msg_ids = explode(',', $form['imap_move_ids']);
-            $same_server_ids = array();
-            $other_server_ids = array();
-            $dest_path = explode('_', $form['imap_move_to']);
-            if (count($dest_path) == 3 && $dest_path[0] == 'imap' && in_array($form['imap_move_action'], array('move', 'copy'), true)) {
-                foreach ($msg_ids as $msg_id) {
-                    $path = explode('_', $msg_id);
-                    if (count($path) == 4 && $path[0] == 'imap') {
-                        if (sprintf('%s_%s', $path[0], $path[1]) == sprintf('%s_%s', $dest_path[0], $dest_path[1])) {
-                            $same_server_ids[$path[1]][$path[3]][] = $path[2];
-                        }
-                        else {
-                            $other_server_ids[$path[1]][$path[3]][] = $path[2];
-                        }
-                    }
-                }
-            }
-            $count = 0;
+            list($msg_ids, $dest_path, $same_server_ids, $other_server_ids) = process_move_to_arguments($form);
+            $moved = array();
             if (count($same_server_ids) > 0) {
-                $keys = array_keys($same_server_ids);
-                $server_id = array_pop($keys);
-                $cache = Hm_IMAP_List::get_cache($this->session, $server_id);
-                $imap = Hm_IMAP_List::connect($server_id, $cache);
-                foreach ($same_server_ids[$server_id] as $folder => $msgs) {
-                    if ($imap && $imap->select_mailbox(hex2bin($folder))) {
-                        $imap->message_action(strtoupper($form['imap_move_action']), $msgs, hex2bin($dest_path[2]));
-                        $count++;
-                    }
-                }
+                $moved = array_merge($moved, imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->session));
             }
             if (count($other_server_ids) > 0) {
-                /* connect to destination server and select mailbox
-                 * loop through other server ids 
-                 * connect to other server id
-                 * loop through folders 
-                 * select folder
-                 * get size for msg
-                 * append the message
-                 * increment $count
-                 */
+                $moved = array_merge($moved, imap_move_different_server($other_server_ids, $form['imap_move_action'], $dest_path, $this->session));
+
             }
-            if ($count > 0 && count($msg_ids) == $count) {
-                Hm_Msgs::add('All messages moved');
+            if (count($moved) > 0 && count($moved) == count($msg_ids)) {
+                if ($form['imap_move_action'] == 'move') {
+                    Hm_Msgs::add('Messages moved');
+                }
+                else {
+                    Hm_Msgs::add('Messages copied');
+                }
+                $this->session->set('imap_cache', array());
             }
-            elseif ($count > 0) {
-                Hm_Msgs::add('Some messages moved (only IMAP message types can be moved)');
+            elseif (count($moved) > 0) {
+                if ($form['imap_move_action'] == 'move') {
+                    Hm_Msgs::add('Some messages moved (only IMAP message types can be moved)');
+                }
+                else {
+                    Hm_Msgs::add('Some messages copied (only IMAP message types can be copied)');
+                }
+                $this->session->set('imap_cache', array());
             }
-            elseif ($count == 0) {
-                Hm_Msgs::add('ERRUnable to move any selected messages');
+            elseif (count($moved) == 0) {
+                Hm_Msgs::add('ERRUnable to move/copy selected messages');
             }
+            $this->out('move_count', $moved);
         }
     }
 }
@@ -1457,7 +1438,7 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
  */
 class Hm_Output_move_copy_controls extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('move_copy_controls', false)) {
+        if (!$this->get('is_mobile') && $this->get('move_copy_controls', false)) {
             $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
             $res .= '<a class="imap_move disabled_input" href="#" data-action="move">'.$this->trans('Move').'</a>';
             $res .= '<div class="move_to_location"></div>';
@@ -2135,6 +2116,111 @@ function imap_refresh_oauth2_token($server, $config) {
         }
     }
     return array();
+}
+
+/**
+ * Copy/Move messages on the same IMAP server
+ * @param array $ids list of message ids with server and folder info
+ * @param string $action action type, copy or move
+ * @param object $session session interface
+ * @return int count of messages moved
+ */
+function imap_move_same_server($ids, $action, $session) {
+    $moved = array();
+    $keys = array_keys($ids);
+    $server_id = array_pop($keys);
+    $cache = Hm_IMAP_List::get_cache($session, $server_id);
+    $imap = Hm_IMAP_List::connect($server_id, $cache);
+    foreach ($ids[$server_id] as $folder => $msgs) {
+        if ($imap && $imap->select_mailbox(hex2bin($folder))) {
+            if ($imap->message_action(strtoupper($form['imap_move_action']), $msgs, hex2bin($dest_path[2]))) {
+                foreach ($msgs as $msg) {
+                    $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
+                }
+            }
+        }
+    }
+    return $moved;
+}
+
+/**
+ * Copy/Move messages on different IMAP servers
+ * @param array $ids list of message ids with server and folder info
+ * @param string $action action type, copy or move
+ * @param array $dest_path imap id and folder to copy/move to
+ * @param object $session session interface
+ * @return int count of messages moved
+ */
+function imap_move_different_server($ids, $action, $dest_path, $session) {
+    $moved = array();
+    $cache = Hm_IMAP_List::get_cache($session, $dest_path[1]);
+    $dest_imap = Hm_IMAP_List::connect($dest_path[1], $cache);
+    if ($dest_imap) {
+        foreach ($ids as $server_id => $folders) {
+            $cache = Hm_IMAP_List::get_cache($session, $server_id);
+            $imap = Hm_IMAP_List::connect($server_id, $cache);
+            foreach ($folders as $folder => $msg_ids) {
+                if ($imap && $imap->select_mailbox(hex2bin($folder))) {
+                    foreach ($msg_ids as $msg_id) {
+                        $detail = $imap->get_message_list(array($msg_id));
+                        if (array_key_exists($msg_id, $detail)) {
+                            if (stristr($detail[$msg_id]['flags'], 'seen')) {
+                                $seen = true;
+                            }
+                            else {
+                                $seen = false;
+                            }
+                        }
+                        $msg = $imap->get_message_content($msg_id, 0);
+                        $msg = str_replace("\r\n", "\n", $msg);
+                        $msg = str_replace("\n", "\r\n", $msg);
+                        $msg = rtrim($msg)."\r\n";
+                        if (!$seen) {
+                            $imap->message_action('UNREAD', array($msg_id));
+                        }
+                        if ($dest_imap->append_start(hex2bin($dest_path[2]), strlen($msg), $seen)) {
+                            $dest_imap->append_feed($msg."\r\n");
+                            if ($dest_imap->append_end()) {
+                                if ($action == 'move') {
+                                    if ($imap->message_action('DELETE', array($msg_id))) {
+                                        $imap->message_action('EXPUNGE', array($msg_id));
+                                    }
+                                }
+                                $moved[] = sprintf('imap_%s_%s_%s', $server_id, $msg_id, $folder);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return $moved;
+}
+
+/**
+ * Group info about move/copy messages
+ * @param array $form move copy input
+ * @return array grouped lists of messages to move/copy
+ */
+function process_move_to_arguments($form) {
+    $msg_ids = explode(',', $form['imap_move_ids']);
+    $same_server_ids = array();
+    $other_server_ids = array();
+    $dest_path = explode('_', $form['imap_move_to']);
+    if (count($dest_path) == 3 && $dest_path[0] == 'imap' && in_array($form['imap_move_action'], array('move', 'copy'), true)) {
+        foreach ($msg_ids as $msg_id) {
+            $path = explode('_', $msg_id);
+            if (count($path) == 4 && $path[0] == 'imap') {
+                if (sprintf('%s_%s', $path[0], $path[1]) == sprintf('%s_%s', $dest_path[0], $dest_path[1])) {
+                    $same_server_ids[$path[1]][$path[3]][] = $path[2];
+                }
+                else {
+                    $other_server_ids[$path[1]][$path[3]][] = $path[2];
+                }
+            }
+        }
+    }
+    return array($msg_ids, $dest_path, $same_server_ids, $other_server_ids);
 }
 
 /**

@@ -36,7 +36,7 @@ add_handler('search', 'imap_message_list_type', true, 'imap', 'message_list_type
 /* message list pages */
 add_handler('message_list', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message_list', 'imap_custom_controls', true, 'imap', 'message_list_heading', 'before');
-//add_output('message_list', 'move_copy_controls', true, 'imap', 'message_list_heading', 'before');
+add_output('message_list', 'move_copy_controls', true, 'imap', 'message_list_heading', 'before');
 
 /* message view page */
 add_handler('message', 'imap_download_message', true, 'imap', 'message_list_type', 'after');
@@ -132,8 +132,8 @@ add_output('ajax_imap_status', 'filter_imap_status_data', true);
 setup_base_ajax_page('ajax_imap_move_copy_action', 'core');
 add_handler('ajax_imap_move_copy_action', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_move_copy_action', 'imap_oauth2_token_check', true);
-add_handler('ajax_imap_move_copy_action', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_move_copy_action', 'imap_process_move',  true);
+add_handler('ajax_imap_move_copy_action', 'close_session_early',  true, 'core');
 
 /* ajax flagged callback data */
 setup_base_ajax_page('ajax_imap_flagged', 'core');
@@ -245,6 +245,7 @@ return array(
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_STRING, false),
         'page_links' => array(FILTER_UNSAFE_RAW, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'move_count' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
     ),
 
     'allowed_get' => array(

@@ -1484,7 +1484,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * $return bool true on success
      */
     public function append_start($mailbox, $size, $seen=true) {
-        if (!$this->clean($mailbox, 'mailbox') || !$this->clean($size, 'uid')) {
+        if (!$this->is_clean($mailbox, 'mailbox') || !$this->is_clean($size, 'uid')) {
             return false;
         }
         if ($seen) {
@@ -1509,9 +1509,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @return int length written
      */
     public function append_feed($string) {
-        fwrite($this->handle, $string);
-        $res = strlen($string);
-        return $res;
+        return fputs($this->handle, $string);
     }
 
     /**
