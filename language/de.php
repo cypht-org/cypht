@@ -356,6 +356,16 @@ return array(
     'Event Created' => 'Event hinzugefügt',
     'Repeats every %s' => 'Wiederholung alle',
     'Event Deleted' => 'Event gelöscht',
+    'Copy' => false,
+    'Move' => false,
+    'Move to ...' => false,
+    'Copy to ...' => false,
+    'Removed non-IMAP messages from selection. They cannot be moved or copied' => false,
+	'Messages moved' => false,
+    'Messages copied' => false,
+    'Some messages moved (only IMAP message types can be moved)' => false,
+    'Some messages copied (only IMAP message types can be copied)' => false,
+    'Unable to move/copy selected messages' => false,
 );
 
 ?>
