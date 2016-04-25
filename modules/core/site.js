@@ -558,6 +558,7 @@ function Message_List() {
 
     this.flag_after_action = function(action_type, selected) {
         var flagged = 0;
+        var class_name;
         var row;
         var index;
         for (index in selected) {
