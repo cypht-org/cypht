@@ -43,7 +43,7 @@ class Hm_MIME_Msg {
             $this->headers['Reply-To'] = $from;
         }
         $this->headers['To'] = $this->encode_header_fld($to);
-        $this->headers['Subject'] = $this->encode_header_fld(html_entity_decode($subject));
+        $this->headers['Subject'] = $this->encode_header_fld(html_entity_decode($subject, ENT_QUOTES));
         $this->headers['Date'] = date('r');
         $this->headers['Message-Id'] = '<'.md5(uniqid(rand(),1)).'@'.php_uname('n').'>';
         $this->boundary = Hm_Crypt::unique_id(32);
