@@ -1206,7 +1206,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
     protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
-            $from = '';
             $small_headers = array('subject', 'date', 'from', 'to', 'cc', 'flags');
             $reply_args = sprintf('&amp;list_path=imap_%d_%s&amp;uid=%d',
                 $this->html_safe($this->get('msg_server_id')),
@@ -1219,9 +1218,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
                     if ($fld == strtolower($name)) {
-                        if ($fld == 'from') {
-                            $from = $value;
-                        }
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
                             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
@@ -1276,9 +1272,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '</th></tr></table>';
 
             $this->out('msg_headers', $txt, false);
-        }
-        elseif (!$this->get('imap_prefetch')) {
-            //Hm_Msgs::add('ERR'.$this->trans('Could not fetch the message, it was moved or deleted'));
         }
     }
 }
