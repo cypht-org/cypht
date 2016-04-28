@@ -87,8 +87,8 @@ class Hm_Cal_Output {
         if (strlen(trim($event['repeat_interval']))) {
             $res .= '<div class="event_repeat">'.$this->output_mod->trans(sprintf('Repeats every %s', $event['repeat_interval'])).'</div>';
         }
-            $res .= '<form method="post"><input name="delete_title" type="hidden" value="'.$this->output_mod->html_safe($event['title']).'" />'.
-                '<input type="hidden" name="delete_ts" value="'.$this->output_mod->html_safe($event['ts']).'" />'.
+            $res .= '<form method="post"><input type="hidden" name="delete_ts" value="'.$this->output_mod->html_safe($event['ts']).'" />'.
+                '<input type="hidden" name="delete_id" value="'.$this->output_mod->html_safe($event['id']).'" />'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->output_mod->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<div class="event_delete"><a>Delete</a></div></form>';
         $res .= '</div>';
@@ -225,11 +225,11 @@ class Hm_Cal_Event_Store {
         return $events;
     }
 
-    public function delete($title, $ts) {
+    public function delete($id) {
         $events = array();
         $deleted = false;
         foreach ($this->data as $event) {
-            if ($event->get('title') == $title && $event->get('date') == $ts) {
+            if ($event->get('id') == $id) {
                 $deleted = true;
                 continue;
             }
@@ -260,6 +260,7 @@ class Hm_Cal_Event {
                 }
             }
         }
+        $this->data['id'] = md5(implode('', array_values($this->data)));
     }
 
     public function is_valid() {

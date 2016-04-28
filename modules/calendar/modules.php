@@ -30,13 +30,13 @@ class Hm_Handler_vcalendar_check extends Hm_Handler_Module {
 /**
  * @subpackage calendar/handler
  */
-class Hm_Handler_process_add_event extends Hm_Handler_Module {
+class Hm_Handler_process_delete_event extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('delete_title', 'delete_ts'));
+        list($success, $form) = $this->process_form(array('delete_id'));
         if ($success) {
             $cal_events = $this->get('cal_events');
             if (is_object($cal_events)) {
-                if ($cal_events->delete($form['delete_title'], $form['delete_ts'])) {
+                if ($cal_events->delete($form['delete_id'])) {
                     Hm_Msgs::add('Event Deleted');
                     $this->session->record_unsaved('Calendar updated');
                     $this->user_config->set('calendar_events', $cal_events->dump());
@@ -49,7 +49,7 @@ class Hm_Handler_process_add_event extends Hm_Handler_Module {
 /**
  * @subpackage calendar/handler
  */
-class Hm_Handler_process_delete_event extends Hm_Handler_Module {
+class Hm_Handler_process_add_event extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('event_title',
             'event_date', 'event_time', 'event_repeat'));
