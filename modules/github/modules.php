@@ -145,8 +145,8 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
             if (array_key_exists('code', $this->request->get)) {
                 $details = github_connect_details($this->config);
                 $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
-                $result = $oauth2->request_token($details['token_url'], $this->request->get['code']);
-                if (!empty($result) && array_key_exists('access_token', $result)) {
+                $result = $oauth2->request_token($details['token_url'], $this->request->get['code'], array('Accept: application/json'));
+                if (count($result) > 0 && array_key_exists('access_token', $result)) {
                     Hm_Msgs::add('Github connection established');
                     $this->user_config->set('github_connect_details', $result);
                     $user_data = $this->user_config->dump();
