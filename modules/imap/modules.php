@@ -1240,7 +1240,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 $value = implode(', ', $new_value);
 
                             }
-                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$value.'</td></tr>';
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                         }
                         break;
                     }
