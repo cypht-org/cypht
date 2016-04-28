@@ -52,10 +52,11 @@ class Hm_Oauth2 {
      * Use curl to exchange an authorization code for a token
      * @param string $url url to post to
      * @param string $authorization_code oauth2 auth code
+     * @param array $headers HTTP headers to add to the request
      * @return array
      */
-    public function request_token($url, $authorization_code) {
-        return $this->api->command($url, array(), array( 'code' => $authorization_code, 'client_id' => $this->client_id,
+    public function request_token($url, $authorization_code, $headers=array()) {
+        return $this->api->command($url, $headers, array('code' => $authorization_code, 'client_id' => $this->client_id,
             'client_secret' => $this->client_secret, 'redirect_uri' => $this->redirect_uri, 'grant_type' => 'authorization_code'));
     }
 
@@ -66,7 +67,7 @@ class Hm_Oauth2 {
      * @return array
      */
     public function refresh_token($url, $refresh_token) {
-        return $this->api->command($url, array(), array( 'client_id' => $this->client_id, 'client_secret' => $this->client_secret,
+        return $this->api->command($url, array(), array('client_id' => $this->client_id, 'client_secret' => $this->client_secret,
             'refresh_token' => $refresh_token, 'grant_type' => 'refresh_token'));
     }
 }
