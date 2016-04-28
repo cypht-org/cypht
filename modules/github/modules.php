@@ -563,7 +563,7 @@ class Hm_Output_github_connect_section extends Hm_Output_Module {
             $this->trans('Github Connect').'</div><div class="github_connect_section"><div class="add_server">';
         if (empty($details)) {
             $res .= 'Connect to Github<br /><br />';
-            $res .= '<a href="'.$this->get('github_auth_url', '').'">'.$this->trans('Enable').'</a></div></div>';
+            $res .= '<a href="'.$this->get('github_auth_url', '').'">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
         }
         else {
             $res .= $this->trans('Already connected');
