@@ -67,8 +67,8 @@ class Hm_Handler_process_add_event extends Hm_Handler_Module {
                 $cal_events = $this->get('cal_events');
                 if (is_object($cal_events)) {
                     if ($cal_events->add(array(
-                        'title' => $form['event_title'],
-                        'description' => $detail,
+                        'title' => html_entity_decode($form['event_title'], ENT_QUOTES),
+                        'description' => html_entity_decode($detail, ENT_QUOTES),
                         'date' => $ts,
                         'repeat_interval' => $repeat
                         ))) {
