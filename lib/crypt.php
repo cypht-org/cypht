@@ -55,6 +55,7 @@ class Hm_Crypt {
     static private $hmac = 'sha512';
     static private $password_rounds = 86000;
     static private $encryption_rounds = 100;
+    static private $hmac_rounds = 101;
 
     /**
      * Convert ciphertext to plaintext
@@ -74,8 +75,10 @@ class Hm_Crypt {
         $crypt_string = substr($string, 192);
         $salt = substr($string, 0, 128);
 
-        /* check the signature */
-        if (!self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key)) {
+        /* check the signature. Temporarily allow the same key for hmac validation, eventually remove the $encryption_rounds
+         * check and require the hmac_rounds check only! */
+        if (!self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key, self::$hmac_rounds) &&
+            !self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key, self::$encryption_rounds)) {
             return false;
         }
 
@@ -95,8 +98,8 @@ class Hm_Crypt {
      * @param string salt from generate_salt()
      * @param string key supplied key for the encryption
      */
-    public static function check_hmac($crypt_string, $hmac, $salt, $key) {
-        $hmac_key = self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac);
+    public static function check_hmac($crypt_string, $hmac, $salt, $key, $rounds) {
+        $hmac_key = self::pbkdf2($key, $salt, 32, $rounds, self::$hmac);
 
         /* make sure the crypt text has not been tampered with */
         if ($hmac !== hash_hmac(self::$hmac, $crypt_string, $hmac_key, true)) {
@@ -118,7 +121,7 @@ class Hm_Crypt {
         /* build required keys */
         $iv = self::pbkdf2($key, $salt, 16, self::$encryption_rounds, self::$hmac);
         $crypt_key = self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac);
-        $hmac_key = self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac);
+        $hmac_key = self::pbkdf2($key, $salt, 32, self::$hmac_rounds, self::$hmac);
 
         /* encrypt the string */
         $crypt_string = openssl_encrypt($string, self::$method, $crypt_key, OPENSSL_RAW_DATA, $iv);
