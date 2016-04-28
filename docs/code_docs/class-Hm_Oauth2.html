@@ -351,6 +351,18 @@
 
 						<ul>
 				<li>
+					<a href="package-modules.imap.folders.html">
+						folders<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.imap.folders.output.html">
+						output					</a>
+
+						</li>
+							</ul></li>
+				<li>
 					<a href="package-modules.imap.functions.html">
 						functions					</a>
 
@@ -700,7 +712,7 @@
 		
 		<b>Package:</b> <a href="package-framework.html">framework</a>\<a href="package-framework.oauth2.html">oauth2</a><br>
 
-			<b>Located at</b> <a href="source-class-Hm_Oauth2.html#9-72" title="Go to source code">oauth2.php</a>
+			<b>Located at</b> <a href="source-class-Hm_Oauth2.html#9-73" title="Go to source code">oauth2.php</a>
 		<br>
 	</div>
 
@@ -808,7 +820,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_request_token">#</a>
-		<code><a href="source-class-Hm_Oauth2.html#51-60" title="Go to source code">request_token</a>( <span>string <var>$url</var></span>, <span>string <var>$authorization_code</var></span> )</code>
+		<code><a href="source-class-Hm_Oauth2.html#51-61" title="Go to source code">request_token</a>( <span>string <var>$url</var></span>, <span>string <var>$authorization_code</var></span>, <span>array <var>$headers</var> = <span class="php-keyword1">array</span>()</span> )</code>
 
 		<div class="description short">
 			<p>Use curl to exchange an authorization code for a token</p>
@@ -824,6 +836,8 @@
 					<dd>url to post to</dd>
 					<dt><var>$authorization_code</var></dt>
 					<dd>oauth2 auth code</dd>
+					<dt><var>$headers</var></dt>
+					<dd>HTTP headers to add to the request</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
@@ -849,7 +863,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_refresh_token">#</a>
-		<code><a href="source-class-Hm_Oauth2.html#62-71" title="Go to source code">refresh_token</a>( <span>string <var>$url</var></span>, <span>string <var>$refresh_token</var></span> )</code>
+		<code><a href="source-class-Hm_Oauth2.html#63-72" title="Go to source code">refresh_token</a>( <span>string <var>$url</var></span>, <span>string <var>$refresh_token</var></span> )</code>
 
 		<div class="description short">
 			<p>Use curl to refresh an access token</p>

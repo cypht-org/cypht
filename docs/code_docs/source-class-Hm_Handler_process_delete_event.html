@@ -352,6 +352,18 @@
 
 						<ul>
 				<li>
+					<a href="package-modules.imap.folders.html">
+						folders<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.imap.folders.output.html">
+						output					</a>
+
+						</li>
+							</ul></li>
+				<li>
 					<a href="package-modules.imap.functions.html">
 						functions					</a>
 
@@ -950,6 +962,8 @@
 				<li><a href="class-Hm_Output_folder_list_content_start.html">Hm_Output_folder_list_content_start</a></li>
 				<li><a href="class-Hm_Output_folder_list_end.html">Hm_Output_folder_list_end</a></li>
 				<li><a href="class-Hm_Output_folder_list_start.html">Hm_Output_folder_list_start</a></li>
+				<li><a href="class-Hm_Output_folders_content.html">Hm_Output_folders_content</a></li>
+				<li><a href="class-Hm_Output_folders_page_link.html">Hm_Output_folders_page_link</a></li>
 				<li><a href="class-Hm_Output_github_add_repo.html">Hm_Output_github_add_repo</a></li>
 				<li><a href="class-Hm_Output_github_connect_section.html">Hm_Output_github_connect_section</a></li>
 				<li><a href="class-Hm_Output_github_folders.html">Hm_Output_github_folders</a></li>
@@ -1142,6 +1156,8 @@
 				<li><a href="function-human_readable_interval.html">human_readable_interval</a></li>
 				<li><a href="function-icon_callback.html">icon_callback</a></li>
 				<li><a href="function-imap_data_sources.html">imap_data_sources</a></li>
+				<li><a href="function-imap_move_different_server.html">imap_move_different_server</a></li>
+				<li><a href="function-imap_move_same_server.html">imap_move_same_server</a></li>
 				<li><a href="function-imap_refresh_oauth2_token.html">imap_refresh_oauth2_token</a></li>
 				<li><a href="function-interface_langs.html">interface_langs</a></li>
 				<li><a href="function-is_email.html">is_email</a></li>
@@ -1164,6 +1180,7 @@
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
 				<li><a href="function-process_address_fld.html">process_address_fld</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
+				<li><a href="function-process_move_to_arguments.html">process_move_to_arguments</a></li>
 				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
 				<li><a href="function-process_site_setting.html">process_site_setting</a></li>
 				<li><a href="function-replace_module.html">replace_module</a></li>
@@ -1275,13 +1292,13 @@
 </span><span id="30" class="l"><a href="#30"> 30: </a><span class="php-comment">/**
 </span></span><span id="31" class="l"><a href="#31"> 31: </a><span class="php-comment"> * @subpackage calendar/handler
 </span></span><span id="32" class="l"><a href="#32"> 32: </a><span class="php-comment"> */</span>
-</span><span id="33" class="l"><a href="#33"> 33: </a><span class="php-keyword1">class</span> Hm_Handler_process_add_event <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="33" class="l"><a href="#33"> 33: </a><span class="php-keyword1">class</span> Hm_Handler_process_delete_event <span class="php-keyword1">extends</span> Hm_Handler_Module {
 </span><span id="34" class="l"><a href="#34"> 34: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="35" class="l"><a href="#35"> 35: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'delete_title'</span>, <span class="php-quote">'delete_ts'</span>));
+</span><span id="35" class="l"><a href="#35"> 35: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'delete_id'</span>));
 </span><span id="36" class="l"><a href="#36"> 36: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
 </span><span id="37" class="l"><a href="#37"> 37: </a>            <span class="php-var">$cal_events</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'cal_events'</span>);
 </span><span id="38" class="l"><a href="#38"> 38: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_object</span>(<span class="php-var">$cal_events</span>)) {
-</span><span id="39" class="l"><a href="#39"> 39: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$cal_events</span>-&gt;<span class="php-keyword2">delete</span>(<span class="php-var">$form</span>[<span class="php-quote">'delete_title'</span>], <span class="php-var">$form</span>[<span class="php-quote">'delete_ts'</span>])) {
+</span><span id="39" class="l"><a href="#39"> 39: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$cal_events</span>-&gt;<span class="php-keyword2">delete</span>(<span class="php-var">$form</span>[<span class="php-quote">'delete_id'</span>])) {
 </span><span id="40" class="l"><a href="#40"> 40: </a>                    Hm_Msgs::add(<span class="php-quote">'Event Deleted'</span>);
 </span><span id="41" class="l"><a href="#41"> 41: </a>                    <span class="php-var">$this</span>-&gt;session-&gt;record_unsaved(<span class="php-quote">'Calendar updated'</span>);
 </span><span id="42" class="l"><a href="#42"> 42: </a>                    <span class="php-var">$this</span>-&gt;user_config-&gt;set(<span class="php-quote">'calendar_events'</span>, <span class="php-var">$cal_events</span>-&gt;dump());
@@ -1294,7 +1311,7 @@
 </span><span id="49" class="l"><a href="#49"> 49: </a><span class="php-comment">/**
 </span></span><span id="50" class="l"><a href="#50"> 50: </a><span class="php-comment"> * @subpackage calendar/handler
 </span></span><span id="51" class="l"><a href="#51"> 51: </a><span class="php-comment"> */</span>
-</span><span id="52" class="l"><a href="#52"> 52: </a><span class="php-keyword1">class</span> Hm_Handler_process_delete_event <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="52" class="l"><a href="#52"> 52: </a><span class="php-keyword1">class</span> Hm_Handler_process_add_event <span class="php-keyword1">extends</span> Hm_Handler_Module {
 </span><span id="53" class="l"><a href="#53"> 53: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
 </span><span id="54" class="l"><a href="#54"> 54: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'event_title'</span>,
 </span><span id="55" class="l"><a href="#55"> 55: </a>            <span class="php-quote">'event_date'</span>, <span class="php-quote">'event_time'</span>, <span class="php-quote">'event_repeat'</span>));
@@ -1312,8 +1329,8 @@
 </span><span id="67" class="l"><a href="#67"> 67: </a>                <span class="php-var">$cal_events</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'cal_events'</span>);
 </span><span id="68" class="l"><a href="#68"> 68: </a>                <span class="php-keyword1">if</span> (<span class="php-keyword2">is_object</span>(<span class="php-var">$cal_events</span>)) {
 </span><span id="69" class="l"><a href="#69"> 69: </a>                    <span class="php-keyword1">if</span> (<span class="php-var">$cal_events</span>-&gt;add(<span class="php-keyword1">array</span>(
-</span><span id="70" class="l"><a href="#70"> 70: </a>                        <span class="php-quote">'title'</span> =&gt; <span class="php-var">$form</span>[<span class="php-quote">'event_title'</span>],
-</span><span id="71" class="l"><a href="#71"> 71: </a>                        <span class="php-quote">'description'</span> =&gt; <span class="php-var">$detail</span>,
+</span><span id="70" class="l"><a href="#70"> 70: </a>                        <span class="php-quote">'title'</span> =&gt; <span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$form</span>[<span class="php-quote">'event_title'</span>], ENT_QUOTES),
+</span><span id="71" class="l"><a href="#71"> 71: </a>                        <span class="php-quote">'description'</span> =&gt; <span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$detail</span>, ENT_QUOTES),
 </span><span id="72" class="l"><a href="#72"> 72: </a>                        <span class="php-quote">'date'</span> =&gt; <span class="php-var">$ts</span>,
 </span><span id="73" class="l"><a href="#73"> 73: </a>                        <span class="php-quote">'repeat_interval'</span> =&gt; <span class="php-var">$repeat</span>
 </span><span id="74" class="l"><a href="#74"> 74: </a>                        ))) {
@@ -1472,6 +1489,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fcd287d8cd305dbe50d979bd87dcdb81c94852a3"></script>
+<script src="elementlist.js?a1e16624a7c2c06917af3329e90ae5099541c8ad"></script>
 </body>
 </html>

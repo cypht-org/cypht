@@ -352,6 +352,18 @@
 
 						<ul>
 				<li>
+					<a href="package-modules.imap.folders.html">
+						folders<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.imap.folders.output.html">
+						output					</a>
+
+						</li>
+							</ul></li>
+				<li>
 					<a href="package-modules.imap.functions.html">
 						functions					</a>
 
@@ -950,6 +962,8 @@
 				<li><a href="class-Hm_Output_folder_list_content_start.html">Hm_Output_folder_list_content_start</a></li>
 				<li><a href="class-Hm_Output_folder_list_end.html">Hm_Output_folder_list_end</a></li>
 				<li><a href="class-Hm_Output_folder_list_start.html">Hm_Output_folder_list_start</a></li>
+				<li><a href="class-Hm_Output_folders_content.html">Hm_Output_folders_content</a></li>
+				<li><a href="class-Hm_Output_folders_page_link.html">Hm_Output_folders_page_link</a></li>
 				<li><a href="class-Hm_Output_github_add_repo.html">Hm_Output_github_add_repo</a></li>
 				<li><a href="class-Hm_Output_github_connect_section.html">Hm_Output_github_connect_section</a></li>
 				<li><a href="class-Hm_Output_github_folders.html">Hm_Output_github_folders</a></li>
@@ -1142,6 +1156,8 @@
 				<li><a href="function-human_readable_interval.html">human_readable_interval</a></li>
 				<li><a href="function-icon_callback.html">icon_callback</a></li>
 				<li><a href="function-imap_data_sources.html">imap_data_sources</a></li>
+				<li><a href="function-imap_move_different_server.html">imap_move_different_server</a></li>
+				<li><a href="function-imap_move_same_server.html">imap_move_same_server</a></li>
 				<li><a href="function-imap_refresh_oauth2_token.html">imap_refresh_oauth2_token</a></li>
 				<li><a href="function-interface_langs.html">interface_langs</a></li>
 				<li><a href="function-is_email.html">is_email</a></li>
@@ -1164,6 +1180,7 @@
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
 				<li><a href="function-process_address_fld.html">process_address_fld</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
+				<li><a href="function-process_move_to_arguments.html">process_move_to_arguments</a></li>
 				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
 				<li><a href="function-process_site_setting.html">process_site_setting</a></li>
 				<li><a href="function-replace_module.html">replace_module</a></li>
@@ -1288,7 +1305,7 @@
 </span><span id="43" class="l"><a href="#43"> 43: </a>            <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Reply-To'</span>] = <span class="php-var">$from</span>;
 </span><span id="44" class="l"><a href="#44"> 44: </a>        }
 </span><span id="45" class="l"><a href="#45"> 45: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'To'</span>] = <span class="php-var">$this</span>-&gt;encode_header_fld(<span class="php-var">$to</span>);
-</span><span id="46" class="l"><a href="#46"> 46: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Subject'</span>] = <span class="php-var">$this</span>-&gt;encode_header_fld(<span class="php-var">$subject</span>);
+</span><span id="46" class="l"><a href="#46"> 46: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Subject'</span>] = <span class="php-var">$this</span>-&gt;encode_header_fld(<span class="php-keyword2">html_entity_decode</span>(<span class="php-var">$subject</span>, ENT_QUOTES));
 </span><span id="47" class="l"><a href="#47"> 47: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Date'</span>] = <span class="php-keyword2">date</span>(<span class="php-quote">'r'</span>);
 </span><span id="48" class="l"><a href="#48"> 48: </a>        <span class="php-var">$this</span>-&gt;headers[<span class="php-quote">'Message-Id'</span>] = <span class="php-quote">'&lt;'</span>.<span class="php-keyword2">md5</span>(<span class="php-keyword2">uniqid</span>(<span class="php-keyword2">rand</span>(),<span class="php-num">1</span>)).<span class="php-quote">'@'</span>.<span class="php-keyword2">php_uname</span>(<span class="php-quote">'n'</span>).<span class="php-quote">'&gt;'</span>;
 </span><span id="49" class="l"><a href="#49"> 49: </a>        <span class="php-var">$this</span>-&gt;boundary = Hm_Crypt::unique_id(<span class="php-num">32</span>);
@@ -1505,6 +1522,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fcd287d8cd305dbe50d979bd87dcdb81c94852a3"></script>
+<script src="elementlist.js?a1e16624a7c2c06917af3329e90ae5099541c8ad"></script>
 </body>
 </html>
