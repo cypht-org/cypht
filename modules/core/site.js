@@ -196,7 +196,6 @@ var Hm_Notices = {
     hide_id: false,
 
     show: function(msgs) {
-        window.scrollTo(0,0);
         var msg_list = $.map(msgs, function(v) {
             if (v.match(/^ERR/)) {
                 return '<span class="err">'+v.substring(3)+'</span>';
