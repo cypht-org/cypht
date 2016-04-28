@@ -27,8 +27,7 @@ return array(
         'event_date' => FILTER_SANITIZE_STRING,
         'event_time' => FILTER_SANITIZE_STRING,
         'event_repeat' => FILTER_SANITIZE_STRING,
-        'delete_title' => FILTER_SANITIZE_STRING,
-        'delete_ts' => FILTER_VALIDATE_INT
+        'delete_id' => FILTER_SANITIZE_STRING
     ),
     'allowed_get' => array(
         'date' => FILTER_SANITIZE_STRING,
