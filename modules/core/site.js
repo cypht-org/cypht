@@ -862,6 +862,9 @@ var Hm_Folders = {
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
+        $('.search_terms').on('search', function() {
+            Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}]);
+        });
     },
     hl_selected_menu: function() {
         var page = hm_page_name();
