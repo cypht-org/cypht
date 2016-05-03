@@ -14,10 +14,11 @@ var record_message = function(res) {
 
     history[window.location.href] = [
         $('th', $('.header_subject')).html(),
-        $('td', $('.header_from')).text(),
+        $('td', $('.header_from')).html(),
         dt_str,
         $('a', $('.content_title')).html()
     ];
+    elog(history);
     Hm_Utils.save_to_local_storage('message_history', Hm_Utils.json_encode(history));
 };
 
