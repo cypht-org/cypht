@@ -18,7 +18,6 @@ var record_message = function(res) {
         dt_str,
         $('a', $('.content_title')).html()
     ];
-    elog(history);
     Hm_Utils.save_to_local_storage('message_history', Hm_Utils.json_encode(history));
 };
 
