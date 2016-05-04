@@ -262,7 +262,7 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_load_module_sets() {
-        $this->module_exec->site_config->set('modules', 'core');
+        $this->module_exec->site_config->mods = array('core');
         $this->module_exec->load_module_sets('home');
         $this->module_exec->handlers['home'] = array('date' => array('core', false));
         $this->module_exec->load_module_sets('home');
@@ -299,7 +299,7 @@ class Hm_Test_Module_Exec_Debug extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_setup_debug_modules() {
-        $this->module_exec->site_config->set('modules', 'core');
+        $this->module_exec->site_config->mods = array('core');
         $this->module_exec->setup_debug_modules();
         $this->assertTrue(!empty($this->module_exec->filters['allowed_pages']));
     }
