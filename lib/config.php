@@ -270,6 +270,18 @@ class Hm_Site_Config_File extends Hm_Config {
             }
         }
     }
+
+    /**
+     * return a list of modules as a string
+     * @return string
+     */
+    public function get_modules() {
+        $mods = $this->get('modules');
+        if (is_array($mods)) {
+            return implode(',', $mods);
+        }
+        return $mods;
+    }
 }
 
 /**
