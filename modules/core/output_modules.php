@@ -363,7 +363,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
         if (DEBUG_MODE) {
             foreach (glob('modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $mod = str_replace(array('modules/', '/'), '', $name);
-                if (stristr($mods, $mod) && is_readable(sprintf("%ssite.css", $name))) {
+                if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.css", $name))) {
                     $res .= '<link href="'.sprintf("%ssite.css", $name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
             }
@@ -399,7 +399,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
                     continue;
                 }
                 $mod = str_replace(array('modules/', '/'), '', $name);
-                if (stristr($mods, $mod) && is_readable(sprintf("%ssite.js", $name))) {
+                if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.js", $name))) {
                     $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $name).'"></script>';
                 }
             }

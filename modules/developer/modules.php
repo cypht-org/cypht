@@ -118,7 +118,7 @@ class Hm_Output_server_information extends Hm_Output_Module {
                 '<tr><th>PHP version</th><td>'.$server_info['phpversion'].'</td></tr>'.
                 '<tr><th>Zend version</th><td>'.$server_info['zend_version'].'</td></tr>'.
                 '<tr><th>SAPI</th><td>'.$server_info['sapi'].'</td></tr>'.
-                '<tr><th>Enabled Modules</th><td>'.str_replace(',', ', ', $this->get('router_module_list')).'</td></tr>'.
+                '<tr><th>Enabled Modules</th><td>'.str_replace(',', ', ', implode(',', $this->get('router_module_list'))).'</td></tr>'.
                 '</table></div>';
         }
         return '';

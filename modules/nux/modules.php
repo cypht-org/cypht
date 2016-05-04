@@ -415,12 +415,10 @@ function credentials_form($details, $mod) {
 /**
  * @subpackage nux/functions
  */
-function data_source_available($mod_str, $types) {
+function data_source_available($mods, $types) {
     if (!is_array($types)) {
         $types = array($types);
     }
-    $mods = explode(',', $mod_str);
-
     return count( array_intersect($types, $mods) ) == count( $types );
 }
 
