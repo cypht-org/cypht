@@ -100,6 +100,16 @@ class Hm_Test_Site_Config_File extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_get_modules() {
+        $config = new Hm_Site_Config_File('./data/siteconfig.rc');
+        $this->assertFalse($config->get_modules());
+        $config->set('modules', 'asdf');
+        $this->assertEquals(array('asdf'), $config->get_modules());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_site_load() {
         $config = new Hm_Site_Config_File('./data/siteconfig.rc');
         $this->assertEquals(array('foo' => 'bar'), $config->dump());

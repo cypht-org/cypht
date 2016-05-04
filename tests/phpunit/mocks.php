@@ -33,6 +33,7 @@ class Hm_Mock_Session {
 }
 
 class Hm_Mock_Config {
+    public $mods = array();
     public $data = array(
         'user_settings_dir' => './data',
         'default_language' => 'es',
@@ -42,6 +43,9 @@ class Hm_Mock_Config {
             return $this->data[$id];
         }
         return $default;
+    }
+    public function get_modules() {
+        return $this->mods;
     }
     public function set($name, $value) {
         $this->data[$name] = $value;
