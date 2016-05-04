@@ -55,7 +55,7 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         $smtp_servers = NULL;
         $feed_servers = NULL;
 
-        $modules = $this->config->get('modules', '');
+        $modules = $this->config->get_modules();
 
         if (data_source_available($modules, 'imap')) {
             $imap_servers = count(Hm_IMAP_List::dump(false));

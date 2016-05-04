@@ -144,7 +144,7 @@ trait Hm_Handler_Module_Exec {
             'router_format_name'  => $request->format,
             'router_login_state'  => $session->is_active(),
             'router_url_path'     => $request->path,
-            'router_module_list'  => $this->site_config->get('modules', ''),
+            'router_module_list'  => $this->site_config->get_modules(),
             'router_app_name'     => $this->site_config->get('app_name', 'HM3')
         ));
     }
@@ -241,7 +241,7 @@ class Hm_Module_Exec {
         $filters = array();
         $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
             'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
-        $modules = explode(',', $this->site_config->get('modules', ''));
+        $modules = explode(',', $this->site_config->get_modules());
         foreach ($modules as $name) {
             if (is_readable(sprintf(APP_PATH."modules/%s/setup.php", $name))) {
                 $filters = self::merge_filters($filters, require sprintf(APP_PATH."modules/%s/setup.php", $name));
@@ -313,7 +313,7 @@ class Hm_Module_Exec {
         if (!count($active_mods)) {
             Hm_Functions::cease('No module assignments found');
         }
-        $mods = explode(',', $this->site_config->get('modules', '')); 
+        $mods = explode(',', $this->site_config->get_modules()); 
         $this->load_module_set_files($mods, $active_mods);
     }
 

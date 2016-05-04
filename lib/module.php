@@ -280,7 +280,7 @@ abstract class Hm_Handler_Module {
      * @return bool
      */
     public function module_is_supported($name) {
-        return strpos(strtolower($this->config->get('modules', '')), strtolower($name)) !== false;
+        return strpos(strtolower($this->config->get_modules()), strtolower($name)) !== false;
     }
 
     /**
