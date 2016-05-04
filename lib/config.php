@@ -272,13 +272,17 @@ class Hm_Site_Config_File extends Hm_Config {
     }
 
     /**
-     * return a list of modules as a string
+     * Return a list of modules as a string
+     * @param bool $as_array true to return the module list as an array
      * @return string
      */
-    public function get_modules() {
+    public function get_modules($array=false) {
         $mods = $this->get('modules');
-        if (is_array($mods)) {
+        if (!$array && is_array($mods)) {
             return implode(',', $mods);
+        }
+        elseif ($array && is_string($mods)) {
+            return explode(',', $mods);
         }
         return $mods;
     }
