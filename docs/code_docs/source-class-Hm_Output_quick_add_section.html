@@ -1317,7 +1317,7 @@
 </span><span id="55" class="l"><a href="#55"> 55: </a>        <span class="php-var">$smtp_servers</span> = <span class="php-keyword1">NULL</span>;
 </span><span id="56" class="l"><a href="#56"> 56: </a>        <span class="php-var">$feed_servers</span> = <span class="php-keyword1">NULL</span>;
 </span><span id="57" class="l"><a href="#57"> 57: </a>
-</span><span id="58" class="l"><a href="#58"> 58: </a>        <span class="php-var">$modules</span> = <span class="php-var">$this</span>-&gt;config-&gt;get(<span class="php-quote">'modules'</span>, <span class="php-quote">''</span>);
+</span><span id="58" class="l"><a href="#58"> 58: </a>        <span class="php-var">$modules</span> = <span class="php-var">$this</span>-&gt;config-&gt;get_modules();
 </span><span id="59" class="l"><a href="#59"> 59: </a>
 </span><span id="60" class="l"><a href="#60"> 60: </a>        <span class="php-keyword1">if</span> (data_source_available(<span class="php-var">$modules</span>, <span class="php-quote">'imap'</span>)) {
 </span><span id="61" class="l"><a href="#61"> 61: </a>            <span class="php-var">$imap_servers</span> = <span class="php-keyword2">count</span>(Hm_IMAP_List::dump(<span class="php-keyword1">false</span>));
@@ -1677,74 +1677,72 @@
 </span><span id="415" class="l"><a href="#415">415: </a><span class="php-comment">/**
 </span></span><span id="416" class="l"><a href="#416">416: </a><span class="php-comment"> * @subpackage nux/functions
 </span></span><span id="417" class="l"><a href="#417">417: </a><span class="php-comment"> */</span>
-</span><span id="418" class="l"><a href="#418">418: </a><span class="php-keyword1">function</span> data_source_available(<span class="php-var">$mod_str</span>, <span class="php-var">$types</span>) {
+</span><span id="418" class="l"><a href="#418">418: </a><span class="php-keyword1">function</span> data_source_available(<span class="php-var">$mods</span>, <span class="php-var">$types</span>) {
 </span><span id="419" class="l"><a href="#419">419: </a>    <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_array</span>(<span class="php-var">$types</span>)) {
 </span><span id="420" class="l"><a href="#420">420: </a>        <span class="php-var">$types</span> = <span class="php-keyword1">array</span>(<span class="php-var">$types</span>);
 </span><span id="421" class="l"><a href="#421">421: </a>    }
-</span><span id="422" class="l"><a href="#422">422: </a>    <span class="php-var">$mods</span> = <span class="php-keyword2">explode</span>(<span class="php-quote">','</span>, <span class="php-var">$mod_str</span>);
-</span><span id="423" class="l"><a href="#423">423: </a>
-</span><span id="424" class="l"><a href="#424">424: </a>    <span class="php-keyword1">return</span> <span class="php-keyword2">count</span>( <span class="php-keyword2">array_intersect</span>(<span class="php-var">$types</span>, <span class="php-var">$mods</span>) ) == <span class="php-keyword2">count</span>( <span class="php-var">$types</span> );
-</span><span id="425" class="l"><a href="#425">425: </a>}
-</span><span id="426" class="l"><a href="#426">426: </a>
-</span><span id="427" class="l"><a href="#427">427: </a><span class="php-comment">/**
-</span></span><span id="428" class="l"><a href="#428">428: </a><span class="php-comment"> * @subpackage nux/lib
-</span></span><span id="429" class="l"><a href="#429">429: </a><span class="php-comment"> */</span>
-</span><span id="430" class="l"><a href="#430">430: </a><span class="php-keyword1">class</span> Nux_Quick_Services {
-</span><span id="431" class="l"><a href="#431">431: </a>
-</span><span id="432" class="l"><a href="#432">432: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">private</span> <span class="php-var">$services</span> = <span class="php-keyword1">array</span>();
-</span><span id="433" class="l"><a href="#433">433: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">private</span> <span class="php-var">$oauth2</span> = <span class="php-keyword1">array</span>();
-</span><span id="434" class="l"><a href="#434">434: </a>
-</span><span id="435" class="l"><a href="#435">435: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> add(<span class="php-var">$id</span>, <span class="php-var">$details</span>) {
-</span><span id="436" class="l"><a href="#436">436: </a>        self::<span class="php-var">$services</span>[<span class="php-var">$id</span>] = <span class="php-var">$details</span>;
-</span><span id="437" class="l"><a href="#437">437: </a>    }
-</span><span id="438" class="l"><a href="#438">438: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> oauth2_setup(<span class="php-var">$config</span>) {
-</span><span id="439" class="l"><a href="#439">439: </a>        <span class="php-var">$settings</span> = <span class="php-keyword1">array</span>();
-</span><span id="440" class="l"><a href="#440">440: </a>        <span class="php-var">$ini_file</span> = <span class="php-keyword2">rtrim</span>(<span class="php-var">$config</span>-&gt;get(<span class="php-quote">'app_data_dir'</span>, <span class="php-quote">''</span>), <span class="php-quote">'/'</span>).<span class="php-quote">'/oauth2.ini'</span>;
-</span><span id="441" class="l"><a href="#441">441: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_readable</span>(<span class="php-var">$ini_file</span>)) {
-</span><span id="442" class="l"><a href="#442">442: </a>            <span class="php-var">$settings</span> = <span class="php-keyword2">parse_ini_file</span>(<span class="php-var">$ini_file</span>, <span class="php-keyword1">true</span>);
-</span><span id="443" class="l"><a href="#443">443: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$settings</span>)) {
-</span><span id="444" class="l"><a href="#444">444: </a>                <span class="php-keyword1">foreach</span> (<span class="php-var">$settings</span> <span class="php-keyword1">as</span> <span class="php-var">$service</span> =&gt; <span class="php-var">$vals</span>) {
-</span><span id="445" class="l"><a href="#445">445: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'auth'</span>] = <span class="php-quote">'oauth2'</span>;
-</span><span id="446" class="l"><a href="#446">446: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'client_id'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'client_id'</span>];
-</span><span id="447" class="l"><a href="#447">447: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'client_secret'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'client_secret'</span>];
-</span><span id="448" class="l"><a href="#448">448: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'redirect_uri'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'client_uri'</span>];
-</span><span id="449" class="l"><a href="#449">449: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'auth_uri'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'auth_uri'</span>];
-</span><span id="450" class="l"><a href="#450">450: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'token_uri'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'token_uri'</span>];
-</span><span id="451" class="l"><a href="#451">451: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'refresh_uri'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'refresh_uri'</span>];
-</span><span id="452" class="l"><a href="#452">452: </a>                }
-</span><span id="453" class="l"><a href="#453">453: </a>            }
-</span><span id="454" class="l"><a href="#454">454: </a>        }
-</span><span id="455" class="l"><a href="#455">455: </a>        self::<span class="php-var">$oauth2</span> = <span class="php-var">$settings</span>;
-</span><span id="456" class="l"><a href="#456">456: </a>    }
-</span><span id="457" class="l"><a href="#457">457: </a>
-</span><span id="458" class="l"><a href="#458">458: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> option_list(<span class="php-var">$current</span>, <span class="php-var">$mod</span>) {
-</span><span id="459" class="l"><a href="#459">459: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="460" class="l"><a href="#460">460: </a>        <span class="php-keyword2">uasort</span>(self::<span class="php-var">$services</span>, <span class="php-keyword1">function</span>(<span class="php-var">$a</span>, <span class="php-var">$b</span>) { <span class="php-keyword1">return</span> <span class="php-keyword2">strcasecmp</span>(<span class="php-var">$a</span>[<span class="php-quote">'name'</span>], <span class="php-var">$b</span>[<span class="php-quote">'name'</span>]); });
-</span><span id="461" class="l"><a href="#461">461: </a>        <span class="php-keyword1">foreach</span>(self::<span class="php-var">$services</span> <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$details</span>) {
-</span><span id="462" class="l"><a href="#462">462: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option value=&quot;'</span>.<span class="php-var">$mod</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;'</span>;
-</span><span id="463" class="l"><a href="#463">463: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$id</span> == <span class="php-var">$current</span>) {
-</span><span id="464" class="l"><a href="#464">464: </a>                <span class="php-var">$res</span> .= <span class="php-quote">' selected=&quot;selected&quot;'</span>;
-</span><span id="465" class="l"><a href="#465">465: </a>            }
-</span><span id="466" class="l"><a href="#466">466: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&gt;'</span>.<span class="php-var">$mod</span>-&gt;trans(<span class="php-var">$details</span>[<span class="php-quote">'name'</span>]);
-</span><span id="467" class="l"><a href="#467">467: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/option&gt;'</span>;
-</span><span id="468" class="l"><a href="#468">468: </a>        }
-</span><span id="469" class="l"><a href="#469">469: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="470" class="l"><a href="#470">470: </a>    }
-</span><span id="471" class="l"><a href="#471">471: </a>
-</span><span id="472" class="l"><a href="#472">472: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> exists(<span class="php-var">$id</span>) {
-</span><span id="473" class="l"><a href="#473">473: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">array_key_exists</span>(<span class="php-var">$id</span>, self::<span class="php-var">$services</span>);
-</span><span id="474" class="l"><a href="#474">474: </a>    }
-</span><span id="475" class="l"><a href="#475">475: </a>
-</span><span id="476" class="l"><a href="#476">476: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> details(<span class="php-var">$id</span>) {
-</span><span id="477" class="l"><a href="#477">477: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$id</span>, self::<span class="php-var">$services</span>)) {
-</span><span id="478" class="l"><a href="#478">478: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$services</span>[<span class="php-var">$id</span>];
-</span><span id="479" class="l"><a href="#479">479: </a>        }
-</span><span id="480" class="l"><a href="#480">480: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>();
-</span><span id="481" class="l"><a href="#481">481: </a>    }
-</span><span id="482" class="l"><a href="#482">482: </a>}
-</span><span id="483" class="l"><a href="#483">483: </a>
-</span><span id="484" class="l"><a href="#484">484: </a>
-</span><span id="485" class="l"><a href="#485">485: </a></span></code></pre>
+</span><span id="422" class="l"><a href="#422">422: </a>    <span class="php-keyword1">return</span> <span class="php-keyword2">count</span>( <span class="php-keyword2">array_intersect</span>(<span class="php-var">$types</span>, <span class="php-var">$mods</span>) ) == <span class="php-keyword2">count</span>( <span class="php-var">$types</span> );
+</span><span id="423" class="l"><a href="#423">423: </a>}
+</span><span id="424" class="l"><a href="#424">424: </a>
+</span><span id="425" class="l"><a href="#425">425: </a><span class="php-comment">/**
+</span></span><span id="426" class="l"><a href="#426">426: </a><span class="php-comment"> * @subpackage nux/lib
+</span></span><span id="427" class="l"><a href="#427">427: </a><span class="php-comment"> */</span>
+</span><span id="428" class="l"><a href="#428">428: </a><span class="php-keyword1">class</span> Nux_Quick_Services {
+</span><span id="429" class="l"><a href="#429">429: </a>
+</span><span id="430" class="l"><a href="#430">430: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">private</span> <span class="php-var">$services</span> = <span class="php-keyword1">array</span>();
+</span><span id="431" class="l"><a href="#431">431: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">private</span> <span class="php-var">$oauth2</span> = <span class="php-keyword1">array</span>();
+</span><span id="432" class="l"><a href="#432">432: </a>
+</span><span id="433" class="l"><a href="#433">433: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> add(<span class="php-var">$id</span>, <span class="php-var">$details</span>) {
+</span><span id="434" class="l"><a href="#434">434: </a>        self::<span class="php-var">$services</span>[<span class="php-var">$id</span>] = <span class="php-var">$details</span>;
+</span><span id="435" class="l"><a href="#435">435: </a>    }
+</span><span id="436" class="l"><a href="#436">436: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> oauth2_setup(<span class="php-var">$config</span>) {
+</span><span id="437" class="l"><a href="#437">437: </a>        <span class="php-var">$settings</span> = <span class="php-keyword1">array</span>();
+</span><span id="438" class="l"><a href="#438">438: </a>        <span class="php-var">$ini_file</span> = <span class="php-keyword2">rtrim</span>(<span class="php-var">$config</span>-&gt;get(<span class="php-quote">'app_data_dir'</span>, <span class="php-quote">''</span>), <span class="php-quote">'/'</span>).<span class="php-quote">'/oauth2.ini'</span>;
+</span><span id="439" class="l"><a href="#439">439: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">is_readable</span>(<span class="php-var">$ini_file</span>)) {
+</span><span id="440" class="l"><a href="#440">440: </a>            <span class="php-var">$settings</span> = <span class="php-keyword2">parse_ini_file</span>(<span class="php-var">$ini_file</span>, <span class="php-keyword1">true</span>);
+</span><span id="441" class="l"><a href="#441">441: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$settings</span>)) {
+</span><span id="442" class="l"><a href="#442">442: </a>                <span class="php-keyword1">foreach</span> (<span class="php-var">$settings</span> <span class="php-keyword1">as</span> <span class="php-var">$service</span> =&gt; <span class="php-var">$vals</span>) {
+</span><span id="443" class="l"><a href="#443">443: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'auth'</span>] = <span class="php-quote">'oauth2'</span>;
+</span><span id="444" class="l"><a href="#444">444: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'client_id'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'client_id'</span>];
+</span><span id="445" class="l"><a href="#445">445: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'client_secret'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'client_secret'</span>];
+</span><span id="446" class="l"><a href="#446">446: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'redirect_uri'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'client_uri'</span>];
+</span><span id="447" class="l"><a href="#447">447: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'auth_uri'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'auth_uri'</span>];
+</span><span id="448" class="l"><a href="#448">448: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'token_uri'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'token_uri'</span>];
+</span><span id="449" class="l"><a href="#449">449: </a>                    self::<span class="php-var">$services</span>[<span class="php-var">$service</span>][<span class="php-quote">'refresh_uri'</span>] = <span class="php-var">$vals</span>[<span class="php-quote">'refresh_uri'</span>];
+</span><span id="450" class="l"><a href="#450">450: </a>                }
+</span><span id="451" class="l"><a href="#451">451: </a>            }
+</span><span id="452" class="l"><a href="#452">452: </a>        }
+</span><span id="453" class="l"><a href="#453">453: </a>        self::<span class="php-var">$oauth2</span> = <span class="php-var">$settings</span>;
+</span><span id="454" class="l"><a href="#454">454: </a>    }
+</span><span id="455" class="l"><a href="#455">455: </a>
+</span><span id="456" class="l"><a href="#456">456: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> option_list(<span class="php-var">$current</span>, <span class="php-var">$mod</span>) {
+</span><span id="457" class="l"><a href="#457">457: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="458" class="l"><a href="#458">458: </a>        <span class="php-keyword2">uasort</span>(self::<span class="php-var">$services</span>, <span class="php-keyword1">function</span>(<span class="php-var">$a</span>, <span class="php-var">$b</span>) { <span class="php-keyword1">return</span> <span class="php-keyword2">strcasecmp</span>(<span class="php-var">$a</span>[<span class="php-quote">'name'</span>], <span class="php-var">$b</span>[<span class="php-quote">'name'</span>]); });
+</span><span id="459" class="l"><a href="#459">459: </a>        <span class="php-keyword1">foreach</span>(self::<span class="php-var">$services</span> <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$details</span>) {
+</span><span id="460" class="l"><a href="#460">460: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option value=&quot;'</span>.<span class="php-var">$mod</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;'</span>;
+</span><span id="461" class="l"><a href="#461">461: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$id</span> == <span class="php-var">$current</span>) {
+</span><span id="462" class="l"><a href="#462">462: </a>                <span class="php-var">$res</span> .= <span class="php-quote">' selected=&quot;selected&quot;'</span>;
+</span><span id="463" class="l"><a href="#463">463: </a>            }
+</span><span id="464" class="l"><a href="#464">464: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&gt;'</span>.<span class="php-var">$mod</span>-&gt;trans(<span class="php-var">$details</span>[<span class="php-quote">'name'</span>]);
+</span><span id="465" class="l"><a href="#465">465: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/option&gt;'</span>;
+</span><span id="466" class="l"><a href="#466">466: </a>        }
+</span><span id="467" class="l"><a href="#467">467: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="468" class="l"><a href="#468">468: </a>    }
+</span><span id="469" class="l"><a href="#469">469: </a>
+</span><span id="470" class="l"><a href="#470">470: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> exists(<span class="php-var">$id</span>) {
+</span><span id="471" class="l"><a href="#471">471: </a>        <span class="php-keyword1">return</span> <span class="php-keyword2">array_key_exists</span>(<span class="php-var">$id</span>, self::<span class="php-var">$services</span>);
+</span><span id="472" class="l"><a href="#472">472: </a>    }
+</span><span id="473" class="l"><a href="#473">473: </a>
+</span><span id="474" class="l"><a href="#474">474: </a>    <span class="php-keyword1">static</span> <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> details(<span class="php-var">$id</span>) {
+</span><span id="475" class="l"><a href="#475">475: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-var">$id</span>, self::<span class="php-var">$services</span>)) {
+</span><span id="476" class="l"><a href="#476">476: </a>            <span class="php-keyword1">return</span> self::<span class="php-var">$services</span>[<span class="php-var">$id</span>];
+</span><span id="477" class="l"><a href="#477">477: </a>        }
+</span><span id="478" class="l"><a href="#478">478: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>();
+</span><span id="479" class="l"><a href="#479">479: </a>    }
+</span><span id="480" class="l"><a href="#480">480: </a>}
+</span><span id="481" class="l"><a href="#481">481: </a>
+</span><span id="482" class="l"><a href="#482">482: </a>
+</span><span id="483" class="l"><a href="#483">483: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>

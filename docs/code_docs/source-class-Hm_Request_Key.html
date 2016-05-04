@@ -1412,10 +1412,10 @@
 </span></span><span id="150" class="l"><a href="#150">150: </a><span class="php-comment">     * @return bool
 </span></span><span id="151" class="l"><a href="#151">151: </a><span class="php-comment">     */</span> 
 </span><span id="152" class="l"><a href="#152">152: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">static</span> <span class="php-keyword1">function</span> hash_compare(<span class="php-var">$a</span>, <span class="php-var">$b</span>) {
-</span><span id="153" class="l"><a href="#153">153: </a>        <span class="php-comment">/* requires PHP &gt;= 5.6 */</span>
-</span><span id="154" class="l"><a href="#154">154: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_string</span>(<span class="php-var">$a</span>) || !<span class="php-keyword2">is_string</span>(<span class="php-var">$b</span>) || <span class="php-keyword2">strlen</span>(<span class="php-var">$a</span>) !== <span class="php-keyword2">strlen</span>(<span class="php-var">$b</span>)) {
-</span><span id="155" class="l"><a href="#155">155: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="156" class="l"><a href="#156">156: </a>        }
+</span><span id="153" class="l"><a href="#153">153: </a>        <span class="php-keyword1">if</span> (!<span class="php-keyword2">is_string</span>(<span class="php-var">$a</span>) || !<span class="php-keyword2">is_string</span>(<span class="php-var">$b</span>) || <span class="php-keyword2">strlen</span>(<span class="php-var">$a</span>) !== <span class="php-keyword2">strlen</span>(<span class="php-var">$b</span>)) {
+</span><span id="154" class="l"><a href="#154">154: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="155" class="l"><a href="#155">155: </a>        }
+</span><span id="156" class="l"><a href="#156">156: </a>        <span class="php-comment">/* requires PHP &gt;= 5.6 */</span>
 </span><span id="157" class="l"><a href="#157">157: </a>        <span class="php-keyword1">if</span> (Hm_Functions::<span class="php-keyword2">function_exists</span>(<span class="php-quote">'hash_equals'</span>)) {
 </span><span id="158" class="l"><a href="#158">158: </a>            <span class="php-keyword1">return</span> hash_equals(<span class="php-var">$a</span>, <span class="php-var">$b</span>);
 </span><span id="159" class="l"><a href="#159">159: </a>        }
