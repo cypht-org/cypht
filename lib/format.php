@@ -98,6 +98,9 @@ class Hm_Format_HTML5 extends HM_Format {
      * @return string HTML5 content
      */
     public function content($output, $allowed_output) {
+        if (array_key_exists('router_module_list', $output)) {
+            unset($output['router_module_list']);
+        }
         return implode('', $output);
     }
 }

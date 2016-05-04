@@ -241,7 +241,7 @@ class Hm_Module_Exec {
         $filters = array();
         $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
             'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
-        $modules = explode(',', $this->site_config->get_modules());
+        $modules = $this->site_config->get_modules();
         foreach ($modules as $name) {
             if (is_readable(sprintf(APP_PATH."modules/%s/setup.php", $name))) {
                 $filters = self::merge_filters($filters, require sprintf(APP_PATH."modules/%s/setup.php", $name));
@@ -313,7 +313,7 @@ class Hm_Module_Exec {
         if (!count($active_mods)) {
             Hm_Functions::cease('No module assignments found');
         }
-        $mods = explode(',', $this->site_config->get_modules()); 
+        $mods = $this->site_config->get_modules(); 
         $this->load_module_set_files($mods, $active_mods);
     }
 

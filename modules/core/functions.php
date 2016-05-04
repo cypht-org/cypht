@@ -139,11 +139,11 @@ function group_data_sources($array) {
 /**
  * Determine if E-mail modules are active
  * @subpackage core/functions
- * @param string $mod_list list of active module sets
+ * @param array $mod_list list of active module sets
  * @return mixed
  */
 function email_is_active($mod_list) {
-    if (stristr($mod_list, 'imap') && stristr($mod_list, 'pop3')) {
+    if (in_array('imap', $mod_list, true) || in_array('pop3', $mod_list, true)) {
         return true;
     }
     return false;
