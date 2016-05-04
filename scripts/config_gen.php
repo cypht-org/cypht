@@ -149,7 +149,11 @@ function get_module_assignments($settings) {
         'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
 
     if (isset($settings['modules'])) {
-        foreach (explode(',', $settings['modules']) as $mod) {
+        $mods = $settings['modules'];
+        if (is_string($mods)) {
+            $mods = explode(',', $mods);
+        }
+        foreach ($mods as $mod) {
             printf("scanning module %s ...\n", $mod);
             if (is_readable(sprintf("modules/%s/site.js", $mod))) {
                $js .= file_get_contents(sprintf("modules/%s/site.js", $mod));
