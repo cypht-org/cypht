@@ -21,7 +21,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             list($msg_ids, $dest_path, $same_server_ids, $other_server_ids) = process_move_to_arguments($form);
             $moved = array();
             if (count($same_server_ids) > 0) {
-                $moved = array_merge($moved, imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->session));
+                $moved = array_merge($moved, imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->session, $dest_path));
             }
             if (count($other_server_ids) > 0) {
                 $moved = array_merge($moved, imap_move_different_server($other_server_ids, $form['imap_move_action'], $dest_path, $this->session));
@@ -2121,9 +2121,10 @@ function imap_refresh_oauth2_token($server, $config) {
  * @param array $ids list of message ids with server and folder info
  * @param string $action action type, copy or move
  * @param object $session session interface
+ * @param array $dest_path imap id and folder to copy/move to
  * @return int count of messages moved
  */
-function imap_move_same_server($ids, $action, $session) {
+function imap_move_same_server($ids, $action, $session, $dest_path) {
     $moved = array();
     $keys = array_keys($ids);
     $server_id = array_pop($keys);
@@ -2131,7 +2132,7 @@ function imap_move_same_server($ids, $action, $session) {
     $imap = Hm_IMAP_List::connect($server_id, $cache);
     foreach ($ids[$server_id] as $folder => $msgs) {
         if ($imap && $imap->select_mailbox(hex2bin($folder))) {
-            if ($imap->message_action(strtoupper($form['imap_move_action']), $msgs, hex2bin($dest_path[2]))) {
+            if ($imap->message_action(strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
                 foreach ($msgs as $msg) {
                     $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
                 }
