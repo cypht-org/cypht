@@ -1247,7 +1247,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
             }
-            $txt .= '<tr><th colspan="2" class="header_links">'.
+            $txt .= '<tr><th colspan="2" class="header_links">';
+            $txt .= '<div class="msg_move_to">'.
                 '<a href="#" class="hlink header_toggle">'.$this->trans('all headers').'</a>'.
                 '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small headers').'</a>'.
                 ' | <a class="hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('reply').'</a>'.
@@ -1269,6 +1270,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $txt .= '<a style="display: none;" class="hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
             }
             $txt .= ' | <a class="hlink" id="delete_message" href="#">'.$this->trans('delete').'</a>';
+            $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('copy').'</a>';
+            $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('move').'</a>';
+            $txt .= '<div class="move_to_location"></div></div>';
+            $txt .= '<input type="hidden" class="move_to_type" value="" />';
+            $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
+            $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
+            $txt .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
             $txt .= '</th></tr></table>';
 
             $this->out('msg_headers', $txt, false);

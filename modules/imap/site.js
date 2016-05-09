@@ -481,6 +481,8 @@ var imap_message_view_finished = function(msg_uid, detail) {
     $('#flag_msg').click(function() { return imap_flag_message($(this).data('state')); });
     $('#unflag_msg').click(function() { return imap_flag_message($(this).data('state')); });
     $('#delete_message').click(function() { return imap_delete_message(); });
+    $('#move_message').click(function() { return imap_move_copy('move');});
+    $('#copy_message').click(function() { return imap_move_copy('copy');});
 };
 
 var get_local_message_content = function(msg_uid, path) {
@@ -650,12 +652,19 @@ var imap_perform_move_copy = function(dest_id) {
     var ids = [];
     $('.move_to_location').html('');
     $('.move_to_location').hide();
-    $('input[type=checkbox]').each(function() {
-        if (this.checked && this.id.search('imap') != -1) {
-            ids.push(this.id);
-        }
-    });
-    if (ids.length) {
+    if (hm_page_name() == 'message') {
+        var uid = hm_msg_uid();
+        var path = Hm_Utils.parse_folder_path(hm_list_path());
+        ids.push('imap_'+path['server_id']+'_'+uid+'_'+path['folder']);
+    }
+    else {
+        $('input[type=checkbox]').each(function() {
+            if (this.checked && this.id.search('imap') != -1) {
+                ids.push(this.id);
+            }
+        });
+    }
+    if (ids.length > 0 && dest_id) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_move_copy_action'},
             {'name': 'imap_move_ids', 'value': ids.join(',')},
@@ -663,17 +672,30 @@ var imap_perform_move_copy = function(dest_id) {
             {'name': 'imap_move_action', 'value': action}],
             function(res) {
                 var index;
-                Hm_Message_List.reset_checkboxes();
-                if (action == 'move') {
-                    for (index in res.move_count) {
-                        $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
+                if (hm_page_name() == 'message_list') {
+                    Hm_Message_List.reset_checkboxes();
+                    if (action == 'move') {
+                        for (index in res.move_count) {
+                            $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
+                        }
+                    }
+                    if (hm_list_path().substr(0, 4) === 'imap') {
+                        select_imap_folder(hm_list_path());
+                    }
+                    else {
+                        Hm_Message_List.load_sources();
                     }
                 }
-                if (hm_list_path().substr(0, 4) === 'imap') {
-                    select_imap_folder(hm_list_path());
-                }
                 else {
-                    Hm_Message_List.load_sources();
+                    if (action == 'move') {
+                        var nlink = $('.nlink');
+                        if (nlink.length) {
+                            window.location.href = nlink.attr('href');
+                        }
+                        else {
+                            window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                        }
+                    }
                 }
             }
         );
@@ -684,8 +706,9 @@ var expand_imap_move_to_mailbox = function(res) {
     if (res.imap_expanded_folder_path) {
         var move_to = $('.move_to_location');
         $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.move_to_location')).append(res.imap_expanded_folder_formatted);
-        $('.imap_folder_link', move_to).unbind('click');
-        $('.imap_folder_link', move_to).click(function() { return expand_imap_move_to_folders($(this).data('target')); });
+        $('.imap_folder_link', move_to).addClass('imap_move_folder_link').removeClass('imap_folder_link');
+        $('.imap_move_folder_link', move_to).unbind('click');
+        $('.imap_move_folder_link', move_to).click(function() { return expand_imap_move_to_folders($(this).data('target')); });
         $('a', move_to).not('.imap_move_folder_link').unbind('click');
         $('a', move_to).not('.imap_move_folder_link').click(function() { imap_perform_move_copy($(this).data('id')); return false; });
     }
