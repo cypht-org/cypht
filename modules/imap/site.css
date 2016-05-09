@@ -75,5 +75,5 @@
 .move_to_title span { float: right; font-size: 90%; }
 .msg_move_to .move_to_location { font-size: 100%; left: auto; right: 0px; top: 33px; font-variant: normal; }
 .msg_move_to { width: auto !important; position: relative; display: inline-block; }
-.move_to_location .expand_link { float: left !important; }
+.move_to_location .expand_link { float: left !important; width: auto !important; }
 
