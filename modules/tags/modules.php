@@ -46,7 +46,9 @@ class Hm_Output_tag_folders extends hm_output_module {
 class Hm_Output_tag_bar extends hm_output_module {
     protected function output() {
         $headers = $this->get('msg_headers');
-        $this->out('msg_headers', $headers.'<img class="tag_icon refresh_list" src="'.
-            Hm_Image_Sources::$tags.'" alt="'.$this->trans('Tags').'" width="24" height="24" />');
+        if (is_string($headers)) {
+            $this->out('msg_headers', $headers.'<img class="tag_icon refresh_list" src="'.
+                Hm_Image_Sources::$tags.'" alt="'.$this->trans('Tags').'" width="24" height="24" />');
+        }
     }
 }
