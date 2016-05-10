@@ -650,9 +650,10 @@ var imap_move_copy = function(action) {
 var imap_perform_move_copy = function(dest_id) {
     var action = $('.move_to_type').val();
     var ids = [];
+    var page = hm_page_name();
     $('.move_to_location').html('');
     $('.move_to_location').hide();
-    if (hm_page_name() == 'message') {
+    if (page == 'message') {
         var uid = hm_msg_uid();
         var path = Hm_Utils.parse_folder_path(hm_list_path());
         ids.push('imap_'+path['server_id']+'_'+uid+'_'+path['folder']);
@@ -669,6 +670,7 @@ var imap_perform_move_copy = function(dest_id) {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_move_copy_action'},
             {'name': 'imap_move_ids', 'value': ids.join(',')},
             {'name': 'imap_move_to', 'value': dest_id},
+            {'name': 'imap_move_page', 'value': page},
             {'name': 'imap_move_action', 'value': action}],
             function(res) {
                 var index;
