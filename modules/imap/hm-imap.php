@@ -1069,7 +1069,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                                     continue;
                                 }
                                 if (isset($headers[$i]) && trim($line) && ($line{0} == "\t" || $line{0} == ' ')) {
-                                    $headers[$i][1] .= ' '.trim($line);
+                                    $headers[$i][1] .= trim($line);
                                 }
                                 elseif ($split) {
                                     $i++;
