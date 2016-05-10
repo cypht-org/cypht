@@ -57,9 +57,9 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
  */
 class Hm_Output_folders_delete_dialog extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('folder_server')) {
-            $res = '<div class="settings_subtitle">'.$this->trans('Delete a folder').'</div>';
-            $res .= '<div class="delete_folder folder_dialog">';
+        if ($this->get('folder_server') !== false) {
+            $res = '<div data-target=".delete_dialog" class="settings_subtitle">'.$this->trans('Delete a Folder').'</div>';
+            $res .= '<div class="delete_dialog folder_dialog">';
             $res .= '<div class="folder_row"><a href="#" class="select_delete_folder">'.$this->trans('Select Folder').'</a>: <span class="selected_delete">';
             $res .= '</span></div>';
             $res .= '<ul class="folders delete_folder_select"><li class="delete_title"><a href="#" class="close">';
@@ -76,9 +76,9 @@ class Hm_Output_folders_delete_dialog extends Hm_Output_Module {
  */
 class Hm_Output_folders_rename_dialog extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('folder_server')) {
-            $res = '<div class="settings_subtitle">'.$this->trans('Rename a folder').'</div>';
-            $res .= '<div class="rename folder_dialog">';
+        if ($this->get('folder_server') !== false) {
+            $res = '<div data-target=".rename_dialog" class="settings_subtitle">'.$this->trans('Rename a Folder').'</div>';
+            $res .= '<div class="rename_dialog folder_dialog">';
             $res .= '<div class="folder_row"><a href="#" class="select_rename_folder">'.$this->trans('Select Folder').'</a>: <span class="selected_rename">';
             $res .= '</span></div>';
             $res .= '<ul class="folders rename_folder_select"><li class="rename_title"><a href="#" class="close">';
@@ -96,8 +96,8 @@ class Hm_Output_folders_rename_dialog extends Hm_Output_Module {
  */
 class Hm_Output_folders_create_dialog extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('folder_server')) {
-            $res = '<div data-target=".create_dialog" class="settings_subtitle">'.$this->trans('Create a new folder').'</div>';
+        if ($this->get('folder_server') !== false) {
+            $res = '<div data-target=".create_dialog" class="settings_subtitle">'.$this->trans('Create a New Folder').'</div>';
             $res .= '<div class="create_dialog folder_dialog">';
             $res .= '<input class="create_folder_name" type="text" value="" placeholder="'.$this->trans('Folder name').'" /><br />';
             $res .= '<div class="folder_row"><a href="#" class="select_parent_folder">'.$this->trans('Select Parent Folder').'</a>: <span class="selected_parent">';

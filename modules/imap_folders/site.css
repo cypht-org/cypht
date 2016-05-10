@@ -1,5 +1,5 @@
 .folders_page { margin: 20px; }
 .folder_dialog { margin-left: 40px; margin-top: 10px; margin-bottom: 30px; }
 .folder_dialog input { display: inline-block; margin-top: 15px; }
-.rename_folder_select, .parent_folder_select { display: none; }
+.folder_dialog, .delete_folder_select, .rename_folder_select, .parent_folder_select { display: none; }
 .folder_row { margin-top: 15px; }
