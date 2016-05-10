@@ -31,6 +31,10 @@ class Hm_Test_Output extends PHPUnit_Framework_TestCase {
         unset($this->http);
     }
 }
+
+/**
+ * tests for Hm_Msgs
+ */
 class Hm_Test_Msgs extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
@@ -44,6 +48,16 @@ class Hm_Test_Msgs extends PHPUnit_Framework_TestCase {
         Hm_Msgs::add('test msg');
         $msgs = Hm_Msgs::get();
         $this->assertTrue(in_array('test msg', $msgs, true));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_flush() {
+        Hm_Msgs::add('test msg');
+        $this->assertTrue(in_array('test msg', Hm_Msgs::get(), true));
+        Hm_Msgs::flush();
+        $this->assertEquals(array(), Hm_Msgs::get());
     }
     /**
      * @preserveGlobalState disabled
