@@ -287,7 +287,8 @@ return array(
         'list_path' => FILTER_SANITIZE_STRING,
         'imap_move_ids' => FILTER_SANITIZE_STRING,
         'imap_move_to' => FILTER_SANITIZE_STRING,
-        'imap_move_action' => FILTER_SANITIZE_STRING
+        'imap_move_action' => FILTER_SANITIZE_STRING,
+        'imap_move_page' => FILTER_SANITIZE_STRING
     )
 );
 

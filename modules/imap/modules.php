@@ -16,7 +16,7 @@ require_once APP_PATH.'modules/imap/hm-imap.php';
  */
 class Hm_Handler_imap_process_move extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_move_to', 'imap_move_action', 'imap_move_ids'));
+        list($success, $form) = $this->process_form(array('imap_move_to', 'imap_move_page', 'imap_move_action', 'imap_move_ids'));
         if ($success) {
             list($msg_ids, $dest_path, $same_server_ids, $other_server_ids) = process_move_to_arguments($form);
             $moved = array();
@@ -47,6 +47,11 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             }
             elseif (count($moved) == 0) {
                 Hm_Msgs::add('ERRUnable to move/copy selected messages');
+            }
+            if ($form['imap_move_action'] == 'move' && $form['imap_move_page'] == 'message') {
+                $msgs = Hm_Msgs::get();
+                Hm_Msgs::flush();
+                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
             }
             $this->out('move_count', $moved);
         }
@@ -366,7 +371,7 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
  */
 class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
     /**
-     * Use IMAP to flag the selected message uid
+     * Use IMAP to delete the selected message uid
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder'));
@@ -383,13 +388,16 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 }
             }
             if (!$del_result) {
-                Hm_Msgs::add('ERRAn error occurred trying to flag this message');
+                Hm_Msgs::add('ERRAn error occurred trying to delete this message');
                 $this->out('imap_delete_error', true);
             }
             else {
                 Hm_Msgs::add('Message deleted');
                 $this->out('imap_delete_error', false);
             }
+            $msgs = Hm_Msgs::get();
+            Hm_Msgs::flush();
+            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
         }
     }
 }
