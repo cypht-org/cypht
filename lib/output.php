@@ -139,6 +139,14 @@ trait Hm_List {
     }
 
     /**
+     * Flush all messages
+     * @return null
+     */
+    public static function flush() {
+        self::$msgs = array();
+    }
+
+    /**
      * Stringify a value
      * @param mixed $mixed value to stringify
      * @return string
