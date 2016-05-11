@@ -15,6 +15,7 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
         folders.remove();
         folder_location.hide();
         $('.'+target).html('');
+        $('#'+id_dest).val('');
         return false;
     });
     return false;
@@ -80,19 +81,26 @@ var folder_page_delete = function() {
         Hm_Notices.show({0: 'ERRFolder to delete is required'});
         return;
     }
-    /* TODO: prompt on delete */
+    if (!confirm('Are you sure you want to delete this folder, and all the messages in it?')) {
+        return;
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_delete'},
         {'name': 'imap_server_id', value: id},
         {'name': 'folder', 'value': val}],
         function(res) {
+            if (res.imap_folders_success) {
+                $('#delete_source').val('');
+                $('#selected_delete').html('');
+                Hm_Folders.reload_folders(true);
+            }
         }
     );
 };
 
 var folder_page_rename = function() {
-    /* TODO: add rename parent support */
     var val = $('#rename_value').val();
+    var par = $('#rename_parent_source').val().trim();
     var folder = $('#rename_source').val().trim();
     var notices = {};
     var id = $('#imap_server_folder').val();
@@ -114,8 +122,16 @@ var folder_page_rename = function() {
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_rename'},
         {'name': 'imap_server_id', value: id},
         {'name': 'folder', 'value': folder},
+        {'name': 'parent', 'value': par},
         {'name': 'new_folder', 'value': val}],
         function(res) {
+            if (res.imap_folders_success) {
+                $('#rename_value').val('');
+                $('#rename_source').val('');
+                $('#rename_parent_source').val('');
+                $('.selected_rename').html('');
+                Hm_Folders.reload_folders(true);
+            }
         }
     );
 };
@@ -138,6 +154,12 @@ var folder_page_create = function() {
         {'name': 'folder', 'value': folder},
         {'name': 'parent', 'value': par}],
         function(res) {
+            if (res.imap_folders_success) {
+                $('#create_value').val('');
+                $('#create_parent').val('');
+                $('.selected_parent').html('');
+                Hm_Folders.reload_folders(true);
+            }
         }
     );
 
@@ -153,6 +175,7 @@ $(function() {
     $('.select_parent_folder').click(function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
     $('.select_rename_folder').click(function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });
     $('.select_delete_folder').click(function() { return folder_page_folder_list('delete_folder_select', 'delete_title', 'imap_delete_folder_link', 'selected_delete', 'delete_source'); });
+    $('.select_rename_parent_folder').click(function() { return folder_page_folder_list('rename_parent_folder_select', 'rename_parent_title', 'imap_rename_parent_folder_link', 'selected_rename_parent', 'rename_parent_source'); });
     $('#create_folder').click(function() { folder_page_create(); return false; });
     $('#delete_folder').click(function() { folder_page_delete(); return false; });
     $('#rename_folder').click(function() { folder_page_rename(); return false; });

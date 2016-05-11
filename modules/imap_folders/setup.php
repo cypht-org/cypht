@@ -20,14 +20,19 @@ add_output('folders', 'folders_rename_dialog', true, 'imap_folders', 'folders_cr
 add_output('folders', 'folders_delete_dialog', true, 'imap_folders', 'folders_rename_dialog', 'after');
 
 setup_base_ajax_page('ajax_imap_folders_delete', 'core');
-add_handler('ajax_imap_folders_delete', 'process_folder_delete', true, 'imap_folders', 'load_user_data', 'after');
+add_handler('ajax_imap_folders_delete', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_imap_folders_delete', 'process_folder_delete', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_imap_folders_delete', 'close_session_early', true, 'core', 'process_folder_delete', 'after');
 
 setup_base_ajax_page('ajax_imap_folders_rename', 'core');
-add_handler('ajax_imap_folders_rename', 'process_folder_rename', true, 'imap_folders', 'load_user_data', 'after');
+add_handler('ajax_imap_folders_rename', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_imap_folders_rename', 'process_folder_rename', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_imap_folders_rename', 'close_session_early', true, 'core', 'process_folder_rename', 'after');
 
 setup_base_ajax_page('ajax_imap_folders_create', 'core');
 add_handler('ajax_imap_folders_create', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_imap_folders_create', 'process_folder_create', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_imap_folders_create', 'close_session_early', true, 'core', 'process_folder_create', 'after');
 
 add_handler('ajax_hm_folders', 'imap_folder_check', true, 'imap_folders', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'folders_page_link', true, 'imap_folders', 'settings_menu_end', 'before');
@@ -39,7 +44,9 @@ return array(
         'ajax_imap_folders_create',
         'ajax_imap_folders_rename'
     ),
-    'allowed_output' => array(),
+    'allowed_output' => array(
+        'imap_folders_success' => array(FILTER_VALIDATE_INT, false)
+    ),
     'allowed_get' => array(),
     'allowed_post' => array(
         'parent' => FILTER_SANITIZE_STRING,
