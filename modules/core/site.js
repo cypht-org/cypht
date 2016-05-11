@@ -143,7 +143,7 @@ var Hm_Ajax_Request = function() { return {
     },
 
     fail: function() {
-        setTimeout(function() { Hm_Notices.show({0: 'An error occurred communicating with the server'}); }, 1000);
+        setTimeout(function() { Hm_Notices.show({0: 'ERRAn error occurred communicating with the server'}); }, 1000);
     },
 
     always: function(res) {
