@@ -370,6 +370,22 @@ return array(
     'Some messages moved (only IMAP message types can be moved)' => false,
     'Some messages copied (only IMAP message types can be copied)' => false,
     'Unable to move/copy selected messages' => false,
+    'Folders' => false,
+    'Select an IMAP server' => false,
+    'You must select an IMAP server first' => false,
+    'New folder name is required' => false,
+    'Folder to delete is required' => false,
+    'Are you sure you want to delete this folder, and all the messages in it?' => false,
+    'Folder to rename is required' => false,
+    'Create a New Folder' => false,
+    'New Folder Name' => false,
+    'Select Parent Folder (optional)' => false,
+    'Rename a Folder' => false,
+    'Select Folder' => false,
+    'New Folder Name' => false,
+    'Rename' => false,
+    'Delete a Folder' => false,
+    'Select Folder' => false,
 ); 
 
 ?>

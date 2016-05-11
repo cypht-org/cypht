@@ -366,6 +366,22 @@ return array(
     'Some messages moved (only IMAP message types can be moved)' => 'Paar E-Mail verschoben (nur IMAP E-Mails können verschoben werden)',
     'Some messages copied (only IMAP message types can be copied)' => 'Paar E-Mail kopiert (nur IMAP E-Mail können Kopiert werden)',
     'Unable to move/copy selected messages' => 'Verschieben/Kopieren der Ausgewählten nachrichten ist fehlgeschlagen',
+    'Folders' => false,
+    'Select an IMAP server' => false,
+    'You must select an IMAP server first' => false,
+    'New folder name is required' => false,
+    'Folder to delete is required' => false,
+    'Are you sure you want to delete this folder, and all the messages in it?' => false,
+    'Folder to rename is required' => false,
+    'Create a New Folder' => false,
+    'New Folder Name' => false,
+    'Select Parent Folder (optional)' => false,
+    'Rename a Folder' => false,
+    'Select Folder' => false,
+    'New Folder Name' => false,
+    'Rename' => false,
+    'Delete a Folder' => false,
+    'Select Folder' => false,
 );
 
 ?>
