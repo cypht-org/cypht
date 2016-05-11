@@ -2106,6 +2106,7 @@ function add_attached_images($txt, $uid, $struct, $imap) {
 
 /**
  * Check for and do an Oauth2 token reset if needed
+ * @subpackage imap/functions
  * @param array $server imap server data
  * @param object $config site config object
  * @return mixed
@@ -2134,6 +2135,7 @@ function imap_refresh_oauth2_token($server, $config) {
 
 /**
  * Copy/Move messages on the same IMAP server
+ * @subpackage imap/functions
  * @param array $ids list of message ids with server and folder info
  * @param string $action action type, copy or move
  * @param object $session session interface
@@ -2160,6 +2162,7 @@ function imap_move_same_server($ids, $action, $session, $dest_path) {
 
 /**
  * Copy/Move messages on different IMAP servers
+ * @subpackage imap/functions
  * @param array $ids list of message ids with server and folder info
  * @param string $action action type, copy or move
  * @param array $dest_path imap id and folder to copy/move to
@@ -2214,6 +2217,7 @@ function imap_move_different_server($ids, $action, $dest_path, $session) {
 
 /**
  * Group info about move/copy messages
+ * @subpackage imap/functions
  * @param array $form move copy input
  * @return array grouped lists of messages to move/copy
  */
@@ -2240,6 +2244,7 @@ function process_move_to_arguments($form) {
 
 /**
  * Get a file extension for a mime type
+ * @subpackage imap/functions
  * @param string $type primary mime type
  * @param string $subtype secondary mime type
  * @todo add tons more type conversions!
@@ -2265,6 +2270,7 @@ function get_imap_mime_extension($type, $subtype) {
 
 /**
  * Try to find a filename for a message part download
+ * @subpackage imap/functions
  * @param array $struct message part structure
  * @param int $uid message number
  * @param string $part_id message part number
