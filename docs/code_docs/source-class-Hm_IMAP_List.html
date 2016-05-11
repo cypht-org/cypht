@@ -358,6 +358,16 @@
 
 						<ul>
 				<li>
+					<a href="package-modules.imap.folders.functions.html">
+						functions					</a>
+
+						</li>
+				<li>
+					<a href="package-modules.imap.folders.handler.html">
+						handler					</a>
+
+						</li>
+				<li>
 					<a href="package-modules.imap.folders.output.html">
 						output					</a>
 
@@ -693,6 +703,7 @@
 				<li><a href="class-Hm_Handler_fetch_apod_content.html">Hm_Handler_fetch_apod_content</a></li>
 				<li><a href="class-Hm_Handler_find_message_contacts.html">Hm_Handler_find_message_contacts</a></li>
 				<li><a href="class-Hm_Handler_flag_imap_message.html">Hm_Handler_flag_imap_message</a></li>
+				<li><a href="class-Hm_Handler_folders_server_id.html">Hm_Handler_folders_server_id</a></li>
 				<li><a href="class-Hm_Handler_get_calendar_date.html">Hm_Handler_get_calendar_date</a></li>
 				<li><a href="class-Hm_Handler_get_inline_message_setting.html">Hm_Handler_get_inline_message_setting</a></li>
 				<li><a href="class-Hm_Handler_get_wp_notice_data.html">Hm_Handler_get_wp_notice_data</a></li>
@@ -715,6 +726,7 @@
 				<li><a href="class-Hm_Handler_imap_delete_message.html">Hm_Handler_imap_delete_message</a></li>
 				<li><a href="class-Hm_Handler_imap_download_message.html">Hm_Handler_imap_download_message</a></li>
 				<li><a href="class-Hm_Handler_imap_flagged.html">Hm_Handler_imap_flagged</a></li>
+				<li><a href="class-Hm_Handler_imap_folder_check.html">Hm_Handler_imap_folder_check</a></li>
 				<li><a href="class-Hm_Handler_imap_folder_expand.html">Hm_Handler_imap_folder_expand</a></li>
 				<li><a href="class-Hm_Handler_imap_folder_page.html">Hm_Handler_imap_folder_page</a></li>
 				<li><a href="class-Hm_Handler_imap_forget.html">Hm_Handler_imap_forget</a></li>
@@ -793,6 +805,9 @@
 				<li><a href="class-Hm_Handler_process_feed_since_setting.html">Hm_Handler_process_feed_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_flagged_since_setting.html">Hm_Handler_process_flagged_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_flagged_source_max_setting.html">Hm_Handler_process_flagged_source_max_setting</a></li>
+				<li><a href="class-Hm_Handler_process_folder_create.html">Hm_Handler_process_folder_create</a></li>
+				<li><a href="class-Hm_Handler_process_folder_delete.html">Hm_Handler_process_folder_delete</a></li>
+				<li><a href="class-Hm_Handler_process_folder_rename.html">Hm_Handler_process_folder_rename</a></li>
 				<li><a href="class-Hm_Handler_process_github_authorization.html">Hm_Handler_process_github_authorization</a></li>
 				<li><a href="class-Hm_Handler_process_idle_time.html">Hm_Handler_process_idle_time</a></li>
 				<li><a href="class-Hm_Handler_process_idle_time_setting.html">Hm_Handler_process_idle_time_setting</a></li>
@@ -962,8 +977,12 @@
 				<li><a href="class-Hm_Output_folder_list_content_start.html">Hm_Output_folder_list_content_start</a></li>
 				<li><a href="class-Hm_Output_folder_list_end.html">Hm_Output_folder_list_end</a></li>
 				<li><a href="class-Hm_Output_folder_list_start.html">Hm_Output_folder_list_start</a></li>
-				<li><a href="class-Hm_Output_folders_content.html">Hm_Output_folders_content</a></li>
+				<li><a href="class-Hm_Output_folders_content_start.html">Hm_Output_folders_content_start</a></li>
+				<li><a href="class-Hm_Output_folders_create_dialog.html">Hm_Output_folders_create_dialog</a></li>
+				<li><a href="class-Hm_Output_folders_delete_dialog.html">Hm_Output_folders_delete_dialog</a></li>
 				<li><a href="class-Hm_Output_folders_page_link.html">Hm_Output_folders_page_link</a></li>
+				<li><a href="class-Hm_Output_folders_rename_dialog.html">Hm_Output_folders_rename_dialog</a></li>
+				<li><a href="class-Hm_Output_folders_server_select.html">Hm_Output_folders_server_select</a></li>
 				<li><a href="class-Hm_Output_github_add_repo.html">Hm_Output_github_add_repo</a></li>
 				<li><a href="class-Hm_Output_github_connect_section.html">Hm_Output_github_connect_section</a></li>
 				<li><a href="class-Hm_Output_github_folders.html">Hm_Output_github_folders</a></li>
@@ -1116,6 +1135,7 @@
 				<li><a href="function-credentials_form.html">credentials_form</a></li>
 				<li><a href="function-data_source_available.html">data_source_available</a></li>
 				<li><a href="function-date_callback.html">date_callback</a></li>
+				<li><a href="function-decode_folder_str.html">decode_folder_str</a></li>
 				<li><a href="function-delete_uploaded_files.html">delete_uploaded_files</a></li>
 				<li><a href="function-display_value.html">display_value</a></li>
 				<li><a href="function-elog.html">elog</a></li>
@@ -1142,6 +1162,7 @@
 				<li><a href="function-get_imap_part_name.html">get_imap_part_name</a></li>
 				<li><a href="function-get_message_list_settings.html">get_message_list_settings</a></li>
 				<li><a href="function-get_oauth2_data.html">get_oauth2_data</a></li>
+				<li><a href="function-get_personal_ns.html">get_personal_ns</a></li>
 				<li><a href="function-get_primary_recipients.html">get_primary_recipients</a></li>
 				<li><a href="function-get_search_from_post.html">get_search_from_post</a></li>
 				<li><a href="function-get_search_from_url.html">get_search_from_url</a></li>
@@ -1177,6 +1198,7 @@
 				<li><a href="function-output_source.html">output_source</a></li>
 				<li><a href="function-parse_contact_xml.html">parse_contact_xml</a></li>
 				<li><a href="function-payload_search.html">payload_search</a></li>
+				<li><a href="function-prep_folder_name.html">prep_folder_name</a></li>
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
 				<li><a href="function-process_address_fld.html">process_address_fld</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
@@ -2331,7 +2353,7 @@
 </span><span id="1069" class="l"><a href="#1069">1069: </a>                                    <span class="php-keyword1">continue</span>;
 </span><span id="1070" class="l"><a href="#1070">1070: </a>                                }
 </span><span id="1071" class="l"><a href="#1071">1071: </a>                                <span class="php-keyword1">if</span> (<span class="php-keyword1">isset</span>(<span class="php-var">$headers</span>[<span class="php-var">$i</span>]) &amp;&amp; <span class="php-keyword2">trim</span>(<span class="php-var">$line</span>) &amp;&amp; (<span class="php-var">$line</span>{<span class="php-num">0</span>} == <span class="php-quote">&quot;\t&quot;</span> || <span class="php-var">$line</span>{<span class="php-num">0</span>} == <span class="php-quote">' '</span>)) {
-</span><span id="1072" class="l"><a href="#1072">1072: </a>                                    <span class="php-var">$headers</span>[<span class="php-var">$i</span>][<span class="php-num">1</span>] .= <span class="php-quote">' '</span>.<span class="php-keyword2">trim</span>(<span class="php-var">$line</span>);
+</span><span id="1072" class="l"><a href="#1072">1072: </a>                                    <span class="php-var">$headers</span>[<span class="php-var">$i</span>][<span class="php-num">1</span>] .= <span class="php-keyword2">trim</span>(<span class="php-var">$line</span>);
 </span><span id="1073" class="l"><a href="#1073">1073: </a>                                }
 </span><span id="1074" class="l"><a href="#1074">1074: </a>                                <span class="php-keyword1">elseif</span> (<span class="php-var">$split</span>) {
 </span><span id="1075" class="l"><a href="#1075">1075: </a>                                    <span class="php-var">$i</span>++;
@@ -3275,12 +3297,23 @@
 </span><span id="2013" class="l"><a href="#2013">2013: </a>        }
 </span><span id="2014" class="l"><a href="#2014">2014: </a>        <span class="php-keyword1">return</span> <span class="php-var">$result</span>;
 </span><span id="2015" class="l"><a href="#2015">2015: </a>    }
-</span><span id="2016" class="l"><a href="#2016">2016: </a>}
-</span><span id="2017" class="l"><a href="#2017">2017: </a>
-</span><span id="2018" class="l"><a href="#2018">2018: </a>}
-</span><span id="2019" class="l"><a href="#2019">2019: </a>
-</span><span id="2020" class="l"><a href="#2020">2020: </a>
-</span><span id="2021" class="l"><a href="#2021">2021: </a></span></code></pre>
+</span><span id="2016" class="l"><a href="#2016">2016: </a>
+</span><span id="2017" class="l"><a href="#2017">2017: </a>    <span class="php-comment">/**
+</span></span><span id="2018" class="l"><a href="#2018">2018: </a><span class="php-comment">     * get the folder list delimiter
+</span></span><span id="2019" class="l"><a href="#2019">2019: </a><span class="php-comment">     * @return string delimiter character
+</span></span><span id="2020" class="l"><a href="#2020">2020: </a><span class="php-comment">     */</span>
+</span><span id="2021" class="l"><a href="#2021">2021: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> get_delimiter() {
+</span><span id="2022" class="l"><a href="#2022">2022: </a>        <span class="php-var">$res</span> = <span class="php-var">$this</span>-&gt;get_folder_list_by_level();
+</span><span id="2023" class="l"><a href="#2023">2023: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">count</span>(<span class="php-var">$res</span>) &gt; <span class="php-num">0</span>) {
+</span><span id="2024" class="l"><a href="#2024">2024: </a>            <span class="php-var">$folder</span> = <span class="php-keyword2">array_pop</span>(<span class="php-var">$res</span>);
+</span><span id="2025" class="l"><a href="#2025">2025: </a>            <span class="php-keyword1">return</span> <span class="php-var">$folder</span>[<span class="php-quote">'delim'</span>];
+</span><span id="2026" class="l"><a href="#2026">2026: </a>        }
+</span><span id="2027" class="l"><a href="#2027">2027: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="2028" class="l"><a href="#2028">2028: </a>    }
+</span><span id="2029" class="l"><a href="#2029">2029: </a>}
+</span><span id="2030" class="l"><a href="#2030">2030: </a>
+</span><span id="2031" class="l"><a href="#2031">2031: </a>}
+</span><span id="2032" class="l"><a href="#2032">2032: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -3288,6 +3321,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?a1e16624a7c2c06917af3329e90ae5099541c8ad"></script>
+<script src="elementlist.js?fd281b93dccfddb843fd26109301421fea189439"></script>
 </body>
 </html>

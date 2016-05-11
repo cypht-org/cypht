@@ -358,6 +358,16 @@
 
 						<ul>
 				<li>
+					<a href="package-modules.imap.folders.functions.html">
+						functions					</a>
+
+						</li>
+				<li>
+					<a href="package-modules.imap.folders.handler.html">
+						handler					</a>
+
+						</li>
+				<li>
 					<a href="package-modules.imap.folders.output.html">
 						output					</a>
 
@@ -693,6 +703,7 @@
 				<li><a href="class-Hm_Handler_fetch_apod_content.html">Hm_Handler_fetch_apod_content</a></li>
 				<li><a href="class-Hm_Handler_find_message_contacts.html">Hm_Handler_find_message_contacts</a></li>
 				<li><a href="class-Hm_Handler_flag_imap_message.html">Hm_Handler_flag_imap_message</a></li>
+				<li><a href="class-Hm_Handler_folders_server_id.html">Hm_Handler_folders_server_id</a></li>
 				<li><a href="class-Hm_Handler_get_calendar_date.html">Hm_Handler_get_calendar_date</a></li>
 				<li><a href="class-Hm_Handler_get_inline_message_setting.html">Hm_Handler_get_inline_message_setting</a></li>
 				<li><a href="class-Hm_Handler_get_wp_notice_data.html">Hm_Handler_get_wp_notice_data</a></li>
@@ -715,6 +726,7 @@
 				<li><a href="class-Hm_Handler_imap_delete_message.html">Hm_Handler_imap_delete_message</a></li>
 				<li><a href="class-Hm_Handler_imap_download_message.html">Hm_Handler_imap_download_message</a></li>
 				<li><a href="class-Hm_Handler_imap_flagged.html">Hm_Handler_imap_flagged</a></li>
+				<li><a href="class-Hm_Handler_imap_folder_check.html">Hm_Handler_imap_folder_check</a></li>
 				<li><a href="class-Hm_Handler_imap_folder_expand.html">Hm_Handler_imap_folder_expand</a></li>
 				<li><a href="class-Hm_Handler_imap_folder_page.html">Hm_Handler_imap_folder_page</a></li>
 				<li><a href="class-Hm_Handler_imap_forget.html">Hm_Handler_imap_forget</a></li>
@@ -793,6 +805,9 @@
 				<li><a href="class-Hm_Handler_process_feed_since_setting.html">Hm_Handler_process_feed_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_flagged_since_setting.html">Hm_Handler_process_flagged_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_flagged_source_max_setting.html">Hm_Handler_process_flagged_source_max_setting</a></li>
+				<li><a href="class-Hm_Handler_process_folder_create.html">Hm_Handler_process_folder_create</a></li>
+				<li><a href="class-Hm_Handler_process_folder_delete.html">Hm_Handler_process_folder_delete</a></li>
+				<li><a href="class-Hm_Handler_process_folder_rename.html">Hm_Handler_process_folder_rename</a></li>
 				<li><a href="class-Hm_Handler_process_github_authorization.html">Hm_Handler_process_github_authorization</a></li>
 				<li><a href="class-Hm_Handler_process_idle_time.html">Hm_Handler_process_idle_time</a></li>
 				<li><a href="class-Hm_Handler_process_idle_time_setting.html">Hm_Handler_process_idle_time_setting</a></li>
@@ -962,8 +977,12 @@
 				<li><a href="class-Hm_Output_folder_list_content_start.html">Hm_Output_folder_list_content_start</a></li>
 				<li><a href="class-Hm_Output_folder_list_end.html">Hm_Output_folder_list_end</a></li>
 				<li><a href="class-Hm_Output_folder_list_start.html">Hm_Output_folder_list_start</a></li>
-				<li><a href="class-Hm_Output_folders_content.html">Hm_Output_folders_content</a></li>
+				<li><a href="class-Hm_Output_folders_content_start.html">Hm_Output_folders_content_start</a></li>
+				<li><a href="class-Hm_Output_folders_create_dialog.html">Hm_Output_folders_create_dialog</a></li>
+				<li><a href="class-Hm_Output_folders_delete_dialog.html">Hm_Output_folders_delete_dialog</a></li>
 				<li><a href="class-Hm_Output_folders_page_link.html">Hm_Output_folders_page_link</a></li>
+				<li><a href="class-Hm_Output_folders_rename_dialog.html">Hm_Output_folders_rename_dialog</a></li>
+				<li><a href="class-Hm_Output_folders_server_select.html">Hm_Output_folders_server_select</a></li>
 				<li><a href="class-Hm_Output_github_add_repo.html">Hm_Output_github_add_repo</a></li>
 				<li><a href="class-Hm_Output_github_connect_section.html">Hm_Output_github_connect_section</a></li>
 				<li><a href="class-Hm_Output_github_folders.html">Hm_Output_github_folders</a></li>
@@ -1116,6 +1135,7 @@
 				<li><a href="function-credentials_form.html">credentials_form</a></li>
 				<li><a href="function-data_source_available.html">data_source_available</a></li>
 				<li><a href="function-date_callback.html">date_callback</a></li>
+				<li><a href="function-decode_folder_str.html">decode_folder_str</a></li>
 				<li><a href="function-delete_uploaded_files.html">delete_uploaded_files</a></li>
 				<li><a href="function-display_value.html">display_value</a></li>
 				<li><a href="function-elog.html">elog</a></li>
@@ -1142,6 +1162,7 @@
 				<li><a href="function-get_imap_part_name.html">get_imap_part_name</a></li>
 				<li><a href="function-get_message_list_settings.html">get_message_list_settings</a></li>
 				<li><a href="function-get_oauth2_data.html">get_oauth2_data</a></li>
+				<li><a href="function-get_personal_ns.html">get_personal_ns</a></li>
 				<li><a href="function-get_primary_recipients.html">get_primary_recipients</a></li>
 				<li><a href="function-get_search_from_post.html">get_search_from_post</a></li>
 				<li><a href="function-get_search_from_url.html">get_search_from_url</a></li>
@@ -1177,6 +1198,7 @@
 				<li><a href="function-output_source.html">output_source</a></li>
 				<li><a href="function-parse_contact_xml.html">parse_contact_xml</a></li>
 				<li><a href="function-payload_search.html">payload_search</a></li>
+				<li><a href="function-prep_folder_name.html">prep_folder_name</a></li>
 				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
 				<li><a href="function-process_address_fld.html">process_address_fld</a></li>
 				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
@@ -1383,6 +1405,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?a1e16624a7c2c06917af3329e90ae5099541c8ad"></script>
+<script src="elementlist.js?fd281b93dccfddb843fd26109301421fea189439"></script>
 </body>
 </html>
