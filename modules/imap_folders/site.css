@@ -2,6 +2,6 @@
 .folder_dialog { margin-left: 40px; margin-top: 10px; margin-bottom: 30px; }
 .folder_dialog input { display: inline-block; margin-top: 15px; }
 .folder_dialog, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select { display: none; }
-.delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select { width: 215px; position: absolute; background-color: #fff; padding: 15px; border: solid 1px #ede8e6; font-weight: normal; padding-left: 0px; min-width: 55px; padding-top: 10px; }
+.delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select { width: 215px; position: absolute; background-color: #fff; padding: 15px; border: solid 1px #ede8e6; font-weight: normal; padding-left: 10px; min-width: 55px; padding-top: 10px; margin-left: 0px !important; margin-top: 0px; }
 .folder_row { margin-top: 15px; }
-.close { float: right; color: teal !important; }
+.close { float: right; font-size: 80%; color: teal !important; }

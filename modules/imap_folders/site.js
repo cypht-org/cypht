@@ -87,7 +87,7 @@ var folder_page_delete = function() {
         function(res) {
             if (res.imap_folders_success) {
                 $('#delete_source').val('');
-                $('#selected_delete').html('');
+                $('.selected_delete').html('');
                 Hm_Folders.reload_folders(true);
             }
         }
@@ -126,6 +126,7 @@ var folder_page_rename = function() {
                 $('#rename_source').val('');
                 $('#rename_parent_source').val('');
                 $('.selected_rename').html('');
+                $('.selected_rename_parent').html('');
                 Hm_Folders.reload_folders(true);
             }
         }
