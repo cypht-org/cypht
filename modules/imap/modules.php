@@ -1270,16 +1270,16 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $txt .= ' | <a class="hlink msg_part_link raw_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
             }
             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                $txt .= ' | <a style="display: none;" class="hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
-                $txt .= '<a id="unflag_msg" class="hlink" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
+                $txt .= ' | <a style="display: none;" class="hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a id="unflag_msg" class="hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
             else {
-                $txt .= ' | <a id="flag_msg" class="hlink" data-state="unflagged" href="#">'.$this->trans('flag').'</a>';
-                $txt .= '<a style="display: none;" class="hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('unflag').'</a>';
+                $txt .= ' | <a id="flag_msg" class="hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a style="display: none;" class="hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
-            $txt .= ' | <a class="hlink" id="delete_message" href="#">'.$this->trans('delete').'</a>';
-            $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('copy').'</a>';
-            $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('move').'</a>';
+            $txt .= ' | <a class="hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
+            $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
+            $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= '<div class="move_to_location"></div></div>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
