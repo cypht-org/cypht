@@ -317,7 +317,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
 
         $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
         $res .= '<div class="nux_qa">'.$this->trans('Add a popular E-mail source quickly and easily');
-        $res .= ' <a class="nux_try_out" href="?page=servers#quick_add_section">'.$this->trans('Add An E-Mail account').'</a>';
+        $res .= ' <a class="nux_try_out" href="?page=servers#quick_add_section">'.$this->trans('Add an E-mail Account').'</a>';
         $res .= '</div><ul>';
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
@@ -376,7 +376,7 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
             '<img src="'.Hm_Image_Sources::$circle_check.'" alt="" width="16" height="16" /> '.
-            $this->trans('Add An E-mail Account').'</div>';
+            $this->trans('Add an E-mail Account').'</div>';
     }
 }
 
