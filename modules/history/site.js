@@ -36,7 +36,7 @@ var display_history_page_links = function() {
         if (history[msg][2] == null) {
             history[msg][2] = '';
         }
-        $('.message_table tbody').append('<tr><td class="source">'+history[msg][3]+'</td><td class="from">'+history[msg][1]+'</td><td class="subject"><div><a href="'+msg+'">'+history[msg][0]+'</a></div></td><td class="msg_date">'+history[msg][2]+'</td></tr>');
+        $('.message_table tbody').prepend('<tr><td class="source">'+history[msg][3]+'</td><td class="from">'+history[msg][1]+'</td><td class="subject"><div><a href="'+msg+'">'+history[msg][0]+'</a></div></td><td class="msg_date">'+history[msg][2]+'</td></tr>');
     }
     if (count === 0) {
         $('.history_content').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
