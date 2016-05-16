@@ -388,6 +388,7 @@ return array(
 	'Monthly' => false,
 	'Yearly' => false,
 	'Add Event' => false,
+    'Download' => false,
 ); 
 
 ?>
