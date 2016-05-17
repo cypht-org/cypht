@@ -232,7 +232,13 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
 };
 
 var imap_sent_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_sent');
+    return imap_message_list_content(id, folder, 'ajax_imap_sent', cache_sent_data);
+};
+
+var cache_sent_data = function() {
+    if (hm_list_path() == 'sent') {
+        Hm_Message_List.set_message_list_state('formatted_sent_data');
+    }
 };
 
 var imap_all_mail_content = function(id, folder) {
@@ -759,6 +765,9 @@ else if (hm_page_name() === 'servers') {
 }
 else if (hm_page_name() === 'info') {
     setTimeout(imap_status_update, 100);
+}
+else if (hm_list_path() == 'sent') {
+    Hm_Message_List.page_caches.sent = 'formatted_sent_data';
 }
 
 $(function() {
