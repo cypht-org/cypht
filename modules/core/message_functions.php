@@ -354,7 +354,7 @@ function format_reply_as_text($body, $type, $reply_type, $lead_in) {
         }
     }
     elseif ($type == 'textplain') {
-        if ($reply_type == 'reply') {
+        if ($reply_type == 'reply' || $reply_type == 'reply_all') {
             $msg = $lead_in.format_reply_text($body);
         }
         else {
