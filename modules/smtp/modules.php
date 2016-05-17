@@ -486,11 +486,9 @@ class Hm_Handler_smtp_auto_bcc_check extends Hm_Handler_Module {
  */
 class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('auto_bcc_enabled', 0)) {
-            $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$sent).'" alt="" width="16" height="16" /> '.$this->trans('Sent').'</a></li>';
-            $this->concat('formatted_folder_list', $res);
-        }
+        $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">'.
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$sent).'" alt="" width="16" height="16" /> '.$this->trans('Sent').'</a></li>';
+        $this->concat('formatted_folder_list', $res);
     }
 }
 
