@@ -6,6 +6,7 @@ h1 { text-shadow: 1px -1px 0px #999; margin: 0px; padding: 0px; font-size: 90px;
 .para {clear: both; max-width: 40em; margin: 0px; margin-left: auto; margin-right: auto; padding: 20px; padding-left: 30px; font-size: 12pt; min-height: 400px; line-height: 20pt; color: #666; margin-top: 20px; padding-bottom: 60px; }
 .inner {clear: both; max-width: 40em; margin: 0px; margin-left: auto; margin-right: auto; }
 li { margin-bottom: 10px; margin-right: 15px; list-style-type: none; }
+.links { padding-left: 20px; }
 .links a { color: #aaa; letter-spacing: 0px; font-variant: small-caps; text-transform: lowercase; font-size: 110%; margin-left: 10px; margin-right: 10px; float: left; margin: 10px; display: block; }
 .footer { text-align: center; margin-bottom: 20px; margin-top: 20px; }
 .footer a { color: #ccc !important; }
