@@ -2033,6 +2033,7 @@ function sort_by_internal_date($a, $b) {
 function merge_imap_search_results($ids, $search_type, $session, $folders = array('INBOX'), $limit=0, $terms=array(), $sent=false) {
     $msg_list = array();
     $connection_failed = false;
+    $sent_results = array();
     foreach($ids as $index => $id) {
         $id = intval($id);
         $cache = Hm_IMAP_List::get_cache($session, $id);
@@ -2040,6 +2041,12 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
         if (is_object($imap) && $imap->get_state() == 'authenticated') {
             $server_details = Hm_IMAP_List::dump($id);
             $folder = $folders[$index];
+            if ($sent) {
+                $sent_folder = $imap->get_special_use_mailboxes('sent');
+                if (array_key_exists('sent', $sent_folder)) {
+                    $sent_results = merge_imap_search_results($ids, $search_type, $session, array($sent_folder['sent']), $limit, $terms, false);
+                }
+            }
             if ($imap->select_mailbox($folder)) {
                 if (!empty($terms)) {
                     if ($sent) {
@@ -2078,6 +2085,9 @@ function merge_imap_search_results($ids, $search_type, $session, $folders = arra
     }
     if ($connection_failed && empty($msg_list)) {
         return array(false);
+    }
+    if (count($sent_results) > 0) {
+        $msg_list = array_merge($msg_list, $sent_results);
     }
     return $msg_list;
 }

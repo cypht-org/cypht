@@ -327,6 +327,33 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     }
 
     /**
+     * special version of LIST to return just special use mailboxes
+     * @param string $type type of special folder to return (sent, all, trash, flagged, junk)
+     * @return array list of special use folders
+     */
+    public function get_special_use_mailboxes($type=false) {
+        $folders = array();
+        $types = array('trash', 'sent', 'flagged', 'all', 'junk');
+        $command = 'LIST (SPECIAL-USE) "" "*"'."\r\n";
+        $this->send_command($command);
+        $res = $this->get_response(false, true);
+        foreach ($res as $row) {
+            foreach ($row as $atom) {
+                if (in_array(strtolower(substr($atom, 1)), $types, true)) {
+                    $folder = array_pop($row);
+                    $name = strtolower(substr($atom, 1));
+                    if ($type && $type == $name) {
+                        return array($name => $folder);
+                    }
+                    $folders[$name] = $folder;
+                    break;
+                }
+            }
+        }
+        return $folders;
+    }
+
+    /**
      * get a list of mailbox folders
      * @param bool $lsub flag to limit results to subscribed folders only
      * @return array associative array of folder details
