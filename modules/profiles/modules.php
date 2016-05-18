@@ -230,7 +230,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     }
                 }
                 $res .= '<tr>'.
-                    '<td><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="Edit">'.
+                    '<td><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
                     '<img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a></td>'.
                     '<td>'.$this->html_safe($profile['name']).'</td>'.
                     '<td>'.$this->html_safe($profile['server']).'</td>'.
