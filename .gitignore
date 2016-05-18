@@ -4,6 +4,7 @@
 /site.css
 /site/
 /todo
+/tests/selenium/creds.py
 *.pyc
 apigen4.sh
 commit_check.sh
