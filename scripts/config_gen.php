@@ -100,12 +100,16 @@ function build_config() {
 function compress($string, $command, $file=false) {
     if ($command) {
         if ($file) {
-            $result = exec("cat ./".$file." | $command", $output);
+            exec("cat ./".$file." | $command", $output);
+            $result = join('', $output);
         }
         else {
             exec("echo ".escapeshellarg($string)." | $command", $output);
             $result = join('', $output);
         }
+    }
+    else {
+        $result = $string;
     }
     if (!trim($result)) {
         printf("WARNING: Compression command failed: %s\n", $command);
