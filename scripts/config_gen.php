@@ -107,9 +107,6 @@ function compress($string, $command, $file=false) {
             $result = join('', $output);
         }
     }
-    else {
-        $result = str_replace('\\\\', '\\', $string); //preg_replace("/\s{2,}/", ' ', $string);
-    }
     if (!trim($result)) {
         printf("WARNING: Compression command failed: %s\n", $command);
         return $string;
