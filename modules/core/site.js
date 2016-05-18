@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /* ajax multiplexer */
 var Hm_Ajax = {
     request_count: 0,

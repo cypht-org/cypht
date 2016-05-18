@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 var update_search = function(event) {
     event.preventDefault();
     if ($('.search_terms').val().length && $('.search_name').val().length) {
