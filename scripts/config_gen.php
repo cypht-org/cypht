@@ -97,10 +97,15 @@ function build_config() {
  *
  * @return string compressed string
  */
-function compress($string, $command) {
+function compress($string, $command, $file=false) {
     if ($command) {
-        exec("echo ".escapeshellarg($string)." | $command", $output);
-        $result = join('', $output);
+        if ($file) {
+            $result = exec("cat ./".$file." | $command", $output);
+        }
+        else {
+            exec("echo ".escapeshellarg($string)." | $command", $output);
+            $result = join('', $output);
+        }
     }
     else {
         $result = str_replace('\\\\', '\\', $string); //preg_replace("/\s{2,}/", ' ', $string);
@@ -196,8 +201,9 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
             $settings['encrypt_local_storage'])) {
             $js_lib .= file_get_contents("third_party/forge.min.js");
         }
-        $js = str_replace('\\', '\\\\', $js);
-        file_put_contents('site.js', $js_lib.compress($js, $js_compress));
+        file_put_contents('tmp.js', $js);
+        file_put_contents('site.js', $js_lib.compress($js, $js_compress, 'tmp.js'));
+        unlink('./tmp.js');
         printf("site.js file created\n");
     }
 }
