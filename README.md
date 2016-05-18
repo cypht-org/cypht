@@ -7,8 +7,3 @@ read more at our website.
 
 
 http://cypht.org
-
-
-
-
-Hi DJ from BrowserStack!
