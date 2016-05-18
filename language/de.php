@@ -389,6 +389,7 @@ return array(
     'Yearly' => "Jährlich",
     'Add Event' => "Event hinzufügen",
     'Download' => "Download",
+    'French' => false,
 );
 
 ?>

@@ -391,6 +391,7 @@ return array(
     'Yearly' => false,
     'Add Event' => false,
     'Download' => false,
+    'French' => false,
 ); 
 
 ?>
