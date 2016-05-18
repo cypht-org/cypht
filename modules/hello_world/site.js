@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 /**
  * This JS sets up an AJAX request and assigns it to a link on the hello_world page.
  * You have access to zepto functions when this code is loaded, so use the standard

@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var imap_delete_action = function(event) {
     event.preventDefault();

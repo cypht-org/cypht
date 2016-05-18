@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 var delete_contact = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_delete_contact'},

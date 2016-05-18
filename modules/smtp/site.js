@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var smtp_test_action = function(event) {
     event.preventDefault();
