@@ -21,7 +21,7 @@ td { vertical-align: top; }
 .message_table { table-layout: fixed; width: 100%; padding: 20px; padding-top: 15px; padding-bottom: 40px; padding-left: 20px; }
 .message_table th:hover { color: #000; }
 .logout_form { white-space: nowrap; padding: 0px; margin: 0px; }
-.logout_form a {}
+.logout_form a { color: #666; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .placeholder { width: 100px !important; }
 .loading_icon { background-position: 0px 0px; background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==') repeat-x top left; background-size: cover; opacity: .6; text-align: center; display: none; position: fixed; right: 0px; top: 0px; left: 0px; height: 6px; z-index: 100; }
@@ -112,7 +112,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .settings_subtitle { font-size: 115%; color: #777 !important; letter-spacing: -1px; padding-bottom: 6px !important; padding-left: 30px !important; height: 25px !important; padding-top: 15px !important; }
 .server_section img, .settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; }
 .settings_subtitle, .server_section { cursor: pointer; max-height: 25px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; border-bottom: solid 1px #ede8e6; }
-.list_meta { float: right; margin-right: 120px; letter-spacing: 0px; display: inline; color: #999 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; }
+.list_meta { float: right; margin-right: 120px; letter-spacing: 0px; display: inline; color: #666 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; }
 .list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ede8e6; opacity: 1; padding-top: 100px; text-align: center; }
 .hide_folders { float: left; clear: none; margin-top: 10px; margin-left: 23px; }
@@ -126,8 +126,8 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; height: 220px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
 .list_sources { z-index: 100; border-left: solid 1px #ede8e6; border-bottom: solid 1px #ede8e6; position: absolute; right: 0px; top: 54px; background-color: #fafafa; font-size: 85%; padding: 30px; padding-top: 10px; display: none;}
-.list_src { margin-bottom: 10px; }
-.src_title { font-size: 110%; padding: 5px; margin-bottom: 10px; }
+.list_src { color: #666; margin-bottom: 10px; }
+.src_title { color: #666; font-size: 110%; padding: 5px; margin-bottom: 10px; }
 .del_src_link { padding: 3px; color: #666; margin-right: 5px; }
 .search_form { font-size: 80%; color: #999; display: inline; padding-left: 15px; }
 .search_form input, .search_form select { margin-right: 3px; margin-left: 3px; }
@@ -216,7 +216,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .folder_toggle img { width: 24px; height: 24px; }
     .update_message_list { margin-right: 20px; }
     .msg_text { max-width: 360px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
-    .msg_controls { position: absolute; z-index: 100; right: -20px; height: 39px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; padding-left: 10px; padding-top: 20px; top: 0px; left: 60px !important; }
+    .msg_controls { position: fixed; z-index: 100; right: -20px; height: 39px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; padding-left: 10px; padding-top: 20px; top: 0px; left: 60px !important; }
     .header_subject th { white-space: normal !important; word-break: break-all !important; word-wrap: break-word !important; }
     .msg_headers th { padding-left: 10px !important; }
     .nlink, .plink, .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
