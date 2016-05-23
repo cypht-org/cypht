@@ -50,9 +50,12 @@ class WebTest:
 
     def logout(self):
         self.driver.find_element_by_class_name('logout_link').click()
-        logout = self.by_id('logout_without_saving')
-        if logout:
-            logout.click()
+        try:
+            logout = self.by_id('logout_without_saving')
+            if logout:
+                logout.click()
+        except:
+            pass
 
     def end(self):
         self.driver.quit()
