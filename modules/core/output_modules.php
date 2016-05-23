@@ -17,8 +17,8 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).
-            '" alt="" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
-            '<input type="search" class="search_terms" name="search_terms" placeholder="'.
+            '" alt="'.$this->trans('Search').'" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
+            '<label class="screen_reader" for="search_terms">'.$this->trans('Search').'</label><input type="search" id="search_terms" class="search_terms" name="search_terms" placeholder="'.
             $this->trans('Search').'" /></form></li>';
         if ($this->format == 'HTML5') {
             return $res;
