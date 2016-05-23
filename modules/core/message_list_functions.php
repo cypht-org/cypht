@@ -333,6 +333,9 @@ function list_sources($sources, $output_mod) {
     $res = '<div class="list_sources">';
     $res .= '<div class="src_title">'.$output_mod->html_safe('Sources').'</div>';
     foreach ($sources as $src) {
+        if (array_key_exists('group', $src) && $src['group'] == 'background') {
+            continue;
+        }
         if ($src['type'] == 'imap' && !array_key_exists('folder', $src)) {
             $folder = '_INBOX';
         }
