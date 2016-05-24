@@ -21,6 +21,9 @@ customize the program without hacking the code.
 
 
 Security details: [https://cypht.org/security.html](https://cypht.org/security.html)
+
 Module info: [https://cypht.org/modules.html](https://cypht.org/modules.html)
+
 Features: [https://cypht.org/features.html](https://cypht.org/features.html)
+
 License: [https://cypht.org/license.html](https://cypht.org/license.html)
