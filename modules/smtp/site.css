@@ -9,7 +9,7 @@
 .smtp_server_setup .content_title { cursor: pointer; }
 .compose_server, .compose_server option { width: 100%; padding: 5px; margin: 5px; }
 .compose_attach_button, .smtp_save, .smtp_reset { cursor: pointer; margin-left: 10px; float: right; margin-top: 10px; }
-.ke-container { margin-left: 5px !important; border-radius: 3px 3px 3px; margin-top: 5px !important; margin-bottom: 5px !important; padding-right: 0px !important; }
+.ke-container { margin-left: 5px !important; border-radius: 3px 3px 3px; margin-top: 5px !important; margin-bottom: 5px !important; padding-right: 0px !important; width: 100% !important; }
 .recipient_fields { display: none; }
 .compose_attach_file { width: 0px; opacity: 0; }
 .uploaded_files { width: 1%;  margin-left: 5px; }
