@@ -1246,4 +1246,6 @@ $(function() {
     if (hm_page_name() == 'search') {
         $('.search_reset').click(Hm_Utils.reset_search_form);
     }
+    try { navigator.registerProtocolHandler("mailto", "?page=compose&compose_to=%s", "Cypht"); } catch(e) {}
+
 });
