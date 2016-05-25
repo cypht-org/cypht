@@ -86,6 +86,7 @@ return array(
         'reply' => FILTER_VALIDATE_INT,
         'reply_all' => FILTER_VALIDATE_INT,
         'forward' => FILTER_VALIDATE_INT,
+        'compose_to' => FILTER_SANITIZE_STRING,
     ),
     'allowed_output' => array(
         'file_details' => array(FILTER_UNSAFE_RAW, false)
