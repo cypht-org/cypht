@@ -1047,7 +1047,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
                         $msg_struct_current = array_shift($struct);
                         if (!trim($msg_text)) {
-                            if (array_key_exists('subtype', $msg_struct_current)) {
+                            if (is_array($msg_struct_current) && array_key_exists('subtype', $msg_struct_current)) {
                                 if ($msg_struct_current['subtype'] == 'plain') {
                                     $subtype = 'html';
                                 }
