@@ -204,6 +204,9 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
         }
+        if (is_array($this->get('compose_draft')) && strlen(trim((join('', $this->get('compose_draft')))) == 0 && array_key_exists('compose_to', $this->request->get)) {
+            $this->out('compose_draft', array('draft_to' => preg_replace('/^mailto:/', '', $this->request->get['compose_to'])));
+        }
         $this->out('smtp_compose_type', $compose_type);
     }
 }
