@@ -27,3 +27,5 @@ Module info: [https://cypht.org/modules.html](https://cypht.org/modules.html)
 Features: [https://cypht.org/features.html](https://cypht.org/features.html)
 
 License: [https://cypht.org/license.html](https://cypht.org/license.html)
+
+Contact: [jason@cypht.org](mailto:jason@cypht.org)
