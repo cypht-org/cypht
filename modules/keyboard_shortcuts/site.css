@@ -1,0 +1,3 @@
+.shortcut_table th { padding-left: 40px; font-weight: normal; padding-top: 6px; padding-bottom: 3px; text-align: left; }
+.shortcut_table .settings_subtitle { cursor: auto; }
+.shortcut_table .keys {white-space: nowrap; width: 1%; font-size: 105%; color: #666; }
