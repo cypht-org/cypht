@@ -4,6 +4,36 @@ var ks_redirect = function(target) {
     document.location.href = target;
 };
 
+var ks_prev_msg = function() {
+    var focused = $(document.activeElement);
+    if (focused.prop('tagName').toLowerCase() != 'tr') {
+        var row = $('.message_table tbody tr').last();
+        row.focus();
+    }
+    else {
+        focused.prev().focus();
+    }
+};
+
+var ks_load_msg = function() {
+    var focused = $(document.activeElement);
+    if (focused.prop('tagName').toLowerCase() == 'tr') {
+        elog('here');
+        document.location.href = $('a', focused).attr('href');
+    }
+};
+
+var ks_next_msg = function() {
+    var focused = $(document.activeElement);
+    if (focused.prop('tagName').toLowerCase() != 'tr') {
+        var row = $('.message_table tbody tr').first();
+        row.focus();
+    }
+    else {
+        focused.next().focus();
+    }
+};
+
 var ks_click_button = function(target) {
     $(target).trigger('click');
 };
@@ -83,6 +113,9 @@ $(function() {
         {'page': '*', 'control_chars': ['meta'], 'char': 83, 'action': ks_redirect, 'target': '?page=compose'},
         {'page': '*', 'control_chars': ['meta'], 'char': 67, 'action': ks_redirect, 'target': '?page=contacts'},
         {'page': '*', 'control_chars': ['meta'], 'char': 85, 'action': ks_redirect, 'target': '?page=message_list&list_path=unread'},
+        {'page': 'message_list', 'control_chars': [], 'char': 78, 'action': ks_next_msg, 'target': false},
+        {'page': 'message_list', 'control_chars': [], 'char': 80, 'action': ks_prev_msg, 'target': false},
+        {'page': 'message_list', 'control_chars': [], 'char': 13, 'action': ks_load_msg, 'target': false}
     ];
     $(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
 });
