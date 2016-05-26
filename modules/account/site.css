@@ -1,4 +1,6 @@
 .create_user { margin-top: 20px; margin-left: 10px; }
+.chg_pass_page { width: 100%; }
+.change_pass { width: 100%; }
 .create_user input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 .create_account_link { margin-left: 120px; float: left; clear: left; font-size: 115%; padding: 5px; }
 .change_pass { margin-left: 20px; margin-top: 20px; }
