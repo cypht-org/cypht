@@ -156,6 +156,7 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
 if (hm_page_name() == 'contacts') {
     $('.delete_contact').click(function() {
         delete_contact($(this).data('id'));
+        return false;
     });
     $('.reset_contact').click(function() {
         window.location.href = '?page=contacts';
