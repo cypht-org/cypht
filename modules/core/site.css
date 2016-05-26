@@ -5,7 +5,7 @@ p { margin: 0px; padding: 0px; }
 br { clear: both; }
 html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #faf6f5, #faf6f5, #faf6f5, #faf6f5, #fff); font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; min-width: 700px; font-size: 100%; }
-table { width: 100%; border-spacing: 0px; table-layout: fixed; }
+table { width: 100%; border-spacing: 0px; }
 td { vertical-align: top; }
 .hr { height: 1px; margin-left: 0px; border-top: solid 1px #ddd; margin-top: 20px; margin-bottom: 20px; }
 .subtitle { color: teal; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
