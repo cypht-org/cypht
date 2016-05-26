@@ -418,6 +418,24 @@
 						</li>
 							</ul></li></ul></li>
 				<li>
+					<a href="package-modules.keyboard.html">
+						keyboard<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.html">
+						shortcuts<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.output.html">
+						output					</a>
+
+						</li>
+							</ul></li></ul></li>
+				<li>
 					<a href="package-modules.nasa.html">
 						nasa<span></span>
 					</a>
@@ -466,6 +484,24 @@
 
 						</li>
 							</ul></li>
+				<li>
+					<a href="package-modules.password.html">
+						password<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.html">
+						restrictions<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.functions.html">
+						functions					</a>
+
+						</li>
+							</ul></li></ul></li>
 				<li>
 					<a href="package-modules.pop3.html">
 						pop3<span></span>
@@ -1062,6 +1098,8 @@
 				<li><a href="class-Hm_Output_settings_save_link.html">Hm_Output_settings_save_link</a></li>
 				<li><a href="class-Hm_Output_settings_servers_link.html">Hm_Output_settings_servers_link</a></li>
 				<li><a href="class-Hm_Output_settings_site_link.html">Hm_Output_settings_site_link</a></li>
+				<li><a href="class-Hm_Output_shortcuts_content.html">Hm_Output_shortcuts_content</a></li>
+				<li><a href="class-Hm_Output_shortcuts_page_link.html">Hm_Output_shortcuts_page_link</a></li>
 				<li><a href="class-Hm_Output_start_all_email_settings.html">Hm_Output_start_all_email_settings</a></li>
 				<li><a href="class-Hm_Output_start_everything_settings.html">Hm_Output_start_everything_settings</a></li>
 				<li><a href="class-Hm_Output_start_feed_settings.html">Hm_Output_start_feed_settings</a></li>
@@ -1069,6 +1107,7 @@
 				<li><a href="class-Hm_Output_start_general_settings.html">Hm_Output_start_general_settings</a></li>
 				<li><a href="class-Hm_Output_start_pop3_settings.html">Hm_Output_start_pop3_settings</a></li>
 				<li><a href="class-Hm_Output_start_settings_form.html">Hm_Output_start_settings_form</a></li>
+				<li><a href="class-Hm_Output_start_shortcuts_page.html">Hm_Output_start_shortcuts_page</a></li>
 				<li><a href="class-Hm_Output_start_unread_settings.html">Hm_Output_start_unread_settings</a></li>
 				<li><a href="class-Hm_Output_tag_bar.html">Hm_Output_tag_bar</a></li>
 				<li><a href="class-Hm_Output_tag_folders.html">Hm_Output_tag_folders</a></li>
@@ -1130,6 +1169,9 @@
 				<li><a href="function-build_github_subject.html">build_github_subject</a></li>
 				<li><a href="function-build_mime_msg.html">build_mime_msg</a></li>
 				<li><a href="function-build_page_links.html">build_page_links</a></li>
+				<li><a href="function-check_passphrase_rules.html">check_passphrase_rules</a></li>
+				<li><a href="function-check_password.html">check_password</a></li>
+				<li><a href="function-check_password_rules.html">check_password_rules</a></li>
 				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
 				<li><a href="function-convert_html_to_text.html">convert_html_to_text</a></li>
 				<li><a href="function-credentials_form.html">credentials_form</a></li>
@@ -1290,134 +1332,134 @@
 </span></span><span id="6" class="l"><a href="#6">  6: </a><span class="php-comment"> * @subpackage imap_folders
 </span></span><span id="7" class="l"><a href="#7">  7: </a><span class="php-comment"> */</span>
 </span><span id="8" class="l"><a href="#8">  8: </a>
-</span><span id="9" class="l"><a href="#9">  9: </a><span class="php-comment">/*
-</span></span><span id="10" class="l"><a href="#10"> 10: </a><span class="php-comment"> * TODO:
-</span></span><span id="11" class="l"><a href="#11"> 11: </a><span class="php-comment"> * add new strings to lang files
-</span></span><span id="12" class="l"><a href="#12"> 12: </a><span class="php-comment"> */</span>
-</span><span id="13" class="l"><a href="#13"> 13: </a>
-</span><span id="14" class="l"><a href="#14"> 14: </a><span class="php-keyword1">if</span> (!<span class="php-keyword2">defined</span>(<span class="php-quote">'DEBUG_MODE'</span>)) { <span class="php-keyword1">die</span>(); }
-</span><span id="15" class="l"><a href="#15"> 15: </a>
-</span><span id="16" class="l"><a href="#16"> 16: </a><span class="php-comment">/**
-</span></span><span id="17" class="l"><a href="#17"> 17: </a><span class="php-comment"> * @subpackage imap_folders/handler
-</span></span><span id="18" class="l"><a href="#18"> 18: </a><span class="php-comment"> */</span>
-</span><span id="19" class="l"><a href="#19"> 19: </a><span class="php-keyword1">class</span> Hm_Handler_process_folder_create <span class="php-keyword1">extends</span> Hm_Handler_Module {
-</span><span id="20" class="l"><a href="#20"> 20: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="21" class="l"><a href="#21"> 21: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'folder'</span>, <span class="php-quote">'imap_server_id'</span>));
-</span><span id="22" class="l"><a href="#22"> 22: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
-</span><span id="23" class="l"><a href="#23"> 23: </a>            <span class="php-var">$parent</span> = <span class="php-keyword1">false</span>;
-</span><span id="24" class="l"><a href="#24"> 24: </a>            <span class="php-var">$parent_str</span> = <span class="php-keyword1">false</span>;
-</span><span id="25" class="l"><a href="#25"> 25: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'parent'</span>, <span class="php-var">$this</span>-&gt;request-&gt;post)) {
-</span><span id="26" class="l"><a href="#26"> 26: </a>                <span class="php-var">$parent_str</span> = <span class="php-var">$this</span>-&gt;request-&gt;post[<span class="php-quote">'parent'</span>];
-</span><span id="27" class="l"><a href="#27"> 27: </a>            }
-</span><span id="28" class="l"><a href="#28"> 28: </a>            <span class="php-var">$cache</span> = Hm_IMAP_List::get_cache(<span class="php-var">$this</span>-&gt;session, <span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>]);
-</span><span id="29" class="l"><a href="#29"> 29: </a>            <span class="php-var">$imap</span> = Hm_IMAP_List::connect(<span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>], <span class="php-var">$cache</span>);
-</span><span id="30" class="l"><a href="#30"> 30: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_object</span>(<span class="php-var">$imap</span>) &amp;&amp; <span class="php-var">$imap</span>-&gt;get_state() == <span class="php-quote">'authenticated'</span>) {
-</span><span id="31" class="l"><a href="#31"> 31: </a>                <span class="php-var">$new_folder</span> = prep_folder_name(<span class="php-var">$imap</span>, <span class="php-var">$form</span>[<span class="php-quote">'folder'</span>], <span class="php-keyword1">false</span>, <span class="php-var">$parent_str</span>);
-</span><span id="32" class="l"><a href="#32"> 32: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$new_folder</span> &amp;&amp; <span class="php-var">$imap</span>-&gt;create_mailbox(<span class="php-var">$new_folder</span>)) {
-</span><span id="33" class="l"><a href="#33"> 33: </a>                    Hm_Msgs::add(<span class="php-quote">'Folder created'</span>);
-</span><span id="34" class="l"><a href="#34"> 34: </a>                    Hm_Page_Cache::<span class="php-keyword2">flush</span>(<span class="php-var">$this</span>-&gt;session);
-</span><span id="35" class="l"><a href="#35"> 35: </a>                    <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'imap_folders_success'</span>, <span class="php-keyword1">true</span>);
-</span><span id="36" class="l"><a href="#36"> 36: </a>                }
-</span><span id="37" class="l"><a href="#37"> 37: </a>                <span class="php-keyword1">else</span> {
-</span><span id="38" class="l"><a href="#38"> 38: </a>                    Hm_Msgs::add(<span class="php-quote">'ERRAn error occurred creating the folder'</span>);
-</span><span id="39" class="l"><a href="#39"> 39: </a>                }
-</span><span id="40" class="l"><a href="#40"> 40: </a>            }
-</span><span id="41" class="l"><a href="#41"> 41: </a>        }
-</span><span id="42" class="l"><a href="#42"> 42: </a>    }
-</span><span id="43" class="l"><a href="#43"> 43: </a>}
-</span><span id="44" class="l"><a href="#44"> 44: </a>
-</span><span id="45" class="l"><a href="#45"> 45: </a><span class="php-comment">/**
-</span></span><span id="46" class="l"><a href="#46"> 46: </a><span class="php-comment"> * @subpackage imap_folders/handler
-</span></span><span id="47" class="l"><a href="#47"> 47: </a><span class="php-comment"> */</span>
-</span><span id="48" class="l"><a href="#48"> 48: </a><span class="php-keyword1">class</span> Hm_Handler_process_folder_rename <span class="php-keyword1">extends</span> Hm_Handler_Module {
-</span><span id="49" class="l"><a href="#49"> 49: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="50" class="l"><a href="#50"> 50: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'imap_server_id'</span>, <span class="php-quote">'folder'</span>, <span class="php-quote">'new_folder'</span>));
-</span><span id="51" class="l"><a href="#51"> 51: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
-</span><span id="52" class="l"><a href="#52"> 52: </a>            <span class="php-var">$cache</span> = Hm_IMAP_List::get_cache(<span class="php-var">$this</span>-&gt;session, <span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>]);
-</span><span id="53" class="l"><a href="#53"> 53: </a>            <span class="php-var">$imap</span> = Hm_IMAP_List::connect(<span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>], <span class="php-var">$cache</span>);
-</span><span id="54" class="l"><a href="#54"> 54: </a>            <span class="php-var">$parent_str</span> = <span class="php-keyword1">false</span>;
-</span><span id="55" class="l"><a href="#55"> 55: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'parent'</span>, <span class="php-var">$this</span>-&gt;request-&gt;post)) {
-</span><span id="56" class="l"><a href="#56"> 56: </a>                <span class="php-var">$parent_str</span> = <span class="php-var">$this</span>-&gt;request-&gt;post[<span class="php-quote">'parent'</span>];
-</span><span id="57" class="l"><a href="#57"> 57: </a>            }
-</span><span id="58" class="l"><a href="#58"> 58: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_object</span>(<span class="php-var">$imap</span>) &amp;&amp; <span class="php-var">$imap</span>-&gt;get_state() == <span class="php-quote">'authenticated'</span>) {
-</span><span id="59" class="l"><a href="#59"> 59: </a>                <span class="php-var">$old_folder</span> = prep_folder_name(<span class="php-var">$imap</span>, <span class="php-var">$form</span>[<span class="php-quote">'folder'</span>], <span class="php-keyword1">true</span>);
-</span><span id="60" class="l"><a href="#60"> 60: </a>                <span class="php-var">$new_folder</span> = prep_folder_name(<span class="php-var">$imap</span>, <span class="php-var">$form</span>[<span class="php-quote">'new_folder'</span>], <span class="php-keyword1">false</span>, <span class="php-var">$parent_str</span>);
-</span><span id="61" class="l"><a href="#61"> 61: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$new_folder</span> &amp;&amp; <span class="php-var">$old_folder</span> &amp;&amp; <span class="php-var">$imap</span>-&gt;rename_mailbox(<span class="php-var">$old_folder</span>, <span class="php-var">$new_folder</span>)) {
-</span><span id="62" class="l"><a href="#62"> 62: </a>                    Hm_Msgs::add(<span class="php-quote">'Folder renamed'</span>);
-</span><span id="63" class="l"><a href="#63"> 63: </a>                    Hm_Page_Cache::<span class="php-keyword2">flush</span>(<span class="php-var">$this</span>-&gt;session);
-</span><span id="64" class="l"><a href="#64"> 64: </a>                    <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'imap_folders_success'</span>, <span class="php-keyword1">true</span>);
-</span><span id="65" class="l"><a href="#65"> 65: </a>                }
-</span><span id="66" class="l"><a href="#66"> 66: </a>                <span class="php-keyword1">else</span> {
-</span><span id="67" class="l"><a href="#67"> 67: </a>                    Hm_Msgs::add(<span class="php-quote">'ERRAn error occurred renaming the folder'</span>);
-</span><span id="68" class="l"><a href="#68"> 68: </a>                }
-</span><span id="69" class="l"><a href="#69"> 69: </a>            }
-</span><span id="70" class="l"><a href="#70"> 70: </a>        }
-</span><span id="71" class="l"><a href="#71"> 71: </a>    }
-</span><span id="72" class="l"><a href="#72"> 72: </a>}
-</span><span id="73" class="l"><a href="#73"> 73: </a>
-</span><span id="74" class="l"><a href="#74"> 74: </a><span class="php-comment">/**
-</span></span><span id="75" class="l"><a href="#75"> 75: </a><span class="php-comment"> * @subpackage imap_folders/handler
-</span></span><span id="76" class="l"><a href="#76"> 76: </a><span class="php-comment"> */</span>
-</span><span id="77" class="l"><a href="#77"> 77: </a><span class="php-keyword1">class</span> Hm_Handler_process_folder_delete <span class="php-keyword1">extends</span> Hm_Handler_Module {
-</span><span id="78" class="l"><a href="#78"> 78: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="79" class="l"><a href="#79"> 79: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'imap_server_id'</span>, <span class="php-quote">'folder'</span>));
-</span><span id="80" class="l"><a href="#80"> 80: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
-</span><span id="81" class="l"><a href="#81"> 81: </a>            <span class="php-var">$cache</span> = Hm_IMAP_List::get_cache(<span class="php-var">$this</span>-&gt;session, <span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>]);
-</span><span id="82" class="l"><a href="#82"> 82: </a>            <span class="php-var">$imap</span> = Hm_IMAP_List::connect(<span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>], <span class="php-var">$cache</span>);
-</span><span id="83" class="l"><a href="#83"> 83: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_object</span>(<span class="php-var">$imap</span>) &amp;&amp; <span class="php-var">$imap</span>-&gt;get_state() == <span class="php-quote">'authenticated'</span>) {
-</span><span id="84" class="l"><a href="#84"> 84: </a>                <span class="php-var">$del_folder</span> = prep_folder_name(<span class="php-var">$imap</span>, <span class="php-var">$form</span>[<span class="php-quote">'folder'</span>], <span class="php-keyword1">true</span>);
-</span><span id="85" class="l"><a href="#85"> 85: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$del_folder</span> &amp;&amp; <span class="php-var">$imap</span>-&gt;delete_mailbox(<span class="php-var">$del_folder</span>)) {
-</span><span id="86" class="l"><a href="#86"> 86: </a>                    Hm_Msgs::add(<span class="php-quote">'Folder deleted'</span>);
-</span><span id="87" class="l"><a href="#87"> 87: </a>                    Hm_Page_Cache::<span class="php-keyword2">flush</span>(<span class="php-var">$this</span>-&gt;session);
-</span><span id="88" class="l"><a href="#88"> 88: </a>                    <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'imap_folders_success'</span>, <span class="php-keyword1">true</span>);
-</span><span id="89" class="l"><a href="#89"> 89: </a>                }
-</span><span id="90" class="l"><a href="#90"> 90: </a>                <span class="php-keyword1">else</span> {
-</span><span id="91" class="l"><a href="#91"> 91: </a>                    Hm_Msgs::add(<span class="php-quote">'ERRAn error occurred deleting the folder'</span>);
-</span><span id="92" class="l"><a href="#92"> 92: </a>                }
-</span><span id="93" class="l"><a href="#93"> 93: </a>            }
-</span><span id="94" class="l"><a href="#94"> 94: </a>        }
-</span><span id="95" class="l"><a href="#95"> 95: </a>    }
-</span><span id="96" class="l"><a href="#96"> 96: </a>}
-</span><span id="97" class="l"><a href="#97"> 97: </a>
-</span><span id="98" class="l"><a href="#98"> 98: </a><span class="php-comment">/**
-</span></span><span id="99" class="l"><a href="#99"> 99: </a><span class="php-comment"> * @subpackage imap_folders/handler
-</span></span><span id="100" class="l"><a href="#100">100: </a><span class="php-comment"> */</span>
-</span><span id="101" class="l"><a href="#101">101: </a><span class="php-keyword1">class</span> Hm_Handler_folders_server_id <span class="php-keyword1">extends</span> Hm_Handler_Module {
-</span><span id="102" class="l"><a href="#102">102: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="103" class="l"><a href="#103">103: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'imap_server_id'</span>, <span class="php-var">$this</span>-&gt;request-&gt;get)) {
-</span><span id="104" class="l"><a href="#104">104: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'folder_server'</span>, <span class="php-var">$this</span>-&gt;request-&gt;get[<span class="php-quote">'imap_server_id'</span>]);
-</span><span id="105" class="l"><a href="#105">105: </a>        }
-</span><span id="106" class="l"><a href="#106">106: </a>    }
-</span><span id="107" class="l"><a href="#107">107: </a>}
-</span><span id="108" class="l"><a href="#108">108: </a>
-</span><span id="109" class="l"><a href="#109">109: </a><span class="php-comment">/**
-</span></span><span id="110" class="l"><a href="#110">110: </a><span class="php-comment"> * @subpackage imap_folders/handler
-</span></span><span id="111" class="l"><a href="#111">111: </a><span class="php-comment"> */</span>
-</span><span id="112" class="l"><a href="#112">112: </a><span class="php-keyword1">class</span> Hm_Handler_imap_folder_check <span class="php-keyword1">extends</span> Hm_Handler_Module {
-</span><span id="113" class="l"><a href="#113">113: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
-</span><span id="114" class="l"><a href="#114">114: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'imap_support'</span>, <span class="php-var">$this</span>-&gt;module_is_supported(<span class="php-quote">'imap'</span>));
-</span><span id="115" class="l"><a href="#115">115: </a>    }
-</span><span id="116" class="l"><a href="#116">116: </a>}
-</span><span id="117" class="l"><a href="#117">117: </a>
-</span><span id="118" class="l"><a href="#118">118: </a><span class="php-comment">/**
-</span></span><span id="119" class="l"><a href="#119">119: </a><span class="php-comment"> * @subpackage imap_folders/output
-</span></span><span id="120" class="l"><a href="#120">120: </a><span class="php-comment"> */</span>
-</span><span id="121" class="l"><a href="#121">121: </a><span class="php-keyword1">class</span> Hm_Output_folders_server_select <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="122" class="l"><a href="#122">122: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="123" class="l"><a href="#123">123: </a>        <span class="php-var">$server_id</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'folder_server'</span>);
-</span><span id="124" class="l"><a href="#124">124: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;folders_page&quot;&gt;&lt;form method=&quot;get&quot;&gt;'</span>;
-</span><span id="125" class="l"><a href="#125">125: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;page&quot; value=&quot;folders&quot; /&gt;'</span>;
-</span><span id="126" class="l"><a href="#126">126: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;select id=&quot;imap_server_folder&quot; name=&quot;imap_server_id&quot;&gt;'</span>;
-</span><span id="127" class="l"><a href="#127">127: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option value=&quot;&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Select an IMAP server'</span>).<span class="php-quote">'&lt;/option&gt;'</span>;
-</span><span id="128" class="l"><a href="#128">128: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_servers'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$server</span>) {
-</span><span id="129" class="l"><a href="#129">129: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
-</span><span id="130" class="l"><a href="#130">130: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$server_id</span> === <span class="php-var">$id</span>) {
-</span><span id="131" class="l"><a href="#131">131: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
-</span><span id="132" class="l"><a href="#132">132: </a>            }
-</span><span id="133" class="l"><a href="#133">133: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>;
-</span><span id="134" class="l"><a href="#134">134: </a>            <span class="php-var">$res</span> .= <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$server</span>[<span class="php-quote">'name'</span>]);
-</span><span id="135" class="l"><a href="#135">135: </a>        }
-</span><span id="136" class="l"><a href="#136">136: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/select&gt;&lt;/form&gt;&lt;/div&gt;'</span>;
+</span><span id="9" class="l"><a href="#9">  9: </a><span class="php-keyword1">if</span> (!<span class="php-keyword2">defined</span>(<span class="php-quote">'DEBUG_MODE'</span>)) { <span class="php-keyword1">die</span>(); }
+</span><span id="10" class="l"><a href="#10"> 10: </a>
+</span><span id="11" class="l"><a href="#11"> 11: </a><span class="php-comment">/**
+</span></span><span id="12" class="l"><a href="#12"> 12: </a><span class="php-comment"> * @subpackage imap_folders/handler
+</span></span><span id="13" class="l"><a href="#13"> 13: </a><span class="php-comment"> */</span>
+</span><span id="14" class="l"><a href="#14"> 14: </a><span class="php-keyword1">class</span> Hm_Handler_process_folder_create <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="15" class="l"><a href="#15"> 15: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
+</span><span id="16" class="l"><a href="#16"> 16: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'folder'</span>, <span class="php-quote">'imap_server_id'</span>));
+</span><span id="17" class="l"><a href="#17"> 17: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
+</span><span id="18" class="l"><a href="#18"> 18: </a>            <span class="php-var">$parent</span> = <span class="php-keyword1">false</span>;
+</span><span id="19" class="l"><a href="#19"> 19: </a>            <span class="php-var">$parent_str</span> = <span class="php-keyword1">false</span>;
+</span><span id="20" class="l"><a href="#20"> 20: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'parent'</span>, <span class="php-var">$this</span>-&gt;request-&gt;post)) {
+</span><span id="21" class="l"><a href="#21"> 21: </a>                <span class="php-var">$parent_str</span> = <span class="php-var">$this</span>-&gt;request-&gt;post[<span class="php-quote">'parent'</span>];
+</span><span id="22" class="l"><a href="#22"> 22: </a>            }
+</span><span id="23" class="l"><a href="#23"> 23: </a>            <span class="php-var">$cache</span> = Hm_IMAP_List::get_cache(<span class="php-var">$this</span>-&gt;session, <span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>]);
+</span><span id="24" class="l"><a href="#24"> 24: </a>            <span class="php-var">$imap</span> = Hm_IMAP_List::connect(<span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>], <span class="php-var">$cache</span>);
+</span><span id="25" class="l"><a href="#25"> 25: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_object</span>(<span class="php-var">$imap</span>) &amp;&amp; <span class="php-var">$imap</span>-&gt;get_state() == <span class="php-quote">'authenticated'</span>) {
+</span><span id="26" class="l"><a href="#26"> 26: </a>                <span class="php-var">$new_folder</span> = prep_folder_name(<span class="php-var">$imap</span>, <span class="php-var">$form</span>[<span class="php-quote">'folder'</span>], <span class="php-keyword1">false</span>, <span class="php-var">$parent_str</span>);
+</span><span id="27" class="l"><a href="#27"> 27: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$new_folder</span> &amp;&amp; <span class="php-var">$imap</span>-&gt;create_mailbox(<span class="php-var">$new_folder</span>)) {
+</span><span id="28" class="l"><a href="#28"> 28: </a>                    Hm_Msgs::add(<span class="php-quote">'Folder created'</span>);
+</span><span id="29" class="l"><a href="#29"> 29: </a>                    Hm_Page_Cache::<span class="php-keyword2">flush</span>(<span class="php-var">$this</span>-&gt;session);
+</span><span id="30" class="l"><a href="#30"> 30: </a>                    <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'imap_folders_success'</span>, <span class="php-keyword1">true</span>);
+</span><span id="31" class="l"><a href="#31"> 31: </a>                }
+</span><span id="32" class="l"><a href="#32"> 32: </a>                <span class="php-keyword1">else</span> {
+</span><span id="33" class="l"><a href="#33"> 33: </a>                    Hm_Msgs::add(<span class="php-quote">'ERRAn error occurred creating the folder'</span>);
+</span><span id="34" class="l"><a href="#34"> 34: </a>                }
+</span><span id="35" class="l"><a href="#35"> 35: </a>            }
+</span><span id="36" class="l"><a href="#36"> 36: </a>        }
+</span><span id="37" class="l"><a href="#37"> 37: </a>    }
+</span><span id="38" class="l"><a href="#38"> 38: </a>}
+</span><span id="39" class="l"><a href="#39"> 39: </a>
+</span><span id="40" class="l"><a href="#40"> 40: </a><span class="php-comment">/**
+</span></span><span id="41" class="l"><a href="#41"> 41: </a><span class="php-comment"> * @subpackage imap_folders/handler
+</span></span><span id="42" class="l"><a href="#42"> 42: </a><span class="php-comment"> */</span>
+</span><span id="43" class="l"><a href="#43"> 43: </a><span class="php-keyword1">class</span> Hm_Handler_process_folder_rename <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="44" class="l"><a href="#44"> 44: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
+</span><span id="45" class="l"><a href="#45"> 45: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'imap_server_id'</span>, <span class="php-quote">'folder'</span>, <span class="php-quote">'new_folder'</span>));
+</span><span id="46" class="l"><a href="#46"> 46: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
+</span><span id="47" class="l"><a href="#47"> 47: </a>            <span class="php-var">$cache</span> = Hm_IMAP_List::get_cache(<span class="php-var">$this</span>-&gt;session, <span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>]);
+</span><span id="48" class="l"><a href="#48"> 48: </a>            <span class="php-var">$imap</span> = Hm_IMAP_List::connect(<span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>], <span class="php-var">$cache</span>);
+</span><span id="49" class="l"><a href="#49"> 49: </a>            <span class="php-var">$parent_str</span> = <span class="php-keyword1">false</span>;
+</span><span id="50" class="l"><a href="#50"> 50: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'parent'</span>, <span class="php-var">$this</span>-&gt;request-&gt;post)) {
+</span><span id="51" class="l"><a href="#51"> 51: </a>                <span class="php-var">$parent_str</span> = <span class="php-var">$this</span>-&gt;request-&gt;post[<span class="php-quote">'parent'</span>];
+</span><span id="52" class="l"><a href="#52"> 52: </a>            }
+</span><span id="53" class="l"><a href="#53"> 53: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_object</span>(<span class="php-var">$imap</span>) &amp;&amp; <span class="php-var">$imap</span>-&gt;get_state() == <span class="php-quote">'authenticated'</span>) {
+</span><span id="54" class="l"><a href="#54"> 54: </a>                <span class="php-var">$old_folder</span> = prep_folder_name(<span class="php-var">$imap</span>, <span class="php-var">$form</span>[<span class="php-quote">'folder'</span>], <span class="php-keyword1">true</span>);
+</span><span id="55" class="l"><a href="#55"> 55: </a>                <span class="php-var">$new_folder</span> = prep_folder_name(<span class="php-var">$imap</span>, <span class="php-var">$form</span>[<span class="php-quote">'new_folder'</span>], <span class="php-keyword1">false</span>, <span class="php-var">$parent_str</span>);
+</span><span id="56" class="l"><a href="#56"> 56: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$new_folder</span> &amp;&amp; <span class="php-var">$old_folder</span> &amp;&amp; <span class="php-var">$imap</span>-&gt;rename_mailbox(<span class="php-var">$old_folder</span>, <span class="php-var">$new_folder</span>)) {
+</span><span id="57" class="l"><a href="#57"> 57: </a>                    Hm_Msgs::add(<span class="php-quote">'Folder renamed'</span>);
+</span><span id="58" class="l"><a href="#58"> 58: </a>                    Hm_Page_Cache::<span class="php-keyword2">flush</span>(<span class="php-var">$this</span>-&gt;session);
+</span><span id="59" class="l"><a href="#59"> 59: </a>                    <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'imap_folders_success'</span>, <span class="php-keyword1">true</span>);
+</span><span id="60" class="l"><a href="#60"> 60: </a>                }
+</span><span id="61" class="l"><a href="#61"> 61: </a>                <span class="php-keyword1">else</span> {
+</span><span id="62" class="l"><a href="#62"> 62: </a>                    Hm_Msgs::add(<span class="php-quote">'ERRAn error occurred renaming the folder'</span>);
+</span><span id="63" class="l"><a href="#63"> 63: </a>                }
+</span><span id="64" class="l"><a href="#64"> 64: </a>            }
+</span><span id="65" class="l"><a href="#65"> 65: </a>        }
+</span><span id="66" class="l"><a href="#66"> 66: </a>    }
+</span><span id="67" class="l"><a href="#67"> 67: </a>}
+</span><span id="68" class="l"><a href="#68"> 68: </a>
+</span><span id="69" class="l"><a href="#69"> 69: </a><span class="php-comment">/**
+</span></span><span id="70" class="l"><a href="#70"> 70: </a><span class="php-comment"> * @subpackage imap_folders/handler
+</span></span><span id="71" class="l"><a href="#71"> 71: </a><span class="php-comment"> */</span>
+</span><span id="72" class="l"><a href="#72"> 72: </a><span class="php-keyword1">class</span> Hm_Handler_process_folder_delete <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="73" class="l"><a href="#73"> 73: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
+</span><span id="74" class="l"><a href="#74"> 74: </a>        <span class="php-keyword1">list</span>(<span class="php-var">$success</span>, <span class="php-var">$form</span>) = <span class="php-var">$this</span>-&gt;process_form(<span class="php-keyword1">array</span>(<span class="php-quote">'imap_server_id'</span>, <span class="php-quote">'folder'</span>));
+</span><span id="75" class="l"><a href="#75"> 75: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
+</span><span id="76" class="l"><a href="#76"> 76: </a>            <span class="php-var">$cache</span> = Hm_IMAP_List::get_cache(<span class="php-var">$this</span>-&gt;session, <span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>]);
+</span><span id="77" class="l"><a href="#77"> 77: </a>            <span class="php-var">$imap</span> = Hm_IMAP_List::connect(<span class="php-var">$form</span>[<span class="php-quote">'imap_server_id'</span>], <span class="php-var">$cache</span>);
+</span><span id="78" class="l"><a href="#78"> 78: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">is_object</span>(<span class="php-var">$imap</span>) &amp;&amp; <span class="php-var">$imap</span>-&gt;get_state() == <span class="php-quote">'authenticated'</span>) {
+</span><span id="79" class="l"><a href="#79"> 79: </a>                <span class="php-var">$del_folder</span> = prep_folder_name(<span class="php-var">$imap</span>, <span class="php-var">$form</span>[<span class="php-quote">'folder'</span>], <span class="php-keyword1">true</span>);
+</span><span id="80" class="l"><a href="#80"> 80: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$del_folder</span> &amp;&amp; <span class="php-var">$imap</span>-&gt;delete_mailbox(<span class="php-var">$del_folder</span>)) {
+</span><span id="81" class="l"><a href="#81"> 81: </a>                    Hm_Msgs::add(<span class="php-quote">'Folder deleted'</span>);
+</span><span id="82" class="l"><a href="#82"> 82: </a>                    Hm_Page_Cache::<span class="php-keyword2">flush</span>(<span class="php-var">$this</span>-&gt;session);
+</span><span id="83" class="l"><a href="#83"> 83: </a>                    <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'imap_folders_success'</span>, <span class="php-keyword1">true</span>);
+</span><span id="84" class="l"><a href="#84"> 84: </a>                }
+</span><span id="85" class="l"><a href="#85"> 85: </a>                <span class="php-keyword1">else</span> {
+</span><span id="86" class="l"><a href="#86"> 86: </a>                    Hm_Msgs::add(<span class="php-quote">'ERRAn error occurred deleting the folder'</span>);
+</span><span id="87" class="l"><a href="#87"> 87: </a>                }
+</span><span id="88" class="l"><a href="#88"> 88: </a>            }
+</span><span id="89" class="l"><a href="#89"> 89: </a>        }
+</span><span id="90" class="l"><a href="#90"> 90: </a>    }
+</span><span id="91" class="l"><a href="#91"> 91: </a>}
+</span><span id="92" class="l"><a href="#92"> 92: </a>
+</span><span id="93" class="l"><a href="#93"> 93: </a><span class="php-comment">/**
+</span></span><span id="94" class="l"><a href="#94"> 94: </a><span class="php-comment"> * @subpackage imap_folders/handler
+</span></span><span id="95" class="l"><a href="#95"> 95: </a><span class="php-comment"> */</span>
+</span><span id="96" class="l"><a href="#96"> 96: </a><span class="php-keyword1">class</span> Hm_Handler_folders_server_id <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="97" class="l"><a href="#97"> 97: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
+</span><span id="98" class="l"><a href="#98"> 98: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'imap_server_id'</span>, <span class="php-var">$this</span>-&gt;request-&gt;get)) {
+</span><span id="99" class="l"><a href="#99"> 99: </a>            <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'folder_server'</span>, <span class="php-var">$this</span>-&gt;request-&gt;get[<span class="php-quote">'imap_server_id'</span>]);
+</span><span id="100" class="l"><a href="#100">100: </a>        }
+</span><span id="101" class="l"><a href="#101">101: </a>    }
+</span><span id="102" class="l"><a href="#102">102: </a>}
+</span><span id="103" class="l"><a href="#103">103: </a>
+</span><span id="104" class="l"><a href="#104">104: </a><span class="php-comment">/**
+</span></span><span id="105" class="l"><a href="#105">105: </a><span class="php-comment"> * @subpackage imap_folders/handler
+</span></span><span id="106" class="l"><a href="#106">106: </a><span class="php-comment"> */</span>
+</span><span id="107" class="l"><a href="#107">107: </a><span class="php-keyword1">class</span> Hm_Handler_imap_folder_check <span class="php-keyword1">extends</span> Hm_Handler_Module {
+</span><span id="108" class="l"><a href="#108">108: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
+</span><span id="109" class="l"><a href="#109">109: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'imap_support'</span>, <span class="php-var">$this</span>-&gt;module_is_supported(<span class="php-quote">'imap'</span>));
+</span><span id="110" class="l"><a href="#110">110: </a>    }
+</span><span id="111" class="l"><a href="#111">111: </a>}
+</span><span id="112" class="l"><a href="#112">112: </a>
+</span><span id="113" class="l"><a href="#113">113: </a><span class="php-comment">/**
+</span></span><span id="114" class="l"><a href="#114">114: </a><span class="php-comment"> * @subpackage imap_folders/output
+</span></span><span id="115" class="l"><a href="#115">115: </a><span class="php-comment"> */</span>
+</span><span id="116" class="l"><a href="#116">116: </a><span class="php-keyword1">class</span> Hm_Output_folders_server_select <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="117" class="l"><a href="#117">117: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="118" class="l"><a href="#118">118: </a>        <span class="php-var">$server_id</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'folder_server'</span>);
+</span><span id="119" class="l"><a href="#119">119: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;folders_page&quot;&gt;&lt;form method=&quot;get&quot;&gt;'</span>;
+</span><span id="120" class="l"><a href="#120">120: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;page&quot; value=&quot;folders&quot; /&gt;'</span>;
+</span><span id="121" class="l"><a href="#121">121: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;select id=&quot;imap_server_folder&quot; name=&quot;imap_server_id&quot;&gt;'</span>;
+</span><span id="122" class="l"><a href="#122">122: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option value=&quot;&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Select an IMAP server'</span>).<span class="php-quote">'&lt;/option&gt;'</span>;
+</span><span id="123" class="l"><a href="#123">123: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'imap_servers'</span>, <span class="php-keyword1">array</span>()) <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$server</span>) {
+</span><span id="124" class="l"><a href="#124">124: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
+</span><span id="125" class="l"><a href="#125">125: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$server_id</span> === <span class="php-var">$id</span>) {
+</span><span id="126" class="l"><a href="#126">126: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
+</span><span id="127" class="l"><a href="#127">127: </a>            }
+</span><span id="128" class="l"><a href="#128">128: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot;&gt;'</span>;
+</span><span id="129" class="l"><a href="#129">129: </a>            <span class="php-var">$res</span> .= <span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$server</span>[<span class="php-quote">'name'</span>]);
+</span><span id="130" class="l"><a href="#130">130: </a>        }
+</span><span id="131" class="l"><a href="#131">131: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/select&gt;&lt;/form&gt;&lt;/div&gt;'</span>;
+</span><span id="132" class="l"><a href="#132">132: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; id=&quot;server_error&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'You must select an IMAP server first'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="133" class="l"><a href="#133">133: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; id=&quot;folder_name_error&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'New folder name is required'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="134" class="l"><a href="#134">134: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; id=&quot;delete_folder_error&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Folder to delete is required'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="135" class="l"><a href="#135">135: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; id=&quot;delete_folder_confirm&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Are you sure you want to delete this folder, and all the messages in it?'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
+</span><span id="136" class="l"><a href="#136">136: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; id=&quot;rename_folder_error&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Folder to rename is required'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="137" class="l"><a href="#137">137: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="138" class="l"><a href="#138">138: </a>    }
 </span><span id="139" class="l"><a href="#139">139: </a>}
@@ -1580,6 +1622,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fd281b93dccfddb843fd26109301421fea189439"></script>
+<script src="elementlist.js?fd641f30151780f6fdcb63767d911da754b70cbd"></script>
 </body>
 </html>

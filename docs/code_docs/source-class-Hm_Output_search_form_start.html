@@ -418,6 +418,24 @@
 						</li>
 							</ul></li></ul></li>
 				<li>
+					<a href="package-modules.keyboard.html">
+						keyboard<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.html">
+						shortcuts<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.output.html">
+						output					</a>
+
+						</li>
+							</ul></li></ul></li>
+				<li>
 					<a href="package-modules.nasa.html">
 						nasa<span></span>
 					</a>
@@ -466,6 +484,24 @@
 
 						</li>
 							</ul></li>
+				<li>
+					<a href="package-modules.password.html">
+						password<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.html">
+						restrictions<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.functions.html">
+						functions					</a>
+
+						</li>
+							</ul></li></ul></li>
 				<li>
 					<a href="package-modules.pop3.html">
 						pop3<span></span>
@@ -1062,6 +1098,8 @@
 				<li><a href="class-Hm_Output_settings_save_link.html">Hm_Output_settings_save_link</a></li>
 				<li><a href="class-Hm_Output_settings_servers_link.html">Hm_Output_settings_servers_link</a></li>
 				<li><a href="class-Hm_Output_settings_site_link.html">Hm_Output_settings_site_link</a></li>
+				<li><a href="class-Hm_Output_shortcuts_content.html">Hm_Output_shortcuts_content</a></li>
+				<li><a href="class-Hm_Output_shortcuts_page_link.html">Hm_Output_shortcuts_page_link</a></li>
 				<li><a href="class-Hm_Output_start_all_email_settings.html">Hm_Output_start_all_email_settings</a></li>
 				<li><a href="class-Hm_Output_start_everything_settings.html">Hm_Output_start_everything_settings</a></li>
 				<li><a href="class-Hm_Output_start_feed_settings.html">Hm_Output_start_feed_settings</a></li>
@@ -1069,6 +1107,7 @@
 				<li><a href="class-Hm_Output_start_general_settings.html">Hm_Output_start_general_settings</a></li>
 				<li><a href="class-Hm_Output_start_pop3_settings.html">Hm_Output_start_pop3_settings</a></li>
 				<li><a href="class-Hm_Output_start_settings_form.html">Hm_Output_start_settings_form</a></li>
+				<li><a href="class-Hm_Output_start_shortcuts_page.html">Hm_Output_start_shortcuts_page</a></li>
 				<li><a href="class-Hm_Output_start_unread_settings.html">Hm_Output_start_unread_settings</a></li>
 				<li><a href="class-Hm_Output_tag_bar.html">Hm_Output_tag_bar</a></li>
 				<li><a href="class-Hm_Output_tag_folders.html">Hm_Output_tag_folders</a></li>
@@ -1130,6 +1169,9 @@
 				<li><a href="function-build_github_subject.html">build_github_subject</a></li>
 				<li><a href="function-build_mime_msg.html">build_mime_msg</a></li>
 				<li><a href="function-build_page_links.html">build_page_links</a></li>
+				<li><a href="function-check_passphrase_rules.html">check_passphrase_rules</a></li>
+				<li><a href="function-check_password.html">check_password</a></li>
+				<li><a href="function-check_password_rules.html">check_password_rules</a></li>
 				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
 				<li><a href="function-convert_html_to_text.html">convert_html_to_text</a></li>
 				<li><a href="function-credentials_form.html">credentials_form</a></li>
@@ -1301,8 +1343,8 @@
 </span><span id="17" class="l"><a href="#17">  17: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
 </span><span id="18" class="l"><a href="#18">  18: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_search&quot;&gt;&lt;form method=&quot;get&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=search&quot;&gt;'</span>.
 </span><span id="19" class="l"><a href="#19">  19: </a>            <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$search</span>).
-</span><span id="20" class="l"><a href="#20">  20: </a>            <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;&lt;/a&gt;&lt;input type=&quot;hidden&quot; name=&quot;page&quot; value=&quot;search&quot; /&gt;'</span>.
-</span><span id="21" class="l"><a href="#21">  21: </a>            <span class="php-quote">'&lt;input type=&quot;search&quot; class=&quot;search_terms&quot; name=&quot;search_terms&quot; placeholder=&quot;'</span>.
+</span><span id="20" class="l"><a href="#20">  20: </a>            <span class="php-quote">'&quot; alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt;&lt;/a&gt;&lt;input type=&quot;hidden&quot; name=&quot;page&quot; value=&quot;search&quot; /&gt;'</span>.
+</span><span id="21" class="l"><a href="#21">  21: </a>            <span class="php-quote">'&lt;label class=&quot;screen_reader&quot; for=&quot;search_terms&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search'</span>).<span class="php-quote">'&lt;/label&gt;&lt;input type=&quot;search&quot; id=&quot;search_terms&quot; class=&quot;search_terms&quot; name=&quot;search_terms&quot; placeholder=&quot;'</span>.
 </span><span id="22" class="l"><a href="#22">  22: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Search'</span>).<span class="php-quote">'&quot; /&gt;&lt;/form&gt;&lt;/li&gt;'</span>;
 </span><span id="23" class="l"><a href="#23">  23: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;format == <span class="php-quote">'HTML5'</span>) {
 </span><span id="24" class="l"><a href="#24">  24: </a>            <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
@@ -2656,6 +2698,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fd281b93dccfddb843fd26109301421fea189439"></script>
+<script src="elementlist.js?fd641f30151780f6fdcb63767d911da754b70cbd"></script>
 </body>
 </html>

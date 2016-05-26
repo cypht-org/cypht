@@ -418,6 +418,24 @@
 						</li>
 							</ul></li></ul></li>
 				<li>
+					<a href="package-modules.keyboard.html">
+						keyboard<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.html">
+						shortcuts<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.output.html">
+						output					</a>
+
+						</li>
+							</ul></li></ul></li>
+				<li>
 					<a href="package-modules.nasa.html">
 						nasa<span></span>
 					</a>
@@ -466,6 +484,24 @@
 
 						</li>
 							</ul></li>
+				<li>
+					<a href="package-modules.password.html">
+						password<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.html">
+						restrictions<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.functions.html">
+						functions					</a>
+
+						</li>
+							</ul></li></ul></li>
 				<li>
 					<a href="package-modules.pop3.html">
 						pop3<span></span>
@@ -1062,6 +1098,8 @@
 				<li><a href="class-Hm_Output_settings_save_link.html">Hm_Output_settings_save_link</a></li>
 				<li><a href="class-Hm_Output_settings_servers_link.html">Hm_Output_settings_servers_link</a></li>
 				<li><a href="class-Hm_Output_settings_site_link.html">Hm_Output_settings_site_link</a></li>
+				<li><a href="class-Hm_Output_shortcuts_content.html">Hm_Output_shortcuts_content</a></li>
+				<li><a href="class-Hm_Output_shortcuts_page_link.html">Hm_Output_shortcuts_page_link</a></li>
 				<li><a href="class-Hm_Output_start_all_email_settings.html">Hm_Output_start_all_email_settings</a></li>
 				<li><a href="class-Hm_Output_start_everything_settings.html">Hm_Output_start_everything_settings</a></li>
 				<li><a href="class-Hm_Output_start_feed_settings.html">Hm_Output_start_feed_settings</a></li>
@@ -1069,6 +1107,7 @@
 				<li><a href="class-Hm_Output_start_general_settings.html">Hm_Output_start_general_settings</a></li>
 				<li><a href="class-Hm_Output_start_pop3_settings.html">Hm_Output_start_pop3_settings</a></li>
 				<li><a href="class-Hm_Output_start_settings_form.html">Hm_Output_start_settings_form</a></li>
+				<li><a href="class-Hm_Output_start_shortcuts_page.html">Hm_Output_start_shortcuts_page</a></li>
 				<li><a href="class-Hm_Output_start_unread_settings.html">Hm_Output_start_unread_settings</a></li>
 				<li><a href="class-Hm_Output_tag_bar.html">Hm_Output_tag_bar</a></li>
 				<li><a href="class-Hm_Output_tag_folders.html">Hm_Output_tag_folders</a></li>
@@ -1130,6 +1169,9 @@
 				<li><a href="function-build_github_subject.html">build_github_subject</a></li>
 				<li><a href="function-build_mime_msg.html">build_mime_msg</a></li>
 				<li><a href="function-build_page_links.html">build_page_links</a></li>
+				<li><a href="function-check_passphrase_rules.html">check_passphrase_rules</a></li>
+				<li><a href="function-check_password.html">check_password</a></li>
+				<li><a href="function-check_password_rules.html">check_password_rules</a></li>
 				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
 				<li><a href="function-convert_html_to_text.html">convert_html_to_text</a></li>
 				<li><a href="function-credentials_form.html">credentials_form</a></li>
@@ -1601,7 +1643,7 @@
 </span><span id="317" class="l"><a href="#317">317: </a>
 </span><span id="318" class="l"><a href="#318">318: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;nux_welcome&quot;&gt;&lt;div class=&quot;nux_title&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Welcome to Cypht'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="319" class="l"><a href="#319">319: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;nux_qa&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add a popular E-mail source quickly and easily'</span>);
-</span><span id="320" class="l"><a href="#320">320: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' &lt;a class=&quot;nux_try_out&quot; href=&quot;?page=servers#quick_add_section&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add An E-Mail account'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
+</span><span id="320" class="l"><a href="#320">320: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' &lt;a class=&quot;nux_try_out&quot; href=&quot;?page=servers#quick_add_section&quot;&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add an E-mail Account'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
 </span><span id="321" class="l"><a href="#321">321: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;&lt;ul&gt;'</span>;
 </span><span id="322" class="l"><a href="#322">322: </a>        <span class="php-keyword1">foreach</span> (<span class="php-var">$protos</span> <span class="php-keyword1">as</span> <span class="php-var">$proto</span>) {
 </span><span id="323" class="l"><a href="#323">323: </a>            <span class="php-var">$proto_dsp</span> = <span class="php-var">$proto</span>;
@@ -1660,7 +1702,7 @@
 </span><span id="376" class="l"><a href="#376">376: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
 </span><span id="377" class="l"><a href="#377">377: </a>        <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;nux_add_account&quot;&gt;&lt;div data-target=&quot;.quick_add_section&quot; class=&quot;server_section&quot;&gt;'</span>.
 </span><span id="378" class="l"><a href="#378">378: </a>            <span class="php-quote">'&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$circle_check</span>.<span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.
-</span><span id="379" class="l"><a href="#379">379: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add An E-mail Account'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="379" class="l"><a href="#379">379: </a>            <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Add an E-mail Account'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="380" class="l"><a href="#380">380: </a>    }
 </span><span id="381" class="l"><a href="#381">381: </a>}
 </span><span id="382" class="l"><a href="#382">382: </a>
@@ -1772,6 +1814,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fd281b93dccfddb843fd26109301421fea189439"></script>
+<script src="elementlist.js?fd641f30151780f6fdcb63767d911da754b70cbd"></script>
 </body>
 </html>

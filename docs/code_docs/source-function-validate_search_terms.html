@@ -418,6 +418,24 @@
 						</li>
 							</ul></li></ul></li>
 				<li>
+					<a href="package-modules.keyboard.html">
+						keyboard<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.html">
+						shortcuts<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.output.html">
+						output					</a>
+
+						</li>
+							</ul></li></ul></li>
+				<li>
 					<a href="package-modules.nasa.html">
 						nasa<span></span>
 					</a>
@@ -466,6 +484,24 @@
 
 						</li>
 							</ul></li>
+				<li>
+					<a href="package-modules.password.html">
+						password<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.html">
+						restrictions<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.functions.html">
+						functions					</a>
+
+						</li>
+							</ul></li></ul></li>
 				<li>
 					<a href="package-modules.pop3.html">
 						pop3<span></span>
@@ -1062,6 +1098,8 @@
 				<li><a href="class-Hm_Output_settings_save_link.html">Hm_Output_settings_save_link</a></li>
 				<li><a href="class-Hm_Output_settings_servers_link.html">Hm_Output_settings_servers_link</a></li>
 				<li><a href="class-Hm_Output_settings_site_link.html">Hm_Output_settings_site_link</a></li>
+				<li><a href="class-Hm_Output_shortcuts_content.html">Hm_Output_shortcuts_content</a></li>
+				<li><a href="class-Hm_Output_shortcuts_page_link.html">Hm_Output_shortcuts_page_link</a></li>
 				<li><a href="class-Hm_Output_start_all_email_settings.html">Hm_Output_start_all_email_settings</a></li>
 				<li><a href="class-Hm_Output_start_everything_settings.html">Hm_Output_start_everything_settings</a></li>
 				<li><a href="class-Hm_Output_start_feed_settings.html">Hm_Output_start_feed_settings</a></li>
@@ -1069,6 +1107,7 @@
 				<li><a href="class-Hm_Output_start_general_settings.html">Hm_Output_start_general_settings</a></li>
 				<li><a href="class-Hm_Output_start_pop3_settings.html">Hm_Output_start_pop3_settings</a></li>
 				<li><a href="class-Hm_Output_start_settings_form.html">Hm_Output_start_settings_form</a></li>
+				<li><a href="class-Hm_Output_start_shortcuts_page.html">Hm_Output_start_shortcuts_page</a></li>
 				<li><a href="class-Hm_Output_start_unread_settings.html">Hm_Output_start_unread_settings</a></li>
 				<li><a href="class-Hm_Output_tag_bar.html">Hm_Output_tag_bar</a></li>
 				<li><a href="class-Hm_Output_tag_folders.html">Hm_Output_tag_folders</a></li>
@@ -1130,6 +1169,9 @@
 				<li><a href="function-build_github_subject.html">build_github_subject</a></li>
 				<li><a href="function-build_mime_msg.html">build_mime_msg</a></li>
 				<li><a href="function-build_page_links.html">build_page_links</a></li>
+				<li><a href="function-check_passphrase_rules.html">check_passphrase_rules</a></li>
+				<li><a href="function-check_password.html">check_password</a></li>
+				<li><a href="function-check_password_rules.html">check_password_rules</a></li>
 				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
 				<li><a href="function-convert_html_to_text.html">convert_html_to_text</a></li>
 				<li><a href="function-credentials_form.html">credentials_form</a></li>
@@ -1617,90 +1659,93 @@
 </span><span id="333" class="l"><a href="#333">333: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;div class=&quot;list_sources&quot;&gt;'</span>;
 </span><span id="334" class="l"><a href="#334">334: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;src_title&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-quote">'Sources'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="335" class="l"><a href="#335">335: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$sources</span> <span class="php-keyword1">as</span> <span class="php-var">$src</span>) {
-</span><span id="336" class="l"><a href="#336">336: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$src</span>[<span class="php-quote">'type'</span>] == <span class="php-quote">'imap'</span> &amp;&amp; !<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'folder'</span>, <span class="php-var">$src</span>)) {
-</span><span id="337" class="l"><a href="#337">337: </a>            <span class="php-var">$folder</span> = <span class="php-quote">'_INBOX'</span>;
+</span><span id="336" class="l"><a href="#336">336: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'group'</span>, <span class="php-var">$src</span>) &amp;&amp; <span class="php-var">$src</span>[<span class="php-quote">'group'</span>] == <span class="php-quote">'background'</span>) {
+</span><span id="337" class="l"><a href="#337">337: </a>            <span class="php-keyword1">continue</span>;
 </span><span id="338" class="l"><a href="#338">338: </a>        }
-</span><span id="339" class="l"><a href="#339">339: </a>        <span class="php-keyword1">elseif</span> (!<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'folder'</span>, <span class="php-var">$src</span>)) {
-</span><span id="340" class="l"><a href="#340">340: </a>            <span class="php-var">$folder</span> = <span class="php-quote">''</span>;
+</span><span id="339" class="l"><a href="#339">339: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$src</span>[<span class="php-quote">'type'</span>] == <span class="php-quote">'imap'</span> &amp;&amp; !<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'folder'</span>, <span class="php-var">$src</span>)) {
+</span><span id="340" class="l"><a href="#340">340: </a>            <span class="php-var">$folder</span> = <span class="php-quote">'_INBOX'</span>;
 </span><span id="341" class="l"><a href="#341">341: </a>        }
-</span><span id="342" class="l"><a href="#342">342: </a>        <span class="php-keyword1">else</span> {
-</span><span id="343" class="l"><a href="#343">343: </a>            <span class="php-var">$folder</span> = <span class="php-quote">'_'</span>.<span class="php-keyword2">hex2bin</span>(<span class="php-var">$src</span>[<span class="php-quote">'folder'</span>]);
+</span><span id="342" class="l"><a href="#342">342: </a>        <span class="php-keyword1">elseif</span> (!<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'folder'</span>, <span class="php-var">$src</span>)) {
+</span><span id="343" class="l"><a href="#343">343: </a>            <span class="php-var">$folder</span> = <span class="php-quote">''</span>;
 </span><span id="344" class="l"><a href="#344">344: </a>        }
-</span><span id="345" class="l"><a href="#345">345: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;list_src&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$src</span>[<span class="php-quote">'type'</span>]).<span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$src</span>[<span class="php-quote">'name'</span>]);
-</span><span id="346" class="l"><a href="#346">346: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">str_replace</span>(<span class="php-quote">'_'</span>, <span class="php-quote">''</span>, <span class="php-var">$folder</span>));
-</span><span id="347" class="l"><a href="#347">347: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="348" class="l"><a href="#348">348: </a>    }
-</span><span id="349" class="l"><a href="#349">349: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="350" class="l"><a href="#350">350: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="351" class="l"><a href="#351">351: </a>}
-</span><span id="352" class="l"><a href="#352">352: </a>
-</span><span id="353" class="l"><a href="#353">353: </a><span class="php-comment">/**
-</span></span><span id="354" class="l"><a href="#354">354: </a><span class="php-comment"> * Output message list controls
-</span></span><span id="355" class="l"><a href="#355">355: </a><span class="php-comment"> * @subpackage core/functions
-</span></span><span id="356" class="l"><a href="#356">356: </a><span class="php-comment"> * @param string $refresh_link refresh link tag
-</span></span><span id="357" class="l"><a href="#357">357: </a><span class="php-comment"> * @param string $config_link configuration link tag
-</span></span><span id="358" class="l"><a href="#358">358: </a><span class="php-comment"> * @param string $source_link source link tag
-</span></span><span id="359" class="l"><a href="#359">359: </a><span class="php-comment"> * @return string
-</span></span><span id="360" class="l"><a href="#360">360: </a><span class="php-comment"> */</span>
-</span><span id="361" class="l"><a href="#361">361: </a><span class="php-keyword1">function</span> list_controls(<span class="php-var">$refresh_link</span>, <span class="php-var">$config_link</span>, <span class="php-var">$source_link</span>=<span class="php-keyword1">false</span>) {
-</span><span id="362" class="l"><a href="#362">362: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;list_controls&quot;&gt;'</span>.
-</span><span id="363" class="l"><a href="#363">363: </a>        <span class="php-var">$refresh_link</span>.<span class="php-var">$source_link</span>.<span class="php-var">$config_link</span>.<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="364" class="l"><a href="#364">364: </a>}
-</span><span id="365" class="l"><a href="#365">365: </a>
-</span><span id="366" class="l"><a href="#366">366: </a><span class="php-comment">/**
-</span></span><span id="367" class="l"><a href="#367">367: </a><span class="php-comment"> * Validate search terms
-</span></span><span id="368" class="l"><a href="#368">368: </a><span class="php-comment"> * @subpackage core/functions
-</span></span><span id="369" class="l"><a href="#369">369: </a><span class="php-comment"> * @param string $terms search terms to validate
-</span></span><span id="370" class="l"><a href="#370">370: </a><span class="php-comment"> * @return string
-</span></span><span id="371" class="l"><a href="#371">371: </a><span class="php-comment"> */</span>
-</span><span id="372" class="l"><a href="#372">372: </a><span class="php-keyword1">function</span> validate_search_terms(<span class="php-var">$terms</span>) {
-</span><span id="373" class="l"><a href="#373">373: </a>    <span class="php-var">$terms</span> = <span class="php-keyword2">trim</span>(<span class="php-keyword2">strip_tags</span>(<span class="php-var">$terms</span>));
-</span><span id="374" class="l"><a href="#374">374: </a>    <span class="php-keyword1">if</span> (!<span class="php-var">$terms</span>) {
-</span><span id="375" class="l"><a href="#375">375: </a>        <span class="php-var">$terms</span> = <span class="php-quote">''</span>;
-</span><span id="376" class="l"><a href="#376">376: </a>    }
-</span><span id="377" class="l"><a href="#377">377: </a>    <span class="php-keyword1">return</span> <span class="php-var">$terms</span>;
-</span><span id="378" class="l"><a href="#378">378: </a>}
-</span><span id="379" class="l"><a href="#379">379: </a>
-</span><span id="380" class="l"><a href="#380">380: </a><span class="php-comment">/**
-</span></span><span id="381" class="l"><a href="#381">381: </a><span class="php-comment"> * Validate the name of a search field
-</span></span><span id="382" class="l"><a href="#382">382: </a><span class="php-comment"> * @subpackage core/functions
-</span></span><span id="383" class="l"><a href="#383">383: </a><span class="php-comment"> * @param string $fld name to validate
-</span></span><span id="384" class="l"><a href="#384">384: </a><span class="php-comment"> * @return mixed
-</span></span><span id="385" class="l"><a href="#385">385: </a><span class="php-comment"> */</span>
-</span><span id="386" class="l"><a href="#386">386: </a><span class="php-keyword1">function</span> validate_search_fld(<span class="php-var">$fld</span>) {
-</span><span id="387" class="l"><a href="#387">387: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-var">$fld</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'TEXT'</span>, <span class="php-quote">'BODY'</span>, <span class="php-quote">'FROM'</span>, <span class="php-quote">'SUBJECT'</span>))) {
-</span><span id="388" class="l"><a href="#388">388: </a>        <span class="php-keyword1">return</span> <span class="php-var">$fld</span>;
-</span><span id="389" class="l"><a href="#389">389: </a>    }
-</span><span id="390" class="l"><a href="#390">390: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
-</span><span id="391" class="l"><a href="#391">391: </a>}
-</span><span id="392" class="l"><a href="#392">392: </a>
-</span><span id="393" class="l"><a href="#393">393: </a><span class="php-comment">/**
-</span></span><span id="394" class="l"><a href="#394">394: </a><span class="php-comment"> * Output a select element for the search field
-</span></span><span id="395" class="l"><a href="#395">395: </a><span class="php-comment"> * @subpackage core/functions
-</span></span><span id="396" class="l"><a href="#396">396: </a><span class="php-comment"> * @param string $current currently selected field
-</span></span><span id="397" class="l"><a href="#397">397: </a><span class="php-comment"> * @param object $output_mod Hm_Output_Module
-</span></span><span id="398" class="l"><a href="#398">398: </a><span class="php-comment"> * @return string
-</span></span><span id="399" class="l"><a href="#399">399: </a><span class="php-comment"> */</span>
-</span><span id="400" class="l"><a href="#400">400: </a><span class="php-keyword1">function</span> search_field_selection(<span class="php-var">$current</span>, <span class="php-var">$output_mod</span>) {
-</span><span id="401" class="l"><a href="#401">401: </a>    <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(
-</span><span id="402" class="l"><a href="#402">402: </a>        <span class="php-quote">'TEXT'</span> =&gt; <span class="php-quote">'Entire message'</span>,
-</span><span id="403" class="l"><a href="#403">403: </a>        <span class="php-quote">'BODY'</span> =&gt; <span class="php-quote">'Message body'</span>,
-</span><span id="404" class="l"><a href="#404">404: </a>        <span class="php-quote">'SUBJECT'</span> =&gt; <span class="php-quote">'Subject'</span>,
-</span><span id="405" class="l"><a href="#405">405: </a>        <span class="php-quote">'FROM'</span> =&gt; <span class="php-quote">'From'</span>,
-</span><span id="406" class="l"><a href="#406">406: </a>    );
-</span><span id="407" class="l"><a href="#407">407: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;select id=&quot;search_fld&quot; name=&quot;search_fld&quot;&gt;'</span>;
-</span><span id="408" class="l"><a href="#408">408: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$flds</span> <span class="php-keyword1">as</span> <span class="php-var">$val</span> =&gt; <span class="php-var">$name</span>) {
-</span><span id="409" class="l"><a href="#409">409: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
-</span><span id="410" class="l"><a href="#410">410: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$current</span> == <span class="php-var">$val</span>) {
-</span><span id="411" class="l"><a href="#411">411: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
-</span><span id="412" class="l"><a href="#412">412: </a>        }
-</span><span id="413" class="l"><a href="#413">413: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;'</span>.<span class="php-var">$val</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-var">$name</span>).<span class="php-quote">'&lt;/option&gt;'</span>;
-</span><span id="414" class="l"><a href="#414">414: </a>    }
-</span><span id="415" class="l"><a href="#415">415: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/select&gt;'</span>;
-</span><span id="416" class="l"><a href="#416">416: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="417" class="l"><a href="#417">417: </a>}
-</span><span id="418" class="l"><a href="#418">418: </a>
-</span><span id="419" class="l"><a href="#419">419: </a></span></code></pre>
+</span><span id="345" class="l"><a href="#345">345: </a>        <span class="php-keyword1">else</span> {
+</span><span id="346" class="l"><a href="#346">346: </a>            <span class="php-var">$folder</span> = <span class="php-quote">'_'</span>.<span class="php-keyword2">hex2bin</span>(<span class="php-var">$src</span>[<span class="php-quote">'folder'</span>]);
+</span><span id="347" class="l"><a href="#347">347: </a>        }
+</span><span id="348" class="l"><a href="#348">348: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;list_src&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$src</span>[<span class="php-quote">'type'</span>]).<span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-var">$src</span>[<span class="php-quote">'name'</span>]);
+</span><span id="349" class="l"><a href="#349">349: </a>        <span class="php-var">$res</span> .= <span class="php-quote">' '</span>.<span class="php-var">$output_mod</span>-&gt;html_safe(<span class="php-keyword2">str_replace</span>(<span class="php-quote">'_'</span>, <span class="php-quote">''</span>, <span class="php-var">$folder</span>));
+</span><span id="350" class="l"><a href="#350">350: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="351" class="l"><a href="#351">351: </a>    }
+</span><span id="352" class="l"><a href="#352">352: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="353" class="l"><a href="#353">353: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="354" class="l"><a href="#354">354: </a>}
+</span><span id="355" class="l"><a href="#355">355: </a>
+</span><span id="356" class="l"><a href="#356">356: </a><span class="php-comment">/**
+</span></span><span id="357" class="l"><a href="#357">357: </a><span class="php-comment"> * Output message list controls
+</span></span><span id="358" class="l"><a href="#358">358: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="359" class="l"><a href="#359">359: </a><span class="php-comment"> * @param string $refresh_link refresh link tag
+</span></span><span id="360" class="l"><a href="#360">360: </a><span class="php-comment"> * @param string $config_link configuration link tag
+</span></span><span id="361" class="l"><a href="#361">361: </a><span class="php-comment"> * @param string $source_link source link tag
+</span></span><span id="362" class="l"><a href="#362">362: </a><span class="php-comment"> * @return string
+</span></span><span id="363" class="l"><a href="#363">363: </a><span class="php-comment"> */</span>
+</span><span id="364" class="l"><a href="#364">364: </a><span class="php-keyword1">function</span> list_controls(<span class="php-var">$refresh_link</span>, <span class="php-var">$config_link</span>, <span class="php-var">$source_link</span>=<span class="php-keyword1">false</span>) {
+</span><span id="365" class="l"><a href="#365">365: </a>    <span class="php-keyword1">return</span> <span class="php-quote">'&lt;div class=&quot;list_controls&quot;&gt;'</span>.
+</span><span id="366" class="l"><a href="#366">366: </a>        <span class="php-var">$refresh_link</span>.<span class="php-var">$source_link</span>.<span class="php-var">$config_link</span>.<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="367" class="l"><a href="#367">367: </a>}
+</span><span id="368" class="l"><a href="#368">368: </a>
+</span><span id="369" class="l"><a href="#369">369: </a><span class="php-comment">/**
+</span></span><span id="370" class="l"><a href="#370">370: </a><span class="php-comment"> * Validate search terms
+</span></span><span id="371" class="l"><a href="#371">371: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="372" class="l"><a href="#372">372: </a><span class="php-comment"> * @param string $terms search terms to validate
+</span></span><span id="373" class="l"><a href="#373">373: </a><span class="php-comment"> * @return string
+</span></span><span id="374" class="l"><a href="#374">374: </a><span class="php-comment"> */</span>
+</span><span id="375" class="l"><a href="#375">375: </a><span class="php-keyword1">function</span> validate_search_terms(<span class="php-var">$terms</span>) {
+</span><span id="376" class="l"><a href="#376">376: </a>    <span class="php-var">$terms</span> = <span class="php-keyword2">trim</span>(<span class="php-keyword2">strip_tags</span>(<span class="php-var">$terms</span>));
+</span><span id="377" class="l"><a href="#377">377: </a>    <span class="php-keyword1">if</span> (!<span class="php-var">$terms</span>) {
+</span><span id="378" class="l"><a href="#378">378: </a>        <span class="php-var">$terms</span> = <span class="php-quote">''</span>;
+</span><span id="379" class="l"><a href="#379">379: </a>    }
+</span><span id="380" class="l"><a href="#380">380: </a>    <span class="php-keyword1">return</span> <span class="php-var">$terms</span>;
+</span><span id="381" class="l"><a href="#381">381: </a>}
+</span><span id="382" class="l"><a href="#382">382: </a>
+</span><span id="383" class="l"><a href="#383">383: </a><span class="php-comment">/**
+</span></span><span id="384" class="l"><a href="#384">384: </a><span class="php-comment"> * Validate the name of a search field
+</span></span><span id="385" class="l"><a href="#385">385: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="386" class="l"><a href="#386">386: </a><span class="php-comment"> * @param string $fld name to validate
+</span></span><span id="387" class="l"><a href="#387">387: </a><span class="php-comment"> * @return mixed
+</span></span><span id="388" class="l"><a href="#388">388: </a><span class="php-comment"> */</span>
+</span><span id="389" class="l"><a href="#389">389: </a><span class="php-keyword1">function</span> validate_search_fld(<span class="php-var">$fld</span>) {
+</span><span id="390" class="l"><a href="#390">390: </a>    <span class="php-keyword1">if</span> (<span class="php-keyword2">in_array</span>(<span class="php-var">$fld</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'TEXT'</span>, <span class="php-quote">'BODY'</span>, <span class="php-quote">'FROM'</span>, <span class="php-quote">'SUBJECT'</span>))) {
+</span><span id="391" class="l"><a href="#391">391: </a>        <span class="php-keyword1">return</span> <span class="php-var">$fld</span>;
+</span><span id="392" class="l"><a href="#392">392: </a>    }
+</span><span id="393" class="l"><a href="#393">393: </a>    <span class="php-keyword1">return</span> <span class="php-keyword1">false</span>;
+</span><span id="394" class="l"><a href="#394">394: </a>}
+</span><span id="395" class="l"><a href="#395">395: </a>
+</span><span id="396" class="l"><a href="#396">396: </a><span class="php-comment">/**
+</span></span><span id="397" class="l"><a href="#397">397: </a><span class="php-comment"> * Output a select element for the search field
+</span></span><span id="398" class="l"><a href="#398">398: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="399" class="l"><a href="#399">399: </a><span class="php-comment"> * @param string $current currently selected field
+</span></span><span id="400" class="l"><a href="#400">400: </a><span class="php-comment"> * @param object $output_mod Hm_Output_Module
+</span></span><span id="401" class="l"><a href="#401">401: </a><span class="php-comment"> * @return string
+</span></span><span id="402" class="l"><a href="#402">402: </a><span class="php-comment"> */</span>
+</span><span id="403" class="l"><a href="#403">403: </a><span class="php-keyword1">function</span> search_field_selection(<span class="php-var">$current</span>, <span class="php-var">$output_mod</span>) {
+</span><span id="404" class="l"><a href="#404">404: </a>    <span class="php-var">$flds</span> = <span class="php-keyword1">array</span>(
+</span><span id="405" class="l"><a href="#405">405: </a>        <span class="php-quote">'TEXT'</span> =&gt; <span class="php-quote">'Entire message'</span>,
+</span><span id="406" class="l"><a href="#406">406: </a>        <span class="php-quote">'BODY'</span> =&gt; <span class="php-quote">'Message body'</span>,
+</span><span id="407" class="l"><a href="#407">407: </a>        <span class="php-quote">'SUBJECT'</span> =&gt; <span class="php-quote">'Subject'</span>,
+</span><span id="408" class="l"><a href="#408">408: </a>        <span class="php-quote">'FROM'</span> =&gt; <span class="php-quote">'From'</span>,
+</span><span id="409" class="l"><a href="#409">409: </a>    );
+</span><span id="410" class="l"><a href="#410">410: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;select id=&quot;search_fld&quot; name=&quot;search_fld&quot;&gt;'</span>;
+</span><span id="411" class="l"><a href="#411">411: </a>    <span class="php-keyword1">foreach</span> (<span class="php-var">$flds</span> <span class="php-keyword1">as</span> <span class="php-var">$val</span> =&gt; <span class="php-var">$name</span>) {
+</span><span id="412" class="l"><a href="#412">412: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;option '</span>;
+</span><span id="413" class="l"><a href="#413">413: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$current</span> == <span class="php-var">$val</span>) {
+</span><span id="414" class="l"><a href="#414">414: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'selected=&quot;selected&quot; '</span>;
+</span><span id="415" class="l"><a href="#415">415: </a>        }
+</span><span id="416" class="l"><a href="#416">416: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'value=&quot;'</span>.<span class="php-var">$val</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-var">$name</span>).<span class="php-quote">'&lt;/option&gt;'</span>;
+</span><span id="417" class="l"><a href="#417">417: </a>    }
+</span><span id="418" class="l"><a href="#418">418: </a>    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/select&gt;'</span>;
+</span><span id="419" class="l"><a href="#419">419: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="420" class="l"><a href="#420">420: </a>}
+</span><span id="421" class="l"><a href="#421">421: </a>
+</span><span id="422" class="l"><a href="#422">422: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1708,6 +1753,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fd281b93dccfddb843fd26109301421fea189439"></script>
+<script src="elementlist.js?fd641f30151780f6fdcb63767d911da754b70cbd"></script>
 </body>
 </html>

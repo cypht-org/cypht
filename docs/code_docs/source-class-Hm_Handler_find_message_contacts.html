@@ -418,6 +418,24 @@
 						</li>
 							</ul></li></ul></li>
 				<li>
+					<a href="package-modules.keyboard.html">
+						keyboard<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.html">
+						shortcuts<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.keyboard.shortcuts.output.html">
+						output					</a>
+
+						</li>
+							</ul></li></ul></li>
+				<li>
 					<a href="package-modules.nasa.html">
 						nasa<span></span>
 					</a>
@@ -466,6 +484,24 @@
 
 						</li>
 							</ul></li>
+				<li>
+					<a href="package-modules.password.html">
+						password<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.html">
+						restrictions<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.password.restrictions.functions.html">
+						functions					</a>
+
+						</li>
+							</ul></li></ul></li>
 				<li>
 					<a href="package-modules.pop3.html">
 						pop3<span></span>
@@ -1062,6 +1098,8 @@
 				<li><a href="class-Hm_Output_settings_save_link.html">Hm_Output_settings_save_link</a></li>
 				<li><a href="class-Hm_Output_settings_servers_link.html">Hm_Output_settings_servers_link</a></li>
 				<li><a href="class-Hm_Output_settings_site_link.html">Hm_Output_settings_site_link</a></li>
+				<li><a href="class-Hm_Output_shortcuts_content.html">Hm_Output_shortcuts_content</a></li>
+				<li><a href="class-Hm_Output_shortcuts_page_link.html">Hm_Output_shortcuts_page_link</a></li>
 				<li><a href="class-Hm_Output_start_all_email_settings.html">Hm_Output_start_all_email_settings</a></li>
 				<li><a href="class-Hm_Output_start_everything_settings.html">Hm_Output_start_everything_settings</a></li>
 				<li><a href="class-Hm_Output_start_feed_settings.html">Hm_Output_start_feed_settings</a></li>
@@ -1069,6 +1107,7 @@
 				<li><a href="class-Hm_Output_start_general_settings.html">Hm_Output_start_general_settings</a></li>
 				<li><a href="class-Hm_Output_start_pop3_settings.html">Hm_Output_start_pop3_settings</a></li>
 				<li><a href="class-Hm_Output_start_settings_form.html">Hm_Output_start_settings_form</a></li>
+				<li><a href="class-Hm_Output_start_shortcuts_page.html">Hm_Output_start_shortcuts_page</a></li>
 				<li><a href="class-Hm_Output_start_unread_settings.html">Hm_Output_start_unread_settings</a></li>
 				<li><a href="class-Hm_Output_tag_bar.html">Hm_Output_tag_bar</a></li>
 				<li><a href="class-Hm_Output_tag_folders.html">Hm_Output_tag_folders</a></li>
@@ -1130,6 +1169,9 @@
 				<li><a href="function-build_github_subject.html">build_github_subject</a></li>
 				<li><a href="function-build_mime_msg.html">build_mime_msg</a></li>
 				<li><a href="function-build_page_links.html">build_page_links</a></li>
+				<li><a href="function-check_passphrase_rules.html">check_passphrase_rules</a></li>
+				<li><a href="function-check_password.html">check_password</a></li>
+				<li><a href="function-check_password_rules.html">check_password_rules</a></li>
 				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
 				<li><a href="function-convert_html_to_text.html">convert_html_to_text</a></li>
 				<li><a href="function-credentials_form.html">credentials_form</a></li>
@@ -1532,10 +1574,10 @@
 </span><span id="248" class="l"><a href="#248">248: </a>                    <span class="php-quote">'&lt;td&gt;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$contact</span>-&gt;value(<span class="php-quote">'phone_number'</span>)).<span class="php-quote">'&lt;/td&gt;'</span>.
 </span><span id="249" class="l"><a href="#249">249: </a>                    <span class="php-quote">'&lt;td class=&quot;contact_controls&quot;&gt;'</span>;
 </span><span id="250" class="l"><a href="#250">250: </a>                <span class="php-keyword1">if</span> (!<span class="php-var">$contact</span>-&gt;value(<span class="php-quote">'source'</span>)) {
-</span><span id="251" class="l"><a href="#251">251: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a data-id=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot; class=&quot;delete_contact&quot; title=&quot;Delete&quot;&gt;&lt;img alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$circle_x</span>.<span class="php-quote">'&quot; /&gt;&lt;/a&gt;'</span>.
-</span><span id="252" class="l"><a href="#252">252: </a>                        <span class="php-quote">'&lt;a href=&quot;?page=contacts&amp;amp;contact_id='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&amp;amp;contact_page='</span>.<span class="php-var">$current_page</span>.<span class="php-quote">'&quot; class=&quot;delete_contact&quot; title=&quot;Edit&quot;&gt;&lt;img alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Edit'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$cog</span>.<span class="php-quote">'&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="251" class="l"><a href="#251">251: </a>                    <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a data-id=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot; href=&quot;&quot; class=&quot;delete_contact&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot;&gt;&lt;img alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$circle_x</span>.<span class="php-quote">'&quot; /&gt;&lt;/a&gt;'</span>.
+</span><span id="252" class="l"><a href="#252">252: </a>                        <span class="php-quote">'&lt;a href=&quot;?page=contacts&amp;amp;contact_id='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&amp;amp;contact_page='</span>.<span class="php-var">$current_page</span>.<span class="php-quote">'&quot; class=&quot;delete_contact&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Edit'</span>).<span class="php-quote">'&quot;&gt;&lt;img alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Edit'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$cog</span>.<span class="php-quote">'&quot; /&gt;&lt;/a&gt;'</span>;
 </span><span id="253" class="l"><a href="#253">253: </a>                }
-</span><span id="254" class="l"><a href="#254">254: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;?page=compose&amp;amp;contact_id='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot; class=&quot;send_to_contact&quot; title=&quot;Send to&quot;&gt;&lt;img alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Send To'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$doc</span>.<span class="php-quote">'&quot; /&gt;&lt;/a&gt;'</span>.
+</span><span id="254" class="l"><a href="#254">254: </a>                <span class="php-var">$res</span> .= <span class="php-quote">'&lt;a href=&quot;?page=compose&amp;amp;contact_id='</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$id</span>).<span class="php-quote">'&quot; class=&quot;send_to_contact&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Send To'</span>).<span class="php-quote">'&quot;&gt;&lt;img alt=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Send To'</span>).<span class="php-quote">'&quot; width=&quot;16&quot; height=&quot;16&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$doc</span>.<span class="php-quote">'&quot; /&gt;&lt;/a&gt;'</span>.
 </span><span id="255" class="l"><a href="#255">255: </a>                    <span class="php-quote">'&lt;/td&gt;&lt;/tr&gt;'</span>;
 </span><span id="256" class="l"><a href="#256">256: </a>            }
 </span><span id="257" class="l"><a href="#257">257: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;tr&gt;&lt;td class=&quot;contact_pages&quot; colspan=&quot;5&quot;&gt;'</span>;
@@ -1677,6 +1719,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fd281b93dccfddb843fd26109301421fea189439"></script>
+<script src="elementlist.js?fd641f30151780f6fdcb63767d911da754b70cbd"></script>
 </body>
 </html>
