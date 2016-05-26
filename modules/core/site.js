@@ -274,7 +274,6 @@ var Hm_Timer = {
 function Message_List() {
 
     var self = this;
-    this.range_start = '',
     this.sources = [];
     this.deleted = [];
     this.completed_count = 0;
@@ -437,45 +436,6 @@ function Message_List() {
         $('input[type=checkbox]').each(function () { this.checked = false; });
         this.toggle_msg_controls();
         this.set_checkbox_callback();
-    };
-
-    this.select_range = function(start, end) {
-        var found = false;
-        var other = false;
-        $('.message_table tbody tr').each(function() {
-            if (found) {
-                $('input[type=checkbox]', $(this)).prop('checked', true);
-                if ($(this).prop('class') == other) {
-                    return false;
-                }
-            }
-            if ($(this).prop('class') == start) {
-                found = true;
-                other = end;
-            }
-            if ($(this).prop('class') == end) {
-                found = true;
-                other = start;
-            }
-        });
-    };
-
-    this.check_select_range = function(event_object) {
-        var start;
-        var end;
-        if (event_object && event_object.shiftKey) {
-            if (event_object.target.checked) {
-                if (this.range_start !== '') {
-                    start = this.range_start;
-                    end = event_object.target.value;
-                    this.select_range(start, end);
-                    this.range_start = '';
-                }
-                else {
-                   this.range_start = event_object.target.value; 
-                }
-            }
-        }
     };
 
     this.toggle_msg_controls = function() {
@@ -758,7 +718,6 @@ function Message_List() {
         $('input[type=checkbox]').unbind('click');
         $('input[type=checkbox]').click(function(e) {
             self.toggle_msg_controls();
-            self.check_select_range(e);
         });
     };
 
