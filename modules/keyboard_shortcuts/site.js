@@ -4,7 +4,7 @@ var ks_redirect = function(target) {
     document.location.href = target;
 };
 
-var ks_prev_msg = function() {
+var ks_prev_msg_list = function() {
     var focused = $(document.activeElement);
     if (focused.prop('tagName').toLowerCase() != 'tr') {
         var row = $('.message_table tbody tr').last();
@@ -22,7 +22,7 @@ var ks_load_msg = function() {
     }
 };
 
-var ks_next_msg = function() {
+var ks_next_msg_list = function() {
     var focused = $(document.activeElement);
     if (focused.prop('tagName').toLowerCase() != 'tr') {
         var row = $('.message_table tbody tr').first();
@@ -30,6 +30,20 @@ var ks_next_msg = function() {
     }
     else {
         focused.next().focus();
+    }
+};
+
+var ks_prev_msg = function() {
+    var link = $('.plink');
+    if (link.length > 0) {
+        document.location.href = link.attr('href');
+    }
+};
+
+var ks_next_msg = function() {
+    var link = $('.nlink');
+    if (link.length > 0) {
+        document.location.href = link.attr('href');
     }
 };
 
@@ -112,9 +126,11 @@ $(function() {
         {'page': '*', 'control_chars': ['meta'], 'char': 83, 'action': ks_redirect, 'target': '?page=compose'},
         {'page': '*', 'control_chars': ['meta'], 'char': 67, 'action': ks_redirect, 'target': '?page=contacts'},
         {'page': '*', 'control_chars': ['meta'], 'char': 85, 'action': ks_redirect, 'target': '?page=message_list&list_path=unread'},
-        {'page': 'message_list', 'control_chars': [], 'char': 78, 'action': ks_next_msg, 'target': false},
-        {'page': 'message_list', 'control_chars': [], 'char': 80, 'action': ks_prev_msg, 'target': false},
-        {'page': 'message_list', 'control_chars': [], 'char': 13, 'action': ks_load_msg, 'target': false}
+        {'page': 'message_list', 'control_chars': [], 'char': 78, 'action': ks_next_msg_list, 'target': false},
+        {'page': 'message_list', 'control_chars': [], 'char': 80, 'action': ks_prev_msg_list, 'target': false},
+        {'page': 'message_list', 'control_chars': [], 'char': 13, 'action': ks_load_msg, 'target': false},
+        {'page': 'message', 'control_chars': [], 'char': 80, 'action': ks_prev_msg, 'target': false},
+        {'page': 'message', 'control_chars': [], 'char': 78, 'action': ks_next_msg, 'target': false}
     ];
     $(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
 });
