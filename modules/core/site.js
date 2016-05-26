@@ -327,7 +327,21 @@ function Message_List() {
         var msg_ids = this.add_rows(msgs, msg_rows);
         var count = this.remove_rows(ids, msg_ids, type, msg_rows);
         this.run_callbacks(completed);
+        if (!cache) {
+            this.set_tab_index();
+        }
         return count;
+    };
+
+    this.set_tab_index = function() {
+        var row;
+        var msg_rows = $('.message_table tbody');
+        var count = 1;
+        var key;
+        $('tr', msg_rows).each(function() {
+            $(this).attr('tabindex', count);
+            count++;
+        });
     };
 
     this.clear_missing_sources = function(msg_rows) {
