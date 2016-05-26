@@ -18,7 +18,6 @@ var ks_prev_msg = function() {
 var ks_load_msg = function() {
     var focused = $(document.activeElement);
     if (focused.prop('tagName').toLowerCase() == 'tr') {
-        elog('here');
         document.location.href = $('a', focused).attr('href');
     }
 };
