@@ -753,6 +753,7 @@ var Hm_Folders = {
         $('.folder_list').show();
         $('.folder_toggle').toggle();
         Hm_Utils.save_to_local_storage('hide_folder_list', '');
+        $('main').css('display', 'table-cell');
         return false;
     },
     toggle_folder_list: function() {
@@ -769,6 +770,7 @@ var Hm_Folders = {
         if (!forget) {
             Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
             Hm_Utils.save_to_local_storage('hide_folder_list', '1');
+            $('main').css('display', 'block');
         }
         return false;
     },
@@ -867,6 +869,7 @@ var Hm_Folders = {
             if (Hm_Utils.get_from_local_storage('hide_folder_list') == '1') {
                 $('.folder_list').hide();
                 $('.folder_toggle').show();
+                $('main').css('display', 'block');
             }
             Hm_Folders.hl_selected_menu();
             Hm_Folders.folder_list_events();
