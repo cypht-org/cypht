@@ -24,6 +24,7 @@ class Hm_Output_shortcuts_content extends Hm_Output_Module {
     protected function output() {
         $res = '<table class="shortcut_table">';
         $res .= '<tr><td colspan="2" class="settings_subtitle">'.$this->trans('General').'</th></tr>';
+        $res .= '<tr><th class="keys">Esc</th><th>'.$this->trans('Unfocus all input elements').'</th></tr>';
         $res .= '<tr><th class="keys">Meta + e</th><th>'.$this->trans('Jump to the "Everything" page').'</th></tr>';
         $res .= '<tr><th class="keys">Meta + u</th><th>'.$this->trans('Jump to the "Unread" page').'</th></tr>';
         $res .= '<tr><th class="keys">Meta + f</th><th>'.$this->trans('Jump to the "Flagged" page').'</th></tr>';
