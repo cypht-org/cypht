@@ -22,7 +22,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
         }
         $ch = Hm_Functions::c_init();
         $res = array();
-        Hm_Functions::c_setopt($ch, CURLOPT_URL, 'http://cypht.org/git.txt');
+        Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://cypht.org/git.txt');
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
         $curl_result = Hm_Functions::c_exec($ch);
