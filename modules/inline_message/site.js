@@ -85,7 +85,6 @@ var get_inline_msg_details = function(link) {
 };
 
 var capture_subject_click = function() {
-    elog('capture');
     $('a', $('.subject')).click(function(e) {
         var msg_details = get_inline_msg_details(this); 
         var uid = msg_details[0];
