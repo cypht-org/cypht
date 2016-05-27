@@ -1,5 +1,12 @@
 'use strict';
 
+var ks_follow_link = function(target) {
+    var link = $(target);
+    if (link.length > 0) {
+        document.location.href = link.attr('href');
+    }
+};
+
 var ks_redirect = function(target) {
     document.location.href = target;
 };
@@ -59,20 +66,6 @@ var ks_next_msg_list = function() {
     }
     else {
         focused.next().focus();
-    }
-};
-
-var ks_prev_msg = function() {
-    var link = $('.plink');
-    if (link.length > 0) {
-        document.location.href = link.attr('href');
-    }
-};
-
-var ks_next_msg = function() {
-    var link = $('.nlink');
-    if (link.length > 0) {
-        document.location.href = link.attr('href');
     }
 };
 
@@ -160,8 +153,19 @@ $(function() {
         {'page': 'message_list', 'control_chars': [], 'char': 13, 'action': ks_load_msg, 'target': false},
         {'page': 'message_list', 'control_chars': [], 'char': 83, 'action': ks_select_msg, 'target': false},
         {'page': 'message_list', 'control_chars': [], 'char': 65, 'action': ks_select_all, 'target': false},
-        {'page': 'message', 'control_chars': [], 'char': 80, 'action': ks_prev_msg, 'target': false},
-        {'page': 'message', 'control_chars': [], 'char': 78, 'action': ks_next_msg, 'target': false}
+        {'page': 'message_list', 'control_chars': ['shift'], 'char': 82, 'action': ks_click_button, 'target': '.msg_read'},
+        {'page': 'message_list', 'control_chars': ['shift'], 'char': 85, 'action': ks_click_button, 'target': '.msg_unread'},
+        {'page': 'message_list', 'control_chars': ['shift'], 'char': 70, 'action': ks_click_button, 'target': '.msg_flag'},
+        {'page': 'message_list', 'control_chars': ['shift'], 'char': 69, 'action': ks_click_button, 'target': '.msg_unflag'},
+        {'page': 'message_list', 'control_chars': ['shift'], 'char': 68, 'action': ks_click_button, 'target': '.msg_delete'},
+        {'page': 'message', 'control_chars': [], 'char': 80, 'action': ks_follow_link, 'target': '.plink'},
+        {'page': 'message', 'control_chars': [], 'char': 78, 'action': ks_follow_link, 'target': '.nlink'},
+        {'page': 'message', 'control_chars': [], 'char': 82, 'action': ks_follow_link, 'target': '.reply_link'},
+        {'page': 'message', 'control_chars': ['shift'], 'char': 70, 'action': ks_follow_link, 'target': '.forward_link'},
+        {'page': 'message', 'control_chars': [], 'char': 85, 'action': ks_click_button, 'target': '.unflagged_link'},
+        {'page': 'message', 'control_chars': [], 'char': 70, 'action': ks_click_button, 'target': '.flagged_link'},
+        {'page': 'message', 'control_chars': [], 'char': 68, 'action': ks_click_button, 'target': '.delete_link'},
+        {'page': 'message', 'control_chars': ['shift'], 'char': 82, 'action': ks_follow_link, 'target': '.reply_all_link'}
     ];
     $(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
 });
