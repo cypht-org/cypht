@@ -1259,25 +1259,24 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<div class="msg_move_to">'.
                 '<a href="#" class="hlink header_toggle">'.$this->trans('all headers').'</a>'.
                 '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small headers').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('reply').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('reply-all').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('forward').'</a>'.
-                ' | <a class="hlink" href="?page=compose&amp;attach=1'.$reply_args.'">'.$this->trans('attach').'</a>';
+                ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('reply').'</a>'.
+                ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('reply-all').'</a>'.
+                ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('forward').'</a>';
             if ($msg_part === '0') {
-                $txt .= ' | <a class="hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
+                $txt .= ' | <a class="normal_link hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
             }
             else {
-                $txt .= ' | <a class="hlink msg_part_link raw_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
+                $txt .= ' | <a class="raw_link hlink msg_part_link raw_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
             }
             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                $txt .= ' | <a style="display: none;" class="hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a id="unflag_msg" class="hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= ' | <a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
             else {
-                $txt .= ' | <a id="flag_msg" class="hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a style="display: none;" class="hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= ' | <a id="flag_msg" class="unflagged_link hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a style="display: none;" class="flagged_link hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
-            $txt .= ' | <a class="hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
+            $txt .= ' | <a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= '<div class="move_to_location"></div></div>';
