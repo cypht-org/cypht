@@ -4,6 +4,23 @@ var ks_redirect = function(target) {
     document.location.href = target;
 };
 
+var ks_select_all = function() {
+    Hm_Message_List.toggle_rows();
+};
+
+var ks_select_msg = function() {
+    var focused = $(document.activeElement);
+    $('input', focused).each(function() {
+        if ($(this).prop('checked')) {
+            $(this).prop('checked', false);
+        }
+        else {
+            $(this).prop('checked', true);
+        }
+    });
+    Hm_Message_List.toggle_msg_controls();
+};
+
 var ks_prev_msg_list = function() {
     var focused = $(document.activeElement);
     if (focused.prop('tagName').toLowerCase() != 'tr') {
@@ -17,8 +34,20 @@ var ks_prev_msg_list = function() {
 
 var ks_load_msg = function() {
     var focused = $(document.activeElement);
+    var inline;
     if (focused.prop('tagName').toLowerCase() == 'tr') {
-        document.location.href = $('a', focused).attr('href');
+        try {
+            inline = inline_msg();
+        }
+        catch (e) {
+            inline = false;
+        }
+        if (inline) {
+            $('a', focused).trigger('click');
+        }
+        else {
+            document.location.href = $('a', focused).attr('href');
+        }
     }
 };
 
@@ -129,6 +158,8 @@ $(function() {
         {'page': 'message_list', 'control_chars': [], 'char': 78, 'action': ks_next_msg_list, 'target': false},
         {'page': 'message_list', 'control_chars': [], 'char': 80, 'action': ks_prev_msg_list, 'target': false},
         {'page': 'message_list', 'control_chars': [], 'char': 13, 'action': ks_load_msg, 'target': false},
+        {'page': 'message_list', 'control_chars': [], 'char': 83, 'action': ks_select_msg, 'target': false},
+        {'page': 'message_list', 'control_chars': [], 'char': 65, 'action': ks_select_all, 'target': false},
         {'page': 'message', 'control_chars': [], 'char': 80, 'action': ks_prev_msg, 'target': false},
         {'page': 'message', 'control_chars': [], 'char': 78, 'action': ks_next_msg, 'target': false}
     ];
