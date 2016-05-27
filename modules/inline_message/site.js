@@ -85,6 +85,7 @@ var get_inline_msg_details = function(link) {
 };
 
 var capture_subject_click = function() {
+    elog('capture');
     $('a', $('.subject')).click(function(e) {
         var msg_details = get_inline_msg_details(this); 
         var uid = msg_details[0];
@@ -135,7 +136,7 @@ $(function() {
         if (inline_msg()) {
             setTimeout(capture_subject_click, 100);
             $('tr').removeClass('hl');
-            Hm_Message_List.callbacks.push(capture_subject_click);
+            Hm_Ajax.add_callback_hook('*', capture_subject_click);
             if (hm_list_path().substr(0, 4) === 'imap') {
                 Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
                 $('.refresh_link').click(function() { select_imap_folder(hm_list_path(), capture_subject_click); });

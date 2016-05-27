@@ -3,6 +3,7 @@
 var Hm_Ajax = {
     request_count: 0,
     callback_hooks: [],
+    p_callbacks: [],
     aborted: false,
     batch_callback: false,
     icon_loading_id: 0,
@@ -50,9 +51,14 @@ var Hm_Ajax = {
         var i;
         for (i in Hm_Ajax.callback_hooks) {
             hook = Hm_Ajax.callback_hooks[i];
-            if (hook[0] == name) {
+            if (hook[0] == name || hook[0] == '*') {
                 func = hook[1];
                 func(res);
+                if (hook[0] == '*') {
+                    if ($.inArray(hook, Hm_Ajax.p_callbacks) === -1) {
+                        Hm_Ajax.p_callbacks.push(hook);
+                    }
+                }
             }
         }
     },
@@ -157,7 +163,8 @@ var Hm_Ajax_Request = function() { return {
         if (Hm_Ajax.request_count === 0) {
             Hm_Message_List.set_checkbox_callback();
             Hm_Ajax.aborted = false;
-            Hm_Ajax.callback_hooks = [];
+            Hm_Ajax.callback_hooks = Hm_Ajax.p_callbacks;
+            Hm_Ajax.p_callbacks = [];
             if (Hm_Ajax.batch_callback) {
                 Hm_Ajax.batch_callback(res);
                 Hm_Ajax.batch_callback = false;
