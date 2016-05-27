@@ -133,7 +133,7 @@ var capture_subject_click = function() {
 $(function() {
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         if (inline_msg()) {
-            capture_subject_click();
+            setTimeout(capture_subject_click, 100);
             $('tr').removeClass('hl');
             Hm_Message_List.callbacks.push(capture_subject_click);
             if (hm_list_path().substr(0, 4) === 'imap') {
