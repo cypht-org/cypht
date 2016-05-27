@@ -33,9 +33,11 @@ class Hm_Output_shortcuts_content extends Hm_Output_Module {
         $res .= '<tr><th class="keys">Meta + s</th><th>'.$this->trans('Jump to the Compose page').'</th></tr>';
         $res .= '<tr><th class="keys">Meta + t</th><th>'.$this->trans('Toggle the folder list').'</th></tr>';
         $res .= '<tr><td colspan="2" class="settings_subtitle">'.$this->trans('Message List').'</td></tr>';
-        $res .= '<tr><th class="keys">n</th><th>'.$this->trans('Select the next message in the list').'</th></tr>';
-        $res .= '<tr><th class="keys">p</th><th>'.$this->trans('Select the previous message in the list').'</th></tr>';
-        $res .= '<tr><th class="keys">Enter</th><th>'.$this->trans('Open the currently selected message').'</th></tr>';
+        $res .= '<tr><th class="keys">n</th><th>'.$this->trans('Focus the next message in the list').'</th></tr>';
+        $res .= '<tr><th class="keys">p</th><th>'.$this->trans('Focus the previous message in the list').'</th></tr>';
+        $res .= '<tr><th class="keys">Enter</th><th>'.$this->trans('Open the currently focused message').'</th></tr>';
+        $res .= '<tr><th class="keys">s</th><th>'.$this->trans('Select/unselect the currently focused message').'</th></tr>';
+        $res .= '<tr><th class="keys">a</th><th>'.$this->trans('Toggle all message selections').'</th></tr>';
         $res .= '<tr><td colspan="2" class="settings_subtitle">'.$this->trans('Message View').'</td></tr>';
         $res .= '<tr><th class="keys">n</th><th>'.$this->trans('View the next message in the list').'</th></tr>';
         $res .= '<tr><th class="keys">p</th><th>'.$this->trans('View  the previous message in the list').'</th></tr>';
