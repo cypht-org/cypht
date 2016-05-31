@@ -71,7 +71,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
             $class = $dir."_page";
 
             if ($this->get('2fa_error')) {
-                $error = '<div class="tfa_error">'.$this->html_safe($this->get('2fa_error')).'</div>';
+                $error = '<div class="tfa_error">'.$this->trans($this->get('2fa_error')).'</div>';
             }
             else {
                 $error = '';
