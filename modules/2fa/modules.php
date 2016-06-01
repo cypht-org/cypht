@@ -11,20 +11,37 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage 2fa/handler
  */
+class Hm_Handler_process_enable_2fa extends Hm_Handler_Module {
+    public function process() {
+        function enable_2fa_callback($val) { return $val; }
+        process_site_setting('enable_2fa', $this, 'enable_2fa_callback', false, true);
+        $secret = get_2fa_key($this->config);
+        if ($secret) {
+            $secret = base32_encode_str($secret);
+            $this->out('2fa_png_path', generate_qr_code($this->config, $secret));
+        }
+    }
+}
+
+/**
+ * @subpackage 2fa/handler
+ */
 class Hm_Handler_2fa_check extends Hm_Handler_Module {
     public function process() {
 
+        $enabled = $this->user_config->get('enable_2fa_setting', 0);
+        if ($enabled) {
+            return;
+        }
+
         $secret = get_2fa_key($this->config);
         if (!$secret) {
-            $this->out('2fa_required', false);
             Hm_Debug::add('2FA module set enabled, but no shared secret configured');
             return;
         }
 
         $confirmed = $this->session->get('2fa_confirmed', false);
-
         if ($confirmed) {
-            $this->out('2fa_required', false);
             return;
         }
 
@@ -33,11 +50,10 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
             if (check_2fa_pin($this->request->post['2fa_code'], $secret)) {
                 $passed = true;
             }
-            else {
-                $this->out('2fa_error', '2 factor authorization code does not match');
-            }
         }
+
         if (!$passed) {
+            $this->out('2fa_error', '2 factor authorization code does not match');
             $this->out('no_redirect', true);
             Hm_Request_Key::load($this->session, $this->request, false);
             $this->out('2fa_key', Hm_Request_Key::generate());
@@ -46,9 +62,37 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
         }
         else {
             $this->session->set('2fa_confirmed', true);
-            $this->session->close_early();
-            $this->out('2fa_required', false);
         }
+    }
+}
+
+/**
+ * @subpackage 2fa/output
+ */
+class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
+    protected function output() {
+        $enabled = false;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('enable_2fa', $settings)) {
+            $enabled = $settings['enable_2fa'];
+        }
+        $res = '<tr class="general_setting"><td>'.$this->trans('Enable 2 factor authorization').
+            '</td><td><input value="1" type="checkbox" name="enable_2fa"';
+        if ($enabled) {
+            $res .= ' checked="checked"';
+        }
+        $res .= '></td></tr>';
+        $path = $this->get('2fa_png_path');
+        if ($this->get('2fa_png_path') && is_readable($this->get('2fa_png_path'))) {
+            $png = file_get_contents($this->get('2fa_png_path', ''));
+            $res .= '<tr class="general_setting"><td></td><td>'.
+                '<div class="err settings_wrap_text">'.$this->trans('Add the following barcode to Google Authenticator BEFORE enabling 2 factor authentication.').
+                '</div><img width="100" height="100" src="data:image/png;base64,'.base64_encode(file_get_contents($this->get('2fa_png_path'))).'" /></td></tr>';
+        }
+        else {
+            $res .= '<tr class="general_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
+        }
+        return $res;
     }
 }
 
@@ -121,4 +165,22 @@ function get_2fa_key($config) {
         }
     }
     return false;
+}
+
+/**
+ * @subpackage 2fa/functions
+ */
+function base32_encode_str($str) {
+    require_once APP_PATH.'third_party/Base32.php';
+    return Base32\Base32::encode($str);
+}
+
+/**
+ * @subpackage 2fa/functions
+ */
+function generate_qr_code($config, $str) {
+    $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/2fa.png';
+    require_once APP_PATH.'third_party/phpqrcode.php';
+    QRcode::png($str, $qr_code);
+    return $qr_code;
 }
