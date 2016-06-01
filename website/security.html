@@ -28,52 +28,55 @@
 Forced TLS for browser connections
 </li>
 <li>
-All cookies are session level, HTTP only, and have the secure flag, path, and domain values set.
+All cookies are session level, HTTP only, and have the secure flag, path, and domain values set
 </li>
 <li>
-HTTP request header fingerprinting and site/user specific page keys.
+HTTP request header fingerprinting and site/user specific page keys
 </li>
 <li>
-Security related HTTP headers like X-XSS-Protection, X-Content-Type-Options, and Content-Security-Policy.
+Security related HTTP headers like X-XSS-Protection, X-Content-Type-Options, and Content-Security-Policy
 </li>
 <li>
-Configurable idle timeout module set that ends a session after a predetermined amount of time.
+Configurable idle timeout module set that ends a session after a predetermined amount of time
 </li>
 <li>
-Optional AES encrypted AJAX responses (still experimental).
+Support for 2 factor authentication with TOTP using the Google Authenticator mobile app
 </li>
 <li>
-Optional AES encrypted local storage cache (still experimental).
+Optional AES encrypted AJAX responses (still experimental)
+</li>
+<li>
+Optional AES encrypted local storage cache (still experimental)
 </lI>
 </ul>
 <h3>On the server</h3>
 <ul>
 <li>
-TLS/STARTTLS support for IMAP, POP3, and SMTP connections.
+TLS/STARTTLS support for IMAP, POP3, and SMTP connections
 </li>
 <li>
-Oauth2 over IMAP/SMTP supported (currently only Gmail and Outlook support this feature).
+Oauth2 over IMAP/SMTP supported (currently only Gmail and Outlook support this feature)
 </li>
 <li>
-Session level data is encrypted with a long random string generated on login. Date is stored server side, and the key is stored in a session level secure cookie.
+Session level data is encrypted with a long random string generated on login. Date is stored server side, and the key is stored in a session level secure cookie
 </li>
 <li>
-Persistent data stored between logins is encrypted with a key derived from your clear text password, which is obviously not stored anywhere.
+Persistent data stored between logins is encrypted with a key derived from your clear text password, which is obviously not stored anywhere
 </li>
 <li>
 All encryption is done with AES-256-CBC, encrypt-then-MAC, and PBKDF2 key derivation
 </li>
 <li>
-PHP ini settings are tightened up at runtime for extra security, including open basedir and session best practices (at least the ones that can be restricted at runtime).
+PHP ini settings are tightened up at runtime for extra security, including open basedir and session best practices (at least the ones that can be restricted at runtime)
 </li>
 <li>
-No writable files or directories are used inside the web-server document root, and only 3 files need to be inside the document root to run the program. Module sets may include additional assets, such as the HTML editor for outbound mail.
+No writable files or directories are used inside the web-server document root, and only 3 files need to be inside the document root to run the program. Module sets may include additional assets, such as the HTML editor for outbound mail
 </li>
 <li>
-Optional local DB based authentication using a salt and PBKDF2.
+Optional local DB based authentication using a salt and PBKDF2
 </li>
 <li>
-HTML formatted E-Mail is filtered through HTMLPurifier with all external resources removed before being rendered.
+HTML formatted E-Mail is filtered through HTMLPurifier with all external resources removed before being rendered
 </li>
 <li>
     Perfect score from the "Email Privacy Tester" at <a href="https://emailprivacytester.com/">https://emailprivacytester.com/</a>
@@ -81,25 +84,25 @@ HTML formatted E-Mail is filtered through HTMLPurifier with all external resourc
 <h3> During development</h3>
 <ul>
 <li>
-Easy output escaping inside modules for potentially dangerous content.
+Easy output escaping inside modules for potentially dangerous content
 </li>
 <li>
-Development is done with PHP's "E_ALL" and "E_STRICT" error reporting.
+Development is done with PHP's "E_ALL" and "E_STRICT" error reporting
 </li>
 <li>
-Module design enforces a separation of input processing and output formatting, and encourages concise methods, which makes the code easier to debug and audit.
+Module design enforces a separation of input processing and output formatting, and encourages concise methods, which makes the code easier to debug and audit
 </li>
 <li>
-Only white-listed and typed/sanitized input is allowed. Modules must pre-define input in order to have access.
+Only white-listed and typed/sanitized input is allowed. Modules must pre-define input in order to have access
 </li>
 <li>
-Modules can't reference PHP super-globals, and there are no globally scoped variables at all (there are a few static class instances with private data structures that use getter/setter methods).
+Modules can't reference PHP super-globals, and there are no globally scoped variables at all (there are a few static class instances with private data structures that use getter/setter methods)
 </li>
 <li>
-    <a href="http://cypht.org/docs/test_coverage/index.html">100% unit test coverage with PHPUnit</a> for the application framework.
+    <a href="http://cypht.org/docs/test_coverage/index.html">100% unit test coverage with PHPUnit</a> for the application framework
 </li>
 <li>
-    UI tests using Selenium (still very limited) and a generously donated subscription from <a href="http://browserstack.com">browserstack.com</a>.
+    UI tests using Selenium (still very limited) and a generously donated subscription from <a href="http://browserstack.com">browserstack.com</a>
 </ul>
 
     </div>
