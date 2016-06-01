@@ -18,7 +18,10 @@ class Hm_Handler_process_enable_2fa extends Hm_Handler_Module {
         $secret = get_2fa_key($this->config);
         if ($secret) {
             $secret = base32_encode_str($secret);
-            $this->out('2fa_png_path', generate_qr_code($this->config, $secret));
+            $app_name = $this->config->get('app_name', 'Cypht');
+            $username = $this->session->get('username', false);
+            $uri = sprintf('otpauth://totp/%s:%s?secret=%s&issuer=%s', $app_name, $username, $secret, $app_name);
+            $this->out('2fa_png_path', generate_qr_code($this->config, $uri));
         }
     }
 }
@@ -83,15 +86,25 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
         }
         $res .= '></td></tr>';
         $path = $this->get('2fa_png_path');
-        if ($this->get('2fa_png_path') && is_readable($this->get('2fa_png_path'))) {
-            $png = file_get_contents($this->get('2fa_png_path', ''));
-            $res .= '<tr class="general_setting"><td></td><td>'.
-                '<div class="err settings_wrap_text">'.$this->trans('Add the following barcode to Google Authenticator BEFORE enabling 2 factor authentication.').
-                '</div><img width="100" height="100" src="data:image/png;base64,'.base64_encode(file_get_contents($this->get('2fa_png_path'))).'" /></td></tr>';
+        if ($path && is_readable($path)) {
+            $png = file_get_contents($path);
+            $qr_code = '<tr class="general_setting"><td></td><td>';
+            if (!$enabled) {
+                $qr_code .= '<div class="err settings_wrap_text">'.
+                    $this->trans('Configure Google Authenticator BEFORE enabling 2 factor authentication.').'<br />'.
+                    $this->trans('Go to "Menu -> Set up account -> Scan a barcode", and scan the code below').'</div>';
+            }
+            else {
+                $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
+            }
+
+            $qr_code .= '<img width="128" height="128" src="data:image/png;base64,'.base64_encode($png).'" />';
+            $qr_code .= '</td></tr>';
         }
         else {
-            $res .= '<tr class="general_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
+            $qr_code .= '<tr class="general_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
         }
+        $res .= $qr_code;
         return $res;
     }
 }
