@@ -40,7 +40,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 300px; border-radius: 0px 0px 10px 0px; margin: 0px; background-color: #f5f5f5; width: 300px; padding-left: 20px; }
 .screen_reader { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
-.err { color: red; }
+.err { color: red !important; }
 .debug { color: teal; font-size: 75%; float: right; clear: both; margin: 20px; }
 .inner_list a { padding-right: 5px; }
 .folders { margin-top: 10px; margin-bottom: 20px; margin-left: 20px !important;}
@@ -142,6 +142,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .save_reminder img { opacity: .4; }
 .reply_quote { color: #999; }
 .hl { background-color: #eee; }
+.settings_wrap_text { white-space: normal; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
