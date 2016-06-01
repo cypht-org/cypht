@@ -33,7 +33,7 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
     public function process() {
 
         $enabled = $this->user_config->get('enable_2fa_setting', 0);
-        if ($enabled) {
+        if (!$enabled) {
             return;
         }
 
