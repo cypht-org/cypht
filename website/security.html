@@ -58,7 +58,7 @@ TLS/STARTTLS support for IMAP, POP3, and SMTP connections
 Oauth2 over IMAP/SMTP supported (currently only Gmail and Outlook support this feature)
 </li>
 <li>
-Session level data is encrypted with a long random string generated on login. Date is stored server side, and the key is stored in a session level secure cookie
+Session level data is encrypted with a long random string generated on login. Data is stored server side, and the key is stored in a session level secure cookie
 </li>
 <li>
 Persistent data stored between logins is encrypted with a key derived from your clear text password, which is obviously not stored anywhere
@@ -67,7 +67,7 @@ Persistent data stored between logins is encrypted with a key derived from your 
 All encryption is done with AES-256-CBC, encrypt-then-MAC, and PBKDF2 key derivation
 </li>
 <li>
-PHP ini settings are tightened up at runtime for extra security, including open basedir and session best practices (at least the ones that can be restricted at runtime)
+PHP ini settings are tightened up at runtime for extra security, including open basedir and session best practices (ones writable at runtime)
 </li>
 <li>
 No writable files or directories are used inside the web-server document root, and only 3 files need to be inside the document root to run the program. Module sets may include additional assets, such as the HTML editor for outbound mail
