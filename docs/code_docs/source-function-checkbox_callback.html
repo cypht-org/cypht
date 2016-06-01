@@ -113,6 +113,28 @@
 
 						<ul>
 				<li>
+					<a href="package-modules.2fa.html">
+						2fa<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="package-modules.2fa.functions.html">
+						functions					</a>
+
+						</li>
+				<li>
+					<a href="package-modules.2fa.handler.html">
+						handler					</a>
+
+						</li>
+				<li>
+					<a href="package-modules.2fa.output.html">
+						output					</a>
+
+						</li>
+							</ul></li>
+				<li>
 					<a href="package-modules.account.html">
 						account<span></span>
 					</a>
@@ -717,6 +739,7 @@
 				<li><a href="class-Hm_Github_Uid_Cache.html">Hm_Github_Uid_Cache</a></li>
 				<li><a href="class-Hm_Gmail_Contact_XML.html">Hm_Gmail_Contact_XML</a></li>
 				<li><a href="class-Hm_Handler_.html">Hm_Handler_</a></li>
+				<li><a href="class-Hm_Handler_2fa_check.html">Hm_Handler_2fa_check</a></li>
 				<li><a href="class-Hm_Handler_add_feeds_to_page_data.html">Hm_Handler_add_feeds_to_page_data</a></li>
 				<li><a href="class-Hm_Handler_add_imap_servers_to_page_data.html">Hm_Handler_add_imap_servers_to_page_data</a></li>
 				<li><a href="class-Hm_Handler_add_pop3_servers_to_page_data.html">Hm_Handler_add_pop3_servers_to_page_data</a></li>
@@ -922,6 +945,7 @@
 				<li><a href="class-Hm_Oauth2.html">Hm_Oauth2</a></li>
 				<li><a href="class-Hm_Output.html">Hm_Output</a></li>
 				<li><a href="class-Hm_Output_.html">Hm_Output_</a></li>
+				<li><a href="class-Hm_Output_2fa_dialog.html">Hm_Output_2fa_dialog</a></li>
 				<li><a href="class-Hm_Output_add_cal_event_form.html">Hm_Output_add_cal_event_form</a></li>
 				<li><a href="class-Hm_Output_add_feed_dialog.html">Hm_Output_add_feed_dialog</a></li>
 				<li><a href="class-Hm_Output_add_imap_server_dialog.html">Hm_Output_add_imap_server_dialog</a></li>
@@ -1169,6 +1193,7 @@
 				<li><a href="function-build_github_subject.html">build_github_subject</a></li>
 				<li><a href="function-build_mime_msg.html">build_mime_msg</a></li>
 				<li><a href="function-build_page_links.html">build_page_links</a></li>
+				<li><a href="function-check_2fa_pin.html">check_2fa_pin</a></li>
 				<li><a href="function-check_passphrase_rules.html">check_passphrase_rules</a></li>
 				<li><a href="function-check_password.html">check_password</a></li>
 				<li><a href="function-check_password_rules.html">check_password_rules</a></li>
@@ -1199,6 +1224,7 @@
 				<li><a href="function-format_reply_as_text.html">format_reply_as_text</a></li>
 				<li><a href="function-format_reply_fields.html">format_reply_fields</a></li>
 				<li><a href="function-format_reply_text.html">format_reply_text</a></li>
+				<li><a href="function-get_2fa_key.html">get_2fa_key</a></li>
 				<li><a href="function-get_date_bounds.html">get_date_bounds</a></li>
 				<li><a href="function-get_imap_mime_extension.html">get_imap_mime_extension</a></li>
 				<li><a href="function-get_imap_part_name.html">get_imap_part_name</a></li>
@@ -1606,11 +1632,11 @@
 </span><span id="280" class="l"><a href="#280">280: </a><span class="php-keyword1">function</span> message_controls(<span class="php-var">$output_mod</span>) {
 </span><span id="281" class="l"><a href="#281">281: </a>    <span class="php-var">$res</span> = <span class="php-quote">'&lt;a class=&quot;toggle_link&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;x&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$check</span>.<span class="php-quote">'&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;&lt;/a&gt;'</span>.
 </span><span id="282" class="l"><a href="#282">282: </a>        <span class="php-quote">'&lt;div class=&quot;msg_controls&quot;&gt;'</span>.
-</span><span id="283" class="l"><a href="#283">283: </a>        <span class="php-quote">'&lt;a class=&quot;core_msg_control&quot; href=&quot;#&quot; data-action=&quot;read&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Read'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
-</span><span id="284" class="l"><a href="#284">284: </a>        <span class="php-quote">'&lt;a class=&quot;core_msg_control&quot; href=&quot;#&quot; data-action=&quot;unread&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Unread'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
-</span><span id="285" class="l"><a href="#285">285: </a>        <span class="php-quote">'&lt;a class=&quot;core_msg_control&quot; href=&quot;#&quot; data-action=&quot;flag&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Flag'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
-</span><span id="286" class="l"><a href="#286">286: </a>        <span class="php-quote">'&lt;a class=&quot;core_msg_control&quot; href=&quot;#&quot; data-action=&quot;unflag&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Unflag'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
-</span><span id="287" class="l"><a href="#287">287: </a>        <span class="php-quote">'&lt;a class=&quot;core_msg_control&quot; href=&quot;#&quot; data-action=&quot;delete&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
+</span><span id="283" class="l"><a href="#283">283: </a>        <span class="php-quote">'&lt;a class=&quot;msg_read core_msg_control&quot; href=&quot;#&quot; data-action=&quot;read&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Read'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="284" class="l"><a href="#284">284: </a>        <span class="php-quote">'&lt;a class=&quot;msg_unread core_msg_control&quot; href=&quot;#&quot; data-action=&quot;unread&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Unread'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="285" class="l"><a href="#285">285: </a>        <span class="php-quote">'&lt;a class=&quot;msg_flag core_msg_control&quot; href=&quot;#&quot; data-action=&quot;flag&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Flag'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="286" class="l"><a href="#286">286: </a>        <span class="php-quote">'&lt;a class=&quot;msg_unflag core_msg_control&quot; href=&quot;#&quot; data-action=&quot;unflag&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Unflag'</span>).<span class="php-quote">'&lt;/a&gt;'</span>.
+</span><span id="287" class="l"><a href="#287">287: </a>        <span class="php-quote">'&lt;a class=&quot;msg_delete core_msg_control&quot; href=&quot;#&quot; data-action=&quot;delete&quot;&gt;'</span>.<span class="php-var">$output_mod</span>-&gt;trans(<span class="php-quote">'Delete'</span>).<span class="php-quote">'&lt;/a&gt;'</span>;
 </span><span id="288" class="l"><a href="#288">288: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$output_mod</span>-&gt;get(<span class="php-quote">'msg_controls_extra'</span>)) {
 </span><span id="289" class="l"><a href="#289">289: </a>        <span class="php-var">$res</span> .= <span class="php-var">$output_mod</span>-&gt;get(<span class="php-quote">'msg_controls_extra'</span>);
 </span><span id="290" class="l"><a href="#290">290: </a>    }
@@ -1753,6 +1779,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?fd641f30151780f6fdcb63767d911da754b70cbd"></script>
+<script src="elementlist.js?3fc138aaa0bd2e0a886375737bff5ea06dbdda16"></script>
 </body>
 </html>
