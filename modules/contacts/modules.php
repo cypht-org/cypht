@@ -20,7 +20,7 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
         if ($success) {
             $val = trim($form['contact_value']);
             $contacts = new Hm_Contact_Store($this->user_config);
-            $contacts = fetch_gmail_contacts($this->config, $contacts);
+            $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
             $contacts->sort('email_address');
             $results = array_slice($contacts->search(array(
                 'display_name' => $val,
@@ -61,7 +61,7 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('contact_id', $this->request->get)) {
             $contacts = new Hm_Contact_Store($this->user_config);
-            $contacts = fetch_gmail_contacts($this->config, $contacts);
+            $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
             $contact = $contacts->get($this->request->get['contact_id']);
             if ($contact) {
                 $to = sprintf('"%s" <%s>', $contact->value('display_name'), $contact->value('email_address'));
@@ -91,7 +91,7 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
         }
         $this->out('contact_page', $page);
         if ($this->module_is_supported('imap')) {
-            $contact_store = fetch_gmail_contacts($this->config, $contacts);
+            $contact_store = fetch_gmail_contacts($this->config, $contacts, $this->session);
         }
         $this->out('contact_store', $contacts);
     }
@@ -367,7 +367,11 @@ function parse_contact_xml($xml, $source) {
 /**
  * @subpackage contacts/functions
  */
-function fetch_gmail_contacts($config, $contact_store) {
+function fetch_gmail_contacts($config, $contact_store, $session=false) {
+    if ($session && $session->get('gmail_contacts') && is_array($session->get('gmail_contacts')) && count($session->get('gmail_contacts')) > 0) {
+        $contact_store->import($session->get('gmail_contacts'));
+        return $contact_store;
+    }
     foreach(Hm_IMAP_List::dump(false, true) as $id => $server) {
         if ($server['server'] == 'imap.gmail.com' && array_key_exists('auth', $server) && $server['auth'] == 'xoauth2') {
             $results = imap_refresh_oauth2_token($server, $config);
@@ -380,6 +384,9 @@ function fetch_gmail_contacts($config, $contact_store) {
             $url = 'https://www.google.com/m8/feeds/contacts/'.$server['user'].'/full';
             $contacts = parse_contact_xml(gmail_contacts_request($server['pass'], $url), $server['name']);
             if (!empty($contacts)) {
+                if ($session) {
+                    $session->set('gmail_contacts', $contacts);
+                }
                 $contact_store->import($contacts);
             }
         }
