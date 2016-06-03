@@ -53,10 +53,12 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
             if (check_2fa_pin($this->request->post['2fa_code'], $secret)) {
                 $passed = true;
             }
+            else {
+                $this->out('2fa_error', '2 factor authorization code does not match');
+            }
         }
 
         if (!$passed) {
-            $this->out('2fa_error', '2 factor authorization code does not match');
             $this->out('no_redirect', true);
             Hm_Request_Key::load($this->session, $this->request, false);
             $this->out('2fa_key', Hm_Request_Key::generate());
