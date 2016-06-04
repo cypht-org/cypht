@@ -390,7 +390,7 @@ return array(
     'Add Event' => false,
     'Download' => false,
     'French' => false,
-	'Shortcuts' => false,
+    'Shortcuts' => false,
     'Unfocus all input elements' => false,
     'Jump to the "Everything" page' => false,
     'Jump to the "Unread" page' => false,
@@ -419,8 +419,8 @@ return array(
     'Flag the message' => false,
     'Unflag the message' => false,
     'Delete the message' => false,
-	'Enter the 6 digit code from Google Authenticator' => false,
-	'Login Code' => false,
+    'Enter the 6 digit code from Google Authenticator' => false,
+    'Login Code' => false,
     '2 factor authorization code does not match' => false,
 ); 
 
