@@ -860,6 +860,7 @@
 				<li><a href="class-Hm_Handler_process_delete_event.html">Hm_Handler_process_delete_event</a></li>
 				<li><a href="class-Hm_Handler_process_dynamic_login.html">Hm_Handler_process_dynamic_login</a></li>
 				<li><a href="class-Hm_Handler_process_edit_contact.html">Hm_Handler_process_edit_contact</a></li>
+				<li><a href="class-Hm_Handler_process_enable_2fa.html">Hm_Handler_process_enable_2fa</a></li>
 				<li><a href="class-Hm_Handler_process_feed_limit_setting.html">Hm_Handler_process_feed_limit_setting</a></li>
 				<li><a href="class-Hm_Handler_process_feed_since_setting.html">Hm_Handler_process_feed_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_flagged_since_setting.html">Hm_Handler_process_flagged_since_setting</a></li>
@@ -996,6 +997,7 @@
 				<li><a href="class-Hm_Output_display_pop3_status.html">Hm_Output_display_pop3_status</a></li>
 				<li><a href="class-Hm_Output_dynamic_login.html">Hm_Output_dynamic_login</a></li>
 				<li><a href="class-Hm_Output_email_menu_content.html">Hm_Output_email_menu_content</a></li>
+				<li><a href="class-Hm_Output_enable_2fa_setting.html">Hm_Output_enable_2fa_setting</a></li>
 				<li><a href="class-Hm_Output_end_settings_form.html">Hm_Output_end_settings_form</a></li>
 				<li><a href="class-Hm_Output_feed_ids.html">Hm_Output_feed_ids</a></li>
 				<li><a href="class-Hm_Output_feed_limit_setting.html">Hm_Output_feed_limit_setting</a></li>
@@ -1190,6 +1192,7 @@
 				<li><a href="function-add_output.html">add_output</a></li>
 				<li><a href="function-address_from_url.html">address_from_url</a></li>
 				<li><a href="function-apod_date_form.html">apod_date_form</a></li>
+				<li><a href="function-base32_encode_str.html">base32_encode_str</a></li>
 				<li><a href="function-build_github_subject.html">build_github_subject</a></li>
 				<li><a href="function-build_mime_msg.html">build_mime_msg</a></li>
 				<li><a href="function-build_page_links.html">build_page_links</a></li>
@@ -1224,6 +1227,7 @@
 				<li><a href="function-format_reply_as_text.html">format_reply_as_text</a></li>
 				<li><a href="function-format_reply_fields.html">format_reply_fields</a></li>
 				<li><a href="function-format_reply_text.html">format_reply_text</a></li>
+				<li><a href="function-generate_qr_code.html">generate_qr_code</a></li>
 				<li><a href="function-get_2fa_key.html">get_2fa_key</a></li>
 				<li><a href="function-get_date_bounds.html">get_date_bounds</a></li>
 				<li><a href="function-get_imap_mime_extension.html">get_imap_mime_extension</a></li>
@@ -1372,7 +1376,7 @@
 </span><span id="20" class="l"><a href="#20"> 20: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$success</span>) {
 </span><span id="21" class="l"><a href="#21"> 21: </a>            <span class="php-var">$val</span> = <span class="php-keyword2">trim</span>(<span class="php-var">$form</span>[<span class="php-quote">'contact_value'</span>]);
 </span><span id="22" class="l"><a href="#22"> 22: </a>            <span class="php-var">$contacts</span> = <span class="php-keyword1">new</span> Hm_Contact_Store(<span class="php-var">$this</span>-&gt;user_config);
-</span><span id="23" class="l"><a href="#23"> 23: </a>            <span class="php-var">$contacts</span> = fetch_gmail_contacts(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$contacts</span>);
+</span><span id="23" class="l"><a href="#23"> 23: </a>            <span class="php-var">$contacts</span> = fetch_gmail_contacts(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$contacts</span>, <span class="php-var">$this</span>-&gt;session);
 </span><span id="24" class="l"><a href="#24"> 24: </a>            <span class="php-var">$contacts</span>-&gt;<span class="php-keyword2">sort</span>(<span class="php-quote">'email_address'</span>);
 </span><span id="25" class="l"><a href="#25"> 25: </a>            <span class="php-var">$results</span> = <span class="php-keyword2">array_slice</span>(<span class="php-var">$contacts</span>-&gt;search(<span class="php-keyword1">array</span>(
 </span><span id="26" class="l"><a href="#26"> 26: </a>                <span class="php-quote">'display_name'</span> =&gt; <span class="php-var">$val</span>,
@@ -1413,7 +1417,7 @@
 </span><span id="61" class="l"><a href="#61"> 61: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> process() {
 </span><span id="62" class="l"><a href="#62"> 62: </a>        <span class="php-keyword1">if</span> (<span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'contact_id'</span>, <span class="php-var">$this</span>-&gt;request-&gt;get)) {
 </span><span id="63" class="l"><a href="#63"> 63: </a>            <span class="php-var">$contacts</span> = <span class="php-keyword1">new</span> Hm_Contact_Store(<span class="php-var">$this</span>-&gt;user_config);
-</span><span id="64" class="l"><a href="#64"> 64: </a>            <span class="php-var">$contacts</span> = fetch_gmail_contacts(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$contacts</span>);
+</span><span id="64" class="l"><a href="#64"> 64: </a>            <span class="php-var">$contacts</span> = fetch_gmail_contacts(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$contacts</span>, <span class="php-var">$this</span>-&gt;session);
 </span><span id="65" class="l"><a href="#65"> 65: </a>            <span class="php-var">$contact</span> = <span class="php-var">$contacts</span>-&gt;get(<span class="php-var">$this</span>-&gt;request-&gt;get[<span class="php-quote">'contact_id'</span>]);
 </span><span id="66" class="l"><a href="#66"> 66: </a>            <span class="php-keyword1">if</span> (<span class="php-var">$contact</span>) {
 </span><span id="67" class="l"><a href="#67"> 67: </a>                <span class="php-var">$to</span> = <span class="php-keyword2">sprintf</span>(<span class="php-quote">'&quot;%s&quot; &lt;%s&gt;'</span>, <span class="php-var">$contact</span>-&gt;value(<span class="php-quote">'display_name'</span>), <span class="php-var">$contact</span>-&gt;value(<span class="php-quote">'email_address'</span>));
@@ -1443,7 +1447,7 @@
 </span><span id="91" class="l"><a href="#91"> 91: </a>        }
 </span><span id="92" class="l"><a href="#92"> 92: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'contact_page'</span>, <span class="php-var">$page</span>);
 </span><span id="93" class="l"><a href="#93"> 93: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$this</span>-&gt;module_is_supported(<span class="php-quote">'imap'</span>)) {
-</span><span id="94" class="l"><a href="#94"> 94: </a>            <span class="php-var">$contact_store</span> = fetch_gmail_contacts(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$contacts</span>);
+</span><span id="94" class="l"><a href="#94"> 94: </a>            <span class="php-var">$contact_store</span> = fetch_gmail_contacts(<span class="php-var">$this</span>-&gt;config, <span class="php-var">$contacts</span>, <span class="php-var">$this</span>-&gt;session);
 </span><span id="95" class="l"><a href="#95"> 95: </a>        }
 </span><span id="96" class="l"><a href="#96"> 96: </a>        <span class="php-var">$this</span>-&gt;out(<span class="php-quote">'contact_store'</span>, <span class="php-var">$contacts</span>);
 </span><span id="97" class="l"><a href="#97"> 97: </a>    }
@@ -1719,27 +1723,34 @@
 </span><span id="367" class="l"><a href="#367">367: </a><span class="php-comment">/**
 </span></span><span id="368" class="l"><a href="#368">368: </a><span class="php-comment"> * @subpackage contacts/functions
 </span></span><span id="369" class="l"><a href="#369">369: </a><span class="php-comment"> */</span>
-</span><span id="370" class="l"><a href="#370">370: </a><span class="php-keyword1">function</span> fetch_gmail_contacts(<span class="php-var">$config</span>, <span class="php-var">$contact_store</span>) {
-</span><span id="371" class="l"><a href="#371">371: </a>    <span class="php-keyword1">foreach</span>(Hm_IMAP_List::dump(<span class="php-keyword1">false</span>, <span class="php-keyword1">true</span>) <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$server</span>) {
-</span><span id="372" class="l"><a href="#372">372: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$server</span>[<span class="php-quote">'server'</span>] == <span class="php-quote">'imap.gmail.com'</span> &amp;&amp; <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'auth'</span>, <span class="php-var">$server</span>) &amp;&amp; <span class="php-var">$server</span>[<span class="php-quote">'auth'</span>] == <span class="php-quote">'xoauth2'</span>) {
-</span><span id="373" class="l"><a href="#373">373: </a>            <span class="php-var">$results</span> = imap_refresh_oauth2_token(<span class="php-var">$server</span>, <span class="php-var">$config</span>);
-</span><span id="374" class="l"><a href="#374">374: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$results</span>)) {
-</span><span id="375" class="l"><a href="#375">375: </a>                <span class="php-keyword1">if</span> (Hm_IMAP_List::update_oauth2_token(<span class="php-var">$id</span>, <span class="php-var">$results</span>[<span class="php-num">1</span>], <span class="php-var">$results</span>[<span class="php-num">0</span>])) {
-</span><span id="376" class="l"><a href="#376">376: </a>                    Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Oauth2 token refreshed for IMAP server id %d'</span>, <span class="php-var">$id</span>));
-</span><span id="377" class="l"><a href="#377">377: </a>                    <span class="php-var">$server</span> = Hm_IMAP_List::dump(<span class="php-var">$id</span>, <span class="php-keyword1">true</span>);
-</span><span id="378" class="l"><a href="#378">378: </a>                }
-</span><span id="379" class="l"><a href="#379">379: </a>            }
-</span><span id="380" class="l"><a href="#380">380: </a>            <span class="php-var">$url</span> = <span class="php-quote">'https://www.google.com/m8/feeds/contacts/'</span>.<span class="php-var">$server</span>[<span class="php-quote">'user'</span>].<span class="php-quote">'/full'</span>;
-</span><span id="381" class="l"><a href="#381">381: </a>            <span class="php-var">$contacts</span> = parse_contact_xml(gmail_contacts_request(<span class="php-var">$server</span>[<span class="php-quote">'pass'</span>], <span class="php-var">$url</span>), <span class="php-var">$server</span>[<span class="php-quote">'name'</span>]);
-</span><span id="382" class="l"><a href="#382">382: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$contacts</span>)) {
-</span><span id="383" class="l"><a href="#383">383: </a>                <span class="php-var">$contact_store</span>-&gt;import(<span class="php-var">$contacts</span>);
-</span><span id="384" class="l"><a href="#384">384: </a>            }
-</span><span id="385" class="l"><a href="#385">385: </a>        }
-</span><span id="386" class="l"><a href="#386">386: </a>    }
-</span><span id="387" class="l"><a href="#387">387: </a>    <span class="php-keyword1">return</span> <span class="php-var">$contact_store</span>;
-</span><span id="388" class="l"><a href="#388">388: </a>}
-</span><span id="389" class="l"><a href="#389">389: </a>
-</span><span id="390" class="l"><a href="#390">390: </a></span></code></pre>
+</span><span id="370" class="l"><a href="#370">370: </a><span class="php-keyword1">function</span> fetch_gmail_contacts(<span class="php-var">$config</span>, <span class="php-var">$contact_store</span>, <span class="php-var">$session</span>=<span class="php-keyword1">false</span>) {
+</span><span id="371" class="l"><a href="#371">371: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$session</span> &amp;&amp; <span class="php-var">$session</span>-&gt;get(<span class="php-quote">'gmail_contacts'</span>) &amp;&amp; <span class="php-keyword2">is_array</span>(<span class="php-var">$session</span>-&gt;get(<span class="php-quote">'gmail_contacts'</span>)) &amp;&amp; <span class="php-keyword2">count</span>(<span class="php-var">$session</span>-&gt;get(<span class="php-quote">'gmail_contacts'</span>)) &gt; <span class="php-num">0</span>) {
+</span><span id="372" class="l"><a href="#372">372: </a>        <span class="php-var">$contact_store</span>-&gt;import(<span class="php-var">$session</span>-&gt;get(<span class="php-quote">'gmail_contacts'</span>));
+</span><span id="373" class="l"><a href="#373">373: </a>        <span class="php-keyword1">return</span> <span class="php-var">$contact_store</span>;
+</span><span id="374" class="l"><a href="#374">374: </a>    }
+</span><span id="375" class="l"><a href="#375">375: </a>    <span class="php-keyword1">foreach</span>(Hm_IMAP_List::dump(<span class="php-keyword1">false</span>, <span class="php-keyword1">true</span>) <span class="php-keyword1">as</span> <span class="php-var">$id</span> =&gt; <span class="php-var">$server</span>) {
+</span><span id="376" class="l"><a href="#376">376: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$server</span>[<span class="php-quote">'server'</span>] == <span class="php-quote">'imap.gmail.com'</span> &amp;&amp; <span class="php-keyword2">array_key_exists</span>(<span class="php-quote">'auth'</span>, <span class="php-var">$server</span>) &amp;&amp; <span class="php-var">$server</span>[<span class="php-quote">'auth'</span>] == <span class="php-quote">'xoauth2'</span>) {
+</span><span id="377" class="l"><a href="#377">377: </a>            <span class="php-var">$results</span> = imap_refresh_oauth2_token(<span class="php-var">$server</span>, <span class="php-var">$config</span>);
+</span><span id="378" class="l"><a href="#378">378: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$results</span>)) {
+</span><span id="379" class="l"><a href="#379">379: </a>                <span class="php-keyword1">if</span> (Hm_IMAP_List::update_oauth2_token(<span class="php-var">$id</span>, <span class="php-var">$results</span>[<span class="php-num">1</span>], <span class="php-var">$results</span>[<span class="php-num">0</span>])) {
+</span><span id="380" class="l"><a href="#380">380: </a>                    Hm_Debug::add(<span class="php-keyword2">sprintf</span>(<span class="php-quote">'Oauth2 token refreshed for IMAP server id %d'</span>, <span class="php-var">$id</span>));
+</span><span id="381" class="l"><a href="#381">381: </a>                    <span class="php-var">$server</span> = Hm_IMAP_List::dump(<span class="php-var">$id</span>, <span class="php-keyword1">true</span>);
+</span><span id="382" class="l"><a href="#382">382: </a>                }
+</span><span id="383" class="l"><a href="#383">383: </a>            }
+</span><span id="384" class="l"><a href="#384">384: </a>            <span class="php-var">$url</span> = <span class="php-quote">'https://www.google.com/m8/feeds/contacts/'</span>.<span class="php-var">$server</span>[<span class="php-quote">'user'</span>].<span class="php-quote">'/full'</span>;
+</span><span id="385" class="l"><a href="#385">385: </a>            <span class="php-var">$contacts</span> = parse_contact_xml(gmail_contacts_request(<span class="php-var">$server</span>[<span class="php-quote">'pass'</span>], <span class="php-var">$url</span>), <span class="php-var">$server</span>[<span class="php-quote">'name'</span>]);
+</span><span id="386" class="l"><a href="#386">386: </a>            <span class="php-keyword1">if</span> (!<span class="php-keyword1">empty</span>(<span class="php-var">$contacts</span>)) {
+</span><span id="387" class="l"><a href="#387">387: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$session</span>) {
+</span><span id="388" class="l"><a href="#388">388: </a>                    <span class="php-var">$session</span>-&gt;set(<span class="php-quote">'gmail_contacts'</span>, <span class="php-var">$contacts</span>);
+</span><span id="389" class="l"><a href="#389">389: </a>                }
+</span><span id="390" class="l"><a href="#390">390: </a>                <span class="php-var">$contact_store</span>-&gt;import(<span class="php-var">$contacts</span>);
+</span><span id="391" class="l"><a href="#391">391: </a>            }
+</span><span id="392" class="l"><a href="#392">392: </a>        }
+</span><span id="393" class="l"><a href="#393">393: </a>    }
+</span><span id="394" class="l"><a href="#394">394: </a>    <span class="php-keyword1">return</span> <span class="php-var">$contact_store</span>;
+</span><span id="395" class="l"><a href="#395">395: </a>}
+</span><span id="396" class="l"><a href="#396">396: </a>
+</span><span id="397" class="l"><a href="#397">397: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1747,6 +1758,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?3fc138aaa0bd2e0a886375737bff5ea06dbdda16"></script>
+<script src="elementlist.js?0eaa31e66e066dbb27625844409261a05eef9077"></script>
 </body>
 </html>
