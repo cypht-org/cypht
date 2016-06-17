@@ -32,16 +32,6 @@ add_handler('servers', 'save_pop3_servers', true, 'pop3', 'add_pop3_servers_to_p
 add_output('servers', 'add_pop3_server_dialog', true, 'pop3', 'server_content_start', 'after');
 add_output('servers', 'display_configured_pop3_servers', true, 'pop3', 'add_pop3_server_dialog', 'after');
 
-/* settings page */
-add_handler('settings', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
-add_handler('settings', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
-add_handler('settings', 'process_pop3_limit_setting', true, 'pop3', 'save_user_settings', 'before');
-add_handler('settings', 'process_pop3_since_setting', true, 'pop3', 'save_user_settings', 'before');
-add_output('settings', 'start_pop3_settings', true, 'pop3', 'end_settings_form', 'before');
-add_output('settings', 'pop3_since_setting', true, 'pop3', 'start_pop3_settings', 'after');
-add_output('settings', 'pop3_limit_setting', true, 'pop3', 'pop3_since_setting', 'after');
-
-
 /* compose page */
 add_handler('compose', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('compose', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');

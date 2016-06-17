@@ -25,69 +25,15 @@ class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
                 $this->out('list_path', $path, false);
                 $details = Hm_POP3_List::dump($matches[1]);
                 if (!empty($details)) {
+                    $this->out('list_meta', false);
                     $this->out('mailbox_list_title', array('POP3', $details['name'], 'INBOX'));
-                    $this->out('message_list_since', $this->user_config->get('pop3_since', DEFAULT_SINCE));
-                    $this->out('per_source_limit', $this->user_config->get('pop3_limit', DEFAULT_SINCE));
+					$this->out('custom_list_controls', ' ');
                 }
             }
         }
         if (array_key_exists('page', $this->request->get) && $this->request->get['page'] == 'search') {
             $this->out('list_path', 'search', false);
         }
-    }
-}
-
-/**
- * Process the setting for the max number of POP3 messages per server
- * @subpackage pop3/handler
- */
-class Hm_Handler_process_pop3_limit_setting extends Hm_Handler_Module {
-    /**
-     * Called when submitting settings
-     */
-    public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'pop3_limit'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            if ($form['pop3_limit'] > MAX_PER_SOURCE || $form['pop3_limit'] < 0) {
-                $limit = DEFAULT_PER_SOURCE;
-            }
-            else {
-                $limit = $form['pop3_limit'];
-            }
-            $new_settings['pop3_limit'] = $limit;
-        }
-        else {
-            $settings['pop3_limit'] = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
-    }
-}
-
-/**
- * Process the message since setting per POP3 account
- * @subpackage pop3/handler
- */
-class Hm_Handler_process_pop3_since_setting extends Hm_Handler_Module {
-    /**
-     * Called when submitting settings
-     */
-    public function process() {
-        list($success, $form) = $this->process_form(array('save_settings', 'pop3_since'));
-        $new_settings = $this->get('new_user_settings', array());
-        $settings = $this->get('user_settings', array());
-
-        if ($success) {
-            $new_settings['pop3_since'] = process_since_argument($form['pop3_since'], true);
-        }
-        else {
-            $settings['pop3_since'] = $this->user_config->get('pop3_since', false);
-        }
-        $this->out('new_user_settings', $new_settings, false);
-        $this->out('user_settings', $settings, false);
     }
 }
 
@@ -170,7 +116,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $page = $this->request->get['list_page'];
             }
             if (array_key_exists('pop3_search', $this->request->post)) {
-                $limit = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
+                $limit = DEFAULT_PER_SOURCE;
                 $terms = $this->session->get('search_terms', false);
                 $since = $this->session->get('search_since', DEFAULT_SINCE);
                 $fld = $this->session->get('search_fld', 'TEXT');
@@ -197,7 +143,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $cutoff_timestamp = strtotime($date);
             }
             else {
-                $limit = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
+                $limit = DEFAULT_PER_SOURCE;
                 $date = false;
                 $cutoff_timestamp = strtotime($date);
             }
@@ -857,58 +803,6 @@ class Hm_Output_display_pop3_status extends Hm_Output_Module {
                 '<td class="pop3_detail_'.$index.'"></td></tr>';
         }
         return $res;
-    }
-}
-
-/**
- * Format the start of the POP3 section of the settings page
- * @subpackage pop3/output
- */
-class Hm_Output_start_pop3_settings extends Hm_Output_Module {
-    /**
-     * Build the HTML for the heading of the POP3 settings section
-     */
-    protected function output() {
-        return '<tr><td data-target=".pop3_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" />'.$this->trans('POP3 Settings').'</td></tr>';
-    }
-}
-
-/**
- * Format the message since setting on the settings page
- * @subpackage pop3/output
- */
-class Hm_Output_pop3_since_setting extends Hm_Output_Module {
-    /**
-     * Build the HTML for the message since setting
-     */
-    protected function output() {
-        $since = false;
-        $settings = $this->get('user_settings', array());
-        if (array_key_exists('pop3_since', $settings)) {
-            $since = $settings['pop3_since'];
-        }
-        return '<tr class="pop3_setting"><td><label for="pop3_since">'.$this->trans('Show messages received since').'</label></td>'.
-            '<td>'.message_since_dropdown($since, 'pop3_since', $this).'</td></tr>';
-    }
-}
-
-/**
- * Format the message limit setting
- * @subpackage pop3/output
- */
-class Hm_Output_pop3_limit_setting extends Hm_Output_Module {
-    /**
-     * Build the HTML for the message limit setting
-     */
-    protected function output() {
-        $limit = DEFAULT_PER_SOURCE;
-        $settings = $this->get('user_settings', array());
-        if (array_key_exists('pop3_limit', $settings)) {
-            $limit = $settings['pop3_limit'];
-        }
-        return '<tr class="pop3_setting"><td><label for="pop3_limit">'.$this->trans('Max messages to display').'</label></td>'.
-            '<td><input type="text" id="pop3_limit" name="pop3_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
 
