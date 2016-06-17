@@ -9,6 +9,42 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * @subpackage keyboard_shortcuts/handler
+ */
+class Hm_Handler_get_shortcut_setting extends Hm_Handler_Module {
+    public function process() {
+        $this->out('shortcuts_enabled', $this->user_config->get('enable_keyboard_shortcuts_setting', false));
+    }
+}
+
+/**
+ * @subpackage keyboard_shortcuts/handler
+ */
+class Hm_Handler_process_enable_shortcut_setting extends Hm_Handler_Module {
+    public function process() {
+        function shortcut_enabled_callback($val) { return $val; }
+        process_site_setting('enable_keyboard_shortcuts', $this, 'shortcut_enabled_callback', false, true);
+    }
+}
+
+/**
+ * @subpackage keyboard_shortcuts/output
+ */
+class Hm_Output_enable_shortcut_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('enable_keyboard_shortcuts', $settings) && $settings['enable_keyboard_shortcuts']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $checked = '';
+        }
+        return '<tr class="general_setting"><td><label for="enable_keyboard_shortcuts">'.$this->trans('Enable keyboard shortcuts').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' value="1" id="enable_keyboard_shortcuts" name="enable_keyboard_shortcuts" /></td></tr>';
+    }
+}
+
+/**
  * @subpackage keyboard_shortcuts/output
  */
 class Hm_Output_start_shortcuts_page extends Hm_Output_Module {
@@ -63,13 +99,15 @@ class Hm_Output_shortcuts_content extends Hm_Output_Module {
  */
 class Hm_Output_shortcuts_page_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_shortcuts"><a class="unread_link" href="?page=shortcuts">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
-            '" alt="" width="16" height="16" /> '.$this->trans('Shortcuts').'</a></li>';
-        if ($this->format == 'HTML5') {
-            return $res;
+        if ($this->get('shortcuts_enabled')) {
+            $res = '<li class="menu_shortcuts"><a class="unread_link" href="?page=shortcuts">'.
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
+                '" alt="" width="16" height="16" /> '.$this->trans('Shortcuts').'</a></li>';
+            if ($this->format == 'HTML5') {
+                return $res;
+            }
+            $this->concat('formatted_folder_list', $res);
         }
-        $this->concat('formatted_folder_list', $res);
     }
 }
 
