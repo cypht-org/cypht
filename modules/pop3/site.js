@@ -74,6 +74,9 @@ var pop3_delete_action = function(event) {
 var display_pop3_mailbox = function(res) {
     var ids = [res.pop3_server_id];
     Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
+    if (res.page_links) {
+        $('.page_links').html(res.page_links);
+    }
     var key = 'pop3_'+res.pop3_server_id;
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');

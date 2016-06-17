@@ -164,7 +164,11 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             if ($login_time) {
                 $this->out('login_time', $login_time);
             }
+            $page = 0;
             $terms = false;
+            if (array_key_exists('list_page', $this->request->get)) {
+                $page = $this->request->get['list_page'];
+            }
             if (array_key_exists('pop3_search', $this->request->post)) {
                 $limit = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
                 $terms = $this->session->get('search_terms', false);
@@ -202,7 +206,13 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
             if ($pop3->state == 'authed') {
                 $this->out('pop3_mailbox_page_path', $path);
-                $list = array_slice(array_reverse(array_unique(array_keys($pop3->mlist()))), 0, $limit);
+                $list = $pop3->mlist();
+                $list = array_reverse(array_unique(array_keys($list)));
+                $total = count($list);
+                $list = array_slice($list, $page, $limit);
+                if ($page == 0) {
+                    $page = 1;
+                }
                 foreach ($list as $id) {
                     $msg_headers = $pop3->msg_headers($id);
                     if (!empty($msg_headers)) {
@@ -227,6 +237,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 }
                 $this->out('pop3_mailbox_page', $msgs);
                 $this->out('pop3_server_id', $form['pop3_server_id']);
+                $this->out('page_links', build_page_links($limit, $page, $total, $path));
             }
         }
     }
