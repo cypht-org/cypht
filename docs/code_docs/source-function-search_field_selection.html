@@ -879,8 +879,6 @@
 				<li><a href="class-Hm_Handler_process_nux_add_service.html">Hm_Handler_process_nux_add_service</a></li>
 				<li><a href="class-Hm_Handler_process_nux_service.html">Hm_Handler_process_nux_service</a></li>
 				<li><a href="class-Hm_Handler_process_oauth2_authorization.html">Hm_Handler_process_oauth2_authorization</a></li>
-				<li><a href="class-Hm_Handler_process_pop3_limit_setting.html">Hm_Handler_process_pop3_limit_setting</a></li>
-				<li><a href="class-Hm_Handler_process_pop3_since_setting.html">Hm_Handler_process_pop3_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_profile_update.html">Hm_Handler_process_profile_update</a></li>
 				<li><a href="class-Hm_Handler_process_save_form.html">Hm_Handler_process_save_form</a></li>
 				<li><a href="class-Hm_Handler_process_search_terms.html">Hm_Handler_process_search_terms</a></li>
@@ -1092,9 +1090,7 @@
 				<li><a href="class-Hm_Output_nux_help.html">Hm_Output_nux_help</a></li>
 				<li><a href="class-Hm_Output_nux_message_list_notice.html">Hm_Output_nux_message_list_notice</a></li>
 				<li><a href="class-Hm_Output_page_js.html">Hm_Output_page_js</a></li>
-				<li><a href="class-Hm_Output_pop3_limit_setting.html">Hm_Output_pop3_limit_setting</a></li>
 				<li><a href="class-Hm_Output_pop3_server_ids.html">Hm_Output_pop3_server_ids</a></li>
-				<li><a href="class-Hm_Output_pop3_since_setting.html">Hm_Output_pop3_since_setting</a></li>
 				<li><a href="class-Hm_Output_profile_content.html">Hm_Output_profile_content</a></li>
 				<li><a href="class-Hm_Output_profile_edit_form.html">Hm_Output_profile_edit_form</a></li>
 				<li><a href="class-Hm_Output_profile_page_link.html">Hm_Output_profile_page_link</a></li>
@@ -1131,7 +1127,6 @@
 				<li><a href="class-Hm_Output_start_feed_settings.html">Hm_Output_start_feed_settings</a></li>
 				<li><a href="class-Hm_Output_start_flagged_settings.html">Hm_Output_start_flagged_settings</a></li>
 				<li><a href="class-Hm_Output_start_general_settings.html">Hm_Output_start_general_settings</a></li>
-				<li><a href="class-Hm_Output_start_pop3_settings.html">Hm_Output_start_pop3_settings</a></li>
 				<li><a href="class-Hm_Output_start_settings_form.html">Hm_Output_start_settings_form</a></li>
 				<li><a href="class-Hm_Output_start_shortcuts_page.html">Hm_Output_start_shortcuts_page</a></li>
 				<li><a href="class-Hm_Output_start_unread_settings.html">Hm_Output_start_unread_settings</a></li>
@@ -1775,7 +1770,61 @@
 </span><span id="419" class="l"><a href="#419">419: </a>    <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
 </span><span id="420" class="l"><a href="#420">420: </a>}
 </span><span id="421" class="l"><a href="#421">421: </a>
-</span><span id="422" class="l"><a href="#422">422: </a></span></code></pre>
+</span><span id="422" class="l"><a href="#422">422: </a><span class="php-comment">/**
+</span></span><span id="423" class="l"><a href="#423">423: </a><span class="php-comment"> * Build pagination links for a list of messages
+</span></span><span id="424" class="l"><a href="#424">424: </a><span class="php-comment"> * @subpackage core/functions
+</span></span><span id="425" class="l"><a href="#425">425: </a><span class="php-comment"> * @param int $page_size number of messages per page
+</span></span><span id="426" class="l"><a href="#426">426: </a><span class="php-comment"> * @param int $current current page number
+</span></span><span id="427" class="l"><a href="#427">427: </a><span class="php-comment"> * @param int $total number of messages total
+</span></span><span id="428" class="l"><a href="#428">428: </a><span class="php-comment"> * @param string $path list path
+</span></span><span id="429" class="l"><a href="#429">429: </a><span class="php-comment"> * @return string
+</span></span><span id="430" class="l"><a href="#430">430: </a><span class="php-comment"> */</span>
+</span><span id="431" class="l"><a href="#431">431: </a><span class="php-keyword1">function</span> build_page_links(<span class="php-var">$page_size</span>, <span class="php-var">$current_page</span>, <span class="php-var">$total</span>, <span class="php-var">$path</span>) {
+</span><span id="432" class="l"><a href="#432">432: </a>    <span class="php-var">$links</span> = <span class="php-quote">''</span>;
+</span><span id="433" class="l"><a href="#433">433: </a>    <span class="php-var">$first</span> = <span class="php-quote">''</span>;
+</span><span id="434" class="l"><a href="#434">434: </a>    <span class="php-var">$last</span> = <span class="php-quote">''</span>;
+</span><span id="435" class="l"><a href="#435">435: </a>    <span class="php-var">$display_links</span> = <span class="php-num">10</span>;
+</span><span id="436" class="l"><a href="#436">436: </a>    <span class="php-var">$max_pages</span> = <span class="php-keyword2">ceil</span>(<span class="php-var">$total</span>/<span class="php-var">$page_size</span>);
+</span><span id="437" class="l"><a href="#437">437: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$max_pages</span> == <span class="php-num">1</span>) {
+</span><span id="438" class="l"><a href="#438">438: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
+</span><span id="439" class="l"><a href="#439">439: </a>    }
+</span><span id="440" class="l"><a href="#440">440: </a>    <span class="php-var">$floor</span> = (<span class="php-var">$current_page</span> - <span class="php-num">1</span>) - <span class="php-keyword2">intval</span>(<span class="php-var">$display_links</span>/<span class="php-num">2</span>);
+</span><span id="441" class="l"><a href="#441">441: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$floor</span> &lt; <span class="php-num">0</span>) {
+</span><span id="442" class="l"><a href="#442">442: </a>        <span class="php-var">$floor</span> = <span class="php-num">1</span>;
+</span><span id="443" class="l"><a href="#443">443: </a>    }
+</span><span id="444" class="l"><a href="#444">444: </a>    <span class="php-var">$ceil</span> = <span class="php-var">$floor</span> + <span class="php-var">$display_links</span>;
+</span><span id="445" class="l"><a href="#445">445: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$ceil</span> &gt; <span class="php-var">$max_pages</span>) {
+</span><span id="446" class="l"><a href="#446">446: </a>        <span class="php-var">$floor</span> -= (<span class="php-var">$ceil</span> - <span class="php-var">$max_pages</span>);
+</span><span id="447" class="l"><a href="#447">447: </a>    }
+</span><span id="448" class="l"><a href="#448">448: </a>    <span class="php-var">$prev</span> = <span class="php-quote">'&lt;a class=&quot;disabled_link&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret_left</span>.<span class="php-quote">'&quot; alt=&quot;&amp;larr;&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="449" class="l"><a href="#449">449: </a>    <span class="php-var">$next</span> = <span class="php-quote">'&lt;a class=&quot;disabled_link&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret_right</span>.<span class="php-quote">'&quot; alt=&quot;&amp;rarr;&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="450" class="l"><a href="#450">450: </a>
+</span><span id="451" class="l"><a href="#451">451: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$floor</span> &gt; <span class="php-num">1</span> ) {
+</span><span id="452" class="l"><a href="#452">452: </a>        <span class="php-var">$first</span> = <span class="php-quote">'&lt;a href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-var">$path</span>).<span class="php-quote">'&amp;amp;list_page=1&quot;&gt;1&lt;/a&gt; ... '</span>;
+</span><span id="453" class="l"><a href="#453">453: </a>    }
+</span><span id="454" class="l"><a href="#454">454: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$ceil</span> &lt; <span class="php-var">$max_pages</span>) {
+</span><span id="455" class="l"><a href="#455">455: </a>        <span class="php-var">$last</span> = <span class="php-quote">' ... &lt;a href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-var">$path</span>).<span class="php-quote">'&amp;amp;list_page='</span>.<span class="php-var">$max_pages</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$max_pages</span>.<span class="php-quote">'&lt;/a&gt;'</span>;
+</span><span id="456" class="l"><a href="#456">456: </a>    }
+</span><span id="457" class="l"><a href="#457">457: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$current_page</span> &gt; <span class="php-num">1</span>) {
+</span><span id="458" class="l"><a href="#458">458: </a>        <span class="php-var">$prev</span> = <span class="php-quote">'&lt;a href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-var">$path</span>).<span class="php-quote">'&amp;amp;list_page='</span>.(<span class="php-var">$current_page</span> - <span class="php-num">1</span>).<span class="php-quote">'&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret_left</span>.<span class="php-quote">'&quot; alt=&quot;&amp;larr;&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="459" class="l"><a href="#459">459: </a>    }
+</span><span id="460" class="l"><a href="#460">460: </a>    <span class="php-keyword1">if</span> (<span class="php-var">$max_pages</span> &gt; <span class="php-num">1</span> &amp;&amp; <span class="php-var">$current_page</span> &lt; <span class="php-var">$max_pages</span>) {
+</span><span id="461" class="l"><a href="#461">461: </a>        <span class="php-var">$next</span> = <span class="php-quote">'&lt;a href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-var">$path</span>).<span class="php-quote">'&amp;amp;list_page='</span>.(<span class="php-var">$current_page</span> + <span class="php-num">1</span>).<span class="php-quote">'&quot;&gt;&lt;img src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret_right</span>.<span class="php-quote">'&quot; alt=&quot;&amp;rarr;&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="462" class="l"><a href="#462">462: </a>    }
+</span><span id="463" class="l"><a href="#463">463: </a>    <span class="php-keyword1">for</span> (<span class="php-var">$i</span>=<span class="php-num">1</span>;<span class="php-var">$i</span>&lt;=<span class="php-var">$max_pages</span>;<span class="php-var">$i</span>++) {
+</span><span id="464" class="l"><a href="#464">464: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$i</span> &lt; <span class="php-var">$floor</span> || <span class="php-var">$i</span> &gt; <span class="php-var">$ceil</span>) {
+</span><span id="465" class="l"><a href="#465">465: </a>            <span class="php-keyword1">continue</span>;
+</span><span id="466" class="l"><a href="#466">466: </a>        }
+</span><span id="467" class="l"><a href="#467">467: </a>        <span class="php-var">$links</span> .= <span class="php-quote">' &lt;a '</span>;
+</span><span id="468" class="l"><a href="#468">468: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$i</span> == <span class="php-var">$current_page</span>) {
+</span><span id="469" class="l"><a href="#469">469: </a>            <span class="php-var">$links</span> .= <span class="php-quote">'class=&quot;current_page&quot; '</span>;
+</span><span id="470" class="l"><a href="#470">470: </a>        }
+</span><span id="471" class="l"><a href="#471">471: </a>        <span class="php-var">$links</span> .= <span class="php-quote">'href=&quot;?page=message_list&amp;amp;list_path='</span>.<span class="php-keyword2">urlencode</span>(<span class="php-var">$path</span>).<span class="php-quote">'&amp;amp;list_page='</span>.<span class="php-var">$i</span>.<span class="php-quote">'&quot;&gt;'</span>.<span class="php-var">$i</span>.<span class="php-quote">'&lt;/a&gt;'</span>;
+</span><span id="472" class="l"><a href="#472">472: </a>    }
+</span><span id="473" class="l"><a href="#473">473: </a>    <span class="php-keyword1">return</span> <span class="php-var">$prev</span>.<span class="php-quote">' '</span>.<span class="php-var">$first</span>.<span class="php-var">$links</span>.<span class="php-var">$last</span>.<span class="php-quote">' '</span>.<span class="php-var">$next</span>;
+</span><span id="474" class="l"><a href="#474">474: </a>}
+</span><span id="475" class="l"><a href="#475">475: </a>
+</span><span id="476" class="l"><a href="#476">476: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -1783,6 +1832,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?0eaa31e66e066dbb27625844409261a05eef9077"></script>
+<script src="elementlist.js?efdb1e11728e39bb13ff228064de4f5af843caa5"></script>
 </body>
 </html>

@@ -713,23 +713,54 @@
 
 			<h3>Functions</h3>
 			<ul>
-				<li><a href="function-add_attached_images.html">add_attached_images</a></li>
 				<li class="active"><a href="function-build_page_links.html">build_page_links</a></li>
-				<li><a href="function-format_imap_folder_section.html">format_imap_folder_section</a></li>
-				<li><a href="function-format_imap_message_list.html">format_imap_message_list</a></li>
-				<li><a href="function-format_msg_part_row.html">format_msg_part_row</a></li>
-				<li><a href="function-format_msg_part_section.html">format_msg_part_section</a></li>
-				<li><a href="function-get_imap_mime_extension.html">get_imap_mime_extension</a></li>
-				<li><a href="function-get_imap_part_name.html">get_imap_part_name</a></li>
-				<li><a href="function-imap_data_sources.html">imap_data_sources</a></li>
-				<li><a href="function-imap_move_different_server.html">imap_move_different_server</a></li>
-				<li><a href="function-imap_move_same_server.html">imap_move_same_server</a></li>
-				<li><a href="function-imap_refresh_oauth2_token.html">imap_refresh_oauth2_token</a></li>
-				<li><a href="function-merge_imap_search_results.html">merge_imap_search_results</a></li>
-				<li><a href="function-prepare_imap_message_list.html">prepare_imap_message_list</a></li>
-				<li><a href="function-process_imap_message_ids.html">process_imap_message_ids</a></li>
-				<li><a href="function-process_move_to_arguments.html">process_move_to_arguments</a></li>
-				<li><a href="function-sort_by_internal_date.html">sort_by_internal_date</a></li>
+				<li><a href="function-checkbox_callback.html">checkbox_callback</a></li>
+				<li><a href="function-date_callback.html">date_callback</a></li>
+				<li><a href="function-display_value.html">display_value</a></li>
+				<li><a href="function-email_is_active.html">email_is_active</a></li>
+				<li><a href="function-filter_auth_servers.html">filter_auth_servers</a></li>
+				<li><a href="function-format_data_sources.html">format_data_sources</a></li>
+				<li><a href="function-format_msg_html.html">format_msg_html</a></li>
+				<li><a href="function-format_msg_image.html">format_msg_image</a></li>
+				<li><a href="function-format_msg_text.html">format_msg_text</a></li>
+				<li><a href="function-format_reply_as_html.html">format_reply_as_html</a></li>
+				<li><a href="function-format_reply_as_text.html">format_reply_as_text</a></li>
+				<li><a href="function-format_reply_fields.html">format_reply_fields</a></li>
+				<li><a href="function-format_reply_text.html">format_reply_text</a></li>
+				<li><a href="function-get_message_list_settings.html">get_message_list_settings</a></li>
+				<li><a href="function-get_oauth2_data.html">get_oauth2_data</a></li>
+				<li><a href="function-group_data_sources.html">group_data_sources</a></li>
+				<li><a href="function-human_readable_interval.html">human_readable_interval</a></li>
+				<li><a href="function-icon_callback.html">icon_callback</a></li>
+				<li><a href="function-interface_langs.html">interface_langs</a></li>
+				<li><a href="function-is_email.html">is_email</a></li>
+				<li><a href="function-list_controls.html">list_controls</a></li>
+				<li><a href="function-list_sources.html">list_sources</a></li>
+				<li><a href="function-max_source_setting_callback.html">max_source_setting_callback</a></li>
+				<li><a href="function-merge_folder_list_details.html">merge_folder_list_details</a></li>
+				<li><a href="function-message_controls.html">message_controls</a></li>
+				<li><a href="function-message_list_meta.html">message_list_meta</a></li>
+				<li><a href="function-message_list_row.html">message_list_row</a></li>
+				<li><a href="function-message_since_dropdown.html">message_since_dropdown</a></li>
+				<li><a href="function-process_since_argument.html">process_since_argument</a></li>
+				<li><a href="function-process_site_setting.html">process_site_setting</a></li>
+				<li><a href="function-reply_format_body.html">reply_format_body</a></li>
+				<li><a href="function-reply_lead_in.html">reply_lead_in</a></li>
+				<li><a href="function-reply_to_address.html">reply_to_address</a></li>
+				<li><a href="function-reply_to_id.html">reply_to_id</a></li>
+				<li><a href="function-reply_to_subject.html">reply_to_subject</a></li>
+				<li><a href="function-safe_output_callback.html">safe_output_callback</a></li>
+				<li><a href="function-save_user_settings.html">save_user_settings</a></li>
+				<li><a href="function-search_field_selection.html">search_field_selection</a></li>
+				<li><a href="function-setup_base_ajax_page.html">setup_base_ajax_page</a></li>
+				<li><a href="function-setup_base_page.html">setup_base_page</a></li>
+				<li><a href="function-since_setting_callback.html">since_setting_callback</a></li>
+				<li><a href="function-subject_callback.html">subject_callback</a></li>
+				<li><a href="function-translate_time_str.html">translate_time_str</a></li>
+				<li><a href="function-validate_domain_full.html">validate_domain_full</a></li>
+				<li><a href="function-validate_local_full.html">validate_local_full</a></li>
+				<li><a href="function-validate_search_fld.html">validate_search_fld</a></li>
+				<li><a href="function-validate_search_terms.html">validate_search_terms</a></li>
 			</ul>
 		</div>
 	</div>
@@ -779,25 +810,35 @@
 
 
 	<div class="description">
-	<p>Build pagination links for an IMAP folder page</p>
+	<p>Build pagination links for a list of messages</p>
 	</div>
 
 	<div class="info">
 		
-		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.imap.html">imap</a>\<a href="package-modules.imap.functions.html">functions</a><br>
+		<b>Package:</b> <a href="package-modules.html">modules</a>\<a href="package-modules.core.html">core</a>\<a href="package-modules.core.functions.html">functions</a><br>
 		<b>Located at</b>
-		<a href="source-function-build_page_links.html#1847-1899" title="Go to source code">
-			imap/modules.php
+		<a href="source-function-build_page_links.html#422-474" title="Go to source code">
+			core/message_list_functions.php
 		</a><br>
 	</div>
 
 
 	<table class="summary" id="parameters">
 	<caption>Parameters summary</caption>
-	<tr id="$detail">
-		<td class="name"><code>array</code></td>
-		<td class="value"><code><var>$detail</var></code></td>
-		<td>folder details</td>
+	<tr id="$page_size">
+		<td class="name"><code>integer</code></td>
+		<td class="value"><code><var>$page_size</var></code></td>
+		<td>number of messages per page</td>
+	</tr>
+	<tr id="$current_page">
+		<td class="name"><code>integer</code></td>
+		<td class="value"><code><var>$current_page</var></code></td>
+		<td>$current current page number</td>
+	</tr>
+	<tr id="$total">
+		<td class="name"><code>integer</code></td>
+		<td class="value"><code><var>$total</var></code></td>
+		<td>number of messages total</td>
 	</tr>
 	<tr id="$path">
 		<td class="name"><code>string</code></td>
@@ -827,6 +868,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?0eaa31e66e066dbb27625844409261a05eef9077"></script>
+<script src="elementlist.js?efdb1e11728e39bb13ff228064de4f5af843caa5"></script>
 </body>
 </html>

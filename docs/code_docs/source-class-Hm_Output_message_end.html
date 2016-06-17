@@ -879,8 +879,6 @@
 				<li><a href="class-Hm_Handler_process_nux_add_service.html">Hm_Handler_process_nux_add_service</a></li>
 				<li><a href="class-Hm_Handler_process_nux_service.html">Hm_Handler_process_nux_service</a></li>
 				<li><a href="class-Hm_Handler_process_oauth2_authorization.html">Hm_Handler_process_oauth2_authorization</a></li>
-				<li><a href="class-Hm_Handler_process_pop3_limit_setting.html">Hm_Handler_process_pop3_limit_setting</a></li>
-				<li><a href="class-Hm_Handler_process_pop3_since_setting.html">Hm_Handler_process_pop3_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_profile_update.html">Hm_Handler_process_profile_update</a></li>
 				<li><a href="class-Hm_Handler_process_save_form.html">Hm_Handler_process_save_form</a></li>
 				<li><a href="class-Hm_Handler_process_search_terms.html">Hm_Handler_process_search_terms</a></li>
@@ -1092,9 +1090,7 @@
 				<li><a href="class-Hm_Output_nux_help.html">Hm_Output_nux_help</a></li>
 				<li><a href="class-Hm_Output_nux_message_list_notice.html">Hm_Output_nux_message_list_notice</a></li>
 				<li><a href="class-Hm_Output_page_js.html">Hm_Output_page_js</a></li>
-				<li><a href="class-Hm_Output_pop3_limit_setting.html">Hm_Output_pop3_limit_setting</a></li>
 				<li><a href="class-Hm_Output_pop3_server_ids.html">Hm_Output_pop3_server_ids</a></li>
-				<li><a href="class-Hm_Output_pop3_since_setting.html">Hm_Output_pop3_since_setting</a></li>
 				<li><a href="class-Hm_Output_profile_content.html">Hm_Output_profile_content</a></li>
 				<li><a href="class-Hm_Output_profile_edit_form.html">Hm_Output_profile_edit_form</a></li>
 				<li><a href="class-Hm_Output_profile_page_link.html">Hm_Output_profile_page_link</a></li>
@@ -1131,7 +1127,6 @@
 				<li><a href="class-Hm_Output_start_feed_settings.html">Hm_Output_start_feed_settings</a></li>
 				<li><a href="class-Hm_Output_start_flagged_settings.html">Hm_Output_start_flagged_settings</a></li>
 				<li><a href="class-Hm_Output_start_general_settings.html">Hm_Output_start_general_settings</a></li>
-				<li><a href="class-Hm_Output_start_pop3_settings.html">Hm_Output_start_pop3_settings</a></li>
 				<li><a href="class-Hm_Output_start_settings_form.html">Hm_Output_start_settings_form</a></li>
 				<li><a href="class-Hm_Output_start_shortcuts_page.html">Hm_Output_start_shortcuts_page</a></li>
 				<li><a href="class-Hm_Output_start_unread_settings.html">Hm_Output_start_unread_settings</a></li>
@@ -2683,44 +2678,47 @@
 </span><span id="1327" class="l"><a href="#1327">1327: </a>            <span class="php-keyword1">else</span> {
 </span><span id="1328" class="l"><a href="#1328">1328: </a>                <span class="php-var">$path</span> = <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>);
 </span><span id="1329" class="l"><a href="#1329">1329: </a>            }
-</span><span id="1330" class="l"><a href="#1330">1330: </a>            <span class="php-var">$config_link</span> = <span class="php-quote">'&lt;a title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Configure'</span>).<span class="php-quote">'&quot; href=&quot;?page=settings#'</span>.<span class="php-var">$path</span>.<span class="php-quote">'_setting&quot;&gt;&lt;img alt=&quot;Configure&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$cog</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
-</span><span id="1331" class="l"><a href="#1331">1331: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">'&lt;a class=&quot;refresh_link&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Refresh'</span>).<span class="php-quote">'&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;Refresh&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$refresh</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
-</span><span id="1332" class="l"><a href="#1332">1332: </a>
-</span><span id="1333" class="l"><a href="#1333">1333: </a>        }
-</span><span id="1334" class="l"><a href="#1334">1334: </a>        <span class="php-keyword1">else</span> {
-</span><span id="1335" class="l"><a href="#1335">1335: </a>            <span class="php-var">$config_link</span> = <span class="php-quote">''</span>;
-</span><span id="1336" class="l"><a href="#1336">1336: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">''</span>;
-</span><span id="1337" class="l"><a href="#1337">1337: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">''</span>;
-</span><span id="1338" class="l"><a href="#1338">1338: </a>        }
-</span><span id="1339" class="l"><a href="#1339">1339: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
-</span><span id="1340" class="l"><a href="#1340">1340: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;message_list '</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>)).<span class="php-quote">'_list&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>;
-</span><span id="1341" class="l"><a href="#1341">1341: </a>        <span class="php-var">$res</span> .= message_controls(<span class="php-var">$this</span>).<span class="php-quote">'&lt;div class=&quot;mailbox_list_title&quot;&gt;'</span>.
-</span><span id="1342" class="l"><a href="#1342">1342: </a>            <span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;'</span>, <span class="php-keyword2">array_map</span>( <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;trans(<span class="php-var">$v</span>); },
-</span><span id="1343" class="l"><a href="#1343">1343: </a>                <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>()))).<span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1344" class="l"><a href="#1344">1344: </a>        <span class="php-var">$res</span> .= list_controls(<span class="php-var">$refresh_link</span>, <span class="php-var">$config_link</span>, <span class="php-var">$source_link</span>);
-</span><span id="1345" class="l"><a href="#1345">1345: </a>        <span class="php-var">$res</span> .= message_list_meta(<span class="php-var">$this</span>-&gt;module_output(), <span class="php-var">$this</span>);
-</span><span id="1346" class="l"><a href="#1346">1346: </a>        <span class="php-var">$res</span> .= list_sources(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'data_sources'</span>, <span class="php-keyword1">array</span>()), <span class="php-var">$this</span>);
-</span><span id="1347" class="l"><a href="#1347">1347: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
-</span><span id="1348" class="l"><a href="#1348">1348: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1349" class="l"><a href="#1349">1349: </a>    }
-</span><span id="1350" class="l"><a href="#1350">1350: </a>}
-</span><span id="1351" class="l"><a href="#1351">1351: </a>
-</span><span id="1352" class="l"><a href="#1352">1352: </a><span class="php-comment">/**
-</span></span><span id="1353" class="l"><a href="#1353">1353: </a><span class="php-comment"> * End a message list table
-</span></span><span id="1354" class="l"><a href="#1354">1354: </a><span class="php-comment"> * @subpackage core/output
-</span></span><span id="1355" class="l"><a href="#1355">1355: </a><span class="php-comment"> */</span>
-</span><span id="1356" class="l"><a href="#1356">1356: </a><span class="php-keyword1">class</span> Hm_Output_message_list_end <span class="php-keyword1">extends</span> Hm_Output_Module {
-</span><span id="1357" class="l"><a href="#1357">1357: </a>    <span class="php-comment">/**
-</span></span><span id="1358" class="l"><a href="#1358">1358: </a><span class="php-comment">     * Close the table opened in Hm_Output_message_list_start
-</span></span><span id="1359" class="l"><a href="#1359">1359: </a><span class="php-comment">     */</span>
-</span><span id="1360" class="l"><a href="#1360">1360: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
-</span><span id="1361" class="l"><a href="#1361">1361: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/tbody&gt;&lt;/table&gt;&lt;div class=&quot;page_links&quot;&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
-</span><span id="1362" class="l"><a href="#1362">1362: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
-</span><span id="1363" class="l"><a href="#1363">1363: </a>    }
-</span><span id="1364" class="l"><a href="#1364">1364: </a>}
-</span><span id="1365" class="l"><a href="#1365">1365: </a>
-</span><span id="1366" class="l"><a href="#1366">1366: </a>
-</span><span id="1367" class="l"><a href="#1367">1367: </a></span></code></pre>
+</span><span id="1330" class="l"><a href="#1330">1330: </a>            <span class="php-keyword1">if</span> (<span class="php-keyword2">substr</span>(<span class="php-var">$path</span>, <span class="php-num">0</span>, <span class="php-num">4</span>) == <span class="php-quote">'pop3'</span>) {
+</span><span id="1331" class="l"><a href="#1331">1331: </a>                <span class="php-var">$path</span> = <span class="php-quote">'pop3'</span>;
+</span><span id="1332" class="l"><a href="#1332">1332: </a>            }
+</span><span id="1333" class="l"><a href="#1333">1333: </a>            <span class="php-var">$config_link</span> = <span class="php-quote">'&lt;a title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Configure'</span>).<span class="php-quote">'&quot; href=&quot;?page=settings#'</span>.<span class="php-var">$path</span>.<span class="php-quote">'_setting&quot;&gt;&lt;img alt=&quot;Configure&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$cog</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="1334" class="l"><a href="#1334">1334: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">'&lt;a class=&quot;refresh_link&quot; title=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Refresh'</span>).<span class="php-quote">'&quot; href=&quot;#&quot;&gt;&lt;img alt=&quot;Refresh&quot; class=&quot;refresh_list&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$refresh</span>.<span class="php-quote">'&quot; width=&quot;20&quot; height=&quot;20&quot; /&gt;&lt;/a&gt;'</span>;
+</span><span id="1335" class="l"><a href="#1335">1335: </a>
+</span><span id="1336" class="l"><a href="#1336">1336: </a>        }
+</span><span id="1337" class="l"><a href="#1337">1337: </a>        <span class="php-keyword1">else</span> {
+</span><span id="1338" class="l"><a href="#1338">1338: </a>            <span class="php-var">$config_link</span> = <span class="php-quote">''</span>;
+</span><span id="1339" class="l"><a href="#1339">1339: </a>            <span class="php-var">$source_link</span> = <span class="php-quote">''</span>;
+</span><span id="1340" class="l"><a href="#1340">1340: </a>            <span class="php-var">$refresh_link</span> = <span class="php-quote">''</span>;
+</span><span id="1341" class="l"><a href="#1341">1341: </a>        }
+</span><span id="1342" class="l"><a href="#1342">1342: </a>        <span class="php-var">$res</span> = <span class="php-quote">''</span>;
+</span><span id="1343" class="l"><a href="#1343">1343: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div class=&quot;message_list '</span>.<span class="php-var">$this</span>-&gt;html_safe(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'list_path'</span>)).<span class="php-quote">'_list&quot;&gt;&lt;div class=&quot;content_title&quot;&gt;'</span>;
+</span><span id="1344" class="l"><a href="#1344">1344: </a>        <span class="php-var">$res</span> .= message_controls(<span class="php-var">$this</span>).<span class="php-quote">'&lt;div class=&quot;mailbox_list_title&quot;&gt;'</span>.
+</span><span id="1345" class="l"><a href="#1345">1345: </a>            <span class="php-keyword2">implode</span>(<span class="php-quote">'&lt;img class=&quot;path_delim&quot; src=&quot;'</span>.Hm_Image_Sources::<span class="php-var">$caret</span>.<span class="php-quote">'&quot; alt=&quot;&amp;gt;&quot; width=&quot;8&quot; height=&quot;8&quot; /&gt;'</span>, <span class="php-keyword2">array_map</span>( <span class="php-keyword1">function</span>(<span class="php-var">$v</span>) { <span class="php-keyword1">return</span> <span class="php-var">$this</span>-&gt;trans(<span class="php-var">$v</span>); },
+</span><span id="1346" class="l"><a href="#1346">1346: </a>                <span class="php-var">$this</span>-&gt;get(<span class="php-quote">'mailbox_list_title'</span>, <span class="php-keyword1">array</span>()))).<span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1347" class="l"><a href="#1347">1347: </a>        <span class="php-var">$res</span> .= list_controls(<span class="php-var">$refresh_link</span>, <span class="php-var">$config_link</span>, <span class="php-var">$source_link</span>);
+</span><span id="1348" class="l"><a href="#1348">1348: </a>        <span class="php-var">$res</span> .= message_list_meta(<span class="php-var">$this</span>-&gt;module_output(), <span class="php-var">$this</span>);
+</span><span id="1349" class="l"><a href="#1349">1349: </a>        <span class="php-var">$res</span> .= list_sources(<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'data_sources'</span>, <span class="php-keyword1">array</span>()), <span class="php-var">$this</span>);
+</span><span id="1350" class="l"><a href="#1350">1350: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;'</span>;
+</span><span id="1351" class="l"><a href="#1351">1351: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1352" class="l"><a href="#1352">1352: </a>    }
+</span><span id="1353" class="l"><a href="#1353">1353: </a>}
+</span><span id="1354" class="l"><a href="#1354">1354: </a>
+</span><span id="1355" class="l"><a href="#1355">1355: </a><span class="php-comment">/**
+</span></span><span id="1356" class="l"><a href="#1356">1356: </a><span class="php-comment"> * End a message list table
+</span></span><span id="1357" class="l"><a href="#1357">1357: </a><span class="php-comment"> * @subpackage core/output
+</span></span><span id="1358" class="l"><a href="#1358">1358: </a><span class="php-comment"> */</span>
+</span><span id="1359" class="l"><a href="#1359">1359: </a><span class="php-keyword1">class</span> Hm_Output_message_list_end <span class="php-keyword1">extends</span> Hm_Output_Module {
+</span><span id="1360" class="l"><a href="#1360">1360: </a>    <span class="php-comment">/**
+</span></span><span id="1361" class="l"><a href="#1361">1361: </a><span class="php-comment">     * Close the table opened in Hm_Output_message_list_start
+</span></span><span id="1362" class="l"><a href="#1362">1362: </a><span class="php-comment">     */</span>
+</span><span id="1363" class="l"><a href="#1363">1363: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> output() {
+</span><span id="1364" class="l"><a href="#1364">1364: </a>        <span class="php-var">$res</span> = <span class="php-quote">'&lt;/tbody&gt;&lt;/table&gt;&lt;div class=&quot;page_links&quot;&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
+</span><span id="1365" class="l"><a href="#1365">1365: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
+</span><span id="1366" class="l"><a href="#1366">1366: </a>    }
+</span><span id="1367" class="l"><a href="#1367">1367: </a>}
+</span><span id="1368" class="l"><a href="#1368">1368: </a>
+</span><span id="1369" class="l"><a href="#1369">1369: </a>
+</span><span id="1370" class="l"><a href="#1370">1370: </a></span></code></pre>
 
 	<div id="footer">
 		Cypht Documentation API documentation generated by <a href="http://apigen.org">ApiGen</a>
@@ -2728,6 +2726,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?0eaa31e66e066dbb27625844409261a05eef9077"></script>
+<script src="elementlist.js?efdb1e11728e39bb13ff228064de4f5af843caa5"></script>
 </body>
 </html>
