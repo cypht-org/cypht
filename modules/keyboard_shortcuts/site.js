@@ -140,32 +140,34 @@ var Keyboard_Shortcuts = {
 };
 
 $(function() {
-    var shortcuts = [
-        {'page': '*', 'control_chars': ['meta'], 'char': 69, 'action': ks_redirect, 'target': '?page=message_list&list_path=combined_inbox'},
-        {'page': '*', 'control_chars': ['meta'], 'char': 70, 'action': ks_redirect, 'target': '?page=message_list&list_path=flagged'},
-        {'page': '*', 'control_chars': ['meta'], 'char': 84, 'action': Hm_Folders.toggle_folder_list, 'target': false},
-        {'page': '*', 'control_chars': ['meta'], 'char': 72, 'action': ks_redirect, 'target': '?page=history'},
-        {'page': '*', 'control_chars': ['meta'], 'char': 83, 'action': ks_redirect, 'target': '?page=compose'},
-        {'page': '*', 'control_chars': ['meta'], 'char': 67, 'action': ks_redirect, 'target': '?page=contacts'},
-        {'page': '*', 'control_chars': ['meta'], 'char': 85, 'action': ks_redirect, 'target': '?page=message_list&list_path=unread'},
-        {'page': 'message_list', 'control_chars': [], 'char': 78, 'action': ks_next_msg_list, 'target': false},
-        {'page': 'message_list', 'control_chars': [], 'char': 80, 'action': ks_prev_msg_list, 'target': false},
-        {'page': 'message_list', 'control_chars': [], 'char': 13, 'action': ks_load_msg, 'target': false},
-        {'page': 'message_list', 'control_chars': [], 'char': 83, 'action': ks_select_msg, 'target': false},
-        {'page': 'message_list', 'control_chars': [], 'char': 65, 'action': ks_select_all, 'target': false},
-        {'page': 'message_list', 'control_chars': ['shift'], 'char': 82, 'action': ks_click_button, 'target': '.msg_read'},
-        {'page': 'message_list', 'control_chars': ['shift'], 'char': 85, 'action': ks_click_button, 'target': '.msg_unread'},
-        {'page': 'message_list', 'control_chars': ['shift'], 'char': 70, 'action': ks_click_button, 'target': '.msg_flag'},
-        {'page': 'message_list', 'control_chars': ['shift'], 'char': 69, 'action': ks_click_button, 'target': '.msg_unflag'},
-        {'page': 'message_list', 'control_chars': ['shift'], 'char': 68, 'action': ks_click_button, 'target': '.msg_delete'},
-        {'page': 'message', 'control_chars': [], 'char': 80, 'action': ks_follow_link, 'target': '.plink'},
-        {'page': 'message', 'control_chars': [], 'char': 78, 'action': ks_follow_link, 'target': '.nlink'},
-        {'page': 'message', 'control_chars': [], 'char': 82, 'action': ks_follow_link, 'target': '.reply_link'},
-        {'page': 'message', 'control_chars': ['shift'], 'char': 70, 'action': ks_follow_link, 'target': '.forward_link'},
-        {'page': 'message', 'control_chars': [], 'char': 85, 'action': ks_click_button, 'target': '.unflagged_link'},
-        {'page': 'message', 'control_chars': [], 'char': 70, 'action': ks_click_button, 'target': '.flagged_link'},
-        {'page': 'message', 'control_chars': [], 'char': 68, 'action': ks_click_button, 'target': '.delete_link'},
-        {'page': 'message', 'control_chars': ['shift'], 'char': 82, 'action': ks_follow_link, 'target': '.reply_all_link'}
-    ];
-    $(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
+    if ($('.menu_shortcuts').length) {
+        var shortcuts = [
+            {'page': '*', 'control_chars': ['meta'], 'char': 69, 'action': ks_redirect, 'target': '?page=message_list&list_path=combined_inbox'},
+            {'page': '*', 'control_chars': ['meta'], 'char': 70, 'action': ks_redirect, 'target': '?page=message_list&list_path=flagged'},
+            {'page': '*', 'control_chars': ['meta'], 'char': 84, 'action': Hm_Folders.toggle_folder_list, 'target': false},
+            {'page': '*', 'control_chars': ['meta'], 'char': 72, 'action': ks_redirect, 'target': '?page=history'},
+            {'page': '*', 'control_chars': ['meta'], 'char': 83, 'action': ks_redirect, 'target': '?page=compose'},
+            {'page': '*', 'control_chars': ['meta'], 'char': 67, 'action': ks_redirect, 'target': '?page=contacts'},
+            {'page': '*', 'control_chars': ['meta'], 'char': 85, 'action': ks_redirect, 'target': '?page=message_list&list_path=unread'},
+            {'page': 'message_list', 'control_chars': [], 'char': 78, 'action': ks_next_msg_list, 'target': false},
+            {'page': 'message_list', 'control_chars': [], 'char': 80, 'action': ks_prev_msg_list, 'target': false},
+            {'page': 'message_list', 'control_chars': [], 'char': 13, 'action': ks_load_msg, 'target': false},
+            {'page': 'message_list', 'control_chars': [], 'char': 83, 'action': ks_select_msg, 'target': false},
+            {'page': 'message_list', 'control_chars': [], 'char': 65, 'action': ks_select_all, 'target': false},
+            {'page': 'message_list', 'control_chars': ['shift'], 'char': 82, 'action': ks_click_button, 'target': '.msg_read'},
+            {'page': 'message_list', 'control_chars': ['shift'], 'char': 85, 'action': ks_click_button, 'target': '.msg_unread'},
+            {'page': 'message_list', 'control_chars': ['shift'], 'char': 70, 'action': ks_click_button, 'target': '.msg_flag'},
+            {'page': 'message_list', 'control_chars': ['shift'], 'char': 69, 'action': ks_click_button, 'target': '.msg_unflag'},
+            {'page': 'message_list', 'control_chars': ['shift'], 'char': 68, 'action': ks_click_button, 'target': '.msg_delete'},
+            {'page': 'message', 'control_chars': [], 'char': 80, 'action': ks_follow_link, 'target': '.plink'},
+            {'page': 'message', 'control_chars': [], 'char': 78, 'action': ks_follow_link, 'target': '.nlink'},
+            {'page': 'message', 'control_chars': [], 'char': 82, 'action': ks_follow_link, 'target': '.reply_link'},
+            {'page': 'message', 'control_chars': ['shift'], 'char': 70, 'action': ks_follow_link, 'target': '.forward_link'},
+            {'page': 'message', 'control_chars': [], 'char': 85, 'action': ks_click_button, 'target': '.unflagged_link'},
+            {'page': 'message', 'control_chars': [], 'char': 70, 'action': ks_click_button, 'target': '.flagged_link'},
+            {'page': 'message', 'control_chars': [], 'char': 68, 'action': ks_click_button, 'target': '.delete_link'},
+            {'page': 'message', 'control_chars': ['shift'], 'char': 82, 'action': ks_follow_link, 'target': '.reply_all_link'}
+        ];
+        $(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
+    }
 });
