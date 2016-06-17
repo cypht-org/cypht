@@ -164,7 +164,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             if ($login_time) {
                 $this->out('login_time', $login_time);
             }
-            $page = 0;
+            $page = 1;
             $terms = false;
             if (array_key_exists('list_page', $this->request->get)) {
                 $page = $this->request->get['list_page'];
@@ -198,7 +198,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             }
             else {
                 $limit = $this->user_config->get('pop3_limit', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('pop3_since', DEFAULT_SINCE));
+                $date = false;
                 $cutoff_timestamp = strtotime($date);
             }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
@@ -206,17 +206,13 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
             if ($pop3->state == 'authed') {
                 $this->out('pop3_mailbox_page_path', $path);
-                $list = $pop3->mlist();
-                $list = array_reverse(array_unique(array_keys($list)));
+                $list = array_reverse(array_unique(array_keys($pop3->mlist())));
                 $total = count($list);
-                $list = array_slice($list, $page, $limit);
-                if ($page == 0) {
-                    $page = 1;
-                }
+                $list = array_slice($list, (($page - 1) * $limit), $limit);
                 foreach ($list as $id) {
                     $msg_headers = $pop3->msg_headers($id);
                     if (!empty($msg_headers)) {
-                        if (isset($msg_headers['date'])) {
+                        if ($date && isset($msg_headers['date'])) {
                             if (!Hm_POP3_Uid_Cache::is_unread(sprintf('pop3_%d_%d', $form['pop3_server_id'], $id)) && strtotime($msg_headers['date']) < $cutoff_timestamp) {
                                 continue;
                             }
@@ -237,7 +233,9 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 }
                 $this->out('pop3_mailbox_page', $msgs);
                 $this->out('pop3_server_id', $form['pop3_server_id']);
-                $this->out('page_links', build_page_links($limit, $page, $total, $path));
+                if (!$date) {
+                    $this->out('page_links', build_page_links($limit, $page, $total, $path));
+                }
             }
         }
     }
