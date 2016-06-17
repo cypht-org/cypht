@@ -1327,6 +1327,9 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             else {
                 $path = $this->get('list_path');
             }
+            if (substr($path, 0, 4) == 'pop3') {
+                $path = 'pop3';
+            }
             $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><img alt="Configure" class="refresh_list" src="'.Hm_Image_Sources::$cog.'" width="20" height="20" /></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
 

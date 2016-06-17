@@ -243,7 +243,6 @@ return array(
         'imap_server_ids' => array(FILTER_SANITIZE_STRING, false),
         'imap_server_id' => array(FILTER_VALIDATE_INT, false),
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_STRING, false),
-        'page_links' => array(FILTER_UNSAFE_RAW, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
     ),

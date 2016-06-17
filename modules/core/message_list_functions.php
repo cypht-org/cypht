@@ -419,3 +419,57 @@ function search_field_selection($current, $output_mod) {
     return $res;
 }
 
+/**
+ * Build pagination links for a list of messages
+ * @subpackage core/functions
+ * @param int $page_size number of messages per page
+ * @param int $current current page number
+ * @param int $total number of messages total
+ * @param string $path list path
+ * @return string
+ */
+function build_page_links($page_size, $current_page, $total, $path) {
+    $links = '';
+    $first = '';
+    $last = '';
+    $display_links = 10;
+    $max_pages = ceil($total/$page_size);
+    if ($max_pages == 1) {
+        return '';
+    }
+    $floor = ($current_page - 1) - intval($display_links/2);
+    if ($floor < 0) {
+        $floor = 1;
+    }
+    $ceil = $floor + $display_links;
+    if ($ceil > $max_pages) {
+        $floor -= ($ceil - $max_pages);
+    }
+    $prev = '<a class="disabled_link"><img src="'.Hm_Image_Sources::$caret_left.'" alt="&larr;" /></a>';
+    $next = '<a class="disabled_link"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
+
+    if ($floor > 1 ) {
+        $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1">1</a> ... ';
+    }
+    if ($ceil < $max_pages) {
+        $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.'">'.$max_pages.'</a>';
+    }
+    if ($current_page > 1) {
+        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).'"><img src="'.Hm_Image_Sources::$caret_left.'" alt="&larr;" /></a>';
+    }
+    if ($max_pages > 1 && $current_page < $max_pages) {
+        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).'"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
+    }
+    for ($i=1;$i<=$max_pages;$i++) {
+        if ($i < $floor || $i > $ceil) {
+            continue;
+        }
+        $links .= ' <a ';
+        if ($i == $current_page) {
+            $links .= 'class="current_page" ';
+        }
+        $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.'">'.$i.'</a>';
+    }
+    return $prev.' '.$first.$links.$last.' '.$next;
+}
+
