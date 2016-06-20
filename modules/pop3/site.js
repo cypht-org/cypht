@@ -77,13 +77,18 @@ var display_pop3_mailbox = function(res) {
     if (res.page_links) {
         $('.page_links').html(res.page_links);
     }
-    var key = 'pop3_'+res.pop3_server_id;
+    var key = 'pop3_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
     Hm_Utils.save_to_local_storage(key, data.html());
 };
 
 var load_pop3_list = function(id) {
+    var key = 'pop3_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
+    var cached = Hm_Utils.get_from_local_storage(key);
+    if (cached) {
+        $('.message_table tbody').html(cached);
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
         {'name': 'pop3_server_id', 'value': id}],
@@ -130,6 +135,11 @@ var pop3_message_view_finished = function() {
         }
         else if (hm_list_parent() == 'unread') {
             Hm_Message_List.prev_next_links('formatted_unread_data', class_name);
+        }
+        else {
+            var path = hm_list_path();
+            var key = 'pop3_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
+            Hm_Message_List.prev_next_links(key, class_name);
         }
     }
     $('.header_toggle').click(function() { return Hm_Utils.toggle_long_headers(); });
