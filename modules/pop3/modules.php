@@ -24,9 +24,13 @@ class Hm_Handler_pop3_message_list_type extends Hm_Handler_Module {
             if (preg_match("/^pop3_(\d+)$/", $path, $matches)) {
                 $this->out('list_path', $path, false);
                 $details = Hm_POP3_List::dump($matches[1]);
+                $title = array('POP3', $details['name'], 'INBOX');
+                if ($this->get('list_page', 0)) {
+                    $title[] = sprintf('Page %d', $this->get('list_page', 0));
+                }
                 if (!empty($details)) {
                     $this->out('list_meta', false);
-                    $this->out('mailbox_list_title', array('POP3', $details['name'], 'INBOX'));
+                    $this->out('mailbox_list_title', $title);
 					$this->out('custom_list_controls', ' ');
                 }
             }
@@ -179,6 +183,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 }
                 $this->out('pop3_mailbox_page', $msgs);
                 $this->out('pop3_server_id', $form['pop3_server_id']);
+                $this->out('list_page', $page);
                 if (!$date) {
                     $this->out('page_links', build_page_links($limit, $page, $total, $path));
                 }
@@ -854,6 +859,9 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         }
         $timestamp = display_value('date', $msg, 'time');
         $url = '?page=message&uid='.$msg_id.'&list_path='.sprintf('pop3_%d', $msg['server_id']).'&list_parent='.$list_parent;
+        if ($output_module->get('list_page', 0)) {
+            $url .= '&list_page='.$output_module->html_safe($output_module->get('list_page', 1));
+        }
         if (Hm_POP3_Uid_Cache::is_read($id)) {
             $flags = array();
         }
