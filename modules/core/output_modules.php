@@ -1178,7 +1178,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
      * @todo this is pretty ugly, clean it up and remove module specific stuff
      */
     protected function output() {
-        if ($this->in('list_parent', array('sent', 'search', 'flagged', 'combined_inbox', 'unread', 'feeds', 'email'))) {
+        if ($this->in('list_parent', array('github_all', 'sent', 'search', 'flagged', 'combined_inbox', 'unread', 'feeds', 'email'))) {
             if ($this->get('list_parent') == 'combined_inbox') {
                 $list_name = $this->trans('Everything');
             }

@@ -298,10 +298,6 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                 if ($this->request->get['list_path'] == 'unread') {
                     $this->out('github_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE)));
                 }
-                $this->out('list_path', $this->request->get['list_path'], false);
-            }
-            else {
-                $this->out('list_path', false, false);
             }
             if (array_key_exists('github_unread', $this->request->post) && $this->request->post['github_unread']) {
                 $this->out('github_unread', true);
@@ -317,18 +313,16 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
     public function process() {
         $repos = $this->user_config->get('github_repos', array());
         $excluded = $this->user_config->get('unread_exclude_github_setting', false);
-        $parent = 'github_all';
+        $parent = '';
         if (array_key_exists('list_parent', $this->request->get)) {
-            if (in_array($this->request->get['list_parent'], array('combined_inbox', 'unread'), true)) {
-                $parent = $this->request->get['list_parent'];
-            }
+            $parent = $this->request->get['list_parent'];
         }
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if (preg_match("/^github_(.+)$/", $path)) {
                 if ($path == 'github_all') {
                     $this->out('list_path', 'github_all', false);
-                    $this->out('list_parent', $parent);
+                    $this->out('list_parent', $parent, false);
                     $this->out('mailbox_list_title', array('Github', 'All'));
                     foreach ($repos as $repo) {
                         $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
@@ -336,9 +330,14 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                 }
                 else {
                     $repo = substr($path, 7);
-                    $this->out('list_path', $path, false);
-                    $this->out('list_parent', $parent);
-                    $this->out('mailbox_list_title', array('Github', urldecode($repo)));
+                    $this->out('list_parent', $parent, false);
+                    if ($parent == 'github_all') {
+                        $this->out('mailbox_list_title', array(urldecode($repo)));
+                    }
+                    else {
+                        $this->out('mailbox_list_title', array('Github', urldecode($repo)));
+                        $this->out('list_path', $path, false);
+                    }
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
             }
@@ -403,13 +402,20 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
         else {
             $cutoff = 0;
         }
+        $list_parent = false;
+        if ($this->get('list_parent', '')) {
+            $list_parent = $this->get('list_parent');
+        }
+        elseif ($this->get('list_path') == 'github_all') {
+            $list_parent = $this->get('list_path');
+        }
         foreach ($this->get('github_data', array()) as $event) {
             $row_class = 'github';
             $id = 'github_'.$repo_id.'_'.$event['id'];
             $subject = build_github_subject($event, $this);
             $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
-            if ($this->get('list_parent', '')) {
-                $url .= '&list_parent='.$this->html_safe($this->get('list_parent'));
+            if ($list_parent) {
+                $url .= '&list_parent='.$this->html_safe($list_parent);
             }
             $from = $event['actor']['login'];
             $ts = strtotime($event['created_at']);
