@@ -1,6 +1,9 @@
 'use strict';
 
 var imap_delete_action = function(event) {
+    if (!hm_delete_prompt()) {
+        return false;
+    }
     event.preventDefault();
     Hm_Notices.hide(true);
     var form = $(this).parent();

@@ -68,6 +68,15 @@ if (hm_page_name() == 'message_list') {
         Hm_Message_List.page_caches.wp_freshly_pressed = 'formatted_wp_freshly_pressed';
     }
 }
+else if (hm_page_name() == 'servers') {
+    $('#wp_disconnect_form').submit(function(e) {
+        if (!hm_delete_prompt()) {
+            e.preventDefault();
+            return false;
+        }
+        return true;
+    });
+}
 else if (hm_page_name() == 'message') {
     if (hm_list_path() == 'wp_notifications') {
         wp_notice_view();

@@ -644,6 +644,9 @@ function Message_List() {
     };
 
     this.message_action = function(action_type) {
+        if (action_type == 'delete' && !hm_delete_prompt()) {
+            return false;
+        }
         var msg_list = $('.message_table');
         var selected = [];
         $('input[type=checkbox]', msg_list).each(function() {

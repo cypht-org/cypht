@@ -500,7 +500,7 @@ class Hm_Output_github_add_repo extends Hm_Output_Module {
                 '</form></div>';
             $res .= '<div class="configured_server"><div class="server_title">'.$this->trans('Repositories').'</div>';
             foreach ($this->get('github_repos', array()) as $repo) {
-                $res .= '<div class="configured_repo"><form method="POST">'.
+                $res .= '<div class="configured_repo"><form class="remove_repo" method="POST">'.
                     '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                     '<input type="hidden" name="github_repo" value="'.$this->html_safe($repo).'" />'.
                     '<input type="submit" name="github_remove_repo" value="'.$this->trans('Remove').'" class="github_remove_repo" />'.$this->html_safe($repo).'</form></div>';
@@ -573,7 +573,7 @@ class Hm_Output_github_connect_section extends Hm_Output_Module {
         }
         else {
             $res .= $this->trans('Already connected');
-            $res .= '<br /><form method="POST">';
+            $res .= '<br /><form id="github_disconnect_form" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="submit" name="github_disconnect" class="github_disconnect" value="'.$this->trans('Disconnect').'" />';
             $res .= '</form>';
