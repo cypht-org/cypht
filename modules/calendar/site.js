@@ -2,7 +2,9 @@
 $(function() {
     if (hm_page_name() == 'calendar') {
         $('.event_delete').click(function() {
-            $(this).parent().submit();
+            if (hm_delete_prompt()) {
+                $(this).parent().submit();
+            }
         });
         $('.cal_title').click(function() {
             $('.event_details').hide();

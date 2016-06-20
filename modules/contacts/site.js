@@ -1,5 +1,8 @@
 'use strict';
 var delete_contact = function(id) {
+    if (!hm_delete_prompt()) {
+        return false;
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_delete_contact'},
         {'name': 'contact_id', 'value': id}],
