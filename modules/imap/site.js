@@ -294,31 +294,14 @@ var imap_combined_inbox_content = function(id, folder) {
     return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_combined_inbox_state);
 };
 
-var get_imap_page_number = function() {
-    var index;
-    var match_result;
-    var page_number = 1;
-    var params = location.search.substr(1).split('&');
-    var param_len = params.length;
-
-    for (index=0; index < param_len; index++) {
-        match_result = params[index].match(/list_page=(\d+)/);
-        if (match_result) {
-            page_number = match_result[1];
-            break;
-        }
-    }
-    return page_number;
-}
-
 var cache_imap_page = function() {
-    var key = 'imap_'+get_imap_page_number()+'_'+hm_list_path();
+    var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
     Hm_Utils.save_to_local_storage(key, $('.message_table tbody').html());
     Hm_Utils.save_to_local_storage(key+'_page_links', $('.page_links').html());
 }
 
 var fetch_cached_imap_page = function() {
-    var key = 'imap_'+get_imap_page_number()+'_'+hm_list_path();
+    var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
     var page = Hm_Utils.get_from_local_storage(key);
     var links = Hm_Utils.get_from_local_storage(key+'_page_links');
     return [ page, links ];
@@ -475,7 +458,7 @@ var imap_message_view_finished = function(msg_uid, detail) {
             Hm_Message_List.prev_next_links('formatted_flagged_data', class_name);
         }
         else {
-            var key = 'imap_'+get_imap_page_number()+'_'+hm_list_path();
+            var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
             Hm_Message_List.prev_next_links(key, class_name);
         }
     }
