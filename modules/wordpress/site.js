@@ -50,6 +50,9 @@ var display_wp_notice = function(res) {
     if (hm_list_parent() == 'unread') {
         Hm_Message_List.prev_next_links('formatted_unread_data', uid);
     }
+    else if (path == 'wp_notifications') {
+        Hm_Message_List.prev_next_links('formatted_wp_notice_data', uid);
+    }
     Hm_Message_List.track_read_messages(path+'_'+uid);
 
 };
