@@ -135,7 +135,7 @@ class Hm_Output_nasa_connect_section extends Hm_Output_Module {
         if (!$this->get('nasa_api_key')) {
             $res .= 'style="display: none;"';
         }
-        $res .= '><div>Already connected</div>';
+        $res .= '><div>'.$this->trans('Already connected').'</div>';
         $res .= '<div><input type="button" class="nasa_api_disconnect" value="'.$this->trans('Disconnect').'" /></div>';
         $res .= '</div></div></div>';
         return $res;
