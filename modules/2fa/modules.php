@@ -54,7 +54,7 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
                 $passed = true;
             }
             else {
-                $this->out('2fa_error', '2 factor authorization code does not match');
+                $this->out('2fa_error', '2 factor authentication code does not match');
             }
         }
 
@@ -81,7 +81,10 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
         if (array_key_exists('enable_2fa', $settings)) {
             $enabled = $settings['enable_2fa'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Enable 2 factor authorization').
+        $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$key.'" />'.$this->trans('2 Factor Authentication').'</td></tr>';
+
+        $res .= '<tr class="tfa_setting"><td>'.$this->trans('Enable 2 factor authentication').
             '</td><td><input value="1" type="checkbox" name="enable_2fa"';
         if ($enabled) {
             $res .= ' checked="checked"';
@@ -90,7 +93,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
         $path = $this->get('2fa_png_path');
         if ($path && is_readable($path)) {
             $png = file_get_contents($path);
-            $qr_code = '<tr class="general_setting"><td></td><td>';
+            $qr_code = '<tr class="tfa_setting"><td></td><td>';
             if (!$enabled) {
                 $qr_code .= '<div class="err settings_wrap_text">'.
                     $this->trans('Configure Google Authenticator BEFORE enabling 2 factor authentication.').'<br />'.
@@ -100,7 +103,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
             }
 
-            $qr_code .= '<img width="128" height="128" src="data:image/png;base64,'.base64_encode($png).'" />';
+            $qr_code .= '<img alt="" width="128" height="128" src="data:image/png;base64,'.base64_encode($png).'" />';
             $qr_code .= '</td></tr>';
         }
         else {
