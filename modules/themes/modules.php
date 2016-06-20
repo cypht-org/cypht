@@ -73,7 +73,7 @@ class Hm_Output_theme_setting extends Hm_Output_Module {
     protected function output() {
 
         $current = $this->get('theme', '');
-        $res = '<tr class="general_setting"><td><label for="language_setting">'.
+        $res = '<tr class="general_setting"><td><label for="theme_setting">'.
             $this->trans('Theme').'</label></td>'.
             '<td><select id="theme_setting" name="theme_setting">';
         foreach (hm_themes($this) as $name => $label) {
