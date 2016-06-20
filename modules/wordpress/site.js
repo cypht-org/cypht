@@ -53,6 +53,9 @@ var display_wp_notice = function(res) {
     else if (path == 'wp_notifications') {
         Hm_Message_List.prev_next_links('formatted_wp_notice_data', uid);
     }
+    else if (path == 'wp_freshly_pressed') {
+        Hm_Message_List.prev_next_links('formatted_wp_freshly_pressed', uid);
+    }
     Hm_Message_List.track_read_messages(path+'_'+uid);
 
 };
@@ -65,6 +68,10 @@ if (hm_page_name() == 'message_list') {
         Hm_Message_List.page_caches.wp_freshly_pressed = 'formatted_wp_freshly_pressed';
     }
 }
-else if (hm_page_name() == 'message' && hm_list_path() == 'wp_notifications') {
-    wp_notice_view();
+else if (hm_page_name() == 'message') {
+    if (hm_list_path() == 'wp_notifications') {
+        wp_notice_view();
+    }
+    /*else if (hm_list_path() == 'wp_freshly_pressed') {
+    }*/
 }
