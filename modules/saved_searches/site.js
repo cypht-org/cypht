@@ -15,6 +15,9 @@ var update_search = function(event) {
 };
 
 var delete_search = function(event) {
+    if (!hm_delete_prompt()) {
+        return false;
+    }
     var name = $('.search_name').val();
     event.preventDefault();
     if (name.length) {
