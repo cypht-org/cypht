@@ -149,10 +149,17 @@ var display_feed_item_content = function(res) {
     else if (hm_list_parent() == 'unread') {
         Hm_Message_List.prev_next_links('formatted_unread_data', path+'_'+msg_uid);
     }
+    else {
+        Hm_Message_List.prev_next_links(path, path+'_'+msg_uid);
+    }
     Hm_Message_List.track_read_messages(path+'_'+msg_uid);
 };
 
 var load_feed_list = function(id) {
+    var cached = Hm_Utils.get_from_local_storage(hm_list_path());
+    if (cached) {
+        $('.message_table tbody').html(cached);
+    }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined'},
         {'name': 'feed_server_ids', 'value': id}],
