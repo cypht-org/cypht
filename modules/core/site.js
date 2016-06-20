@@ -891,6 +891,22 @@ var Hm_Folders = {
 
 /* misc */
 var Hm_Utils = {
+    get_url_page_number: function() {
+        var index;
+        var match_result;
+        var page_number = 1;
+        var params = location.search.substr(1).split('&');
+        var param_len = params.length;
+
+        for (index=0; index < param_len; index++) {
+            match_result = params[index].match(/list_page=(\d+)/);
+            if (match_result) {
+                page_number = match_result[1];
+                break;
+            }
+        }
+        return page_number;
+    },
     preserve_local_settings: function() {
         var i;
         var result = {};
