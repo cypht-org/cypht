@@ -94,8 +94,22 @@ class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module 
 }
 
 /**
+ * Process input from the disable delete prompts setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_delete_prompt_setting extends Hm_Handler_Module {
+    /**
+     * Allowed vals are bool true/false
+     */
+    public function process() {
+        function delete_disabled_callback($val) { return $val; }
+        process_site_setting('disable_delete_prompt', $this, 'delete_disabled_callback', false, true);
+    }
+}
+
+/**
  * Process input from the max per source setting for the Everything page in the settings page
-M` * @subpackage core/handler
+ * @subpackage core/handler
  */
 class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
     /**
@@ -363,6 +377,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
                     $this->session->set('saved_pages', $pages);
                 }
             }
+            $this->out('disable_delete_prompt', $this->user_config->get('disable_delete_prompt_setting'));
         }
         $this->out('is_mobile', $this->request->mobile);
     }

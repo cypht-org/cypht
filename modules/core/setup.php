@@ -42,6 +42,7 @@ add_handler('settings', 'process_all_source_max_setting', true, 'core', 'date', 
 add_handler('settings', 'process_all_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 
@@ -50,7 +51,8 @@ add_output('settings', 'start_general_settings', true, 'core', 'start_settings_f
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'list_style_setting', true, 'core', 'timezone_setting', 'after');
-add_output('settings', 'start_unread_settings', true, 'core', 'list_style_setting', 'after');
+add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_setting', 'after');
+add_output('settings', 'start_unread_settings', true, 'core', 'delete_prompt_setting', 'after');
 add_output('settings', 'unread_since_setting', true, 'core', 'start_unread_settings', 'after');
 add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_setting', 'after');
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');
@@ -203,6 +205,7 @@ return array(
         'all_since' => FILTER_SANITIZE_STRING,
         'list_style' => FILTER_SANITIZE_STRING,
         'timezone' => FILTER_SANITIZE_STRING,
+        'disable_delete_prompt' => FILTER_VALIDATE_INT,
         'section_state' => FILTER_SANITIZE_STRING,
         'section_class' => FILTER_SANITIZE_STRING,
         'message_ids' => FILTER_SANITIZE_STRING,

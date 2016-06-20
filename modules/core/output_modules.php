@@ -441,7 +441,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
      * Uses function wrappers to make the data immutable from JS
      */
     protected function output() {
-        return '<script type="text/javascript">'.
+        $res = '<script type="text/javascript">'.
             'var globals = {};'.
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
             'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.
@@ -452,9 +452,16 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_encrypt_ajax_requests = function() { return "'.$this->html_safe($this->get('encrypt_ajax_requests', '')).'"; };'.
             'var hm_encrypt_local_storage = function() { return "'.$this->html_safe($this->get('encrypt_local_storage', '')).'"; };'.
             'var hm_flag_image_src = function() { return "'.Hm_Image_Sources::$star.'"; };'.
-            'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure?').'"); };'.
-            format_data_sources($this->get('data_sources', array()), $this).
-            '</script>';
+            format_data_sources($this->get('data_sources', array()), $this);
+
+        if (!$this->get('disable_delete_prompt')) {
+            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure?').'"); };';
+        }
+        else {
+            $res .= 'var hm_delete_prompt = function() { return true; };';
+        }
+        $res .= '</script>';
+        return $res;
     }
 }
 
@@ -519,6 +526,23 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
         return $res;
     }
 }
+/**
+ * @subpackage core/output
+ */
+class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('disable_delete_prompt', $settings) && $settings['disable_delete_prompt']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $checked = '';
+        }
+        return '<tr class="general_setting"><td><label for="disable_delete_prompt">'.$this->trans('Disable prompts when deleting').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' value="1" id="disable_delete_prompt" name="disable_delete_prompt" /></td></tr>';
+    }
+}
+
 
 /**
  * Starts the Flagged section on the settings page
