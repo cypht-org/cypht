@@ -452,6 +452,11 @@
 
 						<ul>
 				<li>
+					<a href="package-modules.keyboard.shortcuts.handler.html">
+						handler					</a>
+
+						</li>
+				<li>
 					<a href="package-modules.keyboard.shortcuts.output.html">
 						output					</a>
 
@@ -765,6 +770,7 @@
 				<li><a href="class-Hm_Handler_folders_server_id.html">Hm_Handler_folders_server_id</a></li>
 				<li><a href="class-Hm_Handler_get_calendar_date.html">Hm_Handler_get_calendar_date</a></li>
 				<li><a href="class-Hm_Handler_get_inline_message_setting.html">Hm_Handler_get_inline_message_setting</a></li>
+				<li><a href="class-Hm_Handler_get_shortcut_setting.html">Hm_Handler_get_shortcut_setting</a></li>
 				<li><a href="class-Hm_Handler_get_wp_notice_data.html">Hm_Handler_get_wp_notice_data</a></li>
 				<li><a href="class-Hm_Handler_github_disconnect.html">Hm_Handler_github_disconnect</a></li>
 				<li><a href="class-Hm_Handler_github_event_detail.html">Hm_Handler_github_event_detail</a></li>
@@ -858,9 +864,11 @@
 				<li><a href="class-Hm_Handler_process_create_account.html">Hm_Handler_process_create_account</a></li>
 				<li><a href="class-Hm_Handler_process_delete_contact.html">Hm_Handler_process_delete_contact</a></li>
 				<li><a href="class-Hm_Handler_process_delete_event.html">Hm_Handler_process_delete_event</a></li>
+				<li><a href="class-Hm_Handler_process_delete_prompt_setting.html">Hm_Handler_process_delete_prompt_setting</a></li>
 				<li><a href="class-Hm_Handler_process_dynamic_login.html">Hm_Handler_process_dynamic_login</a></li>
 				<li><a href="class-Hm_Handler_process_edit_contact.html">Hm_Handler_process_edit_contact</a></li>
 				<li><a href="class-Hm_Handler_process_enable_2fa.html">Hm_Handler_process_enable_2fa</a></li>
+				<li><a href="class-Hm_Handler_process_enable_shortcut_setting.html">Hm_Handler_process_enable_shortcut_setting</a></li>
 				<li><a href="class-Hm_Handler_process_feed_limit_setting.html">Hm_Handler_process_feed_limit_setting</a></li>
 				<li><a href="class-Hm_Handler_process_feed_since_setting.html">Hm_Handler_process_feed_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_flagged_since_setting.html">Hm_Handler_process_flagged_since_setting</a></li>
@@ -982,6 +990,7 @@
 				<li><a href="class-Hm_Output_create_account_link.html">Hm_Output_create_account_link</a></li>
 				<li><a href="class-Hm_Output_create_form.html">Hm_Output_create_form</a></li>
 				<li><a href="class-Hm_Output_date.html">Hm_Output_date</a></li>
+				<li><a href="class-Hm_Output_delete_prompt_setting.html">Hm_Output_delete_prompt_setting</a></li>
 				<li><a href="class-Hm_Output_delete_search_icon.html">Hm_Output_delete_search_icon</a></li>
 				<li><a href="class-Hm_Output_dev_content.html">Hm_Output_dev_content</a></li>
 				<li><a href="class-Hm_Output_developer_doc_link.html">Hm_Output_developer_doc_link</a></li>
@@ -996,6 +1005,7 @@
 				<li><a href="class-Hm_Output_dynamic_login.html">Hm_Output_dynamic_login</a></li>
 				<li><a href="class-Hm_Output_email_menu_content.html">Hm_Output_email_menu_content</a></li>
 				<li><a href="class-Hm_Output_enable_2fa_setting.html">Hm_Output_enable_2fa_setting</a></li>
+				<li><a href="class-Hm_Output_enable_shortcut_setting.html">Hm_Output_enable_shortcut_setting</a></li>
 				<li><a href="class-Hm_Output_end_settings_form.html">Hm_Output_end_settings_form</a></li>
 				<li><a href="class-Hm_Output_feed_ids.html">Hm_Output_feed_ids</a></li>
 				<li><a href="class-Hm_Output_feed_limit_setting.html">Hm_Output_feed_limit_setting</a></li>
@@ -1616,9 +1626,9 @@
 </span><span id="265" class="l"><a href="#265">265: </a>            <span class="php-var">$res</span> = <span class="php-quote">'&lt;li class=&quot;menu_wp_notifications&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;list_path=wp_notifications&quot;&gt;'</span>.
 </span><span id="266" class="l"><a href="#266">266: </a>                <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$env_closed</span>).
 </span><span id="267" class="l"><a href="#267">267: </a>                <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Notifications'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
-</span><span id="268" class="l"><a href="#268">268: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;li class=&quot;menu_wp_freshly_pressed&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;list_path=wp_freshly_pressed&quot;&gt;'</span>.
-</span><span id="269" class="l"><a href="#269">269: </a>                <span class="php-quote">'&lt;img class=&quot;account_icon&quot; src=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Image_Sources::<span class="php-var">$env_closed</span>).
-</span><span id="270" class="l"><a href="#270">270: </a>                <span class="php-quote">'&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Freshly Pressed'</span>).<span class="php-quote">'&lt;/a&gt;&lt;/li&gt;'</span>;
+</span><span id="268" class="l"><a href="#268">268: </a>            <span class="php-comment">/*$res .= '&lt;li class=&quot;menu_wp_freshly_pressed&quot;&gt;&lt;a class=&quot;unread_link&quot; href=&quot;?page=message_list&amp;list_path=wp_freshly_pressed&quot;&gt;'.
+</span></span><span id="269" class="l"><a href="#269">269: </a><span class="php-comment">                '&lt;img class=&quot;account_icon&quot; src=&quot;'.$this-&gt;html_safe(Hm_Image_Sources::$env_closed).
+</span></span><span id="270" class="l"><a href="#270">270: </a><span class="php-comment">                '&quot; alt=&quot;&quot; width=&quot;16&quot; height=&quot;16&quot; /&gt; '.$this-&gt;trans('Freshly Pressed').'&lt;/a&gt;&lt;/li&gt;';*/</span>
 </span><span id="271" class="l"><a href="#271">271: </a>            <span class="php-var">$this</span>-&gt;append(<span class="php-quote">'folder_sources'</span>, <span class="php-keyword1">array</span>(<span class="php-quote">'wordPress_folders'</span>, <span class="php-var">$res</span>));
 </span><span id="272" class="l"><a href="#272">272: </a>        }
 </span><span id="273" class="l"><a href="#273">273: </a>        <span class="php-keyword1">return</span> <span class="php-quote">''</span>;
@@ -1808,7 +1818,7 @@
 </span><span id="457" class="l"><a href="#457">457: </a>        }
 </span><span id="458" class="l"><a href="#458">458: </a>        <span class="php-keyword1">else</span> {
 </span><span id="459" class="l"><a href="#459">459: </a>            <span class="php-var">$res</span> .= <span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Already connected'</span>);
-</span><span id="460" class="l"><a href="#460">460: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;br /&gt;&lt;form method=&quot;POST&quot;&gt;'</span>;
+</span><span id="460" class="l"><a href="#460">460: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;br /&gt;&lt;form id=&quot;wp_disconnect_form&quot; method=&quot;POST&quot;&gt;'</span>;
 </span><span id="461" class="l"><a href="#461">461: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;hidden&quot; name=&quot;hm_page_key&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;html_safe(Hm_Request_Key::generate()).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="462" class="l"><a href="#462">462: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;input type=&quot;submit&quot; name=&quot;wp_disconnect&quot; class=&quot;wp_disconnect&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Disconnect'</span>).<span class="php-quote">'&quot; /&gt;'</span>;
 </span><span id="463" class="l"><a href="#463">463: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/form&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
@@ -1901,6 +1911,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?efdb1e11728e39bb13ff228064de4f5af843caa5"></script>
+<script src="elementlist.js?778917e16c8038ff0f5a4cd4a1d1e0a7b2adbdff"></script>
 </body>
 </html>

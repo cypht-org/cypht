@@ -452,6 +452,11 @@
 
 						<ul>
 				<li>
+					<a href="package-modules.keyboard.shortcuts.handler.html">
+						handler					</a>
+
+						</li>
+				<li>
 					<a href="package-modules.keyboard.shortcuts.output.html">
 						output					</a>
 
@@ -765,6 +770,7 @@
 				<li><a href="class-Hm_Handler_folders_server_id.html">Hm_Handler_folders_server_id</a></li>
 				<li><a href="class-Hm_Handler_get_calendar_date.html">Hm_Handler_get_calendar_date</a></li>
 				<li><a href="class-Hm_Handler_get_inline_message_setting.html">Hm_Handler_get_inline_message_setting</a></li>
+				<li><a href="class-Hm_Handler_get_shortcut_setting.html">Hm_Handler_get_shortcut_setting</a></li>
 				<li><a href="class-Hm_Handler_get_wp_notice_data.html">Hm_Handler_get_wp_notice_data</a></li>
 				<li><a href="class-Hm_Handler_github_disconnect.html">Hm_Handler_github_disconnect</a></li>
 				<li><a href="class-Hm_Handler_github_event_detail.html">Hm_Handler_github_event_detail</a></li>
@@ -858,9 +864,11 @@
 				<li><a href="class-Hm_Handler_process_create_account.html">Hm_Handler_process_create_account</a></li>
 				<li><a href="class-Hm_Handler_process_delete_contact.html">Hm_Handler_process_delete_contact</a></li>
 				<li><a href="class-Hm_Handler_process_delete_event.html">Hm_Handler_process_delete_event</a></li>
+				<li><a href="class-Hm_Handler_process_delete_prompt_setting.html">Hm_Handler_process_delete_prompt_setting</a></li>
 				<li><a href="class-Hm_Handler_process_dynamic_login.html">Hm_Handler_process_dynamic_login</a></li>
 				<li><a href="class-Hm_Handler_process_edit_contact.html">Hm_Handler_process_edit_contact</a></li>
 				<li><a href="class-Hm_Handler_process_enable_2fa.html">Hm_Handler_process_enable_2fa</a></li>
+				<li><a href="class-Hm_Handler_process_enable_shortcut_setting.html">Hm_Handler_process_enable_shortcut_setting</a></li>
 				<li><a href="class-Hm_Handler_process_feed_limit_setting.html">Hm_Handler_process_feed_limit_setting</a></li>
 				<li><a href="class-Hm_Handler_process_feed_since_setting.html">Hm_Handler_process_feed_since_setting</a></li>
 				<li><a href="class-Hm_Handler_process_flagged_since_setting.html">Hm_Handler_process_flagged_since_setting</a></li>
@@ -982,6 +990,7 @@
 				<li><a href="class-Hm_Output_create_account_link.html">Hm_Output_create_account_link</a></li>
 				<li><a href="class-Hm_Output_create_form.html">Hm_Output_create_form</a></li>
 				<li><a href="class-Hm_Output_date.html">Hm_Output_date</a></li>
+				<li><a href="class-Hm_Output_delete_prompt_setting.html">Hm_Output_delete_prompt_setting</a></li>
 				<li><a href="class-Hm_Output_delete_search_icon.html">Hm_Output_delete_search_icon</a></li>
 				<li><a href="class-Hm_Output_dev_content.html">Hm_Output_dev_content</a></li>
 				<li><a href="class-Hm_Output_developer_doc_link.html">Hm_Output_developer_doc_link</a></li>
@@ -996,6 +1005,7 @@
 				<li><a href="class-Hm_Output_dynamic_login.html">Hm_Output_dynamic_login</a></li>
 				<li><a href="class-Hm_Output_email_menu_content.html">Hm_Output_email_menu_content</a></li>
 				<li><a href="class-Hm_Output_enable_2fa_setting.html">Hm_Output_enable_2fa_setting</a></li>
+				<li><a href="class-Hm_Output_enable_shortcut_setting.html">Hm_Output_enable_shortcut_setting</a></li>
 				<li><a href="class-Hm_Output_end_settings_form.html">Hm_Output_end_settings_form</a></li>
 				<li><a href="class-Hm_Output_feed_ids.html">Hm_Output_feed_ids</a></li>
 				<li><a href="class-Hm_Output_feed_limit_setting.html">Hm_Output_feed_limit_setting</a></li>
@@ -1486,7 +1496,7 @@
 </span><span id="135" class="l"><a href="#135">135: </a>        <span class="php-keyword1">if</span> (!<span class="php-var">$this</span>-&gt;get(<span class="php-quote">'nasa_api_key'</span>)) {
 </span><span id="136" class="l"><a href="#136">136: </a>            <span class="php-var">$res</span> .= <span class="php-quote">'style=&quot;display: none;&quot;'</span>;
 </span><span id="137" class="l"><a href="#137">137: </a>        }
-</span><span id="138" class="l"><a href="#138">138: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&gt;&lt;div&gt;Already connected&lt;/div&gt;'</span>;
+</span><span id="138" class="l"><a href="#138">138: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&gt;&lt;div&gt;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Already connected'</span>).<span class="php-quote">'&lt;/div&gt;'</span>;
 </span><span id="139" class="l"><a href="#139">139: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;div&gt;&lt;input type=&quot;button&quot; class=&quot;nasa_api_disconnect&quot; value=&quot;'</span>.<span class="php-var">$this</span>-&gt;trans(<span class="php-quote">'Disconnect'</span>).<span class="php-quote">'&quot; /&gt;&lt;/div&gt;'</span>;
 </span><span id="140" class="l"><a href="#140">140: </a>        <span class="php-var">$res</span> .= <span class="php-quote">'&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;'</span>;
 </span><span id="141" class="l"><a href="#141">141: </a>        <span class="php-keyword1">return</span> <span class="php-var">$res</span>;
@@ -1535,6 +1545,6 @@
 </div>
 </div>
 <script src="resources/combined.js?11103d5bda05b31faaed27f8dac7ff566f7e6eef"></script>
-<script src="elementlist.js?efdb1e11728e39bb13ff228064de4f5af843caa5"></script>
+<script src="elementlist.js?778917e16c8038ff0f5a4cd4a1d1e0a7b2adbdff"></script>
 </body>
 </html>
