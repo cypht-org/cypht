@@ -234,6 +234,7 @@ return array(
 
     'allowed_output' => array(
         'imap_connect_status' => array(FILTER_SANITIZE_STRING, false),
+        'auto_sent_folder' => array(FILTER_SANITIZE_STRING, false),
         'imap_connect_time' => array(FILTER_SANITIZE_STRING, false),
         'imap_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'imap_status_display' => array(FILTER_UNSAFE_RAW, false),

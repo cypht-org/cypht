@@ -524,6 +524,16 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
                 $folder = $this->request->post['folder'];
             }
             $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, array(hex2bin($folder)), $limit, array('SINCE' => $date), true);
+            $folders = array();
+            foreach ($msg_list as $msg) {
+                if (hex2bin($msg['folder']) != hex2bin($folder)) {
+                    $folders[] = hex2bin($msg['folder']);
+                }
+            }
+            if (count($folders) > 0) {
+                $auto_folder = $folders[0];
+                $this->out('auto_sent_folder', $msg_list[0]['server_name'].' '.$auto_folder);
+            }
             $this->out('imap_sent_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }

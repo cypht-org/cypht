@@ -225,6 +225,9 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
                     ids[i] = ids[i]+'_'+Hm_Utils.clean_selector(folder);
                 }
             }
+            if (res.auto_sent_folder) {
+                add_auto_folder(res.auto_sent_folder);
+            }
             Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
         },
         [],
@@ -232,6 +235,13 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
         batch_callback
     );
     return false;
+};
+
+var add_auto_folder = function(folder) {
+    $('.list_sources').append('<div class="list_src">imap '+folder+'</div>');
+    var count = $('.src_count').text()*1;
+    count++;
+    $('.src_count').html(count);
 };
 
 var imap_sent_content = function(id, folder) {
