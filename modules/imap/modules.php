@@ -10,6 +10,33 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require_once APP_PATH.'modules/imap/hm-imap.php';
 
+/**
+ * Process input from the max per source setting for the Sent E-mail page in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_sent_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('sent_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the Sent page in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_sent_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('sent_since', $this, 'since_setting_callback');
+    }
+}
+
+
  /**
  * Process an IMAP move/copy action
  * @subpackage imap/handler
@@ -241,8 +268,8 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             }
             elseif ($path == 'sent') {
                 $this->out('mailbox_list_title', array('Sent'));
-                $this->out('per_source_limit', 100);
-                $this->out('message_list_since', '-5 years');
+                $this->out('per_source_limit', $this->user_config->get('sent_per_source_setting', DEFAULT_PER_SOURCE));
+                $this->out('message_list_since', $this->user_config->get('sent_since_setting', DEFAULT_SINCE));
             }
         }
     }
@@ -516,8 +543,8 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = 100;
-            $date = process_since_argument('-5 years');
+            $limit = $this->user_config->get('sent_per_source_setting', DEFAULT_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('sent_since_setting', DEFAULT_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
@@ -1646,6 +1673,58 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
         }
+    }
+}
+
+/**
+ * Start the sent section on the settings page.
+ * @subpackage imap/output
+ */
+class Hm_Output_start_sent_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the Sent E-mail view.
+     */
+    protected function output() {
+        return '<tr><td data-target=".sent_setting" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+            $this->trans('Sent').'</td></tr>';
+    }
+}
+
+/**
+ * Option for the "received since" date range for the All E-mail page
+ * @subpackage imap/output
+ */
+class Hm_Output_sent_since_setting extends Hm_Output_Module {
+    protected function output() {
+        if (!email_is_active($this->get('router_module_list'))) {
+            return '';
+        }
+        $since = DEFAULT_SINCE;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('sent_since', $settings) && $settings['sent_since']) {
+            $since = $settings['sent_since'];
+        }
+        return '<tr class="sent_setting"><td><label for="sent_since">'.
+            $this->trans('Show messages received since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'sent_since', $this).'</td></tr>';
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the All E-mail  page
+ * @subpackage imap/output
+ */
+class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
+    protected function output() {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('sent_per_source', $settings)) {
+            $sources = $settings['sent_per_source'];
+        }
+        return '<tr class="sent_setting"><td><label for="sent_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td><input type="text" size="2" id="sent_per_source" name="sent_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
 }
 

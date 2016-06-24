@@ -23,7 +23,12 @@ add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* settings page data */
+add_handler('settings', 'process_sent_since_setting', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_sent_source_max_setting', true, 'imap', 'date', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
+add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
+add_output('settings', 'sent_source_max_setting', true, 'imap', 'sent_since_setting', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -288,6 +293,8 @@ return array(
         'imap_move_ids' => FILTER_SANITIZE_STRING,
         'imap_move_to' => FILTER_SANITIZE_STRING,
         'imap_move_action' => FILTER_SANITIZE_STRING,
+        'sent_since' => FILTER_SANITIZE_STRING,
+        'sent_per_source' => FILTER_SANITIZE_STRING,
         'imap_move_page' => FILTER_SANITIZE_STRING
     )
 );
