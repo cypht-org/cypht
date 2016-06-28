@@ -3,10 +3,12 @@ var load_github_data = function(id) {
     if (hm_list_path() == 'github_all') {
         Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_repo', 'value': id}], display_github_data, [], false, cache_github_all);
     }
-    else if (hm_list_path().substr(0, 6) == 'github') {
-        var cached = Hm_Utils.get_from_local_storage(hm_list_path());
-        if (cached) {
-            $('.message_table tbody').html(cached);
+    else {
+        if (hm_list_path().substr(0, 6) == 'github') {
+            var cached = Hm_Utils.get_from_local_storage(hm_list_path());
+            if (cached) {
+                $('.message_table tbody').html(cached);
+            }
         }
         Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_repo', 'value': id}], display_github_data);
     }
