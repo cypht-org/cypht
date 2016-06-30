@@ -73,7 +73,7 @@ var autocomplete_contact = function(e, class_name, list_div) {
                         }
                     }
                 }
-            }
+            }, [], true
         );
     }
 };
