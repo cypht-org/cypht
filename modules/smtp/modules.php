@@ -776,6 +776,9 @@ function smtp_server_dropdown($data, $output_mod, $recip) {
             if ($recip && trim($recip) == trim($vals['user'])) {
                 $res .= 'selected="selected" ';
             }
+            elseif (array_key_exists($id, $profiles) && $profiles[$id]['profile_default']) {
+                $res .= 'selected="selected" ';
+            }
             $res .= 'value="'.$output_mod->html_safe($id).'">';
             if (array_key_exists($id, $profiles)) {
                 $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profiles[$id]['profile_name'], $vals['user'], $vals['name']));
