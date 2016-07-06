@@ -372,6 +372,7 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
         $contact_store->import($session->get('gmail_contacts'));
         return $contact_store;
     }
+    $all_contacts = array();
     foreach(Hm_IMAP_List::dump(false, true) as $id => $server) {
         if ($server['server'] == 'imap.gmail.com' && array_key_exists('auth', $server) && $server['auth'] == 'xoauth2') {
             $results = imap_refresh_oauth2_token($server, $config);
@@ -383,12 +384,13 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
             }
             $url = 'https://www.google.com/m8/feeds/contacts/'.$server['user'].'/full';
             $contacts = parse_contact_xml(gmail_contacts_request($server['pass'], $url), $server['name']);
-            if (!empty($contacts)) {
-                if ($session) {
-                    $session->set('gmail_contacts', $contacts);
-                }
+            if (count($contacts) > 0) {
                 $contact_store->import($contacts);
+                $all_contacts = array_merge($all_contacts, $contacts);
             }
+        }
+        if ($session && count($contacts) > 0) {
+            $session->set('gmail_contacts', $all_contacts);
         }
     }
     return $contact_store;
