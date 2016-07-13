@@ -1,8 +1,13 @@
 engines:
     phpcodesniffer:
         enabled: true
+        config:
+            ignore_warnings: true
     phpmd:
         enabled: true
+        config:
+            file_extensions: "php"
+            rulesets: "unusedcode,codesize,naming,cleancode,design"
     duplication:
         enabled: true
         config:
