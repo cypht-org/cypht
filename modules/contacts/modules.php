@@ -20,7 +20,10 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
         if ($success) {
             $val = trim($form['contact_value']);
             $contacts = new Hm_Contact_Store($this->user_config);
-            $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
+            if ($this->module_is_supported('imap')) {
+                $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
+            }
+            $contacts = fetch_ldap_contacts($this->config, $contacts);
             $contacts->sort('email_address');
             $results = array_slice($contacts->search(array(
                 'display_name' => $val,
@@ -61,7 +64,10 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('contact_id', $this->request->get)) {
             $contacts = new Hm_Contact_Store($this->user_config);
-            $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
+            if ($this->module_is_supported('imap')) {
+                $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
+            }
+            $contacts = fetch_ldap_contacts($this->config, $contacts);
             $contact = $contacts->get($this->request->get['contact_id']);
             if ($contact) {
                 $to = sprintf('"%s" <%s>', $contact->value('display_name'), $contact->value('email_address'));
@@ -91,8 +97,9 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
         }
         $this->out('contact_page', $page);
         if ($this->module_is_supported('imap')) {
-            $contact_store = fetch_gmail_contacts($this->config, $contacts, $this->session);
+            $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
         }
+        $contacts = fetch_ldap_contacts($this->config, $contacts);
         $this->out('contact_store', $contacts);
     }
 }
@@ -394,5 +401,37 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
         }
     }
     return $contact_store;
+}
+
+/**
+ * @subpackage contacts/functions
+ */
+function fetch_ldap_contacts($config, $contact_store, $session=false) {
+    $ldap_config = ldap_config($config);
+    if (count($ldap_config) > 0) {
+        $ldap = new Hm_LDAP_Contacts($ldap_config);
+        if ($ldap->connect()) {
+            $contacts = $ldap->fetch();
+            if (count($contacts) > 0) {
+                $contact_store->import($contacts);
+            }
+        }
+    }
+    return $contact_store;
+}
+
+/**
+ * @subpackage contacts/functions
+ */
+function ldap_config($config) {
+    $details = array();
+    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/ldap.ini';
+    if (is_readable($ini_file)) {
+        $settings = parse_ini_file($ini_file);
+        if (!empty($settings)) {
+            $details = $settings;
+        }
+    }
+    return $details;
 }
 
