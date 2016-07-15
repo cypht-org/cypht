@@ -27,9 +27,13 @@ class Hm_Output_history_page_link extends Hm_Output_Module {
 class Hm_Output_history_heading  extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="content_title">'.$this->trans('Message history').'</div>'.
-            '<div class="history_content"><table class="message_table"><colgroup><col class="source_col">'.
-            '<col class="from_col"><col class="subject_col"><col class="date_col"><col class="icon_col">'.
-            '</colgroup><thead></thead><tbody></tbody></table></div>';
+            '<div class="history_content"><table class="message_table">';
+        if (!$this->get('is_mobile')) {
+            $res .= '<colgroup><col class="source_col"><col class="from_col"><col '.
+                'class="subject_col"><col class="date_col"><col class="icon_col">'.
+                '</colgroup><thead></thead>';
+        }
+        $res .= '<tbody></tbody></table></div>';
         return $res;
     }
 }
