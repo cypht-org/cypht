@@ -87,22 +87,6 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
 /**
  * @subpackage contacts/handler
  */
-class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
-    public function process() {
-        $contacts = $this->get('contact_store');
-        list($success, $form) = $this->process_form(array('contact_id'));
-        if ($success) {
-            $contacts->delete($form['contact_id']);
-            $this->user_config->set('contacts', $contacts->export());
-            $this->session->record_unsaved('Contact deleted');
-            Hm_Msgs::add('Contact Deleted');
-        }
-    }
-}
-
-/**
- * @subpackage contacts/handler
- */
 class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('contact_value'));
@@ -245,7 +229,7 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
  */
 class Hm_Output_contacts_form_start extends Hm_Output_Module {
     protected function output() {
-        if (count($this->get('contact_sources', array())) == 0) {
+        if (count($this->get('contact_sources', array())) == 0 || !$this->get('contact_edit', false)) {
             return '';
         }
         return '<div class="add_server"><form class="add_contact_form" method="POST">';
@@ -257,7 +241,7 @@ class Hm_Output_contacts_form_start extends Hm_Output_Module {
  */
 class Hm_Output_contacts_form_end extends Hm_Output_Module {
     protected function output() {
-        if (count($this->get('contact_sources', array())) == 0) {
+        if (count($this->get('contact_sources', array())) == 0 || !$this->get('contact_edit', false)) {
             return '';
         }
         return '</form></div>';

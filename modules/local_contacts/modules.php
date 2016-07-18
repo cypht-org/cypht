@@ -11,6 +11,22 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage local_contacts/handler
  */
+class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
+    public function process() {
+        $contacts = $this->get('contact_store');
+        list($success, $form) = $this->process_form(array('contact_id'));
+        if ($success) {
+            $contacts->delete($form['contact_id']);
+            $this->user_config->set('contacts', $contacts->export());
+            $this->session->record_unsaved('Contact deleted');
+            Hm_Msgs::add('Contact Deleted');
+        }
+    }
+}
+
+/**
+ * @subpackage local_contacts/handler
+ */
 class Hm_Handler_process_add_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
@@ -67,11 +83,12 @@ class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
             }
         }
         $this->out('contact_store', $contacts, false);
+        $this->out('contact_edit', true, false);
     }
 }
 
 /**
- * @subpackage contacts/output
+ * @subpackage local_contacts/output
  */
 class Hm_Output_contacts_form extends Hm_Output_Module {
     protected function output() {
