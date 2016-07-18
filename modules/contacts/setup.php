@@ -13,9 +13,11 @@ add_handler('contacts', 'load_contacts', true, 'contacts', 'load_user_data', 'af
 add_handler('contacts', 'process_add_contact', true, 'contacts', 'load_contacts', 'after');
 add_handler('contacts', 'process_edit_contact', true, 'contacts', 'load_contacts', 'after');
 add_output('contacts', 'contacts_content_start', true, 'contacts', 'content_section_start', 'after');
-add_output('contacts', 'contacts_content_add_form', true, 'contacts', 'contacts_content_start', 'after');
-add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_content_add_form', 'after');
-add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_content_add_form', 'after');
+add_output('contacts', 'contacts_form_start', true, 'contacts', 'contacts_content_start', 'after');
+add_output('contacts', 'contacts_form', true, 'contacts', 'contacts_form_start', 'after');
+add_output('contacts', 'contacts_form_end', true, 'contacts', 'contacts_form', 'after');
+add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_form_end', 'after');
+add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_list', 'after');
 
 add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'logout_menu_item', 'before');
 

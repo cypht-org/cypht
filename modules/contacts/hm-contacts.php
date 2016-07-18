@@ -16,8 +16,7 @@ class Hm_Contact_Store {
     private $contacts = array();
     private $sort_fld = false;
 
-    public function __construct($user_config) {
-        $this->import($user_config->get('contacts', array()));
+    public function __construct() {
     }
 
     public function add_contact($data) {

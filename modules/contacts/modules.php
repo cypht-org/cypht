@@ -19,7 +19,8 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
         $results = array();
         if ($success) {
             $val = trim($form['contact_value']);
-            $contacts = new Hm_Contact_Store($this->user_config);
+            $contacts = new Hm_Contact_Store();
+            $contacts->import($this->user_config->get('contacts', array()));
             if ($this->module_is_supported('imap')) {
                 $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
             }
@@ -40,7 +41,8 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
 class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = array();
-        $existing = new Hm_Contact_Store($this->user_config);
+        $existing = new Hm_Contact_Store();
+        $existing->import($this->user_config->get('contacts', array()));
         $addr_headers = array('to', 'cc', 'bcc', 'sender', 'reply-to', 'from');
         $headers = $this->get('msg_headers', array());
         $addresses = array();
@@ -63,7 +65,8 @@ class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
 class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('contact_id', $this->request->get)) {
-            $contacts = new Hm_Contact_Store($this->user_config);
+            $contacts = new Hm_Contact_Store();
+            $contacts->import($this->user_config->get('contacts', array()));
             if ($this->module_is_supported('imap')) {
                 $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
             }
@@ -83,6 +86,7 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
 class Hm_Handler_load_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = new Hm_Contact_Store($this->user_config);
+        $contacts->import($this->user_config->get('contacts', array()));
         if (array_key_exists('contact_id', $this->request->get)) {
             $contact = $contacts->get($this->request->get['contact_id']);
             if (is_object($contact)) {
@@ -295,14 +299,32 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
 /**
  * @subpackage contacts/output
  */
-class Hm_Output_contacts_content_add_form extends Hm_Output_Module {
+class Hm_Output_contacts_form_start extends Hm_Output_Module {
+    protected function output() {
+        return '<div class="add_server"><form class="add_contact_form" method="POST">';
+    }
+}
+
+/**
+ * @subpackage contacts/output
+ */
+class Hm_Output_contacts_form_end extends Hm_Output_Module {
+    protected function output() {
+        return '</form></div>';
+    }
+}
+
+/**
+ * @subpackage contacts/output
+ */
+class Hm_Output_contacts_form extends Hm_Output_Module {
     protected function output() {
 
         $email = '';
         $name = '';
         $phone = '';
         $button = '<input class="add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
-        $title = $this->trans('Add Local Contact');
+        $title = $this->trans('Add Contact');
         $current = $this->get('current_contact', array());
         if (!empty($current)) {
             if (array_key_exists('email_address', $current)) {
@@ -314,12 +336,11 @@ class Hm_Output_contacts_content_add_form extends Hm_Output_Module {
             if (array_key_exists('phone_number', $current)) {
                 $phone = $current['phone_number'];
             }
-            $title = $this->trans('Update Local Contact');
+            $title = $this->trans('Update Contact');
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
-        return '<div class="add_server"><div class="server_title">'.$title.'</div>'.
-            '<form class="add_contact_form" method="POST">'.
+        return '<div class="server_title">'.$title.'</div>'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="screen_reader" for="contact_email">'.$this->trans('E-mail Address').'</label>'.
             '<input autofocus required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" '.
@@ -329,7 +350,7 @@ class Hm_Output_contacts_content_add_form extends Hm_Output_Module {
             'value="'.$this->html_safe($name).'" /> *<br />'.
             '<label class="screen_reader" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
             '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
-            'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="reset_contact" value="'.$this->trans('Reset').'" /></form></div>';
+            'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="reset_contact" value="'.$this->trans('Reset').'" />';
     }
 }
 
