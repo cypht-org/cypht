@@ -19,12 +19,7 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
         $results = array();
         if ($success) {
             $val = trim($form['contact_value']);
-            $contacts = new Hm_Contact_Store();
-            $contacts->import($this->user_config->get('contacts', array()));
-            if ($this->module_is_supported('imap')) {
-                $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
-            }
-            $contacts = fetch_ldap_contacts($this->config, $contacts);
+            $contacts = $this->get('contact_store');
             $contacts->sort('email_address');
             $results = array_slice($contacts->search(array(
                 'display_name' => $val,
@@ -41,8 +36,7 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
 class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = array();
-        $existing = new Hm_Contact_Store();
-        $existing->import($this->user_config->get('contacts', array()));
+        $existing = $this->get('contact_store');
         $addr_headers = array('to', 'cc', 'bcc', 'sender', 'reply-to', 'from');
         $headers = $this->get('msg_headers', array());
         $addresses = array();
@@ -65,12 +59,7 @@ class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
 class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('contact_id', $this->request->get)) {
-            $contacts = new Hm_Contact_Store();
-            $contacts->import($this->user_config->get('contacts', array()));
-            if ($this->module_is_supported('imap')) {
-                $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
-            }
-            $contacts = fetch_ldap_contacts($this->config, $contacts);
+            $contacts = $this->get('contact_store');
             $contact = $contacts->get($this->request->get['contact_id']);
             if ($contact) {
                 $to = sprintf('"%s" <%s>', $contact->value('display_name'), $contact->value('email_address'));
@@ -85,26 +74,13 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_load_contacts extends Hm_Handler_Module {
     public function process() {
-        $contacts = new Hm_Contact_Store($this->user_config);
-        $contacts->import($this->user_config->get('contacts', array()));
-        if (array_key_exists('contact_id', $this->request->get)) {
-            $contact = $contacts->get($this->request->get['contact_id']);
-            if (is_object($contact)) {
-                $current = $contact->export();
-                $current['id'] = $this->request->get['contact_id'];
-                $this->out('current_contact', $current);
-            }
-        }
+        $contacts = new Hm_Contact_Store();
         $page = 1;
         if (array_key_exists('contact_page', $this->request->get)) {
             $page = $this->request->get['contact_page'];
         }
         $this->out('contact_page', $page);
-        if ($this->module_is_supported('imap')) {
-            $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
-        }
-        $contacts = fetch_ldap_contacts($this->config, $contacts);
-        $this->out('contact_store', $contacts);
+        $this->out('contact_store', $contacts, false);
     }
 }
 
@@ -117,7 +93,7 @@ class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('contact_id'));
         if ($success) {
             $contacts->delete($form['contact_id']);
-            $contacts->save($this->user_config);
+            $this->user_config->set('contacts', $contacts->export());
             $this->session->record_unsaved('Contact deleted');
             Hm_Msgs::add('Contact Deleted');
         }
@@ -137,51 +113,10 @@ class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
                 foreach ($addresses as $vals) {
                     $contacts->add_contact(array('email_address' => $vals['email'], 'display_name' => $vals['name']));
                 }
-                $contacts->save($this->user_config);
+                $this->user_config->set('contacts', $contacts->export());
                 $this->session->record_unsaved('Contact added');
                 Hm_Msgs::add('Contact Added');
             }
-        }
-    }
-}
-
-/**
- * @subpackage contacts/handler
- */
-class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
-    public function process() {
-        $contacts = $this->get('contact_store');
-        list($success, $form) = $this->process_form(array('contact_id', 'contact_email', 'contact_name', 'edit_contact'));
-        if ($success) {
-            $details = array('email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
-            if (array_key_exists('contact_phone', $this->request->post)) {
-                $details['phone_number'] = $this->request->post['contact_phone'];
-            }
-            if ($contacts->update_contact($form['contact_id'], $details)) {
-                $contacts->save($this->user_config);
-                $this->session->record_unsaved('Contact updated');
-                Hm_Msgs::add('Contact Updated');
-            }
-        }
-    }
-}
-
-/**
- * @subpackage contacts/handler
- */
-class Hm_Handler_process_add_contact extends Hm_Handler_Module {
-    public function process() {
-        $contacts = $this->get('contact_store');
-        list($success, $form) = $this->process_form(array('contact_email', 'contact_name', 'add_contact'));
-        if ($success) {
-            $details = array('email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
-            if (array_key_exists('contact_phone', $this->request->post) && $this->request->post['contact_phone']) {
-                $details['phone_number'] = $this->request->post['contact_phone'];
-            }
-            $contacts->add_contact($details);
-            $contacts->save($this->user_config);
-            $this->session->record_unsaved('Contact added');
-            Hm_Msgs::add('Contact Added');
         }
     }
 }
@@ -424,35 +359,4 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
     return $contact_store;
 }
 
-/**
- * @subpackage contacts/functions
- */
-function fetch_ldap_contacts($config, $contact_store, $session=false) {
-    $ldap_config = ldap_config($config);
-    if (count($ldap_config) > 0) {
-        $ldap = new Hm_LDAP_Contacts($ldap_config);
-        if ($ldap->connect()) {
-            $contacts = $ldap->fetch();
-            if (count($contacts) > 0) {
-                $contact_store->import($contacts);
-            }
-        }
-    }
-    return $contact_store;
-}
-
-/**
- * @subpackage contacts/functions
- */
-function ldap_config($config) {
-    $details = array();
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/ldap.ini';
-    if (is_readable($ini_file)) {
-        $settings = parse_ini_file($ini_file);
-        if (!empty($settings)) {
-            $details = $settings;
-        }
-    }
-    return $details;
-}
 
