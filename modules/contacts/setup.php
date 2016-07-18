@@ -12,8 +12,7 @@ setup_base_page('contacts', 'core');
 add_handler('contacts', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_output('contacts', 'contacts_content_start', true, 'contacts', 'content_section_start', 'after');
 add_output('contacts', 'contacts_form_start', true, 'contacts', 'contacts_content_start', 'after');
-add_output('contacts', 'contacts_form', true, 'contacts', 'contacts_form_start', 'after');
-add_output('contacts', 'contacts_form_end', true, 'contacts', 'contacts_form', 'after');
+add_output('contacts', 'contacts_form_end', true, 'contacts', 'contacts_form_start', 'after');
 add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_form_end', 'after');
 add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_list', 'after');
 
@@ -59,7 +58,8 @@ return array(
         'contact_id' => FILTER_VALIDATE_INT,
         'contact_value' => FILTER_SANITIZE_STRING,
         'edit_contact' => FILTER_SANITIZE_STRING,
-        'add_contact' => FILTER_SANITIZE_STRING
+        'add_contact' => FILTER_SANITIZE_STRING,
+        'contact_source' => FILTER_SANITIZE_STRING
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_VALIDATE_INT,
