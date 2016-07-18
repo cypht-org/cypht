@@ -19,6 +19,7 @@ class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
         if ($this->module_is_supported('imap')) {
             $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
         }
+        $this->append('contact_sources', 'gmail');
         $this->out('contact_store', $contacts, false);
     }
 }

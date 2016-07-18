@@ -49,6 +49,7 @@ class Hm_Handler_load_ldap_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
         $contacts = fetch_ldap_contacts($this->config, $contacts);
+        $this->append('contact_sources', 'ldap');
         $this->out('contact_store', $contacts, false);
     }
 }

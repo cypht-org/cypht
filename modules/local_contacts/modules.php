@@ -56,6 +56,7 @@ class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
         $contacts->import($this->user_config->get('contacts', array()));
+        $this->append('contact_sources', 'local');
         # TODO: split this out
         if (array_key_exists('contact_id', $this->request->get)) {
             $contact = $contacts->get($this->request->get['contact_id']);

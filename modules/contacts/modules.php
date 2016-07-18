@@ -127,7 +127,8 @@ class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
 class Hm_Output_contacts_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_contacts"><a class="unread_link" href="?page=contacts">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$people).'" alt="" width="16" height="16" /> '.$this->trans('Contacts').'</a></li>';
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$people).
+            '" alt="" width="16" height="16" /> '.$this->trans('Contacts').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -161,12 +162,15 @@ class Hm_Output_add_message_contacts extends Hm_Output_Module {
         $addresses = $this->get('contact_addresses');
         $headers = $this->get('msg_headers');
         if (!empty($addresses)) {
-            $res = '<div class="add_contact_row"><a href="#" onclick="$(\'.add_contact_controls\').toggle(); return false;"><img width="20" height="20" src="'.Hm_Image_Sources::$people.'" alt="'.$this->trans('Add').'" title="'.$this->html_safe('Add Contact').'" /></a><span class="add_contact_controls"><select id="add_contact">';
+            $res = '<div class="add_contact_row"><a href="#" onclick="$(\'.add_contact_controls\').toggle(); return false;">'.
+                '<img width="20" height="20" src="'.Hm_Image_Sources::$people.'" alt="'.$this->trans('Add').'" title="'.
+                $this->html_safe('Add Contact').'" /></a><span class="add_contact_controls"><select id="add_contact">';
             foreach ($addresses as $vals) {
                 $res .= '<option value="'.$this->html_safe($vals['name']).' '.$this->html_safe($vals['email']).
                     '">'.$this->html_safe($vals['name']).' &lt;'.$this->html_safe($vals['email']).'&gt;</option>';
             }
-            $res .= '</select> <input onclick="return add_contact_from_message_view()" class="add_contact_button" type="button" value="'.$this->trans('Add').'"></span></div>';
+            $res .= '</select> <input onclick="return add_contact_from_message_view()" class="add_contact_button" '.
+                'type="button" value="'.$this->trans('Add').'"></span></div>';
             $headers = $headers.$res;
         }
         $this->out('msg_headers', $headers, false);
@@ -178,6 +182,10 @@ class Hm_Output_add_message_contacts extends Hm_Output_Module {
  */
 class Hm_Output_contacts_list extends Hm_Output_Module {
     protected function output() {
+        if (count($this->get('contact_sources', array())) == 0) {
+            return '<div class="no_contact_sources">'.$this->trans('No contact backends are enabled!').
+                '<br />'.$this->trans('At least one backend must be enabled in the hm3.ini file to use contacts.').'</div>';
+        }
         $per_page = 25;
         $current_page = $this->get('contact_page', 1);
         $res = '<table class="contact_list">';
@@ -196,8 +204,9 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                 if (!$contact->value('source')) {
                     $res .= '<a data-id="'.$this->html_safe($id).'" class="delete_contact" title="'.$this->trans('Delete').'">'.
                         '<img alt="'.$this->trans('Delete').'" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
-                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_page='.$current_page.'" class="edit_contact" title="'.$this->trans('Edit').'">'.
-                        '<img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>';
+                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_page='.$current_page.
+                        '" class="edit_contact" title="'.$this->trans('Edit').'"><img alt="'.$this->trans('Edit').
+                        '" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>';
                 }
                 $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($id).'" class="send_to_contact" title="'.$this->trans('Send To').'">'.
                     '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$doc.'" /></a></td></tr>';
@@ -236,6 +245,9 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
  */
 class Hm_Output_contacts_form_start extends Hm_Output_Module {
     protected function output() {
+        if (count($this->get('contact_sources', array())) == 0) {
+            return '';
+        }
         return '<div class="add_server"><form class="add_contact_form" method="POST">';
     }
 }
@@ -245,6 +257,9 @@ class Hm_Output_contacts_form_start extends Hm_Output_Module {
  */
 class Hm_Output_contacts_form_end extends Hm_Output_Module {
     protected function output() {
+        if (count($this->get('contact_sources', array())) == 0) {
+            return '';
+        }
         return '</form></div>';
     }
 }
