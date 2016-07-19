@@ -143,6 +143,7 @@ class Hm_Output_contacts_content_end extends Hm_Output_Module {
  */
 class Hm_Output_add_message_contacts extends Hm_Output_Module {
     protected function output() {
+        /* TODO: make this source aware */
         $addresses = $this->get('contact_addresses');
         $headers = $this->get('msg_headers');
         if (!empty($addresses)) {
@@ -225,26 +226,3 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
     }
 }
 
-/**
- * @subpackage contacts/output
- */
-class Hm_Output_contacts_form_start extends Hm_Output_Module {
-    protected function output() {
-        if (count($this->get('contact_sources', array())) == 0 || count($this->get('contact_edit', array())) == 0) {
-            return '';
-        }
-        return '<div class="add_server"><form class="add_contact_form" method="POST">';
-    }
-}
-
-/**
- * @subpackage contacts/output
- */
-class Hm_Output_contacts_form_end extends Hm_Output_Module {
-    protected function output() {
-        if (count($this->get('contact_sources', array())) == 0 || count($this->get('contact_edit', array())) == 0) {
-            return '';
-        }
-        return '</form></div>';
-    }
-}

@@ -124,7 +124,8 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
-        return '<div class="server_title">'.$title.'</div>'.
+        return '<div class="add_server"><form class="add_contact_form" method="POST">'.
+            '<div class="server_title">'.$title.'</div>'.
             '<input type="hidden" name="contact_source" value="local" />'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="screen_reader" for="contact_email">'.$this->trans('E-mail Address').'</label>'.
@@ -135,6 +136,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             'value="'.$this->html_safe($name).'" /> *<br />'.
             '<label class="screen_reader" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
             '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
-            'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="reset_contact" value="'.$this->trans('Reset').'" />';
+            'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="reset_contact" value="'.
+            $this->trans('Reset').'" /></form></div>';
     }
 }
