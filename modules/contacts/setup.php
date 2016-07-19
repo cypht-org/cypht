@@ -63,6 +63,7 @@ return array(
     'allowed_get' => array(
         'contact_id' => FILTER_VALIDATE_INT,
         'contact_page' => FILTER_VALIDATE_INT,
+        'contact_source' => FILTER_SANITIZE_STRING,
     ),
     'allowed_output' => array(
         'contact_suggestions' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY)

@@ -68,13 +68,11 @@ class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
 /**
  * @subpackage local_contacts/handler
  */
-class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
+class Hm_Handler_load_edit_contact extends Hm_Handler_Module {
     public function process() {
-        $contacts = $this->get('contact_store');
-        $contacts->import($this->user_config->get('contacts', array()));
-        $this->append('contact_sources', 'local');
-        # TODO: split this out
-        if (array_key_exists('contact_id', $this->request->get)) {
+        if (array_key_exists('contact_source', $this->request->get) && $this->request->get['contact_source'] == 'local'
+            && array_key_exists('contact_id', $this->request->get)) {
+            $contacts = $this->get('contact_store');
             $contact = $contacts->get($this->request->get['contact_id']);
             if (is_object($contact)) {
                 $current = $contact->export();
@@ -82,8 +80,21 @@ class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
                 $this->out('current_contact', $current);
             }
         }
+    }
+}
+
+/**
+ * @subpackage local_contacts/handler
+ */
+class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
+    public function process() {
+        $contacts = $this->get('contact_store');
+        $contact_list = $this->user_config->get('contacts', array());
+        $contact_list = array_map(function($v) { $v['source'] = 'local'; return $v; }, $contact_list);
+        $contacts->import($contact_list);
+        $this->append('contact_sources', 'local');
         $this->out('contact_store', $contacts, false);
-        $this->out('contact_edit', true, false);
+        $this->append('contact_edit', 'local');
     }
 }
 

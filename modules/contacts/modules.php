@@ -175,6 +175,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         $res = '<table class="contact_list">';
         $res .= '<tr><td colspan="5" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
         $contacts = $this->get('contact_store');
+        $editable = $this->get('contact_edit', array());
         if ($contacts) {
             $total = count($contacts->dump());
             $contacts->sort('email_address');
@@ -185,10 +186,10 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<td>'.$this->html_safe($contact->value('email_address')).'</td>'.
                     '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
                     '<td class="contact_controls">';
-                if (!$contact->value('source')) {
+                if (in_array($contact->value('source'), $editable, true)) {
                     $res .= '<a data-id="'.$this->html_safe($id).'" class="delete_contact" title="'.$this->trans('Delete').'">'.
                         '<img alt="'.$this->trans('Delete').'" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
-                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_page='.$current_page.
+                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_source='.$this->html_safe($contact->value('source')).'&amp;contact_page='.$current_page.
                         '" class="edit_contact" title="'.$this->trans('Edit').'"><img alt="'.$this->trans('Edit').
                         '" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>';
                 }
@@ -229,7 +230,7 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
  */
 class Hm_Output_contacts_form_start extends Hm_Output_Module {
     protected function output() {
-        if (count($this->get('contact_sources', array())) == 0 || !$this->get('contact_edit', false)) {
+        if (count($this->get('contact_sources', array())) == 0 || count($this->get('contact_edit', array())) == 0) {
             return '';
         }
         return '<div class="add_server"><form class="add_contact_form" method="POST">';
@@ -241,7 +242,7 @@ class Hm_Output_contacts_form_start extends Hm_Output_Module {
  */
 class Hm_Output_contacts_form_end extends Hm_Output_Module {
     protected function output() {
-        if (count($this->get('contact_sources', array())) == 0 || !$this->get('contact_edit', false)) {
+        if (count($this->get('contact_sources', array())) == 0 || count($this->get('contact_edit', array())) == 0) {
             return '';
         }
         return '</form></div>';
