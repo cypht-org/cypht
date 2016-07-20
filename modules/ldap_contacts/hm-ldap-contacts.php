@@ -78,14 +78,19 @@ class Hm_LDAP_Contacts {
             if (!is_array($contact)) {
                 continue;
             }
+            $all = array();
             foreach ($contact as $name => $fld) {
                 if (in_array($name, array_keys($flds), true)) {
                     $res[$flds[$name]] = $fld[0];
+                }
+                if (!is_int($name) && $name != 'count') {
+                    $all[$name] = $fld[0];
                 }
             }
             if (array_key_exists('email_address', $res) && $res['email_address'] &&
                 array_key_exists('display_name', $res) && $res['display_name']) {
                 $res['source'] = $this->source;
+                $res['all_fields'] = $all;
                 $result[] = $res;
             }
         }

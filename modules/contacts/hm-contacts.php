@@ -95,7 +95,7 @@ class Hm_Contact_Store {
 
     public function export($source = 'local') {
         return array_map(function($contact) { return $contact->export(); },
-            array_filter($this->contacts, function($contact) { return $contact->value('source') == $source; })
+            array_filter($this->contacts, function($contact) use ($source) { return $contact->value('source') == $source; })
         );
     }
 

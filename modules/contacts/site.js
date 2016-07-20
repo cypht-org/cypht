@@ -1,11 +1,12 @@
 'use strict';
-var delete_contact = function(id) {
+var delete_contact = function(id, source) {
     if (!hm_delete_prompt()) {
         return false;
     }
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_delete_contact'},
-        {'name': 'contact_id', 'value': id}],
+        {'name': 'contact_id', 'value': id},
+        {'name': 'contact_source', 'value': source}],
         function(res) { $('.contact_row_'+id).remove(); }
     );
 };
@@ -158,11 +159,14 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
 
 if (hm_page_name() == 'contacts') {
     $('.delete_contact').click(function() {
-        delete_contact($(this).data('id'));
+        delete_contact($(this).data('id'), $(this).data('source'));
         return false;
     });
     $('.reset_contact').click(function() {
         window.location.href = '?page=contacts';
+    });
+    $('.server_title').click(function() {
+        $(this).next().toggle();
     });
 }
 else if (hm_page_name() == 'compose') {

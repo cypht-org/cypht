@@ -15,5 +15,6 @@ add_handler('ajax_autocomplete_contact', 'load_local_contacts', true, 'local_con
 add_handler('ajax_imap_message_content', 'load_local_contacts', true, 'local_contacts', 'load_contacts', 'after');
 add_handler('compose', 'load_local_contacts', true, 'local_contacts', 'load_contacts', 'after');
 
-add_handler('ajax_delete_contact', 'process_delete_contact', true, 'local_contacts', 'load_local_contacts', 'after');
+add_handler('ajax_delete_contact', 'load_local_contacts', true, 'local_contacts', 'load_contacts', 'after');
+add_handler('ajax_delete_contact', 'process_delete_contact', true, 'local_contacts', 'save_user_data', 'before');
 return array();

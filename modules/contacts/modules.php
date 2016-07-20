@@ -188,9 +188,10 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
                     '<td class="contact_controls">';
                 if (in_array($contact->value('source'), $editable, true)) {
-                    $res .= '<a data-id="'.$this->html_safe($id).'" class="delete_contact" title="'.$this->trans('Delete').'">'.
+                    $res .= '<a data-id="'.$this->html_safe($id).'" data-source="'.$this->html_safe($contact->value('source')).'" class="delete_contact" title="'.$this->trans('Delete').'">'.
                         '<img alt="'.$this->trans('Delete').'" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
-                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_source='.$this->html_safe($contact->value('source')).'&amp;contact_page='.$current_page.
+                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_source='.
+                        $this->html_safe($contact->value('source')).'&amp;contact_page='.$current_page.
                         '" class="edit_contact" title="'.$this->trans('Edit').'"><img alt="'.$this->trans('Edit').
                         '" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>';
                 }

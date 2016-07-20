@@ -16,3 +16,9 @@
 #cc_contacts, #bcc_contacts, #to_contacts { display: none; left: 34px; margin-top: -5px; position: absolute; background-color: #fff; border: solid 1px #ddd; padding: 10px; border-radius: 3px 3px 3px 3px; border-top: none; }
 .contact_pages { text-align: center; border-bottom: none !important; }
 .no_contact_sources { text-align: center; color: #999; font-size: 110%; margin-top: 60px; }
+.add_contact { margin-top: 10px; color: #666; margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; }
+.add_contact input, .add_contact select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
+.add_contact .server_title { cursor: pointer; }
+.contact_form { margin-top: 10px; display: none; }
+.add_contact .menu_caret { opacity: .7; }
+.contact_update_form { margin-top: 10px; }
