@@ -89,6 +89,7 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
  */
 class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
     public function process() {
+        # TODO: add source support, move to backend modules
         list($success, $form) = $this->process_form(array('contact_value'));
         if ($success) {
             $addresses = Hm_Address_Field::parse($form['contact_value']);
@@ -188,15 +189,18 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
                     '<td class="contact_controls">';
                 if (in_array($contact->value('source'), $editable, true)) {
-                    $res .= '<a data-id="'.$this->html_safe($id).'" data-source="'.$this->html_safe($contact->value('source')).'" class="delete_contact" title="'.$this->trans('Delete').'">'.
-                        '<img alt="'.$this->trans('Delete').'" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
+                    $res .= '<a data-id="'.$this->html_safe($id).'" data-source="'.$this->html_safe($contact->value('source')).
+                        '" class="delete_contact" title="'.$this->trans('Delete').'"><img alt="'.$this->trans('Delete').
+                        '" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
                         '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_source='.
                         $this->html_safe($contact->value('source')).'&amp;contact_page='.$current_page.
                         '" class="edit_contact" title="'.$this->trans('Edit').'"><img alt="'.$this->trans('Edit').
                         '" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>';
                 }
-                $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($id).'" class="send_to_contact" title="'.$this->trans('Send To').'">'.
-                    '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$doc.'" /></a></td></tr>';
+                $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($id).
+                    '" class="send_to_contact" title="'.$this->trans('Send To').'">'.
+                    '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.
+                    Hm_Image_Sources::$doc.'" /></a></td></tr>';
             }
             $res .= '<tr><td class="contact_pages" colspan="5">';
             if ($current_page > 1) {
