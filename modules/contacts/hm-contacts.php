@@ -167,6 +167,8 @@ class Hm_Address_Field {
 
     public static function parse($string) {
         $marker = true;
+        $string = str_replace(array('<', '>'), array(' <', '> '), $string);
+        $string = preg_replace("/\s{2,}/", ' ', $string);
         $results = array();
 
         while ($marker !== false) {
