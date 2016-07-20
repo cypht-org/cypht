@@ -13,10 +13,12 @@ var delete_contact = function(id, source) {
 
 var add_contact_from_message_view = function() {
     var contact = $('#add_contact').val();
+    var source = $('#contact_source').val();
     if (contact) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
-            {'name': 'contact_value', 'value': contact}],
+            {'name': 'contact_value', 'value': contact},
+            {'name': 'contact_source', 'value': source}],
             function(res) { $('.add_contact_controls').toggle(); }
         );
     }

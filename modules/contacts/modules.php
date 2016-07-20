@@ -85,28 +85,6 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
 }
 
 /**
- * @subpackage contacts/handler
- */
-class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
-    public function process() {
-        # TODO: add source support, move to backend modules
-        list($success, $form) = $this->process_form(array('contact_value'));
-        if ($success) {
-            $addresses = Hm_Address_Field::parse($form['contact_value']);
-            if (!empty($addresses)) {
-                $contacts = $this->get('contact_store');
-                foreach ($addresses as $vals) {
-                    $contacts->add_contact(array('email_address' => $vals['email'], 'display_name' => $vals['name']));
-                }
-                $this->user_config->set('contacts', $contacts->export());
-                $this->session->record_unsaved('Contact added');
-                Hm_Msgs::add('Contact Added');
-            }
-        }
-    }
-}
-
-/**
  * @subpackage contacts/output
  */
 class Hm_Output_contacts_page_link extends Hm_Output_Module {
@@ -144,16 +122,20 @@ class Hm_Output_contacts_content_end extends Hm_Output_Module {
  */
 class Hm_Output_add_message_contacts extends Hm_Output_Module {
     protected function output() {
-        /* TODO: make this source aware */
         $addresses = $this->get('contact_addresses');
         $headers = $this->get('msg_headers');
-        if (!empty($addresses)) {
+        $backends = $this->get('contact_edit', array());
+        if (!empty($addresses) && count($backends) > 0) {
             $res = '<div class="add_contact_row"><a href="#" onclick="$(\'.add_contact_controls\').toggle(); return false;">'.
                 '<img width="20" height="20" src="'.Hm_Image_Sources::$people.'" alt="'.$this->trans('Add').'" title="'.
                 $this->html_safe('Add Contact').'" /></a><span class="add_contact_controls"><select id="add_contact">';
             foreach ($addresses as $vals) {
                 $res .= '<option value="'.$this->html_safe($vals['name']).' '.$this->html_safe($vals['email']).
                     '">'.$this->html_safe($vals['name']).' &lt;'.$this->html_safe($vals['email']).'&gt;</option>';
+            }
+            $res .= '</select> <select id="contact_source">';
+            foreach ($backends as $val) {
+                $res .= '<option value="'.$this->html_safe($val).'">'.$this->html_safe($val).'</option>';
             }
             $res .= '</select> <input onclick="return add_contact_from_message_view()" class="add_contact_button" '.
                 'type="button" value="'.$this->trans('Add').'"></span></div>';

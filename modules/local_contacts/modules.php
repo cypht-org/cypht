@@ -11,6 +11,27 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage local_contacts/handler
  */
+class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('contact_source', 'contact_value'));
+        if ($success && $form['contact_source'] == 'local') {
+            $addresses = Hm_Address_Field::parse($form['contact_value']);
+            if (!empty($addresses)) {
+                $contacts = $this->get('contact_store');
+                foreach ($addresses as $vals) {
+                    $contacts->add_contact(array('source' => 'local', 'email_address' => $vals['email'], 'display_name' => $vals['name']));
+                }
+                $this->user_config->set('contacts', $contacts->export());
+                $this->session->record_unsaved('Contact added');
+                Hm_Msgs::add('Contact Added');
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage local_contacts/handler
+ */
 class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
