@@ -39,6 +39,7 @@ add_handler('ajax_autocomplete_contact', 'load_ldap_contacts', true, 'ldap_conta
 add_handler('ajax_imap_message_content', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
 add_handler('compose', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
 add_handler('ajax_delete_contact', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
+add_handler('ajax_delete_contact', 'process_delete_ldap_contact', true, 'ldap_contacts', 'load_ldap_contacts', 'after');
 add_handler('ajax_add_contact', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
 
 return array(

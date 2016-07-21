@@ -13,6 +13,33 @@ require APP_PATH.'modules/ldap_contacts/hm-ldap-contacts.php';
 /**
  * @subpackage ldap_contacts/handler
  */
+class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
+    public function process() {
+        $contacts = $this->get('contact_store');
+        list($success, $form) = $this->process_form(array('contact_source', 'contact_id'));
+        if ($success && $form['contact_source'] == 'ldap') {
+            $contact = $contacts->get($form['contact_id']);
+            if (!$contact) {
+                Hm_Msgs::add('ERRUnable to find contact to delete');
+            }
+            $config = ldap_config($this->config);
+            $ldap = new Hm_LDAP_Contacts($config);
+            if ($ldap->connect()) {
+                $flds = $contact->value('all_fields');
+                $ldap->delete($flds['dn']);
+                $this->session->record_unsaved('Contact Deleted');
+                Hm_Msgs::add('Contact Deleted');
+            }
+            else {
+                Hm_Msgs::add('ERRCould not delete contact');
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
 class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
     public function process() {
         $form = $this->get('ldap_add_data', array());
@@ -74,7 +101,7 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
         $ldap = new Hm_LDAP_Contacts($config);
         if ($ldap->connect()) {
             if ($ldap->add($entry, $dn)) {
-                $this->session->record_unsaved('Contact deleted');
+                $this->session->record_unsaved('Contact Added');
                 Hm_Msgs::add('Contact Added');
             }
             else {

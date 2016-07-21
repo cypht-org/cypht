@@ -58,6 +58,10 @@ class Hm_LDAP_Contacts {
         return @ldap_add($this->fh, $dn, $entry);
     }
 
+    public function delete($dn) {
+        return @ldap_delete($this->fh, $dn);
+    }
+
     private function auth() {
         if (array_key_exists('auth', $this->config) && $this->config['auth']) {
             if (array_key_exists('user', $this->config) && array_key_exists('pass', $this->config)) {
@@ -87,8 +91,11 @@ class Hm_LDAP_Contacts {
                 if (in_array($name, array_keys($flds), true)) {
                     $res[$flds[$name]] = $fld[0];
                 }
-                if (!is_int($name) && $name != 'count') {
+                elseif (!is_int($name) && $name != 'count' && $name != 'dn') {
                     $all[$name] = $fld[0];
+                }
+                elseif ($name == 'dn') {
+                    $all[$name] = $fld;
                 }
             }
             if (array_key_exists('email_address', $res) && $res['email_address'] &&
