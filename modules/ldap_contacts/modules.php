@@ -13,6 +13,46 @@ require APP_PATH.'modules/ldap_contacts/hm-ldap-contacts.php';
 /**
  * @subpackage ldap_contacts/handler
  */
+class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('contact_source', 'contact_value'));
+        if ($success && $form['contact_source'] == 'ldap') {
+            $addresses = Hm_Address_Field::parse($form['contact_value']);
+            $config = ldap_config($this->config);
+            $ldap = new Hm_LDAP_Contacts($config);
+            if (!empty($addresses)) {
+                $contacts = $this->get('contact_store');
+                if ($ldap->connect()) {
+                    foreach ($addresses as $vals) {
+                        $atts = array('mail' => $vals['email'], 'objectclass' => array('top', 'person', 'organizationalperson', 'inetorgperson'));
+                        if (array_key_exists('name', $vals) && trim($vals['name'])) {
+                            $dn = sprintf('cn=%s,%s', $vals['name'], $config['base_dn']);
+                            $atts['sn'] = $vals['name'];
+                            $atts['cn'] = $vals['name'];
+                            $atts['displayname'] = $vals['name'];
+                        }
+                        else {
+                            $dn = sprintf('cn=%s,%s', str_replace(array('<', '>'), '', $vals['email']), $config['base_dn']);
+                            $atts['cn'] = str_replace(array('<', '>'), '', $vals['email']);
+                            $atts['sn'] = $atts['cn'];
+                        }
+                        if ($ldap->add($atts, $dn)) {
+                            Hm_Msgs::add('Contact Added');
+                            $this->session->record_unsaved('Contact added');
+                        }
+                        else {
+                            Hm_Msgs::add('ERRUnable to add contact');
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
 class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
@@ -305,8 +345,8 @@ class Hm_Output_ldap_form_displayname extends Hm_Output_Module {
 class Hm_Output_ldap_form_mail extends Hm_Output_Module {
     protected function output() {
         $val = get_ldap_value('email_address', $this);
-        return '<label class="screen_reader" for="ldap_mail">'.$this->trans('E-Mail').'</label>'.
-            '<input required placeholder="'.$this->trans('E-Mail').'" id="ldap_mail" type="email" name="ldap_mail" '.
+        return '<label class="screen_reader" for="ldap_mail">'.$this->trans('E-mail Address').'</label>'.
+            '<input required placeholder="'.$this->trans('E-mail Address').'" id="ldap_mail" type="email" name="ldap_mail" '.
             'value="'.$this->html_safe($val).'" /> *<br />';
     }
 }

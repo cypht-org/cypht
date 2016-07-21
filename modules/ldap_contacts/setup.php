@@ -44,6 +44,7 @@ add_handler('compose', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contac
 add_handler('ajax_delete_contact', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
 add_handler('ajax_delete_contact', 'process_delete_ldap_contact', true, 'ldap_contacts', 'load_ldap_contacts', 'after');
 add_handler('ajax_add_contact', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
+add_handler('ajax_add_contact', 'process_add_ldap_contact_from_message', true, 'ldap_contacts', 'save_user_data', 'before');
 
 return array(
     'allowed_post' => array(

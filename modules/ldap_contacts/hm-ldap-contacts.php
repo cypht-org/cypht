@@ -13,13 +13,15 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_LDAP_Contacts {
 
-    private $config;
+    private $config = array();
     private $fh;
     private $source = 'ldap';
 
     public function __construct($config) {
-        $this->config = $config;
-        if (array_key_exists('name', $config)) {
+        if (is_array($config)) {
+            $this->config = $config;
+        }
+        if (is_array($config) && array_key_exists('name', $config)) {
             $this->source = $config['name'];
         }
     }
