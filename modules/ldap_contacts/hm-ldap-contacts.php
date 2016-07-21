@@ -54,6 +54,10 @@ class Hm_LDAP_Contacts {
         return false;
     }
 
+    public function add($entry, $dn) {
+        return @ldap_add($this->fh, $dn, $entry);
+    }
+
     private function auth() {
         if (array_key_exists('auth', $this->config) && $this->config['auth']) {
             if (array_key_exists('user', $this->config) && array_key_exists('pass', $this->config)) {

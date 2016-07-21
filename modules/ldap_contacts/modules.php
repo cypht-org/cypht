@@ -11,35 +11,89 @@ if (!defined('DEBUG_MODE')) { die(); }
 require APP_PATH.'modules/ldap_contacts/hm-ldap-contacts.php';
 
 /**
- * @subpackage ldap_contacts/functions
+ * @subpackage ldap_contacts/handler
  */
-function fetch_ldap_contacts($config, $contact_store, $session=false) {
-    $ldap_config = ldap_config($config);
-    if (count($ldap_config) > 0) {
-        $ldap = new Hm_LDAP_Contacts($ldap_config);
-        if ($ldap->connect()) {
-            $contacts = $ldap->fetch();
-            if (count($contacts) > 0) {
-                $contact_store->import($contacts);
+class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
+    public function process() {
+        $form = $this->get('ldap_add_data', array());
+        if (!is_array($form) || count($form) == 0) {
+            return;
+        }
+        $config = ldap_config($this->config);
+        $dn = sprintf('cn=%s %s,%s', $form['ldap_first_name'], $form['ldap_last_name'], $config['base_dn']);
+        $cn = sprintf('%s %s', $form['ldap_first_name'], $form['ldap_last_name']);
+        $result = array('cn' => $cn, 'objectclass' => array('top', 'person', 'organizationalperson', 'inetorgperson'));
+        $ldap_map = array(
+            'ldap_first_name' => 'givenname',
+            'ldap_last_name' => 'sn',
+            'ldap_displayname' => 'displayname',
+            'ldap_mail' => 'mail',
+            'ldap_locality' => 'l',
+            'ldap_state' => 'st',
+            'ldap_street' => 'street',
+            'ldap_postalcode' => 'postalcode',
+            'ldap_title' => 'title',
+            'ldap_phone' => 'telephonenumber',
+            'ldap_fax' => 'facsimiletelephonenumber',
+            'ldap_mobile' => 'mobile',
+            'ldap_room' => 'roomnumber',
+            'ldap_car' => 'carlicense',
+            'ldap_org' => 'o',
+            'ldap_org_unit' => 'ou',
+            'ldap_org_dpt' => 'departmentnumber',
+            'ldap_emp_num' => 'employeenumber',
+            'ldap_emp_type' => 'employeetype',
+            'ldap_lang' => 'preferredlanguage',
+            'ldap_uri' => 'labeleduri'
+        );
+        foreach ($ldap_map as $name => $val) {
+            if (array_key_exists($name, $form)) {
+                $result[$val] = $form[$name];
+            }
+            elseif (array_key_exists($name, $this->request->post) && trim($this->request->post[$name])) {
+                $result[$val] = $this->request->post[$name];
             }
         }
+        $this->out('add_dn', $dn);
+        $this->out('ldap_add_entry', $result);
+        $this->out('ldap_config', $config);
     }
-    return $contact_store;
 }
 
 /**
- * @subpackage ldap_contacts/functions
+ * @subpackage ldap_contacts/handler
  */
-function ldap_config($config) {
-    $details = array();
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/ldap.ini';
-    if (is_readable($ini_file)) {
-        $settings = parse_ini_file($ini_file);
-        if (!empty($settings)) {
-            $details = $settings;
+class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
+    public function process() {
+        $entry = $this->get('ldap_add_entry', array());
+        if (!is_array($entry) || count($entry) == 0) {
+            return;
+        }
+        $config = $this->get('ldap_config');
+        $dn = $this->get('add_dn');
+        $ldap = new Hm_LDAP_Contacts($config);
+        if ($ldap->connect()) {
+            if ($ldap->add($entry, $dn)) {
+                $this->session->record_unsaved('Contact deleted');
+                Hm_Msgs::add('Contact Added');
+            }
+            else {
+                Hm_Msgs::add('ERRCould not add contact');
+            }
         }
     }
-    return $details;
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
+class Hm_Handler_process_add_ldap_contact extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('contact_source', 'ldap_first_name', 'add_ldap_contact', 'ldap_last_name', 'ldap_mail'));
+        if ($success && $form['contact_source'] == 'ldap') {
+            $this->out('ldap_add_data', $form);
+        }
+    }
 }
 
 /**
@@ -99,7 +153,12 @@ class Hm_Output_ldap_form_first_name extends Hm_Output_Module {
 class Hm_Output_ldap_form_submit extends Hm_Output_Module {
     protected function output() {
         $label = 'Add';
-        return '<input type="submit" value="'.$this->trans($label).'" />'.
+        $name = 'add_ldap_contact';
+        if ($this->get('current_ldap_contact')) {
+            $label = 'Update';
+            $name = 'update_ldap_contact';
+        }
+        return '<input name="'.$name.'" type="submit" value="'.$this->trans($label).'" />'.
             '<input type="button" class="reset_contact" value="'.$this->trans('Reset').'" />';
     }
 }
@@ -141,6 +200,7 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
             $form_class = 'contact_update_form';
         }
         return '<div class="add_contact"><form class="add_contact_form" method="POST">'.
+            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="server_title">'.$title.
             '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>'.
             '<div class="'.$form_class.'">'.
@@ -155,7 +215,7 @@ class Hm_Output_ldap_form_displayname extends Hm_Output_Module {
     protected function output() {
         $val = get_ldap_value('displayname', $this);
         return '<label class="screen_reader" for="ldap_displayname">'.$this->trans('Display Name').'</label>'.
-            '<input placeholder="'.$this->trans('Display Name').'" id="ldap_displayname" type="text" name="ldap_mail" '.
+            '<input placeholder="'.$this->trans('Display Name').'" id="ldap_displayname" type="text" name="ldap_displayname" '.
             'value="'.$this->html_safe($val).'" /><br />';
     }
 }
@@ -167,7 +227,7 @@ class Hm_Output_ldap_form_mail extends Hm_Output_Module {
     protected function output() {
         $val = get_ldap_value('mail', $this);
         return '<label class="screen_reader" for="ldap_mail">'.$this->trans('E-Mail').'</label>'.
-            '<input required placeholder="'.$this->trans('E-Mail').'" id="ldap_mail" type="text" name="ldap_mail" '.
+            '<input required placeholder="'.$this->trans('E-Mail').'" id="ldap_mail" type="email" name="ldap_mail" '.
             'value="'.$this->html_safe($val).'" /> *<br />';
     }
 }
@@ -377,3 +437,36 @@ function get_ldap_value($fld, $mod) {
     }
     return '';
 }
+
+/**
+ * @subpackage ldap_contacts/functions
+ */
+function fetch_ldap_contacts($config, $contact_store, $session=false) {
+    $ldap_config = ldap_config($config);
+    if (count($ldap_config) > 0) {
+        $ldap = new Hm_LDAP_Contacts($ldap_config);
+        if ($ldap->connect()) {
+            $contacts = $ldap->fetch();
+            if (count($contacts) > 0) {
+                $contact_store->import($contacts);
+            }
+        }
+    }
+    return $contact_store;
+}
+
+/**
+ * @subpackage ldap_contacts/functions
+ */
+function ldap_config($config) {
+    $details = array();
+    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/ldap.ini';
+    if (is_readable($ini_file)) {
+        $settings = parse_ini_file($ini_file);
+        if (!empty($settings)) {
+            $details = $settings;
+        }
+    }
+    return $details;
+}
+
