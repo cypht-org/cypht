@@ -356,7 +356,7 @@ class Hm_Output_ldap_form_mail extends Hm_Output_Module {
  */
 class Hm_Output_ldap_form_phone extends Hm_Output_Module {
     protected function output() {
-        $val = get_ldap_value('telephonenumber', $this);
+        $val = get_ldap_value('phone_number', $this);
         return '<label class="screen_reader" for="ldap_phone">'.$this->trans('Telephone Number').'</label>'.
             '<input placeholder="'.$this->trans('Telephone Number').'" id="ldap_phone" type="text" name="ldap_phone" '.
             'value="'.$this->html_safe($val).'" /><br />';
