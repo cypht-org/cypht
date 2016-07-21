@@ -40,7 +40,7 @@ class Hm_Handler_process_api_login extends Hm_Handler_login {
             header('Content-Type: application/json');
             echo json_encode(array(
                 'hm_id' => $this->session->enc_key,
-                'session_id' => $this->session->session_key
+                'hm_session' => $this->session->session_key
             ));
             exit;
         }
