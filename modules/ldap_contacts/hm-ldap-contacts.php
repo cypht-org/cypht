@@ -47,11 +47,20 @@ class Hm_LDAP_Contacts {
         $uri = $this->connect_details(); 
         $this->fh = ldap_connect($uri);
         if ($this->fh) {
+            ldap_set_option($this->fh, LDAP_OPT_PROTOCOL_VERSION, 3);
             if ($this->auth()) {
                 return true;
             }
         }
         return false;
+    }
+
+    public function rename($dn, $new_dn, $parent) {
+        return @ldap_rename($this->fh, $dn, $new_dn, $parent, true);
+    }
+
+    public function modify($entry, $dn) {
+        return @ldap_modify($this->fh, $dn, $entry);
     }
 
     public function add($entry, $dn) {

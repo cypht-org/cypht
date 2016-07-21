@@ -42,7 +42,7 @@ class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
     public function process() {
-        $form = $this->get('ldap_add_data', array());
+        $form = $this->get('ldap_entry_data', array());
         if (!is_array($form) || count($form) == 0) {
             return;
         }
@@ -81,9 +81,44 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
                 $result[$val] = $this->request->post[$name];
             }
         }
-        $this->out('add_dn', $dn);
-        $this->out('ldap_add_entry', $result);
+        $this->out('entry_dn', $dn);
+        $this->out('ldap_entry_data', $result, false);
         $this->out('ldap_config', $config);
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
+class Hm_Handler_process_update_ldap_server extends Hm_Handler_Module {
+    public function process() {
+        if ($this->get('ldap_action') != 'update') {
+            return;
+        }
+        $entry = $this->get('ldap_entry_data', array());
+        if (!is_array($entry) || count($entry) == 0) {
+            return;
+        }
+        $new_dn = $this->get('entry_dn');
+        $old_dn = get_ldap_value('dn', $this);
+        $config = $this->get('ldap_config');
+        $ldap = new Hm_LDAP_Contacts($config);
+        if ($ldap->connect()) {
+            if ($new_dn != $old_dn) {
+                $rdn = sprintf('cn=%s', $entry['cn']);
+                $parent = $config['base_dn'];
+                if (!$ldap->rename($old_dn, $rdn, $parent)) {
+                    Hm_Msgs::add('ERRUnable to update contact');
+                    return;
+                }
+            }
+            if ($ldap->modify($entry, $new_dn)) {
+                Hm_Msgs::add('Contact Updated');
+            }
+            else {
+                Hm_Msgs::add('ERRUnable to update contact');
+            }
+        }
     }
 }
 
@@ -92,12 +127,15 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
  */
 class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
     public function process() {
-        $entry = $this->get('ldap_add_entry', array());
+        if ($this->get('ldap_action') != 'add') {
+            return;
+        }
+        $entry = $this->get('ldap_entry_data', array());
         if (!is_array($entry) || count($entry) == 0) {
             return;
         }
         $config = $this->get('ldap_config');
-        $dn = $this->get('add_dn');
+        $dn = $this->get('entry_dn');
         $ldap = new Hm_LDAP_Contacts($config);
         if ($ldap->connect()) {
             if ($ldap->add($entry, $dn)) {
@@ -114,11 +152,25 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
 /**
  * @subpackage ldap_contacts/handler
  */
+class Hm_Handler_process_update_ldap_contact extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('contact_source', 'ldap_first_name', 'update_ldap_contact', 'ldap_last_name', 'ldap_mail'));
+        if ($success && $form['contact_source'] == 'ldap') {
+            $this->out('ldap_entry_data', $form, false);
+            $this->out('ldap_action', 'update');
+        }
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
 class Hm_Handler_process_add_ldap_contact extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('contact_source', 'ldap_first_name', 'add_ldap_contact', 'ldap_last_name', 'ldap_mail'));
         if ($success && $form['contact_source'] == 'ldap') {
-            $this->out('ldap_add_data', $form);
+            $this->out('ldap_entry_data', $form, false);
+            $this->out('ldap_action', 'add');
         }
     }
 }
@@ -252,7 +304,7 @@ class Hm_Output_ldap_form_displayname extends Hm_Output_Module {
  */
 class Hm_Output_ldap_form_mail extends Hm_Output_Module {
     protected function output() {
-        $val = get_ldap_value('mail', $this);
+        $val = get_ldap_value('email_address', $this);
         return '<label class="screen_reader" for="ldap_mail">'.$this->trans('E-Mail').'</label>'.
             '<input required placeholder="'.$this->trans('E-Mail').'" id="ldap_mail" type="email" name="ldap_mail" '.
             'value="'.$this->html_safe($val).'" /> *<br />';
@@ -461,6 +513,9 @@ function get_ldap_value($fld, $mod) {
     }
     if (array_key_exists($fld, $current['all_fields'])) {
         return $current['all_fields'][$fld];
+    }
+    if (array_key_exists($fld, $current)) {
+        return $current[$fld];
     }
     return '';
 }

@@ -9,7 +9,10 @@ add_handler('contacts', 'load_ldap_contacts', true, 'ldap_contacts', 'load_conta
 add_handler('contacts', 'load_edit_ldap_contact', true, 'ldap_contacts', 'load_ldap_contacts', 'after');
 add_handler('contacts', 'process_add_ldap_contact', true, 'ldap_contacts', 'load_edit_ldap_contact', 'after');
 add_handler('contacts', 'process_ldap_fields', true, 'ldap_contacts', 'process_add_ldap_contact', 'after');
-add_handler('contacts', 'process_add_to_ldap_server', true, 'ldap_contacts', 'process_add_ldap_fields', 'after');
+add_handler('contacts', 'process_add_to_ldap_server', true, 'ldap_contacts', 'process_ldap_fields', 'after');
+add_handler('contacts', 'process_update_ldap_contact', true, 'ldap_contacts', 'load_edit_ldap_contact', 'after');
+add_handler('contacts', 'process_update_ldap_server', true, 'ldap_contacts', 'process_ldap_fields', 'after');
+
 add_output('contacts', 'ldap_contact_form_start', true, 'ldap_contacts', 'contacts_content_start', 'after');
 add_output('contacts', 'ldap_form_first_name', true, 'ldap_contacts', 'ldap_contact_form_start', 'after');
 add_output('contacts', 'ldap_form_last_name', true, 'ldap_contacts', 'ldap_form_first_name', 'after');
