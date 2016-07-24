@@ -1152,8 +1152,9 @@ var Hm_Crypt = {
             var digest = forge.md.sha512.create();
             var hmac = forge.hmac.create();
             var key = forge.pkcs5.pbkdf2(secret, salt, 100, 32, digest);
+            var hmac_key = forge.pkcs5.pbkdf2(secret, salt, 101, 32, digest);
 
-            hmac.start(digest, key);
+            hmac.start(digest, hmac_key);
             hmac.update(payload);
             if (hmac.digest().data != hmac_sig) {
                 return false;
@@ -1175,13 +1176,14 @@ var Hm_Crypt = {
             var salt = forge.random.getBytesSync(128);
             var digest = forge.md.sha512.create();
             var key = forge.pkcs5.pbkdf2(secret, salt, 100, 32, digest);
+            var hmac_key = forge.pkcs5.pbkdf2(secret, salt, 100, 32, digest);
             var iv = forge.pkcs5.pbkdf2(secret, salt, 100, 16, digest);
             var hmac = forge.hmac.create();
             var cipher = forge.cipher.createCipher('AES-CBC', key);
             cipher.start({iv: iv});
             cipher.update(forge.util.createBuffer(plaintext));
             cipher.finish();
-            hmac.start(digest, key);
+            hmac.start(digest, hmac_key);
             hmac.update(cipher.output.data);
             return btoa(salt+hmac.digest().data+cipher.output.data);
         } catch(e) {
