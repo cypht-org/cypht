@@ -93,7 +93,7 @@ class Hm_Dispatch {
         if (!empty($this->request->post) && $this->request->type == 'HTTP') {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
-                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
+                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
             }
             $this->session->end();
             if (array_key_exists('REQUEST_URI', $this->request->server)) {
@@ -102,7 +102,7 @@ class Hm_Dispatch {
             return 'redirect';
         }
         elseif (array_key_exists('hm_msgs', $this->request->cookie) && trim($this->request->cookie['hm_msgs'])) {
-            $msgs = @unserialize(base64_decode($this->request->cookie['hm_msgs']));
+            $msgs = @json_decode(base64_decode($this->request->cookie['hm_msgs']), true);
             if (is_array($msgs)) {
                 array_walk($msgs, function($v) { Hm_Msgs::add($v); });
             }
