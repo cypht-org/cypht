@@ -61,7 +61,7 @@ abstract class Hm_Config {
     }
 
     /**
-     * shuffle the config value order
+     * Shuffle the config value order
      * @return void
      */
     public function shuffle() {
@@ -72,6 +72,24 @@ abstract class Hm_Config {
             $new_config[$key] = $this->config[$key];
         }
         $this->config = $new_config;
+    }
+
+    /**
+     * Decode user settings with json_decode or unserialize depending
+     * on the format
+     */
+    protected function decode($data) {
+        elog($data);
+        if (!is_string($data) || !trim($data)) {
+            return false;
+        }
+        if (substr($data, 0, 2) === 'a:') {
+            return @unserialize($data);
+        }
+        elseif (substr($data, 0, 1) === '{') {
+            return @json_decode($data, true);
+        }
+        return false;
     }
 }
 
@@ -113,7 +131,7 @@ class Hm_User_Config_File extends Hm_Config {
         if (is_readable($source)) {
             $str_data = file_get_contents($source);
             if ($str_data) {
-                $data = @unserialize(Hm_Crypt::plaintext($str_data, $key));
+                $data = $this->decode(Hm_Crypt::plaintext($str_data, $key));
                 if (is_array($data)) {
                     $this->config = array_merge($this->config, $data);
                     $this->set_tz();
@@ -141,7 +159,7 @@ class Hm_User_Config_File extends Hm_Config {
     public function save($username, $key) {
         $this->shuffle();
         $destination = $this->get_path($username);
-        $data = Hm_Crypt::ciphertext(serialize($this->config), $key);
+        $data = Hm_Crypt::ciphertext(json_encode($this->config), $key);
         file_put_contents($destination, $data);
     }
 }
@@ -185,7 +203,7 @@ class Hm_User_Config_DB extends Hm_Config {
                     }
                 }
                 else {
-                    $data = @unserialize(Hm_Crypt::plaintext($data['settings'], $key));
+                    $data = $this->decode(Hm_Crypt::plaintext($data['settings'], $key));
                     if (is_array($data)) {
                         $this->config = array_merge($this->config, $data);
                         $this->set_tz();
@@ -225,7 +243,7 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function save($username, $key) {
         $this->shuffle();
-        $config = Hm_Crypt::ciphertext(serialize($this->config), $key);
+        $config = Hm_Crypt::ciphertext(json_encode($this->config), $key);
         if (!$this->connect()) {
             return false;
         }
@@ -264,7 +282,7 @@ class Hm_Site_Config_File extends Hm_Config {
      */
     public function load($source, $key) {
         if (is_readable($source)) {
-            $data = @unserialize(file_get_contents($source));
+            $data = $this->decode(file_get_contents($source));
             if ($data) {
                 $this->config = array_merge($this->config, $data);
             }

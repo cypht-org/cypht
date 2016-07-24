@@ -225,7 +225,7 @@ function write_config_file($settings, $filters) {
     $settings['handler_modules'] = Hm_Handler_Modules::dump();
     $settings['output_modules'] = Hm_Output_Modules::dump();
     $settings['input_filters'] = $filters;
-    file_put_contents('hm3.rc', serialize($settings));
+    file_put_contents('hm3.rc', json_encode($settings));
     printf("hm3.rc file written\n");
 }
 
