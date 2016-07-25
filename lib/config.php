@@ -79,7 +79,6 @@ abstract class Hm_Config {
      * on the format
      */
     protected function decode($data) {
-        elog($data);
         if (!is_string($data) || !trim($data)) {
             return false;
         }
