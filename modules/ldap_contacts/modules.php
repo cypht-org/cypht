@@ -24,7 +24,7 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
                 $contacts = $this->get('contact_store');
                 if ($ldap->connect()) {
                     foreach ($addresses as $vals) {
-                        $atts = array('mail' => $vals['email'], 'objectclass' => array('top', 'person', 'organizationalperson', 'inetorgperson'));
+                        $atts = array('mail' => $vals['email'], 'objectclass' => $config['objectclass']);
                         if (array_key_exists('name', $vals) && trim($vals['name'])) {
                             $dn = sprintf('cn=%s,%s', $vals['name'], $config['base_dn']);
                             $atts['sn'] = $vals['name'];
@@ -89,7 +89,7 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
         $config = ldap_config($this->config);
         $dn = sprintf('cn=%s %s,%s', $form['ldap_first_name'], $form['ldap_last_name'], $config['base_dn']);
         $cn = sprintf('%s %s', $form['ldap_first_name'], $form['ldap_last_name']);
-        $result = array('cn' => $cn, 'objectclass' => array('top', 'person', 'organizationalperson', 'inetorgperson'));
+        $result = array('cn' => $cn, 'objectclass' => $config['objectclass']);
         $ldap_map = array(
             'ldap_first_name' => 'givenname',
             'ldap_last_name' => 'sn',
