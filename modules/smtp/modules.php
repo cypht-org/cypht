@@ -771,12 +771,22 @@ function smtp_server_dropdown($data, $output_mod, $recip) {
         $profiles = $data['compose_profiles'];
     }
     if (array_key_exists('smtp_servers', $data)) {
+        $selected = false;
+        $default = false;
         foreach ($data['smtp_servers'] as $id => $vals) {
-            $res .= '<option ';
             if ($recip && trim($recip) == trim($vals['user'])) {
-                $res .= 'selected="selected" ';
+                $selected = $id;
             }
             elseif (array_key_exists($id, $profiles) && $profiles[$id]['profile_default']) {
+                $default = $id;
+            }
+        }
+        if ($selected === false && $default !== false) {
+            $selected = $default;
+        }
+        foreach ($data['smtp_servers'] as $id => $vals) {
+            $res .= '<option ';
+            if ($selected === $id) {
                 $res .= 'selected="selected" ';
             }
             $res .= 'value="'.$output_mod->html_safe($id).'">';
