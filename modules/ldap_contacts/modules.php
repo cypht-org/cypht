@@ -20,7 +20,6 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
         if ($success && array_key_exists($form['contact_source'], $ldap_config)) {
             $addresses = Hm_Address_Field::parse($form['contact_value']);
             $config = $ldap_config[$form['contact_source']];
-            elog($config);
             if (count($config) == 0) {
                 Hm_Msgs::add('ERRUnable to add contact');
                 return;
