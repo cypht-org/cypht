@@ -380,6 +380,8 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             $this->out('disable_delete_prompt', $this->user_config->get('disable_delete_prompt_setting'));
         }
         $this->out('is_mobile', $this->request->mobile);
+
+        $this->out('load_settings_failed', $this->user_config->decrypt_failed);
     }
 }
 
