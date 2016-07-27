@@ -40,9 +40,24 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_load_failed() {
+        $this->config->load('testuser', 'blah');
+        $this->assertFalse($this->config->get('foo'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_load() {
         $this->config->load('testuser', 'testkey');
         $this->assertEquals('bar', $this->config->get('foo', false));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_decode_failed() {
+        $this->assertFalse($this->config->decode('foobar'));
     }
     /**
      * @preserveGlobalState disabled

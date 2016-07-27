@@ -83,7 +83,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
         $router->request->server['REQUEST_URI'] = 'asdf';
         $this->assertEquals('redirect', $router->check_for_redirect());
         $router->request->post = array();
-        $router->request->cookie['hm_msgs'] = base64_encode(serialize(array('test message')));
+        $router->request->cookie['hm_msgs'] = base64_encode(json_encode(array('test message')));
         $this->assertEquals('msg_forward', $router->check_for_redirect());
     }
     /**
