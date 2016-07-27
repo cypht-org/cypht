@@ -211,9 +211,18 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 foreach($ids as $id) {
                     $feed_data = Hm_Feed_List::dump($id);
                     if ($feed_data) {
-                        $feed = is_feed($feed_data['server'], $limit);
-                        if ($feed && $feed->parsed_data) {
-                            foreach ($feed->parsed_data as $item) {
+                        $cache = feed_memcached_fetch($this->config, $feed_data);
+                        if (is_array($cache) && count($cache) > 0) {
+                            $data = $cache;
+                        }
+                        else {
+                            $feed = is_feed($feed_data['server'], $limit);
+                            if ($feed && $feed->parsed_data) {
+                                $data = $feed->parsed_data;
+                            }
+                        }
+                        if (is_array($data)) {
+                            foreach ($data as $item) {
                                 if (!array_key_exists('guid', $item)) {
                                     continue;
                                 }
@@ -232,7 +241,6 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                                     continue;
                                 }
                                 else {
-                                    //Hm_Page_Cache::add($id.'_'.md5($item['guid']), $item, true);
                                     $item['server_id'] = $id;
                                     $item['server_name'] = $feed_data['name'];
                                     $res[] = $item;
@@ -241,6 +249,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                         }
                     }
                 }
+            }
+            if ($this->config->get('enable_memcached')) {
+                feed_memcached_save($this->config, $feed_data, $res);
             }
             $this->out('feed_list_data', $res);
             if (isset($this->request->get['list_path'])) {
@@ -265,14 +276,14 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
         if ($success) {
             $path = explode('_', $form['feed_list_path']);
             $id = $path[1];
-            $cache = false; // Hm_Page_Cache::get($id.'_'.$form['feed_uid']);
             $feed_items = array();
-            if ($cache) {
-                $feed_items = array($cache);
-            }
-            else {
-                $feed_data = Hm_Feed_List::dump($id);
-                if ($feed_data) {
+            $feed_data = Hm_Feed_List::dump($id);
+            if ($feed_data) {
+                $cache = feed_memcached_fetch($this->config, $feed_data);
+                if (is_array($cache) && count($cache) > 0) {
+                    $feed_items = $cache;
+                }
+                else {
                     $feed = is_feed($feed_data['server']);
                     if ($feed && $feed->parsed_data) {
                         $feed_items = $feed->parsed_data;
@@ -300,13 +311,11 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                     $headers = $item;
                     unset($headers['title']);
                     $headers = array_merge(array('title' => $title), $headers);
-                    if (!$cache) {
-                        //Hm_Page_Cache::add($id.'_'.md5($item['guid']), $item, true);
-                    }
                     break;
                 }
             }
             if ($content) {
+                feed_memcached_save($this->config, $feed_data, $feed_items);
                 Hm_Feed_Uid_Cache::read($form['feed_uid']);
                 $this->out('feed_message_content', $content);
                 $this->out('feed_message_headers', $headers);
@@ -901,4 +910,22 @@ function search_feed_item($item, $terms, $since, $fld) {
     return false;
 }
 
+/**
+ * @subpackage feeds/functions
+ */
+function feed_memcached_save($config, $feed_data, $data) {
+    $key = sha1(sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']));
+    $memcached = new Memcached();
+    $memcached->addServer($config->get('memcached_server', '127.0.0.1'), $config->get('memcached_port', 11211));
+    $memcached->set($key, $data, 300);
+}
 
+/**
+ * @subpackage feeds/functions
+ */
+function feed_memcached_fetch($config, $feed_data) {
+    $key = sha1(sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']));
+    $memcached = new Memcached();
+    $memcached->addServer($config->get('memcached_server', '127.0.0.1'), $config->get('memcached_port', 11211));
+    return $memcached->get($key);
+}
