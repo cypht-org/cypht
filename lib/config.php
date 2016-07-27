@@ -17,6 +17,9 @@ abstract class Hm_Config {
     /* config data */
     protected $config = array();
 
+    /* flag indicating failed decryption */
+    public $decrypt_failed = false;
+
     /**
      * This method must be overriden by classes extending this one
      * @param string $source source or identifier to determine the source
@@ -77,8 +80,10 @@ abstract class Hm_Config {
     /**
      * Decode user settings with json_decode or unserialize depending
      * on the format
+     * @param string $data serialized or json encoded string
+     * @return mixed array, or false on failure
      */
-    protected function decode($data) {
+    public function decode($data) {
         if (!is_string($data) || !trim($data)) {
             return false;
         }
@@ -134,6 +139,9 @@ class Hm_User_Config_File extends Hm_Config {
                 if (is_array($data)) {
                     $this->config = array_merge($this->config, $data);
                     $this->set_tz();
+                }
+                else {
+                    $decrypt_failed = true;
                 }
             }
         }
@@ -206,6 +214,9 @@ class Hm_User_Config_DB extends Hm_Config {
                     if (is_array($data)) {
                         $this->config = array_merge($this->config, $data);
                         $this->set_tz();
+                    }
+                    else {
+                        $decrypt_failed = true;
                     }
                 }
             }
