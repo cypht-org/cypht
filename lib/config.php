@@ -141,7 +141,7 @@ class Hm_User_Config_File extends Hm_Config {
                     $this->set_tz();
                 }
                 else {
-                    $decrypt_failed = true;
+                    $this->decrypt_failed = true;
                 }
             }
         }
@@ -216,7 +216,7 @@ class Hm_User_Config_DB extends Hm_Config {
                         $this->set_tz();
                     }
                     else {
-                        $decrypt_failed = true;
+                        $this->decrypt_failed = true;
                     }
                 }
             }
