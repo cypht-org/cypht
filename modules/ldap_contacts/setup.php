@@ -70,6 +70,7 @@ return array(
         'ldap_lang' => FILTER_SANITIZE_STRING,
         'ldap_uri' => FILTER_SANITIZE_STRING,
         'add_ldap_contact' => FILTER_SANITIZE_STRING,
-        'update_ldap_contact' => FILTER_SANITIZE_STRING
+        'update_ldap_contact' => FILTER_SANITIZE_STRING,
+        'ldap_source' => FILTER_SANITIZE_STRING
     )
 );
