@@ -131,7 +131,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
         $phone = '';
         $form_class = 'contact_form';
         $button = '<input class="add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
-        $title = $this->trans('Add Local Contact');
+        $title = $this->trans('Add Local');
         $current = $this->get('current_contact', array());
         if (!empty($current)) {
             if (array_key_exists('email_address', $current)) {
@@ -144,7 +144,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
                 $phone = $current['phone_number'];
             }
             $form_class = 'contact_update_form';
-            $title = $this->trans('Update Local Contact');
+            $title = $this->trans('Update Local');
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }

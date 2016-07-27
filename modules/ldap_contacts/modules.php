@@ -354,7 +354,12 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
             return;
         }
         $sources = $this->get('ldap_sources');
-        $title = $this->trans('Add LDAP Contact');
+        if (count($sources) == 1) {
+            $title = sprintf($this->trans('Add %s'), $this->html_safe($sources[0]));
+        }
+        else {
+            $title = $this->trans('Add LDAP');
+        }
         $form_class='contact_form';
         $current = $this->get('current_ldap_contact');
         $current_source = false;
