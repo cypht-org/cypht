@@ -212,6 +212,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                     $feed_data = Hm_Feed_List::dump($id);
                     if ($feed_data) {
                         $cache = feed_memcached_fetch($this->config, $feed_data);
+                        $data = false;
                         if (is_array($cache) && count($cache) > 0) {
                             $data = $cache;
                         }
@@ -224,7 +225,10 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                         }
                         if (is_array($data)) {
                             foreach ($data as $item) {
-                                if (!array_key_exists('guid', $item)) {
+                                if (array_key_exists('id', $item) && !array_key_exists('guid', $item)) {
+                                    $item['guid'] = $item['id'];
+                                }
+                                if (array_key_exists('link_self', $item) || !array_key_exists('guid', $item)) {
                                     continue;
                                 }
                                 if (!Hm_Feed_Uid_Cache::is_unread(md5($item['guid']))) {
