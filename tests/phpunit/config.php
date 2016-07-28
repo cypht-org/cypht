@@ -31,6 +31,17 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_del() {
+        $this->assertFalse($this->config->get('name', false));
+        $this->config->set('name', 'value');
+        $this->config->del('name', 'value');
+        $this->assertFalse($this->config->get('name'));
+        $this->assertFalse($this->config->del('asdfasdf'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_get() {
         $this->config->load('testuser', 'testkey');
         $this->assertEquals('default', $this->config->get('asdf', 'default'));
