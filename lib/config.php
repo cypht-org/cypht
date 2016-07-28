@@ -36,6 +36,18 @@ abstract class Hm_Config {
     }
 
     /**
+     * @param string $name config option name
+     * @return bool true on success
+     */
+    public function del($name) {
+        if (array_key_exists($name, $this->config)) {
+            unset($this->config[$name]);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Set a config value
      * @param string $name config value name
      * @param string $value config value
