@@ -1,3 +1,5 @@
 .feeds_section { display: none; }
 .feed_server_setup .content_title { cursor: pointer; }
 .feeds_setting { display: none; }
+.feeds_section .configured_server, .feeds_section .add_server { height: 140px; }
+.feeds_section .add_server { margin-right: 0px; }

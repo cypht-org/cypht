@@ -93,6 +93,7 @@ var set_combined_feeds_state = function() {
 var display_feeds_combined = function(res) {
     var ids = res.feed_server_ids.split(',');
     Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    $('.total').text($('.message_table tbody tr').length);
 };
 
 var feeds_combined_inbox_content= function(id) {
@@ -177,6 +178,7 @@ var display_feed_list = function(res) {
     var key = 'feeds_'+res.feed_server_ids;
     var data = $('.message_table tbody');
     data.find('*[style]').attr('style', '');
+    $('.total').text($('.message_table tbody tr').length);
     Hm_Utils.save_to_local_storage(key, data.html());
 };
 

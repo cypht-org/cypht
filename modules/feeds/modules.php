@@ -166,6 +166,7 @@ class Hm_Handler_feed_message_action extends Hm_Handler_Module {
 
 /**
  * @subpackage feeds/handler
+ * @todo this is pretty ugly, try to break up
  */
 class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process() {
@@ -227,6 +228,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                             foreach ($data as $item) {
                                 if (array_key_exists('id', $item) && !array_key_exists('guid', $item)) {
                                     $item['guid'] = $item['id'];
+                                }
+                                elseif (array_key_exists('link', $item) && !array_key_exists('guid', $item)) {
+                                    $item['guid'] = $item['link'];
                                 }
                                 if (array_key_exists('link_self', $item) || !array_key_exists('guid', $item)) {
                                     continue;
@@ -573,13 +577,13 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
             $header_str = '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($this->get('feed_message_headers', array()) as $name => $value) {
-                if ($name != 'link' && !strstr($value, ' ') && strlen($value) > 75) {
+                if ($name != 'link' && $name != 'link_alternate' && !strstr($value, ' ') && strlen($value) > 75) {
                     $value = substr($value, 0, 75).'...';
                 }
                 if ($name == 'title') {
                     $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
                 }
-                elseif ($name == 'link') {
+                elseif ($name == 'link' || $name == 'link_alternate') {
                     $header_str .= '<tr class="header_'.$name.'"><th>'.$this->trans($name).'</th><td><a target="_blank" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
                 }
                 elseif ($name == 'author' || $name == 'dc:creator' || $name == 'name') {
@@ -667,6 +671,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 else {
                     $flags = array('unseen');
                 }
+                $nofrom = '';
                 if (isset($item['author'])) {
                     $from = display_value('author', $item, 'from');
                 }
@@ -678,6 +683,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 }
                 elseif ($style == 'email') {
                     $from = $this->trans('[No From]');
+                    $nofrom = ' nofrom';
                 }
                 else {
                     $from = '';
@@ -689,7 +695,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                             array('icon_callback', $flags),
                             array('subject_callback', strip_tags($item['title']), $url, $flags),
                             array('safe_output_callback', 'source', $item['server_name']),
-                            array('safe_output_callback', 'from', $from),
+                            array('safe_output_callback', 'from'.$nofrom, $from),
                             array('date_callback', $date, $timestamp),
                         ),
                         $id,
@@ -702,7 +708,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
                             array('safe_output_callback', 'source', $item['server_name']),
-                            array('safe_output_callback', 'from', $from),
+                            array('safe_output_callback', 'from'.$nofrom, $from),
                             array('subject_callback', strip_tags($item['title']), $url, $flags),
                             array('date_callback', $date, $timestamp),
                             array('icon_callback', $flags)
