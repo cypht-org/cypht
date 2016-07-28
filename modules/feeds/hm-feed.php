@@ -35,7 +35,6 @@ class Hm_Feed_List {
      * @param object $session session object
      * @param int $id server id
      * @return bool
-     * @todo finish this
      */
     public static function get_cache($session, $id) {
         return false;
@@ -379,9 +378,6 @@ class Hm_Feed {
             $this->parsed_data[0][$this->collect] = $data;
         }
         if ($this->data_block && $this->collect) {
-            if ($this->collect == 'dc:date') {
-                $this->collect = 'dc:date';
-            }
             if (isset($this->parsed_data[$this->item_count][$this->collect])) {
                 $this->parsed_data[$this->item_count][$this->collect] .= $data;
             }
