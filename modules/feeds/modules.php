@@ -219,6 +219,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                             $feed = is_feed($feed_data['server'], $limit);
                             if ($feed && $feed->parsed_data) {
                                 $data = $feed->parsed_data;
+                                $cache = false;
                             }
                         }
                         if (is_array($data)) {
@@ -250,7 +251,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                     }
                 }
             }
-            if ($this->config->get('enable_memcached')) {
+            if ($this->config->get('enable_memcached') && !$cache) {
                 feed_memcached_save($this->config, $feed_data, $res);
             }
             $this->out('feed_list_data', $res);
@@ -287,6 +288,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                     $feed = is_feed($feed_data['server']);
                     if ($feed && $feed->parsed_data) {
                         $feed_items = $feed->parsed_data;
+                        $cache = false;
                     }
                 }
             }
@@ -315,7 +317,9 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                 }
             }
             if ($content) {
-                feed_memcached_save($this->config, $feed_data, $feed_items);
+                if ($this->config->get('enable_memcached') && !$cache) {
+                    feed_memcached_save($this->config, $feed_data, $feed_items);
+                }
                 Hm_Feed_Uid_Cache::read($form['feed_uid']);
                 $this->out('feed_message_content', $content);
                 $this->out('feed_message_headers', $headers);
@@ -917,7 +921,7 @@ function feed_memcached_save($config, $feed_data, $data) {
     $key = sha1(sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']));
     $memcached = new Memcached();
     $memcached->addServer($config->get('memcached_server', '127.0.0.1'), $config->get('memcached_port', 11211));
-    $memcached->set($key, $data, 300);
+    $memcached->set($key, $data, 60);
 }
 
 /**
