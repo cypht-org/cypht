@@ -305,6 +305,9 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                     $item['guid'] = $item['id'];
                     unset($item['id']);
                 }
+                elseif (array_key_exists('link', $item) && !array_key_exists('guid', $item)) {
+                    $item['guid'] = $item['link'];
+                }
                 elseif (isset($item['title']) && !isset($item['guid'])) {
                     $item['guid'] = md5($item['title']);
                 }
