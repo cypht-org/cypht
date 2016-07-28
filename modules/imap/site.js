@@ -778,6 +778,7 @@ $(function() {
     if (hm_list_path() !== 'unread') {
         if (typeof hm_data_sources_background === 'function') {
             globals.Hm_Background_Unread = new Message_List();
+            globals.Hm_Background_Unread.background = true;
             globals.Hm_Background_Unread.add_sources(hm_data_sources_background());
             Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, 43, true);
         }
