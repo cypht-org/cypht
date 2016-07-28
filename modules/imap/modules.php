@@ -1845,7 +1845,12 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $msg['subject'] = '[No Subject]';
         }
         $subject = $msg['subject'];
-        $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
+        if ($parent_list == 'sent') {
+            $from = preg_replace("/(\<.+\>)/U", '', $msg['to']);
+        }
+        else {
+            $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
+        }
         $from = str_replace('"', '', $from);
         $nofrom = '';
         if (!trim($from) && trim($msg['from'])) {
