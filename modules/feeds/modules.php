@@ -929,7 +929,7 @@ function feed_memcached_save($config, $feed_data, $data) {
     $key = sha1(sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']));
     $memcached = new Memcached();
     $memcached->addServer($config->get('memcached_server', '127.0.0.1'), $config->get('memcached_port', 11211));
-    $memcached->set($key, $data, 99);
+    $memcached->set($key, $data, 300);
 }
 
 /**
