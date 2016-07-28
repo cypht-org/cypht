@@ -283,6 +283,7 @@ function Message_List() {
     var self = this;
     this.sources = [];
     this.deleted = [];
+    this.background = false;
     this.completed_count = 0;
     this.callbacks = [];
 
@@ -558,8 +559,10 @@ function Message_List() {
     this.load_sources = function() {
         var index;
         var source;
-        $('.src_count').text(self.sources.length);
-        $('.total').text($('.message_table tbody tr').length);
+        if (!self.background) {
+            $('.src_count').text(self.sources.length);
+            $('.total').text($('.message_table tbody tr').length);
+        }
         for (index in self.sources) {
             source = self.sources[index];
             source.callback(source.id, source.folder);
