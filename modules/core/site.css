@@ -86,6 +86,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .news_cell .icon { float: left; }
 .icon { white-space: nowrap; font-size: 110%; }
 .news_cell .from {float: left; font-size: 100% !important; color: #111; letter-spacing: 0px; }
+.nofrom { color: #aaa !important; }
 .news_cell .source {float: left; padding-right: 10px; font-size: 100% !important;}
 .news_cell .msg_date { clear: both; }
 .msg_img { max-width: 100%; }

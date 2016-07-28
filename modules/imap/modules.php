@@ -1847,11 +1847,13 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $subject = $msg['subject'];
         $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
         $from = str_replace('"', '', $from);
+        $nofrom = '';
         if (!trim($from) && trim($msg['from'])) {
             $from = $msg['from'];
         }
         elseif (!trim($from) && $style == 'email') {
             $from = '[No From]';
+            $nofrom = ' nofrom';
         }
         $timestamp = strtotime($msg['internal_date']);
         $date = translate_time_str(human_readable_interval($msg['internal_date']), $output_module);
@@ -1887,7 +1889,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('icon_callback', $flags),
                     array('subject_callback', $subject, $url, $flags),
                     array('safe_output_callback', 'source', $source),
-                    array('safe_output_callback', 'from', $from),
+                    array('safe_output_callback', 'from'.$nofrom, $from),
                     array('date_callback', $date, $timestamp),
                 ),
                 $id,
@@ -1900,7 +1902,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('safe_output_callback', 'source', $source),
-                    array('safe_output_callback', 'from', $from),
+                    array('safe_output_callback', 'from'.$nofrom, $from),
                     array('subject_callback', $subject, $url, $flags),
                     array('date_callback', $date, $timestamp),
                     array('icon_callback', $flags)

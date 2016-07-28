@@ -850,7 +850,9 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         $id = sprintf("pop3_%s_%s", $msg['server_id'], $msg_id);
         $subject = display_value('subject', $msg);;
         $from = display_value('from', $msg);
+        $nofrom = '';
         if ($style == 'email' && !$from) {
+            $nofrom = ' nofrom';
             $from = '[No From]';
         }
         $date = display_value('date', $msg);
@@ -882,7 +884,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
                     array('icon_callback', $flags),
                     array('subject_callback', $subject, $url, $flags),
                     array('safe_output_callback', 'source', $msg['server_name']),
-                    array('safe_output_callback', 'from', $from),
+                    array('safe_output_callback', 'from'.$nofrom, $from),
                     array('date_callback', $date, $timestamp),
                 ),
                 $id,
@@ -895,7 +897,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('safe_output_callback', 'source', $msg['server_name']),
-                    array('safe_output_callback', 'from', $from),
+                    array('safe_output_callback', 'from'.$nofrom, $from),
                     array('subject_callback', $subject, $url, $flags),
                     array('date_callback', $date, $timestamp),
                     array('icon_callback', $flags)
