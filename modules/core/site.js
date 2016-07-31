@@ -1219,12 +1219,13 @@ $(function() {
     if (hm_page_name() == 'settings') {
         Hm_Utils.expand_core_settings();
         $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-        Hm_Folders.reload_folders();
     }
     else if (hm_page_name() == 'servers') {
         $('.server_section').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-        Hm_Folders.reload_folders();
     }
+
+    /* check for folder reload */
+    Hm_Folders.reload_folders();
 
     /* show any pending notices */
     Hm_Utils.show_sys_messages();
