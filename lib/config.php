@@ -20,6 +20,9 @@ abstract class Hm_Config {
     /* flag indicating failed decryption */
     public $decrypt_failed = false;
 
+    /* if decryption fails, save the encrypted payload */
+    public $encrypted_str = false;
+
     /**
      * This method must be overriden by classes extending this one
      * @param string $source source or identifier to determine the source
@@ -154,6 +157,7 @@ class Hm_User_Config_File extends Hm_Config {
                 }
                 else {
                     $this->decrypt_failed = true;
+                    $this->encrypted_str = $str_data;
                 }
             }
         }
@@ -229,6 +233,7 @@ class Hm_User_Config_DB extends Hm_Config {
                     }
                     else {
                         $this->decrypt_failed = true;
+                        $this->encrypted_str = $data['settings'];
                     }
                 }
             }
