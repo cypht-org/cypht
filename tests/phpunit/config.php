@@ -16,7 +16,16 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
      */
     public function test_dump() {
         $this->config->load('testuser', 'testkey');
-        $this->assertEquals(array('foo' => 'bar'), $this->config->dump());
+        $this->assertEquals(array('version' => VERSION, 'foo' => 'bar'), $this->config->dump());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_version() {
+        $this->assertEquals(VERSION, $this->config->version());
+        $this->config->del('version');
+        $this->assertEquals(.1, $this->config->version());
     }
     /**
      * @preserveGlobalState disabled
@@ -138,7 +147,7 @@ class Hm_Test_Site_Config_File extends PHPUnit_Framework_TestCase {
      */
     public function test_site_load() {
         $config = new Hm_Site_Config_File('./data/siteconfig.rc');
-        $this->assertEquals(array('foo' => 'bar'), $config->dump());
+        $this->assertEquals(array('version' => VERSION, 'foo' => 'bar'), $config->dump());
     }
 
     public function tearDown() {
@@ -174,9 +183,9 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $site_config = new Hm_Mock_Config();
         setup_db($site_config);
         $user_config = new Hm_User_Config_DB($site_config);
-        $this->assertEquals(array(), $user_config->dump());
+        $this->assertEquals(array('version' => VERSION), $user_config->dump());
         $user_config->load('testuser', 'testkey');
-        $this->assertEquals(array('foo' => 'bar'), $user_config->dump());
+        $this->assertEquals(array('version' => VERSION, 'foo' => 'bar'), $user_config->dump());
         $user_config->reload(array());
         $user_config->load('testuser', 'testpass');
         $this->assertEquals(array(), $user_config->dump());
