@@ -264,7 +264,8 @@ abstract class Hm_Handler_Module {
         $success = false;
         $new_form = array();
         foreach($form as $name) {
-            if (array_key_exists($name, $post) && (trim($post[$name]) || (($post[$name] === '0' ||  $post[$name] === 0 )))) {
+            if (array_key_exists($name, $post) && (is_array($post[$name]) ||
+                trim($post[$name]) || (($post[$name] === '0' ||  $post[$name] === 0 )))) {
                 $new_form[$name] = $post[$name];
             }
         }
