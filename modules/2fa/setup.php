@@ -16,5 +16,6 @@ add_output('settings', 'enable_2fa_setting', true, '2fa', 'end_settings_form', '
 
 return array( 'allowed_post' => array(
     '2fa_code' => FILTER_SANITIZE_STRING,
-    'enable_2fa' => FILTER_VALIDATE_INT
+    '2fa_enable' => FILTER_VALIDATE_INT,
+    '2fa_backup_codes' => array('filter' => FILTER_VALIDATE_INT, 'flags'  => FILTER_FORCE_ARRAY)
 ));

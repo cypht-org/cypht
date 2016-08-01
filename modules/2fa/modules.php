@@ -14,14 +14,20 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_process_enable_2fa extends Hm_Handler_Module {
     public function process() {
         function enable_2fa_callback($val) { return $val; }
-        process_site_setting('enable_2fa', $this, 'enable_2fa_callback', false, true);
+        function backup_2fa_callback($val) { return $val; }
+        process_site_setting('2fa_enable', $this, 'enable_2fa_callback', false, true);
+        if (array_key_exists('2fa_enable', $this->request->post) && $this->request->post['2fa_enable']) {
+            process_site_setting('2fa_backup_codes', $this, 'backup_2fa_callback', false, false);
+            $this->session->set('2fa_confirmed', true);
+        }
         $secret = get_2fa_key($this->config);
         if ($secret) {
-            $secret = base32_encode_str($secret);
-            $app_name = $this->config->get('app_name', 'Cypht');
             $username = $this->session->get('username', false);
+            $secret = base32_encode_str(create_secret($secret, $username));
+            $app_name = $this->config->get('app_name', 'Cypht');
             $uri = sprintf('otpauth://totp/%s:%s?secret=%s&issuer=%s', $app_name, $username, $secret, $app_name);
             $this->out('2fa_png_path', generate_qr_code($this->config, $uri));
+            $this->out('2fa_backup_codes', backup_codes($this->user_config));
         }
     }
 }
@@ -32,7 +38,7 @@ class Hm_Handler_process_enable_2fa extends Hm_Handler_Module {
 class Hm_Handler_2fa_check extends Hm_Handler_Module {
     public function process() {
 
-        $enabled = $this->user_config->get('enable_2fa_setting', 0);
+        $enabled = $this->user_config->get('2fa_enable_setting', 0);
         if (!$enabled) {
             return;
         }
@@ -48,9 +54,19 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
             return;
         }
 
+        $old_setting = $this->user_config->get('enable_2fa_setting', 0);
+        if ($old_setting && $this->session->loaded) {
+            Hm_Msgs::add('ERR2FA disabled because of a security issue. Go to "Settings" -> "Site" to re-enable');
+        }
         $passed = false;
+        $backup_codes = $this->user_config->get('2fa_backup_codes_setting', array());
         if (array_key_exists('2fa_code', $this->request->post)) {
+            $username = $this->session->get('username', false);
+            $secret = create_secret($secret, $username);
             if (check_2fa_pin($this->request->post['2fa_code'], $secret)) {
+                $passed = true;
+            }
+            elseif (in_array(intval($this->request->post['2fa_code']), $backup_codes, true)) {
                 $passed = true;
             }
             else {
@@ -77,15 +93,16 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
 class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
     protected function output() {
         $enabled = false;
+        $backup_codes = $this->get('2fa_backup_codes', array());
         $settings = $this->get('user_settings', array());
-        if (array_key_exists('enable_2fa', $settings)) {
-            $enabled = $settings['enable_2fa'];
+        if (array_key_exists('2fa_enable', $settings)) {
+            $enabled = $settings['2fa_enable'];
         }
         $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$key.'" />'.$this->trans('2 Factor Authentication').'</td></tr>';
 
         $res .= '<tr class="tfa_setting"><td>'.$this->trans('Enable 2 factor authentication').
-            '</td><td><input value="1" type="checkbox" name="enable_2fa"';
+            '</td><td><input value="1" type="checkbox" name="2fa_enable"';
         if ($enabled) {
             $res .= ' checked="checked"';
         }
@@ -96,8 +113,8 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $qr_code = '<tr class="tfa_setting"><td></td><td>';
             if (!$enabled) {
                 $qr_code .= '<div class="err settings_wrap_text">'.
-                    $this->trans('Configure Google Authenticator BEFORE enabling 2 factor authentication.').'<br />'.
-                    $this->trans('Go to "Menu -> Set up account -> Scan a barcode", and scan the code below').'</div>';
+                    $this->trans('Configure your authentication app using the barcode below BEFORE enabling 2 factor authentication.').'<br />'.
+                    $this->trans('This code was recently updated for a security issue. YOU MUST RE-ADD this to your authentication app.').'<br />';
             }
             else {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
@@ -107,9 +124,14 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $qr_code .= '</td></tr>';
         }
         else {
-            $qr_code .= '<tr class="general_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
+            $qr_code .= '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
         }
         $res .= $qr_code;
+        $res .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('The following backup codes can be used to access your account if you lose your device:').'<br /><br />';
+        foreach ($backup_codes as $val) {
+            $res .= ' '.$val.'<input type="hidden" name="2fa_backup_codes[]" value="'.$val.'" /></br >';
+        }
+        $res .= '</td></tr>';
         return $res;
     }
 }
@@ -201,4 +223,22 @@ function generate_qr_code($config, $str) {
     require_once APP_PATH.'third_party/phpqrcode.php';
     QRcode::png($str, $qr_code);
     return $qr_code;
+}
+
+/**
+ * @subpackage 2fa/functions
+ */
+function create_secret($key, $user) {
+    return Hm_Crypt::pbkdf2($key, $user, 64, 256, 'sha512');
+}
+
+/**
+ * @subpackage 2fa/functions
+ */
+function backup_codes($config) {
+    $codes = $config->get('2fa_backup_codes_setting', array());
+    if (is_array($codes) && count($codes) == 3) {
+        return $codes;
+    }
+    return array(random_int(1000000000, 9999999999), random_int(1000000000, 9999999999), random_int(1000000000, 9999999999));
 }
