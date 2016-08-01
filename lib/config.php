@@ -15,7 +15,7 @@ abstract class Hm_Config {
     protected $source = false;
 
     /* config data */
-    protected $config = array();
+    protected $config = array('version' => VERSION);
 
     /* flag indicating failed decryption */
     public $decrypt_failed = false;
@@ -39,6 +39,7 @@ abstract class Hm_Config {
     }
 
     /**
+     * Delete a setting
      * @param string $name config option name
      * @return bool true on success
      */
@@ -48,6 +49,17 @@ abstract class Hm_Config {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Return a versoin number
+     * @return float
+     */
+    public function version() {
+        if (array_key_exists('version', $this->config)) {
+            return $this->config['version'];
+        }
+        return .1;
     }
 
     /**
@@ -302,7 +314,7 @@ class Hm_Site_Config_File extends Hm_Config {
     }
 
     /**
-     * Load user data from a file
+     * Load site data from a file
      * @param string $source file path to the site configuration
      * @param string $key encryption key (unsued in this class)
      * @return void

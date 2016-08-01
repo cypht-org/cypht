@@ -68,6 +68,7 @@ function build_config() {
     $settings = parse_ini_file(APP_PATH.'hm3.ini');
 
     if (is_array($settings) && !empty($settings)) {
+        $settings['version'] = VERSION;
 
         /* determine compression commands */
         list($js_compress, $css_compress) = compress_methods($settings);

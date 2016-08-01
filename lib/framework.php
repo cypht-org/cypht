@@ -6,6 +6,8 @@
  * @subpackage setup
  */
 
+define('VERSION', 0.1);
+
 require APP_PATH.'lib/module.php';
 require APP_PATH.'lib/modules.php';
 require APP_PATH.'lib/modules_exec.php';
