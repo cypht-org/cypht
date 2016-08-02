@@ -49,6 +49,26 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $auth = new Hm_Auth_POP3($this->config);
         $auth->save_auth_detail($session);
         $this->assertTrue($auth->check_credentials('any', 'thing'));
+
+        $auth = new Hm_Auth_LDAP($this->config);
+        $this->assertFalse($auth->check_credentials('any', 'thing'));
+
+        $this->config->set('ldap_auth_server', 'test');
+        $this->config->set('ldap_auth_port', 123);
+        $this->config->set('ldap_auth_tls', false);
+        $this->config->set('ldap_auth_base_dn', 'asdf');
+        $auth = new Hm_Auth_LDAP($this->config);
+        $this->assertFalse($auth->check_credentials('any', 'thing'));
+        Hm_Functions::$exists = false;
+        $this->assertFalse($auth->check_credentials('any', 'thing'));
+
+        Hm_Functions::$exists = true;
+        $this->config->set('ldap_auth_server', ' ');
+        $this->config->set('ldap_auth_port', 'asdf');
+        $this->config->set('ldap_auth_tls', false);
+        $this->config->set('ldap_auth_base_dn', ' ');
+        $auth = new Hm_Auth_LDAP($this->config);
+        $this->assertFalse($auth->check_credentials('foo', 'bar'));
     }
     /**
      * @preserveGlobalState disabled
