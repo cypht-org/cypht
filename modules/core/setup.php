@@ -189,7 +189,7 @@ return array(
         'save_and_logout' => FILTER_VALIDATE_BOOLEAN,
         'limit' => FILTER_VALIDATE_INT,
         'username' => FILTER_SANITIZE_STRING,
-        'password' => FILTER_SANITIZE_STRING,
+        'password' => FILTER_UNSAFE_RAW,
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'save_settings' => FILTER_SANITIZE_STRING,
         'save_settings_permanently' => FILTER_SANITIZE_STRING,

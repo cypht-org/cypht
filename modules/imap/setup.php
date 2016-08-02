@@ -262,8 +262,6 @@ return array(
     'allowed_post' => array(
         'server_port' => FILTER_VALIDATE_INT,
         'server' => FILTER_SANITIZE_STRING,
-        'username' => FILTER_SANITIZE_STRING,
-        'password' => FILTER_SANITIZE_STRING,
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_server_ids' => FILTER_SANITIZE_STRING,
         'imap_user' => FILTER_SANITIZE_STRING,
