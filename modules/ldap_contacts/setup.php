@@ -46,6 +46,10 @@ add_handler('ajax_delete_contact', 'process_delete_ldap_contact', true, 'ldap_co
 add_handler('ajax_add_contact', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
 add_handler('ajax_add_contact', 'process_add_ldap_contact_from_message', true, 'ldap_contacts', 'save_user_data', 'before');
 
+add_handler('settings', 'load_ldap_settings', true, 'ldap_contacts', 'load_user_data', 'after');
+add_handler('settings', 'process_ldap_auth_settings', true, 'ldap_contacts', 'save_user_settings', 'before');
+add_output('settings', 'ldap_auth_settings', true, 'ldap_contacts', 'end_settings_form', 'before');
+
 return array(
     'allowed_post' => array(
         'ldap_first_name' => FILTER_SANITIZE_STRING,
@@ -71,6 +75,8 @@ return array(
         'ldap_uri' => FILTER_SANITIZE_STRING,
         'add_ldap_contact' => FILTER_SANITIZE_STRING,
         'update_ldap_contact' => FILTER_SANITIZE_STRING,
-        'ldap_source' => FILTER_SANITIZE_STRING
+        'ldap_source' => FILTER_SANITIZE_STRING,
+        'ldap_usernames' => array('filter' => FILTER_SANITIZE_STRING, 'flags'  => FILTER_FORCE_ARRAY),
+        'ldap_passwords' => array('filter' => FILTER_UNSAFE_RAW, 'flags'  => FILTER_FORCE_ARRAY)
     )
 );

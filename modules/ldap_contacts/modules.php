@@ -231,6 +231,7 @@ class Hm_Handler_load_ldap_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
         list($contacts, $ldap_config) = fetch_ldap_contacts($this->config, $contacts);
+        $ldap_config = ldap_add_user_auth($ldap_config, $this->user_config->get('ldap_contacts_auth_setting', array()));
         $this->append('contact_sources', 'ldap');
         $edit = false;
         $sources = array();
@@ -264,6 +265,95 @@ class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
                 $current['id'] = $this->request->get['contact_id'];
                 $this->out('current_ldap_contact', $current);
             }
+        }
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
+class Hm_Handler_process_ldap_auth_settings extends Hm_Handler_Module {
+    public function process() {
+        $connections = $this->get('ldap_contact_connections');
+        $users = array();
+        $passwords = array();
+        $results = array();
+        if (array_key_exists('ldap_usernames', $this->request->post)) {
+            $users = $this->request->post['ldap_usernames'];
+        }
+        if (array_key_exists('ldap_passwords', $this->request->post)) {
+            $passwords = $this->request->post['ldap_passwords'];
+        }
+        foreach ($connections as $name => $vals) {
+            $creds = array();
+            if (array_key_exists($name, $users) && trim($users[$name])) {
+                $results[$name]['user'] = $users[$name];
+            }
+            if (array_key_exists($name, $passwords) && trim($passwords[$name])) {
+                $results[$name]['pass'] = $passwords[$name];
+            }
+        }
+        if (count($results) > 0) {
+            $new_settings = $this->get('new_user_settings');
+            $new_settings['ldap_contacts_auth_setting'] = $results;
+            $this->out('new_user_settings', $new_settings, false);
+        }
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
+class Hm_Handler_load_ldap_settings extends Hm_Handler_Module {
+    public function process() {
+        $connections = array();
+        foreach (ldap_config($this->config) as $name => $vals) {
+            if (array_key_exists('auth', $vals) && $vals['auth']) {
+                if ((!array_key_exists('user', $vals) || !$vals['user']) &&
+                    (!array_key_exists('pass', $vals) || !$vals['pass'])) {
+                    $connections[$name] = $vals;
+                }
+            }
+        }
+        $this->out('ldap_contacts_auth', $this->user_config->get('ldap_contacts_auth_setting'));
+        $this->out('ldap_contact_connections', $connections);
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/output
+ */
+class Hm_Output_ldap_auth_settings extends Hm_Output_Module {
+    protected function output() {
+        $connections = $this->get('ldap_contact_connections', array());
+        $auths = $this->get('ldap_contacts_auth', array());
+        if (count($connections) > 0) {
+            $res = '<tr><td data-target=".ldap_settings" colspan="2" class="settings_subtitle">'.
+                '<img alt="" src="'.Hm_Image_Sources::$people.'" width="16" height="16" />'.
+                $this->trans('Addressbooks').'</td></tr>';
+            foreach ($connections as $name => $con) {
+                $user = '';
+                $pass = false;
+                if (array_key_exists($name, $auths)) {
+                    $user = $auths[$name]['user'];
+                    if (array_key_exists('pass', $auths[$name]) && $auths[$name]['pass']) {
+                        $pass = true;
+                    }
+                }
+                $res .= '<tr class="ldap_settings"><td>'.$this->html_safe($name).'</td><td>';
+                $res .= '<input type="text" value="'.$user.'" name="ldap_usernames['.$this->html_safe($name).']" ';
+                $res .= 'placeholder="'.$this->trans('Username').'" /> <input type="password" ';
+                if ($pass) {
+                    $res .= 'disabled="disabled" placeholder="'.$this->trans('Password saved').'" ';
+                    $res .= 'name="ldap_passwords['.$this->html_safe($name).']" /> <input type="button" ';
+                    $res .= 'value="'.$this->trans('Unlock').'" class="ldap_password_change" /></td></tr>';
+                }
+                else {
+                    $res .= 'placeholder="'.$this->trans('Password').'" ';
+                    $res .= 'name="ldap_passwords['.$this->html_safe($name).']" /></td></tr>';
+                }
+            }
+            return $res;
         }
     }
 }
@@ -693,6 +783,27 @@ function fetch_ldap_contacts($config, $contact_store, $session=false) {
         }
     }
     return array($contact_store, $ldap_config);
+}
+
+/**
+ * @subpackage ldap_contacts/functions
+ */
+function ldap_add_user_auth($ldap_config, $auths) {
+    if (!is_array($ldap_config) || !is_array($auths)) {
+        return $ldap_config;
+    }
+    foreach ($auths as $name => $vals) {
+        if (array_key_exists($name, $ldap_config)) {
+            if (array_key_exists('user', $vals)) {
+                $user = sprintf('cn=%s,%s', $vals['user'], $ldap_config[$name]['base_dn']);
+                $ldap_config[$name]['user'] = $user;
+            }
+            if (array_key_exists('pass', $vals)) {
+                $ldap_config[$name]['pass'] = $vals['pass'];
+            }
+        }
+    }
+    return $ldap_config;
 }
 
 /**
