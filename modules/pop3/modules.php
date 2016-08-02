@@ -204,7 +204,7 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
 
         list($success, $form) = $this->process_form(array('pop3_uid', 'pop3_list_path'));
         if ($success) {
-            $id = (int) substr($form['pop3_list_path'], 4);
+            $id = (int) substr($form['pop3_list_path'], 5);
             $pop3 = Hm_POP3_List::connect($id, false);
             $details = Hm_POP3_List::dump($id);
             if ($pop3->state == 'authed') {
