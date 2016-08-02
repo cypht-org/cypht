@@ -308,3 +308,74 @@ class Hm_Auth_POP3 extends Hm_Auth {
         $session->set('pop3_auth_server_settings', $this->pop3_settings);
     }
 }
+
+/**
+ * Authenticate against an LDAP server
+ */
+class Hm_Auth_LDAP extends Hm_Auth {
+
+    protected $config = array();
+    protected $fh;
+    protected $source = 'ldap';
+
+    private function connect_details() {
+        $prefix = 'ldaps://';
+        $server = 'localhost';
+        $port = 389;
+        if (array_key_exists('server', $this->config)) {
+            $server = $this->config['server'];
+        }
+        if (array_key_exists('port', $this->config)) {
+            $port = $this->config['port'];
+        }
+        if (array_key_exists('enable_tls', $this->config) && !$this->config['enable_tls']) {
+            $prefix = 'ldap://';
+        }
+        return $prefix.$server.':'.$port;
+    }
+
+    public function check_credentials($user, $pass) {
+        list($server, $port, $tls, $base_dn) = $this->get_ldap_config();
+        if ($server && $port && $base_dn) {
+            $user = sprintf('cn=%s,%s', $user, $base_dn);
+            $this->config = array(
+                'server' => $server,
+                'port' => $port,
+                'enable_tls' => $tls,
+                'base_dn' => $base_dn,
+                'user' => $user,
+                'pass' => $pass
+            );
+            return $this->connect();
+        }
+        return false;
+    }
+
+    private function get_ldap_config() {
+        $server = $this->site_config->get('ldap_auth_server', false);
+        $port = $this->site_config->get('ldap_auth_port', false);
+        $tls = $this->site_config->get('ldap_auth_tls', false);
+        $base_dn = $this->site_config->get('ldap_auth_base_dn', false);
+        return array($server, $port, $tls, $base_dn);
+
+    }
+
+    public function connect() {
+        if (!Hm_Functions::function_exists('ldap_connect')) {
+            return false;
+        }
+        $uri = $this->connect_details();
+        $this->fh = @ldap_connect($uri);
+        if ($this->fh) {
+            ldap_set_option($this->fh, LDAP_OPT_PROTOCOL_VERSION, 3);
+            return $this->auth();
+        }
+        return false;
+    }
+
+    protected function auth() {
+        $result = @ldap_bind($this->fh, $this->config['user'], $this->config['pass']);
+        ldap_unbind($this->fh);
+        return $result;
+    }
+}
