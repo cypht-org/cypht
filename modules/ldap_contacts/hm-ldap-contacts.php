@@ -11,11 +11,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage ldap_contacts/lib
  */
-class Hm_LDAP_Contacts {
-
-    private $config = array();
-    private $fh;
-    private $source = 'ldap';
+class Hm_LDAP_Contacts extends Hm_Auth_LDAP {
 
     public function __construct($config) {
         if (is_array($config)) {
@@ -24,37 +20,6 @@ class Hm_LDAP_Contacts {
         if (is_array($config) && array_key_exists('name', $config)) {
             $this->source = $config['name'];
         }
-    }
-
-    private function connect_details() {
-        $prefix = 'ldaps://';
-        $server = 'localhost';
-        $port = 389;
-        if (array_key_exists('server', $this->config)) {
-            $server = $this->config['server'];
-        }
-        if (array_key_exists('port', $this->config)) {
-            $port = $this->config['port'];
-        }
-        if (array_key_exists('enable_tls', $this->config) && !$this->config['enable_tls']) {
-            $prefix = 'ldap://';
-        }
-        return $prefix.$server.':'.$port;
-    }
-
-    public function connect() {
-        if (!function_exists('ldap_connect')) {
-            return false;
-        }
-        $uri = $this->connect_details(); 
-        $this->fh = ldap_connect($uri);
-        if ($this->fh) {
-            ldap_set_option($this->fh, LDAP_OPT_PROTOCOL_VERSION, 3);
-            if ($this->auth()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public function rename($dn, $new_dn, $parent) {
@@ -73,7 +38,7 @@ class Hm_LDAP_Contacts {
         return @ldap_delete($this->fh, $dn);
     }
 
-    private function auth() {
+    protected function auth() {
         if (array_key_exists('auth', $this->config) && $this->config['auth']) {
             if (array_key_exists('user', $this->config) && array_key_exists('pass', $this->config)) {
                 return ldap_bind($this->fh, $this->config['user'], $this->config['pass']);
