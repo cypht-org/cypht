@@ -1,4 +1,5 @@
 'use strict';
+
 var inline_pop3_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
     path = '.'+details['type']+'_'+details['server_id']+'_'+uid;

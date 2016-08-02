@@ -1,4 +1,5 @@
 'use strict';
+
 var load_freshly_pressed = function() {
     Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_wordpess_freshly_pressed'}], display_wordpress_freshly_pressed);
 };

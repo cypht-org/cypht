@@ -1,4 +1,5 @@
 'use strict';
+
 var load_github_data = function(id) {
     if (hm_list_path() == 'github_all') {
         Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_repo', 'value': id}], display_github_data, [], false, cache_github_all);

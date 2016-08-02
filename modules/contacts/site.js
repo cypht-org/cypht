@@ -1,4 +1,5 @@
 'use strict';
+
 var delete_contact = function(id, source) {
     if (!hm_delete_prompt()) {
         return false;

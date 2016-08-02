@@ -1,4 +1,5 @@
 'use strict';
+
 var nasa_disconnect = function(event) {
     if (!hm_delete_prompt()) {
         return false;

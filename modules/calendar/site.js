@@ -1,4 +1,5 @@
 'use strict';
+
 $(function() {
     if (hm_page_name() == 'calendar') {
         $('.event_delete').click(function() {
