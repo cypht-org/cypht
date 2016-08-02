@@ -17,8 +17,8 @@ add_output('ajax_hm_folders', 'recover_settings_page_link', true, 'recover_setti
 return array(
     'allowed_pages' => array('recover_settings'),
     'allowed_post' => array(
-        'old_password_recover' => FILTER_SANITIZE_STRING,
-        'new_password_recover' => FILTER_SANITIZE_STRING,
+        'old_password_recover' => FILTER_UNSAFE_RAW,
+        'new_password_recover' => FILTER_UNSAFE_RAW,
         'recover_settings' => FILTER_SANITIZE_STRING
     )
 );
