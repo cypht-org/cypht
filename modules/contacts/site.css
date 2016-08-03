@@ -22,6 +22,10 @@
 .contact_form { margin-top: 10px; display: none; }
 .add_contact .menu_caret { opacity: .7; }
 .contact_update_form { margin-top: 10px; }
-.contact_detail {margin-top: 5px; position: absolute; display: none; background-color: #fff; padding: 25px; border: solid 1px #ddd; }
+.contact_detail { margin: 20px; margin-bottom: 30px; }
+.contact_detail_row table { width: auto; }
 .contact_detail td { border: none; }
+.contact_detail_row { border: none; display: none;}
 .display_name, .email_address, .phone_number { font-weight: bold; }
+.show_contact { margin-right: 15px; }
+.contact_detail th { font-weight: normal; text-align: right; padding-right: 20px; }
