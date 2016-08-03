@@ -13,6 +13,8 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Gmail_Contact_XML {
     private $collect = false;
+    private $all_fields = false;
+    private $misc_tag_name = false;
     private $results = array();
     private $xml_parser = false;
     private $xml = false;
@@ -31,6 +33,7 @@ class Hm_Gmail_Contact_XML {
         return $this->results;
     }
     public function xml_start_element($parser, $tagname, $attrs) {
+        $this->all_fields = false;
         if ($tagname == 'ENTRY') {
             if (!array_key_exists($this->index, $this->results)) {
                 $this->results[$this->index] = array();
@@ -47,6 +50,10 @@ class Hm_Gmail_Contact_XML {
                 $this->results[$this->index]['phone_number'] = substr($attrs['URI'], 5);
             }
         }
+        else {
+            $this->all_fields = true;
+            $this->misc_tag_name = $tagname;
+        }
     }
     public function xml_end_element($parser, $tagname) {
         if ($tagname == 'ENTRY') {
@@ -57,6 +64,9 @@ class Hm_Gmail_Contact_XML {
         if ($this->collect) {
             $this->results[$this->index]['display_name'] = $data;
             $this->collect = false;
+        }
+        elseif ($this->all_fields && trim($data)) {
+            $this->results[$this->index]['all_fields'][$this->misc_tag_name] = $data;
         }
     }
 }
