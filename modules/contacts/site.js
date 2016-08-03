@@ -165,6 +165,14 @@ if (hm_page_name() == 'contacts') {
         delete_contact($(this).data('id'), $(this).data('source'));
         return false;
     });
+    $('.show_contact').click(function() {
+        $('.contact_detail').hide();
+        $('#'+$(this).data('id')).toggle();
+        $('.contact_detail').click(function() {
+            $(this).hide();
+        });
+        return false;
+    });
     $('.reset_contact').click(function() {
         window.location.href = '?page=contacts';
     });

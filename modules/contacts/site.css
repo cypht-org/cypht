@@ -4,7 +4,7 @@
 .contact_list td { white-space: nowrap; padding-right: 20px; padding-bottom: 5px; vertical-align: -5px; padding-top: 5px; border-bottom: solid 1px #ddd; }
 .gmail_contacts { margin-top: 50px; }
 .contact_list_title { padding-top: 0px !important; padding-bottom: 10px; }
-.edit_contact img, .send_to_contact img, .delete_contact img { opacity: .5; margin-left: 10px; cursor: pointer; }
+.show_contact img, .edit_contact img, .send_to_contact img, .delete_contact img { opacity: .5; margin-left: 10px; cursor: pointer; }
 .contact_controls { text-align: right; }
 .add_contact_row { position: absolute; top: 22px; right: 10px; font-size: 90%; z-index: 100}
 .add_contact_row img { opacity: .4; margin-right: 10px; }
@@ -22,3 +22,6 @@
 .contact_form { margin-top: 10px; display: none; }
 .add_contact .menu_caret { opacity: .7; }
 .contact_update_form { margin-top: 10px; }
+.contact_detail {margin-top: 5px; position: absolute; display: none; background-color: #fff; padding: 25px; border: solid 1px #ddd; }
+.contact_detail td { border: none; }
+.display_name, .email_address, .phone_number { font-weight: bold; }

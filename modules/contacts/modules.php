@@ -165,7 +165,8 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
             $contacts->sort('email_address');
             foreach ($contacts->page($current_page, $per_page) as $id => $contact) {
                 $res .= '<tr class="contact_row_'.$this->html_safe($id).'">'.
-                    '<td>'.($contact->value('source') ? $this->html_safe($contact->value('source')) : $this->trans('local')).'</td>'.
+                    '<td>'.($contact->value('source') ? $this->html_safe($contact->value('source')) : $this->trans('local')).
+                    build_contact_detail($this, $contact, $id).'</td>'.
                     '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
                     '<td>'.$this->html_safe($contact->value('email_address')).'</td>'.
                     '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
@@ -179,10 +180,15 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                         '" class="edit_contact" title="'.$this->trans('Edit').'"><img alt="'.$this->trans('Edit').
                         '" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>';
                 }
+                $res .= '<a data-id="'.$this->html_safe($id).'_detail" '.
+                    '" class="show_contact" title="'.$this->trans('Details').'">'.
+                    '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.
+                    Hm_Image_Sources::$person.'" /></a>';
                 $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($id).
                     '" class="send_to_contact" title="'.$this->trans('Send To').'">'.
                     '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.
-                    Hm_Image_Sources::$doc.'" /></a></td></tr>';
+                    Hm_Image_Sources::$doc.'" /></a>';
+                $res .= '</td></tr>';
             }
             $res .= '<tr><td class="contact_pages" colspan="5">';
             if ($current_page > 1) {
@@ -213,3 +219,26 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage contacts/functions
+ */
+function build_contact_detail($output_mod, $contact, $id) {
+    $res = '<div id="'.$output_mod->html_safe($id).'_detail" class="contact_detail" /><table><thead></thead><tbody>';
+    $all_fields = false;
+    foreach ($contact->export() as $name => $val) {
+        if ($name == 'all_fields') {
+            $all_fields = $val;
+            continue;
+        }
+        $res .= '<tr><td>'.$output_mod->trans(ucfirst(strtolower(str_replace('_', ' ', $name)))).'</td>';
+        $res .= '<td class="'.$output_mod->html_safe($name).'">'.$output_mod->html_safe($val).'</td></tr>';
+    }
+    if ($all_fields) {
+        foreach ($all_fields as $name => $val) {
+            $res .= '<tr><td>'.$output_mod->trans(ucfirst(strtolower(str_replace('_', ' ', $name)))).'</td>';
+            $res .= '<td>'.$output_mod->html_safe($val).'</td></tr>';
+        }
+    }
+    $res .= '</tbody></table></div>';
+    return $res;
+}
