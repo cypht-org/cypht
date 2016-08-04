@@ -240,5 +240,5 @@ function backup_codes($config) {
     if (is_array($codes) && count($codes) == 3) {
         return $codes;
     }
-    return array(random_int(1000000000, 9999999999), random_int(1000000000, 9999999999), random_int(1000000000, 9999999999));
+    return array(random_int(100000000, 999999999), random_int(100000000, 999999999), random_int(100000000, 999999999));
 }
