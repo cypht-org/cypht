@@ -78,7 +78,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             if ($form['imap_move_action'] == 'move' && $form['imap_move_page'] == 'message') {
                 $msgs = Hm_Msgs::get();
                 Hm_Msgs::flush();
-                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
+                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
             }
             $this->out('move_count', $moved);
         }
@@ -424,7 +424,7 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
             }
             $msgs = Hm_Msgs::get();
             Hm_Msgs::flush();
-            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
+            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
         }
     }
 }
@@ -1100,6 +1100,10 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     if (isset($msg_struct_current['subtype']) && strtolower($msg_struct_current['subtype'] == 'html')) {
                         $msg_text = add_attached_images($msg_text, $form['imap_msg_uid'], $msg_struct, $imap);
                     }
+                    $save_reply_text = false;
+                    if (isset($msg_struct_current['type']) && strtolower($msg_struct_current['type'] == 'text')) {
+                        $save_reply_text = true;
+                    }
                     $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);
                     $this->out('msg_headers', $msg_headers);
                     $this->out('imap_prefecth', $prefetch);
@@ -1110,7 +1114,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%d&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
                     $this->session->set(sprintf('reply_details_imap_%d_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
-                        array('msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
+                        array('msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text: ''), 'msg_headers' => $msg_headers));
                 }
             }
         }

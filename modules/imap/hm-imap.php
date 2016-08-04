@@ -29,7 +29,8 @@ class Hm_IMAP_List {
             'port'      => $server['port'],
             'tls'       => $server['tls'],
             'username'  => $user,
-            'password'  => $pass
+            'password'  => $pass,
+            'use_cache' => false
         );
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];

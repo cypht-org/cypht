@@ -18,6 +18,9 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
      * @return int 1 if the cache was updated
      */
     protected function update_cache_data($data) {
+        if (!$this->use_cache) {
+            return 0;
+        }
         $res = 0;
         if (in_array('VANISHED', $data)) {
             $uid = $this->get_adjacent_response_value($data, -1, 'VANISHED');
