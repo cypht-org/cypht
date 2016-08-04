@@ -87,7 +87,7 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
                 $all_contacts = array_merge($all_contacts, $contacts);
             }
         }
-        if ($session && count($contacts) > 0) {
+        if ($session && count($all_contacts) > 0) {
             $session->set('gmail_contacts', $all_contacts);
         }
     }
