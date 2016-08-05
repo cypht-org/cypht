@@ -120,6 +120,7 @@ class Hm_Transform {
         if (!is_array($data)) {
             return false;
         }
+        elog(self::hm_encode($data, $encoding));
         return @json_encode(self::hm_encode($data, $encoding));
 
     }
@@ -160,11 +161,13 @@ class Hm_Transform {
             if (is_array($val)) {
                 $result[$name] = self::hm_encode($val, $encoding);
             }
-            if (is_string($val)) {
-                $result[$name] = $encoding($val);
-            }
             else {
-                $result[$name] = $val;
+                if (is_string($val)) {
+                    $result[$name] = $encoding($val);
+                }
+                else {
+                    $result[$name] = $val;
+                }
             }
         }
         return $result;
