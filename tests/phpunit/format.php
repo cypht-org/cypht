@@ -40,5 +40,29 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
         Hm_Output_Modules::del('test', 'blah');
     }
 }
-
+class Hm_Test_Transform extends PHPUnit_Framework_TestCase {
+    public function setUp() {
+        require 'bootstrap.php';
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_stringify() {
+        $this->assertEquals('{"foo":"YmFy"}', Hm_Transform::stringify(array('foo' => 'bar')));
+        $this->assertFalse(Hm_Transform::stringify(NULL));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_unstringify() {
+        $test = Hm_Transform::stringify(array('foo' => 'bar', 'baz' => array('test' => 'asdf')));
+        $this->assertEquals(array('foo' => 'bar', 'baz' => array('test' => 'asdf')), Hm_Transform::unstringify($test));
+        $this->assertFalse(Hm_Transform::unstringify(array()));
+        $this->assertFalse(Hm_Transform::unstringify('asdf'));
+        print serialize(array('foo' => base64_encode('bar')));
+        $this->assertEquals(array('foo' => 'bar'), Hm_Transform::unstringify('a:1:{s:3:"foo";s:4:"YmFy";}'));
+    }
+}
 ?>
