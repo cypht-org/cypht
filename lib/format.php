@@ -120,7 +120,6 @@ class Hm_Transform {
         if (!is_array($data)) {
             return false;
         }
-        elog(self::hm_encode($data, $encoding));
         return @json_encode(self::hm_encode($data, $encoding));
 
     }
