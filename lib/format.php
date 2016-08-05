@@ -105,8 +105,17 @@ class Hm_Format_HTML5 extends HM_Format {
     }
 }
 
+/**
+ * binary safe wrapper around json encode/decode using base64
+ */
 class Hm_Transform {
 
+    /**
+     * Convert an array to a string
+     * @param array $data data to be transformed to a string
+     * @param string $encoding encoding to use for values
+     * @return mixed string on success, false on failure
+     */
     static function stringify($data, $encoding='base64_encode') {
         if (!is_array($data)) {
             return false;
@@ -115,6 +124,12 @@ class Hm_Transform {
 
     }
 
+    /**
+     * Convert a stringified array back to an array
+     * @param string $data data to be transformed from a string
+     * @param string $encoding encoding to use for values
+     * @return mixed array on success, false on failure
+     */
     static function unstringify($data, $encoding='base64_decode') {
         $result = false;
         if (!is_string($data) || !trim($data)) {
@@ -133,6 +148,12 @@ class Hm_Transform {
         return false;
     }
 
+    /**
+     * Recursively encode values in an array
+     * @param array $data data to encode values for
+     * @param string $encoding the type of encoding to use
+     * @return array
+     */
     static function hm_encode($data, $encoding) {
         $result = array();
         foreach ($data as $name => $val) {
