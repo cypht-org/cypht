@@ -223,7 +223,7 @@ abstract class Hm_Session {
      * @return string encrypted session data
      */
     public function ciphertext($data) {
-        return Hm_Crypt::ciphertext(json_encode($data), $this->enc_key);
+        return Hm_Crypt::ciphertext(Hm_transform::stringify($data), $this->enc_key);
     }
 
     /**
@@ -232,7 +232,7 @@ abstract class Hm_Session {
      * @return array decrpted session data
      */
     public function plaintext($data) {
-        return @json_decode(Hm_Crypt::plaintext($data, $this->enc_key), true);
+        return Hm_transform::unstringify(Hm_Crypt::plaintext($data, $this->enc_key));
     }
 
     /**
