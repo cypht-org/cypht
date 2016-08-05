@@ -61,7 +61,6 @@ class Hm_Test_Transform extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('foo' => 'bar', 'baz' => array('test' => 'asdf')), Hm_Transform::unstringify($test));
         $this->assertFalse(Hm_Transform::unstringify(array()));
         $this->assertFalse(Hm_Transform::unstringify('asdf'));
-        print serialize(array('foo' => base64_encode('bar')));
         $this->assertEquals(array('foo' => 'bar'), Hm_Transform::unstringify('a:1:{s:3:"foo";s:4:"YmFy";}'));
     }
 }
