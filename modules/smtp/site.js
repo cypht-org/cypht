@@ -89,11 +89,13 @@ var save_compose_state = function(no_files, notice) {
     var body = $('.compose_body').val();
     var subject = $('.compose_subject').val();
     var to = $('.compose_to').val();
+    var smtp = $('.compose_server').val();
     $('.smtp_send').prop('disabled', true);
     $('.smtp_send').addClass('disabled_input');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
+        {'name': 'draft_smtp', 'value': smtp},
         {'name': 'draft_subject', 'value': subject},
         {'name': 'delete_uploaded_files', 'value': no_files},
         {'name': 'draft_to', 'value': to}],

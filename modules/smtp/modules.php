@@ -169,10 +169,11 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
         $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
         $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
+        $smtp = array_key_exists('draft_smtp', $this->request->post) ? $this->request->post['draft_smtp'] : '';
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session);
         }
-        $this->session->set('compose_draft', array('draft_to' => $to, 'draft_body' => $body, 'draft_subject' => $subject));
+        $this->session->set('compose_draft', array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body, 'draft_subject' => $subject));
     }
 }
 
@@ -546,6 +547,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $html = $this->get('smtp_compose_type', 0);
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
+        $smtp_id = false;
         if (!empty($reply)) {
             list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
                 $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type,
@@ -557,6 +559,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $to = $draft['draft_to'];
             $subject = $draft['draft_subject'];
             $body= $draft['draft_body'];
+            $smtp_id = $draft['draft_smtp'];
         }
         $res = '';
         if ($html == 1) {
@@ -592,7 +595,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $res .= format_attachment_row($file, $this);
         }
         $res .= '</table>'.
-            smtp_server_dropdown($this->module_output(), $this, $recip).
+            smtp_server_dropdown($this->module_output(), $this, $recip, $smtp_id).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
             '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
@@ -764,7 +767,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
 /**
  * @subpackage smtp/functions
  */
-function smtp_server_dropdown($data, $output_mod, $recip) {
+function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
     $res = '<select name="smtp_server_id" class="compose_server">';
     $profiles = array();
     if (array_key_exists('compose_profiles', $data)) {
@@ -774,7 +777,10 @@ function smtp_server_dropdown($data, $output_mod, $recip) {
         $selected = false;
         $default = false;
         foreach ($data['smtp_servers'] as $id => $vals) {
-            if ($recip && trim($recip) == trim($vals['user'])) {
+            if ($selected_id !== false && $id == $selected_id) {
+                $selected = $id;
+            }
+            elseif ($recip && trim($recip) == trim($vals['user'])) {
                 $selected = $id;
             }
             elseif (array_key_exists($id, $profiles) && $profiles[$id]['profile_default']) {

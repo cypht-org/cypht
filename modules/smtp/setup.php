@@ -118,6 +118,7 @@ return array(
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_SANITIZE_STRING,
         'draft_to' => FILTER_UNSAFE_RAW,
+        'draft_smtp' => FILTER_SANITIZE_STRING,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
     )
 );
