@@ -161,6 +161,9 @@ class Hm_IMAP_Struct {
             return false;
         }
         elseif (!is_array($val)) {
+            if ($type == 'type' || $type == 'subtype') {
+                $val = strtolower($val);
+            }
             return $this->imap->decode_fld($val);
         }
         else {
