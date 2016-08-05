@@ -107,7 +107,7 @@ class Hm_Format_HTML5 extends HM_Format {
 
 class Hm_Transform {
 
-    static function stringify($data, $version=false, $encoding='base64_encode') {
+    static function stringify($data, $encoding='base64_encode') {
         if (!is_array($data)) {
             return false;
         }
@@ -124,7 +124,7 @@ class Hm_Transform {
         if (substr($data, 0, 2) === 'a:') {
             $result = @unserialize($data);
         }
-        elseif (substr($data, 0, 1) === '{') {
+        elseif (substr($data, 0, 1) === '{' || substr($data, 0, 1) === '[') {
             $result = @json_decode($data, true);
         }
         if (is_array($result)) {
