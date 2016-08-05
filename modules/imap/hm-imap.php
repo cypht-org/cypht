@@ -38,10 +38,10 @@ class Hm_IMAP_List {
         return self::$server_list[$id]['object']->connect($config);
     }
     public static function get_cache($session, $id) {
-        $server_cache = $session->get('imap_cache', array());
+        /*$server_cache = $session->get('imap_cache', array());
         if (array_key_exists($id, $server_cache)) {
             return $server_cache[$id];
-        }
+        }*/
         return false;
     }
 }
