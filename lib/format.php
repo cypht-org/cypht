@@ -104,3 +104,48 @@ class Hm_Format_HTML5 extends HM_Format {
         return implode('', $output);
     }
 }
+
+class Hm_Transform {
+
+    static function stringify($data, $version=false, $encoding='base64_encode') {
+        if (!is_array($data)) {
+            return false;
+        }
+        return @json_encode(self::hm_encode($data, $encoding));
+
+    }
+
+    static function unstringify($data, $encoding='base64_decode') {
+        $result = false;
+        if (!is_string($data) || !trim($data)) {
+            return false;
+        }
+
+        if (substr($data, 0, 2) === 'a:') {
+            $result = @unserialize($data);
+        }
+        elseif (substr($data, 0, 1) === '{') {
+            $result = @json_decode($data, true);
+        }
+        if (is_array($result)) {
+            return self::hm_encode($result, $encoding);
+        }
+        return false;
+    }
+
+    static function hm_encode($data, $encoding) {
+        $result = array();
+        foreach ($data as $name => $val) {
+            if (is_array($val)) {
+                $result[$name] = self::hm_encode($val, $encoding);
+            }
+            if (is_string($val)) {
+                $result[$name] = $encoding($val);
+            }
+            else {
+                $result[$name] = $val;
+            }
+        }
+        return $result;
+    }
+}
