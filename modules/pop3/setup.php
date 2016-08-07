@@ -54,11 +54,11 @@ add_output('ajax_hm_folders', 'filter_pop3_folders', true, 'pop3', 'folder_list_
 /* pop3 message list messages */
 add_handler('ajax_pop3_folder_display', 'login', false, 'core');
 add_handler('ajax_pop3_folder_display', 'load_user_data', true, 'core');
+add_handler('ajax_pop3_folder_display', 'load_pop3_servers_from_config', true, 'pop3');
 add_handler('ajax_pop3_folder_display', 'language', true, 'core');
 add_handler('ajax_pop3_folder_display', 'message_list_type', true, 'core');
 add_handler('ajax_pop3_folder_display', 'pop3_message_list_type', true);
 add_handler('ajax_pop3_folder_display', 'close_session_early', true, 'core');
-add_handler('ajax_pop3_folder_display', 'load_pop3_servers_from_config', true);
 add_handler('ajax_pop3_folder_display', 'pop3_folder_page', true);
 add_handler('ajax_pop3_folder_display', 'date', true, 'core');
 add_handler('ajax_pop3_folder_display', 'http_headers', true, 'core');
