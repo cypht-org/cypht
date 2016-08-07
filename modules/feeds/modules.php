@@ -259,9 +259,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                     }
                 }
             }
-            if ($this->config->get('enable_memcached') && !$cache) {
-                feed_memcached_save($this->config, $feed_data, $res);
-            }
+            feed_memcached_save($this->config, $feed_data, $res);
             $this->out('feed_list_data', $res);
             if (isset($this->request->get['list_path'])) {
                 $this->out('feed_list_parent', $this->request->get['list_path']);
@@ -328,9 +326,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                 }
             }
             if ($content) {
-                if ($this->config->get('enable_memcached') && !$cache) {
-                    feed_memcached_save($this->config, $feed_data, $feed_items);
-                }
+                feed_memcached_save($this->config, $feed_data, $feed_items);
                 Hm_Feed_Uid_Cache::read($form['feed_uid']);
                 $this->out('feed_message_content', $content);
                 $this->out('feed_message_headers', $headers);
@@ -931,25 +927,32 @@ function search_feed_item($item, $terms, $since, $fld) {
  * @subpackage feeds/functions
  */
 function feed_memcached_save($config, $feed_data, $data) {
+    if (!$config->get('enable_memcached')) {
+        return false;
+    }
     if (!class_exists('Memcached')) {
         Hm_Debug::add('Memcached enabled, but no PHP support found');
         return false;
     }
-    $key = sha1(sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']));
+    $key = hash('sha256', (sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port'])));
     $memcached = new Memcached();
     $memcached->addServer($config->get('memcached_server', '127.0.0.1'), $config->get('memcached_port', 11211));
     $memcached->set($key, $data, 300);
+    return true;
 }
 
 /**
  * @subpackage feeds/functions
  */
 function feed_memcached_fetch($config, $feed_data) {
+    if (!$config->get('enable_memcached')) {
+        return false;
+    }
     if (!class_exists('Memcached')) {
         Hm_Debug::add('Memcached enabled, but no PHP support found');
         return false;
     }
-    $key = sha1(sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']));
+    $key = hash('sha256', (sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port'])));
     $memcached = new Memcached();
     $memcached->addServer($config->get('memcached_server', '127.0.0.1'), $config->get('memcached_port', 11211));
     return $memcached->get($key);
