@@ -219,6 +219,19 @@ class Hm_Memcached {
         $this->supported = Hm_Functions::class_exists('Memcached');
     }
 
+    public function close() {
+        if (!$this->active()) {
+            return false;
+        }
+        return $this->cache_con->quit();
+    }
+    public function del($key) {
+        if (!$this->active()) {
+            return false;
+        }
+        return $this->cache_con->delete($key);
+    }
+
     public function set($key, $val, $lifetime=300, $crypt_key=false) {
         if (!$this->active()) {
             return false;
@@ -257,7 +270,7 @@ class Hm_Memcached {
         return true;
     }
 
-    private function active() {
+    public function active() {
         if (!$this->enabled) {
             return false;
         }
