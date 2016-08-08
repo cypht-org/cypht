@@ -198,3 +198,80 @@ trait Hm_Uid_Cache {
         }
     }
 }
+
+/**
+ * Memcached cache
+ * @package framework
+ * @subpackage cache
+ */
+class Hm_Memcached {
+
+    private $supported;
+    private $enabled;
+    private $server;
+    private $port;
+    private $cache_con;
+
+    public function __construct($config) {
+        $this->server = $config->get('memcached_server', false);
+        $this->port = $config->get('memcached_port', false);
+        $this->enabled = $config->get('enable_memcached', false);
+        $this->supported = Hm_Functions::class_exists('Memcached');
+    }
+
+    public function set($key, $val, $lifetime=300, $crypt_key=false) {
+        if (!$this->active()) {
+            return false;
+        }
+        return $this->cache_con->set($key, $this->prep_in($val, $crypt_key), $lifetime);
+    }
+
+    public function get($key, $crypt_key=false) {
+        if (!$this->active()) {
+            return false;
+        }
+        return $this->prep_out($this->cache_con->get($key), $crypt_key);
+    }
+
+    private function prep_in($data, $crypt_key) {
+        if ($crypt_key) {
+            return Hm_Crypt::ciphertext(Hm_transform::stringify($data), $crypt_key);
+        }
+        return $data;
+    }
+
+    private function prep_out($data, $crypt_key) {
+        if ($crypt_key && is_string($data) && trim($data)) {
+            return Hm_transform::unstringify(Hm_Crypt::plaintext($data, $crypt_key));
+        }
+        return $data;
+    }
+
+    private function connect() {
+        $this->cache_con = Hm_Functions::memcached();
+        if (!$this->cache_con->addServer($this->server, $this->port)) {
+            Hm_Debug::add('Memcached addServer failed');
+            $this->cache_con = false;
+            return false;
+        }
+        return true;
+    }
+
+    private function active() {
+        if (!$this->enabled) {
+            return false;
+        }
+        if (!$this->server || !$this->port) {
+            Hm_Debug::add('Memcached enabled but no server or port found');
+            return false;
+        }
+        if (!$this->supported) {
+            Hm_Debug::add('Memcached enabled but not supported by PHP');
+            return false;
+        }
+        if (!$this->cache_con) {
+            return $this->connect();
+        }
+        return true;
+    }
+}

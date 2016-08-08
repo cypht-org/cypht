@@ -70,5 +70,8 @@ if (!class_exists('Hm_Functions')) {
         public static function random_bytes($size) {
             return random_bytes($size);
         }
+        public static function memcached() {
+            return new Memcached();
+        }
     }
 }
