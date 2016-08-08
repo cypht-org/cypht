@@ -303,12 +303,22 @@ function setup_session($config) {
         $auth_class = 'Hm_Auth_None';
     }
     if ($session_type == 'DB') {
+        require APP_PATH.'lib/session_db.php';
         $session_class = 'Hm_DB_Session';
+    }
+    elseif ($session_type == 'MEM') {
+        require APP_PATH.'lib/session_memcached.php';
+        $session_class = 'Hm_Memcached_Session';
     }
     else {
         $session_class = 'Hm_PHP_Session';
     }
-    Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
-    $session = new $session_class($config, $auth_class);
-    return $session;
+    if (Hm_Functions::class_exists($auth_class)) {
+        Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
+        $session = new $session_class($config, $auth_class);
+        return $session;
+    }
+    else {
+        Hm_Functions::cease('Invalid auth configuration');
+    }
 }

@@ -15,7 +15,7 @@ require APP_PATH.'lib/config.php';
 require APP_PATH.'lib/auth.php';
 require APP_PATH.'lib/oauth2.php';
 require APP_PATH.'lib/session_base.php';
-require APP_PATH.'lib/session.php';
+require APP_PATH.'lib/session_php.php';
 require APP_PATH.'lib/format.php';
 require APP_PATH.'lib/dispatch.php';
 require APP_PATH.'lib/request.php';
