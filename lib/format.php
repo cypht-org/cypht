@@ -117,8 +117,11 @@ class Hm_Transform {
      * @return mixed string on success, false on failure
      */
     static function stringify($data, $encoding='base64_encode') {
+        if (is_string($data)) {
+            return $data;
+        }
         if (!is_array($data)) {
-            return false;
+            return (string) $data;
         }
         return @json_encode(self::hm_encode($data, $encoding));
 
