@@ -32,6 +32,27 @@ class Hm_Mock_Session {
     }
 }
 
+class Hm_Mock_Memcached_No {
+    function addServer($server, $port) {
+        return false;
+    }
+}
+class Hm_Mock_Memcached {
+    private $data = array();
+    function addServer($server, $port) {
+        return true;
+    }
+    function set($key, $val, $lifetime) {
+        $this->data[$key] = $val;
+        return true;
+    }
+    function get($key) {
+        if (array_key_exists($key, $this->data)) {
+            return $this->data[$key];
+        }
+        return false;
+    }
+}
 class Hm_Mock_Config {
     public $mods = array();
     public $data = array(
@@ -70,6 +91,7 @@ class Hm_Mock_Request {
 }
 class Hm_Functions {
         public static $rand_bytes = 'good';
+        public static $memcache = true;
         public static $exists = true;
         public static $exec_res = '{"unit":"test"}';
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
@@ -82,6 +104,7 @@ class Hm_Functions {
         public static function c_exec() { return self::$exec_res; }
         public static function function_exists($func) { return self::$exists; }
         public static function class_exists($func) { return self::$exists; }
+        public static function memcached() { return self::$memcache ? new Hm_Mock_Memcached() : new Hm_Mock_Memcached_No(); }
         public static function random_bytes($size) {
             if (self::$rand_bytes == 'good') {
                 return random_bytes($size);

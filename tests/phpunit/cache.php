@@ -150,3 +150,56 @@ class Hm_Test_Uid_Cache extends PHPUnit_Framework_TestCase {
         Test_Uid_Cache::load(array(),array());
     }
 }
+
+/**
+ * tests for Hm_Memcached
+ */
+class Hm_Test_Hm_Memcache extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        require 'bootstrap.php';
+        $this->config = new Hm_Mock_Config();
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_set() {
+        $this->config->set('enable_memcached', true);
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->set('foo', 'bar'));
+
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $this->config->set('enable_memcached', true);
+
+        Hm_Functions::$exists = false;
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->set('foo', 'bar'));
+
+        Hm_Functions::$exists = true;
+        $cache = new Hm_Memcached($this->config);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+
+        $this->assertTrue($cache->set('foo', array('bar'), 100, 'asdf'));
+        $this->assertEquals(array('bar'), $cache->get('foo', 'asdf'));
+
+        Hm_Functions::$memcache = false;
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->set('foo', 'bar'));
+        Hm_Functions::$memcache = true;
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get() {
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->get('asdf'));
+        Hm_Functions::$exists = false;
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->get('asdf'));
+    }
+}
+

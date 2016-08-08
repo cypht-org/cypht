@@ -50,7 +50,8 @@ class Hm_Test_Transform extends PHPUnit_Framework_TestCase {
      */
     public function test_stringify() {
         $this->assertEquals('{"foo":"YmFy"}', Hm_Transform::stringify(array('foo' => 'bar')));
-        $this->assertFalse(Hm_Transform::stringify(NULL));
+        $this->assertEquals('', Hm_Transform::stringify(NULL));
+        $this->assertEquals('asdf', Hm_Transform::stringify('asdf'));
     }
     /**
      * @preserveGlobalState disabled
