@@ -201,5 +201,35 @@ class Hm_Test_Hm_Memcache extends PHPUnit_Framework_TestCase {
         $cache = new Hm_Memcached($this->config);
         $this->assertFalse($cache->get('asdf'));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_close() {
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->close());
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $this->config->set('enable_memcached', true);
+        $cache = new Hm_Memcached($this->config);
+        $this->assertTrue($cache->close());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_del() {
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->del('foo'));
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $this->config->set('enable_memcached', true);
+        $cache = new Hm_Memcached($this->config);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+        $cache->del('foo');
+        $this->assertFalse($cache->get('foo'));
+    }
 }
 

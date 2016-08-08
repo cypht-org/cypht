@@ -52,6 +52,16 @@ class Hm_Mock_Memcached {
         }
         return false;
     }
+    function delete($key) {
+        if (array_key_exists($key, $this->data)) {
+            unset($this->data[$key]);
+            return true;
+        }
+        return false;
+    }
+    function quit() {
+        return true;
+    }
 }
 class Hm_Mock_Config {
     public $mods = array();

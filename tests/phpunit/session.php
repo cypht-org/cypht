@@ -80,13 +80,13 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $session->destroy($request);
 
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
-        $request->cookie['PHPSESSID'] = 'testid';
+        $request->cookie['hm_session'] = 'testid';
         $session->check($request);
         $this->assertFalse($session->is_active());
         $session->destroy($request);
 
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
-        $request->cookie['PHPSESSID'] = 'testid';
+        $request->cookie['hm_session'] = 'testid';
         $request->invalid_input_detected = true;
         $request->invalid_input_fields = array('test');
         $session->check($request, 'unittestuser', 'unittestpass');
@@ -143,7 +143,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
     public function test_start() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
-        $request->cookie['PHPSESSID'] = 'asdf';
+        $request->cookie['hm_session'] = 'asdf';
         $session->start($request);
         $session->enc_key = 'unittestpass';
         $session->start($request);
@@ -234,12 +234,89 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
 }
 
 /**
+ * tests for Hm_Memcached_Session
+ */
+class Hm_Test_Memcached_Session extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        require 'bootstrap.php';
+        require APP_PATH.'lib/session_memcached.php';
+        ini_set('session.use_cookies', '0');
+        session_cache_limiter('');
+        $this->config = new Hm_Mock_Config();
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $this->config->set('enable_memcached', true);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_memcached_connect() {
+        $session = new Hm_Memcached_Session($this->config, 'Hm_Auth_DB');
+        $session->connect();
+        $this->assertEquals('Hm_Memcached', get_class($session->conn));
+    }
+    public function test_memcached_start() {
+        $session = new Hm_Memcached_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->loaded = true;
+        $session->start($request);
+        $this->assertTrue($session->is_active());
+        $session->destroy($request);
+
+        $request->cookie['hm_session'] = 'test';
+        $session->loaded = false;
+        $session->start($request);
+        $this->assertFalse($session->is_active());
+        $session->destroy($request);
+
+        $request->cookie = array();
+        $session->loaded = false;
+        $session->start($request);
+        $this->assertFalse($session->is_active());
+        $session->destroy($request);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_memcached_end() {
+        $session = new Hm_Memcached_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->connect();
+        $session->end();
+        $this->assertFalse($session->is_active());
+        $session->destroy($request);
+
+        $session = new Hm_Memcached_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->loaded = true;
+        $session->start($request);
+        $session->end();
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_memcached_close_early() {
+        $session = new Hm_Memcached_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->connect();
+        $session->close_early();
+        $this->assertFalse($session->is_active());
+        $session->destroy($request);
+    }
+}
+
+/**
  * tests for Hm_DB_Session
  */
 class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
+        require APP_PATH.'lib/session_db.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
@@ -407,6 +484,15 @@ class Hm_Test_Session_Functions extends PHPUnit_Framework_TestCase {
         $this->config->set('session_type', 'DB');
         $this->config->set('auth_type', 'DB');
         $this->assertEquals('Hm_DB_Session', get_class((setup_session($this->config))));
+        $this->config->set('session_type', 'asdf');
+        $this->config->set('auth_type', 'DB');
+        $this->assertEquals('Hm_PHP_Session', get_class((setup_session($this->config))));
+        $this->config->set('session_type', 'MEM');
+        $this->assertEquals('Hm_Memcached_Session', get_class((setup_session($this->config))));
+        Hm_Functions::$exists = false;
+        $this->config->set('session_type', 'PHP');
+        $this->config->set('auth_type', 'asdf');
+        $this->assertNull(setup_session($this->config));
     }
     public function tearDown() {
         unset($this->config);
