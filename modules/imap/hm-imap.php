@@ -241,7 +241,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $this->send_command($command);
                 break;
             default:
-                $login = 'LOGIN "'.str_replace(array('"', '\\'), array('\"', '\\\\'), $username).'" "'.str_replace(array('"', '\\'), array('\"', '\\\\'), $password). "\"\r\n";
+                $login = 'LOGIN "'.str_replace(array('\\', '"'), array('\\\\', '\"'), $username).'" "'.str_replace(array('\\', '"'), array('\\\\', '\"'), $password). "\"\r\n";
                 $this->send_command($login);
                 break;
         }
