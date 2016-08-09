@@ -21,8 +21,8 @@ class Hm_IMAP_List {
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         self::$server_list[$id]['object'] = new Hm_IMAP();
-        if ($cache) {
-            self::$server_list[$id]['object']->load_cache($cache, 'string');
+        if ($cache && is_array($cache)) {
+            self::$server_list[$id]['object']->load_cache($cache, 'array');
         }
         $config = array(
             'server'    => $server['server'],
@@ -30,19 +30,17 @@ class Hm_IMAP_List {
             'tls'       => $server['tls'],
             'username'  => $user,
             'password'  => $pass,
-            'use_cache' => false
+            'use_cache' => true
         );
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];
         }
         return self::$server_list[$id]['object']->connect($config);
     }
-    public static function get_cache($session, $id) {
-        /*$server_cache = $session->get('imap_cache', array());
-        if (array_key_exists($id, $server_cache)) {
-            return $server_cache[$id];
-        }*/
-        return false;
+    public static function get_cache($session, $config, $id) {
+        $cache = new Hm_Memcached($config);
+        $key = hash('sha256', (sprintf('%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
+        return $cache->get($key, $session->enc_key);
     }
 }
 
