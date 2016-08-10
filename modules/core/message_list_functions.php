@@ -177,11 +177,15 @@ function message_list_row($values, $id, $style, $output_mod, $row_class='') {
  * @return string
  */
 function safe_output_callback($vals, $style, $output_mod) {
+    $img = '';
+    if (count($vals) == 3) {
+        $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+    }
     if ($style == 'email') {
-        return sprintf('<td class="%s" title="%s">%s</td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[1]));
+        return sprintf('<td class="%s" title="%s">%s%s</td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
     }
     elseif ($style == 'news') {
-        return sprintf('<div class="%s" title="%s">%s</div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[1]));
+        return sprintf('<div class="%s" title="%s">%s%s</div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
     }
 }
 
