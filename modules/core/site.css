@@ -7,6 +7,21 @@ html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #faf6f5, #faf6f5, #faf6f5, #faf6f5, #fff); font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; min-width: 700px; font-size: 100%; }
 table { width: 100%; border-spacing: 0px; }
 td { vertical-align: top; }
+.subject div, .msg_date, .from, .source { overflow: hidden; color: #333; text-overflow: ellipsis; white-space: nowrap; }
+.subject { cursor: pointer; font-size: 110%; }
+.subject a { color: #333 !important; }
+.source { font-style: italic; color: #666; font-size: 75%; }
+.msg_date { color: #666; }
+.news_cell .msg_date { padding-top: 5px; }
+.news_cell .from { font-size: 110%; }
+.chkbox_col { width: 32px; }
+.source_col { width: 10%; }
+.icon_col { width: 60px; white-space: nowrap; }
+.subject_col { width: 55%; }
+.from_col { width: 15%; }
+.date_col { width: 17%; }
+.header_name_col { width: 1%; }
+.header_val_col { width: 99%; }
 .hr { height: 1px; margin-left: 0px; border-top: solid 1px #ddd; margin-top: 20px; margin-bottom: 20px; }
 .subtitle { color: teal; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
 .title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
@@ -144,6 +159,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .reply_quote { color: #999; }
 .hl { background-color: #eee; }
 .settings_wrap_text { white-space: normal; }
+.message_table .source img { opacity: .5; vertical-align: -3px; padding-right: 15px; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }

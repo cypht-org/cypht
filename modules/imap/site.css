@@ -2,21 +2,6 @@
 .imap_connect { display: inline; }
 .imap_debug { border: solid 1px #aaa; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
 .save_settings, .server_link { line-height: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #ddd; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; border-radius: 3px; }
-.subject div, .msg_date, .from, .source { overflow: hidden; color: #333; text-overflow: ellipsis; white-space: nowrap; }
-.subject { cursor: pointer; font-size: 110%; }
-.subject a { color: #333 !important; }
-.source { font-style: italic; color: #666; font-size: 75%; }
-.msg_date { color: #666; }
-.news_cell .msg_date { padding-top: 5px; }
-.news_cell .from { font-size: 110%; }
-.chkbox_col { width: 32px; }
-.source_col { width: 8%; }
-.icon_col { width: 60px; white-space: nowrap; }
-.subject_col { width: 55%; }
-.from_col { width: 15%; }
-.date_col { width: 19%; }
-.header_name_col { width: 1%; }
-.header_val_col { width: 99%; }
 .hl { padding-right: 5px; color: #666; }
 .dl { color: #888; }
 .empty_list { text-align: center; color: #ccc; font-size: 2em; font-style: italic; padding: 30px; padding-bottom: 100px; }
