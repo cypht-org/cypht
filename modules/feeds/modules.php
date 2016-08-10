@@ -693,7 +693,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
                             array('icon_callback', $flags),
-                            array('subject_callback', strip_tags($item['title']), $url, $flags),
+                            array('subject_callback', strip_tags($item['title']), $url, $flags, $icon),
                             array('safe_output_callback', 'source', $item['server_name']),
                             array('safe_output_callback', 'from'.$nofrom, $from),
                             array('date_callback', $date, $timestamp),

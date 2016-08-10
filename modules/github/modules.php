@@ -449,7 +449,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                 $res[$id] = message_list_row(array(
                         array('checkbox_callback', $id),
                         array('icon_callback', $flags),
-                        array('subject_callback', $subject, $url, $flags),
+                        array('subject_callback', $subject, $url, $flags, 'code'),
                         array('safe_output_callback', 'source', $repo),
                         array('safe_output_callback', 'from', $from),
                         array('date_callback', human_readable_interval($date), $ts),

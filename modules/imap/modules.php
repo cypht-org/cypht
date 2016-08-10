@@ -1912,7 +1912,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('icon_callback', $flags),
-                    array('subject_callback', $subject, $url, $flags),
+                    array('subject_callback', $subject, $url, $flags, $icon),
                     array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from'.$nofrom, $from),
                     array('date_callback', $date, $timestamp),

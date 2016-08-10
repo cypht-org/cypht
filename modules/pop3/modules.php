@@ -884,7 +884,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('icon_callback', $flags),
-                    array('subject_callback', $subject, $url, $flags),
+                    array('subject_callback', $subject, $url, $flags, $icon),
                     array('safe_output_callback', 'source', $msg['server_name']),
                     array('safe_output_callback', 'from'.$nofrom, $from),
                     array('date_callback', $date, $timestamp),
