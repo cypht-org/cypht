@@ -39,6 +39,9 @@ ini_set('session.cache_limiter', 'nocache');
 /* session hash mechanism */
 ini_set('session.hash_function', 'sha256');
 
+/* session name */
+ini_set('session.name', 'CYPHTID');
+
 /* disable remote includes */
 ini_set('allow_url_include', 0);
 

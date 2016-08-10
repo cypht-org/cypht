@@ -146,7 +146,7 @@ return array(
         'page_links' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_cookie' => array(
-        'PHPSESSID' => FILTER_SANITIZE_STRING,
+        'CYPHTID' => FILTER_SANITIZE_STRING,
         'hm_id' => FILTER_SANITIZE_STRING,
         'hm_session' => FILTER_SANITIZE_STRING,
         'hm_msgs'    => FILTER_SANITIZE_STRING
