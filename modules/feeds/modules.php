@@ -173,6 +173,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
         $search = false;
         if ($success) {
+            $cache = false;
             if (array_key_exists('feed_search', $this->request->post)) {
                 $terms = $this->session->get('search_terms', false);
                 $since = $this->session->get('search_since', DEFAULT_SINCE);
@@ -259,7 +260,9 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                     }
                 }
             }
-            feed_memcached_save($this->config, $feed_data, $res);
+            if (!$cache) {
+                feed_memcached_save($this->config, $feed_data, $res);
+            }
             $this->out('feed_list_data', $res);
             if (isset($this->request->get['list_path'])) {
                 $this->out('feed_list_parent', $this->request->get['list_path']);
