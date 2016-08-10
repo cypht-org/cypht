@@ -734,7 +734,9 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
         $cache = array();
         foreach ($servers as $index => $server) {
             if (isset($server['object']) && is_object($server['object'])) {
-                $cache[$index] = $server['object']->dump_cache('array');
+                if ($server['object']->use_cache) {
+                    $cache[$index] = $server['object']->dump_cache('array');
+                }
             }
         }
         if (count($cache) > 0) {

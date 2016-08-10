@@ -19,9 +19,11 @@ class Hm_IMAP_List {
     
     use Hm_Server_List;
 
+    public static $use_cache = false;
+
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         self::$server_list[$id]['object'] = new Hm_IMAP();
-        if ($cache && is_array($cache)) {
+        if (self::$use_cache && $cache && is_array($cache)) {
             self::$server_list[$id]['object']->load_cache($cache, 'array');
         }
         $config = array(
@@ -30,7 +32,7 @@ class Hm_IMAP_List {
             'tls'       => $server['tls'],
             'username'  => $user,
             'password'  => $pass,
-            'use_cache' => true
+            'use_cache' => self::$use_cache
         );
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];
@@ -38,6 +40,9 @@ class Hm_IMAP_List {
         return self::$server_list[$id]['object']->connect($config);
     }
     public static function get_cache($session, $config, $id) {
+        if (!self::$use_cache) {
+            return false;
+        }
         $cache = new Hm_Memcached($config);
         $key = hash('sha256', (sprintf('%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
         return $cache->get($key, $session->enc_key);
