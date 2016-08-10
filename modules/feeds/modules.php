@@ -624,7 +624,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 $item['guid'] = md5($item['title']);
             }
             if (isset($item['guid'])) {
-
+                $icon = 'rss';
                 $id = sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid']));
                 if (isset($item['dc:date'])) {
                     $date = display_value('dc:date', $item, 'date');
@@ -668,6 +668,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $flags = array();
                 }
                 else {
+                    $icon = 'rss_alt';
                     $flags = array('unseen');
                 }
                 $nofrom = '';
@@ -706,7 +707,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 else {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
-                            array('safe_output_callback', 'source', $item['server_name']),
+                            array('safe_output_callback', 'source', $item['server_name'], $icon),
                             array('safe_output_callback', 'from'.$nofrom, $from),
                             array('subject_callback', strip_tags($item['title']), $url, $flags),
                             array('date_callback', $date, $timestamp),

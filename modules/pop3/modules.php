@@ -843,6 +843,7 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
 function format_pop3_message_list($msg_list, $output_module, $style, $login_time, $list_parent) {
     $res = array();
     foreach($msg_list as $msg_id => $msg) {
+        $icon = 'env_open';
         $row_class = 'email';
         if ($msg['server_name'] == 'Default-Auth-Server') {
             $msg['server_name'] = 'Default';
@@ -869,6 +870,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         }
         elseif (Hm_POP3_Uid_Cache::is_unread($id)) {
             $flags = array('unseen');
+            $icon = 'env_closed';
             $row_class .= ' unseen';
         }
         elseif (isset($msg['date']) && $login_time && strtotime($msg['date']) <= $login_time) {
@@ -896,7 +898,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         else {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
-                    array('safe_output_callback', 'source', $msg['server_name']),
+                    array('safe_output_callback', 'source', $msg['server_name'], $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from),
                     array('subject_callback', $subject, $url, $flags),
                     array('date_callback', $date, $timestamp),

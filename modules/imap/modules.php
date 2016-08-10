@@ -1847,6 +1847,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
     }
     foreach($msg_list as $msg) {
         $row_class = 'email';
+        $icon = 'env_open';
         if (!$parent_list) {
             $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
         }
@@ -1859,6 +1860,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         $subject = $msg['subject'];
         if ($parent_list == 'sent') {
+            $icon = 'sent';
             $from = preg_replace("/(\<.+\>)/U", '', $msg['to']);
         }
         else {
@@ -1877,8 +1879,11 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $date = translate_time_str(human_readable_interval($msg['internal_date']), $output_module);
         $flags = array();
         if (!stristr($msg['flags'], 'seen')) {
-           $flags[] = 'unseen';
-           $row_class .= ' unseen';
+            $flags[] = 'unseen';
+            $row_class .= ' unseen';
+            if ($icon != 'sent') {
+                $icon = 'env_closed';
+            }
         }
         if (stristr($msg['flags'], 'attachment')) {
             $flags[] = 'attachment';
@@ -1919,7 +1924,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         else {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
-                    array('safe_output_callback', 'source', $source),
+                    array('safe_output_callback', 'source', $source, $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from),
                     array('subject_callback', $subject, $url, $flags),
                     array('date_callback', $date, $timestamp),

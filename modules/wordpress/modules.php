@@ -263,7 +263,7 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
         $details = $this->get('wp_connect_details', array());
         if (!empty($details)) {
             $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
+                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$w).
                 '" alt="" width="16" height="16" /> '.$this->trans('Notifications').'</a></li>';
             /*$res .= '<li class="menu_wp_freshly_pressed"><a class="unread_link" href="?page=message_list&list_path=wp_freshly_pressed">'.
                 '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).
@@ -407,7 +407,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 else {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
-                            array('safe_output_callback', 'source', 'WordPress'),
+                            array('safe_output_callback', 'source', 'WordPress', 'w'),
                             array('safe_output_callback', 'from', $from),
                             array('subject_callback', $subject, $url, $flags),
                             array('date_callback', human_readable_interval($date), $ts),
