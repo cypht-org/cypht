@@ -22,7 +22,7 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
     public $conn = false;
 
     /* default session lifetime */
-    public $lifetime = 3600;
+    public $lifetime = 86400;
 
     /**
      * Start the session. This could be an existing session or a new login
