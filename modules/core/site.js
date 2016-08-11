@@ -6,6 +6,7 @@ var Hm_Ajax = {
     callback_hooks: [],
     p_callbacks: [],
     aborted: false,
+    err_condition: false,
     batch_callback: false,
     icon_loading_id: 0,
 
@@ -136,6 +137,10 @@ var Hm_Ajax_Request = function() { return {
                 window.location.href = "?page=home";
                 return;
             }
+            if (Hm_Ajax.err_condition) {
+                Hm_Ajax.err_condition = false;
+                Hm_Notices.hide(true);
+            }
             if (res.date) {
                 $('.date').html(res.date);
             }
@@ -150,6 +155,7 @@ var Hm_Ajax_Request = function() { return {
     },
 
     fail: function() {
+        Hm_Ajax.err_condition = true;
         setTimeout(function() { Hm_Notices.show({0: 'ERRAn error occurred communicating with the server'}); }, 1000);
     },
 
