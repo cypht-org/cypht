@@ -295,7 +295,7 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                 $this->out('github_data_source_id', array_search($form['github_repo'], $repos, true));
             }
             if (array_key_exists('list_path', $this->request->get)) {
-                if ($this->request->get['list_path'] == 'unread') {
+                if ($this->request->get['list_path'] == 'unread' || $this->request->get['list_path'] == 'combined_inbox') {
                     $this->out('github_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE)));
                 }
             }
