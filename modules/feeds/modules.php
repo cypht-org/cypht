@@ -27,6 +27,7 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_SINCE));
                 $this->out('list_path', $path, false);
+                $this->out('custom_list_controls', ' ');
                 $parts = explode('_', $path, 2);
                 $details = Hm_Feed_List::dump(intval($parts[1]));
                 if (!empty($details)) {

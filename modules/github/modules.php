@@ -341,6 +341,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                         $this->out('mailbox_list_title', array('Github', urldecode($repo)));
                         $this->out('list_path', $path, false);
                     }
+                    $this->out('custom_list_controls', ' ');
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
             }
