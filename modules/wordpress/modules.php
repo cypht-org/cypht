@@ -182,6 +182,9 @@ class Hm_Handler_wp_notification_data extends Hm_Handler_Module {
         if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'unread') {
             $this->out('wp_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE)));
         }
+        elseif (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'combined_inbox') {
+            $this->out('wp_list_since', process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE)));
+        }
     }
 }
 
@@ -376,7 +379,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 }
                 $subject = html_entity_decode($vals['subject']['text']);
                 $from = ucfirst(str_replace('_', ' ', $vals['type']));
-                $ts = $vals['timestamp'];
+                $ts = intval($vals['timestamp']);
                 if ($ts < $cutoff) {
                     continue;
                 }
