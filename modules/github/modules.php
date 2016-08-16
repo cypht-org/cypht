@@ -19,6 +19,24 @@ class Hm_Github_Uid_Cache {
 /**
  * @subpackage github/handler
  */
+class Hm_Handler_process_github_limit_setting extends Hm_Handler_Module {
+    public function process() {
+        process_site_setting('github_limit', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * @subpackage github/handler
+ */
+class Hm_Handler_process_github_since_setting extends Hm_Handler_Module {
+    public function process() {
+        process_site_setting('github_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * @subpackage github/handler
+ */
 class Hm_Handler_process_unread_github_included extends Hm_Handler_Module {
     public function process() {
         function unread_github_setting_callback($val) { return $val; }
@@ -113,9 +131,10 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
             Hm_Github_Uid_Cache::load($this->session->get('github_read_uids', array()));
             $details = $this->user_config->get('github_connect_details', array());
             $repos = $this->user_config->get('github_repos', array());
+            $limit = $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE);
             $repo = substr($form['list_path'], 7);
             if (in_array($repo, $repos, true)) {
-                $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $repo);
+                $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page='.$limit, $repo);
                 $api = new Hm_API_Curl();
                 $data = $api->command($url, array('Authorization: token ' . $details['access_token']));
                 $event = array();
@@ -288,7 +307,8 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
             $details = $this->user_config->get('github_connect_details');
             $repos = $this->user_config->get('github_repos');
             if (in_array($form['github_repo'], $repos, true) && $details) {
-                $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=25', $form['github_repo']);
+                $limit = $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE);
+                $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page='.$limit, $form['github_repo']);
                 $api = new Hm_API_Curl();
                 $this->out('github_data', $api->command($url, array('Authorization: token ' . $details['access_token'])));
                 $this->out('github_data_source', $form['github_repo']);
@@ -300,6 +320,9 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                 }
                 if ($this->request->get['list_path'] == 'combined_inbox') {
                     $this->out('github_list_since', process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE)));
+                }
+                if ($this->request->get['list_path'] == 'github_all') {
+                    $this->out('github_list_since', process_since_argument($this->user_config->get('github_since_setting', DEFAULT_SINCE)));
                 }
             }
             if (array_key_exists('github_unread', $this->request->post) && $this->request->post['github_unread']) {
@@ -327,6 +350,8 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     $this->out('list_path', 'github_all', false);
                     $this->out('list_parent', $parent, false);
                     $this->out('mailbox_list_title', array('Github', 'All'));
+                    $this->out('message_list_since', $this->user_config->get('github_since_setting', DEFAULT_SINCE));
+                    $this->out('per_source_limit', $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE));
                     foreach ($repos as $repo) {
                         $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                     }
@@ -603,6 +628,45 @@ class Hm_Output_unread_github_included_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage github/output
+ */
+class Hm_Output_start_github_settings extends Hm_Output_Module {
+    protected function output() {
+        return '<tr><td colspan="2" data-target=".github_all_setting" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$code.'" />'.$this->trans('Github Settings').'</td></tr>';
+    }
+}
+
+/**
+ * @subpackage github/output
+ */
+class Hm_Output_github_since_setting extends Hm_Output_Module {
+    protected function output() {
+        $since = false;
+        $settings = $this->get('user_settings');
+        if (array_key_exists('github_since', $settings)) {
+            $since = $settings['github_since'];
+        }
+        return '<tr class="github_all_setting"><td><label for="github_since">'.$this->trans('Show Github notices received since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'github_since', $this).'</td></tr>';
+    }
+}
+
+/**
+ * @subpackage github/output
+ */
+class Hm_Output_github_limit_setting extends Hm_Output_Module {
+    protected function output() {
+        $limit = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings');
+        if (array_key_exists('github_limit', $settings)) {
+            $limit = $settings['github_limit'];
+        }
+        return '<tr class="github_all_setting"><td><label for="github_limit">'.$this->trans('Max Github notices per repository').'</label></td>'.
+            '<td><input type="text" id="github_limit" name="github_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
+    }
+}
 /**
  * @subpackage github/functions
  */

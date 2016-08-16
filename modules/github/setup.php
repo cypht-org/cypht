@@ -52,7 +52,12 @@ add_handler('ajax_github_status', 'http_headers', true, 'core');
 add_output('ajax_github_status', 'filter_github_status', true);
 
 add_handler('settings', 'process_unread_github_included', true, 'github', 'save_user_settings', 'before');
+add_handler('settings', 'process_github_limit_setting', true, 'github', 'save_user_settings', 'before');
+add_handler('settings', 'process_github_since_setting', true, 'github', 'save_user_settings', 'before');
 add_output('settings', 'unread_github_included_setting', true, 'github', 'unread_source_max_setting', 'after');
+add_output('settings', 'start_github_settings', true, 'github', 'end_settings_form', 'before');
+add_output('settings', 'github_since_setting', true, 'github', 'start_github_settings', 'after');
+add_output('settings', 'github_limit_setting', true, 'github', 'github_since_setting', 'after');
 
 return array(
     'allowed_pages' => array(
@@ -68,6 +73,8 @@ return array(
     ),
     'allowed_post' => array(
         'github_unread' => FILTER_VALIDATE_INT,
+        'github_since' => FILTER_SANITIZE_STRING,
+        'github_limit' => FILTER_VALIDATE_INT,
         'github_uid' => FILTER_SANITIZE_STRING,
         'github_disconnect' => FILTER_SANITIZE_STRING,
         'new_github_repo_owner' => FILTER_SANITIZE_STRING,
