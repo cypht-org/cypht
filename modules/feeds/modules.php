@@ -21,11 +21,11 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
                 $this->out('list_path', 'feeds', false);
                 $this->out('mailbox_list_title', array('All Feeds'));
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
-                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
             }
             elseif (preg_match("/^feeds_\d+$/", $path)) {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
-                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
                 $this->out('list_path', $path, false);
                 $this->out('custom_list_controls', ' ');
                 $parts = explode('_', $path, 2);
