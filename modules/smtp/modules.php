@@ -170,10 +170,14 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
         $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
         $smtp = array_key_exists('draft_smtp', $this->request->post) ? $this->request->post['draft_smtp'] : '';
+        $cc = array_key_exists('draft_cc', $this->request->post) ? $this->request->post['draft_cc'] : '';
+        $bcc = array_key_exists('draft_bcc', $this->request->post) ? $this->request->post['draft_bcc'] : '';
+        $inreplyto = array_key_exists('draft_in_reply_to', $this->request->post) ? $this->request->post['draft_in_reply_to'] : '';
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session);
         }
-        $this->session->set('compose_draft', array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body, 'draft_subject' => $subject));
+        $this->session->set('compose_draft', array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+            'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc, 'draft_in_reply_to' => $inreplyto));
     }
 }
 
@@ -386,7 +390,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 $draft = array(
                     'draft_to' => $form['compose_to'],
                     'draft_body' => '',
-                    'draft_subject' => $form['compose_subject']
+                    'draft_subject' => $form['compose_subject'],
+                    'draft_smtp' => $form['smtp_server_id']
                 );
                 $to = $form['compose_to'];
                 $subject = $form['compose_subject'];
@@ -556,10 +561,24 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $recip = get_primary_recipients($reply['msg_headers'], $this->get('smtp_servers', array()));
         }
         elseif (!empty($draft)) {
-            $to = $draft['draft_to'];
-            $subject = $draft['draft_subject'];
-            $body= $draft['draft_body'];
-            $smtp_id = $draft['draft_smtp'];
+            if (array_key_exists('draft_to', $draft)) {
+                $to = $draft['draft_to'];
+            }
+            if (array_key_exists('draft_subject', $draft)) {
+                $subject = $draft['draft_subject'];
+            }
+            if (array_key_exists('draft_body', $draft)) {
+                $body= $draft['draft_body'];
+            }
+            if (array_key_exists('draft_smtp', $draft)) {
+                $smtp_id = $draft['draft_smtp'];
+            }
+            if (array_key_exists('draft_in_reply_to', $draft)) {
+                $in_reply_to = $draft['draft_in_reply_to'];
+            }
+            if (array_key_exists('draft_bcc', $draft)) {
+                $bcc = $draft['draft_bcc'];
+            }
         }
         $res = '';
         if ($html == 1) {
@@ -578,7 +597,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
             '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
-            '<input type="hidden" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
+            '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
             '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).
             '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
             '<a href="#" tabindex="-1" class="toggle_recipients">+</a></div><div id="to_contacts"></div>'.

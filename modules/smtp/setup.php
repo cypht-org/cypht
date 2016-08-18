@@ -119,6 +119,9 @@ return array(
         'draft_subject' => FILTER_SANITIZE_STRING,
         'draft_to' => FILTER_UNSAFE_RAW,
         'draft_smtp' => FILTER_SANITIZE_STRING,
+        'draft_cc' => FILTER_SANITIZE_STRING,
+        'draft_bcc' => FILTER_SANITIZE_STRING,
+        'draft_in_reply_to' => FILTER_SANITIZE_STRING,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
     )
 );
