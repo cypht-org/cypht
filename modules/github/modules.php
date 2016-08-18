@@ -651,7 +651,6 @@ class Hm_Output_github_since_setting extends Hm_Output_Module {
         if (array_key_exists('github_since', $settings) && $settings['github_since']) {
             $since = $settings['github_since'];
         }
-        elog($since);
         return '<tr class="github_all_setting"><td><label for="github_since">'.$this->trans('Show Github notices received since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'github_since', $this).'</td></tr>';
     }
