@@ -439,6 +439,9 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             $list_parent = $this->get('list_path');
         }
         foreach ($this->get('github_data', array()) as $event) {
+            if (!is_array($event) || !array_key_exists('id', $event)) {
+                continue;
+            }
             $row_class = 'github';
             $id = 'github_'.$repo_id.'_'.$event['id'];
             $subject = build_github_subject($event, $this);
