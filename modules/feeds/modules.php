@@ -618,6 +618,12 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
         if ($this->get('login_time')) {
             $login_time = $this->get('login_time');
         }
+        if ($this->get('feed_list_parent') == 'feeds') {
+            $src_callback = 'feed_source_callback';
+        }
+        else {
+            $src_callback = 'safe_output_callback';
+        }
         foreach ($this->get('feed_list_data', array()) as $item) {
             $row_style = 'feeds';
             if (isset($item['id']) && !isset($item['guid'])) {
@@ -711,7 +717,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 else {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
-                            array('safe_output_callback', 'source', $item['server_name'], $icon),
+                            array($src_callback, 'source', $item['server_name'], $icon, $item['server_id']),
                             array('safe_output_callback', 'from'.$nofrom, $from),
                             array('subject_callback', strip_tags($item['title']), $url, $flags),
                             array('date_callback', $date, $timestamp),
@@ -726,6 +732,23 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
             }
         }
         $this->out('formatted_message_list', $res);
+    }
+}
+
+/**
+ * @subpackage feeds/functions
+ */
+function feed_source_callback($vals, $style, $output_mod) {
+    $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+    if ($style == 'email') {
+        return sprintf('<td class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</td>',
+            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
+            $img, $output_mod->html_safe($vals[1]));
+    }
+    elseif ($style == 'news') {
+        return sprintf('<div class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</div>',
+            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
+            $img, $output_mod->html_safe($vals[1]));
     }
 }
 

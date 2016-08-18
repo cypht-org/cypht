@@ -3,3 +3,4 @@
 .feeds_setting { display: none; }
 .feeds_section .configured_server, .feeds_section .add_server { height: 140px; }
 .feeds_section .add_server { margin-right: 0px; }
+.feeds .source a { color: #666; }
