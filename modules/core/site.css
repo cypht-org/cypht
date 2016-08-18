@@ -36,7 +36,7 @@ td { vertical-align: top; }
 .message_table { table-layout: fixed; width: 100%; padding: 20px; padding-top: 15px; padding-bottom: 40px; padding-left: 20px; }
 .message_table th:hover { color: #000; }
 .logout_form { white-space: nowrap; padding: 0px; margin: 0px; }
-.logout_form a { color: #666; }
+.logout_form a { font-weight: bold; color: #666; }
 .logged_in { padding-left: 10px; float: right; padding-right: 10px; }
 .placeholder { width: 100px !important; }
 .loading_icon { background-position: 0px 0px; background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==') repeat-x top left; background-size: cover; opacity: .6; text-align: center; display: none; position: fixed; right: 0px; top: 0px; left: 0px; height: 6px; z-index: 100; }
