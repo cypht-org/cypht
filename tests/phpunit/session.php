@@ -143,6 +143,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
     public function test_start() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
+        $request->cookie['CYPHTID'] = 'asdf';
         $request->cookie['hm_session'] = 'asdf';
         $session->start($request);
         $session->enc_key = 'unittestpass';
