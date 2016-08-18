@@ -111,12 +111,15 @@ function reply_to_address($headers, $type, $excluded) {
     elseif (array_key_exists('return-path', $headers)) {
         $msg_to = $headers['return-path'];
     }
+    if ($msg_to) {
+        $msg_to = format_reply_address($msg_to);
+    }
     if ($type == 'reply_all') {
         if (array_key_exists('cc', $headers)) {
-            $msg_cc = $headers['cc'];
+            $msg_cc = format_reply_address($headers['cc'], array());
         }
         if (array_key_exists('to', $headers)) {
-            $recips = format_reply_all_address($headers['to'], $excluded);
+            $recips = format_reply_address($headers['to'], $excluded);
             if ($recips) {
                 if ($msg_cc) {
                     $msg_cc .= ', '.$recips;
@@ -130,7 +133,13 @@ function reply_to_address($headers, $type, $excluded) {
     return array($msg_to, $msg_cc);
 }
 
-function format_reply_all_address($fld, $excluded) {
+/*
+ * Format a reply address line
+ * @param string $fld the field values from the E-mail being replied to
+ * @param array $excluded list of E-mail addresses to exclude
+ * @return string
+ */
+function format_reply_address($fld, $excluded) {
     $addr = process_address_fld($fld);
     $res = array();
     foreach ($addr as $vals) {
@@ -145,7 +154,14 @@ function format_reply_all_address($fld, $excluded) {
         }
     }
     if ($res) {
-        return implode(', ', array_map(function($v) { return $v['label'].' '.$v['email']; }, $res));
+        return implode(', ', array_map(function($v) {
+            if (trim($v['label'])) {
+                return '"'.$v['label'].'"'.' <'.$v['email'].'>';
+            }
+            else {
+                return '<'.$v['email'].'>';
+            }
+        }, $res));
     }
     return '';
 }
@@ -176,7 +192,7 @@ function split_address_fld($str) {
         elseif ($in_quotes) {
             $substr .= $str{$pos};
         }
-        elseif (!$in_quotes && $str{$pos} == ' ') {
+        elseif (!$in_quotes && ($str{$pos} == ' ' || $str{$pos} == '<')) {
             if ($substr) {
                 $output[$index][] = $substr;
             }
@@ -209,9 +225,9 @@ function process_address_fld($fld) {
         $parts = array();
         foreach ($vals as $i => $v) {
             if (is_email($v)) {
-                $parts['email'] = $v;
+                $parts['email'] = str_replace(array('<', '>'), '', $v);
                 array_splice($vals, $i, 1);
-                $parts['label'] = implode(' ', $vals);
+                $parts['label'] = str_replace(array('"', "'"), '', implode(' ', $vals));
                 $res[] = $parts;
                 break;
             }
