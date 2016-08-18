@@ -112,7 +112,7 @@ function reply_to_address($headers, $type, $excluded) {
         $msg_to = $headers['return-path'];
     }
     if ($msg_to) {
-        $msg_to = format_reply_address($msg_to);
+        $msg_to = format_reply_address($msg_to, array());
     }
     if ($type == 'reply_all') {
         if (array_key_exists('cc', $headers)) {
