@@ -213,9 +213,16 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
     protected function output() {
         $suggestions = array();
         foreach ($this->get('contact_suggestions', array()) as $contact) {
-            $suggestions[] = $this->html_safe(sprintf(
-                '"%s" %s', $contact->value('display_name'), $contact->value('email_address')
-            ));
+            if (trim($contact->value('display_name'))) {
+                $suggestions[] = $this->html_safe(sprintf(
+                    '"%s" %s', $contact->value('display_name'), $contact->value('email_address')
+                ));
+            }
+            else {
+                $suggestions[] = $this->html_safe(sprintf(
+                    '%s', $contact->value('email_address')
+                ));
+            }
         }
         $this->out('contact_suggestions', $suggestions);
     }
