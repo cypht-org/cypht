@@ -118,10 +118,10 @@ return array(
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_SANITIZE_STRING,
         'draft_to' => FILTER_UNSAFE_RAW,
-        'draft_smtp' => FILTER_SANITIZE_STRING,
-        'draft_cc' => FILTER_SANITIZE_STRING,
-        'draft_bcc' => FILTER_SANITIZE_STRING,
-        'draft_in_reply_to' => FILTER_SANITIZE_STRING,
+        'draft_smtp' => FILTER_VALIDATE_INT,
+        'draft_cc' => FILTER_UNSAFE_RAW,
+        'draft_bcc' => FILTER_UNSAFE_RAW,
+        'draft_in_reply_to' => FILTER_UNSAFE_RAW,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
     )
 );

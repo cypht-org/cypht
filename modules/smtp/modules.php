@@ -576,6 +576,9 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             if (array_key_exists('draft_in_reply_to', $draft)) {
                 $in_reply_to = $draft['draft_in_reply_to'];
             }
+            if (array_key_exists('draft_cc', $draft)) {
+                $cc = $draft['draft_cc'];
+            }
             if (array_key_exists('draft_bcc', $draft)) {
                 $bcc = $draft['draft_bcc'];
             }
