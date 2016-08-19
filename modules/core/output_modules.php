@@ -106,11 +106,12 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
  */
 class Hm_Output_search_form_end extends Hm_Output_Module {
     protected function output() {
+        $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
         $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
             $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.
             '" width="20" height="20" /></a>';
         return '</form></div>'.
-            list_controls($refresh_link, false, false).'</div>';
+            list_controls($refresh_link, false, $source_link).list_sources($this->get('data_sources', array()), $this).'</div>';
     }
 }
 

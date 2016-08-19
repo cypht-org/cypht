@@ -1,5 +1,5 @@
 .saved_searches_form { margin-left: 30px; }
 .saved_searches_form input { margin-left: 3px; margin-right: 3px; }
-.save_search img, .delete_search img { opacity: .5; position: absolute; right: 45px; top: 22px; }
+.save_search img, .delete_search img { opacity: .5; position: absolute; right: 75px; top: 21px; }
 .update_search img { opacity: .5; position: absolute; right: 75px; top: 22px; }
 @media screen and (max-device-width:480px) and (orientation : portrait) { .delete_search, .add_search { display: none; } }
