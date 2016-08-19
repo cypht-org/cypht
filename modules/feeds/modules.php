@@ -947,7 +947,7 @@ function search_feed_item($item, $terms, $since, $fld) {
     }
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $item)) {
-            if (stristr($item[$fld], $terms)) {
+            if (stristr($item[$fld], $terms) !== false) {
                 return true;
             }
         }
