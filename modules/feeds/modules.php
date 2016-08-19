@@ -580,6 +580,9 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
             $header_str = '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($this->get('feed_message_headers', array()) as $name => $value) {
+                if (in_array($name, array('server_id', 'server_name', 'guid', 'id', 'content'), true)) {
+                    continue;
+                }
                 if ($name != 'link' && $name != 'link_alternate' && !strstr($value, ' ') && strlen($value) > 75) {
                     $value = substr($value, 0, 75).'...';
                 }
@@ -599,6 +602,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                     $header_str .= '<tr><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
             }
+            $header_str .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $header_str .= '<tr><td colspan="2"></td></tr></table>';
             $this->out('feed_message_content', str_replace(array('<', '>', '&ldquo;'), array(' <', '> ', ' &ldquo;'), $this->get('feed_message_content')));
             $txt = '<div class="msg_text_inner">'.format_msg_html($this->get('feed_message_content')).'</div>';

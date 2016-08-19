@@ -1307,6 +1307,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
             }
+            $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
                 '<a href="#" class="hlink header_toggle">'.$this->trans('all headers').'</a>'.
