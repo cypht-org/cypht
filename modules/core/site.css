@@ -161,6 +161,10 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .hl { background-color: #eee; }
 .settings_wrap_text { white-space: normal; }
 .message_table .source img { opacity: .5; vertical-align: -3px; padding-right: 15px; }
+.unsaved_reminder { opacity: .2; position: absolute; top: 0px; left: 0px; width: 20px; height: 20px; }
+.header_space { padding-top: 10px !important; }
+div.unseen, .unseen .subject { font-weight: 700; }
+.debug { -webkit-mask-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .3) 70%); }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
@@ -177,7 +181,6 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .rtl_page .list_controls { left: 0px; padding-left: 10px; top: 0px; padding-top: 10px; right: auto; background-color: #fff; }
 .rtl_page .toggle_link { margin-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
-div.unseen, .unseen .subject { font-weight: 700; }
 
 @media screen and (max-device-width:1080px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; vertical-align: -5px; }
@@ -198,6 +201,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .header_subject th { max-width: 360px; white-space: normal !important; word-break: break-all; word-wrap: break-word; overflow: hidden !important; }
     .msg_headers th { padding-left: 10px !important; }
     .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
+    .unsaved_reminder { display: none; }
 }
 @media screen and (max-device-width:1080px) and (orientation : landscape) {
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
@@ -215,6 +219,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .header_subject th { max-width: 360px; white-space: normal !important; word-break: break-all; word-wrap: break-word; overflow: hidden !important; }
     .msg_headers th { padding-left: 10px !important; }
     .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
+    .unsaved_reminder { display: none; }
 }
 @media screen and (max-device-width:480px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
@@ -248,8 +253,5 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .search_update { clear: both; }
     .search_content .refresh_list { display: none; }
     .search_content .content_title { max-height: 500px; }
-
-}
-.debug {
-    -webkit-mask-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .3) 70%);
+    .unsaved_reminder { display: none; }
 }
