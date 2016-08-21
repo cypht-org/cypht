@@ -37,7 +37,12 @@ ini_set('session.use_trans_sid', 'Off');
 ini_set('session.cache_limiter', 'nocache');
 
 /* session hash mechanism */
-ini_set('session.hash_function', 'sha256');
+if ((float) substr(phpversion(), 0, 3) === 5.6) {
+    ini_set('session.hash_function', 1);
+}
+else {
+    ini_set('session.hash_function', 'sha256');
+}
 
 /* session name */
 ini_set('session.name', 'CYPHTID');
