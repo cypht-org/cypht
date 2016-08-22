@@ -35,7 +35,7 @@ class Hm_DB {
         );
         foreach (self::$required_config as $v) {
             if (!self::$config[$v]) {
-                Hm_Debug::add('Missing configuration setting for %s', $v);
+                Hm_Debug::add(sprintf('Missing configuration setting for %s', $v));
             }
         }
     }
