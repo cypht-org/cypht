@@ -217,6 +217,7 @@ class Hm_Request {
         else {
             $path = $uri;
         }
+        $path = str_replace('index.php', '', $path);
         if (substr($path, -1) != '/') {
             $path .= '/';
         }
