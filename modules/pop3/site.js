@@ -140,6 +140,9 @@ var pop3_message_view_finished = function() {
         else if (hm_list_parent() == 'unread') {
             Hm_Message_List.prev_next_links('formatted_unread_data', class_name);
         }
+        else if (hm_list_parent() === 'search') {
+            Hm_Message_List.prev_next_links('formatted_search_data', class_name);
+        }
         else {
             var path = hm_list_path();
             var key = 'pop3_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();

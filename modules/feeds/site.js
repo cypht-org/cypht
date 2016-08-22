@@ -154,6 +154,9 @@ var display_feed_item_content = function(res) {
     else if (hm_list_parent() == 'unread') {
         Hm_Message_List.prev_next_links('formatted_unread_data', path+'_'+msg_uid);
     }
+    else if (hm_list_parent() === 'search') {
+        Hm_Message_List.prev_next_links('formatted_search_data', path+'_'+msg_uid);
+    }
     else {
         Hm_Message_List.prev_next_links(path, path+'_'+msg_uid);
     }
