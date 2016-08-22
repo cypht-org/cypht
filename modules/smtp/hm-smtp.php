@@ -291,6 +291,7 @@ class Hm_SMTP {
             }
             else {
                 if ($this->state == 'connected') {
+                    $this->state = 'authed';
                     $result = false;
                 }
             }
