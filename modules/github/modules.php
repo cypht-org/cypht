@@ -670,6 +670,7 @@ class Hm_Output_github_limit_setting extends Hm_Output_Module {
             '<td><input type="text" id="github_limit" name="github_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
     }
 }
+
 /**
  * @subpackage github/functions
  */

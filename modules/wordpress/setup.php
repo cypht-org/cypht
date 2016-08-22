@@ -42,7 +42,10 @@ add_handler('ajax_wp_notice_display', 'http_headers', true, 'core');
 add_output('ajax_wp_notice_display', 'filter_wp_notice_data', true);
 
 add_handler('settings', 'process_unread_wp_included', true, 'wordpress', 'save_user_settings', 'before');
+add_handler('settings', 'process_wordpress_since_setting', true, 'wordpress', 'save_user_settings', 'before');
 add_output('settings', 'unread_wp_included_setting', true, 'wordpress', 'unread_source_max_setting', 'after');
+add_output('settings', 'start_wordpress_settings', true, 'wordpress', 'end_settings_form', 'before');
+add_output('settings', 'wordpress_since_setting', true, 'wordpress', 'start_wordpress_settings', 'after');
 
 return array(
     'allowed_pages' => array(
@@ -53,12 +56,12 @@ return array(
     'allowed_post' => array(
         'wp_disconnect' => FILTER_SANITIZE_STRING,
         'unread_exclude_wordpress' => FILTER_VALIDATE_INT,
-        'wp_uid' => FILTER_SANITIZE_STRING
+        'wp_uid' => FILTER_SANITIZE_STRING,
+        'wordpress_limit' => FILTER_VALIDATE_INT,
+        'wordpress_since' => FILTER_SANITIZE_STRING,
     ),
     'allowed_output' => array(
         'wp_notice_text' => array(FILTER_UNSAFE_RAW, false),
         'wp_notice_headers' => array(FILTER_UNSAFE_RAW, false),
     ),
 );
-
-
