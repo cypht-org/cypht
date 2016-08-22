@@ -206,7 +206,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
                 'tls' => $tls,
                 'username' => $user,
                 'password' => $pass,
-                'no_caps' => true,
+                'no_caps' => false,
                 'blacklisted_extensions' => array('enable')
             );
             $imap->connect($this->imap_settings);
