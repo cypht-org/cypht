@@ -39,10 +39,14 @@ class Hm_Mock_Memcached_No {
 }
 class Hm_Mock_Memcached {
     private $data = array();
+    public static $set_failure = false;
     function addServer($server, $port) {
         return true;
     }
     function set($key, $val, $lifetime) {
+        if (self::$set_failure) {
+            return false;
+        }
         $this->data[$key] = $val;
         return true;
     }
@@ -69,7 +73,7 @@ class Hm_Mock_Config {
         'user_settings_dir' => './data',
         'default_language' => 'es',
     );
-    public function get($id, $default) {
+    public function get($id, $default=false) {
         if (array_key_exists($id, $this->data)) {
             return $this->data[$id];
         }

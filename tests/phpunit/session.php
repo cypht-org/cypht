@@ -277,6 +277,15 @@ class Hm_Test_Memcached_Session extends PHPUnit_Framework_TestCase {
         $session->start($request);
         $this->assertFalse($session->is_active());
         $session->destroy($request);
+
+        Hm_Mock_Memcached::$set_failure = true;
+        $session = new Hm_Memcached_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->loaded = true;
+        $session->start($request);
+        $this->assertFalse($session->is_active());
+        $session->destroy($request);
+
     }
     /**
      * @preserveGlobalState disabled

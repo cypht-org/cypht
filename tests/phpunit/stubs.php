@@ -45,14 +45,18 @@ class Hm_Server_Wrapper {
 }
 
 class Hm_IMAP {
+    static public $allow_connection = true;
+    static public $allow_auth = true;
     private $connected = false;
-    public function get_state() { return $this->connected ? 'authenticated' : false; }
-    public function connect() { $this->connected = true; return true; }
+    public function get_state() { if (self::$allow_auth) { return $this->connected ? 'authenticated' : false; } return 'connected'; }
+    public function connect() { if (self::$allow_connection) { $this->connected = true; return true; } return false; }
 }
 
 class Hm_POP3 {
-    public function connect() { return true; }
-    public function auth() { return true; }
+    static public $allow_connection = true;
+    static public $allow_auth = true;
+    public function connect() { if (self::$allow_connection) { return true; } return false; }
+    public function auth() { if (self::$allow_auth) { return true; } return false; }
 }
 
 

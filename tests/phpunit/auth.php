@@ -43,12 +43,30 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $auth->save_auth_detail($session);
         $this->assertTrue($auth->check_credentials('any', 'thing'));
 
+        Hm_IMAP::$allow_connection = false;
+        $auth = new Hm_Auth_IMAP($this->config);
+        $this->assertFalse($auth->check_credentials('any', 'thing'));
+
+        Hm_IMAP::$allow_connection = true;
+        Hm_IMAP::$allow_auth = false;
+        $auth = new Hm_Auth_IMAP($this->config);
+        $this->assertFalse($auth->check_credentials('any', 'thing'));
+
         $this->config->set('pop3_auth_server', 'test');
         $this->config->set('pop3_auth_port', 123);
         $this->config->set('pop3_auth_tls', false);
         $auth = new Hm_Auth_POP3($this->config);
         $auth->save_auth_detail($session);
         $this->assertTrue($auth->check_credentials('any', 'thing'));
+
+        Hm_POP3::$allow_connection = false;
+        $auth = new Hm_Auth_POP3($this->config);
+        $this->assertFalse($auth->check_credentials('any', 'thing'));
+
+        Hm_POP3::$allow_connection = true;
+        Hm_POP3::$allow_auth = false;
+        $auth = new Hm_Auth_POP3($this->config);
+        $this->assertFalse($auth->check_credentials('any', 'thing'));
 
         $auth = new Hm_Auth_LDAP($this->config);
         $this->assertFalse($auth->check_credentials('any', 'thing'));
