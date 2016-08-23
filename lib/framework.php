@@ -38,8 +38,8 @@ if (!class_exists('Hm_Functions')) {
      */
     class Hm_Functions {
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $secure=false, $html_only='') {
-            Hm_Debug::add(sprintf('Setting cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s, name: %s',
-                $name, $lifetime, $path, $domain, $secure, $html_only, $value));
+            Hm_Debug::add(sprintf('Setting cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',
+                $name, $lifetime, $path, $domain, $secure, $html_only));
             return setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
         }
         public static function header($header) {
