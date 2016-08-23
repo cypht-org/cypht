@@ -106,6 +106,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
                 return $this->plaintext($results['data']);
             }
         }
+        Hm_Debug::add('DB SESSION failed to read session data');
         return false;
     }
 
@@ -115,7 +116,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return void
      */
     public function end() {
-        if (!$this->session_closed) {
+        if (!$this->session_closed && $this->active) {
             $this->save_data();
         }
         $this->active = false;
@@ -131,6 +132,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
             $enc_data = $this->ciphertext($this->data);
             return $sql->execute(array($enc_data, $this->session_key));
         }
+        Hm_Debug::add('DB SESSION failed to write session data');
         return false;
     }
 

@@ -96,6 +96,7 @@ class Hm_Auth_DB extends Hm_Auth {
             }
         }
         sleep(2);
+        Hm_Debug::add(sprintf('DB AUTH failed for %s', $user));
         return false;
     }
 
@@ -123,6 +124,7 @@ class Hm_Auth_DB extends Hm_Auth {
         if ($this->dbh) {
             return true;
         }
+        Hm_Debug::add(sprintf('Unable to connect to the DB auth server %s', $this->site_config->get('db_host')));
         return false;
     }
 
@@ -210,10 +212,17 @@ class Hm_Auth_IMAP extends Hm_Auth {
                 'blacklisted_extensions' => array('enable')
             );
             $imap->connect($this->imap_settings);
+            if ($imap->get_state() == 'authenticated') {
+                return true;
+            }
+            if ($imap->get_state() != 'connected') {
+                Hm_Debug::add(sprintf('Unable to connect to the IMAP auth server %s', $server));
+                return false;
+            }
+            Hm_Debug::add(sprintf('IMAP AUTH failed for %s', $user));
+            return false;
         }
-        if ($imap->get_state() == 'authenticated') {
-            return true;
-        }
+        Hm_Debug::add('Invalid IMAP auth configuration settings');
         return false;
     }
 
@@ -279,12 +288,16 @@ class Hm_Auth_POP3 extends Hm_Auth {
             $pop3->port = $port;
             $pop3->tls = $tls;
             if ($pop3->connect()) {
-                $authed = $pop3->auth($user, $pass);
+                if ($pop3->auth($user, $pass)) {
+                    return true;
+                }
+                Hm_Debug::add(sprintf('POP3 AUTH failed for %s', $user));
+                return false;
             }
+            Hm_Debug::add(sprintf('Unable to connect to the POP3 auth server %s', $server));
+            return false;
         }
-        if ($authed) {
-            return true;
-        }
+        Hm_Debug::add('Invalid POP3 auth configuration settings');
         return false;
     }
 
@@ -348,6 +361,7 @@ class Hm_Auth_LDAP extends Hm_Auth {
             );
             return $this->connect();
         }
+        Hm_Debug::add('Invalid LDAP auth configuration settings');
         return false;
     }
 
@@ -370,12 +384,16 @@ class Hm_Auth_LDAP extends Hm_Auth {
             ldap_set_option($this->fh, LDAP_OPT_PROTOCOL_VERSION, 3);
             return $this->auth();
         }
+        Hm_Debug::add(sprintf('Unable to connect to the LDAP auth server %s', $this->config['server']));
         return false;
     }
 
     protected function auth() {
         $result = @ldap_bind($this->fh, $this->config['user'], $this->config['pass']);
         ldap_unbind($this->fh);
+        if (!$result) {
+            Hm_Debug::add(sprintf('LDAP AUTH failed for %s', $this->config['user']));
+        }
         return $result;
     }
 }

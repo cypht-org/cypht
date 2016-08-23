@@ -54,7 +54,9 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
         $this->secure_cookie($request, $this->cname, $this->session_key, 0);
         if ($this->save_data()) {
             $this->active = true;
+            return;
         }
+        Hm_Debug::add('MEM SESSION failed to start a new session');
     }
 
     /**

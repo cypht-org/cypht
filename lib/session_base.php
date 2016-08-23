@@ -254,6 +254,9 @@ abstract class Hm_Session {
         if (array_key_exists('hm_id', $request->cookie)) {
             $this->enc_key = $request->cookie['hm_id'];
         }
+        else {
+            Hm_Debug::add('Unable to get session encryption key');
+        }
     }
 
     /**

@@ -79,6 +79,7 @@ class Hm_Crypt {
          * check and require the hmac_rounds check only! */
         if (!self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key, self::$hmac_rounds) &&
             !self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key, self::$encryption_rounds)) {
+            Hm_Debug::add('HMAC verification failed');
             return false;
         }
 
