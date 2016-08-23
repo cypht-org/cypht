@@ -622,7 +622,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
         if ($this->get('login_time')) {
             $login_time = $this->get('login_time');
         }
-        if ($this->get('feed_list_parent') == 'feeds' || $this->get('feed_list_parent') == 'search') {
+        if ($this->get('feed_list_parent') == 'feeds' ||
+            $this->get('feed_list_parent') == 'search' ||
+            $this->get('feed_list_parent') == 'combined_inbox') {
             $src_callback = 'feed_source_callback';
         }
         else {
