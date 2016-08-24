@@ -35,6 +35,8 @@ class Hm_Test_Server_List extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false), Hm_Server_Wrapper::dump(0));
         $this->assertEquals(array('pass' => 'testpass', 'user' => 'testuser', 'object' => false, 'connected' => false, 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), Hm_Server_Wrapper::dump(0, true));
         $this->assertEquals(array(), Hm_Server_Wrapper::dump(1));
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'name=' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'pass' => false), 20);
+        $this->assertTrue(array_key_exists('nopass', Hm_Server_Wrapper::dump(20)));
     }
     /**
      * @preserveGlobalState disabled
