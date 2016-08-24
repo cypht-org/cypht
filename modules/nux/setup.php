@@ -37,7 +37,7 @@ add_handler('home', 'process_oauth2_authorization', true, 'nux', 'message_list_t
 add_handler('home', 'nux_homepage_data', true, 'nux', 'process_oauth2_authorization', 'after');
 add_handler('home', 'nux_dev_news', true, 'nux', 'nux_homepage_data', 'after');
 
-add_output('home', 'welcome_dialog', true, 'nux', 'home_heading', 'after');
+add_output('home', 'welcome_dialog', true, 'nux', 'home_password_dialogs', 'after');
 add_output('home', 'nux_help', true, 'nux', 'welcome_dialog', 'after');
 add_output('home', 'nux_dev_news', true, 'nux', 'nux_help', 'after');
 

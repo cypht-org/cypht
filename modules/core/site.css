@@ -165,6 +165,9 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .header_space { padding-top: 10px !important; }
 div.unseen, .unseen .subject { font-weight: 700; }
 .debug { -webkit-mask-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, .3) 70%); }
+.home_password_dialogs { min-height: 400px; max-width: 480px; padding: 20px; margin: 20px; margin-right: 0px; float: left; border: solid 1px #eee; }
+.home_password_dialogs .pw_input { width: 120px; }
+.nux_title { font-size: 120%; margin-bottom: 20px; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }

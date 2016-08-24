@@ -13,7 +13,9 @@ output_source('core');
 
 /* homepage */
 setup_base_page('home');
+add_handler('home', 'check_missing_passwords', true, 'core', 'load_user_data', 'after');
 add_output('home', 'home_heading', true, 'core', 'content_section_start', 'after');
+add_output('home', 'home_password_dialogs', true, 'core', 'home_heading', 'after');
 
 /* servers page */
 setup_base_page('servers');
@@ -43,6 +45,7 @@ add_handler('settings', 'process_all_since_setting', true, 'core', 'date', 'afte
 add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_no_password_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 
@@ -52,7 +55,8 @@ add_output('settings', 'language_setting', true, 'core', 'start_general_settings
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'list_style_setting', true, 'core', 'timezone_setting', 'after');
 add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_setting', 'after');
-add_output('settings', 'start_unread_settings', true, 'core', 'delete_prompt_setting', 'after');
+add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
+add_output('settings', 'start_unread_settings', true, 'core', 'no_password_setting', 'after');
 add_output('settings', 'unread_since_setting', true, 'core', 'start_unread_settings', 'after');
 add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_setting', 'after');
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');
@@ -98,6 +102,12 @@ add_output('notfound', 'notfound_content', true, 'core', 'content_section_start'
 /* message action ajax request */
 setup_base_ajax_page('ajax_message_action', 'core');
 
+/* password udpates when not saving between logins */
+setup_base_ajax_page('ajax_update_server_pw', 'core');
+add_handler('ajax_update_server_pw', 'save_user_data', true, 'core', 'language', 'before');
+add_handler('ajax_update_server_pw', 'check_missing_passwords', true, 'core', 'load_user_data', 'after');
+add_handler('ajax_update_server_pw', 'process_pw_update', true, 'core', 'check_missing_passwords', 'after');
+
 /* folder list update ajax request */
 setup_base_ajax_page('ajax_hm_folders', 'core');
 add_output('ajax_hm_folders', 'folder_list_content_start', true);
@@ -128,6 +138,7 @@ return array(
         'ajax_hm_folders',
         'ajax_message_action',
         'ajax_reset_search',
+        'ajax_update_server_pw',
         'notfound',
         'search'
     ),
@@ -210,7 +221,9 @@ return array(
         'section_class' => FILTER_SANITIZE_STRING,
         'message_ids' => FILTER_SANITIZE_STRING,
         'action_type' => FILTER_SANITIZE_STRING,
+        'server_pw_id' => FILTER_SANITIZE_STRING,
         'message_list_since' => FILTER_SANITIZE_STRING,
+        'no_password_save' => FILTER_VALIDATE_BOOLEAN
     )
 );
 

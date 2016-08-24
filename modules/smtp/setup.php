@@ -75,6 +75,7 @@ add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'logout_menu_it
 add_handler('ajax_hm_folders', 'smtp_auto_bcc_check',  true, 'smtp', 'load_imap_servers_from_config', 'after');
 add_output('ajax_hm_folders', 'sent_folder_link', true, 'smtp', 'logout_menu_item', 'before');
 
+add_handler('ajax_update_server_pw', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 return array(
     'allowed_pages' => array(
         'ajax_smtp_debug',

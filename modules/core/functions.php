@@ -347,7 +347,7 @@ function save_user_settings($handler, $form, $logout) {
         $pass = false;
     }
     if ($user && $path && $pass) {
-        filter_auth_servers($handler);
+        filter_servers($handler);
         $handler->user_config->save($user, $pass);
         $handler->session->set('changed_settings', array());
         if ($logout) {
@@ -369,14 +369,24 @@ function save_user_settings($handler, $form, $logout) {
  * @param object $handler hm handler module object
  * @return void
  */
-function filter_auth_servers($handler) {
+function filter_servers($handler) {
     $excluded = array('pop3_servers', 'imap_servers','smtp_servers');
+    $no_password = $handler->user_config->get('no_password_save_setting', false);
     $config = $handler->user_config->dump();
     foreach ($config as $key => $vals) {
         if (in_array($key, $excluded, true)) {
             foreach ($vals as $index => $server) {
-                if (array_key_exists('default', $server)) {
+                if (array_key_exists('default', $server) && $server['default']) {
                     unset($config[$key][$index]);
+                }
+                elseif (!array_key_exists('server', $server)) {
+                    unset($config[$key][$index]);
+                }
+                else {
+                    $config[$key][$index]['object'] = false;
+                    if ($no_password) {
+                        unset($config[$key][$index]['pass']);
+                    }
                 }
             }
         }

@@ -7,6 +7,126 @@
  */
 
 /**
+ * Process a password update 
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_pw_update extends Hm_Handler_Module {
+    /***
+     * update a password in the session for a server
+     */
+    public function process() {
+        list($success, $form ) = $this->process_form(array('server_pw_id', 'password'));
+        $missing = $this->get('missing_pw_servers', array());
+        if ($success) {
+            if (array_key_exists($form['server_pw_id'], $missing)) {
+                $server = $missing[$form['server_pw_id']];
+                switch ($server['type']) {
+                    case 'POP3':
+                        $current = Hm_POP3_List::dump($server['id']);
+                        $current['pass'] = $form['password'];
+                        unset($current['nopass']);
+                        Hm_POP3_List::add($current, $server['id']);
+                        $pop3 = Hm_POP3_List::connect($server['id'], false);
+                        if ($pop3->state == 'authed') {
+                            Hm_Msgs::add('Password Updated');
+                            $this->out('connect_status', true);
+                        }
+                        else {
+                            unset($current['pass']);
+                            Hm_POP3_List::add($current, $server['id']);
+                            Hm_Msgs::add('ERRUnable to authenticate to the POP3 server');
+                            $this->out('connect_status', false);
+                        }
+                        break;
+                    case 'SMTP':
+                        $current = Hm_SMTP_List::dump($server['id']);
+                        $current['pass'] = $form['password'];
+                        unset($current['nopass']);
+                        Hm_SMTP_List::add($current, $server['id']);
+                        $smtp = Hm_SMTP_List::connect($server['id'], false);
+                        if ($smtp->state == 'authed') {
+                            Hm_Msgs::add('Password Updated');
+                            $this->out('connect_status', true);
+                        }
+                        else {
+                            unset($current['pass']);
+                            Hm_SMTP_List::add($current, $server['id']);
+                            Hm_Msgs::add('ERRUnable to authenticate to the SMTP server');
+                            $this->out('connect_status', false);
+                        }
+                        break;
+                    case 'IMAP':
+                        $current = Hm_IMAP_List::dump($server['id']);
+                        $current['pass'] = $form['password'];
+                        unset($current['nopass']);
+                        Hm_IMAP_List::add($current, $server['id']);
+                        $imap = Hm_IMAP_List::connect($server['id'], false);
+                        if ($imap->get_state() == 'authenticated') {
+                            Hm_Msgs::add('Password Updated');
+                            $this->out('connect_status', true);
+                        }
+                        else {
+                            unset($current['pass']);
+                            Hm_IMAP_List::add($current, $server['id']);
+                            Hm_Msgs::add('ERRUnable to authenticate to the IMAP server');
+                            $this->out('connect_status', false);
+                        }
+                        break;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Check for missing passwords to populate a home page dialog 
+ * @subpackage core/handler
+ */
+class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
+    /***
+     * pass a list of servers with missing passwords to the output modules
+     */
+    public function process() {
+        if ($this->user_config->get('no_password_save_setting')) {
+            $missing = array();
+            if ($this->module_is_supported('imap')) {
+                foreach (Hm_IMAP_List::dump() as $index => $vals) {
+                    if (array_key_exists('nopass', $vals)) {
+                        $vals['id'] = $index;
+                        $vals['type'] = 'IMAP';
+                        $key = 'imap_'.$index;
+                        $missing[$key] = $vals;
+                    }
+                }
+            }
+            if ($this->module_is_supported('pop3')) {
+                foreach (Hm_POP3_List::dump() as $index => $vals) {
+                    if (array_key_exists('nopass', $vals)) {
+                        $vals['id'] = $index;
+                        $vals['type'] = 'POP3';
+                        $key = 'pop3_'.$index;
+                        $missing[$key] = $vals;
+                    }
+                }
+            }
+            if ($this->module_is_supported('smtp')) {
+                foreach (Hm_SMTP_List::dump() as $index => $vals) {
+                    if (array_key_exists('nopass', $vals)) {
+                        $vals['id'] = $index;
+                        $vals['type'] = 'SMTP';
+                        $key = 'smtp_'.$index;
+                        $missing[$key] = $vals;
+                    }
+                }
+            }
+            if (count($missing) > 0) {
+                $this->out('missing_pw_servers', $missing);
+            }
+        }
+    }
+}
+
+/**
  * Close the session before it's automatically closed at the end of page processing
  * @subpackage core/handler
  */
@@ -90,6 +210,20 @@ class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module 
      */
     public function process() {
         process_site_setting('all_email_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process input from the no pasword between logins setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_no_password_setting extends Hm_Handler_Module {
+    /**
+     * Allowed vals are bool true/false
+     */
+    public function process() {
+        function no_password_callback($val) { return $val; }
+        process_site_setting('no_password_save', $this, 'no_password_callback', false, true);
     }
 }
 
@@ -380,8 +514,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             $this->out('disable_delete_prompt', $this->user_config->get('disable_delete_prompt_setting'));
         }
         $this->out('is_mobile', $this->request->mobile);
-
-        $this->out('load_settings_failed', $this->user_config->decrypt_failed);
+        $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
     }
 }
 

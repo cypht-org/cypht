@@ -534,6 +534,24 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
         return $res;
     }
 }
+
+/**
+ * @subpackage core/output
+ */
+class Hm_Output_no_password_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('no_password_save', $settings) && $settings['no_password_save']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $checked = '';
+        }
+        return '<tr class="general_setting"><td><label for="no_password_save">'.$this->trans('Don\'t save account passwords between logins').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' value="1" id="no_password_save" name="no_password_save" /></td></tr>';
+    }
+}
+
 /**
  * @subpackage core/output
  */
@@ -550,7 +568,6 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
             '<td><input type="checkbox" '.$checked.' value="1" id="disable_delete_prompt" name="disable_delete_prompt" /></td></tr>';
     }
 }
-
 
 /**
  * Starts the Flagged section on the settings page
@@ -1338,6 +1355,35 @@ class Hm_Output_home_heading extends Hm_Output_Module {
         return '<div class="content_title">'.$this->trans('Home').'</div>';
     }
 }
+
+/**
+ * Output password dialogs if no_password_save is active
+ * @subpackage core/output
+ */
+class Hm_Output_home_password_dialogs extends Hm_Output_Module {
+    /**
+     * Allow the user to input passwords for this session
+     */
+    protected function output() {
+        $missing = $this->get('missing_pw_servers', array());
+        if (count($missing) > 0) {
+            $res = '<div class="home_password_dialogs">';
+            $res .= '<div class="nux_title">Passwords</div>'.$this->trans('You have elected to not store passwords between logins.').
+                ' '.$this->trans('Enter your passwords below to gain access to these services during this session.').'<br /><br />';
+                
+            foreach ($missing as $vals) {
+                $id = $this->html_safe(sprintf('%s_%s', strtolower($vals['type']), $vals['id']));
+                $res .= '<div class="div_'.$id.'" >'.$this->html_safe($vals['type']).' '.$this->html_safe($vals['name']).
+                    ' '.$this->html_safe($vals['user']).' '.$this->html_safe($vals['server']).' <input placeholder="'.$this->trans('Password').
+                    '" type="password" class="pw_input" id="update_pw_'.$id.'" /> <input type="button" class="pw_update" data-id="'.$id.
+                    '" value="'.$this->trans('Update').'" /></div>';
+            }
+            $res .= '</div>';
+            return $res;
+        }
+    }
+}
+
 /**
  * Output the heading for a message list
  * @subpackage core/output

@@ -218,6 +218,9 @@ add_handler('ajax_imap_all_email', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_all_email', 'imap_combined_inbox',  true);
 add_output('ajax_imap_all_email', 'filter_all_email', true);
 
+add_handler('ajax_update_server_pw', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_update_server_pw', 'save_imap_servers', true, 'imap', 'save_user_data', 'before');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -243,6 +246,7 @@ return array(
 
     'allowed_output' => array(
         'imap_connect_status' => array(FILTER_SANITIZE_STRING, false),
+        'connect_status' => array(FILTER_SANITIZE_STRING, false),
         'auto_sent_folder' => array(FILTER_SANITIZE_STRING, false),
         'imap_connect_time' => array(FILTER_SANITIZE_STRING, false),
         'imap_detail_display' => array(FILTER_UNSAFE_RAW, false),

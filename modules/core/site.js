@@ -1196,6 +1196,25 @@ var Hm_Crypt = {
     },
 }
 
+var update_password = function(id) {
+    var pass = $('#update_pw_'+id).val();
+    if (pass && pass.length) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_update_server_pw'},
+            {'name': 'password', 'value': pass},
+            {'name': 'server_pw_id', 'value': id}],
+            function(res) {
+                if (res.connect_status) {
+                    $('.div_'+id).remove();
+                    if ($('.home_password_dialogs div').length == 1) {
+                        $('.home_password_dialogs').remove();
+                    }
+                }
+            }
+        );
+    }
+}
+
 var elog = function(val) {
     if (hm_debug()) {
         console.log(val);
@@ -1256,5 +1275,9 @@ $(function() {
         $('.search_reset').click(Hm_Utils.reset_search_form);
     }
     try { navigator.registerProtocolHandler("mailto", "?page=compose&compose_to=%s", "Cypht"); } catch(e) {}
+
+    if (hm_page_name() == 'home') {
+        $('.pw_update').click(function() { update_password($(this).data('id')); });
+    }
 
 });

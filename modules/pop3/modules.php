@@ -624,10 +624,15 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
 
             $no_edit = false;
 
-            if (isset($vals['user'])) {
+            if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('[saved]');
+            }
+            elseif (array_key_exists('nopass', $vals)) {
+                $user_pc = $vals['user'];
+                $pass_pc = $this->trans('Password');
+                $disabled = '';
             }
             else {
                 $user_pc = '';
@@ -646,7 +651,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="pop3_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<label class="screen_reader" for="pop3_user_'.$index.'">'.$this->trans('POP3 username').'</label>'.
-                '<input '.$disabled.' id="pop3_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').'" type="text" name="pop3_user" value="'.$user_pc.'"></span>'.
+                '<input '.$disabled.' id="pop3_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').'" type="text" name="pop3_user" value="'.$this->html_safe($user_pc).'"></span>'.
                 '<span> <label class="screen_reader" for="pop3_password_'.$index.'">'.$this->trans('POP3 password').'</label>'.
                 '<input '.$disabled.' id="pop3_password_'.$index.'" class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
             if (!$no_edit) {

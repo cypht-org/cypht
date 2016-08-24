@@ -109,6 +109,8 @@ add_handler('ajax_pop3_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_pop3_debug', 'date', true, 'core');
 add_handler('ajax_pop3_debug', 'http_headers', true, 'core');
 
+add_handler('ajax_update_server_pw', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_pop3_debug',

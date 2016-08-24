@@ -729,10 +729,15 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
 
             $no_edit = false;
 
-            if (isset($vals['user'])) {
+            if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('[saved]');
+            }
+            elseif (array_key_exists('nopass', $vals)) {
+                $user_pc = $vals['user'];
+                $pass_pc = $this->trans('Password');
+                $disabled = '';
             }
             else {
                 $user_pc = '';
@@ -748,7 +753,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<label class="screen_reader" for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label>'.
                 '<input '.$disabled.' class="credentials" id="smtp_user_'.$index.'" placeholder="'.$this->trans('Username').
-                '" type="text" name="smtp_user" value="'.$user_pc.'"></span><span> <label class="screen_reader" for="smtp_pass_'.
+                '" type="text" name="smtp_user" value="'.$this->html_safe($user_pc).'"></span><span> <label class="screen_reader" for="smtp_pass_'.
                 $index.'">'.$this->trans('SMTP password').'</label><input '.$disabled.' class="credentials smtp_password" placeholder="'.
                 $pass_pc.'" type="password" id="smtp_pass_'.$index.'" name="smtp_pass"></span>';
 

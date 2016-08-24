@@ -1361,10 +1361,15 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 
             $no_edit = false;
 
-            if (isset($vals['user'])) {
+            if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('[saved]');
+            }
+            elseif (array_key_exists('nopass', $vals)) {
+                $user_pc = $vals['user'];
+                $pass_pc = $this->trans('Password');
+                $disabled = '';
             }
             else {
                 $user_pc = '';
@@ -1380,9 +1385,12 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label>'.
-                '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').'" type="text" name="imap_user" value="'.$user_pc.'"></span>'.
+                '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').
+                '" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'"></span>'.
                 '<span><label class="screen_reader" for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label>'.
-                '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.'" type="password" name="imap_pass"></span>';
+                '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.
+                '" type="password" name="imap_pass"></span>';
+
             if (!$no_edit) {
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
