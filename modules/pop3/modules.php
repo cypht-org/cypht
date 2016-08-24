@@ -459,12 +459,15 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('pop3_servers', array());
         $added = false;
+        $max = 0;
         foreach ($servers as $index => $server) {
             Hm_POP3_List::add( $server, $index );
             if (array_key_exists('default', $server) && $server['default']) {
                 $added = true;
             }
+            $max = $index;
         }
+        $max++;
         if (!$added) {
             $auth_server = $this->session->get('pop3_auth_server_settings', array());
             if (array_key_exists('name', $auth_server)) {
@@ -482,7 +485,7 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
                     'tls' => $auth_server['tls'],
                     'user' => $auth_server['username'],
                     'pass' => $auth_server['password']),
-                count($servers));
+                $max);
             }
         }
         Hm_POP3_Uid_Cache::load($this->session->get('pop3_read_uids', array()));
