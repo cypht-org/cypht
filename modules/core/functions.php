@@ -385,7 +385,9 @@ function filter_servers($handler) {
                 else {
                     $config[$key][$index]['object'] = false;
                     if ($no_password) {
-                        unset($config[$key][$index]['pass']);
+                        if (!array_key_exists('auth', $server) || $server['auth'] != 'xoauth2') {
+                            unset($config[$key][$index]['pass']);
+                        }
                     }
                 }
             }
