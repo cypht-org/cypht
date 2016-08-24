@@ -283,8 +283,11 @@ abstract class Hm_Session {
         if (!$path && isset($request->path)) {
             $path = $request->path;
         }
-        if (!$domain && array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
-            $domain = $request->server['SERVER_NAME'];
+        if (!$domain) {
+            $domain = $this->site_config->get('cookie_domain', false);
+            if (!$domain && array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
+                $domain = $request->server['SERVER_NAME'];
+            }
         }
         return Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
     }
