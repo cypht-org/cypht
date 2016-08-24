@@ -151,6 +151,9 @@ trait Hm_Server_List {
                 continue;
             }
             if (!$full) {
+                if (!array_key_exists('pass', $server) || !$server['pass']) {
+                    $server['nopass'] = true;
+                }
                 unset($server['pass']);
             }
             $list[$index] = $server;
