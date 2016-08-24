@@ -677,6 +677,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $flags = array();
                 }
                 elseif (Hm_Feed_Uid_Cache::is_unread(md5($item['guid']))) {
+                    $icon = 'rss_alt';
                     $flags = array('unseen');
                     $row_style .= ' unseen';
                 }
