@@ -80,7 +80,7 @@ trait Hm_Module_Output {
      * @return string sanitized value
      */
     public function html_safe($string) {
-        return htmlentities($string, ENT_QUOTES | ENT_IGNORE, "UTF-8");
+        return htmlentities($string, ENT_QUOTES, "UTF-8");
     }
 
     /**
