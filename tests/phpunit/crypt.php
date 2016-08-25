@@ -57,6 +57,10 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
         $this->assertFalse(Hm_Crypt::check_password('test', 'asdf'));
         $hash = Hm_Crypt::hash_password('test');
         $this->assertTrue(Hm_Crypt::check_password('test', $hash));
+
+        $hash = Hm_Crypt::hash_password('test', false, false, 'sha512', 'pbkdf2');
+        $this->assertTrue(Hm_Crypt::check_password('test', $hash));
+        $this->assertFalse(Hm_Crypt::check_password('asdf', 'sha512asdf'));
     }
     /**
      * @preserveGlobalState disabled
