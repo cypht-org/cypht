@@ -1089,6 +1089,7 @@ class Hm_Output_save_form extends Hm_Output_Module {
             'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
             '<input class="save_settings" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
             '<input class="save_settings" type="submit" name="save_settings_permanently_then_logout" value="'.$this->trans('Save and Logout').'" />'.
+            '</form><form method="post"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input class="save_settings" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
             '</form></div>';
 
