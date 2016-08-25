@@ -34,9 +34,11 @@ trait Hm_Output_Module_Exec {
         }
         if (!empty($list_output)) {
             $this->output_response = $list_output;
+            $this->output_data = $input;
         }
         else {
             $this->output_response = $input;
+            $this->output_data = $input;
         }
     }
 
@@ -163,6 +165,7 @@ class Hm_Module_Exec {
     public $user_config = false;
     public $handler_response = array();
     public $output_response = false;
+    public $output_data = array();
     public $filters = array();
     public $session = false;
     public $request = false;
@@ -170,7 +173,7 @@ class Hm_Module_Exec {
     public $outputs = array();
 
     /**
-     * @param objecty $config sit econfig
+     * @param object $config site config
      * @return void
      */
     public function __construct($config) {
