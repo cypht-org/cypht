@@ -192,14 +192,18 @@ class Hm_Crypt {
     }
 
     /**
-     * Hash a password using PBKDF2
+     * Hash a password using PBKDF2 or PHP password_hash if availble
      * @param string $password password to hash
      * @param string $salt salt to use, if false generate a new one
      * @param int $count interations for PBKDF2
      * @param string $algo PBKDF2 algo, defaults to sha512
+     * @param string $type Can be either pbkdf2 or php
      * @return string
      */
-    public static function hash_password($password, $salt=false, $count=false, $algo='sha512') {
+    public static function hash_password($password, $salt=false, $count=false, $algo='sha512', $type='php') {
+        if (function_exists('password_hash') && $type === 'php') {
+            return password_hash($password,  PASSWORD_DEFAULT);
+        }
         if (!$salt) {
             $salt = self::generate_salt();
         }
@@ -217,9 +221,16 @@ class Hm_Crypt {
      * @return bool
      */
     public static function check_password($password, $hash) {
+        $type = 'php';
+        if (substr($hash, 0, 6) === 'sha512') {
+            $type = 'pbkdf2';
+        }
+        if (function_exists('password_verify') && $type === 'php') {
+            return password_verify($password, $hash);
+        }
         if (count(explode(':', $hash)) == 4) {
             list($algo, $count, $salt, $nothing) = explode(':', $hash);
-            return self::hash_compare(self::hash_password($password, base64_decode($salt), $count, $algo), $hash);
+            return self::hash_compare(self::hash_password($password, base64_decode($salt), $count, $algo, $type), $hash);
         }
         return false;
     }
