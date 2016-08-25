@@ -79,6 +79,7 @@ class Hm_DB {
         $dsn = self::build_dsn();
         try {
             self::$dbh[$key] = new PDO($dsn, self::$config['db_user'], self::$config['db_pass']);
+            self::$dbh[$key]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn));
             return self::$dbh[$key];
         }
