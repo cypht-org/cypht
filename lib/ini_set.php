@@ -13,25 +13,25 @@ ini_set('zlib.output_compression', 'On');
 ini_set('session.cookie_lifetime', 0);
 
 /* force cookies only */
-ini_set('session.use_cookie', 'On');
-ini_set('session.use_only_cookies', 'On');
+ini_set('session.use_cookie', 1);
+ini_set('session.use_only_cookies', 1);
 
 /* strict session mode */
-ini_set('session.use_strict_mode', 'On');
+ini_set('session.use_strict_mode', 1);
 
 /* limit session cookie to HTTP only */
-ini_set('session.cookie_httponly', 'On');
+ini_set('session.cookie_httponly', 1);
 
 /* HTTPS required for session cookie */
 if (!$config->get('disable_tls', false)) {
-    ini_set('session.cookie_secure', 'On');
+    ini_set('session.cookie_secure', 1);
 }
 
 /* gc max lifetime */
 ini_set('session.gc_maxlifetime', 1440); 
 
 /* disable trans sid */
-ini_set('session.use_trans_sid', 'Off');
+ini_set('session.use_trans_sid', 0);
 
 /* don't allow dynamic page caching */
 ini_set('session.cache_limiter', 'nocache');
