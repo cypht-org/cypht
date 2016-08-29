@@ -101,16 +101,8 @@ class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
             $id = $this->request->post['attachment_id'];
             $filename = false;
             $remaining_files = array();
-            foreach ($this->session->get('uploaded_files', array()) as $file) {
-                if ($id == $file['basename']) {
-                    $filename = $file['filename'];
-                }
-                else {
-                    $remaining_files[] = $file;
-                }
-            }
-            if ($filename && @unlink($filename)) {
-                $this->session->set('uploaded_files', $remaining_files);
+            $res = delete_uploaded_files($this->session, false, $id);
+            if ($res) {
                 Hm_Msgs::add('Attachment deleted');
             }
             else {
@@ -125,8 +117,9 @@ class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
  */
 class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
     public function process() {
-        if (array_key_exists('upload_file', $this->request->files)) {
+        if (array_key_exists('upload_file', $this->request->files) && array_key_exists('draft_id', $this->request->post)) {
             $file = $this->request->files['upload_file'];
+            $draft_id = $this->request->post['draft_id'];
             if (is_readable($file['tmp_name'])) {
                 $content = file_get_contents($file['tmp_name']);
                 if ($content) {
@@ -138,8 +131,7 @@ class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
                         if (@file_put_contents($filepath.'/'.$filename, $content)) {
                             $file['filename'] = $filepath.'/'.$filename;
                             $file['basename'] = $filename; 
-                            $files = $this->session->get('uploaded_files', array());
-                            $this->session->set('uploaded_files', array_merge($files, array($file)));
+                            save_uploaded_file($draft_id, $file, $this->session);
                             $this->out('upload_file_details', $file);
                         }
                         else {
@@ -164,6 +156,26 @@ class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_process_delete_draft extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('draft_id'));
+        if ($success) {
+            delete_uploaded_files($this->session, $form['draft_id']);
+            if (delete_draft($form['draft_id'], $this->session)) {
+                Hm_Msgs::add('Draft deleted');
+                $this->out('draft_id', $form['draft_id']);
+            }
+            else {
+                Hm_Msgs::add('ERRAn error occurred trying to delete the requested draft');
+                $this->out('draft_id', -1);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
     public function process() {
         $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
@@ -173,11 +185,26 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $cc = array_key_exists('draft_cc', $this->request->post) ? $this->request->post['draft_cc'] : '';
         $bcc = array_key_exists('draft_bcc', $this->request->post) ? $this->request->post['draft_bcc'] : '';
         $inreplyto = array_key_exists('draft_in_reply_to', $this->request->post) ? $this->request->post['draft_in_reply_to'] : '';
+        $draft_id = array_key_exists('draft_id', $this->request->post) ? $this->request->post['draft_id'] : false;
+        $draft_notice = array_key_exists('draft_notice', $this->request->post) ? $this->request->post['draft_notice'] : false;
+
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
-            delete_uploaded_files($this->session);
+            delete_uploaded_files($this->session, $draft_id);
+            delete_draft($draft_id, $this->session);
         }
-        $this->session->set('compose_draft', array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
-            'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc, 'draft_in_reply_to' => $inreplyto));
+        else {
+            if (save_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+                'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+                'draft_in_reply_to' => $inreplyto), $draft_id, $this->session) !== false) {
+                if ($draft_notice) {
+                    Hm_Msgs::add('Draft saved');
+                    $this->out('draft_subject', $subject);
+                }
+            }
+            elseif ($draft_notice) {
+                Hm_Msgs::add('ERRYou must enter a subject to save a draft');
+            }
+        }
     }
 }
 
@@ -190,6 +217,8 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         foreach ($servers as $index => $server) {
             Hm_SMTP_List::add( $server, $index );
         }
+        $draft = array();
+        $draft_id = count($this->session->get('compose_drafts', array()));
         $reply_type = false;
         if (array_key_exists('reply', $this->request->get) && $this->request->get['reply']) {
             $reply_type = 'reply';
@@ -200,11 +229,16 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         elseif (array_key_exists('forward', $this->request->get) && $this->request->get['forward']) {
             $reply_type = 'forward';
         }
+        elseif (array_key_exists('draft_id', $this->request->get)) {
+            $draft = get_draft($this->request->get['draft_id'], $this->session);
+            $draft_id = $this->request->get['draft_id'];
+        }
         if ($reply_type) {
             $this->out('reply_type', $reply_type);
         }
-        $this->out('compose_draft', $this->session->get('compose_draft', array()), false);
-        $this->out('uploaded_files', $this->session->get('uploaded_files', array()));
+        $this->out('compose_draft', $draft);
+        $this->out('compose_draft_id', $draft_id);
+        $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
         $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
@@ -260,6 +294,7 @@ class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
     public function process() {
         $servers = Hm_SMTP_List::dump();
         $this->out('smtp_servers', $servers);
+        $this->out('compose_drafts', $this->session->get('compose_drafts', array()));
     }
 }
 
@@ -385,8 +420,9 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('smtp_send', $this->request->post)) {
-            list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'smtp_server_id'));
+            list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'smtp_server_id', 'draft_id'));
             if ($success) {
+                $failed = true;
                 $draft = array(
                     'draft_to' => $form['compose_to'],
                     'draft_body' => '',
@@ -441,7 +477,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     if ($smtp && $smtp->state == 'authed') {
                         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0),
                             $cc, $bcc, $in_reply_to, $from_name, $reply_to);
-                        $mime->add_attachments($this->session->get('uploaded_files', array()));
+                        $mime->add_attachments(get_uploaded_files($form['draft_id'], $this->session));
                         $recipients = $mime->get_recipient_addresses();
                         if (empty($recipients)) {
                             Hm_Msgs::add("ERRNo valid receipts found");
@@ -458,9 +494,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                                     $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
                                 }
                                 $this->out('msg_sent', true);
-                                $draft = array();
-                                delete_uploaded_files($this->session);
+                                $failed = false;
                                 Hm_Msgs::add("Message Sent");
+                                delete_draft($form['draft_id'], $this->session);
+                                delete_uploaded_files($this->session, $form['draft_id']);
                             }
                         }
                     }
@@ -468,7 +505,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                         Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
                     }
                 }
-                $this->session->set('compose_draft', $draft);
+                if ($failed) {
+                    /* HERE */
+                }
             }
             else {
                 Hm_Msgs::add('ERRRequired field missing');
@@ -535,6 +574,29 @@ class Hm_Output_compose_form_attach extends Hm_Output_Module {
 /**
  * @subpackage smtp/output
  */
+class Hm_Output_compose_form_draft_list extends Hm_Output_Module {
+    protected function output() {
+        $drafts = $this->get('compose_drafts', array());
+        if (!count($drafts)) {
+            return;
+        }
+        $res = '<img class="draft_title refresh_list" width="24" height="24" src="'.
+            Hm_Image_Sources::$doc.'" title="'.$this->trans('Drafts').'" alt="'.$this->trans('Drafts').'" />';
+        $res .= '<div class="draft_list">';
+        foreach ($drafts as $id => $draft) {
+            if (trim($draft['draft_subject'])) {
+                $res .= '<div class="draft_'.$this->html_safe($id).'"><a class="draft_link" href="?page=compose&draft_id='.
+                    $this->html_safe($id).'">'.$this->html_safe($draft['draft_subject']).'</a> '.
+                    '<img class="delete_draft" data-id="'.$this->html_safe($id).'" src="'.Hm_Image_Sources::$circle_x.'" /></div>';
+            }
+        }
+        $res .= '</div>';
+        return $res;
+    }
+}
+/**
+ * @subpackage smtp/output
+ */
 class Hm_Output_compose_form_content extends Hm_Output_Module {
     protected function output() {
         $to = '';
@@ -553,6 +615,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
         $smtp_id = false;
+        $draft_id = $this->get('compose_draft_id', 0);
         if (!empty($reply)) {
             list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
                 $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type,
@@ -600,6 +663,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
             '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
+            '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
             '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
             '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).
             '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
@@ -884,11 +948,56 @@ function smtp_refresh_oauth2_token($server, $config) {
 /**
  * @subpackage smtp/functions
  */
-function delete_uploaded_files($session) {
-    foreach ($session->get('uploaded_files', array()) as $file) {
-        @unlink($file['filename']);
+function delete_uploaded_files($session, $draft_id=false, $filename=false) {
+
+    $files = $session->get('uploaded_files', array());
+    $deleted = 0;
+    foreach ($files as $id => $file_list) {
+        foreach ($file_list as $file_id => $file) {
+            if (($draft_id === false && !$filename) || $draft_id === $id || $filename === $file['basename']) {
+                @unlink($file['filename']);
+                $deleted++;
+                if ($filename) {
+                    unset($files[$id][$file_id]);
+                }
+            }
+        }
     }
-    $session->set('uploaded_files', array());
+    if ($draft_id !== false) {
+        if (array_key_exists($draft_id, $files)) {
+            unset($files[$draft_id]);
+        }
+    }
+    elseif ($draft_id === false && !$filename) {
+        $files = array();
+    }
+    $session->set('uploaded_files', $files);
+    return $deleted;
+}
+
+/**
+ * @subpackage/functions
+ */
+function get_uploaded_files($id, $session) {
+    $files = $session->get('uploaded_files', array());
+    if (array_key_exists($id, $files)) {
+        return $files[$id];
+    }
+    return array();
+}
+
+/**
+ * @subpackage/functions
+ */
+function save_uploaded_file($id, $atts, $session) {
+    $files = $session->get('uploaded_files', array());
+    if (array_key_exists($id, $files)) {
+        $files[$id][] = $atts;
+    }
+    else {
+        $files[$id] = array($atts);
+    }
+    $session->set('uploaded_files', $files);
 }
 
 /**
@@ -935,6 +1044,49 @@ function get_primary_recipients($headers, $smtp_servers) {
                 return $user;
             }
         }
+    }
+    return false;
+}
+
+/**
+ * @subpackage/functions
+ */
+function delete_draft($id, $session) {
+    $drafts = $session->get('compose_drafts', array());
+    if (array_key_exists($id, $drafts)) {
+        unset($drafts[$id]);
+        $session->set('compose_drafts', $drafts);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @subpackage smtp/functions
+ */
+function save_draft($atts, $id, $session) {
+    if (!trim($atts['draft_subject'])) {
+        return false;
+    }
+    $drafts = $session->get('compose_drafts', array());
+    if ($id !== false) {
+        $drafts[$id] = $atts;
+    }
+    else {
+        $drafts[] = $atts;
+        $id = count($drafts) - 1;
+    }
+    $session->set('compose_drafts', $drafts);
+    return $id;
+}
+
+/**
+ * @subpackage smtp/functions
+ */
+function get_draft($id, $session) {
+    $drafts = $session->get('compose_drafts', array());
+    if (array_key_exists($id, $drafts)) {
+        return $drafts[$id];
     }
     return false;
 }

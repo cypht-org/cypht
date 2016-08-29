@@ -15,3 +15,7 @@
 .uploaded_files { width: 1%;  margin-left: 5px; }
 .uploaded_files td { padding-right: 10px; white-space: nowrap; }
 .uploaded_files img { opacity: .5; }
+.draft_list { z-index: 100; border-left: solid 1px #ede8e6; border-bottom: solid 1px #ede8e6; position: absolute; right: 0px; top: 55px; background-color: #fafafa; font-size: 85%; padding: 30px; padding-top: 10px; display: none;}
+.draft_title { position: absolute; top: 10px; right: 10px; }
+.draft_list a { font-size: 115%; padding-right: 10px; }
+.draft_list img { float: right; opacity: .4; vertical-align: -3px; cursor: pointer; }

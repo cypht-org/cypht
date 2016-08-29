@@ -11,6 +11,7 @@ add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_smtp
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('compose', 'compose_form_start', true, 'smtp', 'content_section_start', 'after');
+add_output('compose', 'compose_form_draft_list', true, 'smtp', 'compose_form_start', 'before');
 add_output('compose', 'compose_form_content', true, 'smtp', 'compose_form_start', 'after');
 add_output('compose', 'compose_form_end', true, 'smtp', 'compose_form_content', 'after');
 add_output('compose', 'compose_form_attach', true, 'smtp', 'compose_form_end', 'after');
@@ -70,6 +71,9 @@ add_handler('ajax_smtp_delete_attachment', 'save_user_data',  true, 'core');
 add_handler('ajax_smtp_delete_attachment', 'date', true, 'core');
 add_handler('ajax_smtp_delete_attachment', 'http_headers', true, 'core');
 
+setup_base_ajax_page('ajax_smtp_delete_draft', 'core');
+add_handler('ajax_smtp_delete_draft', 'process_delete_draft', true, 'smtp', 'load_user_data', 'after');
+
 /* folder list link */
 add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'logout_menu_item', 'before');
 add_handler('ajax_hm_folders', 'smtp_auto_bcc_check',  true, 'smtp', 'load_imap_servers_from_config', 'after');
@@ -81,16 +85,20 @@ return array(
         'ajax_smtp_debug',
         'ajax_smtp_save_draft',
         'ajax_smtp_attach_file',
-        'ajax_smtp_delete_attachment'
+        'ajax_smtp_delete_attachment',
+        'ajax_smtp_delete_draft'
     ),
     'allowed_get' => array(
         'reply' => FILTER_VALIDATE_INT,
         'reply_all' => FILTER_VALIDATE_INT,
         'forward' => FILTER_VALIDATE_INT,
+        'draft_id' => FILTER_VALIDATE_INT,
         'compose_to' => FILTER_SANITIZE_STRING,
     ),
     'allowed_output' => array(
-        'file_details' => array(FILTER_UNSAFE_RAW, false)
+        'file_details' => array(FILTER_UNSAFE_RAW, false),
+        'draft_subject' => array(FILTER_SANITIZE_STRING, false),
+        'draft_id' => array(FILTER_VALIDATE_INT, false)
     ),
     'allowed_post' => array(
         'attachment_id' => FILTER_SANITIZE_STRING,
@@ -112,17 +120,19 @@ return array(
         'compose_msg_path' => FILTER_SANITIZE_STRING,
         'compose_msg_uid' => FILTER_VALIDATE_INT,
         'compose_body' => FILTER_UNSAFE_RAW,
-        'compose_subject' => FILTER_SANITIZE_STRING,
+        'compose_subject' => FILTER_UNSAFE_RAW,
         'compose_in_reply_to' => FILTER_UNSAFE_RAW,
         'compose_cc' => FILTER_UNSAFE_RAW,
         'compose_bcc' => FILTER_UNSAFE_RAW,
+        'draft_id' => FILTER_VALIDATE_INT,
         'draft_body' => FILTER_UNSAFE_RAW,
-        'draft_subject' => FILTER_SANITIZE_STRING,
+        'draft_subject' => FILTER_UNSAFE_RAW,
         'draft_to' => FILTER_UNSAFE_RAW,
         'draft_smtp' => FILTER_VALIDATE_INT,
         'draft_cc' => FILTER_UNSAFE_RAW,
         'draft_bcc' => FILTER_UNSAFE_RAW,
         'draft_in_reply_to' => FILTER_UNSAFE_RAW,
+        'draft_notice' => FILTER_VALIDATE_BOOLEAN,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
     )
 );
