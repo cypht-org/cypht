@@ -2039,6 +2039,8 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
     else {
         $desc = '';
     }
+    $filename = get_imap_part_name($vals, $id, $part, true);
+    $size = get_imap_size($vals);
     $res = '<tr';
     if ($id == $part) {
         $res .= ' class="selected_part"';
@@ -2051,11 +2053,42 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
     else {
         $res .= $output_mod->html_safe(strtolower($vals['type'])).' / '.$output_mod->html_safe(strtolower($vals['subtype']));
     }
+    $res .= '</td><td>'.$output_mod->html_safe($filename);
+    $res .= '</td><td>'.$output_mod->html_safe($size);
     $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
         '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '').
         '</td><td>'.$output_mod->html_safe($desc).'</td>';
     $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
     return $res;
+}
+
+/*
+ * Get a human readable message size
+ * @param array $vals bodystructure info for this message part
+ * @return string
+ */
+function get_imap_size($vals) {
+    if (!array_key_exists('size', $vals) || !$vals['size']) {
+        return '';
+    }
+    $size = intval($vals['size']);
+    switch (true) {
+        case $size > 1000:
+            $size = $size/1000;
+            $label = 'KB';
+            break;
+        case $size > 1000000:
+            $size = $size/1000000;
+            $label = 'MB';
+            break;
+        case $size > 1000000000:
+            $size = $size/1000000000;
+            $label = 'GB';
+            break;
+        default:
+            $label = 'Bytes';
+    }
+    return sprintf('%s %s', round($size, 2), $label);
 }
 
 /**
@@ -2367,9 +2400,10 @@ function get_imap_mime_extension($type, $subtype) {
  * @param array $struct message part structure
  * @param int $uid message number
  * @param string $part_id message part number
+ * @param bool $no_default don't return a default value
  * @return string
  */
-function get_imap_part_name($struct, $uid, $part_id) {
+function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
     $extension = get_imap_mime_extension(strtolower($struct['type']), strtolower($struct['subtype']));
     if (array_key_exists('file_attributes', $struct) && is_array($struct['file_attributes']) && array_key_exists('attachment', $struct['file_attributes'])) {
         for ($i=0;$i<count($struct['file_attributes']['attachment']);$i++) {
@@ -2396,6 +2430,9 @@ function get_imap_part_name($struct, $uid, $part_id) {
     }
     if (array_key_exists('description', $struct) && trim($struct['description'])) {
         return trim(str_replace(array("\n", ' '), '_', $struct['description'])).$extension;
+    }
+    if ($no_default) {
+        return '';
     }
     return 'message_'.$uid.'_part_'.$part_id.$extension;
 }
