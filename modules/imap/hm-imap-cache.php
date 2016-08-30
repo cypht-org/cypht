@@ -208,15 +208,15 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
             $msg = 'Found cached mailbox state: '.$command;
         }
         elseif (preg_match("/^LIST/ ", $command) && isset($this->cache_data['LIST'][$command])) {
-            $msg = 'Cache hit for: '.$command;
+            $msg = 'IMAP Cache hit for: '.$command;
             $res = $this->cache_data['LIST'][$command];
         }
         elseif (preg_match("/^LSUB /", $command) && isset($this->cache_data['LSUB'][$command])) {
-            $msg = 'Cache hit for: '.$command;
+            $msg = 'IMAP Cache hit for: '.$command;
             $res = $this->cache_data['LSUB'][$command];
         }
         elseif (preg_match("/^NAMESPACE/", $command) && isset($this->cache_data['NAMESPACE'])) {
-            $msg = 'Cache hit for: '.$command;
+            $msg = 'IMAP Cache hit for: '.$command;
             $res = $this->cache_data['NAMESPACE'];
         }
         elseif ($this->selected_mailbox) {
@@ -224,7 +224,7 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
             $box = $this->selected_mailbox['name'];
 
             if (isset($this->cache_data[$box][$command])) {
-                $msg = 'Cache hit for: '.$box.' with: '.$command;
+                $msg = 'IMAP Cache hit for: '.$box.' with: '.$command;
                 $res = $this->cache_data[$box][$command];
             }
         }

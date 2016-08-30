@@ -19,7 +19,7 @@ class Hm_IMAP_List {
     
     use Hm_Server_List;
 
-    public static $use_cache = false;
+    public static $use_cache = true;
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         self::$server_list[$id]['object'] = new Hm_IMAP();
@@ -44,8 +44,12 @@ class Hm_IMAP_List {
             return false;
         }
         $cache = new Hm_Memcached($config);
-        $key = hash('sha256', (sprintf('%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
-        return $cache->get($key, $session->enc_key);
+        $key = hash('sha256', (sprintf('imap%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
+        $res = $cache->get($key, $session->enc_key);
+        if (!$res) {
+            Hm_Debug::add('IMAP cache miss from Memcached');
+        }
+        return $res;
     }
 }
 

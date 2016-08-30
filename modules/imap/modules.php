@@ -742,7 +742,7 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
         if (count($cache) > 0) {
             $total = 0;
             foreach ($cache as $id => $data) {
-                $key = hash('sha256', (sprintf('%s%s%s%s', SITE_ID, $this->session->get('fingerprint'), $id, $this->session->get('username'))));
+                $key = hash('sha256', (sprintf('imap%s%s%s%s', SITE_ID, $this->session->get('fingerprint'), $id, $this->session->get('username'))));
                 $memcache = new Hm_Memcached($this->config);
                 if ($memcache->set($key, $cache[$id], 300, $this->session->enc_key)) {
                     $total++;
