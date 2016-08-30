@@ -300,8 +300,8 @@ class Hm_Output_content_start extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<body><noscript class="noscript">'.
-            $this->trans(sprintf('You Need to have Javascript enabled to use %s, sorry about that!',
-            $this->html_safe($this->get('router_app_name')))).'</noscript>';
+            sprintf($this->trans('You need to have Javascript enabled to use %s, sorry about that!'),
+                $this->html_safe($this->get('router_app_name'))).'</noscript>';
         if (!$this->get('router_login_state')) {
             $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
         }
