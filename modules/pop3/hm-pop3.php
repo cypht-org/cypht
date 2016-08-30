@@ -27,6 +27,10 @@ class Hm_POP3_List {
      */
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         self::$server_list[$id]['object'] = new Hm_POP3();
+        if ($cache && is_array($cache)) {
+            self::$server_list[$id]['object']->load_cache($cache);
+
+        }
         self::$server_list[$id]['object']->server = $server['server'];
         self::$server_list[$id]['object']->port = $server['port'];
         self::$server_list[$id]['object']->ssl = $server['tls'];
@@ -42,11 +46,16 @@ class Hm_POP3_List {
      * Get a server cache
      * @param object $session session object
      * @param int $id server id
-     * @return bool
-     * @todo finish this
+     * @return mixed
      */
-    public static function get_cache($session, $id) {
-        return false;
+    public static function get_cache($session, $config, $id) {
+        $cache = new Hm_Memcached($config);
+        $key = hash('sha256', (sprintf('pop3%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
+        $res = $cache->get($key, $session->enc_key);
+        if (!$res) {
+            Hm_Debug::add('POP3 cache miss from Memcached');
+        }
+        return $res;
     }
 }
 
@@ -207,6 +216,7 @@ class Hm_POP3 extends Hm_POP3_Base {
         $this->responses = array();
         $this->connected = false;
         $this->state = 'started';
+        $this->cache = array();
         $this->handle = false;
     }
 
@@ -241,6 +251,45 @@ class Hm_POP3 extends Hm_POP3_Base {
             }
         }
         return $error;
+    }
+
+    /**
+     * Check for a cached response
+     * @param string $command the POP3 command to check for
+     * @return  mixed
+     */
+    public function check_cache($command) {
+        if (array_key_exists($command, $this->cache)) {
+            Hm_Debug::add('POP3 cache hit for '.$command);
+            return $this->cache[$command];
+        }
+        return false;
+    }
+
+    /**
+     * Cache a response
+     * @param string $command command to cache data for
+     * @param mixed $response data to cache
+     * @return mixed
+     */
+    public function cache_response($command, $response) {
+        $this->cache[$command] = $response;
+        return $response;
+    }
+
+    /**
+     * Dump the cache
+     * @return array
+     */
+    public function dump_cache() {
+        return $this->cache;
+    }
+
+    /**
+     * Load the cache
+     */
+    public function load_cache($data) {
+        $this->cache = $data;
     }
 
     /**
@@ -285,6 +334,10 @@ class Hm_POP3 extends Hm_POP3_Base {
             $multi = false;
             $regex = '/^\+OK (\d+) (\d+)/';
         }
+        $cache = $this->check_cache($command);
+        if ($cache) {
+            return $cache;
+        }
         $this->send_command($command);
         $res = $this->get_response($multi);
         if ($this->is_error($res) == false) {
@@ -294,7 +347,7 @@ class Hm_POP3 extends Hm_POP3_Base {
                 }
             }
         }
-        return $mlist;
+        return $this->cache_response($command, $mlist);
     }
 
     /**
@@ -303,8 +356,13 @@ class Hm_POP3 extends Hm_POP3_Base {
      * @return string
      */
     public function top($id) {
-        $this->send_command('TOP '.$id.' 0');
-        return $this->get_response(true);
+        $command = 'TOP '.$id.' 0';
+        $cache = $this->check_cache($command);
+        if ($cache) {
+            return $cache;
+        }
+        $this->send_command($command);
+        return $this->cache_response($command, $this->get_response(true));
     }
 
     /**
@@ -340,9 +398,14 @@ class Hm_POP3 extends Hm_POP3_Base {
      * @return string
      */
     public function retr_full($id) {
-        $this->send_command('RETR '.$id);
+        $command = 'RETR '.$id;
+        $cache = $this->check_cache($command);
+        if ($cache) {
+            return $cache;
+        }
+        $this->send_command($command);
         $res = $this->get_response(true);
-        return $res;
+        return $this->cache_response($command, $res);
     }
 
     /**
@@ -406,6 +469,10 @@ class Hm_POP3 extends Hm_POP3_Base {
             $multi = false;
             $regex = '/^\+OK (\d+) (.+)/';
         }
+        $cache = $this->check_cache($command);
+        if ($cache) {
+            return $cache;
+        }
         $this->send_command($command);
         $res = $this->get_response($multi);
         if ($this->is_error($res) == false) {
@@ -415,7 +482,7 @@ class Hm_POP3 extends Hm_POP3_Base {
                 }
             }
         }
-        return $uidlist;
+        return $this->cache_response($command, $uidlist);
     }
 
     /**

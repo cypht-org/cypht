@@ -151,7 +151,8 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $date = false;
                 $cutoff_timestamp = strtotime($date);
             }
-            $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
+            $cache = Hm_POP3_List::get_cache($this->session, $this->config, $form['pop3_server_id']);
+            $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
             if ($pop3->state == 'authed') {
@@ -205,7 +206,8 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('pop3_uid', 'pop3_list_path'));
         if ($success) {
             $id = (int) substr($form['pop3_list_path'], 5);
-            $pop3 = Hm_POP3_List::connect($id, false);
+            $cache = Hm_POP3_List::get_cache($this->session, $this->config, $id);
+            $pop3 = Hm_POP3_List::connect($id, $cache);
             $details = Hm_POP3_List::dump($id);
             if ($pop3->state == 'authed') {
                 $msg_lines = $pop3->retr_full($form['pop3_uid']);
@@ -356,35 +358,35 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
 }
 
 /**
- * Load a POP3 cache
- * @subpackage pop3/handler
- */
-class Hm_Handler_load_pop3_cache extends Hm_Handler_Module {
-    /**
-     * Load POP3 cache data from the session
-     * @todo finish this
-     */
-    public function process() {
-        $servers = Hm_POP3_List::dump();
-        $cache = $this->session->get('pop3_cache', array()); 
-        foreach ($servers as $index => $server) {
-            if (isset($cache[$index])) {
-            }
-        }
-    }
-}
-
-/**
  * Save a POP3 server cache
  * @subpackage pop3/handler
  */
 class Hm_Handler_save_pop3_cache extends Hm_Handler_Module {
     /**
      * Save a POP3 server cache in the session
-     * @todo finish this
      *
      */
     public function process() {
+        $cache = array();
+        $servers = Hm_POP3_List::dump(false, true);
+        foreach ($servers as $id => $server) {
+            if (isset($server['object']) && is_object($server['object'])) {
+                $cache[$id] = $server['object']->dump_cache();
+            }
+        }
+        if (count($cache) > 0) {
+            $total = 0;
+            foreach ($cache as $id => $data) {
+                $key = hash('sha256', (sprintf('pop3%s%s%s%s', SITE_ID, $this->session->get('fingerprint'), $id, $this->session->get('username'))));
+                $memcache = new Hm_Memcached($this->config);
+                if ($memcache->set($key, $cache[$id], 300, $this->session->enc_key)) {
+                    $total++;
+                }
+            }
+            if ($total) {
+                Hm_Debug::add(sprintf('Cached data for %d POP3 connections', count($cache)));
+            }
+        }
     }
 }
 
