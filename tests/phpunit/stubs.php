@@ -50,6 +50,7 @@ class Hm_IMAP {
     private $connected = false;
     public function get_state() { if (self::$allow_auth) { return $this->connected ? 'authenticated' : false; } return 'connected'; }
     public function connect() { if (self::$allow_connection) { $this->connected = true; return true; } return false; }
+    public function show_debug() {}
 }
 
 class Hm_POP3 {
@@ -57,6 +58,7 @@ class Hm_POP3 {
     static public $allow_auth = true;
     public function connect() { if (self::$allow_connection) { return true; } return false; }
     public function auth() { if (self::$allow_auth) { return true; } return false; }
+    public function puke() {}
 }
 
 
