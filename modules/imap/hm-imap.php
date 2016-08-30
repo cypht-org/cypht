@@ -271,7 +271,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $this->get_response();
             }
         }
-        if ( $authed ) {
+        if ($authed) {
             $this->debug[] = 'Logged in successfully as '.$username;
             $this->get_capability();
             $this->enable();
@@ -622,9 +622,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             $this->selected_mailbox = array('name' => $box, 'detail' => $result);
             return $this->cache_return_val($result, $command);
 
-        }
-        else {
-            Hm_Debug::add(sprintf('Unselectable folder %s', $box));
         }
         return $result;
     }
