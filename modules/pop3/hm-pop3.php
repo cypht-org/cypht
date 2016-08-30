@@ -215,7 +215,7 @@ class Hm_POP3 extends Hm_POP3_Base {
      * @return string
      */
     public function puke() {
-        return print_r(array_merge($this->debug, $this->commands), true);
+        return print_r(array_merge($this->debug, $this->commands, $this->responses), true);
     }
 
     /**
