@@ -216,12 +216,15 @@ class Hm_Auth_IMAP extends Hm_Auth {
                 return true;
             }
             if ($imap->get_state() != 'connected') {
+                Hm_Debug::add($imap->show_debug(true));
                 Hm_Debug::add(sprintf('Unable to connect to the IMAP auth server %s', $server));
                 return false;
             }
+            Hm_Debug::add($imap->show_debug(true));
             Hm_Debug::add(sprintf('IMAP AUTH failed for %s', $user));
             return false;
         }
+        Hm_Debug::add($imap->show_debug(true));
         Hm_Debug::add('Invalid IMAP auth configuration settings');
         return false;
     }
@@ -291,12 +294,15 @@ class Hm_Auth_POP3 extends Hm_Auth {
                 if ($pop3->auth($user, $pass)) {
                     return true;
                 }
+                Hm_Debug::add($pop3->puke());
                 Hm_Debug::add(sprintf('POP3 AUTH failed for %s', $user));
                 return false;
             }
+            Hm_Debug::add($pop3->puke());
             Hm_Debug::add(sprintf('Unable to connect to the POP3 auth server %s', $server));
             return false;
         }
+        Hm_Debug::add($pop3->puke());
         Hm_Debug::add('Invalid POP3 auth configuration settings');
         return false;
     }
