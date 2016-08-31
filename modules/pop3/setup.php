@@ -5,27 +5,24 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('pop3');
 output_source('pop3');
 
+add_module_to_all_pages('handler', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
+add_module_to_all_pages('handler', 'load_pop3_servers_for_message_list', true, 'pop3', 'load_pop3_servers_from_config', 'after');
+
 /* add stuff to the info page */
-add_handler('info', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('info', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_output('info', 'display_pop3_status', true, 'pop3', 'server_status_start', 'after');
 add_output('info', 'pop3_server_ids', true, 'pop3', 'page_js', 'before');
 
 /* profile page */
-add_handler('profiles', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 
 /* message list page */
-add_handler('message_list', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
-add_handler('message_list', 'load_pop3_servers_for_message_list', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('message_list', 'pop3_message_list_type', true, 'pop3', 'message_list_type', 'after');
 
 /* message view page */
-add_handler('message', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
 add_handler('message', 'pop3_message_list_type', true, 'pop3', 'message_list_type', 'after');
 add_handler('message', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 
 /* servers page */
-add_handler('servers', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('servers', 'process_add_pop3_server', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('servers', 'add_pop3_servers_to_page_data', true, 'pop3', 'process_add_pop3_server', 'after');
 add_handler('servers', 'save_pop3_servers', true, 'pop3', 'add_pop3_servers_to_page_data', 'after');
@@ -33,16 +30,13 @@ add_output('servers', 'add_pop3_server_dialog', true, 'pop3', 'server_content_st
 add_output('servers', 'display_configured_pop3_servers', true, 'pop3', 'add_pop3_server_dialog', 'after');
 
 /* compose page */
-add_handler('compose', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('compose', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 
 /* search page */
-add_handler('search', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('search', 'load_pop3_servers_for_search', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 add_handler('search', 'pop3_message_list_type', true, 'pop3', 'message_list_type', 'after');
 
 /* not found */
-add_handler('notfound', 'load_pop3_servers_from_config', true, 'pop3', 'language', 'after');
 add_handler('notfound', 'add_pop3_servers_to_page_data', true, 'pop3', 'load_pop3_servers_from_config', 'after');
 
 /* folder list */
@@ -144,6 +138,7 @@ return array(
         'pop3_uid' => FILTER_VALIDATE_INT,
         'pop3_limit' => FILTER_VALIDATE_INT,
         'pop3_since' => FILTER_SANITIZE_STRING,
+        'pop3_unread_only' => FILTER_VALIDATE_BOOLEAN,
         'pop3_search' => FILTER_VALIDATE_INT,
     )
 );

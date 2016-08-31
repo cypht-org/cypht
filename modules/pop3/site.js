@@ -226,6 +226,28 @@ var update_pop3_search_result = function(res) {
     Hm_Message_List.update(ids, res.formatted_message_list, 'pop3');
 };
 
+var pop3_unread_background = function(id) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},
+        {'name': 'pop3_unread_only', 'value': 1},
+        {'name': 'pop3_server_id', 'value': id}],
+        update_pop3_unread_display_background
+    );
+    return false;
+};
+
+var update_pop3_unread_display_background = function(res) {
+    var ids = [res.pop3_server_id];
+    var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
+    var count = $('tr', cache).length;
+    globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'pop3', cache);
+    Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
+    if ($('tr', cache).length > count) {
+        $('.menu_unread > a').css('font-weight', 'bold');
+        Hm_Folders.save_folder_list();
+    }
+};
+
 var pop3_combined_unread_content = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_pop3_folder_display'},

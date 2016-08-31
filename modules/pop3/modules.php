@@ -127,7 +127,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $date = process_since_argument($since);
                 $cutoff_timestamp = strtotime($date);
             }
-            elseif ($this->get('list_path') == 'unread') {
+            elseif ($this->get('list_path') == 'unread' || (array_key_exists('pop3_unread_only', $this->request->post) && $this->request->post['pop3_unread_only'])) {
                 $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
                 $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
                 $unread_only = true;
@@ -440,6 +440,9 @@ class Hm_Handler_load_pop3_servers_for_message_list extends Hm_Handler_Module {
                     $server_id = $matches[1];
                     $callback = 'load_pop3_list';
                 }
+                else {
+                    $callback = 'pop3_unread_background';
+                }
                 break;
         }
         if ($callback) {
@@ -447,7 +450,12 @@ class Hm_Handler_load_pop3_servers_for_message_list extends Hm_Handler_Module {
                 if ($server_id !== false && $server_id != $index) {
                     continue;
                 }
-                $this->append('data_sources', array('callback' => $callback, 'type' => 'pop3', 'name' => $vals['name'], 'id' => $index));
+                if ($callback == 'pop3_unread_background') {
+                    $this->append('data_sources', array('callback' => $callback, 'group' => 'background', 'type' => 'pop3', 'name' => $vals['name'], 'id' => $index));
+                }
+                else {
+                    $this->append('data_sources', array('callback' => $callback, 'type' => 'pop3', 'name' => $vals['name'], 'id' => $index));
+                }
             }
         }
     }
