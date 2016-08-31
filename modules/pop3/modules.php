@@ -151,7 +151,10 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
                 $date = false;
                 $cutoff_timestamp = strtotime($date);
             }
-            $cache = Hm_POP3_List::get_cache($this->session, $this->config, $form['pop3_server_id']);
+            $cache = false;
+            if (!$unread_only) {
+                $cache = Hm_POP3_List::get_cache($this->session, $this->config, $form['pop3_server_id']);
+            }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
