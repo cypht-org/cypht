@@ -155,6 +155,9 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             if (!$unread_only) {
                 $cache = Hm_POP3_List::get_cache($this->session, $this->config, $form['pop3_server_id']);
             }
+            if ($cache) {
+                $this->out('pop3_cache_used', true);
+            }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
@@ -371,6 +374,9 @@ class Hm_Handler_save_pop3_cache extends Hm_Handler_Module {
      */
     public function process() {
         $cache = array();
+        if ($this->get('pop3_cache_used')) {
+            return;
+        }
         $servers = Hm_POP3_List::dump(false, true);
         foreach ($servers as $id => $server) {
             if (isset($server['object']) && is_object($server['object'])) {

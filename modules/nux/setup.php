@@ -29,7 +29,6 @@ add_handler('ajax_nux_add_service', 'language',  true, 'core');
 add_handler('ajax_nux_add_service', 'date', true, 'core');
 add_handler('ajax_nux_add_service', 'http_headers', true, 'core');
 
-add_handler('home', 'load_pop3_servers_from_config', true, 'pop3', 'load_user_data', 'after');
 add_handler('home', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 add_handler('home', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
 
