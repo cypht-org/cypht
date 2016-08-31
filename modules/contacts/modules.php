@@ -237,19 +237,63 @@ function build_contact_detail($output_mod, $contact, $id) {
     $contacts = $contact->export();
     ksort($contacts);
     foreach ($contacts as $name => $val) {
+        elog($val);
         if ($name == 'all_fields') {
             $all_fields = $val;
             continue;
         }
-        $res .= '<tr><th>'.$output_mod->trans(ucfirst(strtolower(str_replace('_', ' ', $name)))).'</th>';
+        $res .= '<tr><th>'.$output_mod->trans(name_map($name)).'</th>';
         $res .= '<td class="'.$output_mod->html_safe($name).'">'.$output_mod->html_safe($val).'</td></tr>';
     }
     if ($all_fields) {
         foreach ($all_fields as $name => $val) {
-            $res .= '<tr><th>'.$output_mod->trans(ucfirst(strtolower(str_replace('_', ' ', $name)))).'</th>';
+            if (in_array($name, array(0, 'objectclass', 'dn', 'ID', 'APP:EDITED', 'UPDATED'), true)) {
+                continue;
+            }
+            $res .= '<tr><th>'.$output_mod->trans(name_map($name)).'</th>';
             $res .= '<td>'.$output_mod->html_safe($val).'</td></tr>';
         }
     }
     $res .= '</tbody></table></div>';
     return $res;
+}
+
+/**
+ * @subpackage contacts/functions
+ */
+function name_map($val) {
+    $names = array(
+        'display_name' => 'Display name',
+        'givenname' => 'Given name',
+        'GD:GIVENNAME' => 'Given name',
+        'GD:FAMILYNAME' => 'Surname',
+        'sn' => 'Surname',
+        'displayname' => 'Display name',
+        'mail' => 'E-mail',
+        'source' => 'Source',
+        'email_address' => 'E-mail',
+        'l' => 'Locality',
+        'st' => 'State',
+        'street' => 'Street',
+        'postalcode' => 'Postal code',
+        'title' => 'Title',
+        'TITLE' => 'Title',
+        'phone_number' => 'Telephone number',
+        'telephonenumber' => 'Telephone number',
+        'facsimiletelephonenumber' => 'Fax number',
+        'mobile' => 'Mobile number',
+        'roomnumber' => 'Room number',
+        'carlicense' => 'Vehicle License',
+        'o' => 'Organization',
+        'ou' => 'Organizational Unit',
+        'departmentnumber' => 'Department Number',
+        'employeenumber' => 'Employee Number',
+        'employeetype' => 'Employee Type',
+        'preferredlanguage' => 'Preferred Language',
+        'labeleduri' => 'Homepage URL'
+    );
+    if (array_key_exists($val, $names)) {
+        return $names[$val];
+    }
+    return $val;
 }

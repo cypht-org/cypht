@@ -166,7 +166,6 @@ if (hm_page_name() == 'contacts') {
         return false;
     });
     $('.show_contact').click(function() {
-        $('.contact_detail_row').hide();
         $('#'+$(this).data('id')).toggle();
         return false;
     });
