@@ -170,7 +170,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$person.'" /></a> '.
                     ($contact->value('source') ? $this->html_safe($contact->value('source')) : $this->trans('local')).
                     '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
-                    '<td>'.$this->html_safe($contact->value('email_address')).'</td>'.
+                    '<td><div class="contact_fld">'.$this->html_safe($contact->value('email_address')).'</div></td>'.
                     '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
                     '<td class="contact_controls">';
                 if (in_array($contact->value('source'), $editable, true)) {
