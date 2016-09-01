@@ -10,3 +10,4 @@ apigen4.sh
 commit_check.sh
 website/docs
 tests/phpunit/data/testuser.txt
+website
