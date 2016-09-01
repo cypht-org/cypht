@@ -424,6 +424,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
         }
         $repo_id = $this->get('github_data_source_id');
         $repo = $this->get('github_data_source', 'Github');
+        $repo = explode('/', $repo);
+        $repo = $repo[1];
         $cutoff = $this->get('github_list_since', '');
         if ($cutoff) {
             $cutoff = strtotime($cutoff);
