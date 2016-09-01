@@ -904,6 +904,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
             $flags = array();
         }
         else {
+            $icon = 'env_closed';
             $flags = array('unseen');
         }
         $row_class .= ' '.str_replace(' ', '_', $msg['server_name']);
