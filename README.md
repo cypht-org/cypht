@@ -7,7 +7,7 @@ father's webmail. Cypht is like a news reader, but for E-mail. Cypht does not
 replace your existing accounts - it combines them into one. And it's also a
 news reader.
 
-![alt text](https://github.com/jasonmunro/hm3/blob/master/website/cypht_shot1.png "Unread View").
+![alt text](https://github.com/jasonmunro/cypht-website/blob/master/cypht_shot1.png "Unread View").
 
 The driving force behind Cypht development is to provide combined views for
 multiple accounts, but it's also a standard E-mail client that lets you browse
