@@ -54,6 +54,6 @@
     </filter>
 
     <logging>
-        <log type="coverage-html" target="../../docs/test_coverage/" charset="UTF-8" highlight="false" lowUpperBound="75" highLowerBound="99"/>
+        <log type="coverage-html" target="../../website/docs/test_coverage/" charset="UTF-8" highlight="false" lowUpperBound="75" highLowerBound="99"/>
     </logging>
 </phpunit>
