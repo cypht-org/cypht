@@ -507,6 +507,13 @@ return array(
     'WordPress.com Settings' => false,
     'You have elected to not store passwords between logins.' => false,
     'begin forwarded message' => false,
+    'Employee Type' => false,
+    'Given Name' => false,
+    'Homepage URL' => false,
+    'Organizational Unit' => false,
+    'Preferred Language' => false,
+    'Surname' => false,
+    'Vehicle License' => false
 ); 
 
 ?>
