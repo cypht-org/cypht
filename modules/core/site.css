@@ -55,6 +55,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 300px; border-radius: 0px 0px 10px 0px; margin: 0px; background-color: #f5f5f5; width: 300px; padding-left: 20px; }
 .screen_reader { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
+#username, #password { width: 200px; }
 .err { color: red !important; }
 .debug { color: teal; font-size: 75%; float: right; clear: both; margin: 20px; }
 .inner_list a { padding-right: 5px; }
@@ -139,8 +140,8 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .email_setting, .all_setting, .unread_setting, .flagged_setting, .general_setting { display: none; }
 .configured_server, .add_server { margin-top: 10px; color: #666; background-color: #fff; margin-bottom: 20px; padding: 10px; width: 200px; }
 .message_list { min-height: 600px; background-color: #fff; height: 100%; padding-bottom: 20px; }
-.configured_server { float: left; margin-left: 25px; width: 230px; height: 220px; }
-.add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; height: 220px; }
+.configured_server { float: left; margin-left: 25px; width: 230px; }
+.add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
 .list_sources { z-index: 100; border-left: solid 1px #ede8e6; border-bottom: solid 1px #ede8e6; position: absolute; right: 0px; top: 54px; background-color: #fafafa; font-size: 85%; padding: 30px; padding-top: 10px; display: none;}
 .list_src { color: #666; margin-bottom: 10px; }
