@@ -76,7 +76,9 @@ class Hm_Dispatch {
      * @return bool
      */
     public function check_for_tls_redirect() {
-        if (!$this->request->tls && !$this->site_config->get('disable_tls', false) &&array_key_exists('SERVER_NAME', $this->request->server) && array_key_exists('REQUEST_URI', $this->request->server)) {
+        if (!$this->request->tls && !$this->site_config->get('disable_tls', false) &&
+            array_key_exists('SERVER_NAME', $this->request->server) && array_key_exists('REQUEST_URI', $this->request->server)) {
+            Hm_Debug::add('Page redirected to HTTPS. See "disable_tls" in the ini file to change this behavior');
             return Hm_Dispatch::page_redirect('https://'.$this->request->server['SERVER_NAME'].$this->request->server['REQUEST_URI']);
         }
         return false;
