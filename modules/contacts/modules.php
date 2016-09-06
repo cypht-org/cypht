@@ -237,7 +237,6 @@ function build_contact_detail($output_mod, $contact, $id) {
     $contacts = $contact->export();
     ksort($contacts);
     foreach ($contacts as $name => $val) {
-        elog($val);
         if ($name == 'all_fields') {
             $all_fields = $val;
             continue;
