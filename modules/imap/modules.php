@@ -1839,7 +1839,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         else {
             $results .= $output_mod->html_safe($folder['basename']);
         }
-        $results .= '</li>';
+        $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span></li>';
     }
     $results .= '</ul>';
     return $results;

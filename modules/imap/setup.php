@@ -259,6 +259,7 @@ return array(
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_STRING, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
+        'unread_count' => array(FILTER_VALIDATE_INT, false)
     ),
 
     'allowed_get' => array(
