@@ -765,9 +765,21 @@ function Message_List() {
 /* folder list */
 var Hm_Folders = {
     expand_after_update: false,
+    unread_counts: {},
 
     save_folder_list: function() {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+    },
+    update_unread_counts: function(folder) {
+        if (folder) {
+            $('.unread_'+folder).text('['+Hm_Folders.unread_counts[folder]+']');
+        }
+        else {
+            var name;
+            for (name in Hm_Folders.unread_counts) {
+                $('.unread_'+name).text('['+Hm_Folders.unread_counts[name]+']');
+            }
+        }
     },
     open_folder_list: function() {
         $('.folder_list').show();
