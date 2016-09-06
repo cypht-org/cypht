@@ -424,8 +424,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
         }
         $repo_id = $this->get('github_data_source_id');
         $repo = $this->get('github_data_source', 'Github');
-        $repo = explode('/', $repo);
-        $repo = $repo[1];
+        $repo_parts = explode('/', $repo);
+        $repo_name = $repo_parts[1];
         $cutoff = $this->get('github_list_since', '');
         if ($cutoff) {
             $cutoff = strtotime($cutoff);
@@ -478,13 +478,13 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             if ($this->get('is_mobile')) {
                 $style = 'news';
             }
-            $row_class .= ' '.$repo;
+            $row_class .= ' '.$repo_name;
             if ($style == 'news') {
                 $res[$id] = message_list_row(array(
                         array('checkbox_callback', $id),
                         array('icon_callback', $flags),
                         array('subject_callback', $subject, $url, $flags, 'code'),
-                        array('safe_output_callback', 'source', $repo),
+                        array('safe_output_callback', 'source', $repo_name),
                         array('safe_output_callback', 'from', $from),
                         array('date_callback', human_readable_interval($date), $ts),
                     ),
@@ -497,7 +497,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             else {
                 $res[$id] = message_list_row(array(
                         array('checkbox_callback', $id),
-                        array('safe_output_callback', 'source', $repo, 'code'),
+                        array('safe_output_callback', 'source', $repo_name, 'code'),
                         array('safe_output_callback', 'from', $from),
                         array('subject_callback', $subject, $url, $flags),
                         array('date_callback', human_readable_interval($date), $ts),
