@@ -345,7 +345,7 @@ var setup_imap_folder_page = function() {
     if (cache_details[1]) {
         $('.page_links').html(cache_details[1]);
     }
-    select_imap_folder(hm_list_path());
+    Hm_Timer.add_job(function() { select_imap_folder(hm_list_path()); }, 60);
     $('.remove_source').click(remove_imap_combined_source);
     $('.add_source').click(add_imap_combined_source);
     $('.refresh_link').click(function() { select_imap_folder(hm_list_path()); });
