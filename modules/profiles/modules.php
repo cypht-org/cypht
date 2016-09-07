@@ -21,6 +21,7 @@ class Hm_Handler_profile_edit_data extends Hm_Handler_Module {
             $accounts = $this->get('account_profiles');
             if (count($accounts) > $id) {
                 $this->out('edit_profile', $accounts[$id]);
+                $this->out('default_email_domain', $this->config->get('default_email_domain'));
                 $this->out('edit_profile_id', $id);
             }
         }
@@ -146,10 +147,14 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
         $smtp_servers = $this->get('smtp_servers', array());
         if ($this->get('edit_profile')) {
             $used = $this->get('used_smtp_servers', array());
+            $domain = $this->get('default_email_domain');
             $data = $this->get('edit_profile');
             $id = $this->get('edit_profile_id');
             $profile = $data['profile_details'];
             if (!$profile['profile_replyto']) {
+                if ($domain && !is_email($data['user'])) {
+                    $data['user'] = $data['user'].'@'.$domain;
+                }
                 $profile['profile_replyto'] = $data['user'];
             }
             $res .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />';

@@ -473,6 +473,15 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                             }
                         }
                     }
+                    $domain = $this->config->get('default_email_domain');
+                    if ($domain) {
+                        if (!is_email($from)) {
+                            $from = $from.'@'.$domain;
+                        }
+                        if (!is_email($reply_to)) {
+                            $reply_to = $reply_to.'@'.$domain;
+                        }
+                    }
                     $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
                     if ($smtp && $smtp->state == 'authed') {
                         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0),
