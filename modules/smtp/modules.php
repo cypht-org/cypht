@@ -461,6 +461,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     if (array_key_exists($form['smtp_server_id'], $profiles)) {
                         $from_name = $profiles[$form['smtp_server_id']]['profile_name'];
                         $reply_to = $profiles[$form['smtp_server_id']]['profile_replyto'];
+                        if (array_key_exists('profile_address', $profiles[$form['smtp_server_id']]) &&
+                            trim($profiles[$form['smtp_server_id']]['profile_address'])) {
+                            $from = $profiles[$form['smtp_server_id']]['profile_address'];
+                        }
                     }
                     if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
                         $results = smtp_refresh_oauth2_token($smtp_details, $this->config);

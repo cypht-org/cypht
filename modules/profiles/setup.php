@@ -29,6 +29,7 @@ return array(
         'profile_replyto' => FILTER_SANITIZE_STRING,
         'profile_smtp' => FILTER_VALIDATE_INT,
         'profile_default' => FILTER_VALIDATE_INT,
+        'profile_address' => FILTER_SANITIZE_STRING,
         'profile_sig' => FILTER_UNSAFE_RAW
     ),
 );
