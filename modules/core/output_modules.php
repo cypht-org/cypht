@@ -960,7 +960,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             '</a><span class="combined_inbox_count"></span></li>';
         $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" '.
-            'width="16" height="16" /> '.$this->trans('Unread').'</a></li>';
+            'width="16" height="16" /> '.$this->trans('Unread').'</a><span class="total_unread_count"></span></li>';
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
             '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$this->trans('Flagged').
             '</a> <span class="flagged_count"></span></li>';

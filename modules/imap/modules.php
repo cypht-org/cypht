@@ -99,6 +99,7 @@ class Hm_Handler_imap_mark_as_answered extends Hm_Handler_Module {
                     $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $path[1]);
                     $imap = Hm_IMAP_List::connect($path[1], $cache);
                     if ($imap && $imap->select_mailbox(hex2bin($path[2]))) {
+                        $this->out('folder_status', array('imap_'.$path[1].'_'.$path[2] => $imap->folder_state));
                         $imap->message_action('ANSWERED', array($form['compose_msg_uid']));
                     }
                 }
@@ -118,6 +119,7 @@ class Hm_Handler_imap_mark_as_read extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if ($imap && $imap->select_mailbox(hex2bin($form['folder']))) {
+                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
                 $imap->message_action('READ', array($form['imap_msg_uid']));
             }
         }
@@ -364,6 +366,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                 if ($imap->selected_mailbox) {
                     $this->out('imap_folder_detail', array_merge($imap->selected_mailbox, array('offset' => $offset, 'limit' => $limit)));
                 }
+                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
             }
             $this->out('imap_mailbox_page', $msgs);
             $this->out('list_page', $list_page);
@@ -408,6 +411,7 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
+                    $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
                     if ($imap->message_action('DELETE', array($form['imap_msg_uid']))) {
                         $del_result = true;
                         $imap->message_action('EXPUNGE', array($form['imap_msg_uid']));
@@ -445,6 +449,7 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
+                    $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
                     if ($form['imap_flag_state'] == 'flagged') {
                         $cmd = 'UNFLAG';
                     }
@@ -478,12 +483,14 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 $ids = process_imap_message_ids($form['message_ids']);
                 $errs = 0;
                 $msgs = 0;
+                $status = array();
                 foreach ($ids as $server => $folders) {
                     $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $server);
                     $imap = Hm_IMAP_List::connect($server, $cache);
                     if (is_object($imap) && $imap->get_state() == 'authenticated') {
                         foreach ($folders as $folder => $uids) {
                             if ($imap->select_mailbox(hex2bin($folder))) {
+                                $status['imap_'.$form['imap_server_id'].'_'.$form['folder']] = $imap->folder_state;
                                 if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
                                     $errs++;
                                 }
@@ -499,6 +506,9 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
                 if ($errs > 0) {
                     Hm_Msgs::add(sprintf('ERRAn error occurred trying to %s some messages!', $form['imap_action_type'], $server));
+                }
+                if (count($status) > 0) {
+                    $this->out('folder_state', $status);
                 }
             }
         }
@@ -525,8 +535,9 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
             $this->out('imap_search_results', $msg_list);
+            $this->out('folder_status', $status);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
     }
@@ -550,7 +561,7 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date), true);
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date), true);
             $folders = array();
             foreach ($msg_list as $msg) {
                 if (hex2bin($msg['folder']) != hex2bin($folder)) {
@@ -561,6 +572,7 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
                 $auto_folder = $folders[0];
                 $this->out('auto_sent_folder', $msg_list[0]['server_name'].' '.$auto_folder);
             }
+            $this->out('folder_status', $status);
             $this->out('imap_sent_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
@@ -591,7 +603,8 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            $msg_list = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            $this->out('folder_status', $status);
             $this->out('imap_combined_inbox_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
@@ -616,7 +629,8 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            $msg_list = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            $this->out('folder_status', $status);
             $this->out('imap_flagged_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
@@ -672,7 +686,8 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            $msg_list = merge_imap_search_results($ids, 'UNSEEN', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'UNSEEN', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            $this->out('folder_status', $status);
             $this->out('imap_unread_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
@@ -1080,6 +1095,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             if ($imap) {
                 $imap->read_only = $prefetch;
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
+                    $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
                     $msg_struct = $imap->get_message_structure($form['imap_msg_uid']);
                     $this->out('msg_struct', $msg_struct);
                     if ($part !== false) {
@@ -2148,6 +2164,7 @@ function merge_imap_search_results($ids, $search_type, $session, $config, $folde
     $msg_list = array();
     $connection_failed = false;
     $sent_results = array();
+    $status = array();
     foreach($ids as $index => $id) {
         $id = intval($id);
         $cache = Hm_IMAP_List::get_cache($session, $config, $id);
@@ -2158,10 +2175,12 @@ function merge_imap_search_results($ids, $search_type, $session, $config, $folde
             if ($sent) {
                 $sent_folder = $imap->get_special_use_mailboxes('sent');
                 if (array_key_exists('sent', $sent_folder)) {
-                    $sent_results = merge_imap_search_results($ids, $search_type, $session, $config, array($sent_folder['sent']), $limit, $terms, false);
+                    list($sent_status, $sent_results) = merge_imap_search_results($ids, $search_type, $session, $config, array($sent_folder['sent']), $limit, $terms, false);
+                    $status = array_merge($status, $sent_status);
                 }
             }
             if ($imap->select_mailbox($folder)) {
+                $status['imap_'.$id.'_'.bin2hex($folder)] = $imap->folder_state;
                 if (!empty($terms)) {
                     if ($sent) {
                         $msgs = $imap->search($search_type, false, $terms, array(), true, false, true);
@@ -2197,13 +2216,14 @@ function merge_imap_search_results($ids, $search_type, $session, $config, $folde
             $connection_failed = true;
         }
     }
+    $session->set('imap_folder_status', $status);
     if ($connection_failed && empty($msg_list)) {
-        return array(false);
+        return array(array(), false);
     }
     if (count($sent_results) > 0) {
         $msg_list = array_merge($msg_list, $sent_results);
     }
-    return $msg_list;
+    return array($status, $msg_list);
 }
 
 /**

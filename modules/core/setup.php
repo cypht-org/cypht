@@ -155,6 +155,7 @@ return array(
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),
         'page_links' => array(FILTER_UNSAFE_RAW, false),
+        'folder_status' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_SANITIZE_STRING,

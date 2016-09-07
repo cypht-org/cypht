@@ -147,6 +147,12 @@ var Hm_Ajax_Request = function() { return {
             if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
                 Hm_Notices.show(res.router_user_msgs);
             }
+            if (res.folder_status) {
+                for (var name in res.folder_status) {
+                    Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
+                    Hm_Folders.update_unread_counts();
+                }
+            }
             if (this.callback) {
                 this.callback(res);
             }
@@ -286,7 +292,6 @@ var Hm_Timer = {
 
 /* message list */
 function Message_List() {
-
     var self = this;
     this.sources = [];
     this.deleted = [];
@@ -746,6 +751,10 @@ function Message_List() {
         }
         $('.total').text($('.message_table tbody tr').length);
         self.update_title();
+        if (list_type == 'formatted_unread_data') {
+            $('.total_unread_count').html('&#160;'+$('.message_table tbody tr').length+'&#160;');
+            Hm_Folders.save_folder_list();
+        }
     };
 
     this.set_checkbox_callback = function() {
@@ -770,16 +779,29 @@ var Hm_Folders = {
     save_folder_list: function() {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
     },
+    load_unread_counts: function() {
+        var res = Hm_Utils.json_decode(Hm_Utils.get_from_local_storage('unread_counts'));
+        if (!res) {
+            Hm_Folders.unread_counts = {};
+        }
+        else {
+            Hm_Folders.unread_counts = res;
+        }
+    },
     update_unread_counts: function(folder) {
         if (folder) {
-            $('.unread_'+folder).text('['+Hm_Folders.unread_counts[folder]+']');
+            $('.unread_'+folder).html('&#160;'+Hm_Folders.unread_counts[folder]+'&#160;');
         }
         else {
             var name;
             for (name in Hm_Folders.unread_counts) {
-                $('.unread_'+name).text('['+Hm_Folders.unread_counts[name]+']');
+                if (!Hm_Folders.unread_counts[name]) {
+                    Hm_Folders.unread_counts[name] = 0;
+                }
+                $('.unread_'+name).html('&#160;'+Hm_Folders.unread_counts[name]+'&#160;');
             }
         }
+        Hm_Utils.save_to_local_storage('unread_counts', Hm_Utils.json_encode(Hm_Folders.unread_counts));
     },
     open_folder_list: function() {
         $('.folder_list').show();
@@ -905,6 +927,8 @@ var Hm_Folders = {
             }
             Hm_Folders.hl_selected_menu();
             Hm_Folders.folder_list_events();
+            Hm_Folders.load_unread_counts();
+            Hm_Folders.update_unread_counts();
             return true;
         }
         return false;
@@ -1232,6 +1256,7 @@ var elog = function(val) {
         console.log(val);
     }
 };
+
 var hl_save_link = function() {
     if ($('.save_reminder').length) {
         $('.menu_save a').css('font-weight', 'bold');

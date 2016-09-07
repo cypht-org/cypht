@@ -169,7 +169,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .home_password_dialogs { min-height: 400px; max-width: 480px; padding: 20px; margin: 20px; margin-right: 0px; float: left; border: solid 1px #eee; }
 .home_password_dialogs .pw_input { width: 120px; }
 .nux_title { font-size: 120%; margin-bottom: 20px; }
-.unread_count { float: right; color: #111; }
+.total_unread_count, .unread_count { background-color: #ccc; font-size: 90%; margin-left: 10px; padding: 0px; font-weight: bold; font-variant: small-caps; color: #fff; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }

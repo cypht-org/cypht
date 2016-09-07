@@ -370,6 +370,7 @@ var expand_imap_mailbox = function(res) {
         $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.email_folders')).append(res.imap_expanded_folder_formatted);
         $('.imap_folder_link', $('.email_folders')).unbind('click');
         $('.imap_folder_link', $('.email_folders')).click(function() { return expand_imap_folders($(this).data('target')); });
+        Hm_Folders.update_unread_counts();
     }
 };
 
@@ -575,12 +576,12 @@ var imap_background_unread_content_result = function(res) {
     var count = $('tr', cache).length;
     globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'imap', cache);
     Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
+    $('.total_unread_count').html('&#160;'+count+'&#160;');
     if ($('tr', cache).length > count) {
         $('.menu_unread > a').css('font-weight', 'bold');
         Hm_Folders.save_folder_list();
     }
 };
-
 
 var check_select_for_imap = function() {
     $('input[type=checkbox]').unbind('change'); 

@@ -149,6 +149,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     /* used for message part content streaming */
     private $stream_size = 0;
 
+    /* current selected mailbox status */
+    public $folder_state = false;
+
     /**
      * constructor
      */
@@ -575,12 +578,12 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     /**
      * select a mailbox
      * @param string $mailbox the mailbox to attempt to select
-     * @return array list of information about the selected mailbox
      */
     public function select_mailbox($mailbox) {
         if (isset($this->selected_mailbox['name']) && $this->selected_mailbox['name'] == $mailbox) {
             return $this->poll();
         }
+        $this->folder_state = $this->get_mailbox_status($mailbox);
         $box = $this->utf7_encode(str_replace('"', '\"', $mailbox));
         if (!$this->is_clean($box, 'mailbox')) {
             return false;
