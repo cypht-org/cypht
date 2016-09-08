@@ -490,7 +490,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                     if (is_object($imap) && $imap->get_state() == 'authenticated') {
                         foreach ($folders as $folder => $uids) {
                             if ($imap->select_mailbox(hex2bin($folder))) {
-                                $status['imap_'.$form['imap_server_id'].'_'.$form['folder']] = $imap->folder_state;
+                                $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
                                 if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
                                     $errs++;
                                 }
