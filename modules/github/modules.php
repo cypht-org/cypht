@@ -790,8 +790,6 @@ function github_parse_payload($data, $output_mod) {
     $data = $data['payload'];
     $content = payload_search($data);
     $res = '<div class="msg_text_inner">';
-    elog($type);
-    elog($content);
     foreach ($content as $vals) {
         $res .= '<div class="github_para">';
         if (array_key_exists('body', $vals)) {
