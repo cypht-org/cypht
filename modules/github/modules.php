@@ -401,7 +401,7 @@ class Hm_Output_github_folders extends Hm_Output_Module {
             foreach ($this->get('github_repos', array()) as $repo) {
                 $res .= '<li class="menu_github_'.$this->html_safe($repo).'"><a class="unread_link" href="?page=message_list&list_path=github_'.$this->html_safe($repo).'">'.
                     '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
-                    '" alt="" width="16" height="16" /> '.$this->html_safe(urldecode($repo)).'</a></li>';
+                    '" alt="" width="16" height="16" /> '.$this->html_safe(explode('/', urldecode($repo))[1]).'</a></li>';
             }
             $this->append('folder_sources', array('github_folders', $res));
         }
@@ -790,15 +790,41 @@ function github_parse_payload($data, $output_mod) {
     $data = $data['payload'];
     $content = payload_search($data);
     $res = '<div class="msg_text_inner">';
+    elog($type);
+    elog($content);
     foreach ($content as $vals) {
         $res .= '<div class="github_para">';
-        if (count($vals) == 2) {
-            $res .= sprintf('<div class="github_link"><a target="_blank" href="%s">%s</a></div>', $vals[1], $vals[1]);
+        if (array_key_exists('body', $vals)) {
+            $res .= $output_mod->html_safe(wordwrap($vals['body'], 100));
         }
-        if (count($vals) ==1) {
-            $res .= $output_mod->html_safe($vals[0]).'</div>';
+        if (array_key_exists('message', $vals)) {
+            $res .= $output_mod->html_safe(wordwrap($vals['message'], 100));
         }
-    }
+        if (array_key_exists('html_url', $vals)) {
+            $res .= sprintf('<div class="github_link"><a target="_blank" href="%s">%s</a></div>',
+                $output_mod->html_safe($vals['html_url']), $output_mod->html_safe($vals['html_url']));
+        }
+        if (array_key_exists('url', $vals) && array_key_exists('sha', $vals)) {
+            $url = str_replace(array('commits', 'https://api.github.com/repos'), array('commit', 'https://github.com'), $vals['url']);
+            $res .= sprintf('<div class="github_link"><a target="_blank" href="%s">%s</a></div>',
+                $output_mod->html_safe($url), $output_mod->html_safe($vals['sha']));
+        }
+        $res .= '</div>';
+
+        /*if (count($vals) == 3) {
+            $res .= sprintf('%s<div class="github_link"><a target="_blank" href="%s">%s</a></div></div>', $vals[2],
+                str_replace(array('commits', 'https://api.github.com/repos'), array('commit', 'https://github.com'),
+                $vals[0]), $vals[1]);
+        }
+        elseif (count($vals) == 2 && $type != 'IssueCommentEvent' && $type != 'IssueEvent') {
+            $res .= '<div class="github_para">';
+            $res .= sprintf('<div class="github_link"><a target="_blank" href="%s">%s</a></div></div>', $vals[1], $vals[1]);
+        }
+        elseif (count($vals) == 1 || $type == 'IssueCommentEvent' || $type == 'IssueEvent') {
+            $res .= '<div class="github_para">';
+            $res .= $output_mod->html_safe(wordwrap($vals[1], 100)).'</div>';
+        }
+         */}
     $res .= '</div>';
     return $res;
 }
@@ -808,25 +834,26 @@ function github_parse_payload($data, $output_mod) {
  */
 function payload_search($data) {
     $res = array();
-    $data_flds = array('body', 'description', 'message');
+    $data_flds = array('url', 'sha', 'body', 'description', 'message');
     foreach($data as $vals) {
         if (is_array($vals)) {
             $item = array();
             foreach ($data_flds as $fld) {
                 if (array_key_exists($fld, $vals)) {
-                    $item[] = $vals[$fld];
-                    break;
+                    $item[$fld] = $vals[$fld];
                 }
             }
             if (!empty($item)) {
                 if (array_key_exists('html_url', $data)) {
-                    $item[] = $vals['html_url'];
+                    $item['html_url'] = $vals['html_url'];
                 }
             }
             else {
                 $res = array_merge($res, payload_search($vals));
             }
-            $res[] = $item;
+            if (count($item) > 0) {
+                $res[] = $item;
+            }
         }
     }
     return $res;

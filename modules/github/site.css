@@ -3,5 +3,6 @@
 .github_connect_section .server_title { margin-bottom: 10px; }
 .github_disconnect { margin-left: 20px; margin-top: 20px; }
 .configured_repo { margin-bottom: 5px; }
-.github_link { margin-bottom: 10px; }
+.github_link { margin-left: 10px; display: inline; }
 .github_all_setting { display: none; }
+.github_para { white-space: pre; border-bottom: solid 1px #ccc; padding-bottom: 20px; margin-bottom: 20px; }
