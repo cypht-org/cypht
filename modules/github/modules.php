@@ -787,6 +787,11 @@ function github_parse_payload($data, $output_mod) {
     if (array_key_exists('type', $data)) {
         $type = $data['type'];
     }
+    /* Event types: CommitCommentEvent CreateEvent DeleteEvent DeploymentEvent DeploymentStatusEvent DownloadEvent FollowEvent
+	 * ForkEvent ForkApplyEvent GistEvent GollumEvent IssueCommentEvent IssuesEvent MemberEvent MembershipEvent PageBuildEvent
+	 * PublicEvent PullRequestEvent PullRequestReviewCommentEvent PushEvent ReleaseEvent RepositoryEvent StatusEvent TeamAddEvent
+	 * WatchEvent */
+
     $data = $data['payload'];
     $content = payload_search($data);
     $res = '<div class="msg_text_inner">';
@@ -808,21 +813,7 @@ function github_parse_payload($data, $output_mod) {
                 $output_mod->html_safe($url), $output_mod->html_safe($vals['sha']));
         }
         $res .= '</div>';
-
-        /*if (count($vals) == 3) {
-            $res .= sprintf('%s<div class="github_link"><a target="_blank" href="%s">%s</a></div></div>', $vals[2],
-                str_replace(array('commits', 'https://api.github.com/repos'), array('commit', 'https://github.com'),
-                $vals[0]), $vals[1]);
-        }
-        elseif (count($vals) == 2 && $type != 'IssueCommentEvent' && $type != 'IssueEvent') {
-            $res .= '<div class="github_para">';
-            $res .= sprintf('<div class="github_link"><a target="_blank" href="%s">%s</a></div></div>', $vals[1], $vals[1]);
-        }
-        elseif (count($vals) == 1 || $type == 'IssueCommentEvent' || $type == 'IssueEvent') {
-            $res .= '<div class="github_para">';
-            $res .= $output_mod->html_safe(wordwrap($vals[1], 100)).'</div>';
-        }
-         */}
+    }
     $res .= '</div>';
     return $res;
 }
