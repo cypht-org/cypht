@@ -430,12 +430,7 @@ class Hm_Output_content_end extends Hm_Output_Module {
      * Closes the body and html tags
      */
     protected function output() {
-        if (defined('DEBUG_MODE') && DEBUG_MODE) {
-            return '<div class="debug"></div></body></html>';
-        }
-        else {
-            return '</body></html>';
-        }
+        return '</body></html>';
     }
 }
 

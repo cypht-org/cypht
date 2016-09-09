@@ -170,7 +170,6 @@ var Hm_Ajax_Request = function() { return {
             var dt = new Date();
             var elapsed = dt.getTime() - this.start_time;
             var msg = 'AJAX request finished in ' + elapsed + ' millis';
-            Hm_Debug_Output.add(msg);
         }
         Hm_Ajax.request_count--;
         Hm_Message_List.set_checkbox_callback();
@@ -188,28 +187,6 @@ var Hm_Ajax_Request = function() { return {
         res = null;
     }
 }; };
-
-/* debug output */
-var Hm_Debug_Output = {
-    max: 5,
-    count: 0,
-    add: function(msg) {
-        Hm_Debug_Output.count++;
-        $('.debug').prepend('<div>'+msg+'</div>');
-        if (Hm_Debug_Output.check()) {
-            Hm_Debug_Output.prune();
-        }
-    },
-
-    check: function() {
-        return Hm_Debug_Output.count > Hm_Debug_Output.max;
-    },
-
-    prune: function() {
-        $('.debug > div:last-child').remove();
-        Hm_Debug_Output.count--;
-    }
-};
 
 /* user notification manager */
 var Hm_Notices = {
