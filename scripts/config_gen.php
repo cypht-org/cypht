@@ -70,7 +70,6 @@ function parse_module_ini_files($settings) {
         if (is_readable($ini_file)) {
             $data = parse_ini_file($ini_file, $sections);
             if (is_array($data) && count($data) > 0) {
-                echo $file;
                 $settings[$file] = $data;
             }
         }
