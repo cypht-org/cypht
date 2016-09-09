@@ -50,6 +50,35 @@ function check_php() {
 }
 
 /**
+ * include module ini files in the main config
+ */
+function parse_module_ini_files($settings) {
+    $files = array(
+        array('2fa.ini', false),
+        array('github.ini', false),
+        array('ldap.ini', true),
+        array('oauth2.ini', true),
+        array('wordpress.ini', false)
+    );
+    if (!array_key_exists('app_data_dir', $settings)) {
+        return $settings;
+    }
+    foreach ($files as $vals) {
+        $file = $vals[0];
+        $sections = $vals[1];
+        $ini_file = rtrim($settings['app_data_dir'], '/').'/'.$file;
+        if (is_readable($ini_file)) {
+            $data = parse_ini_file($ini_file, $sections);
+            if (is_array($data) && count($data) > 0) {
+                echo $file;
+                $settings[$file] = $data;
+            }
+        }
+    }
+    return $settings;
+}
+
+/**
  * Entry point into the configuration process
  *
  * @return void
@@ -69,6 +98,7 @@ function build_config() {
 
     if (is_array($settings) && !empty($settings)) {
         $settings['version'] = VERSION;
+        $settings = parse_module_ini_files($settings);
 
         /* determine compression commands */
         list($js_compress, $css_compress) = compress_methods($settings);

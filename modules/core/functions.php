@@ -230,12 +230,7 @@ function validate_local_full($val) {
  * @return array
  */
 function get_oauth2_data($config) {
-    $settings = array();
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/oauth2.ini';
-    if (is_readable($ini_file)) {
-        $settings = parse_ini_file($ini_file, true);
-    }
-    return $settings;
+    return get_ini($config, 'oauth2.ini', true);
 }
 
 /**
@@ -474,3 +469,23 @@ function merge_folder_list_details($folder_sources) {
     return $res;
 }
 
+/**
+ * Get the contents of an ini file, first check the config
+ * object (unless in debug mode
+ */
+function get_ini($config, $name, $sections=false) {
+    if (!DEBUG_MODE) {
+        $data = $config->get($name, array());
+        if (count($data) > 0) {
+            return $data;
+        }
+    }
+    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/'.$name;
+    if (is_readable($ini_file)) {
+        $data = parse_ini_file($ini_file, $sections);
+        if (is_array($data) && count($data) > 0) {
+            return $data;
+        }
+    }
+    return array();
+}

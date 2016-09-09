@@ -432,15 +432,7 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
  * @subpackage wordpress/functions
  */
 function wp_connect_details($config) {
-    $details = array();
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/wordpress.ini';
-    if (is_readable($ini_file)) {
-        $settings = parse_ini_file($ini_file);
-        if (!empty($settings)) {
-            $details = $settings;
-        }
-    }
-    return $details;
+    return get_ini($config, 'wordpress.ini');
 }
 
 /**

@@ -810,14 +810,7 @@ function ldap_add_user_auth($ldap_config, $auths) {
  * @subpackage ldap_contacts/functions
  */
 function ldap_config($config, $key=false) {
-    $details = array();
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/ldap.ini';
-    if (is_readable($ini_file)) {
-        $settings = parse_ini_file($ini_file, true);
-        if (!empty($settings)) {
-            $details = $settings;
-        }
-    }
+    $details = get_ini($config, 'ldap.ini', true);
     if ($key && array_key_exists($key, $details)) {
         return $details[$key];
     }

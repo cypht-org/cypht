@@ -677,15 +677,7 @@ class Hm_Output_github_limit_setting extends Hm_Output_Module {
  * @subpackage github/functions
  */
 function github_connect_details($config) {
-    $details = array();
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/github.ini';
-    if (is_readable($ini_file)) {
-        $settings = parse_ini_file($ini_file);
-        if (!empty($settings)) {
-            $details = $settings;
-        }
-    }
-    return $details;
+    return get_ini($config, 'github.ini');
 }
 
 /**

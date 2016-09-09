@@ -197,12 +197,9 @@ function check_2fa_pin($pin, $secret, $pass_len=6) {
  * @subpackage 2fa/functions
  */
 function get_2fa_key($config) {
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/2fa.ini';
-    if (is_readable($ini_file)) {
-        $settings = parse_ini_file($ini_file, true);
-        if (array_key_exists('2fa_secret', $settings)) {
-            return $settings['2fa_secret'];
-        }
+    $settings = get_ini($config, '2fa.ini');
+    if (array_key_exists('2fa_secret', $settings)) {
+        return $settings['2fa_secret'];
     }
     return false;
 }

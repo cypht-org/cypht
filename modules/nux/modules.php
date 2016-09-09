@@ -435,19 +435,16 @@ class Nux_Quick_Services {
     }
     static public function oauth2_setup($config) {
         $settings = array();
-        $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/oauth2.ini';
-        if (is_readable($ini_file)) {
-            $settings = parse_ini_file($ini_file, true);
-            if (!empty($settings)) {
-                foreach ($settings as $service => $vals) {
-                    self::$services[$service]['auth'] = 'oauth2';
-                    self::$services[$service]['client_id'] = $vals['client_id'];
-                    self::$services[$service]['client_secret'] = $vals['client_secret'];
-                    self::$services[$service]['redirect_uri'] = $vals['client_uri'];
-                    self::$services[$service]['auth_uri'] = $vals['auth_uri'];
-                    self::$services[$service]['token_uri'] = $vals['token_uri'];
-                    self::$services[$service]['refresh_uri'] = $vals['refresh_uri'];
-                }
+        $settings = get_ini($config, 'oauth2.ini', true);
+        if (!empty($settings)) {
+            foreach ($settings as $service => $vals) {
+                self::$services[$service]['auth'] = 'oauth2';
+                self::$services[$service]['client_id'] = $vals['client_id'];
+                self::$services[$service]['client_secret'] = $vals['client_secret'];
+                self::$services[$service]['redirect_uri'] = $vals['client_uri'];
+                self::$services[$service]['auth_uri'] = $vals['auth_uri'];
+                self::$services[$service]['token_uri'] = $vals['token_uri'];
+                self::$services[$service]['refresh_uri'] = $vals['refresh_uri'];
             }
         }
         self::$oauth2 = $settings;
