@@ -11,6 +11,23 @@ if (!defined('DEBUG_MODE')) { die(); }
 require_once APP_PATH.'modules/imap/hm-imap.php';
 
 /**
+ * Get the status of an IMAP folder
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_folder_status extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
+        if ($success) {
+            $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            if ($imap) {
+                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->get_mailbox_status(hex2bin($form['folder']))));
+            }
+        }
+    }
+}
+
+/**
  * Process input from the max per source setting for the Sent E-mail page in the settings page
  * @subpackage imap/handler
  */

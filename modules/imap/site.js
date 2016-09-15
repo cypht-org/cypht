@@ -754,6 +754,32 @@ var imap_background_unread_content = function(id) {
     return false;
 };
 
+var get_imap_folder_status = function(id, folder) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_status'},
+        {'name': 'imap_server_id', 'value': id},
+        {'name': 'folder', 'value': folder}],
+        false,
+        [],
+        true,
+        Hm_Folders.update_unread_counts
+    );
+}
+
+var imap_folder_status = function() {
+    var source;
+    var sources = hm_data_sources();
+    if (!sources || !sources.length) {
+        sources = hm_data_sources_background();
+    }
+    for (var index in sources) {
+        source = sources[index];
+        if (source.type == 'imap') {
+            get_imap_folder_status(source.id, source.folder);
+        }
+    }
+};
+
 if (hm_page_name() === 'message_list' && hm_list_path().substr(0, 4) === 'imap') {
     setup_imap_folder_page();
 }
