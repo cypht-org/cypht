@@ -277,6 +277,12 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
                 }
                 $this->out('custom_list_controls_type', $custom_link);
+                if (array_key_exists('filter', $this->request->get)) {
+                    if (in_array($this->request->get['filter'], array('all', 'unseen', 'seen',
+                        'answered', 'unanswered', 'flagged', 'unflagged'), true)) {
+                        $this->out('imap_filter', $this->request->get['filter']);
+                    }
+                }
                 if (!empty($details)) {
                     $title = array('IMAP', $details['name'], hex2bin($parts[2]));
                     if ($this->get('list_page', 0)) {
@@ -352,8 +358,11 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         $sort = 'ARRIVAL';
         $rev = true;
         $filter = 'ALL';
-        $offset = 0;
+        if ($this->get('imap_filter')) {
+            $filter = strtoupper($this->get('imap_filter'));
+        }
         $limit = 20;
+        $offset = 0;
         $msgs = array();
         $list_page = 1;
 
@@ -370,17 +379,18 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             }
             $path = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
             $details = Hm_IMAP_List::dump($form['imap_server_id']);
-            $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], false);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 $this->out('imap_mailbox_page_path', $path);
-                foreach ($imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit) as $msg) {
+                list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit);
+                foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
                     $msg['folder'] = $form['folder'];
                     $msgs[] = $msg;
                 }
                 if ($imap->selected_mailbox) {
+                    $imap->selected_mailbox['detail']['exists'] = $total;
                     $this->out('imap_folder_detail', array_merge($imap->selected_mailbox, array('offset' => $offset, 'limit' => $limit)));
                 }
                 $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
@@ -1225,15 +1235,33 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
      */
     protected function output() {
         if ($this->get('custom_list_controls_type')) {
+            $filter = $this->get('imap_filter');
+            $opts = array('all' => $this->trans('All'), 'unseen' => $this->trans('Unread'),
+                'seen' => $this->trans('Read'), 'flagged' => $this->trans('Flagged'),
+                'unflagged' => $this->trans('Unflagged'), 'answered' => $this->trans('Answered'),
+                'unanswered' => $this->trans('Unanswered'));
+
+            $custom = '<form id="imap_filter_form" method="GET">';
+            $custom .= '<input type="hidden" name="page" value="message_list" />';
+            $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
+            $custom .= '<select name="filter" class="imap_filter">';
+            foreach ($opts as $name => $val) {
+                $custom .= '<option ';
+                if ($name == $filter) {
+                    $custom .= 'selected="selected" ';
+                }
+                $custom .= 'value="'.$name.'">'.$val.'</option>';
+            }
+            $custom .= '</select></form>';
             if ($this->get('custom_list_controls_type') == 'remove') {
-                $custom = '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
+                $custom .= '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
                     '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.
                     '" alt="'.$this->trans('Remove').'"/></a><a style="display: none;" class="add_source" title="'.
                     $this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.
                     $this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
             }
             else {
-                $custom = '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
+                $custom .= '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
                     '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.
                     $this->trans('Remove').'"/></a><a class="add_source" title="'.$this->trans('Add this folder to combined pages').
                     '" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.
@@ -1728,7 +1756,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
             else {
                 $page_num = ($details['offset']/$details['limit']) + 1;
             }
-            $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'], $this->get('imap_mailbox_page_path')));
+            $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'], $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('imap_filter'))));
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());

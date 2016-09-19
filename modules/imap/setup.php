@@ -57,8 +57,8 @@ add_handler('ajax_imap_mark_as_read', 'save_imap_cache',  true, 'imap', 'imap_ma
 add_handler('ajax_imap_mark_as_read', 'save_imap_servers',  true, 'imap', 'save_imap_cache', 'after');
 
 /* page not found */
-add_output('notfound', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
-add_output('notfound', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+//add_output('notfound', 'imap_message_list', true, 'imap', 'folder_list_end', 'before');
+//add_output('notfound', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* folder list */
 add_handler('ajax_hm_folders', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
@@ -272,7 +272,7 @@ return array(
     'allowed_get' => array(
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
-        'imap_msg_part' => FILTER_SANITIZE_STRING
+        'imap_msg_part' => FILTER_SANITIZE_STRING,
     ),
 
     'allowed_post' => array(

@@ -434,13 +434,20 @@ function search_field_selection($current, $output_mod) {
  * @param int $current current page number
  * @param int $total number of messages total
  * @param string $path list path
+ * @param string $filter list filter
  * @return string
  */
-function build_page_links($page_size, $current_page, $total, $path) {
+function build_page_links($page_size, $current_page, $total, $path, $filter=false) {
     $links = '';
     $first = '';
     $last = '';
     $display_links = 10;
+    if ($filter) {
+        $filter_str = '&amp;filter='.$filter;
+    }
+    else {
+        $filter_str = false;
+    }
     $max_pages = ceil($total/$page_size);
     if ($max_pages == 1) {
         return '';
@@ -457,16 +464,16 @@ function build_page_links($page_size, $current_page, $total, $path) {
     $next = '<a class="disabled_link"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
 
     if ($floor > 1 ) {
-        $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1">1</a> ... ';
+        $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1'.$filter_str.'">1</a> ... ';
     }
     if ($ceil < $max_pages) {
-        $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.'">'.$max_pages.'</a>';
+        $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.$filter_str.'">'.$max_pages.'</a>';
     }
     if ($current_page > 1) {
-        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).'"><img src="'.Hm_Image_Sources::$caret_left.'" alt="&larr;" /></a>';
+        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).$filter_str.'"><img src="'.Hm_Image_Sources::$caret_left.'" alt="&larr;" /></a>';
     }
     if ($max_pages > 1 && $current_page < $max_pages) {
-        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).'"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
+        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).$filter_str.'"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
     }
     for ($i=1;$i<=$max_pages;$i++) {
         if ($i < $floor || $i > $ceil) {
@@ -476,7 +483,7 @@ function build_page_links($page_size, $current_page, $total, $path) {
         if ($i == $current_page) {
             $links .= 'class="current_page" ';
         }
-        $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.'">'.$i.'</a>';
+        $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.$filter_str.'">'.$i.'</a>';
     }
     return $prev.' '.$first.$links.$last.' '.$next;
 }

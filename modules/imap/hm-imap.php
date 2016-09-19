@@ -1843,7 +1843,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * use the SORT extension to get a sorted UID list
      * @param string $sort sort order. can be one of ARRIVAL, DATE, CC, TO, SUBJECT, FROM, or SIZE
      * @param bool $reverse flag to reverse the sort order
-     * @param string $filter can be one of ALL, SEEN, UNSEEN ANSWERED, UNANSWERED, DELETED, UNDELETED, FLAGGED, or UNFLAGGED
+     * @param string $filter can be one of ALL, SEEN, UNSEEN, ANSWERED, UNANSWERED, DELETED, UNDELETED, FLAGGED, or UNFLAGGED
      * @return array list of IMAP message UIDs
      */
     public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $esort=array()) {
@@ -2011,6 +2011,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         else {
             $uids = $this->sort_by_fetch($sort, $rev, $filter);
         }
+        $total = count($uids);
 
         /* reduce to one page */
         if ($limit) {
@@ -2026,7 +2027,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 }
             }
         }
-        return $result;
+        return array($total, $result);
     }
 
     /**

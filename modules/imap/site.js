@@ -349,15 +349,14 @@ var setup_imap_folder_page = function() {
     $('.remove_source').click(remove_imap_combined_source);
     $('.add_source').click(add_imap_combined_source);
     $('.refresh_link').click(function() { select_imap_folder(hm_list_path()); });
+    $('.imap_filter').change(function() { $('#imap_filter_form').submit(); });
 };
 
 var display_imap_mailbox = function(res) {
     var ids = [res.imap_server_id];
     Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
     Hm_Message_List.check_empty_list();
-    if (res.page_links) {
-        $('.page_links').html(res.page_links);
-    }
+    $('.page_links').html(res.page_links);
     $('input[type=checkbox]').click(function(e) {
         Hm_Message_List.toggle_msg_controls();
         Hm_Message_List.check_select_range(e);
