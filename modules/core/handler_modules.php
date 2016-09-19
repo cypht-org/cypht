@@ -459,6 +459,9 @@ class Hm_Handler_login extends Hm_Handler_Module {
             if ($success) {
                 $this->session->check($this->request, rtrim($form['username']), $form['password']);
                 $this->session->set('username', rtrim($form['username']));
+                if ($this->config->get('redirect_after_login')) {
+                    $this->out('redirect_url', $this->config->get('redirect_after_login'));
+                }
             }
             else {
                 $this->session->check($this->request);

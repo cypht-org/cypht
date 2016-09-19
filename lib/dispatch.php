@@ -98,6 +98,9 @@ class Hm_Dispatch {
                 $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
             }
             $this->session->end();
+            if (array_key_exists('redirect_url', $this->module_exec->handler_response) && $this->module_exec->handler_response['redirect_url']) {
+                Hm_Dispatch::page_redirect($this->module_exec->handler_response['redirect_url']);
+            }
             if (array_key_exists('REQUEST_URI', $this->request->server)) {
                 Hm_Dispatch::page_redirect($this->request->server['REQUEST_URI']);
             }
