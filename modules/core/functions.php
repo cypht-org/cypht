@@ -54,6 +54,7 @@ function interface_langs() {
         'fr' => 'French',
         'it' => 'Italian',
         'ru' => 'Russian',
+        'ro' => 'Romanian',
     );
 }
 
