@@ -483,6 +483,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                             $from = $from.'@'.$domain;
                         }
                         if (!is_email($reply_to)) {
+                            if (!trim($reply_to)) {
+                                $reply_to = $smtp_details['user'];
+                            }
                             $reply_to = $reply_to.'@'.$domain;
                         }
                     }
