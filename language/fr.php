@@ -390,6 +390,7 @@ return array(
     'Add Event' => 'Ajouter un évènement',
     'Download' => 'Télécharger',
     'French' => 'Français',
+    'Romanian' => 'Roumain',
 	'Shortcuts' => false,
     'Unfocus all input elements' => false,
     'Jump to the "Everything" page' => false,
