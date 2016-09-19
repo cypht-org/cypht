@@ -122,6 +122,9 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             if (array_key_exists('pop3_search', $this->request->post)) {
                 $limit = DEFAULT_PER_SOURCE;
                 $terms = $this->session->get('search_terms', false);
+                if (!$terms) {
+                    return;
+                }
                 $since = $this->session->get('search_since', DEFAULT_SINCE);
                 $fld = $this->session->get('search_fld', 'TEXT');
                 $date = process_since_argument($since);
