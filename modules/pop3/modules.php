@@ -79,8 +79,11 @@ class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
             $id_list = explode(',', $form['message_ids']);
+            $server_ids = array();
             foreach ($id_list as $msg_id) {
                 if (preg_match("/^pop3_(\d)+_(\d)+$/", $msg_id)) {
+                    $parts = explode('_', $msg_id);
+                    $server_ids[] = $parts[1];
                     switch($form['action_type']) {
                         case 'unread':
                             Hm_POP3_Uid_Cache::unread($msg_id);
@@ -89,6 +92,11 @@ class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
                             Hm_POP3_Uid_Cache::read($msg_id);
                             break;
                     }
+                }
+            }
+            if (count($server_ids) > 0) {
+                foreach ($server_ids as $id) {
+                    bust_pop3_cache($this->session, $this->config, $id);
                 }
             }
         }
@@ -248,7 +256,7 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                 $this->out('pop3_message_body', $body);
                 $this->out('pop3_mailbox_page_path', $form['pop3_list_path']);
                 $this->out('pop3_server_id', $id);
-
+                bust_pop3_cache($this->session, $this->config, $id);
                 Hm_POP3_Uid_Cache::read(sprintf("pop3_%s_%s", $id, $form['pop3_uid']));
             }
         }
@@ -972,4 +980,12 @@ function search_pop3_msg($body, $headers, $terms, $fld) {
     }
 }
 
-
+/**
+ * @subpackage pop3/functions
+ */
+function bust_pop3_cache($session, $config, $id) {
+    $key = hash('sha256', (sprintf('pop3%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
+    $memcache = new Hm_Memcached($config);
+    $memcache->set($key, array(), 1, $session->enc_key);
+    Hm_Debug::add('Busted POP3 cache for id '.$id);
+}
