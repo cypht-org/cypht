@@ -575,7 +575,7 @@ var imap_background_unread_content_result = function(res) {
     var count = $('tr', cache).length;
     globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'imap', cache);
     Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
-    $('.total_unread_count').html('&#160;'+count+'&#160;');
+    $('.total_unread_count').html('&#160;'+$('tr', cache).length+'&#160;');
     if ($('tr', cache).length > count) {
         $('.menu_unread > a').css('font-weight', 'bold');
         Hm_Folders.save_folder_list();
