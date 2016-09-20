@@ -519,7 +519,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         }
 
         /* sort and return the list */
-        ksort($folders);
+        uksort($folders, 'strcasecmp');
         return $this->cache_return_val($folders, $cache_command);
     }
 
