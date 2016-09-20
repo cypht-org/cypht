@@ -375,7 +375,6 @@ return array(
     'New Folder Name' => false,
     'Select Parent Folder (optional)' => false,
     'Rename a Folder' => false,
-    'Select Folder' => false,
     'New Folder Name' => false,
     'Rename' => false,
     'Delete a Folder' => false,

@@ -375,7 +375,6 @@ return array(
     'New Folder Name' => 'Nom du nouveau dossier',
     'Select Parent Folder (optional)' => 'Sélectionner le dossier parent (optionnel)',
     'Rename a Folder' => 'Renommer un dossier',
-    'Select Folder' => 'Sélectionner un dossier',
     'New Folder Name' => 'Nouveau nom du dossier',
     'Rename' => 'Renommer',
     'Delete a Folder' => 'Supprimer un dossier',

@@ -375,7 +375,6 @@ return array(
     'New Folder Name' => "Name für den neuen Ordner",
     'Select Parent Folder (optional)' => "Übergeordneten Ordnerauswählen (Optional)",
     'Rename a Folder' => "Ordner Umbennen",
-    'Select Folder' => "Ordner Auswählen",
     'New Folder Name' => "Name für den neuen Ordner",
     'Rename' => "Umbennen",
     'Delete a Folder' => "Einen Ordner Löschen",
