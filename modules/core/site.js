@@ -175,7 +175,6 @@ var Hm_Ajax_Request = function() { return {
         Hm_Message_List.set_checkbox_callback();
         if (Hm_Ajax.request_count === 0) {
             Hm_Ajax.aborted = false;
-            Hm_Ajax.callback_hooks = Hm_Ajax.p_callbacks;
             Hm_Ajax.p_callbacks = [];
             if (Hm_Ajax.batch_callback) {
                 Hm_Ajax.batch_callback(res);
