@@ -28,8 +28,8 @@ var display_github_data_background = function(res) {
     $('.total_unread_count').html('&#160;'+$('tr', cache).length+'&#160;');
     if ($('tr', cache).length > count) {
         $('.menu_unread > a').css('font-weight', 'bold');
-        Hm_Folders.save_folder_list();
     }
+    Hm_Folders.save_folder_list();
 };
 
 var display_github_data = function(res) {
