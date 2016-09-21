@@ -339,6 +339,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
     public function process() {
         $repos = $this->user_config->get('github_repos', array());
         $excluded = $this->user_config->get('unread_exclude_github_setting', false);
+        $github_list = false;
         $parent = '';
         if (array_key_exists('list_parent', $this->request->get)) {
             $parent = $this->request->get['list_parent'];
@@ -346,6 +347,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if ($this->page == 'message_list' && preg_match("/^github_(.+)$/", $path)) {
+                $github_list = true;
                 if ($path == 'github_all') {
                     $this->out('list_path', 'github_all', false);
                     $this->out('list_parent', $parent, false);
@@ -371,17 +373,18 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                 }
             }
             elseif ($this->page == 'message_list' && $path == 'combined_inbox' || $path == 'unread') {
+                $github_list = true;
                 if (!$excluded || $path == 'combined_inbox') {
                     foreach ($repos as $repo) {
                         $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                     }
                 }
             }
-            else {
-                foreach ($repos as $repo) {
-                    if (!$excluded) {
-                        $this->append('data_sources', array('callback' => 'load_github_data_background', 'group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
-                    }
+        }
+        if (!$github_list) {
+            foreach ($repos as $repo) {
+                if (!$excluded) {
+                    $this->append('data_sources', array('callback' => 'load_github_data_background', 'group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
             }
         }

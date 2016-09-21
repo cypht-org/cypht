@@ -29,7 +29,9 @@ var display_github_data_background = function(res) {
     if ($('tr', cache).length > count) {
         $('.menu_unread > a').css('font-weight', 'bold');
     }
-    Hm_Folders.save_folder_list();
+    if ($('tr', cache).length != count) {
+        Hm_Folders.save_folder_list();
+    }
 };
 
 var display_github_data = function(res) {
