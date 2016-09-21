@@ -350,6 +350,7 @@ var setup_imap_folder_page = function() {
     $('.add_source').click(add_imap_combined_source);
     $('.refresh_link').click(function() { select_imap_folder(hm_list_path()); });
     $('.imap_filter').change(function() { $('#imap_filter_form').submit(); });
+    Hm_Ajax.add_callback_hook('ajax_message_action', function() { select_imap_folder(hm_list_path()); });
 };
 
 var display_imap_mailbox = function(res) {
@@ -809,7 +810,7 @@ $(function() {
             globals.Hm_Background_Unread = new Message_List();
             globals.Hm_Background_Unread.background = true;
             globals.Hm_Background_Unread.add_sources(hm_data_sources_background());
-            Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, 43, true);
+            Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, 23, true);
         }
     }
     Hm_Timer.add_job(imap_prefetch_msgs, 83, true);
