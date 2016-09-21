@@ -571,7 +571,7 @@ var display_reply_content = function(res) {
 };
 
 var imap_background_unread_content_result = function(res) {
-    var ids = [res.imap_server_id];
+    var ids = [res.imap_server_ids];
     var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
     var count = $('tr', cache).length;
     globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'imap', cache);
