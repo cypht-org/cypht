@@ -340,29 +340,6 @@ function Message_List() {
         });
     };
 
-    this.clear_missing_sources = function(msg_rows) {
-        $('tr', msg_rows).filter(function() {
-            var detail = Hm_Utils.parse_folder_path(this.className);
-            if (!detail) {
-                return false;
-            }
-            var source;
-            var index;
-            var found = false;
-            for (index in this.sources) {
-                source = this.sources[index];
-                if (source.type == detail.type && source.folder == detail.folder && source.id == detail.server_id) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                $(this).remove();
-            }
-        });
-        return 0;
-    };
-
     this.remove_rows = function(ids, msg_ids, type, msg_rows) {
         var count = $('tr', msg_rows).length;
         var parts;
@@ -706,8 +683,23 @@ function Message_List() {
         else {
             read_messages = {};
         }
+        var added = false;
+        if (!(class_name in read_messages)) {
+            added = true;
+        }
         read_messages[class_name] = 1;
         Hm_Utils.save_to_local_storage('read_message_list', Hm_Utils.json_encode(read_messages));
+        return added;
+    };
+
+    this.adjust_unread_total = function(amount) {
+        var total = $('.total_unread_count').text()*1;
+        if (amount < 0 && total == 0) {
+            return;
+        }
+        total += amount;
+        $('.total_unread_count').html('&#160;'+total+'&#160;');
+        Hm_Folders.save_folder_list();
     };
 
     this.toggle_rows = function() {
@@ -718,7 +710,6 @@ function Message_List() {
 
     this.set_message_list_state = function(list_type) {
         var data = $('.message_table tbody');
-        //self.clear_missing_sources(data);
         data.find('*[style]').attr('style', '');
         Hm_Utils.save_to_local_storage(list_type, data.html());
         var empty = self.check_empty_list();

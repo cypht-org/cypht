@@ -479,8 +479,10 @@ var imap_message_view_finished = function(msg_uid, detail) {
             Hm_Message_List.prev_next_links(key, class_name);
         }
     }
-    if (class_name) {
-        Hm_Message_List.track_read_messages(class_name);
+    if (Hm_Message_List.track_read_messages(class_name)) {
+        if (hm_list_parent() == 'unread') {
+            Hm_Message_List.adjust_unread_total(-1);
+        }
     }
     $('.header_toggle').click(function() { return Hm_Utils.toggle_long_headers(); });
     $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart')); });

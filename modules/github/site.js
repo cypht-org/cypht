@@ -83,7 +83,11 @@ var display_github_item_content = function(res) {
     else {
         Hm_Message_List.prev_next_links(hm_list_path(), uid);
     }
-    Hm_Message_List.track_read_messages(path+'_'+uid);
+    if (Hm_Message_List.track_read_messages(path+'_'+uid)) {
+        if (hm_list_parent() == 'unread') {
+            Hm_Message_List.adjust_unread_total(-1);
+        }
+    }
 };
 
 var github_repo_update = function() {
