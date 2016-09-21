@@ -242,8 +242,11 @@ var update_pop3_unread_display_background = function(res) {
     var count = $('tr', cache).length;
     globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'pop3', cache);
     Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
+    $('.total_unread_count').html('&#160;'+$('tr', cache).length+'&#160;');
     if ($('tr', cache).length > count) {
         $('.menu_unread > a').css('font-weight', 'bold');
+    }
+    if ($('tr', cache).length != count) {
         Hm_Folders.save_folder_list();
     }
 };

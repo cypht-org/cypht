@@ -579,6 +579,8 @@ var imap_background_unread_content_result = function(res) {
     $('.total_unread_count').html('&#160;'+$('tr', cache).length+'&#160;');
     if ($('tr', cache).length > count) {
         $('.menu_unread > a').css('font-weight', 'bold');
+    }
+    if ($('tr', cache).length != count) {
         Hm_Folders.save_folder_list();
     }
 };
