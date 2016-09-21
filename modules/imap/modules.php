@@ -843,12 +843,6 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
         else {
             $path = '';
         }
-        if (array_key_exists('page', $this->request->get)) {
-            $page = $this->request->get['page'];
-        }
-        else {
-            $page = false;
-        }
         switch ($path) {
             case 'unread':
                 $callback = 'imap_combined_unread_content';
