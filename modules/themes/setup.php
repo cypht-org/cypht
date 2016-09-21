@@ -13,6 +13,7 @@ add_handler('ajax_imap_folder_expand', 'load_theme', true, 'themes', 'load_user_
 
 add_handler('ajax_imap_all_email', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_imap_unread', 'load_theme', true, 'themes', 'load_user_data', 'after');
+add_handler('ajax_imap_folder_display', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_imap_combined_inbox', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_imap_flagged', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_imap_search', 'load_theme', true, 'themes', 'load_user_data', 'after');
