@@ -64,6 +64,7 @@ var search_save_results = function(res) {
     if (res.saved_search_result) {
         $('.search_name').val($('.new_search_name').val());
         $('.delete_search').show();
+        $('.save_search').hide();
         Hm_Folders.reload_folders(true, '.search_folders');
     }
 };
