@@ -28,3 +28,4 @@ textarea { font-size: 100%; }
 @media screen and (max-device-width:1080px) and (orientation : portrait), @media screen and (max-device-width:1080px) and (orientation : landscape), @media screen and (max-device-width:480px) and (orientation : portrait) { .msg_controls { position: absolute; background: #363636 !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; } }
 .total_unread_count, .unread_count { background-color: #2e2e2e; }
 .hl { background-color: #222; }
+.draft_list { background-color: #222; }
