@@ -257,7 +257,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                 '<th>'.$this->trans('Server').'</th>'.
                 '<th>'.$this->trans('Username').'</th>'.
                 '<th>'.$this->trans('Display Name').'</th>'.
-                '<th>'.$this->trans('E-mail').'</th>'.
+                '<th>'.$this->trans('E-mail Address').'</th>'.
                 '<th>'.$this->trans('Reply-to').'</th>'.
                 '<th>'.$this->trans('SMTP Server').'</th>'.
                 '<th>'.$this->trans('Signature').'</th>'.

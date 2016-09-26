@@ -127,7 +127,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $qr_code .= '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
         }
         $res .= $qr_code;
-        $res .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('The following backup codes can be used to access your account if you lose your device:').'<br /><br />';
+        $res .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('The following backup codes can be used to access your account if you lose your device').'<br /><br />';
         foreach ($backup_codes as $val) {
             $res .= ' '.$val.'<input type="hidden" name="2fa_backup_codes[]" value="'.$val.'" /></br >';
         }
