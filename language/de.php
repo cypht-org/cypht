@@ -510,7 +510,13 @@ return array(
     'Organizational Unit' => false,
     'Preferred Language' => false,
     'Surname' => false,
-    'Vehicle License' => false
+    'Vehicle License' => false,
+    'Edit Shortcut' => false,
+    'Modifier Key(s)' => false,
+    'Character' => false,
+    'Romanian' => false,
+    'Unflagged' => false,
+    'Unanswered' => false
 );
 
 ?>
