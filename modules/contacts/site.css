@@ -27,5 +27,5 @@
 .contact_detail_row { border: none; display: none;}
 .display_name, .email_address, .phone_number { font-weight: bold; }
 .show_contact { margin-right: 15px; }
-.contact_detail th { font-weight: normal; text-align: right; padding-right: 20px; }
+.contact_detail th { font-weight: normal; text-align: left; padding-right: 20px; }
 .contact_fld { max-width: 300px; overflow-x: hidden; text-overflow: ellipsis; }
