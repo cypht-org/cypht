@@ -1,4 +1,5 @@
 .calendar { width: 100%; }
+.event_form { margin-left: 40px; }
 .calendar_week th, .calendar_month th { font-weight: normal; padding-top: 10px; border-bottom: solid 1px #eee; padding-bottom: 10px; border-right: solid 1px #eee; }
 .calendar_month td { width: 14%; height: 120px; text-align: left; padding: 10px; border-bottom: solid 1px #eee; vertical-align: top; border-right: solid 1px #eee; }
 .calendar_week, .calendar_month { padding-bottom: 50px; width: 100%; }
