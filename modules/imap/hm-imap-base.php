@@ -482,7 +482,7 @@ class Hm_IMAP_Base {
                 }
                 break;
             case 'uid_list';
-                if (preg_match("/^(\d+\s*,*\s*|(\d+|\*):(\d+|\*))+$/", $val)) {
+                if (preg_match("/^[0-9,*:]+$/", $val)) {
                     $valid = true;
                 }
                 break;
