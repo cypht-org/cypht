@@ -236,7 +236,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($reply_type) {
             $this->out('reply_type', $reply_type);
         }
-        $this->out('compose_draft', $draft);
+        $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
         $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
         $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
