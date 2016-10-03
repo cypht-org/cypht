@@ -955,8 +955,13 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
      * Opens a div and unordered list tag
      */
     protected function output() {
-        $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main').
-        '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+        $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main');
+        if (DEBUG_MODE) {
+            $res .= ' <span title="'.
+                $this->trans('Running in debug mode. See https://cypht.org/install.html Section 5 for more detail.').
+                '" class="debug_title">['.$this->trans('Debug').']</span>';
+        }
+        $res .= '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;

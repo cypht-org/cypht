@@ -170,6 +170,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .home_password_dialogs .pw_input { width: 120px; }
 .nux_title { font-size: 120%; margin-bottom: 20px; }
 .total_unread_count, .unread_count { background-color: #ccc; font-size: 90%; margin-left: 10px; padding: 0px; vertical-align: 2px; font-weight: bold; color: #fff; }
+.debug_title { color: teal; padding-left: 20px; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
