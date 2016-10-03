@@ -398,7 +398,7 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                     $this->user_config->set($name, $value);
                 }
                 Hm_Page_Cache::flush($this->session);
-                Hm_Msgs::add('Settings saved');
+                Hm_Msgs::add('Settings updated');
                 $this->session->record_unsaved('Site settings updated');
                 $this->out('reload_folders', true, false);
             }
