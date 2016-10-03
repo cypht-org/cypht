@@ -514,7 +514,7 @@ return array(
     'Vehicle License' => 'Licencia de Vehículo',
     'Edit Shortcut' => 'Editar Atajo',
     'Modifier Key(s)' => 'Tecla(s) Modificadoras',
-    'Character' => ''Carácter',
+    'Character' => 'Carácter',
     'Romanian' => 'Română',
     'Unflagged' => 'Sin etiquetar',
     'Unanswered' => 'Sin respuesta',
