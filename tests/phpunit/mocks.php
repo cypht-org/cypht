@@ -93,12 +93,13 @@ class Hm_Mock_Request {
     public $post = array('hm_page_key' => 'asdf', 'fld1' => '0', 'fld2' => '1');
     public $get = array();
     public $cookie = array();
-    public $server = array('SERVER_NAME' => 'test', 'REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android');
+    public $server = array('SERVER_NAME' => 'test', 'REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android', 'REQUEST_METHOD' => 'GET');
     public $tls = false;
     public $type;
     public $sapi = 'test';
     public $format = 'Hm_Format_HTML5';
     public $path = 'asdf';
+    public $method = 'GET';
     public function __construct($type) {
         $this->type = $type;
     }
@@ -147,7 +148,7 @@ function filters() {
         'allowed_pages' => array('test'),
         'allowed_post' => array('bar' => FILTER_VALIDATE_INT),
         'allowed_output' => array(),
-        'allowed_server' => array('REQUEST_SCHEME' => FILTER_SANITIZE_STRING, 'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING, 'HTTPS' => FILTER_SANITIZE_STRING, 'HTTP_X_REQUESTED_WITH' => FILTER_SANITIZE_STRING, 'REQUEST_URI' => FILTER_SANITIZE_STRING),
+        'allowed_server' => array('REQUEST_METHOD' => FILTER_SANITIZE_STRING, 'REQUEST_SCHEME' => FILTER_SANITIZE_STRING, 'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING, 'HTTPS' => FILTER_SANITIZE_STRING, 'HTTP_X_REQUESTED_WITH' => FILTER_SANITIZE_STRING, 'REQUEST_URI' => FILTER_SANITIZE_STRING),
         'allowed_get' => array('foo' => FILTER_UNSAFE_RAW),
         'allowed_cookie' => array()
     );
