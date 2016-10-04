@@ -4,7 +4,7 @@
 .edit_shortcut_form select { overflow-y: auto; }
 .edit_shortcut_form table th { font-size: 115%; padding-bottom: 20px; }
 .shortcut_table { width: 50%; }
-.kbd_config { cursor: pointer; }
+.kbd_config { cursor: pointer; opacity: .4; }
 .shortcut_table th { padding-left: 40px; font-weight: normal; padding-top: 6px; padding-bottom: 3px; text-align: left; }
 .shortcut_table td { padding-top: 5px; }
 .shortcut_table .settings_subtitle { cursor: auto; }
