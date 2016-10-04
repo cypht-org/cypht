@@ -34,7 +34,11 @@ class Hm_Handler_process_api_login extends Hm_Handler_login {
         }
         if (!$api_login) {
             Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
+            $this->validate_method();
             $this->process_key();
+            if (!$this->config->get('disable_origin_check', false)) {
+                $this->validate_origin();
+            }
         }
         else {
             header('Content-Type: application/json');

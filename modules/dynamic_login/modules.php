@@ -74,7 +74,11 @@ class Hm_Handler_process_dynamic_login extends Hm_Handler_login {
             $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
         }
         Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
+        $this->validate_method();
         $this->process_key();
+        if (!$this->config->get('disable_origin_check', false)) {
+            $this->validate_origin();
+        }
     }
 }
 
