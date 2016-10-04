@@ -9,7 +9,7 @@
 .add_contact_row { position: absolute; top: 22px; right: 10px; font-size: 90%; z-index: 100}
 .add_contact_row img { opacity: .4; margin-right: 10px; }
 .add_contact_controls { display: none; }
-@media screen and (max-device-width:480px) and (orientation : portrait) { .add_contact_row { display: none; } }
+@media screen and (max-device-width:480px) and (orientation : portrait) { .contact_list { margin-left: 10px; max-width: 100%; } .contact_fld { max-width: 75px !important; } .add_contact_row { display: none; } }
 .contact_suggestion { display: block; }
 .close_autocomplete { float: right; }
 #cc_contacts, #bcc_contacts, #to_contacts { display: none; left: 34px; margin-top: -5px; position: absolute; background-color: #fff; border: solid 1px #ddd; padding: 10px; border-radius: 3px 3px 3px 3px; border-top: none; }
