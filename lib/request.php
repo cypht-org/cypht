@@ -59,6 +59,9 @@ class Hm_Request {
     /* module filters */
     public $filters = array();
 
+    /* HTTP request method */
+    public $method = false;
+
     /**
      * Process request details
      * @param array $filters list of input filters from module sets
@@ -108,6 +111,9 @@ class Hm_Request {
         }
         if (array_key_exists('REQUEST_URI', $this->server)) {
             $this->path = $this->get_clean_url_path($this->server['REQUEST_URI']);
+        }
+        if (array_key_exists('REQUEST_METHOD', $this->server)) {
+            $this->method = $this->server['REQUEST_METHOD'];
         }
         $this->get_request_type();
         $this->is_tls();
