@@ -1064,6 +1064,8 @@ var Hm_Utils = {
         return results;
     },
     get_from_local_storage: function(key) {
+        var prefix = window.location.pathname;
+        key = prefix+key;
         var res = false;
         if (hm_encrypt_local_storage()) {
              res = Hm_Crypt.decrypt(sessionStorage.getItem(key));
@@ -1074,6 +1076,8 @@ var Hm_Utils = {
         return res;
     },
     save_to_local_storage: function(key, val) {
+        var prefix = window.location.pathname;
+        key = prefix+key;
         if (hm_encrypt_local_storage()) {
             val = Hm_Crypt.encrypt(val);
         }
