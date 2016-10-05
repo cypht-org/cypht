@@ -134,8 +134,9 @@ class Hm_PHP_Session extends Hm_Session {
         if (isset($request->path)) {
             $path = $request->path;
         }
-        if (array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
-            $domain = $request->server['SERVER_NAME'];
+        $domain = $this->site_config->get('cookie_domain', false);
+        if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
+            $domain = $request->server['HTTP_HOST'];
         }
         return array($secure, $path, $domain);
     }
