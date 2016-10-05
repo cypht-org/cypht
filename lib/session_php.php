@@ -232,7 +232,8 @@ class Hm_PHP_Session extends Hm_Session {
         $params = session_get_cookie_params();
         $this->secure_cookie($request, $this->cname, '', time()-3600, $params['path'], $params['domain']);
         $this->secure_cookie($request, 'hm_id', '', time()-3600);
-        $this->secure_cookie($request, 'hm_reload_folders', 0, time()-3600);
+        $this->secure_cookie($request, 'hm_reload_folders', '', time()-3600);
+        $this->secure_cookie($request, 'hm_msgs', '', time()-3600);
         $this->active = false;
     }
 }

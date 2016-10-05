@@ -111,7 +111,7 @@ class Hm_Dispatch {
             if (is_array($msgs)) {
                 array_walk($msgs, function($v) { Hm_Msgs::add($v); });
             }
-            $this->session->secure_cookie($this->request, 'hm_msgs', '', 0);
+            $this->session->secure_cookie($this->request, 'hm_msgs', false, time()-3600);
             return 'msg_forward';
         }
         return false;
