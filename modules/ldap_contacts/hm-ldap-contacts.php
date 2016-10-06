@@ -92,7 +92,7 @@ class Hm_LDAP_Contacts extends Hm_Auth_LDAP {
         }
         if (array_key_exists('base_dn', $this->config)) {
             $base_dn = $this->config['base_dn'];
-            $res = ldap_search($this->fh, $base_dn, $search_term);
+            $res = ldap_search($this->fh, $base_dn, $search_term, array(), 0, 0);
             if ($res) {
                 $contacts = ldap_get_entries($this->fh, $res);
                 return $this->parse($contacts);
