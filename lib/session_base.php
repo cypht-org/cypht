@@ -83,7 +83,7 @@ abstract class Hm_Session {
     protected $data = array();
 
     /* session cookie name */
-    protected $cname = false;
+    protected $cname = 'hm_session';
 
     /* authentication object */
     protected $auth_mech = false;

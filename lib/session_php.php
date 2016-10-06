@@ -11,9 +11,6 @@
  */
 class Hm_PHP_Session extends Hm_Session {
 
-    /* cookie name for sessions */
-    protected $cname = 'CYPHTID';
-
     /**
      * Check for an existing session or a new user/pass login request
      * @param object $request request details
