@@ -420,7 +420,7 @@ return array(
     'Unflag the message' => 'Flag verwijderen van bericht',
     'Delete the message' => 'Bericht verwijderen',
 	'Enter the 6 digit code from Google Authenticator' => 'Geef de 6-digit code van Google Authenticator in',
-	'Login Code' => 'Login code'',
+	'Login Code' => 'Login code',
     '2 factor authentication code does not match' => '2-factor authenticatie code komt niet overeen',
     '2 Factor Authentication' => '2-factor authenticatie',
     'Configure Google Authenticator BEFORE enabling 2 factor authentication.' => 'Configureer Google Authenticator voor 2-factor authenticatie in te schakelen',
@@ -496,7 +496,7 @@ return array(
     'SMTP server deleted' => 'SMPT Server verwijderd',
     'Set as default' => 'Instellen als default',
     'Show Github notices received since' => 'Toon github notificaties ontvangen sinds',
-    'Show WordPress.com notices received since' => 'Toon WordPress.com notificaties ontvangen sinds'
+    'Show WordPress.com notices received since' => 'Toon WordPress.com notificaties ontvangen sinds',
     'The following backup codes can be used to access your account if you lose your device' => 'De volgende backup codes kunnen gebruikt worden om toegang tot uw account te krijgen als u uw device verloren bent',
     'This code was recently updated for a security issue. YOU MUST RE-ADD this to your authentication app.' => 'De code was recent geupdate voor een beveiligingsissue. U MOET deze opnieuw toevoegen aan uw authenticatie app',
     'Unlock' => false,
