@@ -55,6 +55,7 @@ function interface_langs() {
         'it' => 'Italian',
         'ru' => 'Russian',
         'ro' => 'Romanian',
+        'ja' => 'Japanese',
     );
 }
 
