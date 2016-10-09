@@ -74,7 +74,11 @@ class Hm_Handler_process_dynamic_login extends Hm_Handler_login {
             $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
         }
         Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
+        $this->validate_method();
         $this->process_key();
+        if (!$this->config->get('disable_origin_check', false)) {
+            $this->validate_origin();
+        }
     }
 }
 
@@ -91,8 +95,7 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
             return parent::output();
         }
         if (!$this->get('router_login_state')) {
-            return '<form class="login_form" method="POST">'.
-                '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
+            return '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
                 ' <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                 ' <label class="screen_reader" for="username">'.$this->trans('E-mail').'</label>'.
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
@@ -101,12 +104,11 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
                 '<select class="dynamic_service_select" required name="email_provider"><option value="">'.
                 $this->trans('E-mail Provider').'</option>'.Nux_Quick_Services::option_list(false, $this).
                 '<option value="other">'.$this->trans('Other').'</option></select><br />'.
-                ' <input type="submit" value="'.$this->trans('Login').'" /></form>';
+                ' <input type="submit" value="'.$this->trans('Login').'" />';
         }
         else {
             $settings = $this->get('changed_settings', array());
-            return '<form class="logout_form" method="POST">'.
-                '<input type="hidden" id="unsaved_changes" value="'.
+            return '<input type="hidden" id="unsaved_changes" value="'.
                 (!empty($settings) ? '1' : '0').'" />'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
@@ -117,7 +119,7 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
                 '<input class="save_settings" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />'.
                 '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
                 '<input class="cancel_logout save_settings" type="button" value="'.$this->trans('Cancel').'" />'.
-                '</div></form>';
+                '</div>';
         }
     }
 }

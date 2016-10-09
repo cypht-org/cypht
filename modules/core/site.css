@@ -152,7 +152,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .search_terms { padding-left: 5px; }
 .folder_list .search_terms { width: 80%; }
 .search_content { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
-.save_perm_form, .save_details { max-width: 600px; margin-left: 30px; margin-top: 20px; max-width: 60%; color: #666; }
+.save_perm_form, .save_details { max-width: 600px; margin-left: 30px; margin-top: 20px; padding-right: 20px; color: #666; }
 .save_subtitle { font-size: 110%; padding-top: 20px; }
 .unsaved_settings { margin-bottom: 30px; }
 .msg_text_inner p { padding: 5px; }
@@ -170,6 +170,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .home_password_dialogs .pw_input { width: 120px; }
 .nux_title { font-size: 120%; margin-bottom: 20px; }
 .total_unread_count, .unread_count { background-color: #ccc; font-size: 90%; margin-left: 10px; padding: 0px; vertical-align: 2px; font-weight: bold; color: #fff; }
+.debug_title { color: teal; padding-left: 20px; }
 
 .rtl_page .search_content { margin-right: 0px !important; margin-left: 20px; }
 .rtl_page .folder_list { margin-right: 0px !important; margin-left: 20px; }
@@ -228,6 +229,8 @@ div.unseen, .unseen .subject { font-weight: 700; }
 }
 @media screen and (max-device-width:480px) and (orientation : portrait) {
     .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
+    .save_settings { margin-left: 0px !important; }
+    .save_settings_password { margin-right: 10px; }
     body { font-size: 90%; min-width: 100%; }
     .list_meta { display: block; }
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }

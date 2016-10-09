@@ -45,7 +45,7 @@ else {
 }
 
 /* session name */
-ini_set('session.name', 'CYPHTID');
+ini_set('session.name', 'hm_session');
 
 /* disable remote includes */
 ini_set('allow_url_include', 0);

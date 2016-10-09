@@ -814,7 +814,7 @@ $(function() {
             globals.Hm_Background_Unread = new Message_List();
             globals.Hm_Background_Unread.background = true;
             globals.Hm_Background_Unread.add_sources(hm_data_sources_background());
-            Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, 23, true);
+            Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, 33, true);
         }
     }
     Hm_Timer.add_job(imap_prefetch_msgs, 43, true);

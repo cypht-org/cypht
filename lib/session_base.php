@@ -83,7 +83,7 @@ abstract class Hm_Session {
     protected $data = array();
 
     /* session cookie name */
-    protected $cname = false;
+    protected $cname = 'hm_session';
 
     /* authentication object */
     protected $auth_mech = false;
@@ -285,8 +285,8 @@ abstract class Hm_Session {
         }
         if (!$domain) {
             $domain = $this->site_config->get('cookie_domain', false);
-            if (!$domain && array_key_exists('SERVER_NAME', $request->server) && strtolower($request->server['SERVER_NAME']) != 'localhost') {
-                $domain = $request->server['SERVER_NAME'];
+            if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
+                $domain = $request->server['HTTP_HOST'];
             }
         }
         return Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);

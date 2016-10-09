@@ -221,6 +221,59 @@ abstract class Hm_Handler_Module {
     }
 
     /**
+     * Validate HTTP request type, only GET and POST are allowed
+     * @return bool
+     */
+    public function validate_method() {
+        if (!in_array(strtolower($this->request->method), array('get', 'post'), true)) {
+            if ($this->session->loaded) {
+                $this->session->destroy($this->request);
+                Hm_Debug::add('LOGGED OUT: mismatched origins');
+            }
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate that the request has matching source and target origins
+     * @return bool
+     */
+    public function validate_origin() {
+        if (!$this->session->loaded) {
+            return true;
+        }
+        $source = array_key_exists('HTTP_ORIGIN', $this->request->server) ? $this->request->server['HTTP_ORIGIN'] : false;
+        if (!$source) {
+            $source = array_key_exists('HTTP_REFERER', $this->request->server) ? $this->request->server['HTTP_REFERER'] : false;
+        }
+        $target = $this->config->get('cookie_domain', false);
+        if (!$target) {
+            $target = array_key_exists('HTTP_X_FORWARDED_HOST', $this->request->server) ? $this->request->serveri['HTTP_X_FORWARDED_HOST'] : false;
+        }
+        if (!$target) {
+            $target = array_key_exists('HTTP_HOST', $this->request->server) ? $this->request->server['HTTP_HOST'] : false;
+        }
+        if (!$target || !$source) {
+            $this->session->destroy($this->request);
+            Hm_Debug::add('LOGGED OUT: missing target origin');
+            return false;
+        }
+        $source = parse_url($source);
+        if (!is_array($source) || !array_key_exists('host', $source)) {
+            $this->session->destroy($this->request);
+            Hm_Debug::add('LOGGED OUT: invalid source origin');
+            return false;
+        }
+        if ($source['host'] !== $target) {
+            $this->session->destroy($this->request);
+            Hm_Debug::add('LOGGED OUT: mismatched origins');
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Validate a form key. If this is a non-empty POST form from an
      * HTTP request or AJAX update, it will take the user to the home
      * page if the page_key value is either not present or not valid
@@ -245,8 +298,8 @@ abstract class Hm_Handler_Module {
             else {
                 if ($this->session->loaded) {
                     $this->session->destroy($this->request);
+                    Hm_Debug::add('LOGGED OUT: request key check failed');
                 }
-                Hm_Debug::add('REQUEST KEY check failed');
                 Hm_Dispatch::page_redirect('?page=home');
                 return 'redirect';
             }

@@ -51,10 +51,12 @@ function interface_langs() {
     return array(
         'en' => 'English',
         'de' => 'German',
+        'es' => 'Spanish',
         'fr' => 'French',
         'it' => 'Italian',
         'ru' => 'Russian',
         'ro' => 'Romanian',
+        'nl' => 'Dutch',
         'ja' => 'Japanese',
     );
 }
@@ -435,7 +437,9 @@ function setup_base_page($name, $source=false) {
     add_output($name, 'header_content', false, $source);
     add_output($name, 'header_end', false, $source);
     add_output($name, 'content_start', false, $source);
+    add_output($name, 'login_start', false, $source);
     add_output($name, 'login', false, $source);
+    add_output($name, 'login_end', false, $source);
     add_output($name, 'loading_icon', true, $source);
     add_output($name, 'date', true, $source);
     add_output($name, 'msgs', false, $source);

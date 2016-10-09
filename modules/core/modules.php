@@ -6,7 +6,7 @@
  * @subpackage core
  */
 
-define('MAX_PER_SOURCE', 100);
+define('MAX_PER_SOURCE', 1000);
 define('DEFAULT_PER_SOURCE', 20);
 define('DEFAULT_SINCE', '-1 week');
 define('DEFAULT_SEARCH_FLD', 'TEXT');

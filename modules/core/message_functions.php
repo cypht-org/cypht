@@ -31,7 +31,7 @@ function format_msg_html($str) {
  * @return string
  */
 function convert_html_to_text($html) {
-    require APP_PATH.'third_party/Html2Text.php';
+    require_once APP_PATH.'third_party/Html2Text.php';
     $html = new \Html2Text\Html2Text($html, array('do_links' => 'table', 'width' => 0));
     return $html->getText();
 }

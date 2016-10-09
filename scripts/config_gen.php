@@ -58,7 +58,8 @@ function parse_module_ini_files($settings) {
         array('github.ini', false),
         array('ldap.ini', true),
         array('oauth2.ini', true),
-        array('wordpress.ini', false)
+        array('wordpress.ini', false),
+        array('recaptcha.ini', false)
     );
     if (!array_key_exists('app_data_dir', $settings)) {
         return $settings;
@@ -70,6 +71,7 @@ function parse_module_ini_files($settings) {
         if (is_readable($ini_file)) {
             $data = parse_ini_file($ini_file, $sections);
             if (is_array($data) && count($data) > 0) {
+                echo 'Found module set ini file: '.$ini_file."\n";
                 $settings[$file] = $data;
             }
         }

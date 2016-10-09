@@ -144,6 +144,37 @@ class Hm_Output_js_search_data extends Hm_Output_Module {
 }
 
 /**
+ * Outputs the end of the login or logout form
+ * @subpackage core/output
+ */
+class Hm_Output_login_end extends Hm_Output_Module {
+    /**
+     * Closes the login form
+     */
+    protected function output() {
+        return '</form>';
+    }
+}
+
+/**
+ * Outputs the start of the login or logout form
+ * @subpackage core/output
+ */
+class Hm_Output_login_start extends Hm_Output_Module {
+    /**
+     * Looks at the current login state and outputs the correct form
+     */
+    protected function output() {
+        if (!$this->get('router_login_state')) {
+            return '<form class="login_form" method="POST">';
+        }
+        else {
+            return '<form class="logout_form" method="POST">';
+        }
+    }
+}
+
+/**
  * Outputs the login or logout form
  * @subpackage core/output
  */
@@ -153,19 +184,17 @@ class Hm_Output_login extends Hm_Output_Module {
      */
     protected function output() {
         if (!$this->get('router_login_state')) {
-            return '<form class="login_form" method="POST">'.
-                '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
+            return '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
                 ' <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                 ' <label class="screen_reader" for="username">'.$this->trans('Username').'</label>'.
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
                 ' <label class="screen_reader" for="password">'.$this->trans('Password').'</label>'.
                 '<input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
-                ' <input type="submit" id="login" value="'.$this->trans('Login').'" /></form>';
+                ' <input type="submit" id="login" value="'.$this->trans('Login').'" />';
         }
         else {
             $settings = $this->get('changed_settings', array());
-            return '<form class="logout_form" method="POST">'.
-                '<input type="hidden" id="unsaved_changes" value="'.
+            return '<input type="hidden" id="unsaved_changes" value="'.
                 (!empty($settings) ? '1' : '0').'" />'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
@@ -176,7 +205,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<input class="save_settings" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />'.
                 '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
                 '<input class="cancel_logout save_settings" type="button" value="'.$this->trans('Cancel').'" />'.
-                '</div></form>';
+                '</div>';
         }
     }
 }
@@ -926,8 +955,13 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
      * Opens a div and unordered list tag
      */
     protected function output() {
-        $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main').
-        '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+        $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main');
+        if (DEBUG_MODE) {
+            $res .= ' <span title="'.
+                $this->trans('Running in debug mode. See https://cypht.org/install.html Section 5 for more detail.').
+                '" class="debug_title">['.$this->trans('Debug').']</span>';
+        }
+        $res .= '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;

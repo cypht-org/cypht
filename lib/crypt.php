@@ -22,13 +22,18 @@ class Hm_Request_Key {
      * @return void
      */
     public static function load($session, $request, $just_logged_in) {
-        if ($session->is_active() && !$just_logged_in) {
-            $user = $session->get('username', false);
+        $user = '';
+        $key = '';
+        if ($session->is_active()) {
+            if (!$just_logged_in) {
+                $user = $session->get('username', '');
+                $key = $session->get('request_key', '');
+            }
+            else {
+                $session->set('request_key', Hm_Crypt::unique_id());
+            }
         }
-        else {
-            $user = '';
-        }
-        self::$site_hash = $session->build_fingerprint($request->server, $user.SITE_ID);
+        self::$site_hash = $session->build_fingerprint($request->server, $key.$user.SITE_ID);
     }
 
     /**

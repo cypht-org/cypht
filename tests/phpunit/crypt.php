@@ -126,8 +126,9 @@ class Hm_Test_Request_Key extends PHPUnit_Framework_TestCase {
         $this->assertEquals('fakefingerprint', Hm_Request_Key::generate());
         $session = new Hm_Mock_Session();
         $request = new Hm_Mock_Request('AJAX');
-        $session->loaded = false;
         Hm_Request_Key::load($session, $request, false);
+        $this->assertEquals('fakefingerprint', Hm_Request_Key::generate());
+        Hm_Request_Key::load($session, $request, true);
         $this->assertEquals('fakefingerprint', Hm_Request_Key::generate());
     }
     /**

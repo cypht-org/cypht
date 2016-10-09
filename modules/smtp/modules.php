@@ -236,7 +236,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($reply_type) {
             $this->out('reply_type', $reply_type);
         }
-        $this->out('compose_draft', $draft);
+        $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
         $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
         $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
@@ -456,9 +456,13 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                 }
                 $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
                 $profiles = $this->get('compose_profiles', array());
+                $imap_server = false;
                 if ($smtp_details) {
                     $from = $smtp_details['user'];
                     if (array_key_exists($form['smtp_server_id'], $profiles)) {
+                        if ($profiles[$form['smtp_server_id']]['name'][1] == 'imap') {
+                            $imap_server = $profiles[$form['smtp_server_id']]['name'][2];
+                        }
                         $from_name = $profiles[$form['smtp_server_id']]['profile_name'];
                         $reply_to = $profiles[$form['smtp_server_id']]['profile_replyto'];
                         if (array_key_exists('profile_address', $profiles[$form['smtp_server_id']]) &&
@@ -504,6 +508,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                                 Hm_Msgs::add(sprintf("ERR%s", $err_msg));
                             }
                             else {
+                                /* TODO: check $imap_server, connect and check for Sent folder, append to
+                                 * folder if found */
                                 $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
                                 if ($auto_bcc) {
                                     $mime->set_auto_bcc($from);

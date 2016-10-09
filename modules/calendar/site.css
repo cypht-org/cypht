@@ -1,5 +1,7 @@
 .calendar { width: 100%; }
+.event_form { margin-left: 40px; }
 .calendar_week th, .calendar_month th { font-weight: normal; padding-top: 10px; border-bottom: solid 1px #eee; padding-bottom: 10px; border-right: solid 1px #eee; }
+@media screen and (max-device-width:480px) and (orientation : portrait) { .calendar_month th { max-width: 30px; overflow: hidden; } }
 .calendar_month td { width: 14%; height: 120px; text-align: left; padding: 10px; border-bottom: solid 1px #eee; vertical-align: top; border-right: solid 1px #eee; }
 .calendar_week, .calendar_month { padding-bottom: 50px; width: 100%; }
 .calendar_week .today, .calendar_month .today { background-color: #f5f5f5; }
@@ -8,7 +10,7 @@
 .calendar_week td { width: 14%; height: 600px; text-align: left; padding: 10px; border-bottom: solid 1px #eee; vertical-align: top; border-right: solid 1px #eee; }
 .calendar .event_form { margin-top: 20px; width: 20%; }
 .calendar .event_form td { padding-top: 5px; }
-.cal_label { text-align: right; padding-right: 20px; }
+.cal_label { text-align: left; padding-right: 20px; }
 .event_submit { padding-top: 15px !important; }
 .cal_event { position: relative; margin-top: 5px; color: #666; }
 .event_details { cursor: pointer; z-index: 100; display: none; position: absolute; width: 300px; border: solid 1px #ddd; background-color: #fff; padding: 10px; }

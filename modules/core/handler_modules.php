@@ -398,7 +398,7 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
                     $this->user_config->set($name, $value);
                 }
                 Hm_Page_Cache::flush($this->session);
-                Hm_Msgs::add('Settings saved');
+                Hm_Msgs::add('Settings updated');
                 $this->session->record_unsaved('Site settings updated');
                 $this->out('reload_folders', true, false);
             }
@@ -472,7 +472,11 @@ class Hm_Handler_login extends Hm_Handler_Module {
             }
         }
         Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
+        $this->validate_method();
         $this->process_key();
+        if (!$this->config->get('disable_origin_check', false)) {
+            $this->validate_origin();
+        }
     }
 }
 

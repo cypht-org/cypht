@@ -135,7 +135,32 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
     public function test_module_is_supported() {
         $this->assertFalse($this->handler_mod->module_is_supported('core'));
     }
-
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_origin() {
+        $this->assertFalse($this->handler_mod->validate_origin());
+        $this->handler_mod->session->loaded = false;
+        $this->assertTrue($this->handler_mod->validate_origin());
+        $this->handler_mod->session->loaded = true;
+        $this->handler_mod->request->server['HTTP_ORIGIN'] = 'asdf';
+        $this->handler_mod->request->server['HTTP_HOST'] = 'localhost';
+        $this->assertFalse($this->handler_mod->validate_origin());
+        $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://localhost';
+        $this->assertTrue($this->handler_mod->validate_origin());
+        $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://otherhost';
+        $this->assertFalse($this->handler_mod->validate_origin());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_method() {
+        $this->assertTrue($this->handler_mod->validate_method());
+        $this->handler_mod->request->method = 'PUT';
+        $this->assertFalse($this->handler_mod->validate_method());
+    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess

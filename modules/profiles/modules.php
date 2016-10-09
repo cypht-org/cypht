@@ -37,6 +37,7 @@ class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
         foreach ($this->user_config->dump() as $name => $vals) {
             if (preg_match("/^profile_/", $name) && is_array($vals)) {
                 if (array_key_exists('profile_smtp', $vals) && $vals['profile_smtp']) {
+                    $vals['name'] = explode('_', $name);
                     $profiles[$vals['profile_smtp']] = $vals;
                 }
             }
@@ -253,16 +254,16 @@ class Hm_Output_profile_content extends Hm_Output_Module {
         if (count($profiles) > 0) {
             $smtp_servers = $this->get('smtp_servers', array());
             $res .= '<table class="profile_details"><tr>'.
-                '<th></th><th>'.$this->trans('Name').'</th>'.
+                '<th>'.$this->trans('Name').'</th>'.
                 '<th>'.$this->trans('Server').'</th>'.
                 '<th>'.$this->trans('Username').'</th>'.
                 '<th>'.$this->trans('Display Name').'</th>'.
-                '<th>'.$this->trans('E-mail').'</th>'.
+                '<th>'.$this->trans('E-mail Address').'</th>'.
                 '<th>'.$this->trans('Reply-to').'</th>'.
                 '<th>'.$this->trans('SMTP Server').'</th>'.
                 '<th>'.$this->trans('Signature').'</th>'.
                 '<th>'.$this->trans('Default').'</th>'.
-                '</tr>';
+                '<th></th></tr>';
             foreach ($profiles as $id => $profile) {
                 $smtp = '';
                 if (array_key_exists('profile_smtp', $profile['profile_details'])) {
@@ -271,8 +272,6 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     }
                 }
                 $res .= '<tr>'.
-                    '<td><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
-                    '<img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a></td>'.
                     '<td>'.$this->html_safe($profile['name']).'</td>'.
                     '<td>'.$this->html_safe($profile['server']).'</td>'.
                     '<td>'.$this->html_safe($profile['user']).'</td>'.
@@ -282,6 +281,8 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td>'.$this->html_safe($smtp).'</td>'.
                     '<td>'.(array_key_exists('profile_sig', $profile['profile_details']) && strlen($profile['profile_details']['profile_sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td>'.(array_key_exists('profile_default', $profile['profile_details']) && $profile['profile_details']['profile_default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
+                    '<img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a></td>'.
                     '</tr>';
             }
             $res .= '</table>';
