@@ -266,7 +266,7 @@ function shortcut_defaults($user_config=false) {
         array('label' => 'View the next message in the list', 'group' => 'message', 'page' => 'message', 'control_chars' => array(), 'char' => 78, 'action' =>  'ks_follow_link', 'target' =>  '.nlink'),
         array('label' => 'View the previous message in the list', 'group' => 'message', 'page' => 'message', 'control_chars' => array(), 'char' => 80, 'action' => 'ks_follow_link', 'target' => '.plink'),
         array('label' => 'Reply', 'group' => 'message', 'page' => 'message', 'control_chars' => array(), 'char' =>  82, 'action' =>  'ks_follow_link', 'target' =>  '.reply_link'),
-        array('label' => 'Reply All', 'group' => 'message', 'page' => 'message', 'control_chars' => array('shift'), 'char' =>  82, 'action' =>  'ks_follow_link', 'target' =>  '.reply_all_link'),
+        array('label' => 'Reply-all', 'group' => 'message', 'page' => 'message', 'control_chars' => array('shift'), 'char' =>  82, 'action' =>  'ks_follow_link', 'target' =>  '.reply_all_link'),
         array('label' => 'Forward', 'group' => 'message', 'page' => 'message', 'control_chars' => array('shift'), 'char' =>  70, 'action' =>  'ks_follow_link', 'target' =>  '.forward_link'),
         array('label' => 'Flag the message', 'group' => 'message', 'page' => 'message', 'control_chars' => array(), 'char' =>  70, 'action' =>  'ks_click_button', 'target' =>  '.flagged_link'),
         array('label' => 'Unflag the message', 'group' => 'message', 'page' => 'message', 'control_chars' => array(), 'char' =>  85, 'action' =>  'ks_click_button', 'target' =>  '.unflagged_link'),

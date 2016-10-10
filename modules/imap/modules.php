@@ -1368,11 +1368,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
-                '<a href="#" class="hlink header_toggle">'.$this->trans('all headers').'</a>'.
-                '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('small headers').'</a>'.
-                ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('reply').'</a>'.
-                ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('reply-all').'</a>'.
-                ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('forward').'</a>';
+                '<a href="#" class="hlink header_toggle">'.$this->trans('All headers').'</a>'.
+                '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('Small headers').'</a>'.
+                ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>'.
+                ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>'.
+                ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';
             if ($msg_part === '0') {
                 $txt .= ' | <a class="normal_link hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
             }

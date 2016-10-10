@@ -173,7 +173,7 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<table><tr><th>'.$this->trans('Display Name').'</th><td><input type="text" name="profile_name" value="'.$this->html_safe($profile['profile_name']).'" /></td></tr>';
             $res .= '<tr><th>'.$this->trans('E-mail Address').'</th><td><input type="email" name="profile_address" value="'.$this->html_safe($profile['profile_address']).'" /></td></tr>';
-            $res .= '<tr><th>'.$this->trans('Reply-to Address').'</th><td><input type="email" name="profile_replyto" value="'.$this->html_safe($profile['profile_replyto']).'" /></td></tr>';
+            $res .= '<tr><th>'.$this->trans('Reply-to').'</th><td><input type="email" name="profile_replyto" value="'.$this->html_safe($profile['profile_replyto']).'" /></td></tr>';
             $res .= '<tr><th>'.$this->trans('SMTP Server').'</th><td><select name="profile_smtp">';
             foreach ($smtp_servers as $id => $server) {
                 $res .= '<option ';

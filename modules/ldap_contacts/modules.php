@@ -43,7 +43,7 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
                         }
                         if ($ldap->add($atts, $dn)) {
                             Hm_Msgs::add('Contact Added');
-                            $this->session->record_unsaved('Contact added');
+                            $this->session->record_unsaved('Contact Added');
                         }
                         else {
                             Hm_Msgs::add('ERRUnable to add contact');

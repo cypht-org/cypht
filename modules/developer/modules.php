@@ -145,12 +145,12 @@ class Hm_Output_config_map extends Hm_Output_Module {
     }
     foreach ($handlers as $page => $mods) {
         $res .= '<tr><td colspan="2" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';
-        $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >Source</th></tr>';
+        $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th></tr>';
         foreach ($mods as $name => $vals) {
             $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td></tr>';
         }
         if (array_key_exists($page, $outputs)) {
-            $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >Source</th></tr>';
+            $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th></tr>';
             foreach($outputs[$page] as $name => $vals) {
                 $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td></tr>';
             }

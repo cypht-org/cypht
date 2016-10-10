@@ -22,7 +22,7 @@ class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
                     $contacts->add_contact(array('source' => 'local', 'email_address' => $vals['email'], 'display_name' => $vals['name']));
                 }
                 $this->user_config->set('contacts', $contacts->export());
-                $this->session->record_unsaved('Contact added');
+                $this->session->record_unsaved('Contact Added');
                 Hm_Msgs::add('Contact Added');
             }
         }
@@ -60,7 +60,7 @@ class Hm_Handler_process_add_contact extends Hm_Handler_Module {
             }
             $contacts->add_contact($details);
             $this->user_config->set('contacts', $contacts->export());
-            $this->session->record_unsaved('Contact added');
+            $this->session->record_unsaved('Contact Added');
             Hm_Msgs::add('Contact Added');
         }
     }

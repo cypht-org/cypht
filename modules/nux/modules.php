@@ -251,7 +251,7 @@ class Hm_Output_quick_add_dialog extends Hm_Output_Module {
             ' <select id="service_select" name="service_select"><option value="">'.$this->trans('Select an E-mail provider').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>'.
             '<label class="screen_reader" for="nux_username">'.$this->trans('Username').'</label>'.
             '<br /><input type="email" id="nux_username" class="nux_username" placeholder="'.$this->trans('Your E-mail address').'" />'.
-            '<label class="screen_reader" for="nux_account_name">'.$this->trans('Account Name').'</label>'.
+            '<label class="screen_reader" for="nux_account_name">'.$this->trans('Account name').'</label>'.
             '<br /><input type="text" id="nux_account_name" class="nux_account_name" placeholder="'.$this->trans('Account Name [optional]').'" />'.
             '<br /><input type="button" class="nux_next_button" value="'.$this->trans('Next').'" />'.
             '</div><div class="nux_step_two"></div></div></div>';
