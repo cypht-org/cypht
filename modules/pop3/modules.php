@@ -235,12 +235,12 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                 foreach ($msg_lines as $line) {
                     if ($headers) {
                         if (substr($line, 0, 1) == "\t") {
-                            $header_list[$last_header] .= ' '.trim($line);
+                            $header_list[$last_header] .= ' '.decode_fld($line);
                         }
                         elseif (strstr($line, ':')) {
                             $parts = explode(':', $line, 2);
                             if (count($parts) == 2) {
-                                $header_list[$parts[0]] = trim($parts[1]);
+                                $header_list[$parts[0]] = decode_fld($parts[1]);
                                 $last_header = $parts[0];
                             }
                         }
@@ -768,7 +768,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                 }
             }
             $txt .= '<tr><th colspan="2" class="header_links">'.
-                '<a href="#" class="header_toggle">'.$this->trans('all').'</a>'.
+                '<a href="#" class="header_toggle">'.$this->trans('All').'</a>'.
                 '<a class="header_toggle" style="display: none;" href="#">small</a>'.
                 ' | <a href="?page=compose">'.$this->trans('reply').'</a>'.
                 ' | <a href="?page=compose">'.$this->trans('forward').'</a>'.

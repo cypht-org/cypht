@@ -376,12 +376,12 @@ class Hm_POP3 extends Hm_POP3_Base {
         $current_header = false;
         foreach ($lines as $line) {
             if ($line{0} == "\t" && $current_header) {
-                $msg_headers[$current_header] .= ' '.trim($line);
+                $msg_headers[$current_header] .= ' '.decode_fld($line);
             }
             else {
                 $parts = explode(":", $line, 2);
                 if (count($parts) == 2) {
-                    $msg_headers[strtolower($parts[0])] = trim($parts[1]);
+                    $msg_headers[strtolower($parts[0])] = decode_fld($parts[1]);
                     $current_header = strtolower($parts[0]);
                 }
                 else {

@@ -429,3 +429,27 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type
     return array($msg_to, $msg_cc, $subject, $msg, $msg_id);
 }
 
+/**
+ * decode mail fields to human readable text
+ * @param string $string field to decode
+ * @return string decoded field
+ */
+function decode_fld($string) {
+    if (preg_match_all("/(=\?[^\?]+\?(q|b)\?[^\?]+\?=)/i", $string, $matches)) {
+        foreach ($matches[1] as $v) {
+            $fld = substr($v, 2, -2);
+            $charset = strtolower(substr($fld, 0, strpos($fld, '?')));
+            $fld = substr($fld, (strlen($charset) + 1));
+            $encoding = $fld{0};
+            $fld = substr($fld, (strpos($fld, '?') + 1));
+            if (strtoupper($encoding) == 'B') {
+                $fld = mb_convert_encoding(base64_decode($fld), 'UTF-8', $charset);
+            }
+            elseif (strtoupper($encoding) == 'Q') {
+                $fld = mb_convert_encoding(quoted_printable_decode(str_replace('_', ' ', $fld)), 'UTF-8', $charset);
+            }
+            $string = str_replace($v, $fld, $string);
+        }
+    }
+    return trim($string);
+}
