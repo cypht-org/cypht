@@ -167,7 +167,6 @@ class Hm_Feed {
      */
     function sort_parsed_data() {
         $data = $this->parsed_data;
-        $title = array_shift($data);
         usort($data, array($this, 'sort_by_time'));
         $final_list = array();
         $i = 1;
@@ -178,7 +177,6 @@ class Hm_Feed {
             }
             $i++;
         }
-        array_unshift($final_list, $title);
         $this->parsed_data = $final_list;
     }
 
