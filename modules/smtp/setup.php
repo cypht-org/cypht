@@ -114,7 +114,7 @@ return array(
         'submit_smtp_server' => FILTER_SANITIZE_STRING,
         'smtp_server_id' => FILTER_VALIDATE_INT,
         'smtp_user' => FILTER_SANITIZE_STRING,
-        'smtp_pass' => FILTER_SANITIZE_STRING,
+        'smtp_pass' => FILTER_UNSAFE_RAW,
         'delete_uploaded_files' => FILTER_VALIDATE_BOOLEAN,
         'compose_to' => FILTER_UNSAFE_RAW,
         'compose_msg_path' => FILTER_SANITIZE_STRING,

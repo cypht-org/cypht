@@ -281,7 +281,7 @@ return array(
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_server_ids' => FILTER_SANITIZE_STRING,
         'imap_user' => FILTER_SANITIZE_STRING,
-        'imap_pass' => FILTER_SANITIZE_STRING,
+        'imap_pass' => FILTER_UNSAFE_RAW,
         'imap_delete' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
         'imap_remember' => FILTER_VALIDATE_INT,

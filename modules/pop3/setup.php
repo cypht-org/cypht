@@ -133,7 +133,7 @@ return array(
         'pop3_server_id' => FILTER_VALIDATE_INT,
         'pop3_server_ids' => FILTER_SANITIZE_STRING,
         'pop3_user' => FILTER_SANITIZE_STRING,
-        'pop3_pass' => FILTER_SANITIZE_STRING,
+        'pop3_pass' => FILTER_UNSAFE_RAW,
         'pop3_list_path' => FILTER_SANITIZE_STRING,
         'pop3_uid' => FILTER_VALIDATE_INT,
         'pop3_limit' => FILTER_VALIDATE_INT,
