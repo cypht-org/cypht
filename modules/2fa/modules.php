@@ -113,8 +113,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $qr_code = '<tr class="tfa_setting"><td></td><td>';
             if (!$enabled) {
                 $qr_code .= '<div class="err settings_wrap_text">'.
-                    $this->trans('Configure your authentication app using the barcode below BEFORE enabling 2 factor authentication.').'<br />'.
-                    $this->trans('This code was recently updated for a security issue. YOU MUST RE-ADD this to your authentication app.').'<br />';
+                    $this->trans('Configure your authentication app using the barcode below BEFORE enabling 2 factor authentication.').'</div>';
             }
             else {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
