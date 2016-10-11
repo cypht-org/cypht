@@ -377,6 +377,7 @@ return array(
     'Add Event' => false,
     'Download' => false,
     'French' => false,
+    'Romanian' => false,
     'Shortcuts' => false,
     'Unfocus all input elements' => false,
     'Jump to the "Everything" page' => false,
@@ -481,7 +482,6 @@ return array(
     'Show Github notices received since' => false,
     'Show WordPress.com notices received since' => false,
     'The following backup codes can be used to access your account if you lose your device' => false,
-    'This code was recently updated for a security issue. YOU MUST RE-ADD this to your authentication app.' => false,
     'Unlock' => false,
     'Updated' => false,
     'WordPress.com Settings' => false,
@@ -497,9 +497,11 @@ return array(
     'Edit Shortcut' => false,
     'Modifier Key(s)' => false,
     'Character' => false,
-    'Romanian' => false,
     'Unflagged' => false,
-    'Unanswered' => false
+    'Unanswered' => false,
+    'Spanish' => false,
+    'Japanese' => false,
+    'Dutch' => false,
 ); 
 
 ?>
