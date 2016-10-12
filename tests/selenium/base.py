@@ -12,17 +12,28 @@ from creds import SITE_URL, USER, PASS, get_driver
 from selenium.common import exceptions
 
 SLEEP_INT = 1
+MODULES = 'core,contacts,local_contacts,ldap_contacts,gmail_contacts,feeds,'
+MODULES += 'pop3,imap,smtp,site,account,idle_timer,calendar,themes,nux,'
+MODULES += 'developer,wordpress,github,history,saved_searches,inline_message,'
+MODULES += 'profiles,imap_folders,password_restrictions,nasa,keyboard_shortcuts,'
+MODULES += '2fa,recover_settings'
 
 class WebTest:
 
     driver = None
 
-    def __init__(self):
-        self.driver = get_driver()
+    def __init__(self, cap=None):
+        self.driver = get_driver(cap)
         self.load()
 
     def load(self):
         self.go(SITE_URL)
+
+    def mod_active(self, name):
+        if name in ','.split(MODULES):
+            return True
+        print " - module not enabled: %s" % name
+        return False
 
     def go(self, url):
         self.driver.get(url)
