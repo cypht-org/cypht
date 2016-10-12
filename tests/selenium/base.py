@@ -3,28 +3,23 @@
 # To run these tests you must create a local file called creds.py in
 # this directory. This file must define the following values:
 #
-# DRIVER_CMD: The command string to pass into browserstack for a remote connection
-# SITE_URL:   The url of the installation of Cypht to test against
-# USER:       The username used to login to Cypht
-# PASS:       The password used to login to Cypht
+# get_driver:  A function that returns a webdriver object
+# SITE_URL:    The url of the installation of Cypht to test against
+# USER:        The username used to login to Cypht
+# PASS:        The password used to login to Cypht
 
 from time import sleep
-from creds import DRIVER_CMD, SITE_URL, USER, PASS
-from selenium import webdriver
+from creds import SITE_URL, USER, PASS, get_driver
 from selenium.common import exceptions
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-DRIVER = webdriver.Remote
 SLEEP_INT = 1
-DESIRED_CAP = {'os': 'Windows', 'os_version': '7', 'browser': 'IE', 'browser_version': '11', 'resolution': '1920x1080' }
 
 class WebTest:
 
     driver = None
 
     def __init__(self):
-        self.driver = DRIVER(command_executor=DRIVER_CMD, desired_capabilities=DESIRED_CAP)
+        self.driver = get_driver()
         self.load()
 
     def load(self):
