@@ -5,6 +5,7 @@
 /site/
 /todo
 /tests/selenium/creds.py
+/tests/selenium/local_creds.py
 *.pyc
 apigen4.sh
 commit_check.sh
