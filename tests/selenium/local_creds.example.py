@@ -21,5 +21,5 @@ USER = 'testuser'
 PASS = 'testpass'
 
 # A function that returns a webdriver object.
-def get_driver():
+def get_driver(cap):
     return DRIVER(DRIVER_CMD)

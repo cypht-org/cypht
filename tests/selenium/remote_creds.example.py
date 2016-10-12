@@ -12,7 +12,8 @@ DRIVER = webdriver.Remote
 # Define the remote command. This format is specific to browserstack.com
 DRIVER_CMD='http://<yourcreds>@hub.browserstack.com:80/wd/hub'
 
-# Set the browser and OS attributes
+# Set the browser and OS attributes. If this is a list of attribute
+# dictionaries, the test suites will be run across each set
 DESIRED_CAP = {'os': 'Windows', 'os_version': '7', 'browser': 'IE', 'browser_version': '11', 'resolution': '1920x1080' }
 
 # The base URL to run the tests against
@@ -25,5 +26,7 @@ USER = 'testuser'
 PASS = 'testpass'
 
 # A function that returns a webdriver object.
-def get_driver():
-    return DRIVER(command_executor=DRIVER_CMD, desired_capabilities=DESIRED_CAP)
+def get_driver(cap):
+    if not cap:
+        cap = DESIRED_CAP
+    return DRIVER(command_executor=DRIVER_CMD, desired_capabilities=cap)
