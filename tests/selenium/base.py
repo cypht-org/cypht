@@ -1,12 +1,11 @@
 #!/usr/bin/python
 
-# To run these tests you must create a local file called creds.py in
-# this directory. This file must define the following values:
+# To run these tests you must copy one of the example files to "creds.py" in
+# this directory, and edit it for your environment. There are 2 example files
+# in this directory:
 #
-# get_driver:  A function that returns a webdriver object
-# SITE_URL:    The url of the installation of Cypht to test against
-# USER:        The username used to login to Cypht
-# PASS:        The password used to login to Cypht
+# remote_creds.example.py:  Configure the Selenium tests to run with BrowserStack
+# local_creds.example.py:   Configure the Selenium tests to run locally
 
 from time import sleep
 from creds import SITE_URL, USER, PASS, get_driver
