@@ -12,16 +12,19 @@ class SettingsTests(WebTest):
         self.rest()
 
     def general_settings(self):
+        self.by_css('[data-source=".settings"]').click()
+        list_item = self.by_class('menu_settings')
+        list_item.find_element_by_tag_name('a').click()
         self.by_css('[data-target=".general_setting"]').click()
         self.by_name('smtp_auto_bcc').click()
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         self.by_name('save_settings').click()
         self.rest()
         self.by_css('[data-source=".settings"]').click()
-        assert self.by_class('sys_messages').text == 'Settings saved'
+        assert self.by_class('sys_messages').text == 'Settings updated'
 
 if __name__ == '__main__':
 
     print "SETTINGS TESTS"
-    test_runner(SettingsTests(), [
+    test_runner(SettingsTests, [
     ])

@@ -57,7 +57,7 @@ class LoginTests(WebTest):
 if __name__ == '__main__':
 
     print "LOGIN TESTS"
-    test_runner(LoginTests(), [
+    test_runner(LoginTests, [
         'bad_login_values',
         'missing_password',
         'missing_username',

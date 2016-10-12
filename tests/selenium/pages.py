@@ -35,6 +35,8 @@ class PageTests(WebTest):
         assert self.by_class('mailbox_list_title').text == 'Flagged'
 
     def contacts(self):
+        if not self.mod_active('contacts'):
+            return
         list_item = self.by_class('menu_contacts')
         list_item.find_element_by_tag_name('a').click()
         self.rest()
@@ -98,7 +100,7 @@ class PageTests(WebTest):
 if __name__ == '__main__':
 
     print "PAGE TESTS"
-    test_runner(PageTests(), [
+    test_runner(PageTests, [
         'search',
         'combined_inbox',
         'unread',
