@@ -20,7 +20,7 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
             if (array_key_exists('parent', $this->request->post)) {
                 $parent_str = $this->request->post['parent'];
             }
-            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 $new_folder = prep_folder_name($imap, $form['folder'], false, $parent_str);
@@ -44,7 +44,7 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder', 'new_folder'));
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             $parent_str = false;
             if (array_key_exists('parent', $this->request->post)) {
@@ -73,7 +73,7 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($this->session, $form['imap_server_id']);
+            $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 $del_folder = prep_folder_name($imap, $form['folder'], true);
