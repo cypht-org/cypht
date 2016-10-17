@@ -32,6 +32,8 @@ class Hm_DB {
             'db_name' => $site_config->get('db_name', false),
             'db_user' => $site_config->get('db_user', false),
             'db_pass' => $site_config->get('db_pass', false),
+            'db_socket' => $site_config->get('db_socket', false),
+            'db_conn_type' => $site_config->get('db_connection_type', 'host'),
         );
         foreach (self::$required_config as $v) {
             if (!self::$config[$v]) {
@@ -49,7 +51,9 @@ class Hm_DB {
             self::$config['db_host'].
             self::$config['db_name'].
             self::$config['db_user'].
-            self::$config['db_pass']
+            self::$config['db_pass'].
+            self::$config['db_conn_type'].
+            self::$config['db_socket']
         );
     }
 
@@ -61,7 +65,12 @@ class Hm_DB {
         if (self::$config['db_driver'] == 'sqlite') {
             return sprintf('%s:%s', self::$config['db_driver'], self::$config['db_host']);
         }
-        return sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
+        if (self::$config['db_conn_type'] == 'socket') {
+            return sprintf('%s:unix_socket=%s;dbname=%s', self::$config['db_driver'], self::$config['db_socket'], self::$config['db_name']);
+        }
+        else {
+            return sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
+        }
     }
 
     /**
