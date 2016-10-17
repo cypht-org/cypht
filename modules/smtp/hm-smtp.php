@@ -244,7 +244,7 @@ class Hm_SMTP {
         $ctx = stream_context_create();
         stream_context_set_option($ctx, 'ssl', 'verify_peer_name', false);
         stream_context_set_option($ctx, 'ssl', 'verify_peer', false);
-        $this->handle = @stream_socket_client($server.':'.$this->port, $errorno, $errorstr, 30, STREAM_CLIENT_CONNECT, $ctx);
+        $this->handle = @stream_socket_client($server.':'.$this->port, $errorno, $errorstr, 30, get_tls_stream_type(), $ctx);
         if (is_resource($this->handle)) {
             $this->debug[] = 'Successfully opened port to the SMTP server';
             $this->connected = true;
@@ -273,7 +273,7 @@ class Hm_SMTP {
                     stream_context_set_option($this->handle, 'tls', 'passphrase', $certpass);
                 }
             }
-            stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+            stream_socket_enable_crypto($this->handle, true, get_tls_stream_type());
             $command = 'EHLO '.$this->hostname;
             $this->send_command($command);
             $response = $this->get_response();

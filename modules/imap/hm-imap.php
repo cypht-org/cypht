@@ -186,7 +186,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             stream_context_set_option($ctx, 'ssl', 'verify_peer', $this->verify_peer);
 
             $timeout = 10;
-            $this->handle = @stream_socket_client($this->server.':'.$this->port, $errorno, $errorstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
+            $this->handle = @stream_socket_client($this->server.':'.$this->port, $errorno, $errorstr, $timeout, get_tls_stream_type(), $ctx);
             if (is_resource($this->handle)) {
                 $this->debug[] = 'Successfully opened port to the IMAP server';
                 $this->state = 'connected';
@@ -302,7 +302,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             if (!empty($response)) {
                 $end = array_pop($response);
                 if (substr($end, 0, strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
-                    stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+                    stream_socket_enable_crypto($this->handle, true, get_tls_stream_type());
                 }
                 else {
                     $this->debug[] = 'Unexpected results from STARTTLS: '.implode(' ', $response);
@@ -739,7 +739,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                         foreach ($lines as $line) {
                             $header = strtolower(substr($line, 0, strpos($line, ':')));
                             if (!$header || (!isset($flds[$header]) && $last_header)) {
-                                ${$flds[$last_header]} .= ' '.trim($line);
+                                ${$flds[$last_header]} .= ltrim($line);
                             }
                             elseif (isset($flds[$header])) {
                                 ${$flds[$header]} = substr($line, (strpos($line, ':') + 1));
@@ -752,7 +752,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                             if (($tags[strtoupper($vals[$i])] == 'flags' || $tags[strtoupper($vals[$i])] == 'google_labels' ) && $vals[$i + 1] == '(') {
                                 $n = 2;
                                 while (isset($vals[$i + $n]) && $vals[$i + $n] != ')') {
-                                    ${$tags[strtoupper($vals[$i])]} .= ' '.$vals[$i + $n];
+                                    ${$tags[strtoupper($vals[$i])]} .= $vals[$i + $n];
                                     $n++;
                                 }
                                 $i += $n;

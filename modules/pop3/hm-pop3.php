@@ -534,7 +534,7 @@ class Hm_POP3 extends Hm_POP3_Base {
         if ($this->starttls) {
             $this->send_command('STLS');
             if ($this->is_error($this->get_response()) == false && is_resource($this->handle)) {
-                stream_socket_enable_crypto($this->handle, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+                stream_socket_enable_crypto($this->handle, true, get_tls_stream_type());
             }
         }
         if (!$this->no_apop && preg_match('/<[0-9.]+@[^>]+>/', $this->banner, $matches)) {
