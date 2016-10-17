@@ -287,7 +287,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         else {
             $this->debug[] = 'Log in for '.$username.' FAILED';
         }
-        elog($this->show_debug(true, true));
         return $authed;
     }
 
