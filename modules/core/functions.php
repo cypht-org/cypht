@@ -495,3 +495,17 @@ function get_ini($config, $name, $sections=false) {
     }
     return array();
 }
+
+/**
+ * Determine the correct TLS connection type to use based
+ * on what this version of PHP supports
+ * @return const
+ */
+function get_tls_stream_type() {
+    $method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+    if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
+        $method |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+        $method |= STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+    }
+    return $method;
+}
