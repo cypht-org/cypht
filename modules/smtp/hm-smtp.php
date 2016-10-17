@@ -244,7 +244,7 @@ class Hm_SMTP {
         $ctx = stream_context_create();
         stream_context_set_option($ctx, 'ssl', 'verify_peer_name', false);
         stream_context_set_option($ctx, 'ssl', 'verify_peer', false);
-        $this->handle = @stream_socket_client($server.':'.$this->port, $errorno, $errorstr, 30, get_tls_stream_type(), $ctx);
+        $this->handle = @stream_socket_client($server.':'.$this->port, $errorno, $errorstr, 30, STREAM_CLIENT_CONNECT, $ctx);
         if (is_resource($this->handle)) {
             $this->debug[] = 'Successfully opened port to the SMTP server';
             $this->connected = true;
