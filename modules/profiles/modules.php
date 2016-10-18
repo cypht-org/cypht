@@ -80,7 +80,7 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             $data = $this->get('account_profiles');
             if (count($data) > $form['profile_id']) {
                 $current = $data[$form['profile_id']];
-                if (!$smtp && array_key_exists('profile_details', $current) && array_key_exists('profile_smtp', $current['profile_details'])) {
+                if ($smtp === '' && array_key_exists('profile_details', $current) && array_key_exists('profile_smtp', $current['profile_details'])) {
                     $smtp = $current['profile_details']['profile_smtp'];
                 }
                 $profile = array(
