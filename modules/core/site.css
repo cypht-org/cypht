@@ -93,7 +93,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .confirm_text {  padding-left: 10px; padding-bottom: 10px; }
 .folder_list .update_unread { float: right; margin-top: 20px; }
 .page_links a { text-decoration: none; color: #111; }
-.page_links a img { vertical-align: -2px; }
+.page_links a img { opacity: .6; width: 16px; height: 16px; vertical-align: -2px; }
 .page_links { text-align: center; padding-top: 20px; }
 .checkbox_cell { width: 20px; padding-right: 10px !important; }
 .menu_caret { padding: 7px; float: right; margin-right: 10px; opacity: .15; }
@@ -161,7 +161,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .reply_quote { color: #999; }
 .hl { background-color: #eee; }
 .settings_wrap_text { white-space: normal; }
-.message_table .source img { opacity: .5; vertical-align: -3px; padding-right: 15px; }
+.message_table .source img { width: 16px; height: 16px; opacity: .5; vertical-align: -3px; padding-right: 15px; }
 .unsaved_reminder { opacity: .2; position: absolute; top: 0px; left: 0px; width: 20px; height: 20px; }
 .header_space { padding-top: 10px !important; }
 div.unseen, .unseen .subject { font-weight: 700; }

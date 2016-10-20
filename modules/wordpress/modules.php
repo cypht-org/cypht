@@ -385,7 +385,7 @@ class Hm_Output_unread_wp_included_setting extends Hm_Output_Module {
 class Hm_Output_start_wordpress_settings extends Hm_Output_Module {
     protected function output() {
         return '<tr><td colspan="2" data-target=".wp_notifications_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$code.'" />'.$this->trans('WordPress.com Settings').'</td></tr>';
+            '<img alt="" src="'.Hm_Image_Sources::$w.'" width="16" height="16" />'.$this->trans('WordPress.com Settings').'</td></tr>';
     }
 }
 

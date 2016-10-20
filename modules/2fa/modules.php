@@ -99,7 +99,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $enabled = $settings['2fa_enable'];
         }
         $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$key.'" />'.$this->trans('2 Factor Authentication').'</td></tr>';
+            '<img alt="" src="'.Hm_Image_Sources::$unlocked.'" width="16" height="16" />'.$this->trans('2 Factor Authentication').'</td></tr>';
 
         $res .= '<tr class="tfa_setting"><td>'.$this->trans('Enable 2 factor authentication').
             '</td><td><input value="1" type="checkbox" name="2fa_enable"';

@@ -642,7 +642,7 @@ class Hm_Output_unread_github_included_setting extends Hm_Output_Module {
 class Hm_Output_start_github_settings extends Hm_Output_Module {
     protected function output() {
         return '<tr><td colspan="2" data-target=".github_all_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$code.'" />'.$this->trans('Github Settings').'</td></tr>';
+            '<img alt="" src="'.Hm_Image_Sources::$code.'" width="16" height="16" />'.$this->trans('Github Settings').'</td></tr>';
     }
 }
 

@@ -72,7 +72,7 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> '.$this->trans('Dev').'</a></li>';
+            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> '.$this->trans('Dev').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
