@@ -98,7 +98,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .checkbox_cell { width: 20px; padding-right: 10px !important; }
 .menu_caret { padding: 7px; float: right; margin-right: 10px; opacity: .15; }
 .news_cell { border: none !important; padding-bottom: 10px !important; padding-top: 10px !important; }
-.news_cell .subject div img {opacity: .5; padding-right: 10px; }
+.news_cell .subject div img {width: 16px; height: 16px; opacity: .5; padding-right: 10px; }
 .news_cell .subject, .news_cell .subject div{ padding-bottom: 5px !important; overflow: visible; white-space: normal; }
 .news_cell .icon { float: right; }
 .icon { white-space: nowrap; font-size: 110%; }
