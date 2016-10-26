@@ -136,7 +136,7 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
 };
 
 var setup_autocomplete_events = function(class_name, list_div, fld_val) {
-    $('.contact_suggestion').click(function() { return add_autocomplete(event, class_name, list_div); });
+    $('.contact_suggestion').click(function(event) { return add_autocomplete(event, class_name, list_div); });
     $(class_name).keydown(function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
     $('.contact_suggestion').keydown(function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
     $(document).click(function() { $(list_div).hide(); });
