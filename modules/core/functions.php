@@ -478,7 +478,7 @@ function setup_base_page($name, $source=false) {
     add_output($name, 'content_section_end', true, $source);
     add_output($name, 'save_reminder', true, $source);
     add_output($name, 'page_js', true, $source);
-    add_output($name, 'content_end', true, $source);
+    add_output($name, 'content_end', false, $source);
 }
 
 /**
