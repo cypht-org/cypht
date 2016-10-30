@@ -497,11 +497,11 @@ return array(
     'Edit Shortcut' => false,
     'Modifier Key(s)' => false,
     'Character' => false,
-    'Unflagged' => false,
-    'Unanswered' => false,
-    'Spanish' => false,
-    'Japanese' => false,
-    'Dutch' => false,
+    'Unflagged' => 'フラグ無し',
+    'Unanswered' => '未回答',
+    'Spanish' => 'スペイン語',
+    'Japanese' => '日本語',
+    'Dutch' => 'オランダ語',
 ); 
 
 ?>
