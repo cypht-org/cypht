@@ -20,6 +20,9 @@ USER = 'testuser'
 # A valid password for the username
 PASS = 'testpass'
 
+# Unused for local testing
+DESIRED_CAP = None
+
 # A function that returns a webdriver object.
 def get_driver(cap):
     return DRIVER(DRIVER_CMD)
