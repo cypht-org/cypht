@@ -774,7 +774,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
                 ' | <a href="?page=compose">'.$this->trans('Forward').'</a>'.
                 ' | <a href="?page=compose">'.$this->trans('Attach').'</a>'.
                 ' | <a data-message-part="0" href="#">'.$this->trans('raw').'</a>'.
-                ' | <a href="#">'.$this->trans('flag').'</a>'.
+                ' | <a href="#">'.$this->trans('Flag').'</a>'.
                 '</th></tr></table>';
 
             $this->out('msg_headers', $txt);
