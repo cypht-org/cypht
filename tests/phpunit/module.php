@@ -151,6 +151,8 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
         $this->assertTrue($this->handler_mod->validate_origin());
         $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://otherhost';
         $this->assertFalse($this->handler_mod->validate_origin());
+        $this->handler_mod->config->set('cookie_domain', 'none');
+        $this->assertFalse($this->handler_mod->validate_origin());
     }
     /**
      * @preserveGlobalState disabled
