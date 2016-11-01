@@ -174,6 +174,14 @@ abstract class Hm_Session {
     }
 
     /**
+     * Dump current session contents
+     * @return array
+     */
+    public function dump() {
+        return $this->data;
+    }
+
+    /**
      * Method called on a new login
      * @return void
      */
