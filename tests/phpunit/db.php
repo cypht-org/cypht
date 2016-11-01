@@ -20,6 +20,11 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
         $this->config->data['db_driver'] = 'sqlite';
         $this->assertEquals('boolean', gettype(Hm_DB::connect($this->config)));
         $this->assertEquals('sqlite:127.0.0.1', Hm_DB::build_dsn());
+        $this->config->data['db_driver'] = 'mysql';
+        $this->config->data['db_connection_type'] = 'socket';
+        $this->config->data['db_socket'] = '/test';
+        $this->assertEquals('boolean', gettype(Hm_DB::connect($this->config)));
+        $this->assertEquals('mysql:unix_socket=/test;dbname=test', Hm_DB::build_dsn());
     }
     /**
      * @preserveGlobalState disabled
