@@ -248,6 +248,9 @@ abstract class Hm_Handler_Module {
             $source = array_key_exists('HTTP_REFERER', $this->request->server) ? $this->request->server['HTTP_REFERER'] : false;
         }
         $target = $this->config->get('cookie_domain', false);
+        if ($target == 'none') {
+            $target = false;
+        }
         if (!$target) {
             $target = array_key_exists('HTTP_X_FORWARDED_HOST', $this->request->server) ? $this->request->serveri['HTTP_X_FORWARDED_HOST'] : false;
         }
