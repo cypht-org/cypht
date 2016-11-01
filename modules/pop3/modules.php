@@ -232,10 +232,19 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                 $body = array();
                 $headers = true;
                 $last_header = false;
+
+                $bodies = array();
+                $has_multipart = false;
+                $boundary = '';
+                $boundaries = array();
+                $multipart_headers = false;
+                $multipart_header_list = array();
+
                 foreach ($msg_lines as $line) {
                     if ($headers) {
-                        if (substr($line, 0, 1) == "\t") {
-                            $header_list[$last_header] .= ' '.decode_fld($line);
+                        if (substr($line, 0, 1) == "\t"
+                            || substr($line, 0, 1) == " ") {
+                            $header_list[$last_header] .= decode_fld($line);
                         }
                         elseif (strstr($line, ':')) {
                             $parts = explode(':', $line, 2);
@@ -244,16 +253,105 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                                 $last_header = $parts[0];
                             }
                         }
+                        if (array_key_exists('Content-Type', $header_list)
+                            && strstr($header_list['Content-Type'], 'multipart')
+                            && $boundary = strstr($header_list['Content-Type'], 'boundary=')) {
+                            $has_multipart = true;
+                            $boundary = str_replace('boundary=', '', $boundary);
+                            $boundary = str_replace('"', '', $boundary);
+                            if (array_search($boundary, $boundaries) === false) {
+                                $boundaries[] = $boundary;
+                            }
+                        }
+                    }
+                    elseif ($multipart_headers) {
+                        if (substr($line, 0, 1) == "\t"
+                            || substr($line, 0, 1) == " ") {
+                            $multipart_header_list[$last_header] .= decode_fld($line);
+                        }
+                        elseif (strstr($line, ':')) {
+                            $parts = explode(':', $line, 2);
+                            if (count($parts) == 2) {
+                                $multipart_header_list[$parts[0]] = decode_fld($parts[1]);
+                                $last_header = $parts[0];
+                            }
+                        }
+                        if (array_key_exists('Content-Type', $multipart_header_list)
+                            && strstr($multipart_header_list['Content-Type'], 'multipart')
+                            && $boundary = strstr($multipart_header_list['Content-Type'], 'boundary=')) {
+                            $has_multipart = true;
+                            $boundary = str_replace('boundary=', '', $boundary);
+                            $boundary = str_replace('"', '', $boundary);
+                            if (array_search($boundary, $boundaries) === false) {
+                                $boundaries[] = $boundary;
+                            }
+                        }
                     }
                     else {
-                        $body[] = $line;
+                        $boundary = '####unmatch-boundary';
+                        foreach ($boundaries as $_boundary) {
+                            if (strstr($line, $_boundary)) {
+                                $boundary = $_boundary;
+                                break;
+                            }
+                        }
+                        if ($has_multipart === true && strstr($line, $boundary)) {
+                            if (array_key_exists('Content-Type', $multipart_header_list)
+                                && strstr($multipart_header_list['Content-Type'], 'html')) {
+                                $body['content-type'] = 'html';
+                            }
+                            else {
+                                $body['content-type'] = 'text';
+                            }
+                            if (array_key_exists('Content-Transfer-Encoding', $multipart_header_list)
+                                && strstr($multipart_header_list['Content-Transfer-Encoding'], 'base64')) {
+                                $body['text'] = base64_decode(str_replace(array("\r", "\n"), '', $body['text']));
+                            }
+                            if (array_key_exists('Content-Type', $multipart_header_list)
+                                && $charset = strstr($multipart_header_list['Content-Type'], 'charset=')) {
+                                $charset = str_replace('charset=', '', $charset);
+                                $body['text'] = mb_convert_encoding($body['text'], 'UTF-8', $charset);
+                            }
+                            if (array_key_exists('text', $body)) {
+                                $bodies[] = $body;
+                            }
+                            $body = array('text' => '');
+                            
+                            $multipart_headers = true;
+                            $multipart_header_list = array();
+                        }
+                        else {
+                            $body['text'] .= $line;
+                        }
                     }
+
                     if (!trim($line)) {
                         $headers = false;
+                        if ($multipart_headers === true) {
+                            $multipart_headers = false;
+                        }
                     }
                 }
                 $this->out('pop3_message_headers', $header_list);
-                $this->out('pop3_message_body', $body);
+
+                if ($has_multipart === false) {
+                    if (array_key_exists('Content-Type', $header_list)
+                        && strstr($header_list['Content-Type'], 'html')) {
+                        $body['content-type'] = 'html';
+                    }
+                    if (array_key_exists('Content-Transfer-Encoding', $header_list)
+                        && strstr($header_list['Content-Transfer-Encoding'], 'base64')) {
+                        $body['text'] = base64_decode(str_replace(array("\r", "\n"), '', $body['text']));
+                    }
+                    if (array_key_exists('Content-Type', $header_list)
+                        && $charset = strstr($header_list['Content-Type'], 'charset=')) {
+                        $charset = str_replace('charset=', '', $charset);
+                        $body['text'] = mb_convert_encoding($body['text'], 'UTF-8', $charset);
+                    }
+                    $bodies[] = $body;
+                }
+
+                $this->out('pop3_message_body', $bodies);
                 $this->out('pop3_mailbox_page_path', $form['pop3_list_path']);
                 $this->out('pop3_server_id', $id);
                 bust_pop3_cache($this->session, $this->config, $id);
@@ -781,7 +879,14 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
         }
         $txt = '<div class="msg_text_inner">';
         if ($this->get('pop3_message_body')) {
-            $txt .= format_msg_text(implode('', $this->get('pop3_message_body')), $this);
+            foreach ($this->get('pop3_message_body') as $body) {
+                if ($body['content-type'] === 'html') {
+                    $txt .= format_msg_html($body['text']);
+                }
+                else {
+                    $txt .= format_msg_text($body['text'], $this);
+                }
+            }
         }
         $txt .= '</div>';
         $this->out('msg_text', $txt);
@@ -887,7 +992,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
             $msg['server_name'] = 'Default';
         }
         $id = sprintf("pop3_%s_%s", $msg['server_id'], $msg_id);
-        $subject = display_value('subject', $msg);;
+        $subject = display_value('subject', $msg);
         $from = display_value('from', $msg);
         $nofrom = '';
         if ($style == 'email' && !$from) {
