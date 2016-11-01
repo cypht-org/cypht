@@ -135,6 +135,9 @@ class Hm_PHP_Session extends Hm_Session {
         if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
             $domain = $request->server['HTTP_HOST'];
         }
+        if ($domain == 'none') {
+            $domain = '';
+        }
         return array($secure, $path, $domain);
     }
 
