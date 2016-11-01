@@ -178,6 +178,13 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $request->path = 'test';
         $this->assertEquals(array(true, 'test', 'test'), $session->set_session_params($request));
         $session->destroy($request);
+
+        $this->config->set('cookie_domain', 'none');
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $this->assertEquals(array(false, 'asdf', false), $session->set_session_params($request));
+
+        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled
