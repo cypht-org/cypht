@@ -1164,6 +1164,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     }
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%d&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+                    clear_existing_reply_details($this->session);
                     $this->session->set(sprintf('reply_details_imap_%d_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
                         array('msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                 }
@@ -2494,4 +2495,15 @@ function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
         return '';
     }
     return 'message_'.$uid.'_part_'.$part_id.$extension;
+}
+
+/**
+ * @subpackage imap/functions
+ */
+function clear_existing_reply_details($session) {
+    foreach ($session->dump() as $name => $val) {
+        if (substr($name, 0, 19) == 'reply_details_imap_') {
+            $session->del($name);
+        }
+    }
 }

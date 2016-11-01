@@ -399,7 +399,7 @@ var expand_imap_folders = function(path) {
     return false;
 };
 
-var get_message_content = function(msg_part, uid, list_path, detail, callback) {
+var get_message_content = function(msg_part, uid, list_path, detail, callback, noupdate) {
     if (!uid) {
         uid = $('.msg_uid').val();
     }
@@ -415,13 +415,21 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback) {
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
             function(res) {
-                $('.msg_text').html('');
-                $('.msg_text').append(res.msg_headers);
-                $('.msg_text').append(res.msg_text);
-                $('.msg_text').append(res.msg_parts);
-                set_message_content(list_path, uid);
-                document.title = $('.header_subject th').text();
-                imap_message_view_finished();
+                if (!noupdate) {
+                    $('.msg_text').html('');
+                    $('.msg_text').append(res.msg_headers);
+                    $('.msg_text').append(res.msg_text);
+                    $('.msg_text').append(res.msg_parts);
+                    set_message_content(list_path, uid);
+                    document.title = $('.header_subject th').text();
+                    imap_message_view_finished();
+                }
+                else {
+                    $('.reply_link, .reply_all_link, .forward_link').each(function() {
+                        $(this).attr("href", $(this).data("href"));
+                        $(this).removeClass('disabled_link');
+                    });
+                }
             },
             [],
             false,
@@ -552,11 +560,12 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     else {
         $('.msg_text').html(msg_content);
         document.title = $('.header_subject th').text();
-        imap_message_view_finished(uid, details);
-        imap_mark_as_read(uid, details);
-        if (callback) {
-            callback();
-        }
+        $('.reply_link, .reply_all_link, .forward_link').each(function() {
+            $(this).data("href", $(this).attr("href")).removeAttr("href");
+            $(this).addClass('disabled_link');
+        });
+        imap_message_view_finished();
+        get_message_content(false, uid, list_path, details, callback, true);
     }
 };
 
