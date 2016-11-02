@@ -435,6 +435,10 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type
  * @return string decoded field
  */
 function decode_fld($string) {
+    if (strpos($string, '=?') === false) {
+        return $string;
+    }
+    $string = preg_replace("/\?=\s+=\?/", '?==?', $string);
     if (preg_match_all("/(=\?[^\?]+\?(q|b)\?[^\?]+\?=)/i", $string, $matches)) {
         foreach ($matches[1] as $v) {
             $fld = substr($v, 2, -2);

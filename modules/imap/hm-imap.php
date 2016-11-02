@@ -739,7 +739,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                         foreach ($lines as $line) {
                             $header = strtolower(substr($line, 0, strpos($line, ':')));
                             if (!$header || (!isset($flds[$header]) && $last_header)) {
-                                ${$flds[$last_header]} .= ltrim($line, "\t");
+                                ${$flds[$last_header]} .= str_replace("\t", " ", $line);
                             }
                             elseif (isset($flds[$header])) {
                                 ${$flds[$header]} = substr($line, (strpos($line, ':') + 1));
@@ -1104,7 +1104,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                                     continue;
                                 }
                                 if (isset($headers[$i]) && trim($line) && ($line{0} == "\t" || $line{0} == ' ')) {
-                                    $headers[$i][1] .= ltrim($line, "\t");
+                                    $headers[$i][1] .= str_replace("\t", " ", $line);
                                 }
                                 elseif ($split) {
                                     $i++;
