@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * GIT VERSION: 3934
+ *
  * Some of the following constants are automatically filled in when
  * the build process is run. If you change them in site/index.php
  * and rerun the build process your changes will be lost
