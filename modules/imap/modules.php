@@ -991,7 +991,14 @@ class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
      * Deletes all the saved IMAP cache data
      */
     public function process() {
-        $this->session->set('imap_cache', array());
+        $memcache = new Hm_Memcached($this->config);
+        list($success, $form) = $this->process_form(array('imap_server_id'));
+        if (!$success) {
+            return;
+        }
+        $key = hash('sha256', (sprintf('imap%s%s%s%s', SITE_ID, $this->session->get('fingerprint'), $form['imap_server_id'], $this->session->get('username'))));
+        $memcache->del($key);
+        Hm_Debug::add(sprintf('Busted cache for IMAP server %s', $form['imap_server_id']));
     }
 }
 

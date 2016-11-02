@@ -92,6 +92,7 @@ add_handler('ajax_imap_flag_message', 'save_imap_servers',  true);
 /* ajax message content */
 setup_base_ajax_page('ajax_imap_message_content', 'core');
 add_handler('ajax_imap_message_content', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_message_content', 'imap_bust_cache',  true);
 add_handler('ajax_imap_message_content', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_message_content', 'imap_message_content',  true);
 add_handler('ajax_imap_message_content', 'save_imap_cache',  true);
