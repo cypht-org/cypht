@@ -1,3 +1,11 @@
 .pgp_section { float: right; margin-right: 10px; margin-top: 10px; }
 .pgp_section input, .pgp_section label, .pgp_section select { margin-right: 10px; }
 .pgp_section select { overflow-y: auto; }
+.pgp_block { margin-bottom: 30px; margin-left: 40px; padding-top: 20px; }
+.pgp_keys { padding-left: 30px; margin-top: 20px; }
+.pgp_keys th { color: #666; padding: 5px; padding-bottom: 2px; border-bottom: solid 1px #eee; font-weight: normal; text-align: left; }
+.pgp_keys td { padding: 10px; }
+.pgp_keys td img { opacity: .6; }
+.pgp_subblock { margin-bottom: 40px; }
+.priv_keys, .public_keys { display: none; }
+.key_count { float: right; margin-right: 120px; font-size: 90%; }

@@ -97,6 +97,16 @@ var Hm_Pgp = {
         }
         return true;
     },
+
+    lookup_public_key: function(query) {
+		var hkp = new openpgp.HKP('https://pgp.mit.edu');
+		var options = {query: query};
+        elog(options);
+		hkp.lookup(options).then(function(key) {
+    		//var pubkey = openpgp.key.readArmored(key);
+            elog(key);
+		});
+    }
 }
 
 $(function() {
@@ -106,5 +116,10 @@ $(function() {
         $('.compose_form').submit(function() { return Hm_Pgp.process_settings(); });
     }
     else if (hm_page_name() == 'message') {
+    }
+    else if (hm_page_name() == 'pgp') {
+        $('.priv_title').click(function() { $('.priv_keys').toggle(); });
+        $('.public_title').click(function() { $('.public_keys').toggle(); });
+        $('#hkp_search').click(function() { Hm_Pgp.lookup_public_key($('#hkp_email').val()); });
     }
 });
