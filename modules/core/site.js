@@ -1287,5 +1287,6 @@ $(function() {
     if (hm_page_name() == 'home') {
         $('.pw_update').click(function() { update_password($(this).data('id')); });
     }
+    $('.content_cell').swipeRight(function() { Hm_Folders.open_folder_list(); });
 
 });
