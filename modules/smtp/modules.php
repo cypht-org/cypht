@@ -610,7 +610,7 @@ class Hm_Output_compose_form_draft_list extends Hm_Output_Module {
             if (trim($draft['draft_subject'])) {
                 $res .= '<div class="draft_'.$this->html_safe($id).'"><a class="draft_link" href="?page=compose&draft_id='.
                     $this->html_safe($id).'">'.$this->html_safe($draft['draft_subject']).'</a> '.
-                    '<img class="delete_draft" data-id="'.$this->html_safe($id).'" src="'.Hm_Image_Sources::$circle_x.'" /></div>';
+                    '<img class="delete_draft" width="16" height="16" data-id="'.$this->html_safe($id).'" src="'.Hm_Image_Sources::$circle_x.'" /></div>';
             }
         }
         $res .= '</div>';
