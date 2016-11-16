@@ -151,20 +151,20 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
     public function process() {
         $headers = array();
         if ($this->get('language')) {
-            $headers[] = 'Content-Language: '.substr($this->get('language'), 0, 2);
+            $headers['Content-Language'] = substr($this->get('language'), 0, 2);
         }
         if ($this->request->tls) {
-            $headers[] = 'Strict-Transport-Security: max-age=31536000';
+            $headers['Strict-Transport-Security'] = 'max-age=31536000';
         }
-        $headers[] = 'X-Frame-Options: SAMEORIGIN';
-        $headers[] = 'X-XSS-Protection: 1; mode=block';
-        $headers[] = 'X-Content-Type-Options: nosniff';
-        $headers[] = 'Expires: '.gmdate('D, d M Y H:i:s \G\M\T', strtotime('-1 year'));
-        $headers[] = "Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';";
+        $headers['X-Frame-Options'] = 'SAMEORIGIN';
+        $headers['X-XSS-Protection'] = '1; mode=block';
+        $headers['X-Content-Type-Options'] = 'nosniff';
+        $headers['Expires'] = gmdate('D, d M Y H:i:s \G\M\T', strtotime('-1 year'));
+        $headers['Content-Security-Policy'] = "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';";
         if ($this->request->type == 'AJAX') {
-            $headers[] = 'Content-Type: application/json';
+            $headers['Content-Type'] = 'application/json';
         }
-        $this->out('http_headers', $headers);
+        $this->out('http_headers', $headers, false);
     }
 }
 

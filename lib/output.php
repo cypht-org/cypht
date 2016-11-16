@@ -46,8 +46,8 @@ class Hm_Output_HTTP extends Hm_Output {
      * @return void
      */
     protected function output_headers($headers) {
-        foreach ($headers as $header) {
-            Hm_Functions::header($header);
+        foreach ($headers as $name => $value) {
+            Hm_Functions::header($name.': '.$value);
         }
     }
 
