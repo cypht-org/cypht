@@ -8,6 +8,20 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+
+/**
+ * @subpackage pgp/handler
+ */
+class Hm_Handler_load_pgp_data extends Hm_Handler_Module {
+    public function process() {
+        $headers = $this->get('http_headers');
+        $key_servers = array('https://pgp.mit.edu');
+        $key_servers = implode(' ', $key_servers);
+        $headers['Content-Security-Policy'] = str_replace('connect-src', 'connect-src '.$key_servers, $headers['Content-Security-Policy']);
+        $this->out('http_headers', $headers);
+    }
+}
+
 /**
  * @subpackage pgp/handler
  */
@@ -84,8 +98,11 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
         $res .= '<div class="pgp_subblock">'.$this->trans('Import a public key from a file').'<br /><br />';
         $res .= '<input id="public_key" type="file"> for <input id="public_email" placeholder="'.$this->trans('E-mail Address');
         $res .= '" type="email"> <input type="button" value="'.$this->trans('Import').'">';
-        $res .= '</div><div class="pgp_subblock">'.$this->trans('Or Search HKP for a key to import').'<br /><br />';
-        $res .= '<input id="hkp_email" type="email" /> <input type="button" id="hkp_search" value="'.$this->trans('Search').'" />';
+        $res .= '</div><div class="pgp_subblock">'.$this->trans('Or Search a key server for a key to import').'<br /><br />';
+        $res .= '<input id="hkp_email" placeholder="'.$this->trans('E-mail Address').'" type="email" /> <select id="hkp_server">';
+        $res .= '<option value="https://pgp.mit.edu">https://pgp.mit.edu</option></select> ';
+        $res .= '<input type="button" id="hkp_search" value="'.$this->trans('Search').'" />';
+        $res .= '<div class="hkp_search_results"></div>';
         $res .= '</div>'.$this->trans('Existing Keys').'<table class="pgp_keys"><thead><tr><th>'.$this->trans('Key').'</th>';
         $res .= '<th>'.$this->trans('E-mail').'</th></tr>';
         $res .= '</thead><tbody></tbody></table>';

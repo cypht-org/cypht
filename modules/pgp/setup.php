@@ -6,6 +6,7 @@ handler_source('pgp');
 output_source('pgp');
 
 setup_base_page('pgp', 'core');
+add_handler('pgp', 'load_pgp_data', true, 'pbp', 'http_headers', 'after');
 add_output('pgp', 'pgp_settings_start', true, 'pgp', 'content_section_start', 'after');
 add_output('pgp', 'pgp_settings_public_keys', true, 'pgp', 'pgp_settings_start', 'after');
 add_output('pgp', 'pgp_settings_private_key', true, 'pgp', 'pgp_settings_public_keys', 'after');
