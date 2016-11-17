@@ -25,10 +25,12 @@ add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 /* settings page data */
 add_handler('settings', 'process_sent_since_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_sent_source_max_setting', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_text_only_setting', true, 'imap', 'date', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
 add_output('settings', 'sent_source_max_setting', true, 'imap', 'sent_since_setting', 'after');
+add_output('settings', 'text_only_setting', true, 'imap', 'list_style_setting', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -283,6 +285,7 @@ return array(
         'imap_server_ids' => FILTER_SANITIZE_STRING,
         'imap_user' => FILTER_SANITIZE_STRING,
         'imap_pass' => FILTER_UNSAFE_RAW,
+        'text_only' => FILTER_VALIDATE_BOOLEAN,
         'imap_delete' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
         'imap_remember' => FILTER_VALIDATE_INT,

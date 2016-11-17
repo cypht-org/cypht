@@ -1965,7 +1965,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
             return array($msg_part_num, $this->get_message_content($uid, $msg_part_num, false, $struct));
         } 
-        return false;
+        return array(false, false);
     }
 
     /**

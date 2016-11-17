@@ -41,6 +41,23 @@ class Hm_Handler_process_sent_source_max_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process "text only" setting for the message view page in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_text_only_setting extends Hm_Handler_Module {
+    /**
+     * valid values are true or false
+     */
+    public function process() {
+        function text_only_callback($val) {
+            elog($val);
+            return $val;
+        }
+        process_site_setting('text_only', $this, 'text_only_callback', false, true);
+    }
+}
+
+/**
  * Process "since" setting for the Sent page in the settings page
  * @subpackage imap/handler
  */
@@ -1137,7 +1154,15 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $msg_text = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $msg_struct_current);
                     }
                     else {
-                        list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
+                        if (!$this->user_config->get('text_only_setting', false)) {
+                            list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'html', $msg_struct);
+                            if (!$part) {
+                                list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
+                            }
+                        }
+                        else {
+                            list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
+                        }
                         $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
                         $msg_struct_current = array_shift($struct);
                         if (!trim($msg_text)) {
@@ -1799,6 +1824,23 @@ class Hm_Output_sent_since_setting extends Hm_Output_Module {
         return '<tr class="sent_setting"><td><label for="sent_since">'.
             $this->trans('Show messages received since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'sent_since', $this).'</td></tr>';
+    }
+}
+
+/**
+ * Option to limit mail fromat to text only when possible (not defaulting to HTML)
+ * @subpackage imap/output
+ */
+class Hm_Output_text_only_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('text_only', $settings) && $settings['text_only']) {
+            $checked = ' checked="checked"';
+        }
+        return '<tr class="general_setting"><td><label for="text_only">'.
+            $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="text_only" name="text_only" value="1" /></td></tr>';
     }
 }
 
