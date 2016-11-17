@@ -50,7 +50,6 @@ class Hm_Handler_process_text_only_setting extends Hm_Handler_Module {
      */
     public function process() {
         function text_only_callback($val) {
-            elog($val);
             return $val;
         }
         process_site_setting('text_only', $this, 'text_only_callback', false, true);
@@ -2097,6 +2096,9 @@ function process_imap_message_ids($ids) {
  * @return string
  */
 function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
+    /*if (filter_message_part($vals)) {
+        return '';
+    }*/
     $allowed = array(
         'textplain',
         'texthtml',
@@ -2223,6 +2225,24 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
         }
     }
     return $res;
+}
+
+/**
+ * Filter out message parts that are not attachments
+ * @param array message structure
+ * @return bool
+ */
+function filter_message_part($vals) {
+    if (array_key_exists('disposition', $vals) && is_array($vals['disposition']) && array_key_exists('inline', $vals['disposition'])) {
+        return true;
+    }
+    if (array_key_exists('file_attributes', $vals) && is_array($vals['file_attributes']) && array_key_exists('inline', $vals['file_attributes'])) {
+        return true;
+    }
+    if (array_key_exists('type', $vals) && $vals['type'] == 'multipart') {
+        return true;
+    }
+    return false;
 }
 
 /**
