@@ -104,7 +104,6 @@ var Hm_Pgp = {
         var key;
         $('.hkp_search_results').html('');
 		hkp.lookup(options).then(function(keys) {
-            elog(keys);
             if (keys) {
     		    var pubkey = openpgp.key.readArmored(keys);
                 if (pubkey) {
