@@ -2401,7 +2401,7 @@ function imap_move_same_server($ids, $action, $session, $dest_path, $config) {
     $moved = array();
     $keys = array_keys($ids);
     $server_id = array_pop($keys);
-    $cache = Hm_IMAP_List::get_cache($session, $server_id);
+    $cache = Hm_IMAP_List::get_cache($session, $config, $server_id);
     $imap = Hm_IMAP_List::connect($server_id, $cache);
     foreach ($ids[$server_id] as $folder => $msgs) {
         if ($imap && $imap->select_mailbox(hex2bin($folder))) {
