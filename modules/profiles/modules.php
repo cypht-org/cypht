@@ -36,7 +36,7 @@ class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
         $profiles = array();
         foreach ($this->user_config->dump() as $name => $vals) {
             if (preg_match("/^profile_/", $name) && is_array($vals)) {
-                if (array_key_exists('profile_smtp', $vals) && $vals['profile_smtp']) {
+                if (array_key_exists('profile_smtp', $vals) && ($vals['profile_smtp'] === 0 || $vals['profile_smtp'])) {
                     $vals['name'] = explode('_', $name);
                     $profiles[$vals['profile_smtp']] = $vals;
                 }
