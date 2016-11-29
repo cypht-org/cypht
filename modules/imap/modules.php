@@ -2004,6 +2004,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 $icon = 'env_closed';
             }
         }
+        if (trim($msg['x_auto_bcc']) === 'cypht') {
+            $icon = 'sent';
+        }
         if (stristr($msg['flags'], 'attachment')) {
             $flags[] = 'attachment';
         }
