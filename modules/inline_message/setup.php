@@ -19,7 +19,6 @@ return array(
     'allowed_pages' => array(),
     'allowed_output' => array(),
     'allowed_get' => array(
-        'profile_id' => FILTER_VALIDATE_INT,
     ),
     'allowed_post' => array(
         'inline_message' => FILTER_VALIDATE_INT
