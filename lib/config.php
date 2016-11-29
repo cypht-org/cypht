@@ -329,7 +329,7 @@ class Hm_Site_Config_File extends Hm_Config {
     }
 
     /**
-     * Return a list of modules as a string
+     * Return a list of modules as an array
      * @return array
      */
     public function get_modules() {
