@@ -17,9 +17,12 @@ if (hm_page_name() == 'compose') {
 }
 
 var insert_sig = function(textarea, sig) {
+    var tmpta = document.createElement('textarea');
+    tmpta.innerHTML = sig;
+    sig = tmpta.value;
     if (document.selection) {
         textarea.focus();
-        sel = document.selection.createRange();
+        var sel = document.selection.createRange();
         sel.text = sig;
     }
     else if (textarea.selectionStart || textarea.selectionStart == '0') {
