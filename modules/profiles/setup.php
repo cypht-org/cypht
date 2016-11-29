@@ -32,4 +32,7 @@ return array(
         'profile_address' => FILTER_SANITIZE_STRING,
         'profile_sig' => FILTER_UNSAFE_RAW
     ),
+    'allowed_get' => array(
+        'profile_id' => FILTER_VALIDATE_INT,
+    ),
 );
