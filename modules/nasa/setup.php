@@ -7,7 +7,7 @@ output_source('nasa');
 
 /* APOD display */
 setup_base_page('nasa_apod', 'core');
-add_handler('nasa_apod', 'fetch_apod_content', true, 'nasa', 'load_user_data', 'after');
+add_handler('nasa_apod', 'fetch_apod_content', true, 'nasa', 'http_headers', 'after');
 add_output('nasa_apod', 'apod_content', true, 'nasa', 'content_section_start', 'after');
 
 /* folder list entry */

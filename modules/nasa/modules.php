@@ -61,6 +61,9 @@ class Hm_Handler_fetch_apod_content extends Hm_Handler_Module {
             $res = $api->command(sprintf(APOD_URL.'&date=%s', $key, $date));
             $this->out('apod_data', $res);
             $this->out('apod_date', $date);
+            $headers = $this->get('http_headers');
+            $headers['Content-Security-Policy'] = str_replace('img-src', 'img-src http://apod.nasa.gov', $headers['Content-Security-Policy']);
+            $this->out('http_headers', $headers);
         }
     }
 }
@@ -100,8 +103,8 @@ class Hm_Output_apod_content extends Hm_Output_Module {
             }
             if (array_key_exists('media_type', $data)) {
                 if ($data['media_type'] == 'image' && array_key_exists('url', $data)) {
-                    $res .= '<div class="apod_image"><a target="_blank" href="'.$this->html_safe($data['url']).
-                        '" title="'.$this->trans('Picture of the day').'">'.$this->html_safe($data['url']).'</a></div>';
+                    $res .= '<div class="apod_image"><img class="msg_img" src="'.$this->html_safe($data['url']).
+                        '" alt="'.$this->trans('Picture of the day').'" /></div>';
                 }
                 elseif ($data['media_type'] == 'video' && array_key_exists('url', $data)) {
                     $res .= '<div class="apod_video"><a target="_blank" href="'.$this->html_safe($data['url']).'">YouTube</a></div>';
