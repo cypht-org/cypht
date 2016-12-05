@@ -388,16 +388,16 @@ abstract class Hm_Output_Module {
     public function trans($string) {
         if (array_key_exists($string, $this->lstr)) {
             if ($this->lstr[$string] === false) {
-                return $this->html_safe($string);
+                return strip_tags($string);
             }
             else {
-                return $this->html_safe($this->lstr[$string]);
+                return strip_tags($this->lstr[$string]);
             }
         }
         else {
             Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string));
         }
-        return str_replace('\n', '<br />', $this->html_safe($string));
+        return str_replace('\n', '<br />', strip_tags($string));
     }
 
     /**
