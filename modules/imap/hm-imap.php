@@ -1427,6 +1427,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      */
     public function message_action($action, $uids, $mailbox=false, $keyword=false) {
         $status = false;
+        $command = false;
         $uid_strings = array();
         if (is_array($uids)) {
             if (count($uids) > 1000) {
@@ -1489,11 +1490,18 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                     $command = "UID COPY $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
                     break;
                 case 'MOVE':
+                    if (!$this->is_clean($mailbox, 'mailbox')) {
+                        return false;
+                    }
                     if ($this->is_supported('MOVE')) {
-                        if (!$this->is_clean($mailbox, 'mailbox')) {
-                            return false;
-                        }
                         $command = "UID MOVE $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
+                    }
+                    else {
+                        if ($this->message_action('COPY', $uids, $mailbox, $keyword)) {
+                            if ($this->message_action('DELETE', $uids, $mailbox, $keyword)) {
+                                $command = "EXPUNGE\r\n";
+                            }
+                        }
                     }
                     break;
             }
