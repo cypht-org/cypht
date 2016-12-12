@@ -35,6 +35,7 @@ add_output('settings', 'text_only_setting', true, 'imap', 'list_style_setting', 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_handler('compose', 'imap_mark_as_answered', true, 'imap', 'process_compose_form_submit', 'after');
+add_handler('compose', 'imap_save_sent', true, 'imap', 'imap_mark_as_answered', 'after');
 
 /* search page data */
 add_handler('search', 'load_imap_servers_for_search',  true, 'imap', 'message_list_type', 'after');

@@ -118,6 +118,48 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
 }
 
  /**
+ * Save a sent message
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
+    public function process() {
+        if (!$this->get('save_sent_msg')) {
+            return;
+        }
+        $server = $this->get('save_sent_server');
+        $mime = $this->get('save_sent_msg');
+        $imap_id = false;
+        foreach (Hm_IMAP_List::dump() as $id => $imap_server) {
+            if ($server[3] == $imap_server['user'] && $server[2] == $imap_server['server']) {
+                $imap_id = $id;
+                break;
+            }
+        }
+        if (!$imap_id) {
+            return;
+        }
+        $msg = $mime->get_mime_msg();
+        $msg = str_replace("\r\n", "\n", $msg);
+        $msg = str_replace("\n", "\r\n", $msg);
+        $msg = rtrim($msg)."\r\n";
+        $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $imap_id);
+        $imap = Hm_IMAP_List::connect($imap_id, $cache);
+        if (is_object($imap) && $imap->get_state() == 'authenticated') {
+            $sent_folder = $imap->get_special_use_mailboxes('sent');
+            if (!array_key_exists('sent', $sent_folder)) {
+                return;
+            }
+            if ($imap->append_start($sent_folder['sent'], strlen($msg), true)) {
+                $imap->append_feed($msg."\r\n");
+                if (!$imap->append_end()) {
+                    Hm_Msgs::add('ERRAn error occurred saving the sent message');
+                }
+            }
+        }
+    }
+}
+
+ /**
  * Flag a message as answered
  * @subpackage imap/handler
  */

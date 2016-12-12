@@ -462,7 +462,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     $from = $smtp_details['user'];
                     if (array_key_exists($form['smtp_server_id'], $profiles)) {
                         if ($profiles[$form['smtp_server_id']]['name'][1] == 'imap') {
-                            $imap_server = $profiles[$form['smtp_server_id']]['name'][2];
+                            $imap_server = $profiles[$form['smtp_server_id']]['name'];
                         }
                         $from_name = $profiles[$form['smtp_server_id']]['profile_name'];
                         $reply_to = $profiles[$form['smtp_server_id']]['profile_replyto'];
@@ -509,12 +509,14 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                                 Hm_Msgs::add(sprintf("ERR%s", $err_msg));
                             }
                             else {
-                                /* TODO: check $imap_server, connect and check for Sent folder, append to
-                                 * folder if found */
                                 $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
                                 if ($auto_bcc) {
                                     $mime->set_auto_bcc($from);
                                     $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
+                                }
+                                if ($imap_server) {
+                                    $this->out('save_sent_server', $imap_server);
+                                    $this->out('save_sent_msg', $mime);
                                 }
                                 $this->out('msg_sent', true);
                                 $failed = false;
