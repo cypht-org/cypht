@@ -34,7 +34,7 @@ class Hm_PHP_Session extends Hm_Session {
         }
         elseif (array_key_exists($this->cname, $request->cookie)) {
             $this->get_key($request);
-            $this->start($request);
+            $this->start($request, true);
             $this->check_fingerprint($request);
         }
         if ($this->is_active() && $request->invalid_input_detected) {
@@ -94,7 +94,7 @@ class Hm_PHP_Session extends Hm_Session {
      * @param object $request request details
      * @return void
      */
-    public function start($request) {
+    public function start($request, $existing_session=false) {
         if (array_key_exists($this->cname, $request->cookie)) {
             session_id($request->cookie[$this->cname]);
         }
@@ -111,7 +111,12 @@ class Hm_PHP_Session extends Hm_Session {
                 Hm_Debug::add('Mismatched session level encryption key');
             }
         }
-        $this->active = true;
+        if ($existing_session && count($this->data) == 0) {
+            $this->destroy($request);
+        }
+        else {
+            $this->active = true;
+        }
     }
 
     /**
