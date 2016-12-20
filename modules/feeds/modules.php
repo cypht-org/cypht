@@ -630,6 +630,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
         else {
             $src_callback = 'safe_output_callback';
         }
+        $show_icons = $this->get('msg_list_icons');
         foreach ($this->get('feed_list_data', array()) as $item) {
             $row_style = 'feeds';
             if (isset($item['id']) && !isset($item['guid'])) {
@@ -705,6 +706,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 else {
                     $from = '';
                 }
+                if (!$show_icons) {
+                    $icon = false;
+                }
                 $row_style .= ' '.str_replace(' ', '_', $item['server_name']);
                 if ($style == 'news') {
                     $res[$id] = message_list_row(array(
@@ -746,7 +750,12 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
  * @subpackage feeds/functions
  */
 function feed_source_callback($vals, $style, $output_mod) {
-    $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+    if ($vals[2]) {
+        $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+    }
+    else {
+        $img = '';
+    }
     if ($style == 'email') {
         return sprintf('<td class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</td>',
             $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
