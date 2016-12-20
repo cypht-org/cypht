@@ -178,7 +178,7 @@ function message_list_row($values, $id, $style, $output_mod, $row_class='') {
  */
 function safe_output_callback($vals, $style, $output_mod) {
     $img = '';
-    if (count($vals) == 3) {
+    if (count($vals) == 3 && $vals[2]) {
         $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
     }
     if ($style == 'email') {

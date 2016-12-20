@@ -46,6 +46,7 @@ add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date',
 add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_no_password_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 
@@ -54,6 +55,7 @@ add_output('settings', 'start_general_settings', true, 'core', 'start_settings_f
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'list_style_setting', true, 'core', 'timezone_setting', 'after');
+add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setting', 'before');
 add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_setting', 'after');
 add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
 add_output('settings', 'start_unread_settings', true, 'core', 'no_password_setting', 'after');
@@ -206,6 +208,7 @@ return array(
         'save_and_logout' => FILTER_VALIDATE_BOOLEAN,
         'limit' => FILTER_VALIDATE_INT,
         'username' => FILTER_SANITIZE_STRING,
+        'show_list_icons' => FILTER_VALIDATE_BOOLEAN,
         'password' => FILTER_UNSAFE_RAW,
         'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'save_settings' => FILTER_SANITIZE_STRING,

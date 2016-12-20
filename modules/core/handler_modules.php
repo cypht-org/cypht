@@ -189,6 +189,22 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process "show icons in message lists" setting for the message list page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_show_list_icons extends Hm_Handler_Module {
+    /**
+     * valid values are true or false
+     */
+    public function process() {
+        function show_list_icons_callback($val) {
+            return $val;
+        }
+        process_site_setting('show_list_icons', $this, 'show_list_icons_callback', false, true);
+    }
+}
+
+/**
  * Process input from the max per source setting for the Unread page in the settings page
  * @subpackage core/handler
  */
@@ -485,9 +501,6 @@ class Hm_Handler_login extends Hm_Handler_Module {
  * @subpackage core/handler
  */
 class Hm_Handler_default_page_data extends Hm_Handler_Module {
-    /**
-     * For now the data_sources array is the only default
-     */
     public function process() {
         $this->out('data_sources', array(), false);
         $this->out('encrypt_ajax_requests', $this->config->get('encrypt_ajax_requests', false));
@@ -640,6 +653,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         $this->out('message_list_since', $message_list_since, false);
         $this->out('per_source_limit', $per_source_limit, false);
         $this->out('no_message_list_headers', $no_list_headers);
+        $this->out('msg_list_icons', $this->user_config->get('show_list_icons_setting', false));
         $this->out('message_list_fields', array(
             array('chkbox_col', false, false),
             array('source_col', 'source', 'Source'),

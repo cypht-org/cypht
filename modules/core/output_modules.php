@@ -901,6 +901,22 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option to enable/disable message list icons
+ * @subpackage core/output
+ */
+class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('show_list_icons', $settings) && $settings['show_list_icons']) {
+            $checked = ' checked="checked"';
+        }
+        return '<tr class="general_setting"><td><label for="show_list_icons">'.
+            $this->trans('Show icons in message lists').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="show_list_icons" name="show_list_icons" value="1" /></td></tr>';
+    }
+}
+/**
  * Ends the settings table
  * @subpackage core/output
  */
