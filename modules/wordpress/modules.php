@@ -298,6 +298,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
         else {
             $cutoff = 0;
         }
+        $show_icons = $this->get('msg_list_icons');
         foreach ($this->get('wp_notice_data', array()) as $vals) {
             $row_class = 'wordpress notifications';
             if (array_key_exists('id', $vals)) {
@@ -325,12 +326,16 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 if ($unread_only && !in_array('unseen', $flags, true)) {
                     continue;
                 }
+                $icon = '';
                 $date = date('r', $ts);
+                if ($show_icons) {
+                    $icon = 'w';
+                }
                 if ($style == 'news') {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
                             array('icon_callback', $flags),
-                            array('subject_callback', $subject, $url, $flags, 'w'),
+                            array('subject_callback', $subject, $url, $flags, $icon),
                             array('safe_output_callback', 'source', 'WordPress'),
                             array('safe_output_callback', 'from', $from),
                             array('date_callback', human_readable_interval($date), $ts),
@@ -344,7 +349,7 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                 else {
                     $res[$id] = message_list_row(array(
                             array('checkbox_callback', $id),
-                            array('safe_output_callback', 'source', 'WordPress', 'w'),
+                            array('safe_output_callback', 'source', 'WordPress', $icon),
                             array('safe_output_callback', 'from', $from),
                             array('subject_callback', $subject, $url, $flags),
                             array('date_callback', human_readable_interval($date), $ts),
