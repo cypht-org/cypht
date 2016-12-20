@@ -2189,11 +2189,11 @@ function process_imap_message_ids($ids) {
  * @param int $level indention level
  * @param string $part currently selected part
  * @param string $dl_args base arguments for a download link URL
+ * @param bool $use_icons flag to enable/disable message part icons
+ * @param bool $simmple_view flag to hide complex message structure
  * @return string
  */
-function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
-    $use_icons = false;
-    $simple_view = false;
+function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $use_icons=false, $simple_view=false) {
     $allowed = array(
         'textplain',
         'texthtml',
@@ -2361,9 +2361,11 @@ function get_imap_size($vals) {
  */
 function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0) {
     $res = '';
+    $simple_view = $output_mod->get('simple_msg_part_view', false);
+    $use_icons = $output_mod->get('use_message_part_icons', false);
     foreach ($struct as $id => $vals) {
         if (is_array($vals) && isset($vals['type'])) {
-            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link);
+            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view);
             if (!$row) {
                 $level--;
             }
