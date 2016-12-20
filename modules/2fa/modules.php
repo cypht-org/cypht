@@ -171,7 +171,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                 '<input autofocus required id="2fa_code" type="number" name="2fa_code" value="" placeholder="'.
                 $this->trans('Login code').'" /><input type="submit" value="'.$this->trans('Submit').
                 '" /></form></body></html>';
-            exit;
+            Hm_Functions::cease();
         }
     }
 }

@@ -298,7 +298,7 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                                         echo $line;
                                     }
                                 }
-                                exit;
+                                Hm_Functions::cease();
                             }
                         }
                     }
