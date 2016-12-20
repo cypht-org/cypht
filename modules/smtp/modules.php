@@ -926,28 +926,8 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
 }
 
 /**
- * @subpackage smtp/functions
- */
-function build_mime_msg($to, $subject, $body, $from) {
-    $headers = array(
-        'from' => $from,
-        'to' => $to,
-        'subject' => $subject,
-        'date' => date('r')
-    );
-    $body = array(
-        1 => array(
-            'type' => TYPETEXT,
-            'subtype' => 'plain',
-            'contents.data' => $body
-        )
-    );
-    return imap_mail_compose($headers, $body);
-}
-
-/**
  * Check for and do an Oauth2 token reset if needed
- * @param array $server imap server data
+ * @param array $server SMTP server data
  * @param object $config site config object
  * @return mixed
  */
