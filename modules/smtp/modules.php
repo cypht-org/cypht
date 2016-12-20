@@ -117,38 +117,31 @@ class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
  */
 class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
     public function process() {
-        if (array_key_exists('upload_file', $this->request->files) && array_key_exists('draft_id', $this->request->post)) {
-            $file = $this->request->files['upload_file'];
-            $draft_id = $this->request->post['draft_id'];
-            if (is_readable($file['tmp_name'])) {
-                $content = file_get_contents($file['tmp_name']);
-                if ($content) {
-                    $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
-                    $filename = hash('sha512', $content); 
-                    $filepath = $this->config->get('attachment_dir');
-                    if ($filepath) {
-                        $filepath = rtrim($filepath, '/');
-                        if (@file_put_contents($filepath.'/'.$filename, $content)) {
-                            $file['filename'] = $filepath.'/'.$filename;
-                            $file['basename'] = $filename; 
-                            save_uploaded_file($draft_id, $file, $this->session);
-                            $this->out('upload_file_details', $file);
-                        }
-                        else {
-                            Hm_Msgs::add('ERRAn error occurred saving the uploaded file.');
-                        }
-                    }
-                    else {
-                        Hm_Msgs::add('ERRNo directory configured for uploaded files.');
-                    }
-                }
-                else {
-                    Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
-                }
-            }
-            else {
-                Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
-            }
+        if (!array_key_exists('upload_file', $this->request->files)) {
+            return;
+        }
+        if (!array_key_exists('draft_id', $this->request->post)) {
+            return;
+        }
+        $file = $this->request->files['upload_file'];
+        $draft_id = $this->request->post['draft_id'];
+        $filepath = $this->config->get('attachment_dir');
+
+        if (!$filepath) {
+            Hm_Msgs::add('ERRNo directory configured for uploaded files.');
+            return;
+        }
+        if (!is_readable($file['tmp_name'])) {
+            Hm_Msgs::add('ERRAn error occurred saving the uploaded file.');
+            return;
+        }
+        $content = file_get_contents($file['tmp_name']);
+        if (!$content) {
+            Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
+            return;
+        }
+        if (!attach_file($content, $file, $filepath, $draft_id, $this)) {
+            Hm_Msgs::add('ERRAn error occurred attaching the uploaded file.');
         }
     }
 }
@@ -1095,3 +1088,21 @@ function get_draft($id, $session) {
     }
     return false;
 }
+
+/**
+ * @subpackage smtp/functions
+ */
+function attach_file($content, $file, $filepath, $draft_id, $mod) {
+    $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
+    $filename = hash('sha512', $content);
+    $filepath = rtrim($filepath, '/');
+    if (@file_put_contents($filepath.'/'.$filename, $content)) {
+        $file['filename'] = $filepath.'/'.$filename;
+        $file['basename'] = $filename;
+        save_uploaded_file($draft_id, $file, $mod->session);
+        $mod->out('upload_file_details', $file);
+        return true;
+    }
+    return false;
+}
+
