@@ -11,6 +11,57 @@ if (!defined('DEBUG_MODE')) { die(); }
 require_once APP_PATH.'modules/imap/hm-imap.php';
 
 /**
+ * Check for attachments when forwarding a message
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_forward_attachments extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('forward', $this->request->get)) {
+            return;
+        }
+        if (!array_key_exists('list_path', $this->request->get)) {
+            return;
+        }
+        if (!array_key_exists('uid', $this->request->get)) {
+            return;
+        }
+        $uid = $this->request->get['uid'];
+        $list_path = $this->request->get['list_path'];
+        $path = explode('_', $list_path);
+        if (count($path) != 3) {
+            return;
+        }
+        if ($path[0] != 'imap') {
+            return;
+        }
+        $filepath = $this->config->get('attachment_dir');
+        if (!$filepath) {
+            return;
+        }
+        $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $path[1]);
+        $imap = Hm_IMAP_List::connect($path[1], $cache);
+        if (!$imap) {
+            return;
+        }
+        if (!$imap->select_mailbox(hex2bin($path[2]))) {
+            return;
+        }
+        $content = $imap->get_message_content($uid, 0);
+        if (!$content) {
+            return;
+        }
+        $file = array(
+            'name' => 'mail.mime',
+            'type' => 'message/rfc822',
+            'no_encoding' => true,
+            'size' => strlen($content)
+        );
+        $draft_id = count($this->session->get('compose_drafts', array()));
+        attach_file($content, $file, $filepath, $draft_id, $this);
+    }
+}
+
+/**
  * Get the status of an IMAP folder
  * @subpackage imap/handler
  */
