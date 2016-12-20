@@ -25,7 +25,7 @@
 .expand_link { display: block; width: 16px; height: 16px; float: left; margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
 .header_subject th { font-size: 1.3em; padding-top: 10px; }
 .header_subject th div img { margin-right: 10px; margin-left: 11px; }
-.msg_parts { border-top: solid 1px #ddd; padding-top: 20px; padding-left: 40px; width: 100%; padding-bottom: 40px; }
+.msg_parts { border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
 .msg_parts td { padding: 3px; padding-right: 10px; white-space: nowrap; }
 .download_link { width: 100px; }
 .row_indent_0 { display: inline; padding: 0px; }
@@ -62,4 +62,5 @@
 .msg_move_to { width: auto !important; position: relative; display: inline-block; }
 .move_to_location .expand_link { float: left !important; width: auto !important; }
 .imap_filter { font-size: 75%; float: left; margin-right: 10px; margin-top: 8px; }
-
+.msg_part_icon { opacity: .4; padding-right: 5px; }
+.msg_part_placeholder { visibility: hidden; }

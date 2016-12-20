@@ -1241,7 +1241,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         else {
                             $max = false;
                         }
-                        $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
+                        $struct = $imap->search_bodystructure($msg_struct, array('imap_part_number' => $part));
                         $msg_struct_current = array_shift($struct);
                         $msg_text = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $msg_struct_current);
                     }
@@ -2192,9 +2192,8 @@ function process_imap_message_ids($ids) {
  * @return string
  */
 function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
-    /*if (filter_message_part($vals)) {
-        return '';
-    }*/
+    $use_icons = false;
+    $simple_view = false;
     $allowed = array(
         'textplain',
         'texthtml',
@@ -2206,7 +2205,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
         'textunknown',
         'textx-vcard',
         'textcalendar',
-        'textx-vCalendar',
+        'textx-vcalendar',
         'textx-sql',
         'textx-comma-separated-values',
         'textenriched',
@@ -2222,6 +2221,41 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
         'imagepjpeg',
         'imagegif',
     );
+    $icons = array(
+        'text' => 'doc',
+        'image' => 'camera',
+        'application' => 'save',
+        'multipart' => 'folder',
+        'audio' => 'audio',
+        'video' => 'monitor',
+        'binary' => 'save',
+
+        'textx-vcard' => 'calendar',
+        'textcalendar' => 'calendar',
+        'textx-vcalendar' => 'calendar',
+        'applicationics' => 'calendar',
+        'multipartdigest' => 'spreadsheet',
+        'applicationpgp-keys' => 'key',
+        'applicationpgp-signature' => 'key',
+        'multipartsigned' => 'lock',
+        'messagerfc822' => 'env_open',
+        'octetstream' => 'paperclip',
+    );
+    $hidden_parts= array(
+        'multipartdigest',
+        'multipartsigned',
+        'multipartmixed',
+        'messagerfc822',
+    );
+    $lc_type = strtolower($vals['type']).strtolower($vals['subtype']);
+    if ($simple_view) {
+        if (filter_message_part($vals)) {
+            return '';
+        }
+        if (in_array($lc_type, $hidden_parts, true)) {
+            return '';
+        }
+    }
     if ($level > 6) {
         $class = 'row_indent_max';
     }
@@ -2244,24 +2278,44 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args) {
         $desc = '';
     }
     $filename = get_imap_part_name($vals, $id, $part, true);
+    if (!$desc && $filename) {
+        $desc = $filename;
+    }
     $size = get_imap_size($vals);
     $res = '<tr';
     if ($id == $part) {
         $res .= ' class="selected_part"';
     }
     $res .= '><td><div class="'.$class.'">';
-    if (in_array(strtolower($vals['type']).strtolower($vals['subtype']), $allowed, true)) {
+    $icon = false;
+    if ($use_icons && array_key_exists($lc_type, $icons)) {
+        $icon = $icons[$lc_type];
+    }
+    elseif ($use_icons && array_key_exists(strtolower($vals['type']), $icons)) {
+        $icon = $icons[strtolower($vals['type'])];
+    }
+    if ($icon) {
+        $res .= '<img class="msg_part_icon" src="'.Hm_Image_Sources::$$icon.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" /> ';
+    }
+    else {
+        $res .= '<img class="msg_part_icon msg_part_placeholder" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" /> ';
+    }
+    if (in_array($lc_type, $allowed, true)) {
         $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(strtolower($vals['type'])).
             ' / '.$output_mod->html_safe(strtolower($vals['subtype'])).'</a>';
     }
     else {
         $res .= $output_mod->html_safe(strtolower($vals['type'])).' / '.$output_mod->html_safe(strtolower($vals['subtype']));
     }
-    $res .= '</td><td>'.$output_mod->html_safe($filename);
+    /*if (!$simple_view) {
+        $res .= '</td><td>'.$output_mod->html_safe($filename);
+    }*/
     $res .= '</td><td>'.$output_mod->html_safe($size);
-    $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-        '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '').
-        '</td><td>'.$output_mod->html_safe($desc).'</td>';
+    if (!$simple_view) {
+        $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
+            '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
+    }
+    $res .= '</td><td>'.$output_mod->html_safe($desc).'</td>';
     $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
     return $res;
 }
@@ -2309,7 +2363,11 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
     $res = '';
     foreach ($struct as $id => $vals) {
         if (is_array($vals) && isset($vals['type'])) {
-            $res .= format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link);
+            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link);
+            if (!$row) {
+                $level--;
+            }
+            $res .= $row;
             if (isset($vals['subs'])) {
                 $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, ($level + 1));
             }
