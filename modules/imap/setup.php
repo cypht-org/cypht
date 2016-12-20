@@ -26,11 +26,15 @@ add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_handler('settings', 'process_sent_since_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_sent_source_max_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_text_only_setting', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_msg_part_icons', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_simple_msg_parts', true, 'imap', 'date', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
 add_output('settings', 'sent_source_max_setting', true, 'imap', 'sent_since_setting', 'after');
 add_output('settings', 'text_only_setting', true, 'imap', 'list_style_setting', 'after');
+add_output('settings', 'imap_msg_icons_setting', true, 'imap', 'text_only_setting', 'after');
+add_output('settings', 'imap_simple_msg_parts', true, 'imap', 'imap_msg_icons_setting', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -128,6 +132,7 @@ add_handler('ajax_imap_folder_status', 'imap_folder_status',  true, 'imap');
 
 /* ajax unread callback data */
 setup_base_ajax_page('ajax_imap_unread', 'core');
+add_handler('ajax_imap_unread', 'message_list_type', true, 'core');
 add_handler('ajax_imap_unread', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_unread', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_unread', 'close_session_early',  true, 'core');
@@ -288,6 +293,8 @@ return array(
         'imap_user' => FILTER_SANITIZE_STRING,
         'imap_pass' => FILTER_UNSAFE_RAW,
         'text_only' => FILTER_VALIDATE_BOOLEAN,
+        'msg_part_icons' => FILTER_VALIDATE_BOOLEAN,
+        'simple_msg_parts' => FILTER_VALIDATE_BOOLEAN,
         'imap_delete' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
         'imap_remember' => FILTER_VALIDATE_INT,

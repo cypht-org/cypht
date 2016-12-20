@@ -92,6 +92,38 @@ class Hm_Handler_process_sent_source_max_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process "simple message parts" setting for the message view page in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_simple_msg_parts extends Hm_Handler_Module {
+    /**
+     * valid values are true or false
+     */
+    public function process() {
+        function simple_msg_view_callback($val) {
+            return $val;
+        }
+        process_site_setting('simple_msg_parts', $this, 'simple_msg_view_callback', false, true);
+    }
+}
+
+/**
+ * Process "message part icons" setting for the message view page in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_msg_part_icons extends Hm_Handler_Module {
+    /**
+     * valid values are true or false
+     */
+    public function process() {
+        function msg_part_icons_callback($val) {
+            return $val;
+        }
+        process_site_setting('msg_part_icons', $this, 'msg_part_icons_callback', false, true);
+    }
+}
+
+/**
  * Process "text only" setting for the message view page in the settings page
  * @subpackage imap/handler
  */
@@ -1282,6 +1314,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('msg_headers', $msg_headers);
                     $this->out('imap_prefecth', $prefetch);
                     $this->out('imap_msg_part', "$part");
+                    $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
+                    $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', false));
                     if ($msg_struct_current) {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
@@ -1920,6 +1954,40 @@ class Hm_Output_sent_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option to enable/disable simple message structure on the message view
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('simple_msg_parts', $settings) && $settings['simple_msg_parts']) {
+            $checked = ' checked="checked"';
+        }
+        return '<tr class="general_setting"><td><label for="simple_msg_parts">'.
+            $this->trans('Show simple message part structure when reading a message').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" value="1" /></td></tr>';
+    }
+}
+
+/**
+ * Option to enable/disable message part icons on the message view
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('msg_part_icons', $settings) && $settings['msg_part_icons']) {
+            $checked = ' checked="checked"';
+        }
+        return '<tr class="general_setting"><td><label for="msg_part_icons">'.
+            $this->trans('Show message part icons when reading a message').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" value="1" /></td></tr>';
+    }
+}
+
+/**
  * Option to limit mail fromat to text only when possible (not defaulting to HTML)
  * @subpackage imap/output
  */
@@ -2057,6 +2125,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
     if ($msg_list === array(false)) {
         return $msg_list;
     }
+    $show_icons = $output_module->get('msg_list_icons');
     foreach($msg_list as $msg) {
         $row_class = 'email';
         $icon = 'env_open';
@@ -2120,6 +2189,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
         if ($output_module->get('list_page', 0)) {
             $url .= '&list_page='.$output_module->html_safe($output_module->get('list_page', 1));
+        }
+        if (!$show_icons) {
+            $icon = false;
         }
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
