@@ -12,9 +12,6 @@
  */
 class Hm_Memcached_Session extends Hm_PHP_Session {
 
-    /* session cookie name */
-    protected $cname = 'hm_session';
-
     /* session key */
     public $session_key = '';
 

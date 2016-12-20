@@ -86,6 +86,12 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $session->destroy($request);
 
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->check($request, 'unittestuser', 'unittestpass', false);
+        $this->assertTrue($session->is_active());
+        $session->destroy($request);
+
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $session->check($request, 'nobody', 'knows');
         $this->assertFalse($session->is_active());
         $session->destroy($request);
@@ -118,6 +124,8 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $request->server['HTTP_HOST'] = 'test';
         $session->check_fingerprint($request);
         $this->assertFalse($session->is_active());
+        $session->set('fingerprint', false);
+        $session->check_fingerprint($request);
         $session->destroy($request);
 
     }

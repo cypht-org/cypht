@@ -18,7 +18,11 @@ trait Hm_Session_Fingerprint {
      */
     public function check_fingerprint($request) {
         $id = $this->build_fingerprint($request->server);
-        $fingerprint = $this->get('fingerprint', false);
+        $fingerprint = $this->get('fingerprint', null);
+        if ($fingerprint === false) {
+            $this->set_fingerprint($request);
+            return;
+        }
         if (!$fingerprint || $fingerprint !== $id) {
             $this->destroy($request);
             Hm_Debug::add('HTTP header fingerprint check failed');
@@ -90,6 +94,9 @@ abstract class Hm_Session {
 
     /* close early flag */
     protected $session_closed = false;
+
+    /* session key */
+    public $session_key = '';
 
     /**
      * check for an active session or an attempt to start one

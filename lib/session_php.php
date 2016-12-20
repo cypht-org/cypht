@@ -18,13 +18,18 @@ class Hm_PHP_Session extends Hm_Session {
      * @param string $pass password
      * @return bool
      */
-    public function check($request, $user=false, $pass=false) {
+    public function check($request, $user=false, $pass=false, $fingerprint=true) {
         if ($user && $pass) {
             if ($this->auth($user, $pass)) {
                 $this->set_key($request);
                 $this->loaded = true;
                 $this->start($request);
-                $this->set_fingerprint($request);
+                if ($fingerprint) {
+                    $this->set_fingerprint($request);
+                }
+                else {
+                    $this->set('fingerprint', false);
+                }
                 $this->save_auth_detail();
                 $this->just_started();
             }
@@ -101,6 +106,7 @@ class Hm_PHP_Session extends Hm_Session {
         list($secure, $path, $domain) = $this->set_session_params($request);
         session_set_cookie_params(0, $path, $domain, $secure);
         Hm_Functions::session_start();
+        $this->session_key = session_id();
         if (array_key_exists('data', $_SESSION)) {
             $data = $this->plaintext($_SESSION['data']);
             if (is_array($data)) {
