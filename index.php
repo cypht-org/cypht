@@ -1,7 +1,7 @@
 <?php
 
 /**
- * GIT VERSION: 3978
+ * GIT VERSION: 3979
  *
  * Some of the following constants are automatically filled in when
  * the build process is run. If you change them in site/index.php
