@@ -419,6 +419,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
         $res = array();
         $login_time = false;
         $unread_only = false;
+        $show_icons = $this->get('msg_list_icons');
         if ($this->get('login_time')) {
             $login_time = $this->get('login_time');
         }
@@ -482,11 +483,15 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                 $style = 'news';
             }
             $row_class .= ' '.$repo_name;
+            $icon = 'code';
+            if (!$show_icons) {
+                $icon = '';
+            }
             if ($style == 'news') {
                 $res[$id] = message_list_row(array(
                         array('checkbox_callback', $id),
                         array('icon_callback', $flags),
-                        array('subject_callback', $subject, $url, $flags, 'code'),
+                        array('subject_callback', $subject, $url, $flags, $icon),
                         array('safe_output_callback', 'source', $repo_name),
                         array('safe_output_callback', 'from', $from),
                         array('date_callback', human_readable_interval($date), $ts),
@@ -500,7 +505,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             else {
                 $res[$id] = message_list_row(array(
                         array('checkbox_callback', $id),
-                        array('safe_output_callback', 'source', $repo_name, 'code'),
+                        array('safe_output_callback', 'source', $repo_name, $icon),
                         array('safe_output_callback', 'from', $from),
                         array('subject_callback', $subject, $url, $flags),
                         array('date_callback', human_readable_interval($date), $ts),
