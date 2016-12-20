@@ -985,6 +985,7 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
  */
 function format_pop3_message_list($msg_list, $output_module, $style, $login_time, $list_parent) {
     $res = array();
+    $show_icons = $output_module->get('msg_list_icons');
     foreach($msg_list as $msg_id => $msg) {
         $icon = 'env_open';
         $row_class = 'email';
@@ -1024,6 +1025,9 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
             $flags = array('unseen');
         }
         $row_class .= ' '.str_replace(' ', '_', $msg['server_name']);
+        if (!$show_icons) {
+            $icon = false;
+        }
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
