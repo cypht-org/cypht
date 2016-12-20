@@ -388,7 +388,7 @@ class Hm_IMAP_Struct {
         foreach ($struct as $msg_id => $vals) {
             $matches = 0;
             if (isset($flds['imap_part_number'])) {
-                if ($msg_id == $flds['imap_part_number'] || preg_replace("/^0\.{1}/", '', $msg_id) == $flds['imap_part_number']) {
+                if ($msg_id === $flds['imap_part_number'] || preg_replace("/^0\.{1}/", '', $msg_id) === $flds['imap_part_number']) {
                     $matches++;
                 }
             }
