@@ -222,7 +222,7 @@ function checkbox_callback($vals, $style, $output_mod) {
  */
 function subject_callback($vals, $style, $output_mod) {
     $img = '';
-    if (count($vals) == 4) {
+    if (count($vals) == 4 && $vals[3]) {
         $img = '<img src="'.Hm_Image_Sources::${$vals[3]}.'" />';
     }
     $subject = $output_mod->html_safe($vals[0]);
