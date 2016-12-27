@@ -144,9 +144,11 @@ class Hm_Output_pgp_settings_end extends Hm_Output_Module {
  */
 class Hm_Output_pgp_settings_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_profiles"><a class="unread_link" href="?page=pgp">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$lock).
-            '" alt="" width="16" height="16" /> '.$this->trans('PGP').'</a></li>';
+        $res = '<li class="menu_profiles"><a class="unread_link" href="?page=pgp">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$lock).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('PGP').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }

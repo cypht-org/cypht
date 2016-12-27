@@ -552,8 +552,11 @@ class Hm_Handler_smtp_auto_bcc_check extends Hm_Handler_Module {
  */
 class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$sent).'" alt="" width="16" height="16" /> '.$this->trans('Sent').'</a></li>';
+        $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$sent).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Sent').'</a></li>';
         $this->concat('formatted_folder_list', $res);
     }
 }
@@ -863,8 +866,11 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
  */
 class Hm_Output_compose_page_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> '.$this->trans('Compose').'</a></li>';
+        $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Compose').'</a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;

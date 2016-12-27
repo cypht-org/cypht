@@ -15,9 +15,13 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
      * Add a search form to the top of the folder list
      */
     protected function output() {
-        $res = '<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).
-            '" alt="'.$this->trans('Search').'" width="16" height="16" /></a><input type="hidden" name="page" value="search" />'.
+        $res = '<li class="menu_search"><form method="get">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<a class="unread_link" href="?page=search">';
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search);
+            $res .= '" alt="'.$this->trans('Search').'" width="16" height="16" /></a>';
+        }
+        $res .= '<input type="hidden" name="page" value="search" />'.
             '<label class="screen_reader" for="search_terms">'.$this->trans('Search').'</label><input type="search" id="search_terms" class="search_terms" name="search_terms" placeholder="'.
             $this->trans('Search').'" /></form></li>';
         if ($this->format == 'HTML5') {
@@ -562,6 +566,23 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
 /**
  * @subpackage core/output
  */
+class Hm_Output_no_folder_icon_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('no_folder_icons', $settings) && $settings['no_folder_icons']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $checked = '';
+        }
+        return '<tr class="general_setting"><td><label for="no_folder_icons">'.$this->trans('Hide folder list icons').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' value="1" id="no_folder_icons" name="no_folder_icons" /></td></tr>';
+    }
+}
+
+/**
+ * @subpackage core/output
+ */
 class Hm_Output_no_password_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings');
@@ -1000,15 +1021,21 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         if (array_key_exists('email_folders', merge_folder_list_details($this->get('folder_sources', array())))) {
             $email = true;
         }
-        $res = '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> '.$this->trans('Everything').
-            '</a><span class="combined_inbox_count"></span></li>';
-        $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" '.
-            'width="16" height="16" /> '.$this->trans('Unread').'</a><span class="total_unread_count"></span></li>';
-        $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> '.$this->trans('Flagged').
-            '</a> <span class="flagged_count"></span></li>';
+        $res = '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
+        $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Unread').'</a><span class="total_unread_count"></span></li>';
+        $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Flagged').'</a> <span class="flagged_count"></span></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1023,8 +1050,11 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
  */
 class Hm_Output_logout_menu_item extends Hm_Output_Module {
     protected function output() {
-        $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#"><img class="account_icon" src="'.
-            $this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> '.$this->trans('Logout').'</a></li>';
+        $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Logout').'</a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1068,9 +1098,11 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             $res .= '<div style="display: none;" ';
             $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
             if ($name == 'Email') {
-                $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">'.
-                    '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).
-                    '" alt="" width="16" height="16" /> '.$this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
+                $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
+                if (!$this->get('hide_folder_icons')) {
+                    $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> ';
+                }
+                $res .= $this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
             }
             $res .= $content.'</ul></div>';
         }
@@ -1093,8 +1125,11 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
         $res = '<div class="src_name" data-source=".settings">'.$this->trans('Settings').
             '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
             '</div><ul style="display: none;" class="settings folders">';
-        $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> '.$this->trans('Home').'</a></li>';
+        $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Home').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1149,12 +1184,14 @@ class Hm_Output_save_form extends Hm_Output_Module {
  */
 class Hm_Output_settings_servers_link extends Hm_Output_Module {
     /**
-     * Outputs links to the Servers and Site Settings pages
+     * Outputs links to the Servers settings pages
      */
     protected function output() {
-        $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).
-            '" alt="" width="16" height="16" /> '.$this->trans('Servers').'</a></li>';
+        $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Servers').'</a></li>';
         $this->concat('formatted_folder_list', $res);
     }
 }
@@ -1165,12 +1202,14 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
  */
 class Hm_Output_settings_site_link extends Hm_Output_Module {
     /**
-     * Outputs links to the Servers and Site Settings pages
+     * Outputs links to the Site Settings pages
      */
     protected function output() {
-        $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).
-            '" alt="" width="16" height="16" /> '.$this->trans('Site').'</a></li>';
+        $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Site').'</a></li>';
         $this->concat('formatted_folder_list', $res);
     }
 }
@@ -1184,9 +1223,11 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
      * Outputs links to the Servers and Site Settings pages
      */
     protected function output() {
-        $res = '<li class="menu_save"><a class="unread_link" href="?page=save">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$save).
-            '" alt="" width="16" height="16" /> '.$this->trans('Save').'</a></li>';
+        $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$save).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Save').'</a></li>';
         $this->concat('formatted_folder_list', $res);
     }
 }

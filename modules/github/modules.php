@@ -398,13 +398,17 @@ class Hm_Output_github_folders extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('github_connect_details', array());
         if (!empty($details)) {
-            $res = '<li class="menu_github_all"><a class="unread_link" href="?page=message_list&list_path=github_all">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
-                '" alt="" width="16" height="16" /> '.$this->trans('All').'</a></li>';
+            $res = '<li class="menu_github_all"><a class="unread_link" href="?page=message_list&list_path=github_all">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> ';
+            }
+            $res .= $this->trans('All').'</a></li>';
             foreach ($this->get('github_repos', array()) as $repo) {
-                $res .= '<li class="menu_github_'.$this->html_safe($repo).'"><a class="unread_link" href="?page=message_list&list_path=github_'.$this->html_safe($repo).'">'.
-                    '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
-                    '" alt="" width="16" height="16" /> '.$this->html_safe(explode('/', urldecode($repo))[1]).'</a></li>';
+                $res .= '<li class="menu_github_'.$this->html_safe($repo).'"><a class="unread_link" href="?page=message_list&list_path=github_'.$this->html_safe($repo).'">';
+                if (!$this->get('hide_folder_icons')) {
+                    $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> ';
+                }
+                $res .= $this->html_safe(explode('/', urldecode($repo))[1]).'</a></li>';
             }
             $this->append('folder_sources', array('github_folders', $res));
         }

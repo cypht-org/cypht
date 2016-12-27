@@ -77,9 +77,11 @@ class Hm_Output_create_account_link extends Hm_Output_Module {
             $res = '';
         }
         else {
-            $res = '<li class="menu_create_account"><a class="unread_link" href="?page=create_account">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" '.
-                'width="16" height="16" /> '.$this->trans('Accounts').'</a></li>';
+            $res = '<li class="menu_create_account"><a class="unread_link" href="?page=create_account">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" '.'width="16" height="16" /> ';
+            }
+            $res .= $this->trans('Accounts').'</a></li>';
         }
         if ($this->format == 'HTML5') {
             return $res;
@@ -117,8 +119,11 @@ class Hm_Output_create_form extends Hm_Output_Module {
 class Hm_Output_change_password_link extends Hm_Output_Module {
     protected function output() {
         if ($this->get('internal_users')) {
-            $res = '<li class="menu_change_password"><a class="unread_link" href="?page=change_password">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$key).'" alt="" width="16" height="16" /> '.$this->trans('Password').'</a></li>';
+            $res = '<li class="menu_change_password"><a class="unread_link" href="?page=change_password">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$key).'" alt="" width="16" height="16" /> ';
+            }
+            $res .= $this->trans('Password').'</a></li>';
             $this->concat('formatted_folder_list', $res);
         }
     }

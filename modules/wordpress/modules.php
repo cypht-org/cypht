@@ -258,9 +258,11 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('wp_connect_details', array());
         if (!empty($details)) {
-            $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$w).
-                '" alt="" width="16" height="16" /> '.$this->trans('Notifications').'</a></li>';
+            $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$w).'" alt="" width="16" height="16" /> ';
+            }
+            $res .= $this->trans('Notifications').'</a></li>';
             $this->append('folder_sources', array('wordPress_folders', $res));
         }
         return '';

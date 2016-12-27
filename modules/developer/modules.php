@@ -71,8 +71,11 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
      * Link to the dev page
      */
     protected function output() {
-        $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> '.$this->trans('Dev').'</a></li>';
+        $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Dev').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -90,8 +93,11 @@ class Hm_Output_info_page_link extends Hm_Output_Module {
      * Info page link
      */
     protected function output() {
-        $res = '<li class="menu_info"><a class="unread_link" href="?page=info">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$info).'" alt="" width="16" height="16" /> '.$this->trans('Info').'</a></li>';
+        $res = '<li class="menu_info"><a class="unread_link" href="?page=info">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$info).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Info').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }

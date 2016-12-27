@@ -7,6 +7,19 @@
  */
 
 /**
+ * Check the folder list icon setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_check_folder_icon_setting extends Hm_Handler_Module {
+    /***
+     * set a flag to use folder list icons or not
+     */
+    public function process() {
+        $this->out('hide_folder_icons', $this->user_config->get('no_folder_icons_setting', false));
+    }
+}
+
+/**
  * Process a password update 
  * @subpackage core/handler
  */
@@ -185,6 +198,22 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
             return 'email_style';
         }
         process_site_setting('list_style', $this, 'list_style_callback');
+    }
+}
+
+/**
+ * Process "hide folder list icons" setting 
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_hide_folder_icons extends Hm_Handler_Module {
+    /**
+     * valid values are true or false
+     */
+    public function process() {
+        function hide_folder_icons_callback($val) {
+            return $val;
+        }
+        process_site_setting('no_folder_icons', $this, 'hide_folder_icons_callback', false, true);
     }
 }
 

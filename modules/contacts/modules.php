@@ -89,9 +89,11 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
  */
 class Hm_Output_contacts_page_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_contacts"><a class="unread_link" href="?page=contacts">'.
-            '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$people).
-            '" alt="" width="16" height="16" /> '.$this->trans('Contacts').'</a></li>';
+        $res = '<li class="menu_contacts"><a class="unread_link" href="?page=contacts">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$people).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Contacts').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }

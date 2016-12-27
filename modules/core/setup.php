@@ -44,6 +44,7 @@ add_handler('settings', 'process_all_source_max_setting', true, 'core', 'date', 
 add_handler('settings', 'process_all_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_no_password_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after');
@@ -54,7 +55,8 @@ add_output('settings', 'start_settings_form', true, 'core', 'content_section_sta
 add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
-add_output('settings', 'list_style_setting', true, 'core', 'timezone_setting', 'after');
+add_output('settings', 'no_folder_icon_setting', true, 'core', 'timezone_setting', 'after');
+add_output('settings', 'list_style_setting', true, 'core', 'no_folder_icon_setting', 'after');
 add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setting', 'before');
 add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_setting', 'after');
 add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
@@ -112,6 +114,7 @@ add_handler('ajax_update_server_pw', 'process_pw_update', true, 'core', 'check_m
 
 /* folder list update ajax request */
 setup_base_ajax_page('ajax_hm_folders', 'core');
+add_handler('ajax_hm_folders', 'check_folder_icon_setting', true, 'ccore', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
 add_output('ajax_hm_folders', 'search_from_folder_list', true);
@@ -223,6 +226,7 @@ return array(
         'all_email_since' => FILTER_SANITIZE_STRING,
         'all_per_source' => FILTER_VALIDATE_INT,
         'all_since' => FILTER_SANITIZE_STRING,
+        'no_folder_icons' => FILTER_VALIDATE_BOOLEAN,
         'list_style' => FILTER_SANITIZE_STRING,
         'timezone' => FILTER_SANITIZE_STRING,
         'disable_delete_prompt' => FILTER_VALIDATE_INT,

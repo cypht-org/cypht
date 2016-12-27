@@ -190,9 +190,11 @@ class Hm_Output_search_folders extends Hm_Output_Module {
                     $this->html_safe(urlencode($args[1])),
                     $this->html_safe(urlencode($name))
                 );
-                $res .= '<li class="menu_search_'.$this->html_safe($name).'"><a class="unread_link" href="'.$url.'">'.
-                    '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).
-                    '" alt="" width="16" height="16" /> '.$this->html_safe($name).'</a></li>';
+                $res .= '<li class="menu_search_'.$this->html_safe($name).'"><a class="unread_link" href="'.$url.'">';
+                if (!$this->get('hide_folder_icons')) {
+                    $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).'" alt="" width="16" height="16" /> ';
+                }
+                $res .= $this->html_safe($name).'</a></li>';
             }
             $this->append('folder_sources', array('search_folders', $res));
         }

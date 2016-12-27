@@ -227,9 +227,11 @@ class Hm_Output_keyboard_shortcut_data extends Hm_Output_Module {
 class Hm_Output_shortcuts_page_link extends Hm_Output_Module {
     protected function output() {
         if ($this->get('shortcuts_enabled')) {
-            $res = '<li class="menu_shortcuts"><a class="unread_link" href="?page=shortcuts">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).
-                '" alt="" width="16" height="16" /> '.$this->trans('Shortcuts').'</a></li>';
+            $res = '<li class="menu_shortcuts"><a class="unread_link" href="?page=shortcuts">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> ';
+            }
+            $res .= $this->trans('Shortcuts').'</a></li>';
             if ($this->format == 'HTML5') {
                 return $res;
             }

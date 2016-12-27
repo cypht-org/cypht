@@ -1771,9 +1771,11 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_">'.
-                    '<img class="account_icon" alt="'.$this->trans('Toggle folder').'" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> '.
-                    $this->html_safe($folder).'</a></li>';
+                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_">';
+                if (!$this->get('hide_folder_icons')) {
+                    $res .= '<img class="account_icon" alt="'.$this->trans('Toggle folder').'" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> ';
+                }
+                $res .= $this->html_safe($folder).'</a></li>';
             }
         }
         if ($res) {
