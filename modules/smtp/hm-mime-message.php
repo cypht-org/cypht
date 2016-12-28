@@ -12,7 +12,7 @@
  */
 class Hm_MIME_Msg {
     private $bcc = '';
-    private $headers = array('MIME-Version' => '1.0');
+    private $headers = array('X-Mailer' => 'Cypht', 'MIME-Version' => '1.0');
     private $boundary = '';
     private $attachments = array();
     private $body = '';
