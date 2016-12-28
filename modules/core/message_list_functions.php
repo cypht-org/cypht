@@ -262,21 +262,26 @@ function date_callback($vals, $style, $output_mod) {
  */
 function icon_callback($vals, $style, $output_mod) {
     $icons = '';
+    $title = array();
     $show_icons = $output_mod->get('msg_list_icons');
     if (in_array('flagged', $vals[0])) {
         $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Flagged').'" />' : ' F';
+        $title[] = $output_mod->trans('Flagged');
     }
     if (in_array('answered', $vals[0])) {
         $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$circle_check.'" width="16" height="16" alt="'.$output_mod->trans('Answered').'" />' : ' A';
+        $title[] = $output_mod->trans('Answered');
     }
     if (in_array('attachment', $vals[0])) {
         $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$paperclip.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" />' : ' +';
+        $title[] = $output_mod->trans('Attachment');
     }
+    $title = implode(', ', $title);
     if ($style == 'email') {
-        return sprintf('<td class="icon">%s</td>', $icons);
+        return sprintf('<td class="icon" title="%s">%s</td>', $title, $icons);
     }
     elseif ($style == 'news') {
-        return sprintf('<div class="icon">%s</div>', $icons);
+        return sprintf('<div class="icon" title="%s">%s</div>', $title, $icons);
     }
 }
 
