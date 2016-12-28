@@ -765,6 +765,11 @@ var Hm_Folders = {
                 if (!Hm_Folders.unread_counts[name]) {
                     Hm_Folders.unread_counts[name] = 0;
                 }
+                if (hm_list_path() == name && hm_page_name() == 'message_list') {
+                    var title = document.title.replace(/^\[\d+\]/, '');
+                    document.title = '['+Hm_Folders.unread_counts[name]+'] '+title;
+                    /* HERE */
+                }
                 $('.unread_'+name).html('&#160;'+Hm_Folders.unread_counts[name]+'&#160;');
             }
         }
