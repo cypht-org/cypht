@@ -262,14 +262,15 @@ function date_callback($vals, $style, $output_mod) {
  */
 function icon_callback($vals, $style, $output_mod) {
     $icons = '';
+    $show_icons = $output_mod->get('msg_list_icons');
     if (in_array('flagged', $vals[0])) {
-        $icons .= '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Flagged').'" />';
+        $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Flagged').'" />' : ' F';
     }
     if (in_array('answered', $vals[0])) {
-        $icons .= '<img src="'.Hm_Image_Sources::$circle_check.'" width="16" height="16" alt="'.$output_mod->trans('Answered').'" />';
+        $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$circle_check.'" width="16" height="16" alt="'.$output_mod->trans('Answered').'" />' : ' A';
     }
     if (in_array('attachment', $vals[0])) {
-        $icons .= '<img src="'.Hm_Image_Sources::$paperclip.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" />';
+        $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$paperclip.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" />' : ' +';
     }
     if ($style == 'email') {
         return sprintf('<td class="icon">%s</td>', $icons);

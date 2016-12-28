@@ -101,7 +101,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .news_cell .subject div img {width: 16px; height: 16px; opacity: .5; padding-right: 10px; }
 .news_cell .subject, .news_cell .subject div{ padding-bottom: 5px !important; overflow: visible; white-space: normal; }
 .news_cell .icon { float: right; }
-.icon { white-space: nowrap; font-size: 110%; }
+.icon { white-space: nowrap; }
 .news_cell .from {float: left; font-size: 100% !important; color: #111; letter-spacing: 0px; }
 .nofrom { color: #aaa !important; }
 .news_cell .source {float: left; padding-right: 10px; font-size: 100% !important;}
