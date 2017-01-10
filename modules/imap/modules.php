@@ -1582,7 +1582,12 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $pass_pc = $this->trans('[saved]');
             }
             elseif (array_key_exists('nopass', $vals)) {
-                $user_pc = $vals['user'];
+                if (array_key_exists('user', $vals)) {
+                    $user_pc = $vals['user'];
+                }
+                else {
+                    $user_pc = '';
+                }
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
             }
