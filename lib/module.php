@@ -252,7 +252,7 @@ abstract class Hm_Handler_Module {
             $target = false;
         }
         if (!$target) {
-            $target = array_key_exists('HTTP_X_FORWARDED_HOST', $this->request->server) ? $this->request->serveri['HTTP_X_FORWARDED_HOST'] : false;
+            $target = array_key_exists('HTTP_X_FORWARDED_HOST', $this->request->server) ? $this->request->server['HTTP_X_FORWARDED_HOST'] : false;
         }
         if (!$target) {
             $target = array_key_exists('HTTP_HOST', $this->request->server) ? $this->request->server['HTTP_HOST'] : false;
