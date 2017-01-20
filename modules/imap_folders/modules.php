@@ -189,6 +189,48 @@ class Hm_Output_folders_rename_dialog extends Hm_Output_Module {
 /**
  * @subpackage imap_folders/output
  */
+class Hm_Output_folders_special_use_dialog extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('folder_server') !== NULL) {
+            $trash_folder = $this->trans('Not set');
+            $sent_folder = $this->trans('Not set');
+            $draft_folder = $this->trans('Not set');
+            $res = '<div data-target=".special_use_dialog" class="settings_subtitle">'.$this->trans('Set Special Use Folders (Sent/Trash/Drafts)').'</div>';
+            $res .= '<div class="folder_dialog special_use_dialog">';
+
+            $res .= '<div class="folder_row"><b>'.$this->trans('Trash Folder').'</b>: '.$trash_folder.'</div>';
+            $res .= '<div class="folder_row"><a href="#" class="select_trash_folder">';
+            $res .= $this->trans('Select Folder').'</a>: <span class="selected_trash"></span></div>';
+            $res .= '<ul class="folders trash_folder_select"><li class="trash_title"><a href="#" class="close">';
+            $res .= $this->trans('Cancel').'</a></li></ul>';
+            $res .= '<input type="hidden" value="" id="trash_source" />';
+            $res .= ' <input type="button" id="set_trash_folder" value="'.$this->trans('Assign').'" /><br /><br />';
+
+            $res .= '<div class="folder_row"><b>'.$this->trans('Sent Folder').'</b>: '.$sent_folder.'</div>';
+            $res .= '<div class="folder_row"><a href="#" class="select_sent_folder">';
+            $res .= $this->trans('Select Folder').'</a>: <span class="selected_sent"></span></div>';
+            $res .= '<ul class="folders sent_folder_select"><li class="sent_title"><a href="#" class="close">';
+            $res .= $this->trans('Cancel').'</a></li></ul>';
+            $res .= '<input type="hidden" value="" id="sent_source" />';
+            $res .= ' <input type="button" id="set_sent_folder" value="'.$this->trans('Assign').'" /><br /><br />';
+
+            $res .= '<div class="folder_row"><b>'.$this->trans('Draft Folder').'</b>: '.$draft_folder.'</div>';
+            $res .= '<div class="folder_row"><a href="#" class="select_draft_folder">';
+            $res .= $this->trans('Select Folder').'</a>: <span class="selected_draft"></span></div>';
+            $res .= '<ul class="folders draft_folder_select"><li class="draft_title"><a href="#" class="close">';
+            $res .= $this->trans('Cancel').'</a></li></ul>';
+            $res .= '<input type="hidden" value="" id="draft_source" />';
+            $res .= ' <input type="button" id="set_draft_folder" value="'.$this->trans('Assign').'" /><br /><br />';
+
+            $res .= '</div>';
+            return $res;
+        }
+    }
+}
+
+/**
+ * @subpackage imap_folders/output
+ */
 class Hm_Output_folders_create_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('folder_server') !== NULL) {

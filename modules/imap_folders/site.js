@@ -133,6 +133,40 @@ var folder_page_rename = function() {
     );
 };
 
+
+var folder_page_assign_trash = function() {
+    var id = $('#imap_server_folder').val();
+    var folder = $('#trash_source').val();
+    if (id && folder) {
+        assign_special_folder(id, folder, 'trash', function(res) { elog(res); });
+    }
+};
+
+var folder_page_assign_sent = function() {
+    var id = $('#imap_server_folder').val();
+    var folder = $('#sent_source').val();
+    if (id && folder) {
+        assign_special_folder(id, folder, 'sent', function(res) { elog(res); });
+    }
+};
+
+var folder_page_assign_draft = function() {
+    var id = $('#imap_server_folder').val();
+    var folder = $('#draft_source').val();
+    if (id && folder) {
+        assign_special_folder(id, folder, 'draft', function(res) { elog(res); });
+    }
+};
+
+var assign_special_folder = function(id, folder, type, callback) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_special_folder'},
+        {'name': 'imap_server_id', value: id},
+        {'name': 'folder', 'value': folder}],
+        callback
+    );
+};
+
 var folder_page_create = function() {
     var par = $('#create_parent').val();
     var folder = $('#create_value').val().trim();
@@ -172,8 +206,14 @@ $(function() {
     $('.select_parent_folder').click(function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
     $('.select_rename_folder').click(function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });
     $('.select_delete_folder').click(function() { return folder_page_folder_list('delete_folder_select', 'delete_title', 'imap_delete_folder_link', 'selected_delete', 'delete_source'); });
+    $('.select_trash_folder').click(function() { return folder_page_folder_list('trash_folder_select', 'trash_title', 'imap_trash_folder_link', 'selected_trash', 'trash_source'); });
+    $('.select_sent_folder').click(function() { return folder_page_folder_list('sent_folder_select', 'sent_title', 'imap_sent_folder_link', 'selected_sent', 'sent_source'); });
+    $('.select_draft_folder').click(function() { return folder_page_folder_list('draft_folder_select', 'draft_title', 'imap_draft_folder_link', 'selected_draft', 'draft_source'); });
     $('.select_rename_parent_folder').click(function() { return folder_page_folder_list('rename_parent_folder_select', 'rename_parent_title', 'imap_rename_parent_folder_link', 'selected_rename_parent', 'rename_parent_source'); });
     $('#create_folder').click(function() { folder_page_create(); return false; });
     $('#delete_folder').click(function() { folder_page_delete(); return false; });
     $('#rename_folder').click(function() { folder_page_rename(); return false; });
+    $('#set_trash_folder').click(function() { folder_page_assign_trash(); return false; });
+    $('#set_sent_folder').click(function() { folder_page_assign_sent(); return false; });
+    $('#set_draft_folder').click(function() { folder_page_assign_draft(); return false; });
 });
