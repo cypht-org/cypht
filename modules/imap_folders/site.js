@@ -138,7 +138,10 @@ var folder_page_assign_trash = function() {
     var id = $('#imap_server_folder').val();
     var folder = $('#trash_source').val();
     if (id && folder) {
-        assign_special_folder(id, folder, 'trash', function(res) { elog(res); });
+        assign_special_folder(id, folder, 'trash', function(res) {
+            $('#trash_val').text(res.imap_special_name);
+            $('.selected_trash').text('');
+        });
     }
 };
 
@@ -146,7 +149,10 @@ var folder_page_assign_sent = function() {
     var id = $('#imap_server_folder').val();
     var folder = $('#sent_source').val();
     if (id && folder) {
-        assign_special_folder(id, folder, 'sent', function(res) { elog(res); });
+        assign_special_folder(id, folder, 'sent', function(res) {
+            $('#sent_val').text(res.imap_special_name);
+            $('.selected_sent').text('');
+        });
     }
 };
 
@@ -154,14 +160,18 @@ var folder_page_assign_draft = function() {
     var id = $('#imap_server_folder').val();
     var folder = $('#draft_source').val();
     if (id && folder) {
-        assign_special_folder(id, folder, 'draft', function(res) { elog(res); });
+        assign_special_folder(id, folder, 'draft', function(res) {
+            $('#draft_val').text(res.imap_special_name);
+            $('.selected_draft').text('');
+        });
     }
 };
 
 var assign_special_folder = function(id, folder, type, callback) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_special_folder'},
-        {'name': 'imap_server_id', value: id},
+        {'name': 'imap_server_id', 'value': id},
+        {'name': 'special_folder_type', 'value': type},
         {'name': 'folder', 'value': folder}],
         callback
     );

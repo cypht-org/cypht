@@ -11,6 +11,33 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage imap_folders/handler
  */
+class Hm_Handler_process_special_folder extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('special_folder_type', 'folder', 'imap_server_id'));
+        if (!$success) {
+            return;
+        }
+        $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
+        $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+
+        if (!is_object($imap) || $imap->get_state() != 'authenticated') {
+            /* error */
+            return;
+        }
+        $new_folder = prep_folder_name($imap, $form['folder'], true);
+        if (!$new_folder || !$imap->select_mailbox($new_folder)) {
+            /* error */
+            return;
+        }
+        /* assign here */
+        Hm_Msgs::add('Special folder assigned');
+        $this->out('imap_special_name', $new_folder);
+    }
+}
+
+/**
+ * @subpackage imap_folders/handler
+ */
 class Hm_Handler_process_folder_create extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('folder', 'imap_server_id'));
@@ -198,7 +225,7 @@ class Hm_Output_folders_special_use_dialog extends Hm_Output_Module {
             $res = '<div data-target=".special_use_dialog" class="settings_subtitle">'.$this->trans('Set Special Use Folders (Sent/Trash/Drafts)').'</div>';
             $res .= '<div class="folder_dialog special_use_dialog">';
 
-            $res .= '<div class="folder_row"><b>'.$this->trans('Trash Folder').'</b>: '.$trash_folder.'</div>';
+            $res .= '<div class="folder_row"><b>'.$this->trans('Trash Folder').'</b>: <span id="trash_val">'.$trash_folder.'</span></div>';
             $res .= '<div class="folder_row"><a href="#" class="select_trash_folder">';
             $res .= $this->trans('Select Folder').'</a>: <span class="selected_trash"></span></div>';
             $res .= '<ul class="folders trash_folder_select"><li class="trash_title"><a href="#" class="close">';
@@ -206,7 +233,7 @@ class Hm_Output_folders_special_use_dialog extends Hm_Output_Module {
             $res .= '<input type="hidden" value="" id="trash_source" />';
             $res .= ' <input type="button" id="set_trash_folder" value="'.$this->trans('Assign').'" /><br /><br />';
 
-            $res .= '<div class="folder_row"><b>'.$this->trans('Sent Folder').'</b>: '.$sent_folder.'</div>';
+            $res .= '<div class="folder_row"><b>'.$this->trans('Sent Folder').'</b>: <span id="sent_val">'.$sent_folder.'</span></div>';
             $res .= '<div class="folder_row"><a href="#" class="select_sent_folder">';
             $res .= $this->trans('Select Folder').'</a>: <span class="selected_sent"></span></div>';
             $res .= '<ul class="folders sent_folder_select"><li class="sent_title"><a href="#" class="close">';
@@ -214,7 +241,7 @@ class Hm_Output_folders_special_use_dialog extends Hm_Output_Module {
             $res .= '<input type="hidden" value="" id="sent_source" />';
             $res .= ' <input type="button" id="set_sent_folder" value="'.$this->trans('Assign').'" /><br /><br />';
 
-            $res .= '<div class="folder_row"><b>'.$this->trans('Draft Folder').'</b>: '.$draft_folder.'</div>';
+            $res .= '<div class="folder_row"><b>'.$this->trans('Draft Folder').'</b>: <span id="draft_val">'.$draft_folder.'</span></div>';
             $res .= '<div class="folder_row"><a href="#" class="select_draft_folder">';
             $res .= $this->trans('Select Folder').'</a>: <span class="selected_draft"></span></div>';
             $res .= '<ul class="folders draft_folder_select"><li class="draft_title"><a href="#" class="close">';

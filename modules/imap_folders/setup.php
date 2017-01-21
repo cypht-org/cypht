@@ -18,6 +18,7 @@ add_output('folders', 'folders_server_select', true, 'imap_folders', 'folders_co
 add_output('folders', 'folders_create_dialog', true, 'imap_folders', 'folders_server_select', 'after');
 add_output('folders', 'folders_rename_dialog', true, 'imap_folders', 'folders_create_dialog', 'after');
 add_output('folders', 'folders_delete_dialog', true, 'imap_folders', 'folders_rename_dialog', 'after');
+
 // Commented out during development
 //add_output('folders', 'folders_special_use_dialog', true, 'imap_folders', 'folders_delete_dialog', 'after');
 
@@ -37,6 +38,8 @@ add_handler('ajax_imap_folders_create', 'process_folder_create', true, 'imap_fol
 add_handler('ajax_imap_folders_create', 'close_session_early', true, 'core', 'process_folder_create', 'after');
 
 setup_base_ajax_page('ajax_imap_special_folder', 'core');
+add_handler('ajax_imap_special_folder', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_imap_special_folder', 'process_special_folder', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
 
 add_handler('ajax_hm_folders', 'imap_folder_check', true, 'imap_folders', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'folders_page_link', true, 'imap_folders', 'settings_menu_end', 'before');
@@ -50,11 +53,13 @@ return array(
         'ajax_imap_special_folder'
     ),
     'allowed_output' => array(
-        'imap_folders_success' => array(FILTER_VALIDATE_INT, false)
+        'imap_folders_success' => array(FILTER_VALIDATE_INT, false),
+        'imap_special_name' => array(FILTER_SANITIZE_STRING, false)
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
         'parent' => FILTER_SANITIZE_STRING,
         'new_folder' => FILTER_SANITIZE_STRING,
+        'special_folder_type' => FILTER_SANITIZE_STRING
     )
 );
