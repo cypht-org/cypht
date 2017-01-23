@@ -167,6 +167,18 @@ var folder_page_assign_draft = function() {
     }
 };
 
+var clear_special_folder = function(type) {
+    var id = $('#imap_server_folder').val();
+    if (id) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_clear_special_folder'},
+            {'name': 'imap_server_id', 'value': id},
+            {'name': 'special_folder_type', 'value': type}],
+            function(res) { $('#'+type+'_val').text($('#not_set_string').val()); }
+        );
+    }
+};
+
 var assign_special_folder = function(id, folder, type, callback) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_special_folder'},
@@ -223,7 +235,12 @@ $(function() {
     $('#create_folder').click(function() { folder_page_create(); return false; });
     $('#delete_folder').click(function() { folder_page_delete(); return false; });
     $('#rename_folder').click(function() { folder_page_rename(); return false; });
+
     $('#set_trash_folder').click(function() { folder_page_assign_trash(); return false; });
     $('#set_sent_folder').click(function() { folder_page_assign_sent(); return false; });
     $('#set_draft_folder').click(function() { folder_page_assign_draft(); return false; });
+
+    $('#clear_trash_folder').click(function() { clear_special_folder('trash'); return false; });
+    $('#clear_sent_folder').click(function() { clear_special_folder('sent'); return false; });
+    $('#clear_draft_folder').click(function() { clear_special_folder("draft"); return false; });
 });

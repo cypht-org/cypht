@@ -13,11 +13,14 @@ output_source('imap_folders');
 
 setup_base_page('folders', 'core');
 add_handler('folders', 'folders_server_id', true, 'imap_folders', 'load_user_data', 'after');
+add_handler('folders', 'special_folders', true, 'imap_folders', 'folders_server_id', 'after');
 add_output('folders', 'folders_content_start', true, 'imap_folders', 'content_section_start', 'after');
 add_output('folders', 'folders_server_select', true, 'imap_folders', 'folders_content_start', 'after');
 add_output('folders', 'folders_create_dialog', true, 'imap_folders', 'folders_server_select', 'after');
 add_output('folders', 'folders_rename_dialog', true, 'imap_folders', 'folders_create_dialog', 'after');
 add_output('folders', 'folders_delete_dialog', true, 'imap_folders', 'folders_rename_dialog', 'after');
+
+add_handler('compose', 'special_folders', true, 'imap_folders', 'load_user_data', 'after');
 
 // Commented out during development
 //add_output('folders', 'folders_special_use_dialog', true, 'imap_folders', 'folders_delete_dialog', 'after');
@@ -37,9 +40,15 @@ add_handler('ajax_imap_folders_create', 'load_imap_servers_from_config', true, '
 add_handler('ajax_imap_folders_create', 'process_folder_create', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_imap_folders_create', 'close_session_early', true, 'core', 'process_folder_create', 'after');
 
+setup_base_ajax_page('ajax_imap_clear_special_folder', 'core');
+add_handler('ajax_imap_clear_special_folder', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_imap_clear_special_folder', 'process_clear_special_folder', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_imap_clear_special_folder', 'save_user_data', true, 'core', 'process_clear_special_folder', 'after');
+
 setup_base_ajax_page('ajax_imap_special_folder', 'core');
 add_handler('ajax_imap_special_folder', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_imap_special_folder', 'process_special_folder', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_imap_special_folder', 'save_user_data', true, 'core', 'process_special_folder', 'after');
 
 add_handler('ajax_hm_folders', 'imap_folder_check', true, 'imap_folders', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'folders_page_link', true, 'imap_folders', 'settings_menu_end', 'before');
@@ -50,7 +59,8 @@ return array(
         'ajax_imap_folders_delete',
         'ajax_imap_folders_create',
         'ajax_imap_folders_rename',
-        'ajax_imap_special_folder'
+        'ajax_imap_special_folder',
+        'ajax_imap_clear_special_folder'
     ),
     'allowed_output' => array(
         'imap_folders_success' => array(FILTER_VALIDATE_INT, false),

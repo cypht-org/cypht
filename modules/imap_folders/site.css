@@ -5,4 +5,5 @@
 .draft_folder_select, .sent_folder_select, .trash_folder_select, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select { width: 215px; position: absolute; background-color: #fff; padding: 15px; border: solid 1px #ede8e6; font-weight: normal; padding-left: 10px; min-width: 55px; padding-top: 10px; margin-left: 0px !important; margin-top: 0px; }
 .folder_row { margin-top: 15px; }
 .close { float: right; font-size: 80%; color: teal !important; }
-.folder_dialog b {font-size: 115%; font-weight: normal; letter-spacing: -1px; color: #999; }
+.sp_folder_title { font-size: 110%; color: #777; }
+.sp_description { padding-bottom: 20px; }

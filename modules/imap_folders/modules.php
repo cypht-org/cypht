@@ -11,26 +11,54 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage imap_folders/handler
  */
+class Hm_Handler_process_clear_special_folder extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('special_folder_type', 'imap_server_id'));
+        if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash'), true)) {
+            return;
+        }
+        $specials = $this->user_config->get('special_imap_folders', array());
+        if (array_key_exists($form['imap_server_id'], $specials)) {
+            $specials[$form['imap_server_id']][$form['special_folder_type']] = '';
+        }
+        $this->user_config->set('special_imap_folders', $specials);
+
+        Hm_Msgs::add('Special folder unassigned');
+        $this->session->record_unsaved('Special folder unassigned');
+        $this->out('imap_special_name', '');
+    }
+}
+
+/**
+ * @subpackage imap_folders/handler
+ */
 class Hm_Handler_process_special_folder extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('special_folder_type', 'folder', 'imap_server_id'));
-        if (!$success) {
+        if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash'), true)) {
             return;
         }
         $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
         $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
 
         if (!is_object($imap) || $imap->get_state() != 'authenticated') {
-            /* error */
+            Hm_Msgs('ERRUnable to connect to the selected IMAP server');
             return;
         }
         $new_folder = prep_folder_name($imap, $form['folder'], true);
         if (!$new_folder || !$imap->select_mailbox($new_folder)) {
-            /* error */
+            Hm_Msgs('ERRSelected folder not found');
             return;
         }
-        /* assign here */
+        $specials = $this->user_config->get('special_imap_folders', array());
+        if (!array_key_exists($form['imap_server_id'], $specials)) {
+            $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '');
+        }
+        $specials[$form['imap_server_id']][$form['special_folder_type']] = $new_folder;
+        $this->user_config->set('special_imap_folders', $specials);
+
         Hm_Msgs::add('Special folder assigned');
+        $this->session->record_unsaved('Special folder assigned');
         $this->out('imap_special_name', $new_folder);
     }
 }
@@ -113,6 +141,25 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
                     Hm_Msgs::add('ERRAn error occurred deleting the folder');
                 }
             }
+        }
+    }
+}
+
+/**
+ * @subpackage imap_folders/handler
+ */
+class Hm_Handler_special_folders extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('imap_server_id', $this->request->get)) {
+            $specials = $this->user_config->get('special_imap_folders', array());
+            if (array_key_exists($this->request->get['imap_server_id'], $specials)) {
+                $this->out('sent_folder', $specials[$this->request->get['imap_server_id']]['sent']);
+                $this->out('trash_folder', $specials[$this->request->get['imap_server_id']]['trash']);
+                $this->out('draft_folder', $specials[$this->request->get['imap_server_id']]['draft']);
+            }
+        }
+        else {
+            $this->out('special_imap_folders', $this->user_config->get('special_imap_folders'));
         }
     }
 }
@@ -219,35 +266,56 @@ class Hm_Output_folders_rename_dialog extends Hm_Output_Module {
 class Hm_Output_folders_special_use_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('folder_server') !== NULL) {
-            $trash_folder = $this->trans('Not set');
-            $sent_folder = $this->trans('Not set');
-            $draft_folder = $this->trans('Not set');
+            $trash_folder = $this->get('trash_folder', $this->trans('Not set'));
+            $sent_folder = $this->get('sent_folder', $this->trans('Not set'));
+            $draft_folder = $this->get('draft_folder', $this->trans('Not set'));
+            if (!$trash_folder) {
+                $trash_folder = $this->trans('Not set');
+            }
+            if (!$sent_folder) {
+                $sent_folder = $this->trans('Not set');
+            }
+            if (!$draft_folder) {
+                $draft_folder = $this->trans('Not set');
+            }
             $res = '<div data-target=".special_use_dialog" class="settings_subtitle">'.$this->trans('Set Special Use Folders (Sent/Trash/Drafts)').'</div>';
+            $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
             $res .= '<div class="folder_dialog special_use_dialog">';
 
-            $res .= '<div class="folder_row"><b>'.$this->trans('Trash Folder').'</b>: <span id="trash_val">'.$trash_folder.'</span></div>';
+            $res .= '<div class="folder_row"><div class="sp_folder_title">'.$this->trans('Trash').'</div>';
+            $res .= '<div class="sp_description">'.$this->trans('If set, deleted messages for this account '.
+                'will be moved to this folder').'</div>';
+            $res .= '<span id="trash_val">'.$trash_folder.'</span></div>';
             $res .= '<div class="folder_row"><a href="#" class="select_trash_folder">';
             $res .= $this->trans('Select Folder').'</a>: <span class="selected_trash"></span></div>';
             $res .= '<ul class="folders trash_folder_select"><li class="trash_title"><a href="#" class="close">';
             $res .= $this->trans('Cancel').'</a></li></ul>';
             $res .= '<input type="hidden" value="" id="trash_source" />';
-            $res .= ' <input type="button" id="set_trash_folder" value="'.$this->trans('Assign').'" /><br /><br />';
+            $res .= ' <input type="button" id="set_trash_folder" value="'.$this->trans('Update').'" /> ';
+            $res .= ' <input type="button" id="clear_trash_folder" value="'.$this->trans('Remove').'" /><br /><br />';
 
-            $res .= '<div class="folder_row"><b>'.$this->trans('Sent Folder').'</b>: <span id="sent_val">'.$sent_folder.'</span></div>';
+            $res .= '<div class="folder_row"><div class="sp_folder_title">'.$this->trans('Sent').'</div>';
+            $res .= '<div class="sp_description">'.$this->trans('If set, a copy of outbound mail sent with a profile '.
+                'tied to this IMAP account, will be saved in this folder').'</div>';
+            $res .= '<span id="sent_val">'.$sent_folder.'</span></div>';
             $res .= '<div class="folder_row"><a href="#" class="select_sent_folder">';
             $res .= $this->trans('Select Folder').'</a>: <span class="selected_sent"></span></div>';
             $res .= '<ul class="folders sent_folder_select"><li class="sent_title"><a href="#" class="close">';
             $res .= $this->trans('Cancel').'</a></li></ul>';
             $res .= '<input type="hidden" value="" id="sent_source" />';
-            $res .= ' <input type="button" id="set_sent_folder" value="'.$this->trans('Assign').'" /><br /><br />';
+            $res .= ' <input type="button" id="set_sent_folder" value="'.$this->trans('Update').'" /> ';
+            $res .= ' <input type="button" id="clear_sent_folder" value="'.$this->trans('Remove').'" /><br /><br />';
 
-            $res .= '<div class="folder_row"><b>'.$this->trans('Draft Folder').'</b>: <span id="draft_val">'.$draft_folder.'</span></div>';
+            $res .= '<div class="folder_row"><div class="sp_folder_title">'.$this->trans('Draft').'</div>';
+            $res .= '<div class="sp_description">'.$this->trans('If set, drafts will be saved in this folder').'</div>';
+            $res .= '<span id="draft_val">'.$draft_folder.'</span></div>';
             $res .= '<div class="folder_row"><a href="#" class="select_draft_folder">';
             $res .= $this->trans('Select Folder').'</a>: <span class="selected_draft"></span></div>';
             $res .= '<ul class="folders draft_folder_select"><li class="draft_title"><a href="#" class="close">';
             $res .= $this->trans('Cancel').'</a></li></ul>';
             $res .= '<input type="hidden" value="" id="draft_source" />';
-            $res .= ' <input type="button" id="set_draft_folder" value="'.$this->trans('Assign').'" /><br /><br />';
+            $res .= ' <input type="button" id="set_draft_folder" value="'.$this->trans('Update').'" /> ';
+            $res .= ' <input type="button" id="clear_draft_folder" value="'.$this->trans('Remove').'" /><br /><br />';
 
             $res .= '</div>';
             return $res;
