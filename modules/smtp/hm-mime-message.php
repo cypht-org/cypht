@@ -46,7 +46,7 @@ class Hm_MIME_Msg {
         $this->headers['Subject'] = $this->encode_header_fld(html_entity_decode($subject, ENT_QUOTES));
         $this->headers['Date'] = date('r');
         $this->headers['Message-Id'] = '<'.md5(uniqid(rand(),1)).'@'.php_uname('n').'>';
-        $this->boundary = Hm_Crypt::unique_id(32);
+        $this->boundary = str_replace(array('=', '/', '+'), '', Hm_Crypt::unique_id(48));
         $this->html = $html;
         $this->body = $body;
     }
@@ -58,9 +58,11 @@ class Hm_MIME_Msg {
 
     function process_attachments() {
         $res = '';
+        $closing = false;
         foreach ($this->attachments as $file) {
             $content = Hm_Crypt::plaintext(@file_get_contents($file['filename']), Hm_Request_Key::generate());
             if ($content) {
+                $closing = true;
                 if (array_key_exists('no_encoding', $file)) {
                     $res .= sprintf("\r\n--%s\r\nContent-Type: %s; name=\"%s\"\r\nContent-Description: %s\r\n".
                         "Content-Disposition: attachment; filename=\"%s\"\r\nContent-Transfer-Encoding: 7bit\r\n\r\n%s",
@@ -74,6 +76,9 @@ class Hm_MIME_Msg {
                 }
 
             }
+        }
+        if ($closing) {
+            $res = rtrim($res, "\r\n").sprintf("\r\n--%s--\r\n", $this->boundary);
         }
         return $res;
     }

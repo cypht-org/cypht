@@ -413,124 +413,95 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
  */
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {
-        if (array_key_exists('smtp_send', $this->request->post)) {
-            list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'smtp_server_id', 'draft_id'));
-            if ($success) {
-                $failed = true;
-                $draft = array(
-                    'draft_to' => $form['compose_to'],
-                    'draft_body' => '',
-                    'draft_subject' => $form['compose_subject'],
-                    'draft_smtp' => $form['smtp_server_id']
-                );
-                $to = $form['compose_to'];
-                $subject = $form['compose_subject'];
-                $body = '';
-                $from = '';
-                $cc = '';
-                $bcc = '';
-                $from_name = '';
-                $in_reply_to = '';
-                $reply_to = '';
-                if (array_key_exists('compose_body', $this->request->post)) {
-                    $body = $this->request->post['compose_body'];
-                    $draft['draft_body'] = $this->request->post['compose_body'];
-                }
-                if (array_key_exists('compose_cc', $this->request->post)) {
-                    $cc = $this->request->post['compose_cc'];
-                    $draft['draft_cc'] = $this->request->post['compose_cc'];
-                }
-                if (array_key_exists('compose_bcc', $this->request->post)) {
-                    $bcc = $this->request->post['compose_bcc'];
-                    $draft['draft_bcc'] = $this->request->post['compose_bcc'];
-                }
-                if (array_key_exists('compose_in_reply_to', $this->request->post)) {
-                    $in_reply_to = $this->request->post['compose_in_reply_to'];
-                    $draft['draft_in_reply_to'] = $this->request->post['compose_in_reply_to'];
-                }
-                $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
-                $profiles = $this->get('compose_profiles', array());
-                $imap_server = false;
-                if ($smtp_details) {
-                    $from = $smtp_details['user'];
-                    if (array_key_exists($form['smtp_server_id'], $profiles)) {
-                        if ($profiles[$form['smtp_server_id']]['name'][1] == 'imap') {
-                            $imap_server = $profiles[$form['smtp_server_id']]['name'];
-                        }
-                        $from_name = $profiles[$form['smtp_server_id']]['profile_name'];
-                        $reply_to = $profiles[$form['smtp_server_id']]['profile_replyto'];
-                        if (array_key_exists('profile_address', $profiles[$form['smtp_server_id']]) &&
-                            trim($profiles[$form['smtp_server_id']]['profile_address'])) {
-                            $from = $profiles[$form['smtp_server_id']]['profile_address'];
-                        }
-                    }
-                    if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
-                        $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
-                        if (!empty($results)) {
-                            if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
-                                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
-                                $servers = Hm_SMTP_List::dump(false, true);
-                                $this->user_config->set('smtp_servers', $servers);
-                                $this->session->set('user_data', $this->user_config->dump());
-                            }
-                        }
-                    }
-                    $domain = $this->config->get('default_email_domain');
-                    if ($domain) {
-                        if (!is_email($from)) {
-                            $from = $from.'@'.$domain;
-                        }
-                        if (!is_email($reply_to)) {
-                            if (!trim($reply_to)) {
-                                $reply_to = $smtp_details['user'];
-                            }
-                            $reply_to = $reply_to.'@'.$domain;
-                        }
-                    }
-                    $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
-                    if ($smtp && $smtp->state == 'authed') {
-                        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0),
-                            $cc, $bcc, $in_reply_to, $from_name, $reply_to);
-                        $mime->add_attachments(get_uploaded_files($form['draft_id'], $this->session));
-                        $recipients = $mime->get_recipient_addresses();
-                        if (empty($recipients)) {
-                            Hm_Msgs::add("ERRNo valid receipts found");
-                        }
-                        else {
-                            $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
-                            if ($err_msg) {
-                                Hm_Msgs::add(sprintf("ERR%s", $err_msg));
-                            }
-                            else {
-                                $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
-                                if ($auto_bcc) {
-                                    $mime->set_auto_bcc($from);
-                                    $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
-                                }
-                                if ($imap_server) {
-                                    $this->out('save_sent_server', $imap_server);
-                                    $this->out('save_sent_msg', $mime);
-                                }
-                                $this->out('msg_sent', true);
-                                $failed = false;
-                                Hm_Msgs::add("Message Sent");
-                                delete_draft($form['draft_id'], $this->session);
-                                delete_uploaded_files($this->session, $form['draft_id']);
-                            }
-                        }
-                    }
-                    else {
-                        Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
-                    }
-                }
-                if ($failed) {
-                    /* HERE */
-                }
-            }
-            else {
-                Hm_Msgs::add('ERRRequired field missing');
-            }
+
+        /* not sending */
+        if (!array_key_exists('smtp_send', $this->request->post)) {
+            return;
         }
+
+        /* missing field */
+        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'smtp_server_id', 'draft_id'));
+        if (!$success) {
+            Hm_Msgs::add('ERRRequired field missing');
+            return;
+        }
+
+        /* defaults */
+        $to = $form['compose_to'];
+        $subject = $form['compose_subject'];
+        $draft = array(
+            'draft_to' => $form['compose_to'],
+            'draft_body' => '',
+            'draft_subject' => $form['compose_subject'],
+            'draft_smtp' => $form['smtp_server_id']
+        );
+
+        /* msg details */
+        list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft);
+
+        /* smtp server details */
+        $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
+        if (!$smtp_details) {
+            Hm_Msgs::add('ERRCould not use the selected SMTP server');
+            return;
+        }
+
+        /* profile details */
+        $profiles = $this->get('compose_profiles', array());
+        list($imap_server, $from_name, $reply_to, $from) = get_outbound_msg_profile_detail($form, $profiles, $smtp_details);
+
+        /* xoauth2 check */
+        smtp_refresh_oauth2_token_on_send($smtp_details, $this, $form);
+
+        /* adjust from and reply to addresses */
+        list($from, $reply_to) = outbound_address_check($this, $from, $reply_to);
+
+        /* try to connect */
+        $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
+        if (!$smtp || $smtp->state != 'authed') {
+            Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+            return;
+        }
+
+        /* build message */
+        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0),
+            $cc, $bcc, $in_reply_to, $from_name, $reply_to);
+
+        /* add attachments */
+        $mime->add_attachments(get_uploaded_files($form['draft_id'], $this->session));
+
+        /* get smtp recipients */
+        $recipients = $mime->get_recipient_addresses();
+        if (empty($recipients)) {
+            Hm_Msgs::add("ERRNo valid receipts found");
+            return;
+        }
+
+        /* send the message */
+        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
+        if ($err_msg) {
+            Hm_Msgs::add(sprintf("ERR%s", $err_msg));
+            return;
+        }
+
+        /* check for auto-bcc */
+        $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
+        if ($auto_bcc) {
+            $mime->set_auto_bcc($from);
+            $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
+        }
+
+        /* check for associated IMAP server to save a copy */
+        if ($imap_server) {
+            $this->out('save_sent_server', $imap_server);
+            $this->out('save_sent_msg', $mime);
+        }
+
+        /* clean up */
+        $this->out('msg_sent', true);
+        Hm_Msgs::add("Message Sent");
+        delete_draft($form['draft_id'], $this->session);
+        delete_uploaded_files($this->session, $form['draft_id']);
     }
 }
 
@@ -1110,5 +1081,91 @@ function attach_file($content, $file, $filepath, $draft_id, $mod) {
         return true;
     }
     return false;
+}
+
+/**
+ * @subpackage smtp/functions
+ */
+function get_outbound_msg_detail($post, $draft) {
+    $body = '';
+    $cc = '';
+    $bcc = '';
+    $in_reply_to = '';
+
+    if (array_key_exists('compose_body', $post)) {
+        $body = $post['compose_body'];
+        $draft['draft_body'] = $post['compose_body'];
+    }
+    if (array_key_exists('compose_cc', $post)) {
+        $cc = $post['compose_cc'];
+        $draft['draft_cc'] = $post['compose_cc'];
+    }
+    if (array_key_exists('compose_bcc', $post)) {
+        $bcc = $post['compose_bcc'];
+        $draft['draft_bcc'] = $post['compose_bcc'];
+    }
+    if (array_key_exists('compose_in_reply_to', $post)) {
+        $in_reply_to = $post['compose_in_reply_to'];
+        $draft['draft_in_reply_to'] = $post['compose_in_reply_to'];
+    }
+    return array($body, $cc, $bcc, $in_reply_to, $draft);
+}
+
+/**
+ * @subpackage smtp/functions
+ */
+function get_outbound_msg_profile_detail($form, $profiles, $smtp_details) {
+    $imap_server = false;
+    $from_name = '';
+    $reply_to = '';
+    $from = $smtp_details['user'];
+    if (array_key_exists($form['smtp_server_id'], $profiles)) {
+        if ($profiles[$form['smtp_server_id']]['name'][1] == 'imap') {
+            $imap_server = $profiles[$form['smtp_server_id']]['name'];
+        }
+        $from_name = $profiles[$form['smtp_server_id']]['profile_name'];
+        $reply_to = $profiles[$form['smtp_server_id']]['profile_replyto'];
+        if (array_key_exists('profile_address', $profiles[$form['smtp_server_id']]) &&
+            trim($profiles[$form['smtp_server_id']]['profile_address'])) {
+            $from = $profiles[$form['smtp_server_id']]['profile_address'];
+        }
+    }
+    return array($imap_server, $from_name, $reply_to, $from);
+}
+
+/**
+ * @subpackage smtp/functions
+ */
+function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $form) {
+    if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
+        $results = smtp_refresh_oauth2_token($smtp_details, $mod->config);
+        if (!empty($results)) {
+            if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
+                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
+                $servers = Hm_SMTP_List::dump(false, true);
+                $mod->user_config->set('smtp_servers', $servers);
+                $mod->session->set('user_data', $mod->user_config->dump());
+            }
+        }
+    }
+}
+
+/*
+ * @subpackage smtp/functions
+ */
+function outbound_address_check($mod, $from, $reply_to) {
+    $domain = $mod->config->get('default_email_domain');
+    if ($domain) {
+        if (!is_email($from)) {
+            $from = $from.'@'.$domain;
+        }
+        if (!is_email($reply_to)) {
+            if (!trim($reply_to)) {
+                $reply_to = $smtp_details['user'];
+            }
+            $reply_to = $reply_to.'@'.$domain;
+        }
+    }
+    return array($from, $reply_to);
 }
 
