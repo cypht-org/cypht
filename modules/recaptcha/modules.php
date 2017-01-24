@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * recaptcha modules
+ * @package modules
+ * @subpackage recaptcha
+ */
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
