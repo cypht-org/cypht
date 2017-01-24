@@ -20,10 +20,12 @@ add_output('folders', 'folders_create_dialog', true, 'imap_folders', 'folders_se
 add_output('folders', 'folders_rename_dialog', true, 'imap_folders', 'folders_create_dialog', 'after');
 add_output('folders', 'folders_delete_dialog', true, 'imap_folders', 'folders_rename_dialog', 'after');
 
-add_handler('compose', 'special_folders', true, 'imap_folders', 'load_user_data', 'after');
-
 // Commented out during development
-//add_output('folders', 'folders_special_use_dialog', true, 'imap_folders', 'folders_delete_dialog', 'after');
+//add_output('folders', 'folders_trash_dialog', true, 'imap_folders', 'folders_delete_dialog', 'after');
+//add_output('folders', 'folders_sent_dialog', true, 'imap_folders', 'folders_trash_dialog', 'after');
+//add_output('folders', 'folders_draft_dialog', true, 'imap_folders', 'folders_sent_dialog', 'after');
+
+add_handler('compose', 'special_folders', true, 'imap_folders', 'load_user_data', 'after');
 
 setup_base_ajax_page('ajax_imap_folders_delete', 'core');
 add_handler('ajax_imap_folders_delete', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');

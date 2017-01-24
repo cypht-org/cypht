@@ -7,3 +7,4 @@
 .close { float: right; font-size: 80%; color: teal !important; }
 .sp_folder_title { font-size: 110%; color: #777; }
 .sp_description { padding-bottom: 20px; }
+#draft_val, #sent_val, #trash_val { padding-left: 20px; }
