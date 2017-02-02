@@ -601,7 +601,7 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
                     $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
-                    if ($trash_folder) {
+                    if ($trash_folder && $trash_folder != hex2bin($form['folder'])) {
                         if ($imap->message_action('MOVE', array($form['imap_msg_uid']), $trash_folder)) {
                             $del_result = true;
                         }
@@ -699,7 +699,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                             if ($imap->select_mailbox(hex2bin($folder))) {
                                 $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
 
-                                if ($form['action_type'] == 'delete' && $trash_folder) {
+                                if ($form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
                                     if (!$imap->message_action('MOVE', $uids, $trash_folder)) {
                                         $errs++;
                                     }
