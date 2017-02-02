@@ -1055,11 +1055,19 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
             if ($callback != 'imap_background_unread_content') {
                 $this->out('move_copy_controls', true);
             }
-            foreach (imap_data_sources($callback, $this->user_config->get('custom_imap_sources', array())) as $vals) {
-                if ($callback == 'imap_background_unread_content') {
-                    $vals['group'] = 'background';
+            if ($path == 'sent') {
+                foreach (imap_sent_sources($callback, $this->user_config->get('special_imap_folders', array()),
+                    $this->user_config->get('smtp_auto_bcc_setting', false)) as $vals) {
+                    $this->append('data_sources', $vals);
                 }
-                $this->append('data_sources', $vals);
+            }
+            else {
+                foreach (imap_data_sources($callback, $this->user_config->get('custom_imap_sources', array())) as $vals) {
+                    if ($callback == 'imap_background_unread_content') {
+                        $vals['group'] = 'background';
+                    }
+                    $this->append('data_sources', $vals);
+                }
             }
         }
     }
@@ -2074,6 +2082,37 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
             $this->trans('Max messages per source').'</label></td>'.
             '<td><input type="text" size="2" id="sent_per_source" name="sent_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
     }
+}
+
+/**
+ * Build a source list for sent folders
+ * @subpackage imap/functions
+ * @param string $callback javascript callback function name
+ * @param array $configured user specific sent folders
+ * @param string $inbox include inbox in search for auto-bcc messages
+ * @return array
+ */
+function imap_sent_sources($callback, $configured, $inbox) {
+    $sources = array();
+    foreach (Hm_IMAP_List::dump() as $index => $vals) {
+        if (array_key_exists('hide', $vals) && $vals['hide']) {
+            continue;
+        }
+        if ($inbox) {
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+        }
+        if (!array_key_exists($index, $configured)) {
+            continue;
+        }
+        if (!array_key_exists('sent', $configured[$index])) {
+            continue;
+        }
+        if (!$configured[$index]['sent']) {
+            continue;
+        }
+        $sources[] = array('callback' => $callback, 'folder' => bin2hex($configured[$index]['sent']), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+    }
+    return $sources;
 }
 
 /**
