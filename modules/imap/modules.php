@@ -227,12 +227,25 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         $msg = rtrim($msg)."\r\n";
         $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $imap_id);
         $imap = Hm_IMAP_List::connect($imap_id, $cache);
+        $sent_folder = false;
         if (is_object($imap) && $imap->get_state() == 'authenticated') {
-            $sent_folder = $imap->get_special_use_mailboxes('sent');
-            if (!array_key_exists('sent', $sent_folder)) {
-                return;
+            $specials = $this->user_config->get('special_imap_folders', array());
+            if (array_key_exists($imap_id, $specials)) {
+                if (array_key_exists('sent', $specials[$imap_id])) {
+                    if ($specials[$imap_id]['sent']) {
+                        $sent_folder = $specials[$imap_id]['sent'];
+                    }
+                }
             }
-            if ($imap->append_start($sent_folder['sent'], strlen($msg), true)) {
+
+            if (!$sent_folder) {
+                $auto_sent = $imap->get_special_use_mailboxes('sent');
+                if (!array_key_exists('sent', $auto_sent)) {
+                    return;
+                }
+                $sent_folder = $auto_sent['sent'];
+            }
+            if ($imap->append_start($sent_folder, strlen($msg), true)) {
                 $imap->append_feed($msg."\r\n");
                 if (!$imap->append_end()) {
                     Hm_Msgs::add('ERRAn error occurred saving the sent message');
@@ -576,12 +589,28 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
             $del_result = false;
             $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            $trash_folder = false;
+            $specials = $this->user_config->get('special_imap_folders', array());
+            if (array_key_exists($form['imap_server_id'], $specials)) {
+                if (array_key_exists('trash', $specials[$form['imap_server_id']])) {
+                    if ($specials[$form['imap_server_id']]['trash']) {
+                        $trash_folder = $specials[$form['imap_server_id']]['trash'];
+                    }
+                }
+            }
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
                     $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
-                    if ($imap->message_action('DELETE', array($form['imap_msg_uid']))) {
-                        $del_result = true;
-                        $imap->message_action('EXPUNGE', array($form['imap_msg_uid']));
+                    if ($trash_folder) {
+                        if ($imap->message_action('MOVE', array($form['imap_msg_uid']), $trash_folder)) {
+                            $del_result = true;
+                        }
+                    }
+                    else {
+                        if ($imap->message_action('DELETE', array($form['imap_msg_uid']))) {
+                            $del_result = true;
+                            $imap->message_action('EXPUNGE', array($form['imap_msg_uid']));
+                        }
                     }
                 }
             }
@@ -651,20 +680,39 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 $errs = 0;
                 $msgs = 0;
                 $status = array();
+                $specials = $this->user_config->get('special_imap_folders', array());
                 foreach ($ids as $server => $folders) {
+                    $trash_folder = false;
+                    if ($form['action_type'] == 'delete') {
+                        if (array_key_exists($server, $specials)) {
+                            if (array_key_exists('trash', $specials[$server])) {
+                                if ($specials[$server]['trash']) {
+                                    $trash_folder = $specials[$server]['trash'];
+                                }
+                            }
+                        }
+                    }
                     $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $server);
                     $imap = Hm_IMAP_List::connect($server, $cache);
                     if (is_object($imap) && $imap->get_state() == 'authenticated') {
                         foreach ($folders as $folder => $uids) {
                             if ($imap->select_mailbox(hex2bin($folder))) {
                                 $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
-                                if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
-                                    $errs++;
+
+                                if ($form['action_type'] == 'delete' && $trash_folder) {
+                                    if (!$imap->message_action('MOVE', $uids, $trash_folder)) {
+                                        $errs++;
+                                    }
                                 }
                                 else {
-                                    $msgs += count($uids);
-                                    if ($form['action_type'] == 'delete') {
-                                        $imap->message_action('EXPUNGE', $uids);
+                                    if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
+                                        $errs++;
+                                    }
+                                    else {
+                                        $msgs += count($uids);
+                                        if ($form['action_type'] == 'delete') {
+                                            $imap->message_action('EXPUNGE', $uids);
+                                        }
                                     }
                                 }
                             }

@@ -21,8 +21,8 @@ add_output('folders', 'folders_rename_dialog', true, 'imap_folders', 'folders_cr
 add_output('folders', 'folders_delete_dialog', true, 'imap_folders', 'folders_rename_dialog', 'after');
 
 // Commented out during development
-//add_output('folders', 'folders_trash_dialog', true, 'imap_folders', 'folders_delete_dialog', 'after');
-//add_output('folders', 'folders_sent_dialog', true, 'imap_folders', 'folders_trash_dialog', 'after');
+add_output('folders', 'folders_trash_dialog', true, 'imap_folders', 'folders_delete_dialog', 'after');
+add_output('folders', 'folders_sent_dialog', true, 'imap_folders', 'folders_trash_dialog', 'after');
 //add_output('folders', 'folders_draft_dialog', true, 'imap_folders', 'folders_sent_dialog', 'after');
 
 add_handler('compose', 'special_folders', true, 'imap_folders', 'load_user_data', 'after');

@@ -136,6 +136,9 @@ var set_message_content = function(path, msg_uid) {
 };
 
 var imap_delete_message = function(state) {
+    if (!hm_delete_prompt()) {
+        return false;
+    }
     var uid = hm_msg_uid();
     var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
     if (detail && uid) {
@@ -147,11 +150,17 @@ var imap_delete_message = function(state) {
             function(res) {
                 if (!res.imap_delete_error) {
                     var nlink = $('.nlink');
+                    console.log(nlink);
                     if (nlink.length) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
-                        window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                        if (!hm_list_parent()) {
+                            window.location.href = "?page=message_list&list_path="+hm_list_path();
+                        }
+                        else {
+                            window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                        }
                     }
                 }
             }
