@@ -96,7 +96,6 @@ var smtp_delete_draft = function(id) {
 
 var save_compose_state = function(no_files, notice) {
     var no_icon = true;
-    var callback = false;
     if (notice) {
         no_icon = false;
     }

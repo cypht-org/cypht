@@ -166,11 +166,6 @@ var Hm_Ajax_Request = function() { return {
     },
 
     always: function(res) {
-        if (hm_debug()) {
-            var dt = new Date();
-            var elapsed = dt.getTime() - this.start_time;
-            var msg = 'AJAX request finished in ' + elapsed + ' millis';
-        }
         Hm_Ajax.request_count--;
         Hm_Message_List.set_checkbox_callback();
         if (Hm_Ajax.request_count === 0) {
@@ -330,10 +325,8 @@ function Message_List() {
     };
 
     this.set_tab_index = function() {
-        var row;
         var msg_rows = $('.message_table tbody');
         var count = 1;
-        var key;
         $('tr', msg_rows).each(function() {
             $(this).attr('tabindex', count);
             count++;
@@ -378,9 +371,6 @@ function Message_List() {
         var row;
         var id;
         var index;
-        var timestr;
-        var subject;
-        var timeint;
         for (index in msgs) {
             row = msgs[index][0];
             id = msgs[index][1];
@@ -1116,21 +1106,6 @@ var Hm_Utils = {
                 $('.sys_messages').hide();
                 $('.sys_messages').html('');
             });
-        }
-    },
-    prune_local_storage: function() {
-        var i;
-        var key;
-        var value_size;
-        var size = sessionStorage.length;
-        if (size > 1) {
-            for (i = 0; i < size; i++) {
-                key = sessionStorage.key(i);
-                value_size = sessionStorage.getItem(key).length;
-                if (value_size > 0 && key != 'formatted_folder_list') {
-                    /* candidate for pruning */
-                }
-            }
         }
     },
     cancel_logout_event: function() {

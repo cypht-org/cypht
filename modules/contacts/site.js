@@ -28,7 +28,6 @@ var add_contact_from_message_view = function() {
 var get_search_term = function(class_name) {
     var fld_val = $(class_name).val();
     var addresses = fld_val.split(' ');
-    var first = '';
     if (addresses.length > 1) {
         fld_val = addresses.pop();
     }
