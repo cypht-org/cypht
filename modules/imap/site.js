@@ -790,9 +790,10 @@ var expand_imap_move_to_folders = function(path) {
     return false;
 };
 
-var imap_background_unread_content = function(id) {
+var imap_background_unread_content = function(id, folder) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unread'},
+        {'name': 'folder', 'value': folder},
         {'name': 'imap_server_ids', 'value': id}],
         imap_background_unread_content_result,
         [],
