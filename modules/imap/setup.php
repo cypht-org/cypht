@@ -10,6 +10,8 @@ add_module_to_all_pages('handler', 'load_imap_servers_from_config', true, 'imap'
 add_module_to_all_pages('handler', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_module_to_all_pages('handler', 'load_imap_servers_for_message_list', true, 'imap', 'imap_oauth2_token_check', 'after');
 add_module_to_all_pages('handler', 'add_imap_servers_to_page_data', true, 'imap', 'imap_oauth2_token_check', 'after');
+add_module_to_all_pages('handler', 'prefetch_imap_folders', true, 'imap', 'add_imap_servers_to_page_data', 'after');
+add_module_to_all_pages('output', 'prefetch_imap_folder_ids', true, 'imap', 'content_start', 'after');
 
 /* add stuff to the info page */
 add_output('info', 'display_imap_status', true, 'imap', 'server_status_start', 'after');

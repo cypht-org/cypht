@@ -150,7 +150,6 @@ var imap_delete_message = function(state) {
             function(res) {
                 if (!res.imap_delete_error) {
                     var nlink = $('.nlink');
-                    console.log(nlink);
                     if (nlink.length) {
                         window.location.href = nlink.attr('href');
                     }
@@ -381,6 +380,32 @@ var expand_imap_mailbox = function(res) {
         $('.imap_folder_link', $('.email_folders')).click(function() { return expand_imap_folders($(this).data('target')); });
         Hm_Folders.update_unread_counts();
     }
+};
+
+var prefetch_imap_folders = function() {
+    var id_el = $('#imap_prefetch_ids');
+    if (!id_el.length) {
+        return;
+    }
+    var ids = id_el.val().split(',');
+    if (ids.length == 0 ) {
+        return;
+    }
+    var id = ids.shift();
+    if (id === '') {
+        return;
+    }
+
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
+        {'name': 'imap_server_id', 'value': id},
+        {'name': 'imap_prefetch', 'value': true},
+        {'name': 'folder', 'value': ''}],
+        function(res) { $('#imap_prefetch_ids').val(ids.join(',')); prefetch_imap_folders(); },
+        [],
+        true
+    );
+
 };
 
 var expand_imap_folders = function(path) {
@@ -836,4 +861,5 @@ $(function() {
         }
     }
     Hm_Timer.add_job(imap_prefetch_msgs, 43, true);
+    setTimeout(prefetch_imap_folders, 2);
 });

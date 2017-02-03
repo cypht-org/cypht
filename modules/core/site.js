@@ -850,7 +850,7 @@ var Hm_Folders = {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'}],
             Hm_Folders.update_folder_list_display,
             [],
-            false
+            true
         );
         return false;
     },

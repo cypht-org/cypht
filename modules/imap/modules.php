@@ -471,6 +471,11 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             }
             $path = sprintf("imap_%d_%s", $form['imap_server_id'], $folder);
             $page_cache =  Hm_Page_Cache::get('imap_folders_'.$path);
+            if (array_key_exists('imap_prefetch', $this->request->post)) {
+                $prefetched = $this->session->get('imap_prefetched_ids', array());
+                $prefetched[] = $form['imap_server_id'];
+                $this->session->set('imap_prefetched_ids', array_unique($prefetched, SORT_NUMERIC));
+            }
             if ($page_cache) {
                 $this->out('imap_expanded_folder_data', $page_cache);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
@@ -1158,6 +1163,31 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
             $servers = Hm_IMAP_List::dump(false, true);
             $this->user_config->set('imap_servers', $servers);
             $this->session->set('user_data', $this->user_config->dump());
+        }
+    }
+}
+
+/**
+ * Set IMAP server ids to prefetch on login
+ * @subpackage imap/handler
+ */
+class Hm_Handler_prefetch_imap_folders extends Hm_Handler_Module {
+    /**
+     * Check for imap servers to prefetch
+     */
+    public function process() {
+
+        $servers = $this->get('imap_servers', array());
+        if (count($servers) == 0) {
+            return;
+        }
+        $fetched = $this->session->get('imap_prefetched_ids', array());
+        $ids = array_keys($servers);
+        if (count($fetched) > 0) {
+            $ids = array_diff($ids, $fetched);
+        }
+        if (count($ids) > 0) {
+            $this->out('prefetch_folder_ids', $ids);
         }
     }
 }
@@ -2030,6 +2060,20 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         return '<tr class="general_setting"><td><label for="simple_msg_parts">'.
             $this->trans('Show simple message part structure when reading a message').'</label></td>'.
             '<td><input type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" value="1" /></td></tr>';
+    }
+}
+
+/**
+ * Output imap prefetch ids
+ * @subpackage imap/output
+ */
+class Hm_Output_prefetch_imap_folder_ids extends Hm_Output_Module {
+    protected function output() {
+        $ids = $this->get('prefetch_folder_ids', array());
+        if (count($ids) == 0) {
+            return;
+        }
+        return '<input type="hidden" id="imap_prefetch_ids" value="'.$this->html_safe(implode(',', $ids)).'" />';
     }
 }
 
