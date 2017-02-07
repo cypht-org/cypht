@@ -375,6 +375,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         $excluded = array();
         $parents = array();
         $delim = false;
+        $inbox = false;
         $commands = $this->build_list_commands($lsub, $mailbox, $keyword);
         $cache_command = implode('', array_map(function($v) { return $v[0]; }, $commands)).(string)$mailbox.(string)$keyword;
         $cache = $this->check_cache($cache_command);
@@ -498,6 +499,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 }
 
                 /* store the results in the big folder list struct */
+                if (strtolower($folder) == 'inbox') {
+                    $inbox = true;
+                }
                 $folders[$folder] = array('parent' => $parent, 'delim' => $delim, 'name' => $folder,
                                         'name_parts' => $folder_parts, 'basename' => $base_name,
                                         'realname' => $folder, 'namespace' => $namespace, 'marked' => $marked,
@@ -512,7 +516,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         }
 
         /* ALL account need an inbox. If we did not find one manually add it to the results */
-        if (!isset($folders['INBOX']) && !$mailbox ) {
+        if (!$inbox && !$mailbox ) {
             $folders = array_merge(array('INBOX' => array(
                     'name' => 'INBOX', 'basename' => 'INBOX', 'realname' => 'INBOX', 'noselect' => false,
                     'parent' => false, 'has_kids' => false, 'name_parts' => array(), 'delim' => $delim)), $folders);
