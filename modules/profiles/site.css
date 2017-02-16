@@ -7,3 +7,6 @@
 .edit_profile table th, .edit_profile table td { padding-bottom: 10px; }
 .compose_sign { cursor: pointer; margin-left: 10px; float: right; margin-top: 10px; }
 .profiles_empty { text-align: center; padding-top: 100px; color: #666; }
+@media screen and (max-device-width:480px) and (orientation : portrait) {
+    .profile_fld { display: none; }
+}

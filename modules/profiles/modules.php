@@ -257,14 +257,14 @@ class Hm_Output_profile_content extends Hm_Output_Module {
             $smtp_servers = $this->get('smtp_servers', array());
             $res .= '<table class="profile_details"><tr>'.
                 '<th>'.$this->trans('Name').'</th>'.
-                '<th>'.$this->trans('Server').'</th>'.
-                '<th>'.$this->trans('Username').'</th>'.
+                '<th class="profile_fld">'.$this->trans('Server').'</th>'.
+                '<th class="profile_fld">'.$this->trans('Username').'</th>'.
                 '<th>'.$this->trans('Display Name').'</th>'.
-                '<th>'.$this->trans('E-mail Address').'</th>'.
-                '<th>'.$this->trans('Reply-to').'</th>'.
-                '<th>'.$this->trans('SMTP Server').'</th>'.
-                '<th>'.$this->trans('Signature').'</th>'.
-                '<th>'.$this->trans('Default').'</th>'.
+                '<th class="profile_fld">'.$this->trans('E-mail Address').'</th>'.
+                '<th class="profile_fld">'.$this->trans('Reply-to').'</th>'.
+                '<th class="profile_fld">'.$this->trans('SMTP Server').'</th>'.
+                '<th class="profile_fld">'.$this->trans('Signature').'</th>'.
+                '<th class="profile_fld">'.$this->trans('Default').'</th>'.
                 '<th></th></tr>';
             foreach ($profiles as $id => $profile) {
                 $smtp = '';
@@ -275,14 +275,14 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                 }
                 $res .= '<tr>'.
                     '<td>'.$this->html_safe($profile['name']).'</td>'.
-                    '<td>'.$this->html_safe($profile['server']).'</td>'.
-                    '<td>'.$this->html_safe($profile['user']).'</td>'.
+                    '<td class="profile_fld">'.$this->html_safe($profile['server']).'</td>'.
+                    '<td class="profile_fld">'.$this->html_safe($profile['user']).'</td>'.
                     '<td>'.(array_key_exists('profile_name', $profile['profile_details']) ? $this->html_safe($profile['profile_details']['profile_name']) : '').'</td>'.
-                    '<td>'.(array_key_exists('profile_address', $profile['profile_details']) ? $this->html_safe($profile['profile_details']['profile_address']) : '').'</td>'.
-                    '<td>'.(array_key_exists('profile_replyto', $profile['profile_details']) ? $this->html_safe($profile['profile_details']['profile_replyto']) : '').'</td>'.
-                    '<td>'.$this->html_safe($smtp).'</td>'.
-                    '<td>'.(array_key_exists('profile_sig', $profile['profile_details']) && strlen($profile['profile_details']['profile_sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td>'.(array_key_exists('profile_default', $profile['profile_details']) && $profile['profile_details']['profile_default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="profile_fld">'.(array_key_exists('profile_address', $profile['profile_details']) ? $this->html_safe($profile['profile_details']['profile_address']) : '').'</td>'.
+                    '<td class="profile_fld">'.(array_key_exists('profile_replyto', $profile['profile_details']) ? $this->html_safe($profile['profile_details']['profile_replyto']) : '').'</td>'.
+                    '<td class="profile_fld">'.$this->html_safe($smtp).'</td>'.
+                    '<td class="profile_fld">'.(array_key_exists('profile_sig', $profile['profile_details']) && strlen($profile['profile_details']['profile_sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="profile_fld">'.(array_key_exists('profile_default', $profile['profile_details']) && $profile['profile_details']['profile_default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
                     '<img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a></td>'.
                     '</tr>';
