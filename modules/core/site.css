@@ -235,19 +235,19 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .list_meta { display: block; }
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
     .mailbox_list_title { font-size: 90%; }
-    .folder_list { display: none; width: 340px; }
+    .folder_list { display: none; width: 480px; }
     .content_cell { min-width: 360px; max-width: 480px; }
     .msg_parts { padding-left: 5px !important; }
     .msg_parts td { font-size: 90%; padding: 0px !important; padding-right: 5px !important; }
-    .content_title { padding-left: 30px; padding-top: 20px; margin-bottom: 5px; }
+    .content_title { padding-left: 40px; padding-top: 20px; margin-bottom: 5px; }
     .folder_toggle { display: block; top: 19px; left: 0px; }
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
     .message_table { padding-left: 10px !important; }
     .list_settings_link, .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
     .refresh_list { margin-right: 5px; }
-    .folder_toggle img { width: 24px; height: 24px; }
+    .folder_toggle img { margin-top: -10px; }
     .update_message_list { margin-right: 20px; }
-    .msg_text { max-width: 360px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
+    .msg_text { width: 100%; max-width: 480px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
     .msg_controls { position: fixed; z-index: 100; right: -20px; height: 39px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; padding-left: 10px; padding-top: 20px; top: 0px; left: 60px !important; }
     .header_subject th { white-space: normal !important; word-break: break-all !important; word-wrap: break-word !important; }
     .msg_headers th { padding-left: 10px !important; }
@@ -262,4 +262,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .search_content .refresh_list { display: none; }
     .search_content .content_title { max-height: 500px; }
     .unsaved_reminder { display: none; }
+    .checkbox_cell { width: 35px; }
+    .checkbox_cell label { width: 30px; height: 30px; }
+    .github_para { white-space: normal !important; }
 }
