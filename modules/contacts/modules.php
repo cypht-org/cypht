@@ -170,10 +170,10 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                 $res .= '<td><a data-id="contact_'.$this->html_safe($id).'_detail" '.
                     '" class="show_contact" title="'.$this->trans('Details').'">'.
                     '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$person.'" /></a> '.
-                    ($contact->value('source') ? $this->html_safe($contact->value('source')) : $this->trans('local')).
+                    '<span class="contact_src">'.($contact->value('source') ? $this->html_safe($contact->value('source')) : $this->trans('local')).'</span>'.
                     '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
                     '<td><div class="contact_fld">'.$this->html_safe($contact->value('email_address')).'</div></td>'.
-                    '<td>'.$this->html_safe($contact->value('phone_number')).'</td>'.
+                    '<td class="contact_fld">'.$this->html_safe($contact->value('phone_number')).'</td>'.
                     '<td class="contact_controls">';
                 if (in_array($contact->value('source'), $editable, true)) {
                     $res .= '<a data-id="'.$this->html_safe($id).'" data-source="'.$this->html_safe($contact->value('source')).

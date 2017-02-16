@@ -768,8 +768,13 @@ var Hm_Folders = {
     open_folder_list: function() {
         $('.folder_list').show();
         $('.folder_toggle').toggle();
+        if (hm_mobile()) {
+            $('main').hide();
+        }
+        else {
+            $('main').css('display', 'table-cell');
+        }
         Hm_Utils.save_to_local_storage('hide_folder_list', '');
-        $('main').css('display', 'table-cell');
         return false;
     },
     toggle_folder_list: function() {

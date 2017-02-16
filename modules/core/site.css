@@ -235,8 +235,9 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .list_meta { display: block; }
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
     .mailbox_list_title { font-size: 90%; }
-    .folder_list { display: none; width: 480px; }
-    .content_cell { min-width: 360px; max-width: 480px; }
+    .folder_cell { display: block; max-width: 96%; width: 96%; padding: 0px !important;}
+    .folder_list { padding: 0px !important; font-size: 120%; margin-right: 0px; display: none; width: 100%; }
+    .content_cell { display: block; width: 100%; }
     .msg_parts { padding-left: 5px !important; }
     .msg_parts td { font-size: 90%; padding: 0px !important; padding-right: 5px !important; }
     .content_title { padding-left: 40px; padding-top: 20px; margin-bottom: 5px; }
@@ -265,4 +266,13 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .checkbox_cell { width: 35px; }
     .checkbox_cell label { width: 30px; height: 30px; }
     .github_para { white-space: normal !important; }
+    .login_form { margin-top: 150px; display: block; float: none; width: 100%; background-color: #fff; font-size: 150%; height: auto; }
+    #username, #password { width: 75%; }
+    .account_icon { width: 20px; height: 20px; }
+    .imap_filter { display: none; }
+    .list_controls { background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; height: 50px; padding-left: 5px; padding-right: 5px; }
+    .page_links { font-size: 150%; }
+    .page_links a img { width: 24px; height: 24px; }
+    .toggle_link { padding: 5px !important; line-height: auto !important; }
+    .toggle_link img { vertical-align: -3px !important; width: 16px; height: 16px; }
 }
