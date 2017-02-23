@@ -269,7 +269,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
             foreach ($profiles as $id => $profile) {
                 $smtp = '';
                 if (array_key_exists('profile_smtp', $profile['profile_details'])) {
-                    if (array_key_exists($profile['profile_details']['profile_smtp'], $smtp_servers)) {
+                    if ($profile['profile_details']['profile_smtp'] !== false && array_key_exists($profile['profile_details']['profile_smtp'], $smtp_servers)) {
                         $smtp = $smtp_servers[$profile['profile_details']['profile_smtp']]['name'];
                     }
                 }
