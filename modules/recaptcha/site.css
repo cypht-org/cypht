@@ -1,1 +1,4 @@
 .g-recaptcha { margin-left: -12px; }
+@media screen and (max-device-width:480px) and (orientation : portrait) {
+    .g-recaptcha { clear: left; margin-left: 20px; }
+}

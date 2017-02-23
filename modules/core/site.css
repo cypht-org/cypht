@@ -266,7 +266,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .checkbox_cell { width: 35px; }
     .checkbox_cell label { width: 30px; height: 30px; }
     .github_para { white-space: normal !important; }
-    .login_form { margin-top: 150px; display: block; float: none; width: 100%; background-color: #fff; font-size: 150%; height: auto; }
+    .login_form { margin-top: 100px; display: block; float: none; width: 100%; background-color: #fff; font-size: 130%; height: auto; }
     #username, #password { width: 75%; }
     .account_icon { width: 20px; height: 20px; }
     .imap_filter { display: none; }
