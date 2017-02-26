@@ -246,7 +246,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .message_table { padding-left: 10px !important; }
     .list_settings_link, .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
     .refresh_list { margin-right: 5px; }
-    .folder_toggle img { margin-top: -10px; }
+    .folder_toggle img { width: 30px; height: 36px; margin-top: -7px; }
     .update_message_list { margin-right: 20px; }
     .msg_text { width: 100%; max-width: 480px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
     .msg_controls { position: fixed; z-index: 100; right: -20px; height: 29px; font-size: 115%; background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; padding-left: 10px; padding-top: 9px; top: 10px; left: 70px !important; }

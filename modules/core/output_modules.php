@@ -994,7 +994,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$big_caret.'" width="20" height="20" /></a>'.
+        $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$menu.'" width="16" height="20" /></a>'.
             '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
