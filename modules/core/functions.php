@@ -540,3 +540,19 @@ function get_tls_stream_type() {
     }
     return $method;
 }
+
+/**
+ * List of valid start page options
+ * @return array
+ */
+function start_page_opts() {
+    return array(
+        'None' => 'none',
+        'Home' => 'page=home',
+        'Everything' => 'page=message_list&list_path=combined_inbox',
+        'Unread' => 'page=message_list&list_path=unread',
+        'Flagged' => 'page=message_list&list_path=flagged',
+        'Compose' => 'page=compose'
+    );
+}
+

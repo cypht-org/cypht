@@ -531,6 +531,39 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
 }
 
 /**
+ * Outputs the start page option on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_page_setting extends Hm_Output_Module {
+    /**
+     * Can be any of the main combined pages
+     */
+    protected function output() {
+        $options = start_page_opts();
+        $settings = $this->get('user_settings', array());
+
+        if (array_key_exists('start_page', $settings)) {
+            $start_page = $settings['start_page'];
+        }
+        else {
+            $start_page = false;
+        }
+        $res = '<tr class="general_setting"><td><label for="start_page">'.
+            $this->trans('First page after login').'</label></td>'.
+            '<td><select id="start_page" name="start_page">';
+        foreach ($options as $label => $val) {
+            $res .= '<option ';
+            if ($start_page == $val) {
+                $res .= 'selected="selected" ';
+            }
+            $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
+        }
+        $res .= '</select></td></tr>';
+        return $res;
+    }
+}
+
+/**
  * Outputs the list style option on the settings page
  * @subpackage core/output
  */

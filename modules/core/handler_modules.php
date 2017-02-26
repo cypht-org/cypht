@@ -182,22 +182,22 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
 }
 
 /**
- * Process input from the the list style setting in the general settings section.
+ * Process input from the the start page setting in the general settings section.
  * @subpackage core/handler
  */
-class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
+class Hm_Handler_process_start_page_setting extends Hm_Handler_Module {
 
     /**
-     * Can be one of two values, 'email_style' or 'list_style'. The default is 'email_style'.
+     * Can be one of the values in start_page_opts()
      */
     public function process() {
-        function list_style_callback($val) {
-            if (in_array($val, array('email_style', 'news_style'))) {
+        function start_page_callback($val) {
+            if (in_array($val, start_page_opts(), true)) {
                 return $val;
             }
-            return 'email_style';
+            return false;
         }
-        process_site_setting('list_style', $this, 'list_style_callback');
+        process_site_setting('start_page', $this, 'start_page_callback');
     }
 }
 
@@ -562,6 +562,12 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
                 }
             }
             $this->out('disable_delete_prompt', $this->user_config->get('disable_delete_prompt_setting'));
+        }
+        if ($this->session->loaded) {
+            $start_page = $this->user_config->get('start_page_setting');
+            if ($start_page && $start_page != 'none' && in_array($start_page, start_page_opts(), true)) {
+                $this->out('redirect_url', '?'.$start_page);
+            }
         }
         $this->out('is_mobile', $this->request->mobile);
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));

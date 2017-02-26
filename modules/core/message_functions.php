@@ -10,13 +10,16 @@
  * Format a message body that has HMTL markup
  * @subpackage core/functions
  * @param string $str message HTML
+ * @param bool $images allow external images
  * @return string
  */
-function format_msg_html($str) {
+function format_msg_html($str, $images=false) {
     require APP_PATH.'third_party/HTMLPurifier.standalone.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
-    $config->set('URI.DisableExternalResources', true);
+    if (!$images) {
+        $config->set('URI.DisableExternalResources', true);
+    }
     $config->set('HTML.TargetBlank', true);
     $config->set('URI.AllowedSchemes', array('data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);

@@ -1528,7 +1528,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
         if ($this->get('msg_text')) {
             $struct = $this->get('msg_struct_current', array());
             if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
-                $txt .= format_msg_html($this->get('msg_text'));
+                $txt .= format_msg_html($this->get('msg_text'), $this->get('external_images', false));
             }
             elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
                 $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
