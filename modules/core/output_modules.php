@@ -305,7 +305,8 @@ class Hm_Output_header_start extends Hm_Output_Module {
         }
         $class = $dir."_page";
         return '<!DOCTYPE html><html dir="'.$this->html_safe($dir).'" class="'.
-            $this->html_safe($class).'" lang='.$this->html_safe($lang).'><head><meta charset="utf-8" />';
+            $this->html_safe($class).'" lang='.$this->html_safe($lang).'><head>'.
+            '<meta name="theme-color" content="#888888" /><meta charset="utf-8" />';
     }
 }
 
