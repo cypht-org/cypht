@@ -859,9 +859,11 @@ $(function() {
             globals.Hm_Background_Unread = new Message_List();
             globals.Hm_Background_Unread.background = true;
             globals.Hm_Background_Unread.add_sources(hm_data_sources_background());
-            Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, 33, true);
+            var interval = Hm_Utils.get_from_global('imap_background_update_interval', 33);
+            Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, interval, true);
         }
     }
-    Hm_Timer.add_job(imap_prefetch_msgs, 43, true);
+    var prefetch_interval = Hm_Utils.get_from_global('imap_prefetch_msg_interval', 43);
+    Hm_Timer.add_job(imap_prefetch_msgs, prefetch_interval, true);
     setTimeout(prefetch_imap_folders, 2);
 });

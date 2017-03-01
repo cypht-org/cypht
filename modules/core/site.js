@@ -549,6 +549,7 @@ function Message_List() {
     this.setup_combined_view = function(cache_name) {
         self.add_sources(hm_data_sources());
         var data = Hm_Utils.get_from_local_storage(cache_name);
+        var interval = Hm_Utils.get_from_global('combined_view_refresh_interval', 60);
         if (data && data.length) {
             $('.message_table tbody').html(data);
             if (cache_name == 'formatted_unread_data') {
@@ -557,10 +558,10 @@ function Message_List() {
             self.set_checkbox_callback();
         }
         if (hm_page_name() == 'search' && hm_run_search() == "0") {
-            Hm_Timer.add_job(self.load_sources, 60, true);
+            Hm_Timer.add_job(self.load_sources, interval, true);
         }
         else {
-            Hm_Timer.add_job(this.load_sources, 60);
+            Hm_Timer.add_job(this.load_sources, interval);
         }
     };
 
@@ -922,6 +923,12 @@ var Hm_Utils = {
             }
         }
         return page_number;
+    },
+    get_from_global: function(name, def) {
+        if (globals[name]) {
+            return globals[name];
+        }
+        return def;
     },
     preserve_local_settings: function() {
         var i;
