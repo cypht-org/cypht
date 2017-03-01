@@ -66,13 +66,13 @@ if (!is_callable('random_bytes')) {
                 $n = ($bytes - $i) > 1073741824
                     ? 1073741824
                     : $bytes - $i;
-                $buf .= \Sodium\randombytes_buf($n);
+                $buf .= Sodium::randombytes_buf($n);
             }
         } else {
-            $buf = \Sodium\randombytes_buf($bytes);
+            $buf = Sodium::randombytes_buf($bytes);
         }
 
-        if ($buf !== false) {
+        if (is_string($buf)) {
             if (RandomCompat_strlen($buf) === $bytes) {
                 return $buf;
             }

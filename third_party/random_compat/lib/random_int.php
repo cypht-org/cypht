@@ -4,8 +4,8 @@
  * for using the new PHP 7 random_* API in PHP 5 projects
  * 
  * The MIT License (MIT)
- * 
- * Copyright (c) 2015 Paragon Initiative Enterprises
+ *
+ * Copyright (c) 2015 - 2016 Paragon Initiative Enterprises
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,6 +55,7 @@ function random_int($min, $max)
             'random_int(): $min must be an integer'
         );
     }
+
     try {
         $max = RandomCompat_intval($max);
     } catch (TypeError $ex) {
@@ -73,6 +74,7 @@ function random_int($min, $max)
             'Minimum value must be less than or equal to the maximum value'
         );
     }
+
     if ($max === $min) {
         return $min;
     }
@@ -98,6 +100,7 @@ function random_int($min, $max)
      * Test for integer overflow:
      */
     if (!is_int($range)) {
+
         /**
          * Still safely calculate wider ranges.
          * Provided by @CodesInChaos, @oittaa
@@ -111,7 +114,9 @@ function random_int($min, $max)
          */
         $bytes = PHP_INT_SIZE;
         $mask = ~0;
+
     } else {
+
         /**
          * $bits is effectively ceil(log($range, 2)) without dealing with 
          * type juggling
@@ -146,11 +151,6 @@ function random_int($min, $max)
          * Let's grab the necessary number of random bytes
          */
         $randomByteString = random_bytes($bytes);
-        if ($randomByteString === false) {
-            throw new Exception(
-                'Random number generator failure'
-            );
-        }
 
         /**
          * Let's turn $randomByteString into an integer
@@ -181,5 +181,6 @@ function random_int($min, $max)
          * then try again.
          */
     } while (!is_int($val) || $val > $max || $val < $min);
+
     return (int) $val;
 }
