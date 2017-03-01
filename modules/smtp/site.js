@@ -93,7 +93,6 @@ var smtp_delete_draft = function(id) {
     );
 };
 
-
 var save_compose_state = function(no_files, notice) {
     var no_icon = true;
     if (notice) {
@@ -107,6 +106,11 @@ var save_compose_state = function(no_files, notice) {
     var bcc = $('.compose_bcc').val();
     var inreplyto = $('.compose_in_reply_to').val();
     var draft_id = $('.compose_draft_id').val();
+    if (globals.draft_state == body+subject+to+smtp+cc+bcc) {
+        return;
+    }
+    globals.draft_state = body+subject+to+smtp+cc+bcc;
+
     $('.smtp_send').prop('disabled', true);
     $('.smtp_send').addClass('disabled_input');
     Hm_Ajax.request(
