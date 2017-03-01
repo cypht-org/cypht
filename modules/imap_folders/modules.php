@@ -11,6 +11,25 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage imap_folders/handler
  */
+class Hm_Handler_add_folder_manage_link extends Hm_Handler_Module {
+    public function process() {
+        $server = false;
+        $folder = false;
+        if (array_key_exists('imap_server_id', $this->request->post)) {
+            $server = $this->request->post['imap_server_id'];
+        }
+        if (array_key_exists('folder', $this->request->post)) {
+            $folder = $this->request->post['folder'];
+        }
+        if (($server || $server === 0) && !$folder) {
+            $this->out('imap_folder_manage_link', sprintf('?page=folders&imap_server_id=%s', $server));
+        }
+    }
+}
+
+/**
+ * @subpackage imap_folders/handler
+ */
 class Hm_Handler_process_clear_special_folder extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('special_folder_type', 'imap_server_id'));
@@ -58,6 +77,7 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
         $this->user_config->set('special_imap_folders', $specials);
 
         Hm_Msgs::add('Special folder assigned');
+
         $this->session->record_unsaved('Special folder assigned');
         $this->out('imap_special_name', $new_folder);
     }

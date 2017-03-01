@@ -20,6 +20,8 @@ add_output('folders', 'folders_create_dialog', true, 'imap_folders', 'folders_se
 add_output('folders', 'folders_rename_dialog', true, 'imap_folders', 'folders_create_dialog', 'after');
 add_output('folders', 'folders_delete_dialog', true, 'imap_folders', 'folders_rename_dialog', 'after');
 
+add_handler('ajax_imap_folder_expand', 'add_folder_manage_link', true, 'imap_folders', 'imap_folder_expand', 'after');
+
 // Commented out during development
 add_output('folders', 'folders_trash_dialog', true, 'imap_folders', 'folders_delete_dialog', 'after');
 add_output('folders', 'folders_sent_dialog', true, 'imap_folders', 'folders_trash_dialog', 'after');

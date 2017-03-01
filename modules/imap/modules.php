@@ -2228,6 +2228,7 @@ function prepare_imap_message_list($msgs, $mod, $type) {
  */
 function format_imap_folder_section($folders, $id, $output_mod) {
     $results = '<ul class="inner_list">';
+    $manage = $output_mod->get('imap_folder_manage_link');
     foreach ($folders as $folder_name => $folder) {
         $folder_name = bin2hex($folder_name);
         $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
@@ -2247,6 +2248,9 @@ function format_imap_folder_section($folders, $id, $output_mod) {
             $results .= $output_mod->html_safe($folder['basename']);
         }
         $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span></li>';
+    }
+    if ($manage) {
+        $results .= '<li><a class="manage_folder_link" href="'.$manage.'"><img class="folder_icon manage_folder_icon" src="'.Hm_Image_Sources::$cog.'" alt="" width="16" height="16" />'.$output_mod->trans('Manage Folders').'</a>';
     }
     $results .= '</ul>';
     return $results;

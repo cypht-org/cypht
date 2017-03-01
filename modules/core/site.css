@@ -277,4 +277,5 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .toggle_link img { vertical-align: -3px !important; width: 16px; height: 16px; }
     .compose_form { padding: 0px !important; padding-left: 5px !important; width: 92% !important; }
     .toggle_recipients { top: 8px !important; right: 0px !important; }
+    .prevnext, .news_cell .subject div img { width: 20px; height: 20px; }
 }
