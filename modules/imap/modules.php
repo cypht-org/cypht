@@ -228,7 +228,7 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $imap_id);
         $imap = Hm_IMAP_List::connect($imap_id, $cache);
         $sent_folder = false;
-        if (is_object($imap) && $imap->get_state() == 'authenticated') {
+        if (is_object($imap) && ($imap->get_state() == 'authenticated' || $imap->get_state() == 'selected')) {
             $specials = $this->user_config->get('special_imap_folders', array());
             if (array_key_exists($imap_id, $specials)) {
                 if (array_key_exists('sent', $specials[$imap_id])) {
