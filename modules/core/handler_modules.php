@@ -30,63 +30,65 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
     public function process() {
         list($success, $form ) = $this->process_form(array('server_pw_id', 'password'));
         $missing = $this->get('missing_pw_servers', array());
-        if ($success) {
-            if (array_key_exists($form['server_pw_id'], $missing)) {
-                $server = $missing[$form['server_pw_id']];
-                switch ($server['type']) {
-                    case 'POP3':
-                        $current = Hm_POP3_List::dump($server['id']);
-                        $current['pass'] = $form['password'];
-                        unset($current['nopass']);
-                        Hm_POP3_List::add($current, $server['id']);
-                        $pop3 = Hm_POP3_List::connect($server['id'], false);
-                        if ($pop3->state == 'authed') {
-                            Hm_Msgs::add('Password Updated');
-                            $this->out('connect_status', true);
-                        }
-                        else {
-                            unset($current['pass']);
-                            Hm_POP3_List::add($current, $server['id']);
-                            Hm_Msgs::add('ERRUnable to authenticate to the POP3 server');
-                            $this->out('connect_status', false);
-                        }
-                        break;
-                    case 'SMTP':
-                        $current = Hm_SMTP_List::dump($server['id']);
-                        $current['pass'] = $form['password'];
-                        unset($current['nopass']);
-                        Hm_SMTP_List::add($current, $server['id']);
-                        $smtp = Hm_SMTP_List::connect($server['id'], false);
-                        if ($smtp->state == 'authed') {
-                            Hm_Msgs::add('Password Updated');
-                            $this->out('connect_status', true);
-                        }
-                        else {
-                            unset($current['pass']);
-                            Hm_SMTP_List::add($current, $server['id']);
-                            Hm_Msgs::add('ERRUnable to authenticate to the SMTP server');
-                            $this->out('connect_status', false);
-                        }
-                        break;
-                    case 'IMAP':
-                        $current = Hm_IMAP_List::dump($server['id']);
-                        $current['pass'] = $form['password'];
-                        unset($current['nopass']);
-                        Hm_IMAP_List::add($current, $server['id']);
-                        $imap = Hm_IMAP_List::connect($server['id'], false);
-                        if ($imap->get_state() == 'authenticated') {
-                            Hm_Msgs::add('Password Updated');
-                            $this->out('connect_status', true);
-                        }
-                        else {
-                            unset($current['pass']);
-                            Hm_IMAP_List::add($current, $server['id']);
-                            Hm_Msgs::add('ERRUnable to authenticate to the IMAP server');
-                            $this->out('connect_status', false);
-                        }
-                        break;
+        if (!$success) {
+            return;
+        }
+        if (!array_key_exists($form['server_pw_id'], $missing)) {
+            return;
+        }
+        $server = $missing[$form['server_pw_id']];
+        switch ($server['type']) {
+            case 'POP3':
+                $current = Hm_POP3_List::dump($server['id']);
+                $current['pass'] = $form['password'];
+                unset($current['nopass']);
+                Hm_POP3_List::add($current, $server['id']);
+                $pop3 = Hm_POP3_List::connect($server['id'], false);
+                if ($pop3->state == 'authed') {
+                    Hm_Msgs::add('Password Updated');
+                    $this->out('connect_status', true);
                 }
-            }
+                else {
+                    unset($current['pass']);
+                    Hm_POP3_List::add($current, $server['id']);
+                    Hm_Msgs::add('ERRUnable to authenticate to the POP3 server');
+                    $this->out('connect_status', false);
+                }
+                break;
+            case 'SMTP':
+                $current = Hm_SMTP_List::dump($server['id']);
+                $current['pass'] = $form['password'];
+                unset($current['nopass']);
+                Hm_SMTP_List::add($current, $server['id']);
+                $smtp = Hm_SMTP_List::connect($server['id'], false);
+                if ($smtp->state == 'authed') {
+                    Hm_Msgs::add('Password Updated');
+                    $this->out('connect_status', true);
+                }
+                else {
+                    unset($current['pass']);
+                    Hm_SMTP_List::add($current, $server['id']);
+                    Hm_Msgs::add('ERRUnable to authenticate to the SMTP server');
+                    $this->out('connect_status', false);
+                }
+                break;
+            case 'IMAP':
+                $current = Hm_IMAP_List::dump($server['id']);
+                $current['pass'] = $form['password'];
+                unset($current['nopass']);
+                Hm_IMAP_List::add($current, $server['id']);
+                $imap = Hm_IMAP_List::connect($server['id'], false);
+                if ($imap->get_state() == 'authenticated') {
+                    Hm_Msgs::add('Password Updated');
+                    $this->out('connect_status', true);
+                }
+                else {
+                    unset($current['pass']);
+                    Hm_IMAP_List::add($current, $server['id']);
+                    Hm_Msgs::add('ERRUnable to authenticate to the IMAP server');
+                    $this->out('connect_status', false);
+                }
+                break;
         }
     }
 }
@@ -100,41 +102,42 @@ class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
      * pass a list of servers with missing passwords to the output modules
      */
     public function process() {
-        if ($this->user_config->get('no_password_save_setting')) {
-            $missing = array();
-            if ($this->module_is_supported('imap')) {
-                foreach (Hm_IMAP_List::dump() as $index => $vals) {
-                    if (array_key_exists('nopass', $vals)) {
-                        $vals['id'] = $index;
-                        $vals['type'] = 'IMAP';
-                        $key = 'imap_'.$index;
-                        $missing[$key] = $vals;
-                    }
+        if (!$this->user_config->get('no_password_save_setting')) {
+            return;
+        }
+        $missing = array();
+        if ($this->module_is_supported('imap')) {
+            foreach (Hm_IMAP_List::dump() as $index => $vals) {
+                if (array_key_exists('nopass', $vals)) {
+                    $vals['id'] = $index;
+                    $vals['type'] = 'IMAP';
+                    $key = 'imap_'.$index;
+                    $missing[$key] = $vals;
                 }
             }
-            if ($this->module_is_supported('pop3')) {
-                foreach (Hm_POP3_List::dump() as $index => $vals) {
-                    if (array_key_exists('nopass', $vals)) {
-                        $vals['id'] = $index;
-                        $vals['type'] = 'POP3';
-                        $key = 'pop3_'.$index;
-                        $missing[$key] = $vals;
-                    }
+        }
+        if ($this->module_is_supported('pop3')) {
+            foreach (Hm_POP3_List::dump() as $index => $vals) {
+                if (array_key_exists('nopass', $vals)) {
+                    $vals['id'] = $index;
+                    $vals['type'] = 'POP3';
+                    $key = 'pop3_'.$index;
+                    $missing[$key] = $vals;
                 }
             }
-            if ($this->module_is_supported('smtp')) {
-                foreach (Hm_SMTP_List::dump() as $index => $vals) {
-                    if (array_key_exists('nopass', $vals)) {
-                        $vals['id'] = $index;
-                        $vals['type'] = 'SMTP';
-                        $key = 'smtp_'.$index;
-                        $missing[$key] = $vals;
-                    }
+        }
+        if ($this->module_is_supported('smtp')) {
+            foreach (Hm_SMTP_List::dump() as $index => $vals) {
+                if (array_key_exists('nopass', $vals)) {
+                    $vals['id'] = $index;
+                    $vals['type'] = 'SMTP';
+                    $key = 'smtp_'.$index;
+                    $missing[$key] = $vals;
                 }
             }
-            if (count($missing) > 0) {
-                $this->out('missing_pw_servers', $missing);
-            }
+        }
+        if (count($missing) > 0) {
+            $this->out('missing_pw_servers', $missing);
         }
     }
 }
@@ -410,19 +413,20 @@ class Hm_Handler_process_save_form extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('password'));
+        if (!$success) {
+            return;
+        }
         $save = false;
         $logout = false;
-        if ($success) {
-            if (array_key_exists('save_settings_permanently', $this->request->post)) {
-                $save = true;
-            }
-            elseif (array_key_exists('save_settings_permanently_then_logout', $this->request->post)) {
-                $save = true;
-                $logout = true;
-            }
-            if ($save) {
-                save_user_settings($this, $form, $logout);
-            }
+        if (array_key_exists('save_settings_permanently', $this->request->post)) {
+            $save = true;
+        }
+        elseif (array_key_exists('save_settings_permanently_then_logout', $this->request->post)) {
+            $save = true;
+            $logout = true;
+        }
+        if ($save) {
+            save_user_settings($this, $form, $logout);
         }
     }
 }
@@ -437,16 +441,17 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings'));
-        if ($success) {
-            if ($new_settings = $this->get('new_user_settings', array())) {
-                foreach ($new_settings as $name => $value) {
-                    $this->user_config->set($name, $value);
-                }
-                Hm_Page_Cache::flush($this->session);
-                Hm_Msgs::add('Settings updated');
-                $this->session->record_unsaved('Site settings updated');
-                $this->out('reload_folders', true, false);
+        if (!$success) {
+            return;
+        }
+        if ($new_settings = $this->get('new_user_settings', array())) {
+            foreach ($new_settings as $name => $value) {
+                $this->user_config->set($name, $value);
             }
+            Hm_Page_Cache::flush($this->session);
+            Hm_Msgs::add('Settings updated');
+            $this->session->record_unsaved('Site settings updated');
+            $this->out('reload_folders', true, false);
         }
     }
 }
