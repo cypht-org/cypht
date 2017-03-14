@@ -54,13 +54,13 @@ class Hm_Request_Key {
     }
 }
 
-class Hm_Crypt {
+class Hm_Crypt_Base {
 
-    static private $method = 'aes-256-cbc';
-    static private $hmac = 'sha512';
-    static private $password_rounds = 86000;
-    static private $encryption_rounds = 100;
-    static private $hmac_rounds = 101;
+    static protected $method = 'aes-256-cbc';
+    static protected $hmac = 'sha512';
+    static protected $password_rounds = 86000;
+    static protected $encryption_rounds = 100;
+    static protected $hmac_rounds = 101;
 
     /**
      * Convert ciphertext to plaintext

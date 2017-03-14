@@ -22,12 +22,17 @@ require APP_PATH.'lib/request.php';
 require APP_PATH.'lib/cache.php';
 require APP_PATH.'lib/output.php';
 require APP_PATH.'lib/crypt.php';
+require APP_PATH.'lib/crypt_sodium.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
 
 if (!function_exists('random_bytes')) {
     require APP_PATH.'third_party/random_compat/lib/random.php';
+}
+
+if (!defined('LIBSODIUM')) {
+    define('LIBSODIUM', extension_loaded('libsodium'));
 }
 
 if (!class_exists('Hm_Functions')) {
