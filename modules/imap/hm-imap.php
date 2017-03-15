@@ -491,7 +491,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 if (stristr($flags, 'noinferiors')) { 
                     $can_have_kids = false;
                 }
-                if (($folder == $namespace && $namespace) || stristr($flags, 'haschildren')) { 
+                if (($folder == $namespace && $namespace) || stristr($flags, 'hashchildren') || stristr($flags, 'haschildren')) { 
                     $has_kids = true;
                 }
                 if ($folder != 'INBOX' && $folder != $namespace && stristr($flags, 'noselect')) { 
