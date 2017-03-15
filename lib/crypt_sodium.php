@@ -34,7 +34,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
         $crypt_string = substr($raw_string, 56);
 
         if (\Sodium\crypto_auth_verify($hmac, $crypt_string, $crypt_key)) {
-            $res = Sodium\crypto_secretbox_open($crypt_string, $salt, $crypt_key);
+            $res = \Sodium\crypto_secretbox_open($crypt_string, $salt, $crypt_key);
         }
         if ($res === false) {
             return parent::plaintext($string, $key);
@@ -68,7 +68,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
         if (!LIBSODIUM) {
             return parent::hash_password($password, $salt, $count, $algo, $type);
         }
-        return Sodium\crypto_pwhash_str( $password,
+        return \Sodium\crypto_pwhash_str( $password,
             \Sodium\CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
             \Sodium\CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE
         );
