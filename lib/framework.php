@@ -32,7 +32,7 @@ if (!function_exists('random_bytes')) {
 }
 
 if (!defined('LIBSODIUM')) {
-    define('LIBSODIUM', extension_loaded('libsodium'));
+    define('LIBSODIUM', extension_loaded('libsodium') && function_exists('\Sodium\crypto_pwhash_str_verify'));
 }
 
 if (!class_exists('Hm_Functions')) {
