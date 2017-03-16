@@ -16,6 +16,12 @@ class PageTests(WebTest):
         self.rest()
         assert self.by_class('content_title').text[0:6] == 'Search'
 
+    def sent(self):
+        list_item = self.by_class('menu_sent')
+        list_item.find_element_by_tag_name('a').click()
+        self.rest()
+        assert self.by_class('mailbox_list_title').text == 'Sent'
+
     def unread(self):
         list_item = self.by_class('menu_unread')
         list_item.find_element_by_tag_name('a').click()
@@ -49,12 +55,16 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Compose'
 
     def calendar(self):
+        if not self.mod_active('smtp'):
+            return
         list_item = self.by_class('menu_calendar')
         list_item.find_element_by_tag_name('a').click()
         self.rest()
         assert self.by_class('content_title').text == 'Calendar'
 
     def history(self):
+        if not self.mod_active('history'):
+            return
         list_item = self.by_class('menu_history')
         list_item.find_element_by_tag_name('a').click()
         self.rest()
@@ -86,12 +96,17 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Save Settings'
 
     def password(self):
-        list_item = self.by_class('menu_change_password')
-        list_item.find_element_by_tag_name('a').click()
-        self.rest()
-        assert self.by_class('content_title').text == 'Change Password'
+        try:
+            list_item = self.by_class('menu_change_password')
+            list_item.find_element_by_tag_name('a').click()
+            self.rest()
+            assert self.by_class('content_title').text == 'Change Password'
+        except AttributeError:
+            pass
 
     def profiles(self):
+        if self.mod_active('profiles'):
+            return
         list_item = self.by_class('menu_profiles')
         list_item.find_element_by_tag_name('a').click()
         self.rest()
@@ -104,6 +119,7 @@ if __name__ == '__main__':
         'search',
         'combined_inbox',
         'unread',
+        'sent',
         'flagged',
         'contacts',
         'compose',

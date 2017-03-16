@@ -7,30 +7,36 @@
 # remote_creds.example.py:  Configure the Selenium tests to run with BrowserStack
 # local_creds.example.py:   Configure the Selenium tests to run locally
 
+import re
 from time import sleep
 from creds import SITE_URL, USER, PASS, get_driver
 from selenium.common import exceptions
 
+INI_PATH = '../../hm3.ini'
 SLEEP_INT = 1
-MODULES = 'core,contacts,local_contacts,ldap_contacts,gmail_contacts,feeds,'
-MODULES += 'pop3,imap,smtp,site,account,idle_timer,calendar,themes,nux,'
-MODULES += 'developer,wordpress,github,history,saved_searches,inline_message,'
-MODULES += 'profiles,imap_folders,password_restrictions,nasa,keyboard_shortcuts,'
-MODULES += '2fa,recover_settings'
 
 class WebTest:
 
     driver = None
 
     def __init__(self, cap=None):
+        self.read_ini()
         self.driver = get_driver(cap)
         self.load()
+
+    def read_ini(self):
+        self.modules = []
+        ini = open(INI_PATH)
+        for row in ini.readlines():
+            if re.match('^modules\[\]\=', row):
+                parts = row.split('=')
+                self.modules.append(parts[1].strip())
 
     def load(self):
         self.go(SITE_URL)
 
     def mod_active(self, name):
-        if name in ','.split(MODULES):
+        if name in self.modules:
             return True
         print " - module not enabled: %s" % name
         return False
