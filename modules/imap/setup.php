@@ -35,7 +35,7 @@ add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form',
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
 add_output('settings', 'sent_source_max_setting', true, 'imap', 'sent_since_setting', 'after');
 add_output('settings', 'text_only_setting', true, 'imap', 'list_style_setting', 'after');
-add_output('settings', 'imap_msg_icons_setting', true, 'imap', 'text_only_setting', 'after');
+add_output('settings', 'imap_msg_icons_setting', true, 'imap', 'msg_list_icons_setting', 'after');
 add_output('settings', 'imap_simple_msg_parts', true, 'imap', 'imap_msg_icons_setting', 'after');
 
 /* compose page data */
