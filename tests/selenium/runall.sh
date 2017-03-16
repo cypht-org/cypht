@@ -1,8 +1,12 @@
 #!/bin/bash
+FILE=`realpath $0`
+PATH=`dirname $FILE`
+cd $PATH
+
 for suite in *
 do
-    pyc=`echo $suite | grep 'pyc$'`
+    pyc=`echo $suite | /bin/grep 'pyc$'`
     if [ -z "$pyc" ] && [ "$suite" != "runner.py" ] && [ "$suite" != "base.py" ] && [ "$suite" != "runall.sh" ]; then
-        python ./$suite
+        /usr/bin/python ./$suite
     fi
 done

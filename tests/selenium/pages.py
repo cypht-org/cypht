@@ -49,13 +49,15 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Contacts'
 
     def compose(self):
+        if not self.mod_active('smtp'):
+            return
         list_item = self.by_class('menu_compose')
         list_item.find_element_by_tag_name('a').click()
         self.rest()
         assert self.by_class('content_title').text == 'Compose'
 
     def calendar(self):
-        if not self.mod_active('smtp'):
+        if not self.mod_active('calendar'):
             return
         list_item = self.by_class('menu_calendar')
         list_item.find_element_by_tag_name('a').click()
@@ -88,6 +90,14 @@ class PageTests(WebTest):
         list_item.find_element_by_tag_name('a').click()
         self.rest()
         assert self.by_class('content_title').text == 'Site Settings'
+
+    def folders(self):
+        if not self.mod_active('imap_folders'):
+            return
+        list_item = self.by_class('menu_folders')
+        list_item.find_element_by_tag_name('a').click()
+        self.rest()
+        assert self.by_class('content_title').text == 'Folders'
 
     def save(self):
         list_item = self.by_class('menu_save')
@@ -128,6 +138,7 @@ if __name__ == '__main__':
         'home',
         'servers',
         'site',
+        'folders',
         'save',
         'password',
         'profiles',
