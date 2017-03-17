@@ -735,6 +735,8 @@ function build_github_subject($event, $output_mod) {
         case 'commitcommentevent':
             $post = substr($event['payload']['comment']['body'], 0, $max);
             break;
+        case 'releaseevent':
+            $post = substr($event['payload']['release']['name'], 0, $max);
         default:
             break;
     }
@@ -801,6 +803,10 @@ function github_parse_payload($data, $output_mod) {
     $res = '<div class="msg_text_inner">';
     foreach ($content as $vals) {
         $res .= '<div class="github_para">';
+        if (array_key_exists('name', $vals)) {
+            $res .= $output_mod->html_safe($vals['name']);
+            $res .= '</div><div class="github_para">';
+        }
         if (array_key_exists('body', $vals)) {
             $res .= $output_mod->html_safe(wordwrap($vals['body'], 100));
         }
@@ -827,7 +833,7 @@ function github_parse_payload($data, $output_mod) {
  */
 function payload_search($data) {
     $res = array();
-    $data_flds = array('url', 'sha', 'body', 'description', 'message');
+    $data_flds = array('url', 'sha', 'body', 'description', 'message', 'name');
     foreach($data as $vals) {
         if (is_array($vals)) {
             $item = array();
