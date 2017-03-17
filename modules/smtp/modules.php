@@ -481,7 +481,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = 'test'; //$smtp->send_message($from, $recipients, $mime->get_mime_msg());
+        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
         if ($err_msg) {
             Hm_Msgs::add(sprintf("ERR%s", $err_msg));
             repopulate_compose_form($draft, $this);
