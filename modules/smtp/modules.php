@@ -443,6 +443,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
         if (!$smtp_details) {
             Hm_Msgs::add('ERRCould not use the selected SMTP server');
+            repopulate_compose_form($draft, $this);
             return;
         }
 
@@ -460,6 +461,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
         if (!$smtp || $smtp->state != 'authed') {
             Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+            repopulate_compose_form($draft, $this);
             return;
         }
 
@@ -474,13 +476,15 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
             Hm_Msgs::add("ERRNo valid receipts found");
+            repopulate_compose_form($draft, $this);
             return;
         }
 
         /* send the message */
-        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
+        $err_msg = 'test'; //$smtp->send_message($from, $recipients, $mime->get_mime_msg());
         if ($err_msg) {
             Hm_Msgs::add(sprintf("ERR%s", $err_msg));
+            repopulate_compose_form($draft, $this);
             return;
         }
 
@@ -606,6 +610,12 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $html = $this->get('smtp_compose_type', 0);
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
+        if (!$msg_path) {
+            $msg_path = $this->get('compose_msg_path', '');
+        }
+        if (!$msg_uid) {
+            $msg_uid = $this->get('compose_msg_uid', '');
+        }
         $smtp_id = false;
         $draft_id = $this->get('compose_draft_id', 0);
         if (!empty($reply)) {
@@ -1167,5 +1177,21 @@ function outbound_address_check($mod, $from, $reply_to) {
         }
     }
     return array($from, $reply_to);
+}
+
+/**
+ * @subpackage smtp/functions
+ */
+function repopulate_compose_form($draft, $handler_mod) {
+    $handler_mod->out('no_redirect', true);
+    $handler_mod->out('compose_draft', $draft);
+    if (array_key_exists('compose_msg_path', $handler_mod->request->post)
+        && $handler_mod->request->post['compose_msg_path']) {
+        $handler_mod->out('compose_msg_path', $handler_mod->request->post['compose_msg_path']);
+    }
+    if (array_key_exists('compose_msg_uid', $handler_mod->request->post)
+        && $handler_mod->request->post['compose_msg_uid']) {
+        $handler_mod->out('compose_msg_uid', $handler_mod->request->post['compose_msg_uid']);
+    }
 }
 
