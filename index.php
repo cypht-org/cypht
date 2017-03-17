@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RELEASE VERSION 1.0.0-rc2
+ * RELEASE VERSION 1.0.0-rc3
  *
  * Some of the following constants are automatically filled in when
  * the build process is run. If you change them in site/index.php
