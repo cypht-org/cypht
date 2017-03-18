@@ -21,3 +21,4 @@ a { color: #222 !important; }
 .message_list tr td { border: none; }
 ::-webkit-input-placeholder { color: #999; }
 .checkbox_cell input[type="checkbox"]:checked + label { background-color: #94b096 !important; }
+.list_controls { background: none !important; }
