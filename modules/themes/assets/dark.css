@@ -29,3 +29,4 @@ textarea { font-size: 100%; }
 .total_unread_count, .unread_count { background-color: #2e2e2e; }
 .hl { background-color: #222; }
 .draft_list { background-color: #222; }
+.list_controls { background: none !important; }
