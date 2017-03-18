@@ -143,22 +143,49 @@ class Hm_Output_config_map extends Hm_Output_Module {
     $res = '<div class="content_title">'.$this->trans('Configuration Map').'</div><table class="config_map">';
     $handlers = array();
     $outputs = array();
+    $ajax = array();
+    $normal = array();
     $server_info = $this->get('server_info', array());
     if (!empty($server_info)) {
         $handlers = $server_info['handlers'];
         ksort($handlers);
         $outputs = $server_info['output'];
     }
+    $res .= '<tr><td colspan="3"><div class="settings_subtitle">Pages</div></td></tr>';
     foreach ($handlers as $page => $mods) {
-        $res .= '<tr><td colspan="2" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';
-        $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th></tr>';
+        if (substr($page, 0, 4) == 'ajax') {
+            continue;
+        }
+        $res .= '<tr><td colspan="3" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';
+        $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
         foreach ($mods as $name => $vals) {
-            $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td></tr>';
+            $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td>';
+            $res .= '<td class="hmod c'.$page.'"><a target="_blank" href="https://cypht.org/docs/code_docs/class-Hm_Handler_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
         }
         if (array_key_exists($page, $outputs)) {
-            $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th></tr>';
+            $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
             foreach($outputs[$page] as $name => $vals) {
-                $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td></tr>';
+                $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td>';
+                $res .= '<td class="omod c'.$page.'"><a target="_blank" href="https://cypht.org/docs/code_docs/class-Hm_Output_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
+            }
+        }
+    }
+    $res .= '<tr><td colspan="3"><div class="settings_subtitle">AJAX Requests</div></td></tr>';
+    foreach ($handlers as $page => $mods) {
+        if (substr($page, 0, 4) != 'ajax') {
+            continue;
+        }
+        $res .= '<tr><td colspan="3" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';
+        $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
+        foreach ($mods as $name => $vals) {
+            $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td>';
+            $res .= '<td class="hmod c'.$page.'"><a target="_blank" href="https://cypht.org/docs/code_docs/class-Hm_Handler_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
+        }
+        if (array_key_exists($page, $outputs)) {
+            $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
+            foreach($outputs[$page] as $name => $vals) {
+                $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td>';
+                $res .= '<td class="omod c'.$page.'"><a target="_blank" href="https://cypht.org/docs/code_docs/class-Hm_Output_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
             }
         }
     }

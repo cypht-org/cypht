@@ -1,12 +1,14 @@
 .long_text { max-width: 600px; margin-left: 30px; margin-top: 20px; max-width: 60%; color: #666; }
-.info_content, .server_summary { width: 100%; height: 100%; background-color: #fff; }
+.info_content, .server_summary { width: 100%; background-color: #fff; }
 .info_content table, .server_summary table { table-layout: fixed; width: 100%; padding: 20px; padding-bottom: 40px; padding-left: 30px; }
 .info_content table th, .server_summary table th { font-style: normal; padding: 5px; padding-left: 10px; text-align: left; color: #999; font-size: 75%; font-weight: normal; }
 .info_content table td, .server_summary table td { white-space: nowrap; padding: 5px; overflow: hidden; text-overflow: ellipsis; }
 .config_map, .server_info table { table-layout: initial; width: auto; }
 .server_info table td { white-space: normal; vertical-align: top; }
 .server_info table th { white-space: nowrap; vertical-align: top; }
-.hmod_val, .omod_val, .hmod, .omod { color: #666; display: none; padding: 4px; padding-left: 20px; }
-.config_map_page { color: #666; font-size: 110%; cursor: pointer; padding-top: 20px; }
+.hmod_val, .omod_val, .hmod, .omod { color: #666; display: none; padding: 4px; padding-left: 60px; }
+.config_map_page { color: #666; font-size: 110%; cursor: pointer; padding-top: 20px; padding-left: 40px; }
 .config_map { margin-left: 40px; min-width: 400px; }
 .config_map th {border-bottom: solid 1px #eee; padding-left: 20px;  display: none; padding-top: 10px; color: #666; font-size: 90%; text-align: left; }
+.config_map th { padding-left: 60px; }
+.config_map img { width: 16px; height: 16px; opacity: .6 }
