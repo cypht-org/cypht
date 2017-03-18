@@ -46,7 +46,7 @@ td { vertical-align: top; }
 .server_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 500px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { table-layout: fixed; width: 100%; }
 .user_settings table td { height: 34px; vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 10px; color: #666; }
-.save_settings { float: left !important; }
+.settings_table .save_settings { cursor: pointer; color: #666; font-size: 125%; padding: 10px !important; float: left !important; }
 .disabled_link { color: #bbb; }
 .save_settings_password { float: left; margin-left: 0px; padding: 4px; }
 .disabled_input, input:disabled { color: #aaa !important; background-color: #ddd; }
