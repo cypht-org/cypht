@@ -783,12 +783,12 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 '<span> <label class="screen_reader" for="pop3_password_'.$index.'">'.$this->trans('POP3 password').'</label>'.
                 '<input '.$disabled.' id="pop3_password_'.$index.'" class="credentials pop3_password" placeholder="'.$pass_pc.'" type="password" name="pop3_pass"></span>';
             if (!$no_edit) {
-                $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_pop3_connection" />';
                     $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_pop3_connection" />';
                 }
                 else {
+                    $res .= '<input type="submit" value="Test" class="test_pop3_connect" />';
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_pop3_connection" />';
                     $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_pop3_connection" />';
                 }
