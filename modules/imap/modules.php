@@ -1701,12 +1701,12 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 '" type="password" name="imap_pass"></span>';
 
             if (!$no_edit) {
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
                     $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection" />';
                 }
                 else {
+                    $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
                     $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection" />';
                 }
