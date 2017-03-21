@@ -1,4 +1,4 @@
-.search_content .msg_text, .message_list .msg_text { float: right; width: 50%; max-width: 50%; overflow: hidden; }
+.search_content .msg_text, .message_list .msg_text { float: right; width: 50%; max-width: 50%; }
 .search_content .msg_text_inner, .message_list .msg_text_inner { padding-left: 10px; }
 .search_content .msg_headers th, .search_content .msg_headers td, .message_list .msg_headers th, .message_list .msg_headers td { padding-left: 5px; white-space: normal; overflow-wrap: break-word; }
 .close_inline_msg { float: right; margin-right: 10px; cursor: pointer;}
