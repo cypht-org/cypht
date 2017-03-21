@@ -13,7 +13,7 @@ textarea { font-size: 100%; }
 .ke-content body * { background-color: #000 !important; }
 .src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #333, #383838) !important; }
 .debug, .subtitle { color: #999 !important; }
-.subject, .subject a { font-weight: normal !important; font-size: 99% !important; color: #999 !important; }
+.subject, .subject a { font-weight: normal !important; color: #999 !important; }
 .empty_list { color: #666 !important; }
 .selected_part a, .selected_menu, .selected_menu a { color: #eee !important; }
 .icon { color: #aaa !important; }
