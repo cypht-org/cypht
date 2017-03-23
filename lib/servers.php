@@ -165,6 +165,26 @@ trait Hm_Server_List {
     }
 
     /**
+     * Fetch a server by the username and servername
+     * @param string $username the user associated with the server
+     * @param string $servername the host associated with the server
+     * @return array, false on failure
+     */
+    public static function fetch($username, $servername) {
+        foreach (self::$server_list as $server) {
+            if (array_key_exists('user', $server) && array_key_exists('server', $server)) {
+                if ($username == $server['user'] && $servername == $server['server']) {
+                    if (array_key_exists('pass', $server)) {
+                        unset($server['pass']);
+                        return $server;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Try to disconnect cleanly
      * @param int $id server id
      * @return void

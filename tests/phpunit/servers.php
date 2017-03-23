@@ -30,6 +30,14 @@ class Hm_Test_Server_List extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_fetch() {
+        $this->assertTrue(count(Hm_Server_Wrapper::fetch('testuser', 'test')) > 0);
+        $this->assertFalse(Hm_Server_Wrapper::fetch('asdf', 'asdf'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_dump() {
         $this->assertEquals(array( 0 => array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false), 3 => array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false)), Hm_Server_Wrapper::dump());
         $this->assertEquals(array('user' => 'testuser', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'object' => false, 'connected' => false), Hm_Server_Wrapper::dump(0));
