@@ -16,7 +16,7 @@ before_install:
   - mysql -u root -e "create user 'test'@'localhost' identified by '123456';"
   - mysql -u root -e "grant all privileges on test.* to 'test'@'localhost';"
   - mysql -u root -e "insert into hm_user values('unittestuser', 'sha512:86000:xfEgf7NIUQ2XkeU5tnIcA+HsN8pUllMVdzpJxCSwmbsZAE8Hze3Zs+MeIqepwocYteJ92vhq7pjOfrVThg/p1voELkDdPenU8i2PgG9UTI0IJTGhMN7rsUILgT6XlMAKLp/u2OD13sukUFcQNTdZNFqMsuTVTYw/Me2tAnFwgO4=:rfyUhYsWBCknx6EmbeswN0fy0hAC0N3puXzwWyDRquA=');" test
-  - mysql -u root -e "insert into hm_user_settings values('testuser', '8moxOokpTk1+tuT0WnwQTsM7AqkWtdMPq7wRtM9sMszuj7IVHZYlvaNa9fJ+VM0DjXnnuFYtmrkOAA5UJ+H0/muOpYgMsaFpQF1k9Urw8WbSaSHPNw==');" test
+  - mysql -u root -e "insert into hm_user_settings values('testuser', ' 2t78kjYXcapaBu7V5T3ItpiFTso3h/6N1oTGrZw/mYgJw93THy3hOeIDL9qeEj0It+ocR0GaWVW8g/ugS2b4uzME81YAyuj6PWz5siWO1+jvyiCWWvZssVoUOAcAhyPoAQXnlmn8/DWzCvrs22in2sZbIWu/p+9ll2mc91/tYaUCZEwf50q4E5UgxsQ8RYkUghabfLRElGfIOcMh3XTstmmEiWtDUJLf6waFtSUvpL6FDfM2P7jw5HIfL7+6K9/01AJzJVTP8yJDTLNsM9UM1BV4k9C51YyLjxXIfwboa5I=');" test
 
 notifications:
     irc: "irc.freenode.org#hastymail"
