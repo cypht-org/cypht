@@ -5,10 +5,19 @@ php:
 
 # omitting "script:" will default to phpunit
 # use the $DB env variable to determine the phpunit.xml to use
-script: cd tests/phpunit && phpunit 
+script: cd tests/phpunit && phpunit --testsuite auth
 
 env:
     - DB=mysql
+
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - mysql -e 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));'
+  - mysql -e 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));'
+  - mysql -e 'create table hm_user_settings( username varchar(255), settings longblob, primary key (username));'
+  - mysql -e "CREATE USER 'test'@'localhost' IDENTIFIED BY '123456';"
+  - mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'test'@'localhost';"
+
 # configure notifications (email, IRC, campfire etc)
 #notifications:
 #irc: "irc.freenode.org#hastymail"
