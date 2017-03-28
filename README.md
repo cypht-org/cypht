@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jasonmunro/cypht.svg?branch=master)](https://travis-ci.org/jasonmunro/cypht)
+
 #### Cypht
 [https://cypht.org](https://cypht.org)
 
