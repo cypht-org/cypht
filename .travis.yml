@@ -5,7 +5,7 @@ php:
 
 # omitting "script:" will default to phpunit
 # use the $DB env variable to determine the phpunit.xml to use
-script: cd tests/phpunit && phpunit --testsuite auth
+script: cd tests/phpunit && phpunit
 
 env:
     - DB=mysql
@@ -19,5 +19,5 @@ before_install:
   - mysql -u root -e "GRANT ALL PRIVILEGES ON test.* TO 'test'@'localhost';"
 
 # configure notifications (email, IRC, campfire etc)
-#notifications:
-#irc: "irc.freenode.org#hastymail"
+notifications:
+    irc: "irc.freenode.org#hastymail"
