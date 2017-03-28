@@ -14,6 +14,16 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_save() {
+        $this->config->reload(array('foo' => 'bar'));
+        $this->config->save('testuser', 'testkey');
+        $this->config->load('testuser', 'testkey');
+        $this->assertEquals(array('foo' => 'bar'), $this->config->dump());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_dump() {
         $this->config->load('testuser', 'testkey');
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar'), $this->config->dump());
@@ -105,16 +115,6 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
         $this->config->reload(array('timezone_setting' => 'UTC', 'bar' => 'foo'));
         $this->assertEquals('UTC', date_default_timezone_get());
         $this->assertEquals('foo', $this->config->get('bar'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_save() {
-        $this->config->reload(array('foo' => 'bar'));
-        $this->config->save('testuser', 'testkey');
-        $this->config->load('testuser', 'testkey');
-        $this->assertEquals(array('foo' => 'bar'), $this->config->dump());
     }
     public function tearDown() {
         unset($this->config);
