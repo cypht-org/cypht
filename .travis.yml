@@ -17,6 +17,7 @@ before_install:
   - mysql -u root -e 'create table hm_user_settings( username varchar(255), settings longblob, primary key (username));' test
   - mysql -u root -e "CREATE USER 'test'@'localhost' IDENTIFIED BY '123456';"
   - mysql -u root -e "GRANT ALL PRIVILEGES ON test.* TO 'test'@'localhost';"
+  - php ./scripts/create_account.php unittestuser unittestpass
 
 # configure notifications (email, IRC, campfire etc)
 notifications:
