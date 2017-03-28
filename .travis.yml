@@ -1,13 +1,12 @@
 language: php
 
 php:
-  - 7.0
-  - hhvm
+    - 5.6
 
 # omitting "script:" will default to phpunit
 # use the $DB env variable to determine the phpunit.xml to use
-script: phpunit --configuration tests/phpunit/phpunit.xml
+script: cd tests/phpunit && phpunit 
 
 # configure notifications (email, IRC, campfire etc)
-notifications:
-  irc: "irc.freenode.org#hastymail"
+#notifications:
+#irc: "irc.freenode.org#hastymail"
