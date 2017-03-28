@@ -7,6 +7,8 @@ php:
 # use the $DB env variable to determine the phpunit.xml to use
 script: cd tests/phpunit && phpunit 
 
+env:
+    - DB=mysql
 # configure notifications (email, IRC, campfire etc)
 #notifications:
 #irc: "irc.freenode.org#hastymail"
