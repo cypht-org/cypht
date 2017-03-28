@@ -3,22 +3,19 @@ language: php
 php:
     - 5.6
 
-# omitting "script:" will default to phpunit
-# use the $DB env variable to determine the phpunit.xml to use
 script: cd tests/phpunit && phpunit
 
 env:
     - DB=mysql
 
 before_install:
-  - mysql -u root -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - mysql -u root -e 'create database if not exists test;'
   - mysql -u root -e 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));' test
   - mysql -u root -e 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));' test
   - mysql -u root -e 'create table hm_user_settings( username varchar(255), settings longblob, primary key (username));' test
-  - mysql -u root -e "CREATE USER 'test'@'localhost' IDENTIFIED BY '123456';"
-  - mysql -u root -e "GRANT ALL PRIVILEGES ON test.* TO 'test'@'localhost';"
-  - php ./scripts/create_account.php unittestuser unittestpass
+  - mysql -u root -e "create user 'test'@'localhost' identified by '123456';"
+  - mysql -u root -e "grant all privileges on test.* to 'test'@'localhost';"
+  - mysql -u root -e "insert into hm_user values('unittestuser', 'sha512:86000:xfEgf7NIUQ2XkeU5tnIcA+HsN8pUllMVdzpJxCSwmbsZAE8Hze3Zs+MeIqepwocYteJ92vhq7pjOfrVThg/p1voELkDdPenU8i2PgG9UTI0IJTGhMN7rsUILgT6XlMAKLp/u2OD13sukUFcQNTdZNFqMsuTVTYw/Me2tAnFwgO4=:rfyUhYsWBCknx6EmbeswN0fy0hAC0N3puXzwWyDRquA=');" test
 
-# configure notifications (email, IRC, campfire etc)
 notifications:
     irc: "irc.freenode.org#hastymail"
