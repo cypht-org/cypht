@@ -9,7 +9,7 @@ env:
     - DB=mysql
 
 before_install:
-    - sudo useradd -m -d /home/testuser -p `mkpasswd testuser` testuser
+    - sudo useradd -m -d /home/testuser -p uKttwaBonUUc6 testuser
     - sudo apt-get -qq update
     - sudo apt-get install -y dovecot-imapd
     - sudo apt-get install chromedriver
