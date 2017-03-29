@@ -18,7 +18,7 @@ before_install:
     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
     - wget https://cypht.org/travis/apache.conf -O travis-ci-apache
-    - sudo cp -f build/travis-ci-apache /etc/apache2/sites-available/default
+    - sudo cp -f travis-ci-apache /etc/apache2/sites-available/default
     - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/default
     - sudo service apache2 restart
     - wget https://cypht.org/travis/hm3.ini
