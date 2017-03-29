@@ -13,7 +13,8 @@ before_install:
     - sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
     - sudo apt-get -qq update
     - sudo apt-get install -y dovecot-imapd
-    - cat /etc/dovecot/dovecot.conf
+    - sudo echo "protocols = pop3 pop3s imap imaps" >> /etc/dovecot/dovecot.conf
+    - sudo doveadm stop && sudo doveadm start
     - sudo apt-get install apache2 libapache2-mod-fastcgi
     - sudo apt-get install python-pip
     - sudo pip install selenium
