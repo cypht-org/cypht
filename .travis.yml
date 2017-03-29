@@ -38,8 +38,7 @@ before_install:
 addons:
     sauce_connect:
         username: "sail_frog"
-        access_key:
-            secure: "t5e3rVAZtjTKQEopJfy/J/R8JN7eAGApdfxfFVVYrUuoF3Xp66bsWUjnAtF6Dpj4fYKlUcRVlJUEKdGy6k/A51SvPLgbpfr56MA0zUbR0za+k168K6gYJuAzd0WStrhFNKqc+BuVJmTFImwkUcF6Sj3dE3PzQBq4gQu7xAKKi5vJiCwNe8ZSPOR0ISEMf0lZr4O3f2NFj/qIF/Dj86cYFOD9vnZ1hxbK8PeLl3SpSugshdTmj9Yc7Rm0hc8nmt442jbud3YiS8slYSVUudqRGVD33quJrPKhJ436Fjw6K2z1rFtQZzPCQSkHiBcOV48/4q+OqBPXj6MjMtT9EYJ9W99/JK2rHxQ1qeoBNtUZ6cvmPX6obXEOawPV8AoRdSBJCR91B8/HREDQ795eVyIg2d60luecrewF7G+NDUs/O2oaXz11AA6d7pufHjJEafl19/0Dl386Difn3h65yft0GOfO+RDJEnjomZcZYjZQXL5wLYB7CAcOlOWfGBE6DYcmYPxfApusVq77LswoFqTelJ1qbsTwHsK/MAmDkcvfrrrSZG+Bi/PJLnMGAxyKpBLS6trX88uoUCz6FXQyTNZyert7BlLqt/IGC4XbELkV5HonfbOGQCA2RV7wAhKtvKeEWQz7J6AKPq8t3E8KlJ2TVs3JtWx9N5ZEFiMZRCpyVcE="
+        access_key: "d0f2e9da-5bea-48b3-bf3d-734b15027afe"
 
 notifications:
     irc: "irc.freenode.org#hastymail"
