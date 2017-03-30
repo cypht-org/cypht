@@ -48,7 +48,7 @@ before_install:
     - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
     - sudo a2enmod rewrite actions fastcgi alias
     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-     if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then sudo cp www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then sudo cp www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
     - wget https://cypht.org/travis/apache.conf -O travis-ci-apache
     - sudo cp -f travis-ci-apache /etc/apache2/sites-available/default
