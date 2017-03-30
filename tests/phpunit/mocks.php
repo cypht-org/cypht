@@ -117,7 +117,12 @@ class Hm_Functions {
         public static function c_init() { return true; }
         public static function c_setopt() { return true; }
         public static function c_exec() { return self::$exec_res; }
-        public static function function_exists($func) { return self::$exists; }
+        public static function function_exists($func) {
+            if ((float) substr(phpversion(), 0, 3) < 5.6) {
+                return false;
+            }
+            return self::$exists;
+        }
         public static function class_exists($func) { return self::$exists; }
         public static function memcached() { return self::$memcache ? new Hm_Mock_Memcached() : new Hm_Mock_Memcached_No(); }
         public static function random_bytes($size) {
