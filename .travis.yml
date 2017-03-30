@@ -2,6 +2,7 @@ language: php
 
 php:
     - '5.6'
+    - '7.0'
 
 # run the phpunit tests, then the selenium tests
 script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh
@@ -40,12 +41,14 @@ before_install:
     - sudo mv phpunit-5.7.phar /usr/local/bin/phpunit
 
     # setup apache and fpm
+    - wget https://cypht.org/travis/www.conf
     - sudo apt-get install apache2 libapache2-mod-fastcgi
     - sudo apt-get install python-pip
     - sudo pip install selenium
     - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
     - sudo a2enmod rewrite actions fastcgi alias
     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+     if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then sudo cp www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
     - wget https://cypht.org/travis/apache.conf -O travis-ci-apache
     - sudo cp -f travis-ci-apache /etc/apache2/sites-available/default
