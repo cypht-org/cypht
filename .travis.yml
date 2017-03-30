@@ -3,18 +3,22 @@ language: php
 php:
     - 5.6
 
-#script: cd tests/phpunit && phpunit && cd ../selenium && sh ./runall.sh
-script: cd tests/selenium && sh ./runall.sh
+# run the phpunit tests, then the selenium tests
+script: cd tests/phpunit && phpunit && cd ../selenium && sh ./runall.sh
 
+# the unit tests need a DB setup, the selenium tests do not. Eventually
+# we should test postgresql and sqlite in addition to mysql
 env:
     - DB=mysql
 
+# set up everything we need. The unit tests only require the last section.
+# Everything else is for the selenium tests
 before_install:
 
-    # add a system user
+    # add a system user we will log into Cypht with
     - sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
 
-    # update apt
+    # update apt repo
     - sudo apt-get -qq update
 
     # setup dovecot for IMAP
@@ -44,7 +48,7 @@ before_install:
     - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/default
     - sudo service apache2 restart
 
-    # setup env for Cypht unit tests
+    # setup env for unit tests
     - mysql -u root -e 'create database if not exists test;'
     - mysql -u root -e 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));' test
     - mysql -u root -e 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));' test
@@ -55,14 +59,17 @@ before_install:
     - mysql -u root -e "insert into hm_user_settings values('testuser', 'sFpVPU/hPvmfeiEKUBs4w1EizmbW/Ze2BALZf6kdJrIU3KVZrsqIhKaWTNNFRm3p51ssRAH2mpbxBMhsdpOAqIZMXFHjLttRu9t5WZWOkN7qwEh2LRq6imbkMkfqXg//K294QDLyWjE0Lsc/HSGqnguBF0YUVLVmWmdeqq7/OrXUo4HNbU88i4s2gkukKobJA2hjcOEq/rLOXr3t4LnLlcISnUbt4ptalSbeRrOnx4ehZV8hweQf1E+ID7s/a+8HHx1Qo713JDzReoLEKUsxRQ==');" test
     - echo '+2IdQejfHu4FNYOA3tm0DJVQNg92gcpJf8ETeVj+HK0OU6J5iaV/J823rLm8+5Et7tQLoCCoZwElGTH7N2P2M4JMct1jRyWgjqJQn9FYlovFYj/8fLwkixGo+VMNIKsUwJ42GXTj61nn0Rf4+FO688SfAR5LhaLTXlR6XZ9mJD2/2RX1X+Z1JVl7SrqELgE8wnz5IYCrzqBbgK4MDn86rTtPM9jie3gFS9viMZ7OQRENbXLvwBaIXNLvQlZZn2JBdzXF1spoLnSlq8P0pYXlDig==' > tests/phpunit/data/testuser.txt
 
+# dump some useful info to the logs
 after_script:
     - sudo cat /var/log/apache2/error.log
-    - sudo ls /var/log
+    - sudo cat /var/log/mail.err
 
+# use sauce labs for the selenium tests
 addons:
     sauce_connect:
         username: "sail_frog"
         access_key: "d0f2e9da-5bea-48b3-bf3d-734b15027afe"
 
+# send notices to our irc channel
 notifications:
     irc: "irc.freenode.org#hastymail"
