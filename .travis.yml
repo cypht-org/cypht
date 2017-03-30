@@ -13,17 +13,22 @@ before_install:
 
     # add a system user
     - sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
-      #- echo -e "testuser\ntestuser" | sudo passwd testuser
 
     # update apt
     - sudo apt-get -qq update
 
-    # setup dovecot
+    # setup dovecot for IMAP
     - sudo apt-get install -y dovecot-imapd
     - sudo sleep 10
     - sudo stop dovecot
     - echo "mail_location = maildir:/home/%u/Maildir" | sudo tee --append /etc/dovecot/conf.d/10-mail.conf
     - sudo start dovecot
+
+    # setup Cypht
+    - wget https://cypht.org/travis/hm3.ini
+    - wget https://cypht.org/travis/creds.py
+    - mv creds.py tests/selenium/
+    - php ./scripts/config_gen.php
 
     # setup apache and fpm
     - sudo apt-get install apache2 libapache2-mod-fastcgi
@@ -34,15 +39,10 @@ before_install:
     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
     - wget https://cypht.org/travis/apache.conf -O travis-ci-apache
+    - cat travis-ci-apache
     - sudo cp -f travis-ci-apache /etc/apache2/sites-available/default
     - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/default
     - sudo service apache2 restart
-
-    # setup Cypht
-    - wget https://cypht.org/travis/hm3.ini
-    - wget https://cypht.org/travis/creds.py
-    - mv creds.py tests/selenium/
-    - php ./scripts/config_gen.php
 
     # setup env for Cypht unit tests
     - mysql -u root -e 'create database if not exists test;'
@@ -57,7 +57,7 @@ before_install:
 
 after_script:
     - sudo cat /var/log/apache2/error.log
-    - sudo cat /var/log/mail.info
+    - sudo ls /var/log
 
 addons:
     sauce_connect:
