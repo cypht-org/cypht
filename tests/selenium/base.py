@@ -71,25 +71,13 @@ class WebTest:
         self.driver.quit()
 
     def by_id(self, el_id):
-        try:
-            return self.driver.find_element_by_id(el_id)
-        except exceptions.NoSuchElementException:
-            return None
+        return self.driver.find_element_by_id(el_id)
 
     def by_name(self, name):
-        try:
-            return self.driver.find_element_by_name(name)
-        except exceptions.NoSuchElementException:
-            return None
+        return self.driver.find_element_by_name(name)
 
     def by_css(self, selector):
-        try:
-            return self.driver.find_element_by_css_selector(selector)
-        except exceptions.NoSuchElementException:
-            return None
+        return self.driver.find_element_by_css_selector(selector)
 
     def by_class(self, class_name):
-        try:
-            return self.driver.find_element_by_class_name(class_name)
-        except exceptions.NoSuchElementException:
-            return None
+        return self.driver.find_element_by_class_name(class_name)

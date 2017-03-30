@@ -106,13 +106,12 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Save Settings'
 
     def password(self):
-        try:
-            list_item = self.by_class('menu_change_password')
-            list_item.find_element_by_tag_name('a').click()
-            self.rest()
-            assert self.by_class('content_title').text == 'Change Password'
-        except AttributeError:
-            pass
+        if not self.mod_active('account'):
+            return
+        list_item = self.by_class('menu_change_password')
+        list_item.find_element_by_tag_name('a').click()
+        self.rest()
+        assert self.by_class('content_title').text == 'Change Password'
 
     def profiles(self):
         if self.mod_active('profiles'):

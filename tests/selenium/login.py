@@ -15,21 +15,18 @@ class LoginTests(WebTest):
         self.load()
         self.login('asdf', '')
         self.rest()
-        assert self.by_class('err') == None
         assert self.by_class('login_form') != None
 
     def missing_username(self):
         self.load()
         self.login('', 'asdf')
         self.rest()
-        assert self.by_class('err') == None
         assert self.by_class('login_form') != None
 
     def missing_username_and_password(self):
         self.load()
         self.login('', '')
         self.rest()
-        assert self.by_class('err') == None
         assert self.by_class('login_form') != None
 
     def bad_login_key(self):
@@ -44,7 +41,6 @@ class LoginTests(WebTest):
         self.load()
         self.login(USER, PASS)
         self.rest()
-        assert self.by_class('err') == None
         assert self.by_class('content_title') != None
 
     def good_logout(self):
