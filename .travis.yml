@@ -43,7 +43,6 @@ before_install:
     - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then wget https://cypht.org/travis/creds.py-chrome -O creds.py; fi
     - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then wget https://cypht.org/travis/creds.py-safari -O creds.py; fi
     - wget https://cypht.org/travis/hm3.ini
-    - wget https://cypht.org/travis/creds.py
     - mv creds.py tests/selenium/
     - php ./scripts/config_gen.php
 
