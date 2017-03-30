@@ -29,3 +29,8 @@ SLEEP_INT = 2
 # A function that returns a webdriver object.
 def get_driver(cap):
     return DRIVER(DRIVER_CMD)
+
+# A function called when all tests from one set
+# complete
+def success():
+    pass

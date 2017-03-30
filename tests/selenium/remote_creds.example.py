@@ -33,3 +33,8 @@ def get_driver(cap):
     if not cap:
         cap = DESIRED_CAP
     return DRIVER(command_executor=DRIVER_CMD, desired_capabilities=cap)
+
+# A function called when all tests from one set
+# complete
+def success():
+    pass

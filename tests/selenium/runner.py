@@ -2,7 +2,7 @@
 
 from sys import exc_info
 from traceback import print_exception
-from creds import DESIRED_CAP
+from creds import DESIRED_CAP, success
 
 GREEN = '\033[92m'
 RED = '\033[91m'
@@ -27,6 +27,7 @@ def run_tests(obj, tests):
         print '%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), END)
         obj.end()
         exit(1);
+    success()
     print
     obj.end()
     return True
