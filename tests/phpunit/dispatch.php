@@ -12,7 +12,9 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_is_php_setup() {
-        $this->assertTrue(Hm_Dispatch::is_php_setup());
+        if ((float) substr(phpversion(), 0, 3) >= 5.6) {
+            $this->assertTrue(Hm_Dispatch::is_php_setup());
+        }
         Hm_Functions::$exists = false;
         $this->assertFalse(Hm_Dispatch::is_php_setup());
     }
