@@ -1,6 +1,8 @@
 language: php
 
 php:
+    - '5.4'
+    - '5.5'
     - '5.6'
     - '7.0'
     - '7.1'
@@ -41,9 +43,13 @@ before_install:
     - php ./scripts/config_gen.php
 
     # get old stable version of phpunit
-    - wget https://phar.phpunit.de/phpunit-5.7.phar
-    - chmod +x phpunit-5.7.phar
-    - sudo mv phpunit-5.7.phar /usr/local/bin/phpunit
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.4" ]]; then wget https://phar.phpunit.de/phpunit-4.8.phar -O phpunit; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.5" ]]; then wget https://phar.phpunit.de/phpunit-4.8.phar -O phpunit; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.6" ]]; then wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit; fi
+    - chmod +x phpunit
+    - sudo mv phpunit /usr/local/bin/phpunit
 
     # setup apache and fpm
     - wget https://cypht.org/travis/www.conf
