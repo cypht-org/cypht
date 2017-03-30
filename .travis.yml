@@ -14,7 +14,7 @@ before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y dovecot-imapd
     - echo "service imap-login {\n inet_listener imaps {\n }\n }\n" | sudo tee --append /etc/dovecot/conf.d/10-master.conf
-    - cat /etc/dovecot/config.d/10-master.conf
+    - cat /etc/dovecot/conf.d/10-master.conf
     - sudo doveadm stop && sudo doveadm start
     - sudo netstat -lntp
     - sudo apt-get install apache2 libapache2-mod-fastcgi
