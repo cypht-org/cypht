@@ -27,7 +27,7 @@ def run_tests(obj, tests):
         print '%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), END)
         obj.end()
         exit(1);
-    success()
+    success(obj.driver)
     print
     obj.end()
     return True

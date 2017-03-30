@@ -36,5 +36,5 @@ def get_driver(cap):
 
 # A function called when all tests from one set
 # complete
-def success():
+def success(driver):
     pass
