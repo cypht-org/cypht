@@ -10,14 +10,22 @@ env:
     - DB=mysql
 
 before_install:
+
+    # add a system user
     - sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
-    - echo -e "testuser\ntestuser" | sudo passwd testuser
+      #- echo -e "testuser\ntestuser" | sudo passwd testuser
+
+    # update apt
     - sudo apt-get -qq update
+
+    # setup dovecot
     - sudo apt-get install -y dovecot-imapd
     - sudo sleep 10
     - sudo stop dovecot
     - echo "mail_location = maildir:/home/%u/Maildir" | sudo tee --append /etc/dovecot/conf.d/10-mail.conf
     - sudo start dovecot
+
+    # setup apache and fpm
     - sudo apt-get install apache2 libapache2-mod-fastcgi
     - sudo apt-get install python-pip
     - sudo pip install selenium
@@ -29,10 +37,14 @@ before_install:
     - sudo cp -f travis-ci-apache /etc/apache2/sites-available/default
     - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/default
     - sudo service apache2 restart
+
+    # setup Cypht
     - wget https://cypht.org/travis/hm3.ini
     - wget https://cypht.org/travis/creds.py
     - mv creds.py tests/selenium/
     - php ./scripts/config_gen.php
+
+    # setup env for Cypht unit tests
     - mysql -u root -e 'create database if not exists test;'
     - mysql -u root -e 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));' test
     - mysql -u root -e 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));' test
