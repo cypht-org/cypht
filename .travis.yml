@@ -3,6 +3,7 @@ language: php
 php:
     - '5.6'
     - '7.0'
+    - '7.1'
 
 # run the phpunit tests, then the selenium tests
 script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh
@@ -15,6 +16,9 @@ env:
 # set up everything we need. The unit tests only require the last section.
 # Everything else is for the selenium tests
 before_install:
+
+    # PHP7+ needs ldap configured
+    - phpenv config-add tests/travis/enable-ldap.ini
 
     # add a system user we will log into Cypht with
     - sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
@@ -49,6 +53,7 @@ before_install:
     - sudo a2enmod rewrite actions fastcgi alias
     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then sudo cp www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then sudo cp www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
     - wget https://cypht.org/travis/apache.conf -O travis-ci-apache
     - sudo cp -f travis-ci-apache /etc/apache2/sites-available/default
