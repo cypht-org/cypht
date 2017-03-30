@@ -34,6 +34,12 @@ before_install:
     - mv creds.py tests/selenium/
     - php ./scripts/config_gen.php
 
+    # get old stable version of phpunit
+    - wget https://phar.phpunit.de/phpunit-5.7.phar
+    - chmod +x phpunit-5.7.phar
+    - sudo mv phpunit-5.7.phar /usr/local/bin/phpunit
+    - which phpunit
+
     # setup apache and fpm
     - sudo apt-get install apache2 libapache2-mod-fastcgi
     - sudo apt-get install python-pip
