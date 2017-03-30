@@ -15,6 +15,7 @@ before_install:
     - sudo apt-get install -y dovecot-imapd
     - sudo doveadm reload
     - sudo netstat -lntp
+    - php -r 'phpinfo();'
     - sudo apt-get install apache2 libapache2-mod-fastcgi
     - sudo apt-get install python-pip
     - sudo pip install selenium
