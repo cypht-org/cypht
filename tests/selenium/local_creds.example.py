@@ -23,6 +23,9 @@ PASS = 'testpass'
 # Unused for local testing
 DESIRED_CAP = None
 
+# delay time for the res() function in seconds
+SLEEP_INT = 2
+
 # A function that returns a webdriver object.
 def get_driver(cap):
     return DRIVER(DRIVER_CMD)

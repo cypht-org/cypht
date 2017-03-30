@@ -9,11 +9,10 @@
 
 import re
 from time import sleep
-from creds import SITE_URL, USER, PASS, get_driver
+from creds import SITE_URL, USER, PASS, get_driver, SLEEP_INT
 from selenium.common import exceptions
 
 INI_PATH = '../../hm3.ini'
-SLEEP_INT = 2
 
 class WebTest:
 
