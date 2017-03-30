@@ -11,6 +11,7 @@ env:
 
 before_install:
     - sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
+    - echo -e "testuser\ntestuser" | sudo passwd testuser
     - sudo apt-get -qq update
     - sudo apt-get install -y dovecot-imapd
     - sudo doveadm reload
