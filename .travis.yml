@@ -14,10 +14,10 @@ before_install:
     - echo -e "testuser\ntestuser" | sudo passwd testuser
     - sudo apt-get -qq update
     - sudo apt-get install -y dovecot-imapd
-    - sudo netstat -lntp
-    - sudo sleep 5
-      #- sudo doveadm reload
-    - sudo cat /var/log/syslog
+    - sudo sleep 10
+    - sudo stop dovecot
+    - echo "mail_location = maildir:/home/%u/Maildir" | sudo tee --append /etc/dovecot/conf.d/10-mail.conf
+    - sudo start dovecot
     - sudo apt-get install apache2 libapache2-mod-fastcgi
     - sudo apt-get install python-pip
     - sudo pip install selenium
@@ -45,7 +45,7 @@ before_install:
 
 after_script:
     - sudo cat /var/log/apache2/error.log
-    - sudo cat /var/log/syslog
+    - sudo cat /var/log/mail.info
 
 addons:
     sauce_connect:
