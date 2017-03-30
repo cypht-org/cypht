@@ -13,7 +13,7 @@ from creds import SITE_URL, USER, PASS, get_driver
 from selenium.common import exceptions
 
 INI_PATH = '../../hm3.ini'
-SLEEP_INT = 4
+SLEEP_INT = 15
 
 class WebTest:
 
