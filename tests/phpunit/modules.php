@@ -150,7 +150,8 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
      */
     public function test_get_current_language() {
         $this->module_exec->handler_response['language'] = 'en';
-        $this->assertTrue(!empty($this->module_exec->get_current_language()));
+        $lang = $this->module_exec->get_current_language();
+        $this->assertTrue($lang != false);
 
     }
     /**
