@@ -14,6 +14,8 @@ before_install:
     - echo -e "testuser\ntestuser" | sudo passwd testuser
     - sudo apt-get -qq update
     - sudo apt-get install -y dovecot-imapd
+    - sudo netstat -lntp
+    - sudo sleep 5
     - sudo doveadm reload
     - sudo apt-get install apache2 libapache2-mod-fastcgi
     - sudo apt-get install python-pip
