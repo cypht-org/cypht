@@ -15,6 +15,7 @@ before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y dovecot-imapd
     - sudo doveadm reload
+    - sudo cat /etc/dovecot/conf.d/auth-passwdfile.conf.ext
     - sudo netstat -lntp
     - php -r 'phpinfo();'
     - sudo apt-get install apache2 libapache2-mod-fastcgi
