@@ -91,7 +91,7 @@ class Hm_Profiles {
         return false;
 
     }
-    public function list() {
+    public function list_all() {
         return $this->data;
     }
 }
