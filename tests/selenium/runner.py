@@ -25,10 +25,11 @@ def run_tests(obj, tests):
     print '%s%s of %s PASSED%s' % (GREEN, passed, len(tests), END)
     if (len(tests) > passed):
         print '%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), END)
+        obj.end()
         exit(1);
     print
-    return True
     obj.end()
+    return True
 
 def get_tests(class_name):
     res = []
