@@ -58,14 +58,12 @@ class WebTest:
             var e=arguments[0]; var v=arguments[1]; e.value=v;''',
             el, val)
 
+    def logout_no_save(self):
+        self.driver.find_element_by_class_name('logout_link').click()
+        logout = self.by_id('logout_without_saving').click()
+
     def logout(self):
         self.driver.find_element_by_class_name('logout_link').click()
-        try:
-            logout = self.by_id('logout_without_saving')
-            if logout:
-                logout.click()
-        except:
-            pass
 
     def end(self):
         self.driver.quit()
