@@ -379,9 +379,6 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                                 }
                                 header('Content-Type: '.$part_struct['type'].'/'.$part_struct['subtype'].$charset);
                                 header('Content-Transfer-Encoding: binary');
-                                if (array_key_exists('size', $part_struct)) {
-                                    header('Content-Length: '.$part_struct['size']);
-                                }
                                 ob_end_clean();
                                 while($line = $imap->read_stream_line()) {
                                     if ($encoding == 'quoted-printable') {
