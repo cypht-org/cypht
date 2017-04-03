@@ -36,13 +36,13 @@ before_install:
     - echo "mail_location = maildir:/home/%u/Maildir" | sudo tee --append /etc/dovecot/conf.d/10-mail.conf
     - sudo start dovecot
 
-    # setup Cypht. Use different browsers for each version of PHP being tested
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.4" ]]; then wget https://cypht.org/travis/creds.py-ff -O creds.py; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.5" ]]; then wget https://cypht.org/travis/creds.py-chrome -O creds.py; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.6" ]]; then wget https://cypht.org/travis/creds.py-ff -O creds.py; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then wget https://cypht.org/travis/creds.py-chrome -O creds.py; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then wget https://cypht.org/travis/creds.py-ff -O creds.py; fi
-    - wget https://cypht.org/travis/hm3.ini
+    # setup Cypht 
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.4" ]]; then mv .travis/creds.py-ff creds.py; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.5" ]]; then mv .travis/creds.py-chrome creds.py; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.6" ]]; then mv .travis/creds.py-ff creds.py; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then mv .travis/creds.py-chrome creds.py; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then mv .travis/creds.py-ff creds.py; fi
+    - mv .travis/hm3.ini .
     - mv creds.py tests/selenium/
     - php ./scripts/config_gen.php
 
@@ -56,18 +56,16 @@ before_install:
     - sudo mv phpunit /usr/local/bin/phpunit
 
     # setup apache and fpm
-    - wget https://cypht.org/travis/www.conf
     - sudo apt-get install apache2 libapache2-mod-fastcgi
     - sudo apt-get install python-pip
     - sudo pip install selenium
     - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
     - sudo a2enmod rewrite actions fastcgi alias
     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then sudo cp www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then sudo cp www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/; fi
     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
-    - wget https://cypht.org/travis/apache.conf -O travis-ci-apache
-    - sudo cp -f travis-ci-apache /etc/apache2/sites-available/default
+    - sudo cp -f .travis/travis-ci-apache /etc/apache2/sites-available/default
     - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/default
     - sudo service apache2 restart
 
