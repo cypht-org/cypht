@@ -272,6 +272,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
             $namespace = $nsvals['prefix'];
             $delim = $nsvals['delim'];
             $ns_class = $nsvals['class'];
+            $mailbox = $this->utf7_encode(str_replace('"', '\"', $mailbox));
             if (strtoupper(substr($namespace, 0, 5)) == 'INBOX') { 
                 $namespace = '';
             }
