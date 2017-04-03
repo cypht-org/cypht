@@ -523,8 +523,21 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         }
 
         /* sort and return the list */
-        uksort($folders, 'strcasecmp');
+        uksort($folders, array($this, 'fsort'));
         return $this->cache_return_val($folders, $cache_command);
+    }
+
+    /**
+     * Sort a folder list with the inbox at the top
+     */
+    function fsort($a, $b) {
+        if (strtolower($a) == 'inbox') {
+            return -1;
+        }
+        if (strtolower($b) == 'inbox') {
+            return 1;
+        }
+        return strcasecmp($a, $b);
     }
 
     /**

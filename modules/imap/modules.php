@@ -1803,7 +1803,6 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
         $res = '';
         $folder_data = $this->get('imap_expanded_folder_data', array());
         if (!empty($folder_data)) {
-            ksort($folder_data);
             $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this);
             $this->out('imap_expanded_folder_formatted', $res);
         }
