@@ -2525,10 +2525,10 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     }*/
     $res .= '</td><td>'.$output_mod->html_safe($size);
     if (!$simple_view) {
-        $res .= '</td><td>'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-            '</td><td>'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
+        $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
+            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
     }
-    $res .= '</td><td>'.$output_mod->html_safe($desc).'</td>';
+    $res .= '</td><td>'.$output_mod->html_safe(decode_fld($desc)).'</td>';
     $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
     return $res;
 }
