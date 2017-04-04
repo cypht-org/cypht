@@ -25,8 +25,8 @@
 .expand_link { display: block; width: 16px; height: 16px; float: left; margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
 .header_subject th { font-size: 1.3em; padding-top: 10px; }
 .header_subject th div img { margin-right: 10px; margin-left: 11px; }
-.msg_parts { border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
-.msg_parts td { padding: 3px; padding-right: 10px; white-space: nowrap; }
+.msg_parts { table-layout: fixed; border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
+.msg_parts td { padding: 3px; padding-right: 10px; white-space: nowrap; overflow: hidden;  text-overflow: ellipsis; }
 .download_link { width: 100px; }
 .row_indent_0 { display: inline; padding: 0px; }
 .row_indent_1 { display: inline; padding-left: 20px; }

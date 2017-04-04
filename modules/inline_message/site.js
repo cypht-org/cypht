@@ -63,6 +63,8 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     $('.message_table').css('width', '50%');
     $(path).addClass('hl');
     imap_setup_message_view_page(uid, details, list_path, inline_msg_loaded_callback);
+    $('.part_encoding').hide();
+    $('.part_charset').hide();
     $('div', $(path)).removeClass('unseen');
     $(path).removeClass('unseen');
 };
