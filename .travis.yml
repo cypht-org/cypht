@@ -38,9 +38,9 @@ before_install:
 
     # setup Cypht 
     - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.4" ]]; then mv .travis/creds.py-ff creds.py; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.5" ]]; then mv .travis/creds.py-chrome creds.py; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.5" ]]; then mv .travis/creds.py-ff creds.py; fi
     - if [[ ${TRAVIS_PHP_VERSION:0:3} == "5.6" ]]; then mv .travis/creds.py-ff creds.py; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then mv .travis/creds.py-chrome creds.py; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then mv .travis/creds.py-ff creds.py; fi
     - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then mv .travis/creds.py-ff creds.py; fi
     - mv .travis/hm3.ini .
     - mv creds.py tests/selenium/
