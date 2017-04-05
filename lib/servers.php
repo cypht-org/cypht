@@ -171,13 +171,14 @@ trait Hm_Server_List {
      * @return array, false on failure
      */
     public static function fetch($username, $servername) {
-        foreach (self::$server_list as $server) {
+        foreach (self::$server_list as $id => $server) {
             if (array_key_exists('user', $server) && array_key_exists('server', $server)) {
                 if ($username == $server['user'] && $servername == $server['server']) {
                     if (array_key_exists('pass', $server)) {
                         unset($server['pass']);
-                        return $server;
                     }
+                    $server['id'] = $id;
+                    return $server;
                 }
             }
         }
