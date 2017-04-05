@@ -54,6 +54,9 @@ class Hm_Profiles {
                 $profile = $hmod->user_config->get('profile_imap_'.$server['server'].'_'.$server['user'], array(
                     'profile_default' => false, 'profile_name' => '', 'profile_address' => '',
                     'profile_replyto' => '', 'profile_smtp' => '', 'profile_sig' => ''));
+                if (!$profiles['name']) {
+                    continue;
+                }
                 $profiles[] = array(
                     'default' => $profile['profile_default'],
                     'name' => $profile['profile_name'],
@@ -62,24 +65,6 @@ class Hm_Profiles {
                     'smtp_id' => $profile['profile_smtp'],
                     'sig' => $profile['profile_sig'],
                     'type' => 'imap',
-                    'user' => $server['user'],
-                    'server' => $server['server'],
-                );
-            }
-        }
-        if ($hmod->module_is_supported('pop3')) {
-            foreach (Hm_POP3_List::dump() as $id => $server) {
-                $profile = $hmod->user_config->get('profile_pop3_'.$server['server'].'_'.$server['user'], array(
-                    'profile_default' => false, 'profile_name' => '', 'profile_address' => '',
-                    'profile_replyto' => '', 'profile_smtp' => '', 'profile_sig' => ''));
-                $profiles[] = array(
-                    'default' => $profile['profile_default'],
-                    'name' => $profile['profile_name'],
-                    'address' => $profile['profile_address'],
-                    'replyto' => $profile['profile_replyto'],
-                    'smtp_id' => $profile['profile_smtp'],
-                    'sig' => $profile['profile_sig'],
-                    'type' => 'pop3',
                     'user' => $server['user'],
                     'server' => $server['server'],
                 );

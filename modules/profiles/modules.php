@@ -136,38 +136,54 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
                 }
                 $profile['replyto'] = $profile['user'];
             }
-            $res .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />';
-            $res .= $this->html_safe($profile['name']).'</div>';
-            $res .= '<div class="edit_profile"><form method="post" action="?page=profiles">';
-            $res .= '<input type="hidden" name="profile_id" value="'.$this->html_safe($id).'" />';
-            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<table><tr><th>'.$this->trans('Display Name').'</th><td><input type="text" name="profile_name" value="'.$this->html_safe($profile['name']).'" /></td></tr>';
-            $res .= '<tr><th>'.$this->trans('E-mail Address').'</th><td><input type="email" name="profile_address" value="'.$this->html_safe($profile['address']).'" /></td></tr>';
-            $res .= '<tr><th>'.$this->trans('Reply-to').'</th><td><input type="email" name="profile_replyto" value="'.$this->html_safe($profile['replyto']).'" /></td></tr>';
-            $res .= '<tr><th>'.$this->trans('SMTP Server').'</th><td><select name="smtp_id">';
-            foreach ($smtp_servers as $id => $server) {
-                $res .= '<option ';
-                if ($id == $profile['smtp_id']) {
-                    $res .= 'selected="selected"';
-                }
-                $res .= 'value="'.$this->html_safe($id).'">'.$this->html_safe($server['name']).'</option>';
-            }
-            $res .= '</select></td></tr>';
-            $res .= '<tr><th>'.$this->trans('Signature').'</th><td><textarea cols="80" rows="4" name="profile_sig">';
-            $res .= $this->html_safe($profile['sig']).'</textarea></td></tr>';
-            $res .= '<tr><th>'.$this->trans('Set as default').'</th><td><input type="checkbox" ';
-            if ($profile['default']) {
-                $res .= 'checked="checked"';
-            }
-            $res .= 'name="profile_default" /></td></tr>';
-            $res .= '<tr><td></td><td><input type="submit" value="'.$this->trans('Update').'" /></td></tr></table>';
-            $res .= '</form></div>';
+            $res .= profile_form($profile, $id, $smtp_servers, array(), $this);
         }
         else {
             $res .= '</div>';
         }
         return $res;
     }
+}
+
+/**
+ * @subpackage profile/functions
+ */
+function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
+    if ($form_vals['name']) {
+        $res .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />';
+        $res .= $out_mod->html_safe($form_vals['name']).'</div>';
+    }
+    $res .= '<div class="edit_profile"><form method="post" action="?page=profiles">';
+    $res .= '<input type="hidden" name="profile_id" value="'.$out_mod->html_safe($id).'" />';
+    $res .= '<input type="hidden" name="hm_page_key" value="'.$out_mod->html_safe(Hm_Request_Key::generate()).'" />';
+    $res .= '<table><tr><th>'.$out_mod->trans('Display Name').'</th><td><input type="text" required name="profile_name" value="'.$out_mod->html_safe($form_vals['name']).'" /></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('E-mail Address').'</th><td><input type="email" required name="profile_address" value="'.$out_mod->html_safe($form_vals['address']).'" /></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('Reply-to').'</th><td><input type="email" required name="profile_replyto" value="'.$out_mod->html_safe($form_vals['replyto']).'" /></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('IMAP Server').'</th><td><select required name="profile_imap">';
+    foreach ($imap_servers as $id => $server) {
+        $res .= '<option ';
+        $res .= 'value="'.$out_mod->html_safe($id).'">'.$out_mod->html_safe($server['name']).'</option>';
+    }
+    $res .= '</select></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('SMTP Server').'</th><td><select required name="profile_smtp">';
+    foreach ($smtp_servers as $id => $server) {
+        $res .= '<option ';
+        if ($id == $form_vals['smtp_id']) {
+            $res .= 'selected="selected"';
+        }
+        $res .= 'value="'.$out_mod->html_safe($id).'">'.$out_mod->html_safe($server['name']).'</option>';
+    }
+    $res .= '</select></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('Signature').'</th><td><textarea cols="80" rows="4" name="profile_sig">';
+    $res .= $out_mod->html_safe($form_vals['sig']).'</textarea></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('Set as default').'</th><td><input type="checkbox" ';
+    if ($form_vals['default']) {
+        $res .= 'checked="checked"';
+    }
+    $res .= 'name="profile_default" /></td></tr>';
+    $res .= '<tr><td></td><td><input type="submit" value="'.$out_mod->trans(($form_vals['name'] ? 'Update' : 'Create')).'" /></td></tr></table>';
+    $res .= '</form></div>';
+    return $res;
 }
 
 /**
@@ -223,7 +239,6 @@ class Hm_Output_profile_content extends Hm_Output_Module {
         if (count($profiles) > 0) {
             $smtp_servers = $this->get('smtp_servers', array());
             $res .= '<table class="profile_details"><tr>'.
-                '<th>'.$this->trans('Name').'</th>'.
                 '<th class="profile_fld">'.$this->trans('Server').'</th>'.
                 '<th class="profile_fld">'.$this->trans('Username').'</th>'.
                 '<th>'.$this->trans('Display Name').'</th>'.
@@ -240,7 +255,6 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                         $smtp = $smtp_servers[$profile['smtp_id']]['name'];
                     }
                 $res .= '<tr>'.
-                    '<td>'.$this->html_safe($profile['name']).'</td>'.
                     '<td class="profile_fld">'.$this->html_safe($profile['server']).'</td>'.
                     '<td class="profile_fld">'.$this->html_safe($profile['user']).'</td>'.
                     '<td>'.$this->html_safe($profile['name']).'</td>'.
