@@ -34,6 +34,19 @@ class Hm_Profiles {
         $this->data[] = $data;
     }
 
+    public function set_default($id) {
+        if (!array_key_exists($id, $this->data)) {
+            return false;
+        }
+        foreach ($this->data as $id => $vals) {
+            if ($vals['default']) {
+                $this->data[$id]['default'] = false;
+            }
+        }
+        $this->data[$id]['default'] = true;
+        return true;
+    }
+
     public function load_legacy($hmod) {
         $profiles = array();
         if ($hmod->module_is_supported('imap')) {

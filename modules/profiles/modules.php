@@ -20,7 +20,7 @@ class Hm_Handler_profile_edit_data extends Hm_Handler_Module {
             $id = $this->request->get['profile_id'];
         }
         if ($id !== false) {
-            $accounts = $this->get('account_profiles');
+            $accounts = $this->get('profiles');
             if (count($accounts) > $id) {
                 $this->out('edit_profile', $accounts[$id]);
                 $this->out('default_email_domain', $this->config->get('default_email_domain'));
@@ -79,35 +79,32 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             if (array_key_exists('profile_default', $this->request->post)) {
                 $default = true;
             }
-            $data = $this->get('account_profiles');
+            $data = $this->get('profiles');
+
             if (count($data) > $form['profile_id']) {
                 $current = $data[$form['profile_id']];
-                if ($smtp === '' && array_key_exists('profile_details', $current) && array_key_exists('profile_smtp', $current['profile_details'])) {
-                    $smtp = $current['profile_details']['profile_smtp'];
-                }
                 $profile = array(
-                    'profile_name' => $name,
-                    'profile_sig' => $sig,
-                    'profile_smtp' => $smtp,
-                    'profile_replyto' => $replyto,
-                    'profile_default' => $default,
-                    'profile_address' => $address
+                    'name' => $name,
+                    'sig' => $sig,
+                    'smtp_id' => $smtp,
+                    'replyto' => $replyto,
+                    'default' => $default,
+                    'address' => $address,
+                    'server' => $current['server'],
+                    'user' => $current['user'],
+                    'type' => $current['type']
                 );
-                $this->user_config->set('profile_'.$current['type'].'_'.$current['server'].'_'.$current['user'], $profile);
-                $this->session->record_unsaved('Profile updated');
-                if ($default) {
-                    foreach ($data as $index => $other_profile) {
-                        if ($index == $form['profile_id']) {
-                            continue;
-                        }
-                        $details = $other_profile['profile_details'];
-                        $details['profile_default'] = false;
-                        $this->user_config->set('profile_'.$other_profile['type'].'_'.$other_profile['server'].'_'.$other_profile['user'], $details);
+                $profiles = new Hm_Profiles($this);
+                if ($profiles->edit($form['profile_id'], $profile)) {
+                    $this->session->record_unsaved('Profile updated');
+                    if ($default) {
+                        $profiles->set_default($form['profile_id']);
                     }
+                    $profiles->save($this->user_config);
+                    $user_data = $this->user_config->dump();
+                    $this->session->set('user_data', $user_data);
+                    Hm_Msgs::add('Profile Updated');
                 }
-                $user_data = $this->user_config->dump();
-                $this->session->set('user_data', $user_data);
-                Hm_Msgs::add('Profile Updated');
             }
         }
     }
@@ -119,33 +116,8 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 class Hm_Handler_profile_data extends Hm_Handler_Module {
     public function process() {
         $accounts = array();
-        if ($this->module_is_supported('imap')) {
-            foreach (Hm_IMAP_List::dump() as $server) {
-                $server['profile_details'] = $this->user_config->get('profile_imap_'.$server['server'].'_'.$server['user'], array(
-                    'profile_default' => false, 'profile_name' => '', 'profile_address' => '', 'profile_replyto' => '', 'profile_smtp' => '', 'profile_sig' => ''));
-                $server['type'] = 'imap';
-                $accounts[] = $server;
-            }
-        }
-        if ($this->module_is_supported('pop3')) {
-            foreach (Hm_POP3_List::dump() as $server) {
-                $server['profile_details'] = $this->user_config->get('profile_pop3_'.$server['server'].'_'.$server['user'], array(
-                    'profile_default' => false, 'profile_name' => '', 'profile_address' => '', 'profile_replyto' => '', 'profile_smtp' => '', 'profile_sig' => ''));
-                $server['type'] = 'pop3';
-                $accounts[] = $server;
-            }
-        }
-        $used_smtp_servers = array();
-        foreach ($accounts as $index => $account) {
-            if ($account['profile_details']['profile_smtp'] != '') {
-                if (!array_key_exists('profile_address', $account['profile_details'])) {
-                    $accounts[$index]['profile_details']['profile_address'] = '';
-                }
-                $used_smtp_servers[] = $account['profile_details']['profile_smtp'];
-            }
-        }
-        $this->out('account_profiles', $accounts);
-        $this->out('used_smtp_servers', $used_smtp_servers);
+        $profiles = new Hm_Profiles($this);
+        $this->out('profiles', $profiles->list_all());
     }
 }
 
@@ -157,41 +129,36 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
         $res = '<div class="profile_content"><div class="content_title">'.$this->trans('Profiles');
         $smtp_servers = $this->get('smtp_servers', array());
         if ($this->get('edit_profile')) {
-            $used = $this->get('used_smtp_servers', array());
             $domain = $this->get('default_email_domain');
-            $data = $this->get('edit_profile');
+            $profile = $this->get('edit_profile');
             $id = $this->get('edit_profile_id');
-            $profile = $data['profile_details'];
-            if (!$profile['profile_replyto']) {
-                if ($domain && !is_email($data['user'])) {
-                    $data['user'] = $data['user'].'@'.$domain;
+            if (!$profile['replyto']) {
+                if ($domain && !is_email($profile['user'])) {
+                    $profile['user'] = $profile['user'].'@'.$domain;
                 }
-                $profile['profile_replyto'] = $data['user'];
+                $profile['replyto'] = $profile['user'];
             }
             $res .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />';
-            $res .= $this->html_safe($data['name']).'</div>';
+            $res .= $this->html_safe($profile['name']).'</div>';
             $res .= '<div class="edit_profile"><form method="post" action="?page=profiles">';
             $res .= '<input type="hidden" name="profile_id" value="'.$this->html_safe($id).'" />';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<table><tr><th>'.$this->trans('Display Name').'</th><td><input type="text" name="profile_name" value="'.$this->html_safe($profile['profile_name']).'" /></td></tr>';
-            $res .= '<tr><th>'.$this->trans('E-mail Address').'</th><td><input type="email" name="profile_address" value="'.$this->html_safe($profile['profile_address']).'" /></td></tr>';
-            $res .= '<tr><th>'.$this->trans('Reply-to').'</th><td><input type="email" name="profile_replyto" value="'.$this->html_safe($profile['profile_replyto']).'" /></td></tr>';
-            $res .= '<tr><th>'.$this->trans('SMTP Server').'</th><td><select name="profile_smtp">';
+            $res .= '<table><tr><th>'.$this->trans('Display Name').'</th><td><input type="text" name="profile_name" value="'.$this->html_safe($profile['name']).'" /></td></tr>';
+            $res .= '<tr><th>'.$this->trans('E-mail Address').'</th><td><input type="email" name="profile_address" value="'.$this->html_safe($profile['address']).'" /></td></tr>';
+            $res .= '<tr><th>'.$this->trans('Reply-to').'</th><td><input type="email" name="profile_replyto" value="'.$this->html_safe($profile['replyto']).'" /></td></tr>';
+            $res .= '<tr><th>'.$this->trans('SMTP Server').'</th><td><select name="smtp_id">';
             foreach ($smtp_servers as $id => $server) {
                 $res .= '<option ';
-                if (in_array($id, $used, true)) {
-                    $res .= 'disabled="disabled" ';
-                }
-                if ($id == $profile['profile_smtp']) {
+                if ($id == $profile['smtp_id']) {
                     $res .= 'selected="selected"';
                 }
                 $res .= 'value="'.$this->html_safe($id).'">'.$this->html_safe($server['name']).'</option>';
             }
             $res .= '</select></td></tr>';
             $res .= '<tr><th>'.$this->trans('Signature').'</th><td><textarea cols="80" rows="4" name="profile_sig">';
-            $res .= $this->html_safe($profile['profile_sig']).'</textarea></td></tr>';
+            $res .= $this->html_safe($profile['sig']).'</textarea></td></tr>';
             $res .= '<tr><th>'.$this->trans('Set as default').'</th><td><input type="checkbox" ';
-            if ($profile['profile_default']) {
+            if ($profile['default']) {
                 $res .= 'checked="checked"';
             }
             $res .= 'name="profile_default" /></td></tr>';
@@ -253,7 +220,7 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
  */
 class Hm_Output_profile_content extends Hm_Output_Module {
     protected function output() {
-        $profiles = $this->get('account_profiles');
+        $profiles = $this->get('profiles');
         $res = '';
         if (count($profiles) > 0) {
             $smtp_servers = $this->get('smtp_servers', array());
@@ -268,23 +235,22 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                 '<th class="profile_fld">'.$this->trans('Signature').'</th>'.
                 '<th class="profile_fld">'.$this->trans('Default').'</th>'.
                 '<th></th></tr>';
+
             foreach ($profiles as $id => $profile) {
                 $smtp = '';
-                if (array_key_exists('profile_smtp', $profile['profile_details'])) {
-                    if ($profile['profile_details']['profile_smtp'] !== false && array_key_exists($profile['profile_details']['profile_smtp'], $smtp_servers)) {
-                        $smtp = $smtp_servers[$profile['profile_details']['profile_smtp']]['name'];
+                    if ($profile['smtp_id'] !== false && array_key_exists($profile['smtp_id'], $smtp_servers)) {
+                        $smtp = $smtp_servers[$profile['smtp_id']]['name'];
                     }
-                }
                 $res .= '<tr>'.
                     '<td>'.$this->html_safe($profile['name']).'</td>'.
                     '<td class="profile_fld">'.$this->html_safe($profile['server']).'</td>'.
                     '<td class="profile_fld">'.$this->html_safe($profile['user']).'</td>'.
-                    '<td>'.(array_key_exists('profile_name', $profile['profile_details']) ? $this->html_safe($profile['profile_details']['profile_name']) : '').'</td>'.
-                    '<td class="profile_fld">'.(array_key_exists('profile_address', $profile['profile_details']) ? $this->html_safe($profile['profile_details']['profile_address']) : '').'</td>'.
-                    '<td class="profile_fld">'.(array_key_exists('profile_replyto', $profile['profile_details']) ? $this->html_safe($profile['profile_details']['profile_replyto']) : '').'</td>'.
+                    '<td>'.$this->html_safe($profile['name']).'</td>'.
+                    '<td class="profile_fld">'.$this->html_safe($profile['address']).'</td>'.
+                    '<td class="profile_fld">'.$this->html_safe($profile['replyto']).'</td>'.
                     '<td class="profile_fld">'.$this->html_safe($smtp).'</td>'.
-                    '<td class="profile_fld">'.(array_key_exists('profile_sig', $profile['profile_details']) && strlen($profile['profile_details']['profile_sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td class="profile_fld">'.(array_key_exists('profile_default', $profile['profile_details']) && $profile['profile_details']['profile_default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="profile_fld">'.(strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="profile_fld">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
                     '<img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a></td>'.
                     '</tr>';
