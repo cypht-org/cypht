@@ -54,7 +54,7 @@ class Hm_Profiles {
                 $profile = $hmod->user_config->get('profile_imap_'.$server['server'].'_'.$server['user'], array(
                     'profile_default' => false, 'profile_name' => '', 'profile_address' => '',
                     'profile_replyto' => '', 'profile_smtp' => '', 'profile_sig' => ''));
-                if (!$profiles['name']) {
+                if (!$profile['profile_name']) {
                     continue;
                 }
                 $profiles[] = array(
