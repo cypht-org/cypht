@@ -34,3 +34,9 @@ var insert_sig = function(textarea, sig) {
         textarea.value += textarea;
     }
 };
+
+$(function() {
+    if (hm_page_name() === 'profiles') {
+        $('.add_profile').click(function() { $('.edit_profile').show(); });
+    }
+});
