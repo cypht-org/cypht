@@ -35,16 +35,14 @@ class Hm_Handler_profile_edit_data extends Hm_Handler_Module {
  */
 class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
     public function process() {
-        $profiles = array();
-        foreach ($this->user_config->dump() as $name => $vals) {
-            if (preg_match("/^profile_/", $name) && is_array($vals)) {
-                if (array_key_exists('profile_smtp', $vals) && ($vals['profile_smtp'] === 0 || $vals['profile_smtp'])) {
-                    $vals['name'] = explode('_', $name);
-                    $profiles[$vals['profile_smtp']] = $vals;
-                }
+        $profiles = new Hm_Profiles($this);
+        $compose_profiles = array();
+        foreach ($profiles->list_all() as $id => $vals) {
+            if ($vals['smtp_id'] !== false && $vals['smtp_id'] !== '') {
+                $compose_profiles[$vals['smtp_id']] = $vals;
             }
         }
-        $this->out('compose_profiles', $profiles);
+        $this->out('compose_profiles', $compose_profiles);
     }
 }
 
@@ -206,8 +204,8 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
         $res = '<script type="text/javascript">var profile_signatures = {';
         $sigs = array();
         foreach ($this->get('compose_profiles', array()) as $smtp_id => $vals) {
-            if (strlen(trim($vals['profile_sig']))) {
-                $sigs[] = sprintf("%s: \"\\n%s\\n\"", $smtp_id, $this->html_safe(str_replace("\r\n", "\\n", $vals['profile_sig'])));
+            if (strlen(trim($vals['sig']))) {
+                $sigs[] = sprintf("%s: \"\\n%s\\n\"", $smtp_id, $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
             }
         }
         $res .= implode(', ', $sigs).'}</script>';

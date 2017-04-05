@@ -449,7 +449,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* profile details */
         $profiles = $this->get('compose_profiles', array());
-        list($imap_server, $from_name, $reply_to, $from) = get_outbound_msg_profile_detail($form, $profiles, $smtp_details);
+        list($imap_server, $from_name, $reply_to, $from) = get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $this);
 
         /* xoauth2 check */
         smtp_refresh_oauth2_token_on_send($smtp_details, $this, $form);
@@ -879,7 +879,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             elseif ($recip && trim($recip) == trim($vals['user'])) {
                 $selected = $id;
             }
-            elseif (array_key_exists($id, $profiles) && $profiles[$id]['profile_default']) {
+            elseif (array_key_exists($id, $profiles) && $profiles[$id]['default']) {
                 $default = $id;
             }
         }
@@ -893,7 +893,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             }
             $res .= 'value="'.$output_mod->html_safe($id).'">';
             if (array_key_exists($id, $profiles)) {
-                $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profiles[$id]['profile_name'], $vals['user'], $vals['name']));
+                $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profiles[$id]['name'], $vals['user'], $vals['name']));
             }
             else {
                 $res .= $output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name']));
@@ -1124,21 +1124,23 @@ function get_outbound_msg_detail($post, $draft) {
 /**
  * @subpackage smtp/functions
  */
-function get_outbound_msg_profile_detail($form, $profiles, $smtp_details) {
+function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod) {
     $imap_server = false;
     $from_name = '';
     $reply_to = '';
     $from = $smtp_details['user'];
-    if (array_key_exists($form['smtp_server_id'], $profiles)) {
-        if ($profiles[$form['smtp_server_id']]['name'][1] == 'imap') {
-            $imap_server = $profiles[$form['smtp_server_id']]['name'];
+    $id = $form['smtp_server_id'];
+    if (array_key_exists($id, $profiles)) {
+        $profile = $profiles[$id];
+        if ($profile['type'] == 'imap' && $hmod->module_is_supported('imap')) {
+            $imap = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
+            if ($imap) {
+                $imap_server = $imap['id'];
+            }
         }
-        $from_name = $profiles[$form['smtp_server_id']]['profile_name'];
-        $reply_to = $profiles[$form['smtp_server_id']]['profile_replyto'];
-        if (array_key_exists('profile_address', $profiles[$form['smtp_server_id']]) &&
-            trim($profiles[$form['smtp_server_id']]['profile_address'])) {
-            $from = $profiles[$form['smtp_server_id']]['profile_address'];
-        }
+        $from_name = $profile['name'];
+        $reply_to = $profile['replyto'];
+        $from = $profile['address'];
     }
     return array($imap_server, $from_name, $reply_to, $from);
 }

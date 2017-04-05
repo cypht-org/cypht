@@ -209,16 +209,10 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         if (!$this->get('save_sent_msg')) {
             return;
         }
-        $server = $this->get('save_sent_server');
+        $imap_id = $this->get('save_sent_server');
         $mime = $this->get('save_sent_msg');
-        $imap_id = false;
-        foreach (Hm_IMAP_List::dump() as $id => $imap_server) {
-            if ($server[3] == $imap_server['user'] && $server[2] == $imap_server['server']) {
-                $imap_id = $id;
-                break;
-            }
-        }
-        if (!$imap_id) {
+
+        if ($imap_id === false) {
             return;
         }
         $msg = $mime->get_mime_msg();
