@@ -102,20 +102,10 @@ function reply_to_address($headers, $type, $excluded) {
     if ($type == 'forward') {
         return $msg_to;
     }
-    if (array_key_exists('reply-to', $headers)) {
-        $msg_to = $headers['reply-to'];
-    }
-    elseif (array_key_exists('from', $headers)) {
-        $msg_to = $headers['from'];
-    }
-    elseif (array_key_exists('sender', $headers)) {
-        $msg_to = $headers['sender'];
-    }
-    elseif (array_key_exists('return-path', $headers)) {
-        $msg_to = $headers['return-path'];
-    }
-    if ($msg_to) {
-        $msg_to = format_reply_address($msg_to, array());
+    foreach (array('reply-to', 'from', 'sender', 'return-path') as $fld) {
+        if (array_key_exists($fld, $headers) && $msg_to = format_reply_address($headers[$fld])) {
+            break;
+        }
     }
     if ($type == 'reply_all') {
         if (array_key_exists('cc', $headers)) {
