@@ -2277,15 +2277,17 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $subject = $msg['subject'];
         if ($parent_list == 'sent') {
             $icon = 'sent';
-            $from = preg_replace("/(\<.+\>)/U", '', $msg['to']);
+            $from = $msg['to'];
         }
         else {
-            $from = preg_replace("/(\<.+\>)/U", '', $msg['from']);
-        }
-        $from = str_replace('"', '', $from);
-        $nofrom = '';
-        if (!trim($from) && trim($msg['from'])) {
             $from = $msg['from'];
+        }
+        $tmp_from = str_replace('"', '', $from);
+        $tmp_from = preg_replace("/(\<.+\>)/U", '', $tmp_from);
+        $nofrom = '';
+
+        if (trim($tmp_from)) {
+            $from = $tmp_from;
         }
         elseif (!trim($from) && $style == 'email') {
             $from = '[No From]';
@@ -2302,19 +2304,13 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             }
         }
         if (trim($msg['x_auto_bcc']) === 'cypht') {
+            $from = preg_replace("/(\<.+\>)/U", '', $msg['to']);
             $icon = 'sent';
         }
-        if (stristr($msg['flags'], 'attachment')) {
-            $flags[] = 'attachment';
-        }
-        if (stristr($msg['flags'], 'deleted')) {
-            $flags[] = 'deleted';
-        }
-        if (stristr($msg['flags'], 'flagged')) {
-            $flags[] = 'flagged';
-        }
-        if (stristr($msg['flags'], 'answered')) {
-            $flags[] = 'answered';
+        foreach (array('attachment', 'deleted', 'flagged', 'answered') as $flag) {
+            if (stristr($msg['flags'], $flag)) {
+                $flags[] = $flag;
+            }
         }
         $source = $msg['server_name'];
         $row_class .= ' '.str_replace(' ', '_', $source);
