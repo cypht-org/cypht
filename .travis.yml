@@ -20,6 +20,7 @@ env:
 before_install:
 
     # PHP7+ needs ldap configured
+    - echo ${TRAVIS_PHP_VERSION}
     - sh .travis/setup.sh
       #- if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi
       #- if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi
