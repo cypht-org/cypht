@@ -1,0 +1,36 @@
+#!/usr/bin/python
+
+import os, sys, httplib, base64, json
+from selenium import webdriver
+
+DESIRED_CAP = None
+SITE_URL = 'http://localhost/'
+USER = 'testuser'
+PASS = 'testuser'
+SLEEP_INT = 6
+
+config = {
+    'user': os.environ['SAUCE_USERNAME'],
+    'key': os.environ['SAUCE_ACCESS_KEY'],
+    'job': os.environ['TRAVIS_JOB_NUMBER']
+}
+
+def get_driver(cap):
+    capabilities = {
+        "screenResolution": "1600x1200",
+        "browserName": "safari",
+        "version": "10.0",
+        "platform": "macOS 10.12",
+        "tunnel-identifier": config['job']
+    }
+    hub_url = "%s:%s@localhost:4445" % (config['user'], config['key'])
+    return webdriver.Remote(desired_capabilities=capabilities, command_executor="http://%s/wd/hub" % hub_url)
+
+def success(driver):
+    base64string = base64.encodestring('%s:%s' % (config['user'], config['key']))[:-1]
+    body_content = json.dumps({"passed": True})
+    connection = httplib.HTTPConnection("saucelabs.com")
+    connection.request('PUT', '/rest/v1/%s/jobs/%s' % (config['user'], driver.session_id),
+       body_content, headers={"Authorization": "Basic %s" % base64string})
+    result = connection.getresponse()
+    return result.status == 200
