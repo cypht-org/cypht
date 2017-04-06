@@ -20,8 +20,9 @@ env:
 before_install:
 
     # PHP7+ needs ldap configured
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi
-    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi
+    - sh .travis/setup.sh
+      #- if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi
+      #- if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi
 
     # add a system user we will log into Cypht with
     - sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
