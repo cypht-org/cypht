@@ -64,3 +64,10 @@
 .imap_filter { font-size: 75%; float: left; margin-right: 10px; margin-top: 8px; }
 .msg_part_icon { opacity: .4; padding-right: 5px; }
 .msg_part_placeholder { visibility: hidden; }
+
+.msg_part_desc { width: 40%; }
+.msg_part_mime { width: 25%; }
+.msg_part_size { width: 10%; }
+.msg_part_encoding { width: 7%; }
+.msg_part_charset { width: 8%; }
+.msg_part_download { width: 10%; }

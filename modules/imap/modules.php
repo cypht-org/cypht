@@ -1543,7 +1543,9 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
      */
     protected function output() {
         if ($this->get('msg_struct')) {
-            $res = '<table class="msg_parts">';
+            $res = '<table class="msg_parts"><colgroup><col class="msg_part_mime"><col class="msg_part_size">';
+            $res .= '<col class="msg_part_encoding"><col class="msg_part_charset"><col class="msg_part_desc">';
+            $res .= '<col class="msg_part_download"></colgroup>';
             $part = $this->get('imap_msg_part', '1');
             $args = $this->get('msg_download_args', '');
             $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part, $args);
@@ -1572,7 +1574,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             );
             $msg_part = $this->get('imap_msg_part');
             $headers = $this->get('msg_headers', array());
-            $txt .= '<table class="msg_headers"><col class="header_name_col"><col class="header_val_col"></colgroup>';
+            $txt .= '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
                     if ($fld == strtolower($name)) {
