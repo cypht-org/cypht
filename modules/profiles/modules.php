@@ -42,7 +42,7 @@ class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
         $compose_profiles = array();
         foreach ($profiles->list_all() as $id => $vals) {
             if ($vals['smtp_id'] !== false && $vals['smtp_id'] !== '') {
-                $compose_profiles[$vals['smtp_id']] = $vals;
+                $compose_profiles[] = $vals;
             }
         }
         $this->out('compose_profiles', $compose_profiles);

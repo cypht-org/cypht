@@ -873,13 +873,14 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
         $selected = false;
         $default = false;
         foreach ($data['smtp_servers'] as $id => $vals) {
+            $profile = profile_by_smtp_id($profiles, $id);
             if ($selected_id !== false && $id == $selected_id) {
                 $selected = $id;
             }
             elseif ($recip && trim($recip) == trim($vals['user'])) {
                 $selected = $id;
             }
-            elseif (array_key_exists($id, $profiles) && $profiles[$id]['default']) {
+            elseif ($profile  && $profile['default']) {
                 $default = $id;
             }
         }
@@ -887,13 +888,14 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             $selected = $default;
         }
         foreach ($data['smtp_servers'] as $id => $vals) {
+            $profile = profile_by_smtp_id($profiles, $id);
             $res .= '<option ';
             if ($selected === $id) {
                 $res .= 'selected="selected" ';
             }
             $res .= 'value="'.$output_mod->html_safe($id).'">';
-            if (array_key_exists($id, $profiles)) {
-                $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profiles[$id]['name'], $vals['user'], $vals['name']));
+            if ($profile) {
+                $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], $vals['user'], $vals['name']));
             }
             else {
                 $res .= $output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name']));
@@ -1130,8 +1132,8 @@ function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod)
     $reply_to = '';
     $from = $smtp_details['user'];
     $id = $form['smtp_server_id'];
-    if (array_key_exists($id, $profiles)) {
-        $profile = $profiles[$id];
+    $profile = profile_by_smtp_id($profiles, $id);
+    if ($profile) {
         if ($profile['type'] == 'imap' && $hmod->module_is_supported('imap')) {
             $imap = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
             if ($imap) {
@@ -1197,3 +1199,14 @@ function repopulate_compose_form($draft, $handler_mod) {
     }
 }
 
+/**
+ * @subpackage smtp/functions
+ */
+function profile_by_smtp_id($profiles, $id) {
+    foreach ($profiles as $vals) {
+        if ($vals['smtp_id'] == $id) {
+            return $vals;
+        }
+    }
+    return false;
+}
