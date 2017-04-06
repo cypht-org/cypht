@@ -258,7 +258,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
             $res .= '</table>';
         }
         else {
-            $res .= '<div class="profiles_empty">'.$this->trans('No IMAP or POP3 servers configured').'</div>';
+            $res .= '<div class="profiles_empty">'.$this->trans('No Profiles Fund').'</div>';
         }
         $res .= '</div>';
         return $res;
@@ -270,8 +270,8 @@ class Hm_Output_profile_content extends Hm_Output_Module {
  */
 function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res = '';
-    $res .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />';
     if ($form_vals['name']) {
+        $res .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />';
         $res .= $out_mod->html_safe($form_vals['name']);
     }
     else {
@@ -281,10 +281,10 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '</div><div class="edit_profile" '.($form_vals['name'] ? '' : 'style="display: none;"').'><form method="post" action="?page=profiles">';
     $res .= '<input type="hidden" name="profile_id" value="'.$out_mod->html_safe($id).'" />';
     $res .= '<input type="hidden" name="hm_page_key" value="'.$out_mod->html_safe(Hm_Request_Key::generate()).'" />';
-    $res .= '<table><tr><th>'.$out_mod->trans('Display Name').'</th><td><input type="text" required name="profile_name" value="'.$out_mod->html_safe($form_vals['name']).'" /></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('E-mail Address').'</th><td><input type="email" required name="profile_address" value="'.$out_mod->html_safe($form_vals['address']).'" /></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('Reply-to').'</th><td><input type="email" required name="profile_replyto" value="'.$out_mod->html_safe($form_vals['replyto']).'" /></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('IMAP Server').'</th><td><select required name="profile_imap">';
+    $res .= '<table><tr><th>'.$out_mod->trans('Display Name').' *</th><td><input type="text" required name="profile_name" value="'.$out_mod->html_safe($form_vals['name']).'" /></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('E-mail Address').' *</th><td><input type="email" required name="profile_address" value="'.$out_mod->html_safe($form_vals['address']).'" /></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('Reply-to').' *</th><td><input type="email" required name="profile_replyto" value="'.$out_mod->html_safe($form_vals['replyto']).'" /></td></tr>';
+    $res .= '<tr><th>'.$out_mod->trans('IMAP Server').' *</th><td><select required name="profile_imap">';
     foreach ($imap_servers as $id => $server) {
         $res .= '<option ';
         if ($server['user'] == $form_vals['user'] && $server['server'] == $form_vals['server']) {
@@ -293,7 +293,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
         $res .= 'value="'.$out_mod->html_safe($server['server'].'|'.$server['user']).'">'.$out_mod->html_safe($server['name']).'</option>';
     }
     $res .= '</select></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('SMTP Server').'</th><td><select required name="profile_smtp">';
+    $res .= '<tr><th>'.$out_mod->trans('SMTP Server').' *</th><td><select required name="profile_smtp">';
     foreach ($smtp_servers as $id => $server) {
         $res .= '<option ';
         if ($id == $form_vals['smtp_id']) {
