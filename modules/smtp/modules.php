@@ -800,7 +800,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('[saved]');
             }
-            elseif (array_key_exists('nopass', $vals)) {
+            elseif (array_key_exists('user', $vals) && array_key_exists('nopass', $vals)) {
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
