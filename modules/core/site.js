@@ -933,7 +933,9 @@ var Hm_Utils = {
     preserve_local_settings: function() {
         var i;
         var result = {};
+        var prefix = window.location.pathname.length;
         for (i in sessionStorage) {
+            i = i.substr(prefix);
             if (i.match(/\..+(_setting|_section)/)) {
                 result[i] = Hm_Utils.get_from_local_storage(i);
             }
