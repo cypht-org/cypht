@@ -64,8 +64,8 @@ var imap_forget_action = function(event) {
         function(res) {
             if (res.just_forgot_credentials) {
                 form.find('.credentials').prop('disabled', false);
-                form.find('.imap_password').val('');
-                form.find('.imap_password').prop('placeholder', 'Password');
+                form.find('.credentials').val('');
+                form.find('.credentials').attr('placeholder', '');
                 form.append('<input type="submit" value="Save" class="save_imap_connection" />');
                 $('.save_imap_connection').on('click', imap_save_action);
                 $('.forget_imap_connection', form).hide();
