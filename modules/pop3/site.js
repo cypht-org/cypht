@@ -1,5 +1,17 @@
 'use strict';
 
+
+var pop3_test_action = function(event) {
+    event.preventDefault();
+    Hm_Notices.hide(true);
+    var form = $(this).parent();
+    Hm_Ajax.request(
+        form.serializeArray(),
+        function() { },
+        {'pop3_connect': 1}
+    );
+};
+
 var pop3_save_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
@@ -291,6 +303,7 @@ var expand_pop3_settings = function() {
 };
 
 if (hm_page_name() == 'servers') {
+    $('.test_pop3_connect').on('click', pop3_test_action);
     $('.save_pop3_connection').on('click', pop3_save_action);
     $('.forget_pop3_connection').on('click', pop3_forget_action);
     $('.delete_pop3_connection').on('click', pop3_delete_action);
