@@ -172,7 +172,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
-            if ($pop3->state == 'authed') {
+            if ($pop3 && $pop3->state == 'authed') {
                 $this->out('pop3_mailbox_page_path', $path);
                 $list = array_reverse(array_unique(array_keys($pop3->mlist())));
                 $total = count($list);
@@ -375,17 +375,16 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('pop3_user', 'pop3_pass', 'pop3_server_id'));
             if (!$success) {
                 Hm_Msgs::add('ERRUsername and Password are required to save a connection');
+                return;
+            }
+            $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false, $form['pop3_user'], $form['pop3_pass'], true);
+            if ($pop3->state == 'authed') {
+                $just_saved_credentials = true;
+                Hm_Msgs::add("Server saved");
+                $this->session->record_unsaved('POP3 server saved');
             }
             else {
-                $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false, $form['pop3_user'], $form['pop3_pass'], true);
-                if ($pop3->state == 'authed') {
-                    $just_saved_credentials = true;
-                    Hm_Msgs::add("Server saved");
-                    $this->session->record_unsaved('POP3 server saved');
-                }
-                else {
-                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
-                }
+                Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
             }
         }
         $this->out('just_saved_credentials', $just_saved_credentials);
@@ -704,6 +703,11 @@ class Hm_Handler_save_pop3_servers extends Hm_Handler_Module {
      */
     public function process() {
         $servers = Hm_POP3_List::dump(false, true);
+        foreach ($servers as $index => $vals) {
+            if (array_key_exists('object', $vals) && $vals['object']) {
+                unset($servers[$index]['object']);
+            }
+        }
         $this->user_config->set('pop3_servers', $servers);
         $this->session->set('pop3_read_uids', Hm_POP3_Uid_Cache::dump());
         Hm_POP3_List::clean_up();
@@ -757,7 +761,7 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('[saved]');
             }
-            elseif (array_key_exists('nopass', $vals)) {
+            elseif (array_key_exists('user', $vals) && array_key_exists('nopass', $vals)) {
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('Password');
                 $disabled = '';

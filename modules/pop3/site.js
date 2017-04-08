@@ -1,16 +1,5 @@
 'use strict';
 
-var pop3_test_action = function(event) {
-    event.preventDefault();
-    Hm_Notices.hide(true);
-    var form = $(this).parent();
-    Hm_Ajax.request(
-        form.serializeArray(),
-        function() { },
-        {'pop3_connect': 1}
-    );
-};
-
 var pop3_save_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
@@ -41,9 +30,9 @@ var pop3_forget_action = function(event) {
         form.serializeArray(),
         function(res) {
             if (res.just_forgot_credentials) {
-                form.find('.credentials').attr('disabled', false);
-                form.find('.pop3_password').val('');
-                form.find('.pop3_password').attr('placeholder', 'Password');
+                form.find('.credentials').prop('disabled', false);
+                form.find('.credentials').val('');
+                form.find('.credentials').attr('placeholder', '');
                 form.append('<input type="submit" value="Save" class="save_pop3_connection" />');
                 $('.save_pop3_connection').on('click', pop3_save_action);
                 $('.forget_pop3_connection', form).remove();
@@ -69,6 +58,19 @@ var pop3_delete_action = function(event) {
                 form.parent().remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
+                var label = $('.server_count', $('.pop3_server_setup')).text();
+                if (label) {
+                    var parts = label.split(' ');
+                    var count = parts[0]*1;
+                    if (count > 0) {
+                        count--;
+                    }
+                    else {
+                        count = 0;
+                    }
+                    $('.server_count', $('.pop3_server_setup')).text(count+' '+parts[1]);
+
+                }
             }
         },
         {'pop3_delete': 1}
@@ -289,7 +291,6 @@ var expand_pop3_settings = function() {
 };
 
 if (hm_page_name() == 'servers') {
-    $('.test_pop3_connect').on('click', pop3_test_action);
     $('.save_pop3_connection').on('click', pop3_save_action);
     $('.forget_pop3_connection').on('click', pop3_forget_action);
     $('.delete_pop3_connection').on('click', pop3_delete_action);
