@@ -45,9 +45,8 @@ var smtp_forget_action = function(event) {
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
             if (res.just_forgot_credentials) {
-                form.find('.credentials').attr('disabled', false);
-                form.find('.smtp_password').val('');
-                form.find('.smtp_password').attr('placeholder', 'Password');
+                form.find('.credentials').prop('disabled', false);
+                form.find('.credentials').val('');
                 form.append('<input type="submit" value="Save" class="save_smtp_connection" />');
                 $('.save_smtp_connection').on('click', smtp_save_action);
                 $('.forget_smtp_connection', form).remove();
