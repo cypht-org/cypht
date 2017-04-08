@@ -1177,7 +1177,12 @@ class Hm_Handler_prefetch_imap_folders extends Hm_Handler_Module {
      */
     public function process() {
 
-        $servers = $this->get('imap_servers', array());
+        $servers = array();
+        foreach ($this->get('imap_servers', array()) as $index => $vals) {
+            if (array_key_exists('user', $vals)) {
+                $servers[$index] = $vals;
+            }
+        }
         if (count($servers) == 0) {
             return;
         }
@@ -2171,6 +2176,9 @@ function imap_data_sources($callback, $custom=array()) {
     $sources = array();
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
         if (array_key_exists('hide', $vals) && $vals['hide']) {
+            continue;
+        }
+        if (!array_key_exists('user', $vals)) {
             continue;
         }
         $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
