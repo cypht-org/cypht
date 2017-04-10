@@ -1305,6 +1305,10 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRUsername and Password are required to save a connection');
             }
             else {
+                if (in_server_list('Hm_IMAP_List', $form['imap_server_id'], $form['imap_user'])) {
+                    Hm_Msgs::add('ERRThis server and username are already configured');
+                    return;
+                }
                 $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
                 $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], true);
                 if ($imap->get_state() == 'authenticated') {
@@ -1314,6 +1318,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                 }
                 else {
                     Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
+                    Hm_IMAP_List::forget_credentials($form['imap_server_id']);
                 }
             }
         }

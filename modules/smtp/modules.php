@@ -313,6 +313,10 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRUsername and Password are required to save a connection');
             }
             else {
+                if (in_server_list('Hm_SMTP_List', $form['smtp_server_id'], $form['smtp_user'])) {
+                    Hm_Msgs::add('ERRThis server and username are already configured');
+                    return;
+                }
                 $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
                 if ($smtp->state == 'authed') {
                     $just_saved_credentials = true;
@@ -321,6 +325,7 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
                 }
                 else {
                     Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
+                    Hm_SMTP_List::forget_credentials($form['smtp_server_id']);
                 }
             }
         }

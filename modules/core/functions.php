@@ -556,3 +556,30 @@ function start_page_opts() {
     );
 }
 
+/**
+ * See if a host + username is already in a server list
+ * @param class $list class to check
+ * @param int $id server id to get hostname from
+ * @param string $user username to check for
+ * @return bool
+ */
+function in_server_list($list, $id, $user) {
+    $exists = false;
+    $server = $list::dump($id);
+    if (count($server) == 0) {
+        return false;
+    }
+    if (!array_key_exists('server', $server)) {
+        return false;
+    }
+    foreach ($list::dump() as $server_id => $vals) {
+        if ($id == $server_id) {
+            continue;
+        }
+        if (array_key_exists('user', $vals) && $vals['user'] == $user) {
+            $exists = true;
+            break;
+        }
+    }
+    return $exists;
+}
