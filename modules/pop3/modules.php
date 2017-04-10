@@ -377,6 +377,10 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRUsername and Password are required to save a connection');
                 return;
             }
+            if (in_server_list('Hm_POP3_List', $form['pop3_server_id'], $form['pop3_user'])) {
+                Hm_Msgs::add('ERRThis server and username are already configured');
+                return;
+            }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false, $form['pop3_user'], $form['pop3_pass'], true);
             if ($pop3->state == 'authed') {
                 $just_saved_credentials = true;
@@ -384,6 +388,7 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
                 $this->session->record_unsaved('POP3 server saved');
             }
             else {
+                Hm_POP3_List::forget_credentials($form['pop3_server_id']);
                 Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
             }
         }
