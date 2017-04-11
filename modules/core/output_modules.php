@@ -385,7 +385,10 @@ class Hm_Output_header_content extends Hm_Output_Module {
         }
         return '<title>'.$this->trans(trim($title)).'</title>'.
             '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">'.
-            '<link rel="icon" class="tab_icon" type="image/png" href="'.Hm_Image_Sources::$env_closed.'">'.
+            '<link rel="icon" class="tab_icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo'.
+            'AAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAFVJR'.
+            'EFUOI3NkkEKACEMA2d92fpzfVn3oHhYqAF7qIFeSpImUMjGA1jEoEQTFKAC/UDbp3bhBRqj0m7a5C78F56Rx5MEdUB'.
+            'HFMlkV09ogN3xB7kG+fgA0tc160Jy09wAAAAASUVORK5CYII=" >'.
             '<base href="'.$this->html_safe($this->get('router_url_path')).'" />';
     }
 }
