@@ -45,17 +45,28 @@ var Hm_Pgp = {
     },
 
     sign_text: function() {
+        var key_id = $('#pgp_sign').val();
+        var key = Hm_Pgp.private_key_by_index(key_id);
         var body = $('#compose_body').val();
         if (!body || !body.length) {
             return true;
         }
         var bodyarray = new TextEncoder('UTF-8').encode(body);
-        var privateKey = Hm_Pgp.private_keys();
-        var options = {data: body, privateKeys: privateKey.keys, armor: true};
+        var options = {data: body, privateKeys: [key], armor: true};
         return openpgp.sign(options).then(function(ciphertext) {
             $('#compose_body').val(ciphertext.data);
             return true;
         });
+    },
+
+    private_key_by_index(id) {
+        var keys = Hm_Pgp.private_keys();
+        for (var index in keys.keys) {
+            if (index == id) {
+                return key.keys[index]
+            }
+        }
+        return false;
     },
 
     encrypt_text: function(sign) {
@@ -80,22 +91,41 @@ var Hm_Pgp = {
     verify_signature: function() {
     },
 
+    load_private_keys: function() {
+        var ids;
+        var key;
+        var options = [];
+        var keys = Hm_Pgp.private_keys();
+        for (var index in keys.keys) {
+            key = keys.keys[index];
+            ids = key.getUserIds();
+            options.push('<option value="'+index+'">'+ids[0]+'</option>');
+        }
+        if (options.length) {
+            $('.pgp_sign').show();
+            $('#pgp_sign').html(options);
+        }
+    },
+
     process_settings: function() {
-        var sign = $('#pgp_sign')[0].checked;
+        var sign = $('#pgp_sign').val();
+        if (sign === 0) {
+            sign = true;
+        }
         var encrypt = $('#pgp_encrypt').val();
         if (encrypt == 'none') {
             encrypt = false;
         }
         if (encrypt && sign) {
-            return Hm_Pgp.encrypt_text(true);
+            Hm_Pgp.encrypt_text(true);
         }
         else if (encrypt) {
-            return Hm_Pgp.encrypt_text();
+            Hm_Pgp.encrypt_text();
         }
         else if (sign) {
-            return Hm_Pgp.sign_text();
+            Hm_Pgp.sign_text();
         }
-        return true;
+        return false;
     },
 
     lookup_public_key: function(query, server) {
@@ -118,16 +148,29 @@ var Hm_Pgp = {
                 $('.hkp_search_results').text('No keys found');
             }
 		});
+    },
+
+    check_pgp_msg: function(res) {
+        if (res.pgp_msg_part) {
+            $('.pgp_msg_controls').show();
+        }
+        else {
+            $('.pgp_msg_controls').hide();
+        }
     }
+
 }
+
 
 $(function() {
     if (hm_page_name() == 'compose') {
         $('.pgp_crypt').click(function() { Hm_Pgp.encrypt_text(true); });
         $('.pgp_sign').click(function() { Hm_Pgp.sign_text(); });
         $('.compose_form').submit(function() { return Hm_Pgp.process_settings(); });
+        Hm_Pgp.load_private_keys();
     }
     else if (hm_page_name() == 'message') {
+        Hm_Ajax.add_callback_hook('ajax_imap_message_content', Hm_Pgp.check_pgp_msg);
     }
     else if (hm_page_name() == 'pgp') {
         $('.priv_title').click(function() { $('.priv_keys').toggle(); });

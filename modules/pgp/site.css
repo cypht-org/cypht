@@ -9,3 +9,5 @@
 .pgp_subblock { margin-bottom: 40px; }
 .priv_keys, .public_keys { display: none; }
 .key_count { float: right; margin-right: 120px; font-size: 90%; }
+.pgp_msg_controls { display: none; position: absolute; right: 20px; top: 70px; }
+.pgp_sign { display: none; }

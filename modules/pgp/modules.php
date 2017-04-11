@@ -27,8 +27,8 @@ class Hm_Handler_load_pgp_data extends Hm_Handler_Module {
  */
 class Hm_Handler_pgp_compose_data extends Hm_Handler_Module {
     public function process() {
-        /* TODO: check for html mail, pgp option (?),  */
-        /* load private/public keys */
+        $this->out('html_mail', $this->user_config->get('smtp_compose_type_setting', 0));
+        $this->out('pgp_public_keys', $this->user_config->get('pgp_public_keys', array()));
     }
 }
 
@@ -38,9 +38,17 @@ class Hm_Handler_pgp_compose_data extends Hm_Handler_Module {
 class Hm_Handler_pgp_message_check extends Hm_Handler_Module {
     public function process() {
         /* TODO: Check for pgp parts, look at current part for pgp lines */
+        $pgp = false;
         $struct = $this->get('msg_struct', array());
         $text = $this->get('msg_text');
+        if (strpos($text, '----BEGIN PGP MESSAGE-----') !== false) {
+            $pgp = true;
+        }
         $part_struct = $this->get('msg_struct_current', array());
+        if ($part_struct['type'] == 'application' && $part_struct['subtype'] == 'pgp-encrypted') {
+            $pgp = true;
+        }
+        $this->out('pgp_msg_part', $pgp);
     }
 }
 
@@ -49,29 +57,23 @@ class Hm_Handler_pgp_message_check extends Hm_Handler_Module {
  */
 class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
     protected function output() {
-        /* TODO: Don't include if html mail is set */
-        /* TODO: Don't show encrypt option if there are no public keys */
-        /* TODO: Fetch public key list from storage */
-        $pub_keys = array(
-            array('none', 'None'),
-            array('name', 'jason@cypht.org')
-        );
-        $priv_keys = array(
-            array('none', 'None'),
-            array('name', 'jason@cypht.org')
-        );
+        if ($this->get('html_mail', 0)) {
+            return;
+        }
+        $pub_keys = $this->get('pgp_public_keys');
         $res = '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>'.
-            '<div class="pgp_section"><label for="pgp_sign">'.$this->trans('PGP Sign').'</label>'.
-            '<select id="pgp_sign" size="1">';
-        foreach ($priv_keys as $vals) {
-            $res .= '<option value="'.$vals[0].'">'.$vals[1].'</option>';
+            '<div class="pgp_section"><div class="pgp_sign"><label for="pgp_sign">'.$this->trans('PGP Sign').'</label>'.
+            '<select id="pgp_sign" size="1"></select></div>';
+
+        if (count($pub_keys) > 0) {
+            $res .= '<label for="pgp_encrypt">'.$this->trans('Encrypt for:').
+                '</label><select id="pgp_encrypt" size="1">';
+            foreach ($pub_keys as $vals) {
+                $res .= '<option value="'.$vals[0].'">'.$vals[1].'</option>';
+            }
+            $res .= '</select>';
         }
-        $res .= '</select><label for="pgp_encrypt">'.$this->trans('Encrypt for:').
-            '</label><select id="pgp_encrypt" size="1">';
-        foreach ($pub_keys as $vals) {
-            $res .= '<option value="'.$vals[0].'">'.$vals[1].'</option>';
-        }
-        $res .= '</select></div>';
+        $res .= '</div>';
         return $res;
     }
 }
@@ -136,6 +138,15 @@ class Hm_Output_pgp_settings_private_key extends Hm_Output_Module {
 class Hm_Output_pgp_settings_end extends Hm_Output_Module {
     protected function output() {
         return '</div>';
+    }
+}
+
+/**
+ * @subpackage pgp/output
+ */
+class Hm_Output_pgp_msg_controls extends Hm_Output_Module {
+    protected function output() {
+        return '<div class="pgp_msg_controls"><select class="pgp_private_keys"></select> <input type="button" class="pgp_btn" value="Decrypt" /></div>';
     }
 }
 
