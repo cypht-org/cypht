@@ -781,7 +781,9 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
             if (hex2bin($folder) == 'INBOX') {
                 list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date), true);
             }
+            else {
                 list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date), false);
+            }
             $folders = array();
             foreach ($msg_list as $msg) {
                 if (hex2bin($msg['folder']) != hex2bin($folder)) {
