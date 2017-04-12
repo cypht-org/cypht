@@ -207,9 +207,9 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
     protected function output() {
         $res = '<script type="text/javascript">var profile_signatures = {';
         $sigs = array();
-        foreach ($this->get('compose_profiles', array()) as $smtp_id => $vals) {
+        foreach ($this->get('compose_profiles', array()) as $vals) {
             if (strlen(trim($vals['sig']))) {
-                $sigs[] = sprintf("%s: \"\\n%s\\n\"", $smtp_id, $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
+                $sigs[] = sprintf("%s: \"\\n%s\\n\"", $vals['smtp_id'], $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
             }
         }
         $res .= implode(', ', $sigs).'}</script>';
