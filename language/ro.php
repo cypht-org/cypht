@@ -502,6 +502,23 @@ return array(
     'Spanish' => false,
     'Japanese' => false,
     'Dutch' => false,
+    'Connected, but failed to authenticate to the SMTP server' => false,
+    'First page after login' => false,
+    'Github Settings' => false,
+    'Github-All' => false,
+    'Hide folder list icons' => false,
+    'Hungarian' => false,
+    'Manage Folders' => false,
+    'Prefer text over HTML when reading messages' => false,
+    'Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.' => false,
+    'Show icons in message lists' => false,
+    'Show message part icons when reading a message' => false,
+    'Show simple message part structure when reading a message' => false,
+    'Unsaved changes' => false,
+    'homephone' => false,
+    'pager' => false,
+    'Brazilian Portuguese' => false,
+    'Debug',
 ); 
 
 ?>
