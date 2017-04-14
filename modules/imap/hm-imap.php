@@ -672,7 +672,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use IMAP NOOP to poll for untagged server messages
-     * @return array list of properties that have changed since SELECT
+     * @return bool
      */
     public function poll() {
         $command = "NOOP\r\n";
