@@ -1555,9 +1555,12 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
      */
     protected function output() {
         if ($this->get('msg_struct')) {
-            $res = '<table class="msg_parts"><colgroup><col class="msg_part_mime"><col class="msg_part_size">';
-            $res .= '<col class="msg_part_encoding"><col class="msg_part_charset"><col class="msg_part_desc">';
-            $res .= '<col class="msg_part_download"></colgroup>';
+            $res = '<table class="msg_parts">';
+            if (!$this->get('is_mobile')) {
+                $res .= '<colgroup><col class="msg_part_mime"><col class="msg_part_size">';
+                $res .= '<col class="msg_part_encoding"><col class="msg_part_charset"><col class="msg_part_desc">';
+                $res .= '<col class="msg_part_download"></colgroup>';
+            }
             $part = $this->get('imap_msg_part', '1');
             $args = $this->get('msg_download_args', '');
             $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part, $args);
@@ -2530,7 +2533,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     /*if (!$simple_view) {
         $res .= '</td><td>'.$output_mod->html_safe($filename);
     }*/
-    $res .= '</td><td>'.$output_mod->html_safe($size);
+    $res .= '</td><td class="part_size">'.$output_mod->html_safe($size);
     if (!$simple_view) {
         $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
             '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
@@ -2564,7 +2567,7 @@ function get_imap_size($vals) {
             $label = 'GB';
             break;
         default:
-            $label = 'Bytes';
+            $label = 'B';
     }
     return sprintf('%s %s', round($size, 2), $label);
 }
@@ -2583,6 +2586,10 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
     $res = '';
     $simple_view = $output_mod->get('simple_msg_part_view', false);
     $use_icons = $output_mod->get('use_message_part_icons', false);
+    $mobile = $output_mod->get('is_mobile');
+    if ($mobile) {
+        $simple_view = true;
+    }
     foreach ($struct as $id => $vals) {
         if (is_array($vals) && isset($vals['type'])) {
             $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view);
