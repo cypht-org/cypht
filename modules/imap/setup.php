@@ -43,6 +43,8 @@ add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_handler('compose', 'imap_forward_attachments', true, 'imap', 'add_imap_servers_to_page_data', 'after');
 add_handler('compose', 'imap_mark_as_answered', true, 'imap', 'process_compose_form_submit', 'after');
 add_handler('compose', 'imap_save_sent', true, 'imap', 'imap_mark_as_answered', 'after');
+add_handler('compose', 'imap_unflag_on_send', true, 'imap', 'imap_save_sent', 'after');
+add_output('compose', 'imap_unflag_on_send_controls', true, 'imap', 'compose_form_end', 'before');
 
 /* search page data */
 add_handler('search', 'load_imap_servers_for_search',  true, 'imap', 'message_list_type', 'after');
@@ -324,7 +326,8 @@ return array(
         'imap_move_action' => FILTER_SANITIZE_STRING,
         'sent_since' => FILTER_SANITIZE_STRING,
         'sent_per_source' => FILTER_SANITIZE_STRING,
-        'imap_move_page' => FILTER_SANITIZE_STRING
+        'imap_move_page' => FILTER_SANITIZE_STRING,
+        'compose_unflag_send' => FILTER_VALIDATE_BOOLEAN,
     )
 );
 

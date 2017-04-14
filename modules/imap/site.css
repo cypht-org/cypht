@@ -72,3 +72,4 @@
 .msg_part_charset { width: 8%; }
 .msg_part_download { width: 10%; }
 @media screen and (max-device-width:480px) and (orientation : portrait) { .msg_parts td { padding-bottom: 5px !important; width: 25%; padding-left: 3px !important;} .part_size { width: 50px !important; } .part_encoding { display: none; } .part_charset { display: none; } .download_link { width: 50px !important; overflow: visible !important; }}
+.unflag_send_div { float: right; clear: right; margin-top: 10px; }

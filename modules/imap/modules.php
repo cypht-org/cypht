@@ -250,6 +250,28 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
 }
 
  /**
+ * Unflag a message after replying to it
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_unflag_on_send extends Hm_Handler_Module {
+    public function process() {
+        if ($this->get('msg_sent')) {
+            list($success, $form) = $this->process_form(array('compose_unflag_send', 'compose_msg_uid', 'compose_msg_path'));
+            if ($success) {
+                $path = explode('_', $form['compose_msg_path']);
+                if (count($path) == 3 && $path[0] == 'imap') {
+                    $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $path[1]);
+                    $imap = Hm_IMAP_List::connect($path[1], $cache);
+                    if ($imap && $imap->select_mailbox(hex2bin($path[2]))) {
+                        $imap->message_action('UNFLAG', array($form['compose_msg_uid']));
+                    }
+                }
+            }
+        }
+    }
+}
+
+ /**
  * Flag a message as answered
  * @subpackage imap/handler
  */
@@ -2056,6 +2078,18 @@ class Hm_Output_sent_since_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * Option to unflag a message on reply
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_unflag_on_send_controls extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('list_path') || $this->get('compose_msg_path')) {
+            return '<div class="unflag_send_div"><input type="checkbox" value="1" name="compose_unflag_send" id="unflag_send">'.
+                '<label for="unflag_send">'.$this->trans('Unflag on reply').'</label></div>';
+        }
+    }
+}
 /**
  * Option to enable/disable simple message structure on the message view
  * @subpackage imap/output
