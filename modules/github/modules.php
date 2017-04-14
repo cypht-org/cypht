@@ -704,7 +704,7 @@ function build_github_subject($event, $output_mod) {
             $post = $event['payload']['issue']['title'];
             break;
         case 'issuesevent':
-            $post = $event['payload']['issue']['title'];
+            $post = $event['payload']['issue']['title'].' - '.$event['payload']['action'];
             break;
         case 'pushevent':
             if (count($event['payload']['commits']) > 1) {
