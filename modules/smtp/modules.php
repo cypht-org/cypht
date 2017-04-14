@@ -403,7 +403,6 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                 Hm_Msgs::add("Successfully authenticated to the SMTP server");
             }
             elseif ($smtp && $smtp->state == 'connected') {
-                # TODO: needs translated
                 Hm_Msgs::add("ERRConnected, but failed to authenticate to the SMTP server");
             }
             else {

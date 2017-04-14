@@ -380,7 +380,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
                 $title .= ' Nope';
             }
             else {
-                $title .= ' '.ucfirst(str_replace('_', ' ', $this->get('router_page_name')));
+                $title .= ' '.ucwords(str_replace('_', ' ', $this->get('router_page_name')));
             }
         }
         return '<title>'.$this->trans(trim($title)).'</title>'.
