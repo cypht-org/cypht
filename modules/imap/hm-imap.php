@@ -675,7 +675,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @return array list of properties that have changed since SELECT
      */
     public function poll() {
-        $result = array();
         $command = "NOOP\r\n";
         $this->send_command($command);
         $res = $this->get_response(false, true);
@@ -687,8 +686,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             else {
                 $this->debug[] = sprintf('Cache bust avoided on %s with QRESYNC!', $this->selected_mailbox['name']);
             }
+            return true;
         }
-        return $result;
+        return false;
     }
 
     /**
