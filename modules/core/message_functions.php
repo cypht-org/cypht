@@ -103,13 +103,13 @@ function reply_to_address($headers, $type, $excluded) {
         return $msg_to;
     }
     foreach (array('reply-to', 'from', 'sender', 'return-path') as $fld) {
-        if (array_key_exists($fld, $headers) && $msg_to = format_reply_address($headers[$fld])) {
+        if (array_key_exists($fld, $headers) && $msg_to = format_reply_address($headers[$fld], $excluded)) {
             break;
         }
     }
     if ($type == 'reply_all') {
         if (array_key_exists('cc', $headers)) {
-            $msg_cc = format_reply_address($headers['cc'], array());
+            $msg_cc = format_reply_address($headers['cc'], $excluded);
         }
         if (array_key_exists('to', $headers)) {
             $recips = format_reply_address($headers['to'], $excluded);
