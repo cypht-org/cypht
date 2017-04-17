@@ -252,8 +252,10 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
 function write_config_file($settings, $filters) {
     Hm_Handler_Modules::try_queued_modules();
     Hm_Handler_Modules::process_all_page_queue();
+    Hm_Handler_Modules::try_queued_modules();
     Hm_Output_Modules::try_queued_modules();
     Hm_Output_Modules::process_all_page_queue();
+    Hm_Output_Modules::try_queued_modules();
     $settings['handler_modules'] = Hm_Handler_Modules::dump();
     $settings['output_modules'] = Hm_Output_Modules::dump();
     $settings['input_filters'] = $filters;
