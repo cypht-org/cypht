@@ -269,6 +269,8 @@ function Message_List() {
     this.background = false;
     this.completed_count = 0;
     this.callbacks = [];
+    this.past_total = 0;
+    this.just_inserted = [];
 
     this.page_caches = {
         'feeds': 'formatted_feed_data',
@@ -407,6 +409,7 @@ function Message_List() {
         else {
             msg_rows.append(row);
         }
+        self.just_inserted.push($('.from', $(row)).text()+' - '+$('.subject', $(row)).text());
     };
 
     this.reset_checkboxes = function() {
@@ -683,14 +686,32 @@ function Message_List() {
         return added;
     };
 
-    this.adjust_unread_total = function(amount) {
-        var total = $('.total_unread_count').text()*1;
-        if (amount < 0 && total == 0) {
+    this.adjust_unread_total = function(amount, replace) {
+        var current = $('.total_unread_count').text()*1;
+        var new_total;
+        if (replace && amount == current) {
             return;
         }
-        total += amount;
-        $('.total_unread_count').html('&#160;'+total+'&#160;');
+        if (!replace && amount == 0) {
+            return;
+        }
+        if (replace) {
+            new_total = amount;
+        }
+        else {
+            new_total = current + amount;
+        }
+        if (new_total != current) {
+            $('.total_unread_count').html('&#160;'+new_total+'&#160;');
+        }
+        if (new_total > current) {
+            $('.menu_unread > a').css('font-weight', 'bold');
+        }
+        else if (amount == -1) {
+            $('.menu_unread > a').css('font-weight', 'normal');
+        }
         Hm_Folders.save_folder_list();
+        self.past_total = current;
     };
 
     this.toggle_rows = function() {
@@ -710,8 +731,7 @@ function Message_List() {
         $('.total').text($('.message_table tbody tr').length);
         self.update_title();
         if (list_type == 'formatted_unread_data') {
-            $('.total_unread_count').html('&#160;'+$('.message_table tbody tr').length+'&#160;');
-            Hm_Folders.save_folder_list();
+            self.adjust_unread_total($('.message_table tbody tr').length, true);
         }
     };
 
@@ -1233,6 +1253,10 @@ var hl_save_link = function() {
 
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
+
+$("body").on('DOMSubtreeModified', ".total_unread_count", function(data) {
+    $('body').trigger('new_message');
+});
 
 /* executes on onload, has access to other module code */
 $(function() {
