@@ -1146,7 +1146,9 @@ function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod)
         }
         $from_name = $profile['name'];
         $reply_to = $profile['replyto'];
-        $from = $profile['address'];
+        if ($profile['address']) {
+            $from = $profile['address'];
+        }
     }
     return array($imap_server, $from_name, $reply_to, $from);
 }
