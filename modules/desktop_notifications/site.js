@@ -16,7 +16,7 @@ $(function() {
             return;
         }
         var content;
-        if (unread) {
+        if (unread_page) {
             content = Hm_Message_List.just_inserted.reverse().join("\n");
         }
         else {
