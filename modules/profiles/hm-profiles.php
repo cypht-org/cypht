@@ -60,7 +60,7 @@ class Hm_Profiles {
                 $profiles[] = array(
                     'default' => $profile['profile_default'],
                     'name' => $profile['profile_name'],
-                    'address' => $profile['profile_address'],
+                    'address' => array_key_exists('profile_address', $profile) ? $profile['profile_address'] : '',
                     'replyto' => $profile['profile_replyto'],
                     'smtp_id' => $profile['profile_smtp'],
                     'sig' => $profile['profile_sig'],
