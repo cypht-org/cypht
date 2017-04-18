@@ -17,10 +17,10 @@ $(function() {
         }
         var content;
         if (unread_page) {
-            content = Hm_Message_List.just_inserted.reverse().join("\n");
+            content = Hm_Message_List.just_inserted.reverse().join("\n\n");
         }
         else {
-            content = globals.Hm_Background_Unread.just_inserted.reverse().join("\n");
+            content = globals.Hm_Background_Unread.just_inserted.reverse().join("\n\n");
         }
         Push.create("New Message", {
             body: content,
