@@ -704,7 +704,7 @@ function Message_List() {
         if (new_total != current) {
             $('.total_unread_count').html('&#160;'+new_total+'&#160;');
         }
-        if (new_total > current) {
+        if (new_total > current && hm_page_name() != 'message_list' && hm_list_path() != 'unread') {
             $('.menu_unread > a').css('font-weight', 'bold');
         }
         else if (amount == -1) {
