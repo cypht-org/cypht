@@ -13,7 +13,7 @@ config = {
     'user': os.environ['BROWSERSTACK_USER'],
     'key': os.environ['BROWSERSTACK_KEY'],
     'id': os.environ['BROWSERSTACK_LOCAL_IDENTIFIER'],
-    'name': os.environ['TEST_SUITE']
+    'name': os.environ['TEST_SUITE'].upper().replace('_', ' ')[:-3]
 }
 
 def get_driver(cap):
