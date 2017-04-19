@@ -21,7 +21,7 @@ def get_driver(cap):
         'browserstack.local': 'true',
         'browserstack.localIdentifier': config['id'],
         'os': 'Windows',
-        'os_version': '10',
+        'os_version': '8.1',
         'browser': 'Edge',
         'resolution': '1920x1200',
         'name': config['name']
