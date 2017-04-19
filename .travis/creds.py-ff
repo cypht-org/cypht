@@ -24,7 +24,8 @@ def get_driver(cap):
         'browser': 'Firefox',
         'resolution': '1920x1080'
     }
-    driver_url='http://{0}:{1}@@hub-cloud.browserstack.com/wd/hub'.format(config['user'], config['key'])
+    driver_url='http://{0}:{1}@hub-cloud.browserstack.com/wd/hub'.format(config['user'], config['key'])
+    print driver_url
     return webdriver.Remote(desired_capabilities=capabilities, command_executor=driver_url)
 
 def success(driver):
