@@ -22,6 +22,9 @@ $(function() {
         else {
             content = globals.Hm_Background_Unread.just_inserted.reverse().join("\n\n");
         }
+        if (!content) {
+            return;
+        }
         Push.create("New Message", {
             body: content,
             timeout: 10000,
