@@ -2341,7 +2341,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $nofrom = '';
 
         if (trim($tmp_from)) {
-            $from = $tmp_from;
+            $from = trim($tmp_from);
         }
         elseif (!trim($from) && $style == 'email') {
             $from = '[No From]';
