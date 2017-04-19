@@ -12,7 +12,8 @@ SLEEP_INT = 6
 config = {
     'user': os.environ['BROWSERSTACK_USER'],
     'key': os.environ['BROWSERSTACK_KEY'],
-    'id': os.environ['BROWSERSTACK_LOCAL_IDENTIFIER']
+    'id': os.environ['BROWSERSTACK_LOCAL_IDENTIFIER'],
+    'name': os.environ['TEST_SUITE']
 }
 
 def get_driver(cap):
@@ -22,9 +23,11 @@ def get_driver(cap):
         'os': 'Windows',
         'os_version': '10',
         'browser': 'Edge',
-        'resolution': '1920x1080'
+        'resolution': '1920x1080',
+        'name': config['name']
     }
     driver_url='http://{0}:{1}@hub-cloud.browserstack.com/wd/hub'.format(config['user'], config['key'])
+    print capabilities
     return webdriver.Remote(desired_capabilities=capabilities, command_executor=driver_url)
 
 def success(driver):

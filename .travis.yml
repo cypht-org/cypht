@@ -29,6 +29,9 @@ after_script:
 
 # use browserstack
 addons:
+    hosts:
+        - cypht-test.org
+
     browserstack:
         username: "jasonmunro1"
         access_key:
