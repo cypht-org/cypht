@@ -33,6 +33,7 @@ addons:
         username: "jasonmunro1"
         access_key:
             secure: "qi6SxOjPA9YQCmKS2ibDw+QmOE50Kr4DrtjN9PKORVwRQRJy/hjtVe6FsSEonPyl6jVfKRVTpe9kNe/LBsuLENM5Ro2L3dnBmlC6vBoBC6zV8gPYi1dJai3edhlejR8l5zjSwdEs2pMeODabCbbVir2Cg7Wv8ugiV6S4FjK87Yp4UPgpcuBZQHi6pavg51KXvF4NZcX9rg/BJuCkxHhrgNKT+eZWIiMsRc3gJASxXA5qRNVAb3BqEszS/1rwOLemJ8YvIxqB5tU9TEJ1QbaQGxKUv7SLPUTcAwDg2BWt11nqXtFfERfF/SHG/upFVLV2umr2UZMbruTfyH2K9HPB+DdRQUDkoO+s9X6sby53MP9ofsnQDd1+WrZHYU6Tg6Kcy5PyjMIeioptIKo/Z95Xo1vkgPLfPmLOmKDu5g/nlARHObQkrdUFFk9q7mNZ8ihYpbryG4c9CsuPXSOYybIsHUFNWJ9wJECUVBqkXgBYwf3B5FPjA0CamHpmXrAw+NMO0SVZP/t+xOCZ8NNxrUO1sUuPmilRGfCZsFVnoLO3JQ7ktA/diisPoCGb8HCu6zu7G8fl2egnENDbRxPcCjhZAJxr4J3pEr4P8hrsvYT0WrmlEDfFnaifQnXXGBsv36NocB2aQRxT32qO36jJUnAeZkwotdtVFpquvOe9ZBd33Bs="
+        forcelocal: true
 
 
 # send notices to our irc channel

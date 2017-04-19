@@ -16,6 +16,11 @@ setup_ldap() {
     fi
 }
 
+# add a hostname
+add_hostname() {
+    sudo echo '127.0.0.1 cypht-test.org' >> /etc/hosts
+}
+
 # Add a system user dovecot will use for authentication
 setup_user() {
     sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
@@ -123,6 +128,7 @@ setup_db() {
 
 setup_ldap
 setup_user
+add_hostname
 update_apt
 install_dovecot
 selenium_config
