@@ -9,6 +9,7 @@ class LoginTests(WebTest):
         self.load()
         self.login('asdf', 'asdf')
         self.rest()
+        self.rest()
         assert self.by_class('err') != None
 
     def missing_password(self):
