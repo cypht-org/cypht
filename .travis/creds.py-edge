@@ -21,9 +21,9 @@ def get_driver(cap):
         'browserstack.local': 'true',
         'browserstack.localIdentifier': config['id'],
         'os': 'Windows',
-        'os_version': '8',
+        'os_version': '7',
         'browser': 'edge',
-        'resolution': '1600x1200',
+        'resolution': '1920x1080',
         'name': config['name']
     }
     driver_url='http://{0}:{1}@hub-cloud.browserstack.com/wd/hub'.format(config['user'], config['key'])
