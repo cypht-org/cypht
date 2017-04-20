@@ -7,7 +7,7 @@ DESIRED_CAP = None
 SITE_URL = 'http://cypht-test.org/'
 USER = 'testuser'
 PASS = 'testuser'
-SLEEP_INT = 3
+SLEEP_INT = 5
 
 config = {
     'user': os.environ['BROWSERSTACK_USER'],
