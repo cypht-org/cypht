@@ -84,7 +84,7 @@ class PageTests(WebTest):
         list_item.find_element_by_tag_name('a').click()
         self.rest()
         print ':{0}:'.format(self.by_class('content_title').text)
-        assert self.by_class('content_title').text == 'Servers'
+        assert self.by_class('content_title').text.strip() == 'Servers'
 
     def site(self):
         list_item = self.by_class('menu_settings')
