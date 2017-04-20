@@ -701,6 +701,9 @@ function Message_List() {
         else {
             new_total = current + amount;
         }
+        if (new_total < 0) {
+            new_total = 0;
+        }
         if (new_total != current) {
             $('.total_unread_count').html('&#160;'+new_total+'&#160;');
         }
