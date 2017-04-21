@@ -2084,6 +2084,16 @@ class Hm_Output_sent_since_setting extends Hm_Output_Module {
  */
 class Hm_Output_imap_unflag_on_send_controls extends Hm_Output_Module {
     protected function output() {
+        $flagged = false;
+        $details = $this->get('reply_details', array());
+        if (is_array($details) && array_key_exists('msg_headers', $details) && array_key_exists('Flags', $details['msg_headers'])) {
+            if (stristr($details['msg_headers']['Flags'], 'flagged')) {
+                $flagged = true;
+            }
+        }
+        if (!$flagged) {
+            return;
+        }
         if ($this->get('list_path') || $this->get('compose_msg_path')) {
             return '<div class="unflag_send_div"><input type="checkbox" value="1" name="compose_unflag_send" id="unflag_send">'.
                 '<label for="unflag_send">'.$this->trans('Unflag on reply').'</label></div>';
