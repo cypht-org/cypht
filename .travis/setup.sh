@@ -111,6 +111,7 @@ bootstrap_unit_tests() {
 
 # Create and populate database for phpunit tests
 setup_db() {
+    echo $DB
     mysql -u root -e 'create database if not exists test;'
     mysql -u root -e 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));' test
     mysql -u root -e 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));' test
