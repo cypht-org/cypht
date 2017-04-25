@@ -712,7 +712,6 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                     }
                     $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $server);
                     $imap = Hm_IMAP_List::connect($server, $cache);
-                    elog('STATE:'.$imap->get_state());
                     if (is_authenticated($imap)) {
                         foreach ($folders as $folder => $uids) {
                             if ($imap->select_mailbox(hex2bin($folder))) {
