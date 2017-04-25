@@ -59,6 +59,7 @@ setup_cypht() {
     mv .travis/hm3.ini .
     if [ "$DB" = "postgresql" ]; then
         sed -i 's/db_driver=mysql/db_driver=pgsql/' hm3.ini
+        cat hm3.ini | grep 'db'
     fi
     mv creds.py tests/selenium/
     php ./scripts/config_gen.php
