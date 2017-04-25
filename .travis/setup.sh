@@ -57,6 +57,9 @@ selenium_config() {
 # Configure Cypht
 setup_cypht() {
     mv .travis/hm3.ini .
+    if [ "$DB" = "postgresql" ]; then
+        sed -i 's/db_driver=mysql/db_driver=pgsql/' hm3.ini
+    fi
     mv creds.py tests/selenium/
     php ./scripts/config_gen.php
 }
@@ -111,15 +114,25 @@ bootstrap_unit_tests() {
 
 # Create and populate database for phpunit tests
 setup_db() {
-    echo $DB
-    mysql -u root -e 'create database if not exists test;'
-    mysql -u root -e 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));' test
-    mysql -u root -e 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));' test
-    mysql -u root -e 'create table hm_user_settings( username varchar(255), settings longblob, primary key (username));' test
-    mysql -u root -e "create user 'test'@'localhost' identified by '123456';"
-    mysql -u root -e "grant all privileges on test.* to 'test'@'localhost';"
-    mysql -u root -e "insert into hm_user values('unittestuser', 'sha512:86000:xfEgf7NIUQ2XkeU5tnIcA+HsN8pUllMVdzpJxCSwmbsZAE8Hze3Zs+MeIqepwocYteJ92vhq7pjOfrVThg/p1voELkDdPenU8i2PgG9UTI0IJTGhMN7rsUILgT6XlMAKLp/u2OD13sukUFcQNTdZNFqMsuTVTYw/Me2tAnFwgO4=:rfyUhYsWBCknx6EmbeswN0fy0hAC0N3puXzwWyDRquA=');" test
-    mysql -u root -e "insert into hm_user_settings values('testuser', 'sFpVPU/hPvmfeiEKUBs4w1EizmbW/Ze2BALZf6kdJrIU3KVZrsqIhKaWTNNFRm3p51ssRAH2mpbxBMhsdpOAqIZMXFHjLttRu9t5WZWOkN7qwEh2LRq6imbkMkfqXg//K294QDLyWjE0Lsc/HSGqnguBF0YUVLVmWmdeqq7/OrXUo4HNbU88i4s2gkukKobJA2hjcOEq/rLOXr3t4LnLlcISnUbt4ptalSbeRrOnx4ehZV8hweQf1E+ID7s/a+8HHx1Qo713JDzReoLEKUsxRQ==');" test
+    if [ "$DB" = "postgresql" ]; then
+        psql -c 'create database test;' -U postgres
+        psql -c 'CREATE TABLE hm_user (username varchar(255) primary key not null, hash varchar(255));' -U postgres
+        psql -c 'CREATE TABLE hm_user_session (hm_id varchar(250) primary key not null, data text, date timestamp);' -U postgres
+        psql -c 'CREATE TABLE hm_user_settings (username varchar(250) primary key not null, settings text);' -U postgres
+        psql -c "CREATE USER test with password '123456';" -U postgres
+        psql -c 'GRANT ALL PRIVILEGES on test to test;' -U postgresql
+        psql -c "insert into hm_user values('unittestuser', 'sha512:86000:xfEgf7NIUQ2XkeU5tnIcA+HsN8pUllMVdzpJxCSwmbsZAE8Hze3Zs+MeIqepwocYteJ92vhq7pjOfrVThg/p1voELkDdPenU8i2PgG9UTI0IJTGhMN7rsUILgT6XlMAKLp/u2OD13sukUFcQNTdZNFqMsuTVTYw/Me2tAnFwgO4=:rfyUhYsWBCknx6EmbeswN0fy0hAC0N3puXzwWyDRquA=');" -U postgres
+        psql -c "insert into hm_user_settings values('testuser', 'sFpVPU/hPvmfeiEKUBs4w1EizmbW/Ze2BALZf6kdJrIU3KVZrsqIhKaWTNNFRm3p51ssRAH2mpbxBMhsdpOAqIZMXFHjLttRu9t5WZWOkN7qwEh2LRq6imbkMkfqXg//K294QDLyWjE0Lsc/HSGqnguBF0YUVLVmWmdeqq7/OrXUo4HNbU88i4s2gkukKobJA2hjcOEq/rLOXr3t4LnLlcISnUbt4ptalSbeRrOnx4ehZV8hweQf1E+ID7s/a+8HHx1Qo713JDzReoLEKUsxRQ==');" -U postgres
+    else
+        mysql -u root -e 'create database if not exists test;'
+        mysql -u root -e 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));' test
+        mysql -u root -e 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));' test
+        mysql -u root -e 'create table hm_user_settings( username varchar(255), settings longblob, primary key (username));' test
+        mysql -u root -e "create user 'test'@'localhost' identified by '123456';"
+        mysql -u root -e "grant all privileges on test.* to 'test'@'localhost';"
+        mysql -u root -e "insert into hm_user values('unittestuser', 'sha512:86000:xfEgf7NIUQ2XkeU5tnIcA+HsN8pUllMVdzpJxCSwmbsZAE8Hze3Zs+MeIqepwocYteJ92vhq7pjOfrVThg/p1voELkDdPenU8i2PgG9UTI0IJTGhMN7rsUILgT6XlMAKLp/u2OD13sukUFcQNTdZNFqMsuTVTYw/Me2tAnFwgO4=:rfyUhYsWBCknx6EmbeswN0fy0hAC0N3puXzwWyDRquA=');" test
+        mysql -u root -e "insert into hm_user_settings values('testuser', 'sFpVPU/hPvmfeiEKUBs4w1EizmbW/Ze2BALZf6kdJrIU3KVZrsqIhKaWTNNFRm3p51ssRAH2mpbxBMhsdpOAqIZMXFHjLttRu9t5WZWOkN7qwEh2LRq6imbkMkfqXg//K294QDLyWjE0Lsc/HSGqnguBF0YUVLVmWmdeqq7/OrXUo4HNbU88i4s2gkukKobJA2hjcOEq/rLOXr3t4LnLlcISnUbt4ptalSbeRrOnx4ehZV8hweQf1E+ID7s/a+8HHx1Qo713JDzReoLEKUsxRQ==');" test
+    fi
 }
 
 setup_ldap
