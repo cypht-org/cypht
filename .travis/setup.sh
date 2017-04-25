@@ -120,6 +120,7 @@ bootstrap_unit_tests() {
 
 # Create and populate database for phpunit tests
 setup_db() {
+    echo "SETTING UP DB $DB"
     if [ "$DB" = "postgresql" ]; then
         psql -c 'create database test;' -U postgres
         psql -c 'CREATE TABLE hm_user (username varchar(255) primary key not null, hash varchar(255));' -U postgres test
