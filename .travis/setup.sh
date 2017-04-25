@@ -117,13 +117,13 @@ bootstrap_unit_tests() {
 setup_db() {
     if [ "$DB" = "postgresql" ]; then
         psql -c 'create database test;' -U postgres
-        psql -c 'CREATE TABLE hm_user (username varchar(255) primary key not null, hash varchar(255));' -U postgres
-        psql -c 'CREATE TABLE hm_user_session (hm_id varchar(250) primary key not null, data text, date timestamp);' -U postgres
-        psql -c 'CREATE TABLE hm_user_settings (username varchar(250) primary key not null, settings text);' -U postgres
-        psql -c "CREATE USER test with password '123456';" -U postgres
-        psql -c 'GRANT ALL PRIVILEGES on database test to test;' -U postgres
-        psql -c "insert into hm_user values('unittestuser', 'sha512:86000:xfEgf7NIUQ2XkeU5tnIcA+HsN8pUllMVdzpJxCSwmbsZAE8Hze3Zs+MeIqepwocYteJ92vhq7pjOfrVThg/p1voELkDdPenU8i2PgG9UTI0IJTGhMN7rsUILgT6XlMAKLp/u2OD13sukUFcQNTdZNFqMsuTVTYw/Me2tAnFwgO4=:rfyUhYsWBCknx6EmbeswN0fy0hAC0N3puXzwWyDRquA=');" -U postgres
-        psql -c "insert into hm_user_settings values('testuser', 'sFpVPU/hPvmfeiEKUBs4w1EizmbW/Ze2BALZf6kdJrIU3KVZrsqIhKaWTNNFRm3p51ssRAH2mpbxBMhsdpOAqIZMXFHjLttRu9t5WZWOkN7qwEh2LRq6imbkMkfqXg//K294QDLyWjE0Lsc/HSGqnguBF0YUVLVmWmdeqq7/OrXUo4HNbU88i4s2gkukKobJA2hjcOEq/rLOXr3t4LnLlcISnUbt4ptalSbeRrOnx4ehZV8hweQf1E+ID7s/a+8HHx1Qo713JDzReoLEKUsxRQ==');" -U postgres
+        psql -c 'CREATE TABLE hm_user (username varchar(255) primary key not null, hash varchar(255));' -U postgres test
+        psql -c 'CREATE TABLE hm_user_session (hm_id varchar(250) primary key not null, data text, date timestamp);' -U postgres test
+        psql -c 'CREATE TABLE hm_user_settings (username varchar(250) primary key not null, settings text);' -U postgres test
+        psql -c "CREATE USER test with password '123456';" -U postgres test
+        psql -c 'GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA PUBLIC TO test;' -U postgres test
+        psql -c "insert into hm_user values('unittestuser', 'sha512:86000:xfEgf7NIUQ2XkeU5tnIcA+HsN8pUllMVdzpJxCSwmbsZAE8Hze3Zs+MeIqepwocYteJ92vhq7pjOfrVThg/p1voELkDdPenU8i2PgG9UTI0IJTGhMN7rsUILgT6XlMAKLp/u2OD13sukUFcQNTdZNFqMsuTVTYw/Me2tAnFwgO4=:rfyUhYsWBCknx6EmbeswN0fy0hAC0N3puXzwWyDRquA=');" -U postgres test
+        psql -c "insert into hm_user_settings values('testuser', 'sFpVPU/hPvmfeiEKUBs4w1EizmbW/Ze2BALZf6kdJrIU3KVZrsqIhKaWTNNFRm3p51ssRAH2mpbxBMhsdpOAqIZMXFHjLttRu9t5WZWOkN7qwEh2LRq6imbkMkfqXg//K294QDLyWjE0Lsc/HSGqnguBF0YUVLVmWmdeqq7/OrXUo4HNbU88i4s2gkukKobJA2hjcOEq/rLOXr3t4LnLlcISnUbt4ptalSbeRrOnx4ehZV8hweQf1E+ID7s/a+8HHx1Qo713JDzReoLEKUsxRQ==');" -U postgres test
     else
         mysql -u root -e 'create database if not exists test;'
         mysql -u root -e 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));' test
