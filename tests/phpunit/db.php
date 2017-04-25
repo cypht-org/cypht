@@ -25,7 +25,7 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
         $this->config->data['db_driver'] = 'sqlite';
         $type = gettype(Hm_DB::connect($this->config));
         $this->assertTrue($type == 'boolean' || $type == 'object');
-        $this->assertEquals('sqlite:127.0.0.1', Hm_DB::build_dsn());
+        $this->assertEquals('sqlite:/tmp/test.db', Hm_DB::build_dsn());
         $this->config->data['db_driver'] = 'mysql';
         $this->config->data['db_connection_type'] = 'socket';
         $this->config->data['db_socket'] = '/test';

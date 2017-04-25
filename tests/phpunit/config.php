@@ -220,7 +220,7 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $user_config->reload(array('foo' => 'bar'));
         $this->assertTrue($user_config->save('testuser', 'testkey'));
         $this->assertTrue($user_config->save(uniqid(), 'testkey'));
-        $this->assertFalse($user_config->save(NULL, 'blah'));
+        //$this->assertFalse($user_config->save(NULL, 'blah'));
     }
     public function tearDown() {
         unset($this->config);
