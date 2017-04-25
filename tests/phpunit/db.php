@@ -16,7 +16,12 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
     public function test_build_dsn() {
         setup_db($this->config);
         $this->assertEquals('object', gettype(Hm_DB::connect($this->config)));
-        $this->assertEquals('mysql:host=127.0.0.1;dbname=test', Hm_DB::build_dsn());
+        if ($this->config->data['db_driver'] == 'mysql') {
+            $this->assertEquals('mysql:host=127.0.0.1;dbname=test', Hm_DB::build_dsn());
+        }
+        if ($this->config->data['db_driver'] == 'pgsql') {
+            $this->assertEquals('pgsql:host=127.0.0.1;dbname=test', Hm_DB::build_dsn());
+        }
         $this->config->data['db_driver'] = 'sqlite';
         $type = gettype(Hm_DB::connect($this->config));
         $this->assertTrue($type == 'boolean' || $type == 'object');
