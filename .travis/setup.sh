@@ -37,21 +37,7 @@ install_dovecot() {
 
 # Select the browser and driver config for Selenium tests
 selenium_config() {
-    if [ "$TRAVIS_PHP_VERSION" = "5.4" ]; then
-        mv .travis/creds.py-ff creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "5.5" ]; then
-        mv .travis/creds.py-chrome creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
-        mv .travis/creds.py-edge creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
-        mv .travis/creds.py-ie creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
-        mv .travis/creds.py-safari creds.py
-    fi
+    mv .travis/creds.py-$BROWSER creds.py
 }
 
 # Configure Cypht

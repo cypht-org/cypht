@@ -15,6 +15,11 @@ env:
     - DB=mysql
     - DB=postgresql
     - DB=sqlite
+    - BROWSER=ff
+    - BROWSER=chrome
+    - BROWSER=edge
+    - BROWSER=ie
+    - BROWSER=safari
 
 # set up everything we need. The unit tests only require the last section.
 # Everything else is for the selenium tests
