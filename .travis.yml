@@ -9,26 +9,11 @@ php:
 # run the phpunit tests, then the selenium tests
 script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh
 
-# the unit tests need a DB setup, the selenium tests do not. Eventually
-# we should test postgresql and sqlite in addition to mysql
+# the unit tests need a DB setup, the selenium tests do not
 env:
-    - DB=mysql BROWSER=ff
-    - DB=mysql BROWSER=chrome
-    - DB=mysql BROWSER=edge
-    - DB=mysql BROWSER=ie
-    - DB=mysql BROWSER=safari
-
-    - DB=postgresql BROWSER=ff
-    - DB=postgresql BROWSER=chrome
-    - DB=postgresql BROWSER=edge
-    - DB=postgresql BROWSER=ie
-    - DB=postgresql BROWSER=safari
-
-    - DB=sqlite BROWSER=ff
-    - DB=sqlite BROWSER=chrome
-    - DB=sqlite BROWSER=edge
-    - DB=sqlite BROWSER=ie
-    - DB=sqlite BROWSER=safari
+    - DB=mysql
+    - DB=postgresql
+    - DB=sqlite
 
 # set up everything we need. The unit tests only require the last section.
 # Everything else is for the selenium tests
