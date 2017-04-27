@@ -16,8 +16,10 @@ require_once APP_PATH.'modules/nux/modules.php';
 class Hm_Discover_Services {
 
     private $timeout = 1;
+    private $host;
     private $domain = false;
     private $server = false;
+    private $base_domain = false;
     private $port = false;
     private $tls = false;
     private $type = false;
@@ -28,10 +30,21 @@ class Hm_Discover_Services {
     private $pop3_ports = array(995, 110);
     private $transports = array('tls://' => true, 'tcp://' => false);
     private $service = false;
+    private $mail_pre = '';
+    private $smtp_pre = '';
+    private $host_pre = '';
+    private $dyn_host = false;
+    private $dyn_user = false;
 
-    public function __construct($email, $service=false) {
+    public function __construct($email, $config, $service=false, $host=false) {
         $this->service = $service;
-        $this->domain = $this->get_domain($email);
+        $this->host = $host;
+        $this->domain = $this->get_domain($email, $host);
+        $this->mail_pre = $config['mail_pre'];
+        $this->smtp_pre = $config['smtp_pre'];
+        $this->host_pre = $config['host_pre'];
+        $this->dyn_host = $config['host'];
+        $this->dyn_user = $config['user'];
     }
 
     public function get_host_details() {
@@ -42,13 +55,22 @@ class Hm_Discover_Services {
         return $this->manual_host_check();
     }
 
-    private function get_domain($email) {
-        if (strpos($email, '@')) {
-            $parts = explode('@', $email);
-            $domain = $parts[1];
+    private function get_domain($email, $host) {
+        $domain = 'localhost';
+        if ($this->dyn_host) {
+            if (substr($host, 0, strlen($this->host_pre)) == $this->host_pre) {
+                $domain = substr($host, strlen($this->host_pre));
+            }
         }
-        else {
-            $domain = 'localhost';
+        elseif ($this->dyn_user || $domain == 'localhost') {
+            if (strpos($email, '@')) {
+                $parts = explode('@', $email);
+                $domain = $parts[1];
+            }
+        }
+        $this->base_domain = $domain;
+        if ($this->mail_pre) {
+            $domain = sprintf('%s.%s', $this->mail_pre, $domain);
         }
         return $domain;
     }
@@ -80,6 +102,10 @@ class Hm_Discover_Services {
     }
 
     private function host_details() {
+        $smtp_server = $this->server;
+        if ($this->smtp_pre) {
+            $smtp_server = sprintf('%s.%s', $this->smtp_pre, $this->server);
+        }
         return array(
             'type' => $this->type,
             'port' => $this->port,
@@ -89,15 +115,20 @@ class Hm_Discover_Services {
             'smtp' => array(
                 'port' => $this->smtp_port,
                 'tls' => $this->smtp_tls,
-                'server' => $this->server
+                'server' => $smtp_server
             )
         );
     }
 
     private function get_mx_host() {
-        getmxrr($this->domain, $hosts);
-        if (is_array($hosts) && count($hosts) > 0) {
-            $this->server = array_shift($hosts);
+        if ($this->dyn_host) {
+            $this->server = $this->domain;
+        }
+        else {
+            getmxrr($this->domain, $hosts);
+            if (is_array($hosts) && count($hosts) > 0) {
+                $this->server = array_shift($hosts);
+            }
         }
     }
 

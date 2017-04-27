@@ -21,10 +21,12 @@ class Hm_Handler_process_dynamic_login extends Hm_Handler_login {
         if ($this->config->get('auth_type') != 'dynamic') {
             return parent::process();
         }
+        $login_config = dynamic_login_config($this->config);
+        $this->out('dynamic_config', $login_config);
         $this->out('dynamic_login', true);
         list($success, $form) = $this->process_form(array('username', 'password', 'email_provider'));
         if ($success) {
-            $discover = new Hm_Discover_Services($form['username'], $form['email_provider']);
+            $discover = new Hm_Discover_Services($form['username'], $login_config, $form['email_provider'], $this->request->server['HTTP_HOST']);
             $details = $discover->get_host_details();
             $auth_details = array();
             if (array_key_exists('server', $details)) {
@@ -94,17 +96,24 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
         if (!$this->get('dynamic_login')) {
             return parent::output();
         }
+        $config = $this->get('dynamic_config', array ());
         if (!$this->get('router_login_state')) {
-            return '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
+            $res = '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
                 ' <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                 ' <label class="screen_reader" for="username">'.$this->trans('E-mail').'</label>'.
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
                 ' <label class="screen_reader" for="password">'.$this->trans('Password').'</label>'.
-                '<input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
-                '<select class="dynamic_service_select" required name="email_provider"><option value="">'.
-                $this->trans('E-mail Provider').'</option>'.Nux_Quick_Services::option_list(false, $this).
-                '<option value="other">'.$this->trans('Other').'</option></select><br />'.
-                ' <input type="submit" value="'.$this->trans('Login').'" />';
+                '<input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">';
+            if (array_key_exists('user', $config) && $config['user'] || array_key_exists('host', $config) && $config['host']) {
+                $res .= '<input type="hidden" value="other" name="email_provider" />';
+            }
+            else {
+                $res .= '<select class="dynamic_service_select" required name="email_provider"><option value="">'.
+                    $this->trans('E-mail Provider').'</option>'.Nux_Quick_Services::option_list(false, $this).
+                    '<option value="other">'.$this->trans('Other').'</option></select><br />';
+            }
+            $res .= ' <input type="submit" value="'.$this->trans('Login').'" />';
+            return $res;
         }
         else {
             $settings = $this->get('changed_settings', array());
@@ -124,3 +133,33 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
     }
 }
 
+
+/**
+ * @subpackage dynamic_login/functions
+ */
+function dynamic_login_config($config) {
+    $settings = array(
+        'host' => false,
+        'user' => false,
+        'host_pre' => '',
+        'mail_pre' => '',
+        'smtp_pre' => ''
+    );
+    $res = get_ini($config, 'dynamic_login.ini');
+    if (array_key_exists('dynamic_host', $res) && $res['dynamic_host']) {
+        $settings['host'] = $res['dynamic_host'];
+    }
+    if (array_key_exists('dynamic_user', $res) && $res['dynamic_user']) {
+        $settings['user'] = $res['dynamic_user'];
+    }
+    if (array_key_exists('dynamic_host_subdomain', $res) && $res['dynamic_host_subdomain']) {
+        $settings['host_pre'] = $res['dynamic_host_subdomain'];
+    }
+    if (array_key_exists('dynamic_mail_subdomain', $res) && $res['dynamic_mail_subdomain']) {
+        $settings['mail_pre'] = $res['dynamic_mail_subdomain'];
+    }
+    if (array_key_exists('dynamic_smtp_subdomain', $res) && $res['dynamic_smtp_subdomain']) {
+        $settings['smtp_pre'] = $res['dynamic_smtp_subdomain'];
+    }
+    return $settings;
+}
