@@ -15,11 +15,8 @@ env:
     - DB=postgresql
     - DB=sqlite
 
-# set up everything we need. The unit tests only require the last section.
-# Everything else is for the selenium tests
+# install and configure everything
 before_install:
-
-    # install and configure everything
     - sh .travis/setup.sh
 
 # dump some useful info to the logs
