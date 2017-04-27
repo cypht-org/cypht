@@ -59,7 +59,8 @@ function parse_module_ini_files($settings) {
         array('ldap.ini', true),
         array('oauth2.ini', true),
         array('wordpress.ini', false),
-        array('recaptcha.ini', false)
+        array('recaptcha.ini', false),
+        array('dynamic_login.ini', false)
     );
     if (!array_key_exists('app_data_dir', $settings)) {
         return $settings;
