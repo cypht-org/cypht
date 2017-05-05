@@ -141,7 +141,7 @@ class Hm_Output_js_search_data extends Hm_Output_Module {
      */
     protected function output() {
         return '<script type="text/javascript">'.
-            'var hm_search_terms = function() { return "'.$this->html_safe($this->get('search_terms', '')).'"; };'.
+            'var hm_search_terms = function() { return "'.$this->html_safe($this->get('search_terms', ''), true).'"; };'.
             'var hm_run_search = function() { return "'.$this->html_safe($this->get('run_search', 0)).'"; };'.
             '</script>';
     }
