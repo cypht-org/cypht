@@ -231,6 +231,7 @@ class Hm_Test_Output_Module extends PHPUnit_Framework_TestCase {
     public function test_html_safe() {
         $this->assertEquals('&lt;script&gt;', $this->output_mod->html_safe('<script>'));
         $this->assertEquals('nohtml', $this->output_mod->html_safe('nohtml'));
+        $this->assertEquals('&lt;script&gt;', $this->output_mod->html_safe('<script>', true));
     }
     public function tearDown() {
         unset($this->output_mod);
