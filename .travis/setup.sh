@@ -28,36 +28,7 @@ update_apt() {
 
 # Install Dovecot
 install_dovecot() {
-    sudo apt-get install -y dovecot-imapd
-    sleep 10
-    sudo stop dovecot
-    echo "mail_location = maildir:/home/%u/Maildir" | sudo tee --append /etc/dovecot/conf.d/10-mail.conf
-    STARTPATH=`pwd`
-    SSL_CERT=/etc/ssl/certs/dovecot.pem
-    SSL_KEY=/etc/ssl/private/dovecot.pem
-    cd /etc/ssl/certs
-    PATH=$PATH:/usr/bin/ssl
-    FQDN=cypht-test.org
-    MAILNAME=cypht-test.org
-(sudo openssl req -new -x509 -days 365 -nodes -out $SSL_CERT -keyout $SSL_KEY > /dev/null 2>&1 <<+
-.
-.
-.
-Dovecot mail server
-$FQDN
-$FQDN
-root@$MAILNAME
-+
-) || echo "Warning : Bad SSL config, can't generate certificate."
-    sudo chown root $SSL_CERT || true
-    sudo chgrp dovecot $SSL_CERT || true
-    sudo chmod 0644 $SSL_CERT || true
-    sudo chown root $SSL_KEY || true
-    sudo chgrp dovecot $SSL_KEY || true
-    sudo chmod 0600 $SSL_KEY || true
-
-    sudo start dovecot
-    netstat -lnt
+    sudo sh .travis/dovecot.sh
 }
 
 # Select the browser and driver config for Selenium tests
