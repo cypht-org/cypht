@@ -7,7 +7,7 @@ SSL_KEY=/etc/ssl/private/dovecot.pem
 PATH=$PATH:/usr/bin/ssl
 FQDN=cypht-test.org
 MAILNAME=cypht-test.org
-(openssl req -new -x509 -days 365 -nodes -out $SSL_CERT -keyout $SSL_KEY > /dev/null 2>&1 <<+
+(openssl req -new -x509 -days 365 -nodes -out $SSL_CERT -keyout $SSL_KEY <<+
 .
 .
 .
