@@ -33,6 +33,7 @@ install_dovecot() {
     sudo stop dovecot
     echo "mail_location = maildir:/home/%u/Maildir" | sudo tee --append /etc/dovecot/conf.d/10-mail.conf
     sudo start dovecot
+    netstat -lnt
 }
 
 # Select the browser and driver config for Selenium tests
