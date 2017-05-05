@@ -118,12 +118,7 @@ class Hm_MIME_Msg {
     function encode_header_fld($input, $email=true) {
         $res = array();
         $input = trim($input, ',; ');
-        if (strstr($input, ' ')) {
-            $parts = explode(' ', $input);
-        }
-        else {
-            $parts[] = $input;
-        }
+        $parts[] = $input;
         foreach ($parts as $v) {
             if (preg_match('/(?:[^\x00-\x7F])/',$v) === 1) {
                 $leading_quote = false;
