@@ -18,7 +18,7 @@ setup_ldap() {
 
 # Add a system user dovecot will use for authentication
 setup_user() {
-    sudo useradd -m -d /home/testuser -p '$1$/mOCc9QV$Aq2.10s6vSi4UOGryu3WJ0' testuser
+    sudo useradd -m -d /home/testuser -p '$1$Ud5O7hjy$w9hqt3c2jpN2bvztgTWb11' testuser
 }
 
 # Get the latest package list

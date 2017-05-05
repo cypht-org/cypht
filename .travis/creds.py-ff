@@ -6,7 +6,7 @@ from selenium import webdriver
 DESIRED_CAP = None
 SITE_URL = 'http://cypht-test.org/'
 USER = 'testuser'
-PASS = 'w390jwgfhoiua&#Frcf'
+PASS = 'testuser'
 SLEEP_INT = 5
 
 config = {
