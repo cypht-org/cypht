@@ -77,9 +77,13 @@ trait Hm_Module_Output {
     /**
      * Sanitize input string
      * @param string $string text to sanitize
+     * @param bool $special_only only use htmlspecialchars not htmlentities
      * @return string sanitized value
      */
-    public function html_safe($string) {
+    public function html_safe($string, $special_only=false) {
+        if ($special_only) {
+            return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
+        }
         return htmlentities($string, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
     }
 

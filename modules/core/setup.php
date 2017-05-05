@@ -200,7 +200,7 @@ return array(
         'list_parent' => FILTER_SANITIZE_STRING,
         'list_page' => FILTER_VALIDATE_INT,
         'uid' => FILTER_SANITIZE_STRING,
-        'search_terms' => FILTER_SANITIZE_STRING,
+        'search_terms' => FILTER_UNSAFE_RAW,
         'search_since' => FILTER_SANITIZE_STRING,
         'search_fld' => FILTER_SANITIZE_STRING,
         'filter' => FILTER_SANITIZE_STRING
