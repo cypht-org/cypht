@@ -39,16 +39,16 @@ install_dovecot() {
     PATH=$PATH:/usr/bin/ssl
     FQDN=cypht-test.org
     MAILNAME=cypht-test.org
-    (openssl req -new -x509 -days 365 -nodes -out $SSL_CERT -keyout $SSL_KEY > /dev/null 2>&1 <<+
-    .
-    .
-    .
-    Dovecot mail server
-    $FQDN
-    $FQDN
-    root@$MAILNAME
-    +
-    ) || echo "Warning : Bad SSL config, can't generate certificate."
+(openssl req -new -x509 -days 365 -nodes -out $SSL_CERT -keyout $SSL_KEY > /dev/null 2>&1 <<+
+.
+.
+.
+Dovecot mail server
+$FQDN
+$FQDN
+root@$MAILNAME
++
+) || echo "Warning : Bad SSL config, can't generate certificate."
     chown root $SSL_CERT || true
     chgrp dovecot $SSL_CERT || true
     chmod 0644 $SSL_CERT || true
