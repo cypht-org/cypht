@@ -26,7 +26,7 @@ class Hm_Handler_process_enable_2fa extends Hm_Handler_Module {
             $secret = base32_encode_str(create_secret($secret, $username));
             $app_name = $this->config->get('app_name', 'Cypht');
             $uri = sprintf('otpauth://totp/%s:%s?secret=%s&issuer=%s', $app_name, $username, $secret, $app_name);
-            $this->out('2fa_png_path', generate_qr_code($this->config, $uri));
+            $this->out('2fa_png_path', generate_qr_code($this->config, $username, $uri));
             $this->out('2fa_backup_codes', backup_codes($this->user_config));
         }
     }
@@ -214,8 +214,8 @@ function base32_encode_str($str) {
 /**
  * @subpackage 2fa/functions
  */
-function generate_qr_code($config, $str) {
-    $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/2fa.png';
+function generate_qr_code($config, $username, $str) {
+    $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png';
     require_once APP_PATH.'third_party/phpqrcode.php';
     QRcode::png($str, $qr_code);
     return $qr_code;
