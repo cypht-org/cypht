@@ -424,27 +424,28 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* missing field */
-        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'smtp_server_id', 'draft_id'));
+        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id'));
         if (!$success) {
             Hm_Msgs::add('ERRRequired field missing');
             return;
         }
 
         /* defaults */
+        $smtp_id = server_from_compose_smtp_id($form['compose_smtp_id']);
         $to = $form['compose_to'];
         $subject = $form['compose_subject'];
         $draft = array(
             'draft_to' => $form['compose_to'],
             'draft_body' => '',
             'draft_subject' => $form['compose_subject'],
-            'draft_smtp' => $form['smtp_server_id']
+            'draft_smtp' => $smtp_id
         );
 
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft);
 
         /* smtp server details */
-        $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
+        $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
         if (!$smtp_details) {
             Hm_Msgs::add('ERRCould not use the selected SMTP server');
             repopulate_compose_form($draft, $this);
@@ -462,7 +463,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         list($from, $reply_to) = outbound_address_check($this, $from, $reply_to);
 
         /* try to connect */
-        $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
+        $smtp = Hm_SMTP_List::connect($smtp_id, false);
         if (!$smtp || $smtp->state != 'authed') {
             Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             repopulate_compose_form($draft, $this);
@@ -868,7 +869,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
  * @subpackage smtp/functions
  */
 function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
-    $res = '<select name="smtp_server_id" class="compose_server">';
+    $res = '<select name="compose_smtp_id" class="compose_server">';
     $profiles = array();
     if (array_key_exists('compose_profiles', $data)) {
         $profiles = $data['compose_profiles'];
@@ -877,34 +878,49 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
         $selected = false;
         $default = false;
         foreach ($data['smtp_servers'] as $id => $vals) {
-            $profile = profile_by_smtp_id($profiles, $id);
+            $smtp_profiles = profiles_by_smtp_id($profiles, $id);
             if ($selected_id !== false && $id == $selected_id) {
                 $selected = $id;
             }
             elseif ($recip && trim($recip) == trim($vals['user'])) {
                 $selected = $id;
             }
-            elseif ($profile  && $profile['default']) {
-                $default = $id;
+            else {
+                foreach ($smtp_profiles as $index => $profile) {
+                    if ($profile['default']) {
+                        $default = $id.'.'.($index + 1);
+                    }
+                    if ((string) $selected_id === sprintf('%s.%s', $id, ($index + 1))) {
+                        $selected = $id.'.'.($index + 1);
+                    }
+                }
             }
         }
         if ($selected === false && $default !== false) {
             $selected = $default;
         }
         foreach ($data['smtp_servers'] as $id => $vals) {
-            $profile = profile_by_smtp_id($profiles, $id);
-            $res .= '<option ';
-            if ($selected === $id) {
-                $res .= 'selected="selected" ';
-            }
-            $res .= 'value="'.$output_mod->html_safe($id).'">';
-            if ($profile) {
-                $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], $vals['user'], $vals['name']));
+            $smtp_profiles = profiles_by_smtp_id($profiles, $id);
+            if (count($smtp_profiles) > 0) {
+                foreach ($smtp_profiles as $index => $profile) {
+                    $res .= '<option ';
+                    if ((string) $selected === sprintf('%s.%s', $id, ($index + 1))) {
+                        $res .= 'selected="selected" ';
+                    }
+                    $res .= 'value="'.$output_mod->html_safe($id.'.'.($index+1)).'">';
+                    $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], $profile['address'], $vals['name']));
+                    $res .= '</option>';
+                }
             }
             else {
+                $res .= '<option ';
+                if ($selected === $id) {
+                    $res .= 'selected="selected" ';
+                }
+                $res .= 'value="'.$output_mod->html_safe($id).'">';
                 $res .= $output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name']));
+                $res .= '</option>';
             }
-            $res .= '</option>';
         }
     }
     $res .= '</select>';
@@ -1135,8 +1151,7 @@ function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod)
     $from_name = '';
     $reply_to = '';
     $from = $smtp_details['user'];
-    $id = $form['smtp_server_id'];
-    $profile = profile_by_smtp_id($profiles, $id);
+    $profile = profile_from_compose_smtp_id($profiles, $form['compose_smtp_id']);
     if ($profile) {
         if ($profile['type'] == 'imap' && $hmod->module_is_supported('imap')) {
             $imap = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
@@ -1208,10 +1223,37 @@ function repopulate_compose_form($draft, $handler_mod) {
 /**
  * @subpackage smtp/functions
  */
-function profile_by_smtp_id($profiles, $id) {
+function profiles_by_smtp_id($profiles, $id) {
+    $res = array();
     foreach ($profiles as $vals) {
         if ($vals['smtp_id'] == $id) {
-            return $vals;
+            $res[] = $vals;
+        }
+    }
+    return $res;
+}
+/**
+ * @subpackage smtp/functions
+ */
+function server_from_compose_smtp_id($id) {
+    $pos = strpos($id, '.');
+    if ($pos === false) {
+        return intval($id);
+    }
+    return intval(substr($id, 0, $pos));
+}
+/**
+ * @subpackage smtp/functions
+ */
+function profile_from_compose_smtp_id($profiles, $id) {
+    if (strpos($id, '.') === false) {
+        return false;
+    }
+    $smtp_id = server_from_compose_smtp_id($id);
+    $profiles = profiles_by_smtp_id($profiles, $smtp_id);
+    foreach ($profiles as $index => $profile) {
+        if ((string) $id === sprintf('%s.%s', $smtp_id, ($index+1))) {
+            return $profile;
         }
     }
     return false;
