@@ -203,7 +203,8 @@ return array(
         'search_terms' => FILTER_UNSAFE_RAW,
         'search_since' => FILTER_SANITIZE_STRING,
         'search_fld' => FILTER_SANITIZE_STRING,
-        'filter' => FILTER_SANITIZE_STRING
+        'filter' => FILTER_SANITIZE_STRING,
+        'sort' => FILTER_SANITIZE_STRING,
     ),
 
     'allowed_post' => array(

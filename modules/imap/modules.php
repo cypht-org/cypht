@@ -462,6 +462,12 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $this->out('imap_filter', $this->request->get['filter']);
                     }
                 }
+                if (array_key_exists('sort', $this->request->get)) {
+                    if (in_array($this->request->get['sort'], array('arrival', 'from', 'subject',
+                        'date', 'to', '-arrival', '-from', '-subject', '-date', '-to'), true)) {
+                        $this->out('imap_sort', $this->request->get['sort']);
+                    }
+                }
                 if (!empty($details)) {
                     $title = array('IMAP', $details['name'], hex2bin($parts[2]));
                     if ($this->get('list_page', 0)) {
@@ -539,12 +545,11 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
      */
     public function process() {
 
-        $sort = 'ARRIVAL';
-        $rev = true;
         $filter = 'ALL';
         if ($this->get('imap_filter')) {
             $filter = strtoupper($this->get('imap_filter'));
         }
+        list($sort, $rev) = process_sort_arg($this->get('imap_sort'));
         $limit = $this->user_config->get('imap_per_page_setting', DEFAULT_PER_SOURCE);
         $offset = 0;
         $msgs = array();
@@ -1517,14 +1522,33 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
     protected function output() {
         if ($this->get('custom_list_controls_type')) {
             $filter = $this->get('imap_filter');
+            $sort = $this->get('imap_sort');
             $opts = array('all' => $this->trans('All'), 'unseen' => $this->trans('Unread'),
                 'seen' => $this->trans('Read'), 'flagged' => $this->trans('Flagged'),
                 'unflagged' => $this->trans('Unflagged'), 'answered' => $this->trans('Answered'),
                 'unanswered' => $this->trans('Unanswered'));
 
+            $sorts = array('arrival' => $this->trans('Arrival'), 'from' => $this->trans('From'),
+                'to' => $this->trans('To'), 'subject' => $this->trans('Subject'), 'date' => $this->trans('Date'));
+
             $custom = '<form id="imap_filter_form" method="GET">';
             $custom .= '<input type="hidden" name="page" value="message_list" />';
             $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
+            $custom .= '<select name="sort" class="imap_sort">';
+            foreach ($sorts as $name => $val) {
+                $custom .= '<option ';
+                if ($name == $sort) {
+                    $custom .= 'selected="selected" ';
+                }
+                $custom .= 'value="'.$name.'">'.$val.' &darr;</option>';
+                $custom .= '<option ';
+                if ('-'.$name == $sort) {
+                    $custom .= 'selected="selected" ';
+                }
+                $custom .= 'value="-'.$name.'">'.$val.' &uarr;</option>';
+            }
+            $custom .= '</select>';
+
             $custom .= '<select name="filter" class="imap_filter">';
             foreach ($opts as $name => $val) {
                 $custom .= '<option ';
@@ -2048,7 +2072,8 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
             else {
                 $page_num = ($details['offset']/$details['limit']) + 1;
             }
-            $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'], $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('imap_filter'))));
+            $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'],
+                $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('imap_filter')), $this->html_safe($this->get('imap_sort'))));
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
@@ -3042,4 +3067,23 @@ function clear_existing_reply_details($session) {
  */
 function is_authenticated($imap) {
     return is_object($imap) && ($imap->get_state() == 'authenticated' || $imap->get_state() == 'selected');
+}
+
+/**
+ * @subpackage imap/functions
+ */
+function process_sort_arg($sort) {
+    if (!$sort) {
+        return array('ARRIVAL', true);
+    }
+    $rev = false;
+    if (substr($sort, 0, 1) == '-') {
+        $rev = true;
+        $sort = substr($sort, 1);
+    }
+    $sort = strtoupper($sort);
+    if ($sort == 'ARRIVAL' || $sort == 'DATE') {
+        $rev = $rev ? false : true;
+    }
+    return array($sort, $rev);
 }

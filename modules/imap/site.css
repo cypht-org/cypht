@@ -61,7 +61,7 @@
 .msg_move_to .move_to_location { font-size: 100%; left: auto; right: 0px; top: 33px; font-variant: normal; }
 .msg_move_to { width: auto !important; position: relative; display: inline-block; }
 .move_to_location .expand_link { float: left !important; width: auto !important; }
-.imap_filter { font-size: 75%; float: left; margin-right: 10px; margin-top: 8px; }
+.imap_sort, .imap_filter { font-size: 75%; float: left; margin-right: 10px; margin-top: 8px; }
 .msg_part_icon { opacity: .4; padding-right: 5px; }
 .msg_part_placeholder { visibility: hidden; }
 
