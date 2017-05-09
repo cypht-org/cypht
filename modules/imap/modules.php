@@ -79,6 +79,19 @@ class Hm_Handler_imap_folder_status extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the per page count setting
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_imap_per_page_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('imap_per_page', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
  * Process input from the max per source setting for the Sent E-mail page in the settings page
  * @subpackage imap/handler
  */
@@ -532,7 +545,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         if ($this->get('imap_filter')) {
             $filter = strtoupper($this->get('imap_filter'));
         }
-        $limit = 20;
+        $limit = $this->user_config->get('imap_per_page_setting', DEFAULT_PER_SOURCE);
         $offset = 0;
         $msgs = array();
         $list_page = 1;
@@ -2128,6 +2141,23 @@ class Hm_Output_prefetch_imap_folder_ids extends Hm_Output_Module {
             return;
         }
         return '<input type="hidden" id="imap_prefetch_ids" value="'.$this->html_safe(implode(',', $ids)).'" />';
+    }
+}
+
+/**
+ * Option to set the per page count for IMAP folder views
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $per_page = 20;
+        if (array_key_exists('imap_per_page', $settings)) {
+            $per_page = $settings['imap_per_page'];
+        }
+        return '<tr class="general_setting"><td><label for="imap_per_page">'.
+            $this->trans('Messages per page for IMAP folder views').'</label></td><td><input type="text" id="imap_per_page" '.
+            'name="imap_per_page" value="'.$this->html_safe($per_page).'" /></td></tr>';
     }
 }
 
