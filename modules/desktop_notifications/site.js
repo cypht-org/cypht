@@ -19,7 +19,7 @@ $(function() {
         if (unread_page) {
             content = Hm_Message_List.just_inserted.reverse().join("\n\n");
         }
-        else {
+        else if (globals.Hm_Background_Unread) {
             content = globals.Hm_Background_Unread.just_inserted.reverse().join("\n\n");
         }
         if (!content) {
