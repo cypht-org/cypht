@@ -516,6 +516,9 @@ var imap_message_view_finished = function(msg_uid, detail) {
         else if (hm_list_parent() === 'search') {
             Hm_Message_List.prev_next_links('formatted_search_data', class_name);
         }
+        else if (hm_list_parent() === 'sent') {
+            Hm_Message_List.prev_next_links('formatted_sent_data', class_name);
+        }
         else {
             var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
             Hm_Message_List.prev_next_links(key, class_name);
