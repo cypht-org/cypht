@@ -182,11 +182,29 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the the list style setting in the general settings section.
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
+    /**
+     * Can be one of two values, 'email_style' or 'list_style'. The default is 'email_style'.
+     */
+    public function process() {
+        function list_style_callback($val) {
+            if (in_array($val, array('email_style', 'news_style'))) {
+                return $val;
+            }
+            return 'email_style';
+        }
+        process_site_setting('list_style', $this, 'list_style_callback');
+    }
+}
+
+/**
  * Process input from the the start page setting in the general settings section.
  * @subpackage core/handler
  */
 class Hm_Handler_process_start_page_setting extends Hm_Handler_Module {
-
     /**
      * Can be one of the values in start_page_opts()
      */
