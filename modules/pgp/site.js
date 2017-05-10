@@ -59,7 +59,7 @@ var Hm_Pgp = {
         });
     },
 
-    private_key_by_index(id) {
+    private_key_by_index: function(id) {
         var keys = Hm_Pgp.private_keys();
         for (var index in keys.keys) {
             if (index == id) {
