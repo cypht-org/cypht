@@ -269,6 +269,7 @@ function Message_List() {
     this.background = false;
     this.completed_count = 0;
     this.callbacks = [];
+    this.sort_fld = 4;
     this.past_total = 0;
     this.just_inserted = [];
 
@@ -366,6 +367,46 @@ function Message_List() {
             });
         }
         return count;
+    };
+
+    this.sort = function(fld) {
+        var table = $('.message_table tbody');
+        var listitems = $('tr', table);
+        var aval;
+        var bval;
+        listitems.sort(function(a, b) {
+            switch (Math.abs(fld)) {
+                case 1:
+                case 2:
+                case 3:
+                    aval = $($('td', a)[Math.abs(fld)]).text();
+                    bval = $($('td', b)[Math.abs(fld)]).text();
+                    break;
+                case 4:
+                default:
+                    aval = $('input', $($('td', a)[Math.abs(fld)])).val();
+                    bval = $('input', $($('td', b)[Math.abs(fld)])).val();
+                    break;
+            }
+            if (fld == 4 || fld == -4 || !fld) {
+                if (fld == -4) {
+                    return aval > bval;
+                }
+                return aval < bval;
+            }
+            else {
+                if (fld && fld < 0) {
+                    return bval.toUpperCase().localeCompare(aval.toUpperCase());
+                }
+                else {
+                    return aval.toUpperCase().localeCompare(bval.toUpperCase());
+                }
+            }
+        });
+        $.each(listitems, function(_, itm) { table.append(itm); });
+        this.set_tab_index();
+        this.sort_fld = fld;
+        /* TODO: save cache after sort */
     };
 
     this.add_rows = function(msgs, msg_rows) {
