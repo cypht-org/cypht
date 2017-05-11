@@ -457,7 +457,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         list($imap_server, $from_name, $reply_to, $from) = get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $this);
 
         /* xoauth2 check */
-        smtp_refresh_oauth2_token_on_send($smtp_details, $this, $form);
+        smtp_refresh_oauth2_token_on_send($smtp_details, $this, $smtp_id);
 
         /* adjust from and reply to addresses */
         list($from, $reply_to) = outbound_address_check($this, $from, $reply_to);
@@ -883,7 +883,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                 $selected = $id;
             }
             elseif ($recip && trim($recip) == trim($vals['user'])) {
-                $selected = $id;
+                $selected = $id.'.1';
             }
             else {
                 foreach ($smtp_profiles as $index => $profile) {
@@ -1171,12 +1171,12 @@ function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod)
 /**
  * @subpackage smtp/functions
  */
-function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $form) {
+function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
     if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
         $results = smtp_refresh_oauth2_token($smtp_details, $mod->config);
         if (!empty($results)) {
-            if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
-                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
+            if (Hm_SMTP_List::update_oauth2_token($smtp_id, $results[1], $results[0])) {
+                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $smtp_id));
                 $servers = Hm_SMTP_List::dump(false, true);
                 $mod->user_config->set('smtp_servers', $servers);
                 $mod->session->set('user_data', $mod->user_config->dump());
