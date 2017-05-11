@@ -459,13 +459,13 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                 if (array_key_exists('filter', $this->request->get)) {
                     if (in_array($this->request->get['filter'], array('all', 'unseen', 'seen',
                         'answered', 'unanswered', 'flagged', 'unflagged'), true)) {
-                        $this->out('imap_filter', $this->request->get['filter']);
+                        $this->out('list_filter', $this->request->get['filter']);
                     }
                 }
                 if (array_key_exists('sort', $this->request->get)) {
                     if (in_array($this->request->get['sort'], array('arrival', 'from', 'subject',
                         'date', 'to', '-arrival', '-from', '-subject', '-date', '-to'), true)) {
-                        $this->out('imap_sort', $this->request->get['sort']);
+                        $this->out('list_sort', $this->request->get['sort']);
                     }
                 }
                 if (!empty($details)) {
@@ -546,10 +546,10 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
     public function process() {
 
         $filter = 'ALL';
-        if ($this->get('imap_filter')) {
-            $filter = strtoupper($this->get('imap_filter'));
+        if ($this->get('list_filter')) {
+            $filter = strtoupper($this->get('list_filter'));
         }
-        list($sort, $rev) = process_sort_arg($this->get('imap_sort'));
+        list($sort, $rev) = process_sort_arg($this->get('list_sort'));
         $limit = $this->user_config->get('imap_per_page_setting', DEFAULT_PER_SOURCE);
         $offset = 0;
         $msgs = array();
@@ -1521,8 +1521,8 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
      */
     protected function output() {
         if ($this->get('custom_list_controls_type')) {
-            $filter = $this->get('imap_filter');
-            $sort = $this->get('imap_sort');
+            $filter = $this->get('list_filter');
+            $sort = $this->get('list_sort');
             $opts = array('all' => $this->trans('All'), 'unseen' => $this->trans('Unread'),
                 'seen' => $this->trans('Read'), 'flagged' => $this->trans('Flagged'),
                 'unflagged' => $this->trans('Unflagged'), 'answered' => $this->trans('Answered'),
@@ -2073,7 +2073,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
                 $page_num = ($details['offset']/$details['limit']) + 1;
             }
             $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'],
-                $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('imap_filter')), $this->html_safe($this->get('imap_sort'))));
+                $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('list_filter')), $this->html_safe($this->get('list_sort'))));
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
@@ -2380,6 +2380,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         return $msg_list;
     }
     $show_icons = $output_module->get('msg_list_icons');
+    $list_page = $output_module->get('list_page', 0);
+    $list_sort = $output_module->get('list_sort');
+    $list_filter = $output_module->get('list_filter');
     foreach($msg_list as $msg) {
         $row_class = 'email';
         $icon = 'env_open';
@@ -2437,8 +2440,14 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
         }
         $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
-        if ($output_module->get('list_page', 0)) {
-            $url .= '&list_page='.$output_module->html_safe($output_module->get('list_page', 1));
+        if ($list_page) {
+            $url .= '&list_page='.$output_module->html_safe($list_page);
+        }
+        if ($list_sort) {
+            $url .= '&sort='.$output_module->html_safe($list_sort);
+        }
+        if ($list_filter) {
+            $url .= '&filter='.$output_module->html_safe($list_filter);
         }
         if (!$show_icons) {
             $icon = false;
