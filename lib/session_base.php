@@ -347,6 +347,9 @@ function setup_session($config) {
     else {
         $session_class = 'Hm_PHP_Session';
     }
+    if ($auth_type == 'dynamic' && !in_array('dynamic_login', $config->get_modules(), true)) {
+        Hm_Functions::cease('Invalid auth configuration');
+    }
     if (Hm_Functions::class_exists($auth_class)) {
         Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
         $session = new $session_class($config, $auth_class);
