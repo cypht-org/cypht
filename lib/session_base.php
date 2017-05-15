@@ -98,6 +98,9 @@ abstract class Hm_Session {
     /* session key */
     public $session_key = '';
 
+    /* session cookie lifetime - 0 means "session only" */
+    public $lifetime = 0;
+
     /**
      * check for an active session or an attempt to start one
      * @param object $request request object
@@ -285,7 +288,7 @@ abstract class Hm_Session {
      * @param string $html_only set html only cookie flag
      * @return void
      */
-    public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='', $html_only=true) {
+    public function secure_cookie($request, $name, $value, $lifetime=false, $path='', $domain='', $html_only=true) {
         if ($name == 'hm_reload_folders') {
             return Hm_Functions::setcookie($name, $value);
         }
@@ -297,6 +300,9 @@ abstract class Hm_Session {
         }
         if (!$path && isset($request->path)) {
             $path = $request->path;
+        }
+        if ($lifetime === false) {
+            $lifetime = $this->lifetime;
         }
         if (!$domain) {
             $domain = $this->site_config->get('cookie_domain', false);
@@ -320,19 +326,23 @@ function setup_session($config) {
 
     $session_type = $config->get('session_type', false);
     $auth_type = $config->get('auth_type', false);
-    if ($auth_type && $auth_type != 'dynamic') {
+    if ($auth_type && $auth_type != 'dynamic' && $auth_type != 'custom') {
         $auth_class = sprintf('Hm_Auth_%s', $auth_type);
+    }
+    elseif ($auth_type == 'custom') {
+        $auth_class = 'Custom_Auth';
     }
     else {
         $auth_class = 'Hm_Auth_None';
     }
     if ($session_type == 'DB') {
-        require APP_PATH.'lib/session_db.php';
         $session_class = 'Hm_DB_Session';
     }
     elseif ($session_type == 'MEM') {
-        require APP_PATH.'lib/session_memcached.php';
         $session_class = 'Hm_Memcached_Session';
+    }
+    elseif ($session_type == 'custom' && is_readable(APP_PATH.'modules/site/lib.php')) {
+        $session_class = 'Custom_Session';
     }
     else {
         $session_class = 'Hm_PHP_Session';

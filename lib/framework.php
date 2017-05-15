@@ -16,6 +16,8 @@ require APP_PATH.'lib/auth.php';
 require APP_PATH.'lib/oauth2.php';
 require APP_PATH.'lib/session_base.php';
 require APP_PATH.'lib/session_php.php';
+require APP_PATH.'lib/session_db.php';
+require APP_PATH.'lib/session_memcached.php';
 require APP_PATH.'lib/format.php';
 require APP_PATH.'lib/dispatch.php';
 require APP_PATH.'lib/request.php';
@@ -27,6 +29,10 @@ require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
 
+
+if (is_readable(APP_PATH.'modules/site/lib.php')) {
+    require APP_PATH.'modules/site/lib.php';
+}
 if (!function_exists('random_bytes')) {
     require APP_PATH.'third_party/random_compat/lib/random.php';
 }
