@@ -284,6 +284,24 @@ class Hm_Test_Memcached_Session extends PHPUnit_Framework_TestCase {
         $session->connect();
         $this->assertEquals('Hm_Memcached', get_class($session->conn));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_memcached_start_existing() {
+        $session = new Hm_Memcached_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->loaded = true;
+        $session->start($request);
+        $session->set('foo', 'bar');
+        $session->save_data();
+        $session->start_existing($request, $session->session_key);
+        $this->assertEquals('bar', $session->get('foo'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_memcached_start() {
         $session = new Hm_Memcached_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
