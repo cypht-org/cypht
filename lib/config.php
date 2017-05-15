@@ -291,11 +291,10 @@ class Hm_User_Config_DB extends Hm_Config {
             Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
             return true;
         }
-        $sql = $this->dbh->prepare("insert into hm_user_settings values(?,?)");
-        if ($sql->execute(array($username, $config))) {
-            return true;
+        else {
+            $sql = $this->dbh->prepare("insert into hm_user_settings values(?,?)");
+            return $sql->execute(array($username, $config));
         }
-        return false;
     }
 }
 
