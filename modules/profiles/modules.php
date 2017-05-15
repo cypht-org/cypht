@@ -258,7 +258,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
             $res .= '</table>';
         }
         else {
-            $res .= '<div class="profiles_empty">'.$this->trans('No Profiles Fund').'</div>';
+            $res .= '<div class="profiles_empty">'.$this->trans('No Profiles Found').'</div>';
         }
         $res .= '</div>';
         return $res;
