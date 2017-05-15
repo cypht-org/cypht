@@ -4,6 +4,7 @@
  * To use these overrides, you must first enable the "site" module in your
  * hm3.ini file, then rebuild your configuration with the config_gen.php script
  * to activate the module. 
+ */
 
 /**
  * Override the session class. These are the methods that must be overriden to
