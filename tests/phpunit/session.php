@@ -522,12 +522,20 @@ class Hm_Test_Session_Functions extends PHPUnit_Framework_TestCase {
         $this->config->set('session_type', 'asdf');
         $this->config->set('auth_type', 'DB');
         $this->assertEquals('Hm_PHP_Session', get_class((setup_session($this->config))));
+
+        $this->config->set('session_type', 'custom');
+        $this->config->set('auth_type', 'custom');
+        $this->assertEquals('Custom_Session', get_class((setup_session($this->config))));
+
         $this->config->set('session_type', 'MEM');
         $this->assertEquals('Hm_Memcached_Session', get_class((setup_session($this->config))));
         Hm_Functions::$exists = false;
         $this->config->set('session_type', 'PHP');
         $this->config->set('auth_type', 'asdf');
         $this->assertNull(setup_session($this->config));
+        $this->config->set('auth_type', 'dynamic');
+        $this->assertNull(setup_session($this->config));
+
     }
     public function tearDown() {
         unset($this->config);
