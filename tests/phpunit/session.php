@@ -268,7 +268,6 @@ class Hm_Test_Memcached_Session extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        require APP_PATH.'lib/session_memcached.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
@@ -353,7 +352,6 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
-        require APP_PATH.'lib/session_db.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
