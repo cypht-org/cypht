@@ -147,7 +147,7 @@ setup_db() {
 }
 
 # install coveralls
-setup_coveralls() {
+install_coveralls() {
     wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
     chmod +x coveralls.phar
     php coveralls.phar --version
@@ -160,6 +160,6 @@ install_dovecot
 selenium_config
 setup_cypht
 install_phpunit
+install_coveralls
 install_apache
 bootstrap_unit_tests
-setup_coveralls

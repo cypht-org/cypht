@@ -9,7 +9,8 @@ php:
     - '7.1'
 
 # run the phpunit tests, then the selenium tests
-script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh
+#script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh
+script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../../
 
 # the unit tests need a DB setup, the selenium tests do not
 env:
