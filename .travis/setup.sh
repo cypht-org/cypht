@@ -146,6 +146,13 @@ setup_db() {
     fi
 }
 
+# install coveralls
+setup_coveralls() {
+    wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
+    chmod +x coveralls.phar
+    php coveralls.phar --version
+}
+
 setup_ldap
 setup_user
 update_apt
@@ -155,3 +162,4 @@ setup_cypht
 install_phpunit
 install_apache
 bootstrap_unit_tests
+setup_coveralls

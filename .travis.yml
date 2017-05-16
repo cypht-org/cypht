@@ -26,6 +26,10 @@ after_script:
     - sudo cat /var/log/apache2/error.log
     - sudo cat /var/log/mail.err
 
+# unit test coverage reporting
+after_success:
+     - travis_retry php coveralls.phar -v
+
 # use browserstack
 addons:
     hosts:

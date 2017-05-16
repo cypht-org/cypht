@@ -1,0 +1,4 @@
+service_name: travis-ci
+repo_token: ms4UofHzMWd1VrLp6CgDjclBgR4MAypey
+coverage_clover: tests/phpunit/clover.xml
+json_path: tests/phpunit/coveralls-upload.json
