@@ -13,3 +13,4 @@ commit_check.sh
 website/docs
 tests/phpunit/data/testuser.txt
 website
+tests/phpunit/clover.xml
