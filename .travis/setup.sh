@@ -153,6 +153,14 @@ install_coveralls() {
     php coveralls.phar --version
 }
 
+# install libsodium
+install_sodium() {
+    sudo add-apt-repository ppa:ondrej/php -y
+    sudo apt-get update -q
+    sudo apt-get install libsodium-dev -y
+    sudo pecl install libsodium
+}
+
 setup_ldap
 setup_user
 update_apt
@@ -162,4 +170,5 @@ setup_cypht
 install_phpunit
 install_coveralls
 install_apache
+install_sodium
 bootstrap_unit_tests
