@@ -14,3 +14,4 @@ website/docs
 tests/phpunit/data/testuser.txt
 website
 tests/phpunit/clover.xml
+tests/phpunit/coveralls-upload.json
