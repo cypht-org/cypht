@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/jasonmunro/cypht.svg?branch=master)](https://travis-ci.org/jasonmunro/cypht)
+[![Coverage Status](https://coveralls.io/repos/github/jasonmunro/cypht/badge.svg?branch=master)](https://coveralls.io/github/jasonmunro/cypht?branch=master)
 
 #### Cypht
 [https://cypht.org](https://cypht.org)
