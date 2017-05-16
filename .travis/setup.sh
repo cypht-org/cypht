@@ -158,7 +158,7 @@ install_sodium() {
     sudo add-apt-repository ppa:ondrej/php -y
     sudo apt-get update -q
     sudo apt-get install libsodium-dev -y
-    sudo pecl install libsodium
+    pecl install libsodium
 }
 
 setup_ldap
