@@ -9,8 +9,7 @@ php:
     - '7.1'
 
 # run the phpunit tests, then the selenium tests
-#script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh
-script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../../
+script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh && cd ../../
 
 # the unit tests need a DB setup, the selenium tests do not
 env:
@@ -29,7 +28,7 @@ after_script:
 
 # unit test coverage reporting
 after_success:
-     - travis_retry php coveralls.phar -v
+     - if [ "$TRAVIS_PHP_VERSION" = "7.1" ] && [ "$DB" = "postgresql" ]; then php coveralls.phar -v; fi
 
 # use browserstack
 addons:
