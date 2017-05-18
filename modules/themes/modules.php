@@ -110,6 +110,7 @@ function hm_themes($output_mod) {
         'terminal' => $output_mod->trans('VT100'),
         'lightblue' => $output_mod->trans('Light Blue'),
         'hn' => $output_mod->trans('Hacker News'),
+        'so_alone' => $output_mod->trans('So Alone'),
     );
 }
 
