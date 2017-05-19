@@ -11,6 +11,10 @@
  */
 class Hm_PHP_Session extends Hm_Session {
 
+
+    /* data store connection used by classes that extend this */
+    public $conn;
+
     /**
      * Check for an existing session or a new user/pass login request
      * @param object $request request details

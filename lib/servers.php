@@ -168,7 +168,7 @@ trait Hm_Server_List {
      * Fetch a server by the username and servername
      * @param string $username the user associated with the server
      * @param string $servername the host associated with the server
-     * @return array, false on failure
+     * @return array|false
      */
     public static function fetch($username, $servername) {
         foreach (self::$server_list as $id => $server) {
