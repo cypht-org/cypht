@@ -15,6 +15,12 @@ trait Hm_Output_Module_Exec {
     public $output_data = array();
 
     /**
+     * Look for translation strings based on the current language setting
+     * return array
+     */
+    abstract public function get_current_language();
+
+    /**
      * Setup a default language translation
      * @return void
      */
