@@ -48,11 +48,20 @@ if (!class_exists('Hm_Functions')) {
      * @subpackage setup
      */
     class Hm_Functions {
+
+        /**
+         * @param string $name
+         * @param string $value
+         */
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $secure=false, $html_only=false) {
             Hm_Debug::add(sprintf('Setting cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',
                 $name, $lifetime, $path, $domain, $secure, $html_only));
             return setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
         }
+
+        /**
+         * @param string $header
+         */
         public static function header($header) {
             return header($header);
         }
@@ -65,21 +74,42 @@ if (!class_exists('Hm_Functions')) {
         public static function error_log($str) {
             error_log($str);
         }
+
+        /**
+         * @param resource $handle
+         * @param integer $name
+         */
         public static function c_setopt($handle, $name, $value) {
             curl_setopt($handle, $name, $value);
         }
         public static function c_init() {
             return curl_init();
         }
+
+        /**
+         * @param resource $handle
+         */
         public static function c_exec($handle) {
             return curl_exec($handle);
         }
+
+        /**
+         * @param string $func
+         */
         public static function function_exists($func) {
             return function_exists($func);
         }
+
+        /**
+         * @param string $class
+         */
         public static function class_exists($class) {
             return class_exists($class, false);
         }
+
+        /**
+         * @param integer $size
+         */
         public static function random_bytes($size) {
             return random_bytes($size);
         }
