@@ -14,8 +14,6 @@ trait Hm_Output_Module_Exec {
     public $handler_response = array();
     public $output_response;
     public $output_data = array();
-    public $request;
-    public $site_config;
     public $page = '';
 
     /**
@@ -98,12 +96,8 @@ trait Hm_Output_Module_Exec {
  */
 trait Hm_Handler_Module_Exec {
 
-    public $handler_response = array();
-    public $output_response;
-    public $output_data = array();
     public $request;
     public $site_config;
-    public $page = '';
 
     /**
      * Setup a default language translation
