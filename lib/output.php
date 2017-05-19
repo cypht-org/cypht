@@ -15,9 +15,10 @@ abstract class Hm_Output {
     /**
      * Extended classes must override this method to output content
      * @param mixed $content data to output
+     * @param array $headers headers to send
      * @return void
      */
-    abstract protected function output_content($content);
+    abstract protected function output_content($content, $headers);
 
     /**
      * Wrapper around extended class output_content() calls

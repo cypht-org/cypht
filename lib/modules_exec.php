@@ -146,7 +146,7 @@ trait Hm_Handler_Module_Exec {
         $name = "Hm_Handler_$name";
         if (class_exists($name)) {
             if (!$args[1] || ($args[1] && $session->is_active())) {
-                $mod = new $name($this, $args[1], $this->page, $input, $protected);
+                $mod = new $name($this, $this->page, $input, $protected);
                 $mod->process($input);
                 $input = $mod->module_output();
                 $protected = $mod->output_protected();
@@ -268,7 +268,6 @@ class Hm_Module_Exec {
      * @return array list of filters, input, and output modules
      */
     public function setup_debug_modules() {
-        $filters = array();
         $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
             'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
         $modules = $this->site_config->get_modules();

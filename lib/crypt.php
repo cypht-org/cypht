@@ -246,7 +246,7 @@ class Hm_Crypt_Base {
             return password_verify($password, $hash);
         }
         if (count(explode(':', $hash)) == 4) {
-            list($algo, $count, $salt, $nothing) = explode(':', $hash);
+            list($algo, $count, $salt,,) = explode(':', $hash);
             return self::hash_compare(self::hash_password($password, base64_decode($salt), $count, $algo, $type), $hash);
         }
         return false;

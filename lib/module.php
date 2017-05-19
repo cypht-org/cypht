@@ -100,7 +100,7 @@ trait Hm_Module_Output {
                 return true;
             }
             else {
-                Hm_Debug::add('Could not append %s to %s', print_r($value,true), $name);
+                Hm_Debug::add(sprintf('Could not append %s to %s', print_r($value,true), $name));
                 return false;
             }
         }
@@ -208,12 +208,11 @@ abstract class Hm_Handler_Module {
     /**
      * Assign input and state sources
      * @param object $parent instance of the Hm_Request_Handler class
-     * @param bool $logged_in true if currently logged in
      * @param string $page page id
      * @param array $output data from handler modules
      * @param array $protected list of protected output names
      */
-    public function __construct($parent, $logged_in, $page, $output=array(), $protected=array()) {
+    public function __construct($parent, $page, $output=array(), $protected=array()) {
         $this->session = $parent->session;
         $this->request = $parent->request;
         $this->page = $page;
@@ -418,7 +417,7 @@ abstract class Hm_Output_Module {
         if (array_key_exists('interface_direction', $lang_str)) {
             $this->dir = $lang_str['interface_direction'];
         }
-        return $this->output($format);
+        return $this->output();
     }
 
     /**

@@ -103,7 +103,6 @@ trait Hm_Modules {
      * @return bool true if the module was added or was already registered
      */
     public static function add($page, $module, $logged_in, $marker=false, $placement='after', $queue=true, $source=false) {
-        $inserted = false;
         if (!array_key_exists($page, self::$module_list)) {
             self::$module_list[$page] = array();
         }

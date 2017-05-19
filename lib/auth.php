@@ -275,7 +275,6 @@ class Hm_Auth_POP3 extends Hm_Auth {
      */
     public function check_credentials($user, $pass) {
         $pop3 = new Hm_POP3();
-        $authed = false;
         list($server, $port, $tls) = $this->get_pop3_config();
         if ($user && $pass && $server && $port) {
             $this->pop3_settings = array(

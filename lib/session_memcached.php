@@ -36,7 +36,7 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
                 $this->destroy($request);
             }
             else {
-                $this->start_existing($request, $request->cookie[$this->cname]);
+                $this->start_existing($request->cookie[$this->cname]);
             }
         }
     }
@@ -62,7 +62,7 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
      * @param string $key session key
      * @return void
      */
-    public function start_existing($request, $key) {
+    public function start_existing($key) {
         $this->session_key = $key;
         $data = $this->plaintext($this->conn->get($key));
         if (is_array($data)) {

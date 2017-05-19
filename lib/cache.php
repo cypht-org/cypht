@@ -244,7 +244,7 @@ class Hm_Memcached {
 
     /**
      * @param string $key key to set
-     * @param array $val value to set
+     * @param string $val value to set
      * @param integer $lifetime lifetime of the cache entry
      * @param string $crypt_key encryption key
      * @return boolean

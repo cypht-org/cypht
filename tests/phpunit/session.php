@@ -295,7 +295,7 @@ class Hm_Test_Memcached_Session extends PHPUnit_Framework_TestCase {
         $session->start($request);
         $session->set('foo', 'bar');
         $session->save_data();
-        $session->start_existing($request, $session->session_key);
+        $session->start_existing($session->session_key);
         $this->assertEquals('bar', $session->get('foo'));
     }
     /**
@@ -438,7 +438,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $this->assertTrue($session->is_active());
         $key = $session->session_key;
         $session->end();
-        $session->start_existing_session($request, $key);
+        $session->start_existing_session($key);
         $session->destroy($request);
     }
     /**

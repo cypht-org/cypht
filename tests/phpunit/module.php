@@ -8,7 +8,7 @@ class Hm_Test_Modules_Output extends PHPUnit_Framework_TestCase {
     public function setUp() {
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false, 'home');
+        $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
     }
     /**
      * @preserveGlobalState disabled
@@ -101,7 +101,7 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
     public function setUp() {
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false, 'home');
+        $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
     }
     /**
      * @preserveGlobalState disabled
@@ -186,7 +186,7 @@ class Hm_Test_Handler_Module_Debug extends PHPUnit_Framework_TestCase {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
-        $this->handler_mod = new Hm_Handler_Test($this->parent, false, 'home');
+        $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
     }
     /**
      * @preserveGlobalState disabled
