@@ -204,10 +204,10 @@ class Hm_User_Config_File extends Hm_Config {
 class Hm_User_Config_DB extends Hm_Config {
 
     /* site configuration */
-    private $site_config = false;
+    private $site_config;
 
     /* DB connection handle */
-    private $dbh = false;
+    private $dbh;
 
     /**
      * Load site config

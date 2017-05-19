@@ -16,7 +16,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
     public $session_key = '';
 
     /* DB handle */
-    protected $dbh = false;
+    protected $dbh;
 
     /**
      * Create a new session

@@ -158,9 +158,6 @@ trait Hm_Handler_Module_Exec {
  */
 class Hm_Module_Exec {
 
-    use Hm_Output_Module_Exec;
-    use Hm_Handler_Module_Exec;
-
     public $page = false;
     public $site_config = false;
     public $user_config = false;
@@ -172,6 +169,9 @@ class Hm_Module_Exec {
     public $request = false;
     public $handlers = array();
     public $outputs = array();
+
+    use Hm_Output_Module_Exec;
+    use Hm_Handler_Module_Exec;
 
     /**
      * @param object $config site config

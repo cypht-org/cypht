@@ -126,7 +126,7 @@ class Hm_Transform {
 
     /**
      * Convert a stringified array back to an array
-     * @param string $data data to be transformed from a string
+     * @param string|false $data data to be transformed from a string
      * @param string $encoding encoding to use for values
      * @return mixed array on success, false on failure
      */

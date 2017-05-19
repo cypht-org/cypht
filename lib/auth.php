@@ -15,7 +15,7 @@
 abstract class Hm_Auth {
 
     /* site configuration object */
-    protected $site_config = false;
+    protected $site_config;
 
     /* bool flag defining if users are internal */
     static public $internal_users = false;
@@ -77,6 +77,9 @@ class Hm_Auth_DB extends Hm_Auth {
 
     /* bool flag indicating this is an internal user setup */
     static public $internal_users = true;
+
+    /* database conneciton handle */
+    private $dbh;
 
     /**
      * Send the username and password to the configured DB for authentication
