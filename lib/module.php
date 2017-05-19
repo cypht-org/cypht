@@ -24,6 +24,21 @@ trait Hm_Module_Output {
     protected $appendable = array();
 
     /**
+     * @param string $name name to check for
+     * @param array $list array to look for name in
+     * @param string $type
+     * @param mixed $value value
+     * @return bool
+     */
+    protected function check_overwrite($name, $list, $type, $value) {
+        if (in_array($name, $list, true)) {
+            Hm_Debug::add(sprintf('MODULES: Cannot overwrite %s %s with %s', $type, $name, print_r($value,true)));
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Add a name value pair to the output array
      * @param string $name name of value to store
      * @param mixed $value value
@@ -31,12 +46,10 @@ trait Hm_Module_Output {
      * @return bool true on success
      */
     public function out($name, $value, $protected=true) {
-        if (in_array($name, $this->protected, true)) {
-            Hm_Debug::add(sprintf('MODULES: Cannot overwrite protected %s with %s', $name, print_r($value,true)));
+        if (!$this->check_overwrite($name, $this->protected, 'protected', $value)) {
             return false;
         }
-        if (in_array($name, $this->appendable, true)) {
-            Hm_Debug::add(sprintf('MODULES: Cannot overwrite appendable %s with %s', $name, print_r($value,true)));
+        if (!$this->check_overwrite($name, $this->appendable, 'protected', $value)) {
             return false;
         }
         if ($protected) {
@@ -53,8 +66,7 @@ trait Hm_Module_Output {
      * @return bool true on success
      */
     public function append($name, $value) {
-        if (in_array($name, $this->protected, true)) {
-            Hm_Debug::add(sprintf('MODULES: Cannot overwrite %s with %s', $name, print_r($value,true)));
+        if (!$this->check_overwrite($name, $this->protected, 'protected', $value)) {
             return false;
         }
         if (array_key_exists($name, $this->output)) {
