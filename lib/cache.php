@@ -37,7 +37,7 @@ class Hm_Page_Cache {
      */
     public static function concat($key, $page, $save = false, $delim=false) {
         if (array_key_exists($key, self::$pages)) {
-            if ($delim) {
+            if ($delim !== false) {
                 self::$pages[$key][0] .= $delim.$page;
             }
             else {

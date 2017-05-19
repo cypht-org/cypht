@@ -41,7 +41,7 @@ trait Hm_Server_List {
                 return $server['object'];
             }
             else {
-                if ((!$user || !$pass) && (!array_key_exists('user', $server) || !array_key_exists('pass', $server))) {
+                if (($user === false || $pass === false) && (!array_key_exists('user', $server) || !array_key_exists('pass', $server))) {
                     return false;
                 }
                 elseif (array_key_exists('user', $server) && array_key_exists('pass', $server)) {

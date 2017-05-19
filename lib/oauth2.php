@@ -41,7 +41,7 @@ class Hm_Oauth2 {
         $res = sprintf('%s?response_type=code&amp;scope=%s&amp;state=%s&amp;'.
             'approval_prompt=force&amp;access_type=offline&amp;client_id=%s&amp;redirect_uri=%s',
             $url, $scope, $state, $this->client_id, $this->redirect_uri);
-        if ($login_hint) {
+        if ($login_hint !== false) {
             $res .= '&amp;login_hint='.$login_hint;
         }
         return $res;

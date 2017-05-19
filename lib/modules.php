@@ -111,10 +111,10 @@ trait Hm_Modules {
             Hm_Debug::add(sprintf("Already registered module for %s re-attempted: %s", $page, $module));
             return true;
         }
-        if (!$source) {
+        if ($source === false) {
             $source = self::$source;
         }
-        if ($marker) {
+        if ($marker !== false) {
             $inserted = self::insert_at_marker($marker, $page, $module, $logged_in, $placement, $source);
         }
         else {
@@ -167,7 +167,7 @@ trait Hm_Modules {
      * @return void
      */
     public static function replace($target, $replacement, $page=false) {
-        if ($page) {
+        if ($page !== false) {
             if (array_key_exists($page, self::$module_list) && array_key_exists($target, self::$module_list[$page])) {
                 self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
             }

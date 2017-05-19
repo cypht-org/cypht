@@ -66,7 +66,7 @@ class Hm_Crypt_Base {
      * Convert ciphertext to plaintext
      * @param string $string ciphertext to decrypt
      * @param string $key encryption key
-     * @return string decrypted text
+     * @return string|false decrypted text
      */
     public static function plaintext($string, $key) {
         $string = base64_decode($string);
@@ -211,10 +211,10 @@ class Hm_Crypt_Base {
         if (function_exists('password_hash') && $type === 'php') {
             return password_hash($password,  PASSWORD_DEFAULT);
         }
-        if (!$salt) {
+        if ($salt === false) {
             $salt = self::generate_salt();
         }
-        if (!$count) {
+        if ($count === false) {
             $count = self::$password_rounds;
         }
         return sprintf("%s:%s:%s:%s", $algo, $count, base64_encode($salt), base64_encode(

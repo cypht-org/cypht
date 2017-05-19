@@ -377,7 +377,7 @@ abstract class Hm_Output_Module {
      * @param array $input data from handler modules
      * @param array $protected list of protected keys
      */
-    function __construct($input, $protected) {
+    public function __construct($input, $protected) {
         $this->output = $input;
         $this->protected = $protected;
     }

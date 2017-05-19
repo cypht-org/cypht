@@ -18,7 +18,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
      * Convert ciphertext to plaintext
      * @param string $string ciphertext to decrypt
      * @param string $key encryption key
-     * @return string decrypted text
+     * @return string|false decrypted text
      */
     public static function plaintext($string, $key) {
         if (!LIBSODIUM) {
@@ -99,7 +99,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
      * @return array
      */
     private static function keygen($key, $salt=false) {
-        if (!$salt) {
+        if ($salt === false) {
             $salt = \Sodium\randombytes_buf(\Sodium\CRYPTO_SECRETBOX_NONCEBYTES);
         }
         return array($salt, parent::pbkdf2($key, $salt, 32, parent::$encryption_rounds, parent::$hmac));

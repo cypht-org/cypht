@@ -76,7 +76,7 @@ class Hm_DB {
     /**
      * Connect to a DB server
      * @param object $site_config site settings
-     * @return object database connection on success
+     * @return object|false database connection on success
      */
     static public function connect($site_config) {
         self::parse_config($site_config);

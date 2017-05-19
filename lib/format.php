@@ -113,7 +113,7 @@ class Hm_Transform {
      * @param string $encoding encoding to use for values
      * @return string on success, false on failure
      */
-    static function stringify($data, $encoding='base64_encode') {
+    public static function stringify($data, $encoding='base64_encode') {
         if (is_string($data)) {
             return $data;
         }
@@ -130,7 +130,7 @@ class Hm_Transform {
      * @param string $encoding encoding to use for values
      * @return mixed array on success, false on failure
      */
-    static function unstringify($data, $encoding='base64_decode') {
+    public static function unstringify($data, $encoding='base64_decode') {
         $result = false;
         if (!is_string($data) || !trim($data)) {
             return false;
@@ -154,7 +154,7 @@ class Hm_Transform {
      * @param string $encoding the type of encoding to use
      * @return array
      */
-    static function hm_encode($data, $encoding) {
+    public static function hm_encode($data, $encoding) {
         $result = array();
         foreach ($data as $name => $val) {
             if (is_array($val)) {

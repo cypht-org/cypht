@@ -19,7 +19,7 @@ class Hm_PHP_Session extends Hm_Session {
      * @return bool
      */
     public function check($request, $user=false, $pass=false, $fingerprint=true) {
-        if ($user && $pass) {
+        if ($user !== false && $pass !== false) {
             if ($this->auth($user, $pass)) {
                 $this->set_key($request);
                 $this->loaded = true;
