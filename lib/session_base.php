@@ -12,6 +12,29 @@
 trait Hm_Session_Fingerprint {
 
     /**
+     * Save a value in the session
+     * @param string $name the name to save
+     * @param string $value the value to save
+     * @return void
+     */
+    abstract protected function set($name, $value);
+
+    /**
+     * Destroy a session for good
+     * @param object $request request details
+     * @return void
+     */
+    abstract protected function destroy($request);
+
+    /**
+     * Return a session value, or a user settings value stored in the session
+     * @param string $name session value name to return
+     * @param string $default value to return if $name is not found
+     * @return mixed the value if found, otherwise $default
+     */
+    abstract protected function get($name, $default=false);
+
+    /**
      * Check HTTP header "fingerprint" against the session value
      * @param object $request request details
      * @return void
@@ -90,7 +113,7 @@ abstract class Hm_Session {
     protected $cname = 'hm_session';
 
     /* authentication object */
-    protected $auth_mech = false;
+    protected $auth_mech;
 
     /* close early flag */
     protected $session_closed = false;
@@ -124,22 +147,6 @@ abstract class Hm_Session {
     abstract protected function auth($user, $pass);
 
     /**
-     * Return a session value, or a user settings value stored in the session
-     * @param string $name session value name to return
-     * @param string $default value to return if $name is not found
-     * @return mixed the value if found, otherwise $default
-     */
-    abstract protected function get($name, $default=false);
-
-    /**
-     * Save a value in the session
-     * @param string $name the name to save
-     * @param string $value the value to save
-     * @return void
-     */
-    abstract protected function set($name, $value);
-
-    /**
      * Delete a value from the session
      * @param string $name name of value to delete
      * @return void
@@ -152,13 +159,6 @@ abstract class Hm_Session {
      * @return void
      */
     abstract protected function end();
-
-    /**
-     * Destroy a session for good
-     * @param object $request request details
-     * @return void
-     */
-    abstract protected function destroy($request);
 
     /**
      * Setup initial data

@@ -172,7 +172,7 @@ class Hm_Crypt_Base {
      * Key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
      * @param string $key payload
      * @param string $salt random string from generate_salt
-     * @return string
+     * @return string[]
      */
     protected static function keygen($key, $salt) {
         return array($salt, self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac));

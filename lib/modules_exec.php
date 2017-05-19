@@ -16,6 +16,7 @@ trait Hm_Output_Module_Exec {
     public $output_data = array();
     public $request;
     public $site_config;
+    public $page = '';
 
     /**
      * Setup a default language translation
@@ -102,6 +103,13 @@ trait Hm_Handler_Module_Exec {
     public $output_data = array();
     public $request;
     public $site_config;
+    public $page = '';
+
+    /**
+     * Setup a default language translation
+     * @return void
+     */
+    abstract public function default_language();
 
     /**
      * Run all the handler modules for a page and merge the results
@@ -152,7 +160,7 @@ trait Hm_Handler_Module_Exec {
 
     /**
      * Merge the combined response from the handler modules with some default values
-     * @param object $request request details
+     * @param Hm_Request $request request details
      * @param object $session session interface
      * @param string $page page id
      * @return void

@@ -96,7 +96,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
      * stretch (or shrink) a key for libsodium
      * @param string $key the key to stretch/shrink
      * @param string $salt a salt to use, or create one if needed
-     * @return array
+     * @return string[]
      */
     protected static function keygen($key, $salt=false) {
         if ($salt === false) {

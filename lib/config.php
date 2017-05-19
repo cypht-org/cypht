@@ -75,7 +75,7 @@ abstract class Hm_Config {
     /**
      * Return a config value if it exists
      * @param string $name config value name
-     * @param mixed $default value to return if the name is not found
+     * @param false|string $default value to return if the name is not found
      * @return mixed found value, otherwise $default
      */
     public function get($name, $default=false) {

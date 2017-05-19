@@ -16,7 +16,7 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
     public $session_key = '';
 
     /* memcached connection */
-    public $conn = false;
+    public $conn;
 
     /* default session lifetime */
     public $lifetime = 86400;
