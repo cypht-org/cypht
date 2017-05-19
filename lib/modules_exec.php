@@ -11,6 +11,18 @@
  */
 trait Hm_Output_Module_Exec {
 
+    public $handler_response = array();
+    public $output_response;
+    public $output_data = array();
+    public $request;
+    public $site_config;
+
+    /**
+     * Setup a default language translation
+     * @return void
+     */
+    abstract public function default_language();
+
     /**
      * Run all the handler modules for a page and merge the results
      * @param Hm_Request $request details about the request
@@ -85,6 +97,12 @@ trait Hm_Output_Module_Exec {
  */
 trait Hm_Handler_Module_Exec {
 
+    public $handler_response = array();
+    public $output_response;
+    public $output_data = array();
+    public $request;
+    public $site_config;
+
     /**
      * Run all the handler modules for a page and merge the results
      * @param Hm_Request $request details about the request
@@ -158,15 +176,16 @@ trait Hm_Handler_Module_Exec {
  */
 class Hm_Module_Exec {
 
-    public $page = false;
-    public $site_config = false;
-    public $user_config = false;
     public $handler_response = array();
-    public $output_response = false;
+    public $output_response;
     public $output_data = array();
+    public $request;
+    public $site_config;
+
+    public $user_config;
+    public $session;
+    public $page = '';
     public $filters = array();
-    public $session = false;
-    public $request = false;
     public $handlers = array();
     public $outputs = array();
 

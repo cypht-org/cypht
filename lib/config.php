@@ -12,7 +12,7 @@
 abstract class Hm_Config {
 
     /* config source */
-    protected $source = false;
+    protected $source = '';
 
     /* config data */
     protected $config = array('version' => VERSION);
@@ -21,7 +21,7 @@ abstract class Hm_Config {
     public $decrypt_failed = false;
 
     /* if decryption fails, save the encrypted payload */
-    public $encrypted_str = false;
+    public $encrypted_str;
 
     /**
      * This method must be overriden by classes extending this one
@@ -107,7 +107,7 @@ abstract class Hm_Config {
     /**
      * Decode user settings with json_decode or unserialize depending
      * on the format
-     * @param string $data serialized or json encoded string
+     * @param string|false $data serialized or json encoded string
      * @return mixed array, or false on failure
      */
     public function decode($data) {

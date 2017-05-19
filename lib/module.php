@@ -191,19 +191,19 @@ abstract class Hm_Handler_Module {
     use Hm_Module_Output;
 
     /* session object */
-    public $session = false;
+    public $session;
 
     /* request object */
-    public $request = false;
+    public $request;
 
     /* site configuration object */
-    public $config = false;
+    public $config;
 
     /* current request id */
-    protected $page = false;
+    protected $page = '';
 
     /* user settings */
-    public $user_config = false;
+    public $user_config;
 
     /**
      * Assign input and state sources

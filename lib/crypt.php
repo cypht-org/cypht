@@ -172,9 +172,19 @@ class Hm_Crypt_Base {
      * Key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
      * @param string $key payload
      * @param string $salt random string from generate_salt
+     * @return string
+     */
+    protected static function keygen($key, $salt) {
+        return array($salt, self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac));
+    }
+    /**
+     * Key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+     * @param string $key payload
+     * @param string $salt random string from generate_salt
      * @param string $length result length
      * @param string $count iterations
      * @param string $algo hash algorithm to use
+     * @return string
      */
     public static function pbkdf2($key, $salt, $length, $count, $algo) {
         /* requires PHP >= 5.5 */
@@ -260,9 +270,6 @@ class Hm_Crypt_Base {
         $res = false;
         try {
             $res = Hm_Functions::random_bytes($size);
-        }
-        catch (Error $e) {
-            throw($e);
         }
         catch (Exception $e) {
             Hm_Functions::cease('No reliable random byte source found');

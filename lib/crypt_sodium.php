@@ -98,11 +98,11 @@ class Hm_Crypt extends Hm_Crypt_Base {
      * @param string $salt a salt to use, or create one if needed
      * @return array
      */
-    private static function keygen($key, $salt=false) {
+    protected static function keygen($key, $salt=false) {
         if ($salt === false) {
             $salt = \Sodium\randombytes_buf(\Sodium\CRYPTO_SECRETBOX_NONCEBYTES);
         }
-        return array($salt, parent::pbkdf2($key, $salt, 32, parent::$encryption_rounds, parent::$hmac));
+        return parent::keygen($key, $salt);
     }
 
 }
