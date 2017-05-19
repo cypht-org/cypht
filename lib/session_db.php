@@ -154,10 +154,10 @@ class Hm_DB_Session extends Hm_PHP_Session {
             $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
             $sql->execute(array($this->session_key));
         }
-        $this->secure_cookie($request, $this->cname, false, time()-3600);
-        $this->secure_cookie($request, 'hm_id', false, time()-3600);
-        $this->secure_cookie($request, 'hm_reload_folders', false, time()-3600);
-        $this->secure_cookie($request, 'hm_msgs', false, time()-3600);
+        $this->secure_cookie($request, $this->cname, '', time()-3600);
+        $this->secure_cookie($request, 'hm_id', '', time()-3600);
+        $this->secure_cookie($request, 'hm_reload_folders', '', time()-3600);
+        $this->secure_cookie($request, 'hm_msgs', '', time()-3600);
         $this->active = false;
         Hm_Request_Key::load($this, $request, false);
     }
