@@ -175,7 +175,6 @@ class Hm_Module_Exec {
 
     /**
      * @param object $config site config
-     * @return void
      */
     public function __construct($config) {
         $this->site_config = $config;

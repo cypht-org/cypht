@@ -164,7 +164,6 @@ abstract class Hm_Session {
      * Setup initial data
      * @param object $config site config
      * @param string $auth_type authentication class
-     * @return void
      */
     public function __construct($config, $auth_type='Hm_Auth_DB') {
         $this->site_config = $config;

@@ -19,7 +19,6 @@ abstract class HM_Format {
     /**
      * Init
      * @param object $config site config object
-     * @return void
      */
     public function __construct($config) {
         $this->config = $config;

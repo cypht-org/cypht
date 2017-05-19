@@ -212,7 +212,6 @@ abstract class Hm_Handler_Module {
      * @param string $page page id
      * @param array $output data from handler modules
      * @param array $protected list of protected output names
-     * @return void
      */
     public function __construct($parent, $logged_in, $page, $output=array(), $protected=array()) {
         $this->session = $parent->session;
@@ -377,7 +376,6 @@ abstract class Hm_Output_Module {
      * Constructor
      * @param array $input data from handler modules
      * @param array $protected list of protected keys
-     * @return void
      */
     function __construct($input, $protected) {
         $this->output = $input;
@@ -408,8 +406,7 @@ abstract class Hm_Output_Module {
      * Build output by calling module specific output functions
      * @param string $format output type, either HTML5 or AJAX
      * @param array $lang_str list of language translation strings
-     * @return mixed module output, a string for HTML5 format,
-     *               and an array for AJAX
+     * @return mixed module output, a string for HTML5 and an array for AJAX
      * @todo remove or fix $protected arg
      */
     public function output_content($format, $lang_str, $protected) {

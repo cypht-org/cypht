@@ -23,7 +23,6 @@ abstract class Hm_Auth {
     /**
      * Assign site config
      * @param object $config site config
-     * @return void
      */
     public function __construct($config) {
         $this->site_config = $config;
@@ -181,7 +180,6 @@ class Hm_Auth_IMAP extends Hm_Auth {
     /**
      * Assign site config, get required libs
      * @param object $config site config
-     * @return void
      */
     public function __construct($config) {
         $this->site_config = $config;
@@ -260,7 +258,6 @@ class Hm_Auth_POP3 extends Hm_Auth {
     /**
      * Assign site config, get required libs
      * @param object $config site config
-     * @return void
      */
     public function __construct($config) {
         $this->site_config = $config;

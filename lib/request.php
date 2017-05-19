@@ -33,7 +33,7 @@ class Hm_Request {
     public $sapi = false;
 
     /* Output format, either Hm_Format_JSON or Hm_Format_HTML5 */
-    public $format = false;
+    public $format = '';
 
     /* bool indicating if the request was over SSL/TLS */
     public $tls = false;
@@ -65,7 +65,6 @@ class Hm_Request {
     /**
      * Process request details
      * @param array $filters list of input filters from module sets
-     * @return void
      */
     public function __construct($filters) {
         $this->filters = $filters;

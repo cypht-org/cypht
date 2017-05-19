@@ -20,7 +20,6 @@ class Hm_Dispatch {
     /**
      * Setup object needed to process a request
      * @param object $config site configuration
-     * @return object
      */
     public function __construct($config) {
 

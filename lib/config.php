@@ -135,7 +135,6 @@ class Hm_User_Config_File extends Hm_Config {
     /**
      * Load site configuration
      * @param object $config site config
-     * @return void
      */
     public function __construct($config) {
         $this->site_config = $config;
@@ -213,7 +212,6 @@ class Hm_User_Config_DB extends Hm_Config {
     /**
      * Load site config
      * @param object $config site config
-     * @return void
      */
     public function __construct($config) {
         $this->site_config = $config;
@@ -306,7 +304,6 @@ class Hm_Site_Config_File extends Hm_Config {
     /**
      * Load data based on source
      * @param string $source source location for site configuration
-     * @return void
      */
     public function __construct($source) {
         $this->load($source, false);
