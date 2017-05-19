@@ -31,7 +31,7 @@ abstract class Hm_Output {
             $this->output_content($response, $input['http_headers']);
         }
         else {
-            $this->output_content($response);
+            $this->output_content($response, array());
         }
     }
 }

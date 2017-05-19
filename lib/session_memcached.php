@@ -57,21 +57,6 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
     }
 
     /**
-     * Continue an existing session
-     * @param object $request request details
-     * @param string $key session key
-     * @return void
-     */
-    public function start_existing($key) {
-        $this->session_key = $key;
-        $data = $this->plaintext($this->conn->get($key));
-        if (is_array($data)) {
-            $this->active = true;
-            $this->data = $data;
-        }
-    }
-
-    /**
      * update memcache with current data
      */
     public function save_data() {

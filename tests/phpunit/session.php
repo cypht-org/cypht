@@ -438,7 +438,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $this->assertTrue($session->is_active());
         $key = $session->session_key;
         $session->end();
-        $session->start_existing_session($key);
+        $session->start_existing($key);
         $session->destroy($request);
     }
     /**

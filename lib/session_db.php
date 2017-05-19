@@ -57,7 +57,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
                 $this->destroy($request);
             }
             else {
-                $this->start_existing_session($request->cookie[$this->cname]);
+                $this->start_existing($request->cookie[$this->cname]);
             }
         }
     }
@@ -80,7 +80,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @param string $key session key
      * @return void
      */
-    public function start_existing_session($key) {
+    public function start_existing($key) {
         $this->session_key = $key;
         $data = $this->get_session_data($key);
         if (is_array($data)) {

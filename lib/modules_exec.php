@@ -184,12 +184,6 @@ trait Hm_Handler_Module_Exec {
  */
 class Hm_Module_Exec {
 
-    public $handler_response = array();
-    public $output_response;
-    public $output_data = array();
-    public $request;
-    public $site_config;
-
     public $user_config;
     public $session;
     public $page = '';

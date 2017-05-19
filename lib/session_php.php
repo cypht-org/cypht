@@ -50,6 +50,22 @@ class Hm_PHP_Session extends Hm_Session {
     }
 
     /**
+     * Continue an existing session. Only used by classes that
+     * extend this one.
+     * @param string $key session key
+     * @return void
+     */
+    public function start_existing($key) {
+        $this->session_key = $key;
+        $data = $this->plaintext($this->conn->get($key));
+        if (is_array($data)) {
+            $this->active = true;
+            $this->data = $data;
+        }
+    }
+
+
+    /**
      * Call the configured authentication method to check user credentials
      * @param string $user username
      * @param string $pass password
