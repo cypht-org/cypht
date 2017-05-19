@@ -11,10 +11,8 @@
  */
 trait Hm_Output_Module_Exec {
 
-    public $handler_response = array();
     public $output_response;
     public $output_data = array();
-    public $page = '';
 
     /**
      * Setup a default language translation
@@ -98,6 +96,7 @@ trait Hm_Handler_Module_Exec {
 
     public $request;
     public $site_config;
+    public $page = '';
 
     /**
      * Setup a default language translation
@@ -180,7 +179,7 @@ class Hm_Module_Exec {
 
     public $user_config;
     public $session;
-    public $page = '';
+    public $handler_response = array();
     public $filters = array();
     public $handlers = array();
     public $outputs = array();
