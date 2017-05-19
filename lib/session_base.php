@@ -126,7 +126,7 @@ abstract class Hm_Session {
     /**
      * Return a session value, or a user settings value stored in the session
      * @param string $name session value name to return
-     * @param mixed $default value to return if $name is not found
+     * @param string $default value to return if $name is not found
      * @return mixed the value if found, otherwise $default
      */
     abstract protected function get($name, $default=false);
@@ -201,7 +201,7 @@ abstract class Hm_Session {
 
     /**
      * Record session level changes not yet saved in persistant storage
-     * @param string $vaue short description of the unsaved value
+     * @param string $value short description of the unsaved value
      * @return void
      */
     public function record_unsaved($value) {
@@ -285,8 +285,8 @@ abstract class Hm_Session {
      * @param string $lifetime cookie lifetime
      * @param string $path cookie path
      * @param string $domain cookie domain
-     * @param bool $html_only set html only cookie flag
-     * @return void
+     * @param boolean $html_only set html only cookie flag
+     * @return boolean
      */
     public function secure_cookie($request, $name, $value, $lifetime=false, $path='', $domain='', $html_only=true) {
         if ($name == 'hm_reload_folders') {

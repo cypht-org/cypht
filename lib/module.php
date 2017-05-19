@@ -284,7 +284,7 @@ abstract class Hm_Handler_Module {
      * Validate a form key. If this is a non-empty POST form from an
      * HTTP request or AJAX update, it will take the user to the home
      * page if the page_key value is either not present or not valid
-     * @return void
+     * @return false|string
      */
     public function process_key() {
         if (empty($this->request->post)) {
@@ -406,7 +406,7 @@ abstract class Hm_Output_Module {
 
     /**
      * Build output by calling module specific output functions
-     * @param string $formt output type, either HTML5 or AJAX
+     * @param string $format output type, either HTML5 or AJAX
      * @param array $lang_str list of language translation strings
      * @return mixed module output, a string for HTML5 format,
      *               and an array for AJAX

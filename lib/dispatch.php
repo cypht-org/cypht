@@ -73,7 +73,7 @@ class Hm_Dispatch {
 
     /**
      * Force TLS connections unless the site config has it disabled
-     * @return bool
+     * @return null|false
      */
     public function check_for_tls_redirect() {
         if (!$this->request->tls && !$this->site_config->get('disable_tls', false) &&
@@ -86,7 +86,7 @@ class Hm_Dispatch {
 
     /**
      * Redirect the page after a POST form is submitted and forward any user notices
-     * @return mixed
+     * @return string|false
      */
     public function check_for_redirect() {
         if (array_key_exists('no_redirect', $this->module_exec->handler_response) && $this->module_exec->handler_response['no_redirect']) {
@@ -142,7 +142,7 @@ class Hm_Dispatch {
     /**
      * Determine the page id
      * @param array $filters list of filters
-     * @param object $request request details
+     * @param Hm_Request $request request details
      * @return void
      */
     public function get_page($filters, $request) {

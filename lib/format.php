@@ -28,7 +28,6 @@ abstract class HM_Format {
     /**
      * Return combined output from all modules. Must be overridden by specific
      * output classes
-     * @param array $output data from the output modules
      * @param array $allowed_output allowed fields for JSON responses
      * @return mixed combined output
      */
@@ -42,8 +41,7 @@ class Hm_Format_JSON extends HM_Format {
 
     /**
      * Run modules and merge + filter the result array
-     * @param array $input data from the handler modules
-     * @param array $lang_str langauge strings
+     * @param array $output data from the handler modules
      * @param array $allowed_output allowed fields for JSON responses
      * @return JSON encoded data to be sent to the browser
      */
@@ -114,7 +112,7 @@ class Hm_Transform {
      * Convert an array to a string
      * @param array $data data to be transformed to a string
      * @param string $encoding encoding to use for values
-     * @return mixed string on success, false on failure
+     * @return string on success, false on failure
      */
     static function stringify($data, $encoding='base64_encode') {
         if (is_string($data)) {

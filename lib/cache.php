@@ -212,6 +212,9 @@ class Hm_Memcached {
     private $port;
     private $cache_con;
 
+    /**
+     * @param Hm_Config $config site config object
+     */
     public function __construct($config) {
         $this->server = $config->get('memcached_server', false);
         $this->port = $config->get('memcached_port', false);
@@ -219,12 +222,19 @@ class Hm_Memcached {
         $this->supported = Hm_Functions::class_exists('Memcached');
     }
 
+    /**
+     * @return boolean
+     */
     public function close() {
         if (!$this->active()) {
             return false;
         }
         return $this->cache_con->quit();
     }
+
+    /**
+     * @param string $key cache key to delete
+     */
     public function del($key) {
         if (!$this->active()) {
             return false;
@@ -232,20 +242,37 @@ class Hm_Memcached {
         return $this->cache_con->delete($key);
     }
 
-    public function set($key, $val, $lifetime=300, $crypt_key=false) {
+    /**
+     * @param string $key key to set
+     * @param string $val value to set
+     * @param integer $lifetime lifetime of the cache entry
+     * @param string $crypt_key encryption key
+     * @return boolean
+     */
+    public function set($key, $val, $lifetime=300, $crypt_key='') {
         if (!$this->active()) {
             return false;
         }
         return $this->cache_con->set($key, $this->prep_in($val, $crypt_key), $lifetime);
     }
 
-    public function get($key, $crypt_key=false) {
+    /**
+     * @param string $key name of value to fetch
+     * @param string $crypt_key encryption key
+     * @return false|string
+     */
+    public function get($key, $crypt_key='') {
         if (!$this->active()) {
             return false;
         }
         return $this->prep_out($this->cache_con->get($key), $crypt_key);
     }
 
+    /**
+     * @param array $data data to prep
+     * @param string $crypt_key encryption key
+     * @return string
+     */
     private function prep_in($data, $crypt_key) {
         if ($crypt_key) {
             return Hm_Crypt::ciphertext(Hm_transform::stringify($data), $crypt_key);
@@ -253,6 +280,11 @@ class Hm_Memcached {
         return $data;
     }
 
+    /**
+     * @param array $data data to prep
+     * @param string $crypt_key encryption key
+     * @return array
+     */
     private function prep_out($data, $crypt_key) {
         if ($crypt_key && is_string($data) && trim($data)) {
             return Hm_transform::unstringify(Hm_Crypt::plaintext($data, $crypt_key));
@@ -260,6 +292,9 @@ class Hm_Memcached {
         return $data;
     }
 
+    /*
+     * @return boolean
+     */
     private function connect() {
         $this->cache_con = Hm_Functions::memcached();
         if (!$this->cache_con->addServer($this->server, $this->port)) {
@@ -270,6 +305,9 @@ class Hm_Memcached {
         return true;
     }
 
+    /*
+     * @return boolean
+     */
     public function active() {
         if (!$this->enabled) {
             return false;

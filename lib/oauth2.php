@@ -20,7 +20,7 @@ class Hm_Oauth2 {
      * Load default settings
      * @param string $id Oath2 client id
      * @param string $secret Oath2 client secret
-     * @param string $redirect_uri URI to redirect to from the remote site
+     * @param string $uir URI to redirect to from the remote site
      * @return object
      */
     public function __construct($id, $secret, $uri) {

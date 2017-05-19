@@ -13,8 +13,9 @@ trait Hm_Output_Module_Exec {
 
     /**
      * Run all the handler modules for a page and merge the results
-     * @param object $request details about the request
+     * @param Hm_Request $request details about the request
      * @param bool $active_session true if the session is active
+     * @param string $page current page request
      * @return void
      */
     public function run_output_modules($request, $active_session, $page) {
@@ -86,7 +87,7 @@ trait Hm_Handler_Module_Exec {
 
     /**
      * Run all the handler modules for a page and merge the results
-     * @param object $request details about the request
+     * @param Hm_Request $request details about the request
      * @param object $session session interface
      * @param string $page page id
      * @return void

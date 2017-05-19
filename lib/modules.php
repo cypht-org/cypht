@@ -140,7 +140,7 @@ trait Hm_Modules {
      * @param bool $logged_in true if the module requires the user to be logged in
      * @param string $placement "before" or "after" the $marker module
      * @param string $source the module set containing this module
-     * @return void
+     * @return boolean
      */
     private static function insert_at_marker($marker, $page, $module, $logged_in, $placement, $source) {
         $inserted = false;
