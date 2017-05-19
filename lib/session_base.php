@@ -78,10 +78,10 @@ abstract class Hm_Session {
     public $enc_key = '';
 
     /* authentication class name */
-    public $auth_class = false;
+    public $auth_class;
 
     /* site config object */
-    public $site_config = false;
+    public $site_config;
 
     /* session data */
     protected $data = array();

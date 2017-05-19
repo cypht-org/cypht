@@ -130,7 +130,7 @@ abstract class Hm_Config {
 class Hm_User_Config_File extends Hm_Config {
 
     /* config values */
-    private $site_config = false;
+    private $site_config;
 
     /**
      * Load site configuration

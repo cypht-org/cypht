@@ -147,7 +147,6 @@ class Hm_Auth_DB extends Hm_Auth {
 
     /**
      * Create a new user in the DB
-     * @param object $request request details
      * @param string $user username
      * @param string $pass password
      * @return bool

@@ -12,7 +12,7 @@
 class Hm_Request_Key {
 
     /* site key */
-    private static $site_hash = false;
+    private static $site_hash = '';
 
     /**
      * Load the request key
@@ -101,8 +101,10 @@ class Hm_Crypt_Base {
      * Check hmac signature
      * @param string $crypt_string payload to check
      * @param string $hmac signature to check
-     * @param string salt from generate_salt()
-     * @param string key supplied key for the encryption
+     * @param string $salt from generate_salt()
+     * @param string $key supplied key for the encryption
+     * @param integer $rounds iterations
+     * @return boolean
      */
     public static function check_hmac($crypt_string, $hmac, $salt, $key, $rounds) {
         $hmac_key = self::pbkdf2($key, $salt, 32, $rounds, self::$hmac);
