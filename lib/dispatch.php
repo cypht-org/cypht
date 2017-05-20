@@ -84,13 +84,10 @@ class Hm_Dispatch {
     }
 
     /**
-     * Redirect the page after a POST form is submitted and forward any user notices
-     * @return string|false
+     * Redirect after an HTTP POST form
+     * @return boolean
      */
-    public function check_for_redirect() {
-        if (array_key_exists('no_redirect', $this->module_exec->handler_response) && $this->module_exec->handler_response['no_redirect']) {
-            return 'noredirect';
-        }
+    private function post_redirect() {
         if (!empty($this->request->post) && $this->request->type == 'HTTP') {
             $msgs = Hm_Msgs::get();
             if (!empty($msgs)) {
@@ -103,6 +100,20 @@ class Hm_Dispatch {
             if (array_key_exists('REQUEST_URI', $this->request->server)) {
                 Hm_Dispatch::page_redirect($this->request->server['REQUEST_URI']);
             }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Redirect the page after a POST form is submitted and forward any user notices
+     * @return string|false
+     */
+    public function check_for_redirect() {
+        if (array_key_exists('no_redirect', $this->module_exec->handler_response) && $this->module_exec->handler_response['no_redirect']) {
+            return 'noredirect';
+        }
+        if ($this->post_redirect()) {
             return 'redirect';
         }
         elseif (array_key_exists('hm_msgs', $this->request->cookie) && trim($this->request->cookie['hm_msgs'])) {
