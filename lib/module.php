@@ -257,19 +257,22 @@ abstract class Hm_Handler_Module {
         if (!$this->session->loaded) {
             return true;
         }
-        $source = array_key_exists('HTTP_ORIGIN', $this->request->server) ? $this->request->server['HTTP_ORIGIN'] : false;
-        if (!$source) {
-            $source = array_key_exists('HTTP_REFERER', $this->request->server) ? $this->request->server['HTTP_REFERER'] : false;
-        }
+        $source = false;
         $target = $this->config->get('cookie_domain', false);
         if ($target == 'none') {
             $target = false;
         }
-        if (!$target) {
-            $target = array_key_exists('HTTP_X_FORWARDED_HOST', $this->request->server) ? $this->request->server['HTTP_X_FORWARDED_HOST'] : false;
+        foreach (array('HTTP_ORIGIN', 'HTTP_REFERER') as $header) {
+            if (array_key_exists($header, $this->request->server) && $this->request->server[$header]) {
+                $source = $this->request->server[$header];
+                break;
+            }
         }
-        if (!$target) {
-            $target = array_key_exists('HTTP_HOST', $this->request->server) ? $this->request->server['HTTP_HOST'] : false;
+        foreach (array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST') as $header) {
+            if (array_key_exists($header, $this->request->server) && $this->request->server[$header]) {
+                $target = $this->request->server[$header];
+                break;
+            }
         }
         if (!$target || !$source) {
             $this->session->destroy($this->request);
