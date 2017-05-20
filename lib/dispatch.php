@@ -150,6 +150,37 @@ class Hm_Dispatch {
     }
 
     /**
+     * Get a list of valid pages
+     * @param array $filters list of filters
+     * @param return array
+     */
+    private function get_pages($filters) {
+        $pages = array();
+        if (array_key_exists('allowed_pages', $filters)) {
+            $pages = $filters['allowed_pages'];
+        }
+        return $pages;
+    }
+
+    /**
+     * Check for a valid ajax request
+     * @param Hm_Request $request request details
+     * @param array $filters list of filters
+     * @return boolean
+     */
+    private function validate_ajax_request($request, $filters) {
+        if (array_key_exists('hm_ajax_hook', $request->post)) {
+            if (in_array($request->post['hm_ajax_hook'], $this->get_pages($filters), true)) {
+                return true;
+            }
+            else {
+                Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Determine the page id
      * @param array $filters list of filters
      * @param Hm_Request $request request details
@@ -157,19 +188,10 @@ class Hm_Dispatch {
      */
     public function get_page($filters, $request) {
         $this->page = 'notfound';
-        $pages = array();
-        if (array_key_exists('allowed_pages', $filters)) {
-            $pages = $filters['allowed_pages'];
+        if ($request->type == 'AJAX' && $this->validate_ajax_request($request, $filters)) {
+            $this->page = $request->post['hm_ajax_hook'];
         }
-        if ($request->type == 'AJAX' && array_key_exists('hm_ajax_hook', $request->post)) {
-            if (in_array($request->post['hm_ajax_hook'], $pages, true)) {
-                $this->page = $request->post['hm_ajax_hook'];
-            }
-            else {
-                Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
-            }
-        }
-        elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $pages, true)) {
+        elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $this->get_pages($filters), true)) {
             $this->page = $request->get['page'];
         }
         elseif (!array_key_exists('page', $request->get)) {
