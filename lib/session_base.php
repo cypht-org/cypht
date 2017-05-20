@@ -277,6 +277,21 @@ abstract class Hm_Session {
     }
 
     /**
+     * @param Hm_Request $request request object
+     * @return string
+     */
+    private function cookie_domain($request) {
+        $domain = $this->site_config->get('cookie_domain', false);
+        if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
+            $domain = $request->server['HTTP_HOST'];
+        }
+        if ($domain == 'none') {
+            $domain = '';
+        }
+        return $domain;
+    }
+
+    /**
      * Set a cookie, secure if possible
      * @param object $request request details
      * @param string $name cookie name
@@ -304,13 +319,7 @@ abstract class Hm_Session {
             $lifetime = $this->lifetime;
         }
         if (!$domain) {
-            $domain = $this->site_config->get('cookie_domain', false);
-            if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
-                $domain = $request->server['HTTP_HOST'];
-            }
-            if ($domain == 'none') {
-                $domain = '';
-            }
+            $domain = $this->cookie_domain($request);
         }
         return Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
     }
