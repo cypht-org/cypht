@@ -15,6 +15,27 @@ class Hm_PHP_Session extends Hm_Session {
     /* data store connection used by classes that extend this */
     public $conn;
 
+
+    /**
+     * Setup newly authenticated session
+     * @param Hm_Request $request
+     * @param boolean $fingerprint
+     * @return null
+     */
+    private function authed($request, $fingerprint) {
+        $this->set_key($request);
+        $this->loaded = true;
+        $this->start($request);
+        if ($fingerprint) {
+            $this->set_fingerprint($request);
+        }
+        else {
+            $this->set('fingerprint', false);
+        }
+        $this->save_auth_detail();
+        $this->just_started();
+    }
+
     /**
      * Check for an existing session or a new user/pass login request
      * @param object $request request details
@@ -25,17 +46,7 @@ class Hm_PHP_Session extends Hm_Session {
     public function check($request, $user=false, $pass=false, $fingerprint=true) {
         if ($user !== false && $pass !== false) {
             if ($this->auth($user, $pass)) {
-                $this->set_key($request);
-                $this->loaded = true;
-                $this->start($request);
-                if ($fingerprint) {
-                    $this->set_fingerprint($request);
-                }
-                else {
-                    $this->set('fingerprint', false);
-                }
-                $this->save_auth_detail();
-                $this->just_started();
+                $this->authed($request, $fingerprint);
             }
             else {
                 Hm_Msgs::add("ERRInvalid username or password");
