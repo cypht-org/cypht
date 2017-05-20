@@ -23,12 +23,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return bool true on success
      */
     public function insert_session_row() {
-        if ($this->dbh) {
-            $sql = $this->dbh->prepare("insert into hm_user_session values(?, ?, current_date)");
-            $enc_data = $this->ciphertext($this->data);
-            return $sql->execute(array($this->session_key, $enc_data));
-        }
-        return false;
+        return $this->upsert('insert');
     }
 
     /**
@@ -123,13 +118,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return void
      */
     public function save_data() {
-        if ($this->dbh) {
-            $sql = $this->dbh->prepare("update hm_user_session set data=? where hm_id=?");
-            $enc_data = $this->ciphertext($this->data);
-            return $sql->execute(array($enc_data, $this->session_key));
-        }
-        Hm_Debug::add('DB SESSION failed to write session data');
-        return false;
+        return $this->upsert('update');
     }
 
     /**
@@ -139,6 +128,28 @@ class Hm_DB_Session extends Hm_PHP_Session {
     public function close_early() {
         $this->session_closed = true;
         $this->save_data();
+    }
+    /**
+     * Update or insert a row
+     * @param string $type type of action (insert or update)
+     * @return bool true on success
+     */
+    public function upsert($type) {
+        if ($this->dbh) {
+            $sql = '';
+            $params = array(':key' => $this->session_key, ':data' => $this->ciphertext($this->data));
+            if ($type == 'update') {
+                $sql = $this->dbh->prepare("update hm_user_session set data=:data where hm_id=:key");
+            }
+            elseif ($type == 'insert') {
+                $sql = $this->dbh->prepare("insert into hm_user_session values(:key, :data, current_date)");
+            }
+            if ($sql) {
+                return $sql->execute($params);
+            }
+        }
+        Hm_Debug::add('DB SESSION failed to write session data');
+        return false;
     }
 
     /**
