@@ -61,8 +61,6 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
         $this->assertEquals('home', $router->page);
         $request = new Hm_Mock_Request('AJAX');
         $request->post['hm_ajax_hook'] = 'ajax_test';
-        $router->get_page(array(), $request);
-        $this->assertEquals('notfound', $router->page);
         $router->get_page(array('allowed_pages' => array('ajax_test')), $request);
         $this->assertEquals('ajax_test', $router->page);
     }
@@ -99,6 +97,20 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
      */
     public function test_page_redirect() {
         $this->assertTrue(Hm_Dispatch::page_redirect('test', 303));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_ajax_request() {
+        ob_start();
+        ob_start();
+        $router = new Hm_Dispatch($this->config);
+        ob_end_clean();
+        $request = new Hm_Mock_Request('HTTP');
+        $this->assertFalse($router->validate_ajax_request($request, array()));
+        $request->post['hm_ajax_hook'] = 'asdf';
+        $this->assertFalse($router->validate_ajax_request($request, array()));
     }
 }
 

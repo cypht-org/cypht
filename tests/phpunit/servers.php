@@ -98,9 +98,14 @@ class Hm_Test_Server_List extends PHPUnit_Framework_TestCase {
         Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 1);
         $this->assertTrue(Hm_Server_Wrapper::connect(1, false, false, false, true) !== false);
         $this->assertTrue(Hm_Server_Wrapper::connect(1, false, false, false, true) !== false);
+
         Hm_Server_Wrapper::add(array('pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 2);
         $this->assertFalse(Hm_Server_Wrapper::connect(2));
         $this->assertFalse(Hm_Server_Wrapper::connect(234));
+
+        Hm_Server_Wrapper::$connected = false;
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 1);
+        $this->assertFalse(Hm_Server_Wrapper::connect(1, false, false, false, true) !== false);
     }
     /**
      * @preserveGlobalState disabled

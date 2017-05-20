@@ -37,10 +37,11 @@ class Hm_Test_Server {
 
 class Hm_Server_Wrapper {
     use Hm_Server_List;
+    static public $connected = true;
     public static function service_connect($id, $server, $user, $pass, $cache) {
         self::$server_list[$id]['object'] = new Hm_Test_Server();
         self::$server_list[$id]['connected'] = true;
-        return true;
+        return self::$connected;
     }
 }
 
