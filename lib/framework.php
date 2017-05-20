@@ -52,7 +52,7 @@ if (!class_exists('Hm_Functions')) {
         /**
          * @param string $name
          * @param string $value
-         * @return null
+         * @return boolean
          */
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $secure=false, $html_only=false) {
             Hm_Debug::add(sprintf('Setting cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',
@@ -99,7 +99,7 @@ if (!class_exists('Hm_Functions')) {
         }
 
         /**
-         * @return handle|false
+         * @return resource|false
          */
         public static function c_init() {
             return curl_init();
@@ -134,7 +134,7 @@ if (!class_exists('Hm_Functions')) {
         }
 
         /**
-         * @return object
+         * @return Memcached
          */
         public static function memcached() {
             return new Memcached();
