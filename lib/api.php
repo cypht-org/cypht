@@ -24,7 +24,7 @@ class Hm_API_Curl {
 
     /**
      * Setup curl options
-     * @param resource $ch curl connection
+     * @param resource|false $ch curl connection
      * @param string $url url to fetch content from
      * @param array $headers HTTP headers
      * @return void
@@ -38,7 +38,7 @@ class Hm_API_Curl {
 
     /**
      * Setup optional post properties
-     * @param resource $ch curl connection
+     * @param resource|false $ch curl connection
      * @param array $post post fields
      * @return void
      */
@@ -65,7 +65,7 @@ class Hm_API_Curl {
 
     /**
      * Process a curl request result
-     * @param resource $ch curl connection
+     * @param resource|false $ch curl connection
      * @return array
      */
     private function curl_result($ch) {
