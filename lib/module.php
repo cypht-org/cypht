@@ -250,13 +250,10 @@ abstract class Hm_Handler_Module {
     }
 
     /**
-     * Validate that the request has matching source and target origins
-     * @return bool
+     * Find source and target values for validate_origin
+     * @return string[]
      */
-    public function validate_origin() {
-        if (!$this->session->loaded) {
-            return true;
-        }
+    private function source_and_target() {
         $source = false;
         $target = $this->config->get('cookie_domain', false);
         if ($target == 'none') {
@@ -273,6 +270,18 @@ abstract class Hm_Handler_Module {
                 $$type = $this->request->server[$header];
             }
         }
+        return array($source, $target);
+    }
+
+    /**
+     * Validate that the request has matching source and target origins
+     * @return bool
+     */
+    public function validate_origin() {
+        if (!$this->session->loaded) {
+            return true;
+        }
+        list($source, $target) = $this->source_and_target();
         if (!$target || !$source) {
             $this->session->destroy($this->request);
             Hm_Debug::add('LOGGED OUT: missing target origin');

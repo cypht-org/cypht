@@ -52,6 +52,7 @@ if (!class_exists('Hm_Functions')) {
         /**
          * @param string $name
          * @param string $value
+         * @return null
          */
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $secure=false, $html_only=false) {
             Hm_Debug::add(sprintf('Setting cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',
@@ -61,18 +62,32 @@ if (!class_exists('Hm_Functions')) {
 
         /**
          * @param string $header
+         * @return null
          */
         public static function header($header) {
             return header($header);
         }
-        public static function cease($msg=false) {
+
+        /**
+         * @param string $msg
+         * @return null
+         */
+        public static function cease($msg='') {
             die($msg);
         }
+
+        /**
+         * @return boolean
+         */
         public static function session_start() {
             return session_start();
         }
+
+        /**
+         * @return boolean
+         */
         public static function error_log($str) {
-            error_log($str);
+            return error_log($str);
         }
 
         /**
@@ -82,6 +97,10 @@ if (!class_exists('Hm_Functions')) {
         public static function c_setopt($handle, $name, $value) {
             curl_setopt($handle, $name, $value);
         }
+
+        /**
+         * @return handle|false
+         */
         public static function c_init() {
             return curl_init();
         }
@@ -113,6 +132,10 @@ if (!class_exists('Hm_Functions')) {
         public static function random_bytes($size) {
             return random_bytes($size);
         }
+
+        /**
+         * @return object
+         */
         public static function memcached() {
             return new Memcached();
         }

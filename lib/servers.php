@@ -28,8 +28,8 @@ trait Hm_Server_List {
 
     /**
      * Process user and pass args
-     * @param string $user username
-     * @param string $pass password
+     * @param string|false $user username
+     * @param string|false $pass password
      * @param array $server server details
      * @return string[]
      */
