@@ -32,32 +32,31 @@ trait Hm_Server_List {
      * @param string $user username
      * @param string $pass password
      * @param bool $save_credentials true to save the username and password
-     * @return mixed connection object on success, otherwise false
+     * @return object|false connection object on success, otherwise false
      */
     public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
-        if (array_key_exists($id, self::$server_list)) {
-            $server = self::$server_list[$id];
-            if ($server['object']) {
-                return $server['object'];
+        if (!array_key_exists($id, self::$server_list)) {
+            return false;
+        }
+        $server = self::$server_list[$id];
+        if ($server['object']) {
+            return $server['object'];
+        }
+        if (($user === false || $pass === false) && (!array_key_exists('user', $server) || !array_key_exists('pass', $server))) {
+            return false;
+        }
+        if (array_key_exists('user', $server) && array_key_exists('pass', $server)) {
+            $user = $server['user'];
+            $pass = $server['pass'];
+        }
+        $res = self::service_connect($id, $server, $user, $pass, $cache);
+        if ($res) {
+            self::$server_list[$id]['connected'] = true;
+            if ($save_credentials) {
+                self::$server_list[$id]['user'] = $user;
+                self::$server_list[$id]['pass'] = $pass;
             }
-            else {
-                if (($user === false || $pass === false) && (!array_key_exists('user', $server) || !array_key_exists('pass', $server))) {
-                    return false;
-                }
-                elseif (array_key_exists('user', $server) && array_key_exists('pass', $server)) {
-                    $user = $server['user'];
-                    $pass = $server['pass'];
-                }
-                $res = self::service_connect($id, $server, $user, $pass, $cache);
-                if ($res) {
-                    self::$server_list[$id]['connected'] = true;
-                    if ($save_credentials) {
-                        self::$server_list[$id]['user'] = $user;
-                        self::$server_list[$id]['pass'] = $pass;
-                    }
-                }
-                return self::$server_list[$id]['object'];
-            }
+            return self::$server_list[$id]['object'];
         }
         return false;
     }
