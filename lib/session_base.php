@@ -326,14 +326,15 @@ abstract class Hm_Session {
 }
 
 /**
- * Start up the selected session type
+ * Set up auth
  * @param object $config site configuration
- * @return object
+ * @return string
  */
-function setup_session($config) {
-
-    $session_type = $config->get('session_type', false);
+function setup_auth($config) {
     $auth_type = $config->get('auth_type', false);
+    if ($auth_type == 'dynamic' && !in_array('dynamic_login', $config->get_modules(), true)) {
+        Hm_Functions::cease('Invalid auth configuration');
+    }
     if ($auth_type && $auth_type != 'dynamic' && $auth_type != 'custom') {
         $auth_class = sprintf('Hm_Auth_%s', $auth_type);
     }
@@ -343,6 +344,18 @@ function setup_session($config) {
     else {
         $auth_class = 'Hm_Auth_None';
     }
+    return $auth_class;
+}
+
+/**
+ * Start up the selected session type
+ * @param object $config site configuration
+ * @return object
+ */
+function setup_session($config) {
+
+    $session_type = $config->get('session_type', false);
+    $auth_class = setup_auth($config);
     if ($session_type == 'DB') {
         $session_class = 'Hm_DB_Session';
     }
@@ -354,9 +367,6 @@ function setup_session($config) {
     }
     else {
         $session_class = 'Hm_PHP_Session';
-    }
-    if ($auth_type == 'dynamic' && !in_array('dynamic_login', $config->get_modules(), true)) {
-        Hm_Functions::cease('Invalid auth configuration');
     }
     if (Hm_Functions::class_exists($auth_class)) {
         Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
