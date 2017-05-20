@@ -279,14 +279,9 @@ abstract class Hm_Handler_Module {
             return false;
         }
         $source = parse_url($source);
-        if (!is_array($source) || !array_key_exists('host', $source)) {
+        if (!is_array($source) || !array_key_exists('host', $source) || $source['host'] !== $target) {
             $this->session->destroy($this->request);
             Hm_Debug::add('LOGGED OUT: invalid source origin');
-            return false;
-        }
-        if ($source['host'] !== $target) {
-            $this->session->destroy($this->request);
-            Hm_Debug::add('LOGGED OUT: mismatched origins');
             return false;
         }
         return true;
