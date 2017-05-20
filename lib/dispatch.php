@@ -168,7 +168,7 @@ class Hm_Dispatch {
      * @param array $filters list of filters
      * @return boolean
      */
-    private function validate_ajax_request($request, $filters) {
+    public function validate_ajax_request($request, $filters) {
         if (array_key_exists('hm_ajax_hook', $request->post)) {
             if (in_array($request->post['hm_ajax_hook'], $this->get_pages($filters), true)) {
                 return true;
