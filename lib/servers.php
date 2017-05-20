@@ -25,6 +25,37 @@ trait Hm_Server_List {
      */
     public abstract function service_connect($id, $server, $user, $pass, $cache);
 
+
+    /**
+     * Process user and pass args
+     * @param string $user username
+     * @param string $pass password
+     * @param array $server server details
+     * @return string[]
+     */
+    private static function user_and_pass($user, $pass, $server) {
+        if (array_key_exists('user', $server) && array_key_exists('pass', $server)) {
+            return array($server['user'], $server['pass']);
+        }
+        return array($user, $pass);
+    }
+
+    /**
+     * Enable server
+     * @param int $id server id
+     * @param string $user username
+     * @param string $pass password
+     * @param bool $save save user and pass
+     */
+    private static function enable_server($id, $user, $pass, $save) {
+        self::$server_list[$id]['connected'] = true;
+        if ($save) {
+            self::$server_list[$id]['user'] = $user;
+            self::$server_list[$id]['pass'] = $pass;
+        }
+        return self::$server_list[$id]['object'];
+    }
+
     /**
      * Connect to a server
      * @param int $id server id
@@ -42,23 +73,15 @@ trait Hm_Server_List {
         if ($server['object']) {
             return $server['object'];
         }
-        if (($user === false || $pass === false) && (!array_key_exists('user', $server) || !array_key_exists('pass', $server))) {
+        list($user, $pass) = self::user_and_pass($user, $pass, $server);
+        if ($user === false || $pass === false) {
             return false;
         }
-        if (array_key_exists('user', $server) && array_key_exists('pass', $server)) {
-            $user = $server['user'];
-            $pass = $server['pass'];
-        }
         $res = self::service_connect($id, $server, $user, $pass, $cache);
-        if ($res) {
-            self::$server_list[$id]['connected'] = true;
-            if ($save_credentials) {
-                self::$server_list[$id]['user'] = $user;
-                self::$server_list[$id]['pass'] = $pass;
-            }
-            return self::$server_list[$id]['object'];
+        if (!$res) {
+            return false;
         }
-        return false;
+        return self::enable_server($id, $user, $pass, $save_credentials);
     }
 
     /**
