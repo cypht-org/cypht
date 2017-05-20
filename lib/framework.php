@@ -106,7 +106,7 @@ if (!class_exists('Hm_Functions')) {
         }
 
         /**
-         * @param resource $handle
+         * @param resource|false $handle
          */
         public static function c_exec($handle) {
             return curl_exec($handle);
