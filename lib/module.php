@@ -262,16 +262,15 @@ abstract class Hm_Handler_Module {
         if ($target == 'none') {
             $target = false;
         }
-        foreach (array('HTTP_ORIGIN', 'HTTP_REFERER') as $header) {
+        $server_vars = array(
+            'HTTP_REFERER' => 'source',
+            'HTTP_ORIGIN' => 'source',
+            'HTTP_HOST' => 'target',
+            'HTTP_X_FORWARDED_HOST' => 'target'
+        );
+        foreach ($server_vars as $header => $type) {
             if (array_key_exists($header, $this->request->server) && $this->request->server[$header]) {
-                $source = $this->request->server[$header];
-                break;
-            }
-        }
-        foreach (array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST') as $header) {
-            if (array_key_exists($header, $this->request->server) && $this->request->server[$header]) {
-                $target = $this->request->server[$header];
-                break;
+                $$type = $this->request->server[$header];
             }
         }
         if (!$target || !$source) {
