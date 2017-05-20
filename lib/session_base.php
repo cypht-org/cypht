@@ -254,7 +254,7 @@ abstract class Hm_Session {
 
     /**
      * Set the session level encryption key
-     * @param object $request request details
+     * @param Hm_Request $request request details
      * @return void
      */
     protected function set_key($request) {

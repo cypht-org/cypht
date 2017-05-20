@@ -219,7 +219,7 @@ class Hm_Debug {
 /**
  * Easy to use error logging
  * @param mixed $mixed vaule to send to the log
- * @return void
+ * @return boolean|null
  */
 function elog($mixed) {
     if (DEBUG_MODE) {
