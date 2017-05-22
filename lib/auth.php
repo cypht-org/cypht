@@ -334,6 +334,10 @@ class Hm_Auth_LDAP extends Hm_Auth {
     protected $fh;
     protected $source = 'ldap';
 
+    /**
+     * Build connect uri
+     * @return string
+     */
     private function connect_details() {
         $prefix = 'ldaps://';
         $server = 'localhost';
@@ -350,6 +354,12 @@ class Hm_Auth_LDAP extends Hm_Auth {
         return $prefix.$server.':'.$port;
     }
 
+    /**
+     * Check a username and password
+     * @param string $user username
+     * @param string $pass password
+     * @return boolean
+     */
     public function check_credentials($user, $pass) {
         list($server, $port, $tls) = get_auth_config($this->site_config, 'ldap');
         $base_dn = $this->site_config->get('ldap_auth_base_dn', false);
@@ -369,6 +379,10 @@ class Hm_Auth_LDAP extends Hm_Auth {
         return false;
     }
 
+    /**
+     * Connect and auth to the LDAP server
+     * @return boolean
+     */
     public function connect() {
         if (!Hm_Functions::function_exists('ldap_connect')) {
             return false;
@@ -383,6 +397,10 @@ class Hm_Auth_LDAP extends Hm_Auth {
         return false;
     }
 
+    /**
+     * Authenticate to the LDAP server
+     * @return boolean
+     */
     protected function auth() {
         $result = @ldap_bind($this->fh, $this->config['user'], $this->config['pass']);
         ldap_unbind($this->fh);
@@ -394,6 +412,9 @@ class Hm_Auth_LDAP extends Hm_Auth {
 }
 
 /*
+ * @param object $config site config object
+ * @param string $prefix settings prefix
+ * @return array
  */
 function get_auth_config($config, $prefix) {
     $server = $config->get($prefix.'_auth_server', false);
