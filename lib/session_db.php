@@ -115,7 +115,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Write session data to the db
-     * @return void
+     * @return boolean
      */
     public function save_data() {
         return $this->upsert('update');

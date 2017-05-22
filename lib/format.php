@@ -42,7 +42,7 @@ class Hm_Format_JSON extends HM_Format {
      * Run modules and merge + filter the result array
      * @param array $output data from the handler modules
      * @param array $allowed_output allowed fields for JSON responses
-     * @return JSON encoded data to be sent to the browser
+     * @return string encoded data to be sent to the browser
      */
     public function content($output, $allowed_output) {
         $output['router_user_msgs'] = Hm_Msgs::get();

@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/jasonmunro/cypht.svg?branch=master)](https://travis-ci.org/jasonmunro/cypht)
 [![Coverage Status](https://coveralls.io/repos/github/jasonmunro/cypht/badge.svg?branch=master)](https://coveralls.io/github/jasonmunro/cypht?branch=master)
+![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jasonmunro/cypht/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jasonmunro/cypht/?branch=master)
 
 #### Cypht
 [https://cypht.org](https://cypht.org)
