@@ -221,7 +221,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
      */
     public function check_credentials($user, $pass) {
         $imap = new Hm_IMAP();
-        list($server, $port, $tls) = $this->get_imap_config();
+        list($server, $port, $tls) = get_auth_config($this->site_config, 'imap');
         if ($user && $pass && $server && $port) {
             $this->imap_settings = array(
                 'server' => $server,
@@ -246,17 +246,6 @@ class Hm_Auth_IMAP extends Hm_Auth {
      */
     public function save_auth_detail($session) {
         $session->set('imap_auth_server_settings', $this->imap_settings);
-    }
-
-    /**
-     * Get IMAP server details from the site config
-     * @return array list of required details
-     */
-    private function get_imap_config() {
-        $server = $this->site_config->get('imap_auth_server', false);
-        $port = $this->site_config->get('imap_auth_port', false);
-        $tls = $this->site_config->get('imap_auth_tls', false);
-        return array($server, $port, $tls);
     }
 }
 
@@ -306,7 +295,7 @@ class Hm_Auth_POP3 extends Hm_Auth {
      */
     public function check_credentials($user, $pass) {
         $pop3 = new Hm_POP3();
-        list($server, $port, $tls) = $this->get_pop3_config();
+        list($server, $port, $tls) = get_auth_config($this->site_config, 'pop3');
         if ($user && $pass && $server && $port) {
             $this->pop3_settings = array(
                 'server' => $server,
@@ -324,17 +313,6 @@ class Hm_Auth_POP3 extends Hm_Auth {
         Hm_Debug::add($pop3->puke());
         Hm_Debug::add('Invalid POP3 auth configuration settings');
         return false;
-    }
-
-    /**
-     * Get POP3 server details from the site config
-     * @return array list of required details
-     */
-    private function get_pop3_config() {
-        $server = $this->site_config->get('pop3_auth_server', false);
-        $port = $this->site_config->get('pop3_auth_port', false);
-        $tls = $this->site_config->get('pop3_auth_tls', false);
-        return array($server, $port, $tls);
     }
 
     /**
@@ -373,7 +351,8 @@ class Hm_Auth_LDAP extends Hm_Auth {
     }
 
     public function check_credentials($user, $pass) {
-        list($server, $port, $tls, $base_dn) = $this->get_ldap_config();
+        list($server, $port, $tls) = get_auth_config($this->site_config, 'ldap');
+        $base_dn = $this->site_config->get('ldap_auth_base_dn', false);
         if ($server && $port && $base_dn) {
             $user = sprintf('cn=%s,%s', $user, $base_dn);
             $this->config = array(
@@ -388,15 +367,6 @@ class Hm_Auth_LDAP extends Hm_Auth {
         }
         Hm_Debug::add('Invalid LDAP auth configuration settings');
         return false;
-    }
-
-    private function get_ldap_config() {
-        $server = $this->site_config->get('ldap_auth_server', false);
-        $port = $this->site_config->get('ldap_auth_port', false);
-        $tls = $this->site_config->get('ldap_auth_tls', false);
-        $base_dn = $this->site_config->get('ldap_auth_base_dn', false);
-        return array($server, $port, $tls, $base_dn);
-
     }
 
     public function connect() {
@@ -421,4 +391,13 @@ class Hm_Auth_LDAP extends Hm_Auth {
         }
         return $result;
     }
+}
+
+/*
+ */
+function get_auth_config($config, $prefix) {
+    $server = $config->get($prefix.'_auth_server', false);
+    $port = $config->get($prefix.'_auth_port', false);
+    $tls = $config->get($prefix.'_auth_tls', false);
+    return array($server, $port, $tls);
 }

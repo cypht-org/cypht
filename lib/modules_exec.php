@@ -85,7 +85,7 @@ trait Hm_Output_Module_Exec {
     /**
      * @param object $mod output module
      * @param string $format output format type
-     * @param string $lang_str language
+     * @param array $lang_str translation lookup array
      * @param array protected output
      * @return array
      */

@@ -175,7 +175,7 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Setup the cookie params for a session cookie
-     * @param object $request request details
+     * @param Hm_Request $request request details
      * @return array list of cookie fields
      */
     public function set_session_params($request) {
