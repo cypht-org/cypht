@@ -218,36 +218,53 @@ class Hm_User_Config_DB extends Hm_Config {
     }
 
     /**
+     * @param string $username
+     * @return boolean
+     */
+    private function new_settings($username) {
+        $sql = $this->dbh->prepare("insert into hm_user_settings values(?,?)");
+        $sql->execute(array($username, ''));
+        Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
+        $this->config = array();
+        return true;
+    }
+
+    /**
+     * @param string $data
+     * @param string $key
+     * @return boolean
+     */
+    private function decrypt_settings($data, $key) {
+        $data = $this->decode(Hm_Crypt::plaintext($data['settings'], $key));
+        if (is_array($data)) {
+            $this->config = array_merge($this->config, $data);
+            $this->set_tz();
+            return true;
+        }
+        else {
+            $this->decrypt_failed = true;
+            $this->encrypted_str = $data['settings'];
+            return false;
+        }
+    }
+
+    /**
      * Load the user settings from the DB
      * @param string $username username
      * @param string $key encryption key
-     * @return void
+     * @return boolean
      */
     public function load($username, $key) {
-        if ($this->connect()) {
-            $sql = $this->dbh->prepare("select * from hm_user_settings where username=?");
-            if ($sql->execute(array($username))) {
-                $data = $sql->fetch();
-                if (!$data || !array_key_exists('settings', $data)) {
-                    $sql = $this->dbh->prepare("insert into hm_user_settings values(?,?)");
-                    if ($sql->execute(array($username, ''))) {
-                        Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
-                        $this->config = array();
-                    }
-                }
-                else {
-                    $data = $this->decode(Hm_Crypt::plaintext($data['settings'], $key));
-                    if (is_array($data)) {
-                        $this->config = array_merge($this->config, $data);
-                        $this->set_tz();
-                    }
-                    else {
-                        $this->decrypt_failed = true;
-                        $this->encrypted_str = $data['settings'];
-                    }
-                }
-            }
+        if (!$this->connect()) {
+            return false;
         }
+        $sql = $this->dbh->prepare("select * from hm_user_settings where username=?");
+        $sql->execute(array($username));
+        $data = $sql->fetch();
+        if (!$data || !array_key_exists('settings', $data)) {
+            return $this->new_settings($username);
+        }
+        return $this->decrypt_settings($data, $key);
     }
 
     /**
