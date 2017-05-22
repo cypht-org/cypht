@@ -297,6 +297,31 @@ abstract class Hm_Handler_Module {
     }
 
     /**
+     * @return string
+     */
+    private function invalid_ajax_key() {
+        if (DEBUG_MODE) {
+            Hm_Debug::add('REQUEST KEY check failed');
+            Hm_Debug::load_page_stats();
+            Hm_Debug::show('log');
+        }
+        Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
+        return 'exit';
+    }
+
+    /**
+     * @return string
+     */
+    private function invalid_http_key() {
+        if ($this->session->loaded) {
+            $this->session->destroy($this->request);
+            Hm_Debug::add('LOGGED OUT: request key check failed');
+        }
+        Hm_Dispatch::page_redirect('?page=home');
+        return 'redirect';
+    }
+
+    /**
      * Validate a form key. If this is a non-empty POST form from an
      * HTTP request or AJAX update, it will take the user to the home
      * page if the page_key value is either not present or not valid
@@ -308,26 +333,15 @@ abstract class Hm_Handler_Module {
         }
         $key = array_key_exists('hm_page_key', $this->request->post) ? $this->request->post['hm_page_key'] : false;
         $valid = Hm_Request_Key::validate($key);
-        if (!$valid) {
-            if ($this->request->type == 'AJAX') {
-                if (DEBUG_MODE) {
-                    Hm_Debug::add('REQUEST KEY check failed');
-                    Hm_Debug::load_page_stats();
-                    Hm_Debug::show('log');
-                }
-                Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
-                return 'exit';
-            }
-            else {
-                if ($this->session->loaded) {
-                    $this->session->destroy($this->request);
-                    Hm_Debug::add('LOGGED OUT: request key check failed');
-                }
-                Hm_Dispatch::page_redirect('?page=home');
-                return 'redirect';
-            }
+        if ($valid) {
+            return false;
         }
-        return false;
+        if ($this->request->type == 'AJAX') {
+            return $this->invalid_ajax_key();
+        }
+        else {
+            return $this->invalid_http_key();
+        }
     }
 
     /**
