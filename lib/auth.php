@@ -193,6 +193,27 @@ class Hm_Auth_IMAP extends Hm_Auth {
     private $imap_settings = array();
 
     /**
+     * @param object $imap imap connection object
+     * @return boolean
+     */
+    private function check_connection($imap) {
+        $imap->connect($this->imap_settings);
+        if ($imap->get_state() == 'authenticated') {
+            return true;
+        }
+        elseif ($imap->get_state() != 'connected') {
+            Hm_Debug::add($imap->show_debug(true));
+            Hm_Debug::add(sprintf('Unable to connect to the IMAP auth server %s', $this->imap_settings['server']));
+            return false;
+        }
+        else {
+            Hm_Debug::add($imap->show_debug(true));
+            Hm_Debug::add(sprintf('IMAP AUTH failed for %s', $this->imap_settings['username']));
+            return false;
+        }
+    }
+
+    /**
      * Send the username and password to the configured IMAP server for authentication
      * @param string $user username
      * @param string $pass password
@@ -211,18 +232,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
                 'no_caps' => false,
                 'blacklisted_extensions' => array('enable')
             );
-            $imap->connect($this->imap_settings);
-            if ($imap->get_state() == 'authenticated') {
-                return true;
-            }
-            if ($imap->get_state() != 'connected') {
-                Hm_Debug::add($imap->show_debug(true));
-                Hm_Debug::add(sprintf('Unable to connect to the IMAP auth server %s', $server));
-                return false;
-            }
-            Hm_Debug::add($imap->show_debug(true));
-            Hm_Debug::add(sprintf('IMAP AUTH failed for %s', $user));
-            return false;
+            return $this->check_connection($imap);
         }
         Hm_Debug::add($imap->show_debug(true));
         Hm_Debug::add('Invalid IMAP auth configuration settings');
@@ -268,6 +278,27 @@ class Hm_Auth_POP3 extends Hm_Auth {
     }
 
     /**
+     * @param object $pop3 pop3 connection object
+     * @param string $user username to login with
+     * @param string $pass password to login with
+     * @param string $server server to login to
+     * @return boolean
+     */
+    private function check_connection($pop3, $user, $pass, $server) {
+        if (!$pop3->connect()) {
+            Hm_Debug::add($pop3->puke());
+            Hm_Debug::add(sprintf('Unable to connect to the POP3 auth server %s', $server));
+            return false;
+        }
+        if (!$pop3->auth($user, $pass)) {
+            Hm_Debug::add($pop3->puke());
+            Hm_Debug::add(sprintf('POP3 AUTH failed for %s', $user));
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Send the username and password to the configured POP3 server for authentication
      * @param string $user username
      * @param string $pass password
@@ -288,17 +319,7 @@ class Hm_Auth_POP3 extends Hm_Auth {
             $pop3->server = $server;
             $pop3->port = $port;
             $pop3->tls = $tls;
-            if ($pop3->connect()) {
-                if ($pop3->auth($user, $pass)) {
-                    return true;
-                }
-                Hm_Debug::add($pop3->puke());
-                Hm_Debug::add(sprintf('POP3 AUTH failed for %s', $user));
-                return false;
-            }
-            Hm_Debug::add($pop3->puke());
-            Hm_Debug::add(sprintf('Unable to connect to the POP3 auth server %s', $server));
-            return false;
+            return $this->check_connection($pop3, $user, $pass, $server);
         }
         Hm_Debug::add($pop3->puke());
         Hm_Debug::add('Invalid POP3 auth configuration settings');
