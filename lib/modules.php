@@ -135,7 +135,7 @@ trait Hm_Modules {
      * @param string $page the page to assign the module to
      * @param string $module the module to add
      * @param bool $logged_in true if the module requires the user to be logged in
-     * @param string $marker the module to insert before or after
+     * @param string|false $marker the module to insert before or after
      * @param string $placement "before" or "after" the $marker module
      * @param string $source the module set containing this module
      * @return boolean
@@ -152,7 +152,7 @@ trait Hm_Modules {
     }
 
     /**
-     * @param string $marker the module to insert before or after
+     * @param string|false $marker the module to insert before or after
      * @param string $page the page to assign the module to
      * @param string $module the module to add
      * @param bool $logged_in true if the module requires the user to be logged in
