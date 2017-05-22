@@ -83,6 +83,11 @@ trait Hm_Output_Module_Exec {
     }
 
     /**
+     * @param object $mod output module
+     * @param string $format output format type
+     * @param string $lang_str language
+     * @param array protected output
+     * @return array
      */
     private function process_result($mod, $format, $lang_str, $protected) {
         $mod_output = false;
@@ -99,6 +104,10 @@ trait Hm_Output_Module_Exec {
     }
 
     /**
+     * @param array $input module input
+     * @param array $protected protected output
+     * @param string|false http output module result
+     * @return array
      */
     private function output_result($input, $protected, $mod_output) {
         if (!$mod_output) {

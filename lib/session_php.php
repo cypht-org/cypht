@@ -127,7 +127,8 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Start the session. This could be an existing session or a new login
-     * @param object $request request details
+     * @param Hm_Request $request request details
+     * @param boolean $existing_session
      * @return void
      */
     public function start($request, $existing_session=false) {
@@ -138,6 +139,28 @@ class Hm_PHP_Session extends Hm_Session {
         session_set_cookie_params(0, $path, $domain, $secure);
         Hm_Functions::session_start();
         $this->session_key = session_id();
+        $this->start_session_data($request);
+        $this->validate_session_data($request, $existing_session);
+    }
+
+    /**
+     * @param Hm_Request $request request details
+     * @param boolean $existing_session
+     * @return void
+     */
+    private function validate_session_data($request, $existing_session) {
+        if ($existing_session && count($this->data) == 0) {
+            $this->destroy($request);
+        }
+        else {
+            $this->active = true;
+        }
+    }
+    /**
+     * @param Hm_Request $request request details
+     * @return void
+     */
+    private function start_session_data($request) {
         if (array_key_exists('data', $_SESSION)) {
             $data = $this->plaintext($_SESSION['data']);
             if (is_array($data)) {
@@ -147,12 +170,6 @@ class Hm_PHP_Session extends Hm_Session {
                 $this->destroy($request);
                 Hm_Debug::add('Mismatched session level encryption key');
             }
-        }
-        if ($existing_session && count($this->data) == 0) {
-            $this->destroy($request);
-        }
-        else {
-            $this->active = true;
         }
     }
 
