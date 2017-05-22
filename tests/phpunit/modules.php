@@ -185,6 +185,7 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('<div class="date"></div>', array(), 'HTML5'), $this->module_exec->run_output_module(array('test' => 'foo'), array(), 'date', array(false, true), $session, 'HTML5', array()));
         $this->assertEquals(array(array('test' => 'foo'), array(), 'JSON'), $this->module_exec->run_output_module(array('test' => 'foo'), array(), 'blah', array(false, true), $session, 'Hm_Format_JSON', array()));
         $this->assertEquals(array(array('test' => 'foo'), array(), 'JSON'), $this->module_exec->run_output_module(array('test' => 'foo'), array(), 'date', array(false, true), $session, 'Hm_Format_JSON', array()));
+		$this->assertEquals(array(array('test' => 'foo'), array(), 'JSON'), $this->module_exec->run_output_module(array('test' => 'foo'), array(), 'date', array(false, true), false, 'Hm_Format_JSON', array()));
 
     }
     /**

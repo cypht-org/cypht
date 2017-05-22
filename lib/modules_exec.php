@@ -38,9 +38,9 @@ trait Hm_Output_Module_Exec {
         $protected = array();
         $modules = Hm_Output_Modules::get_for_page($page);
         $list_output = array();
-        $lang_str = $this->get_current_language();
         foreach ($modules as $name => $args) {
-            list($output, $protected, $type) = $this->run_output_module($input, $protected, $name, $args, $active_session, $request->format, $lang_str);
+            list($output, $protected, $type) = $this->run_output_module($input, $protected, $name,
+                $args, $active_session, $request->format, $this->get_current_language());
             if ($type != 'JSON') {
                 $list_output[] = $output;
             }
@@ -67,27 +67,40 @@ trait Hm_Output_Module_Exec {
      * @param bool $active_session true if the session is active
      * @param string $format HTML5 or JSON format
      * @param array $lang_str translation lookup array
+     * @return array
      */
     public function run_output_module($input, $protected, $name, $args, $active_session, $format, $lang_str) {
         $name = "Hm_Output_$name";
+        if (!class_exists($name)) {
+            Hm_Debug::add(sprintf('Output module %s activated but not found', $name));
+            return $this->output_result($input, $protected, false);
+        }
+        if ($args[1] && !$active_session) {
+            return $this->output_result($input, $protected, false);
+        }
+        $mod = new $name($input, $protected);
+        return $this->process_result($mod, $format, $lang_str, $protected);
+    }
+
+    /**
+     */
+    private function process_result($mod, $format, $lang_str, $protected) {
         $mod_output = false;
-        if (class_exists($name)) {
-            if (!$args[1] || ($args[1] && $active_session)) {
-                $mod = new $name($input, $protected);
-                if ($format == 'Hm_Format_JSON') {
-                    $mod->output_content($format, $lang_str, $protected);
-                    $input = $mod->module_output();
-                    $protected = $mod->output_protected();
-                }
-                else {
-                    $mod_output = $mod->output_content($format, $lang_str, array());
-                    $input = $mod->module_output();
-                }
-            }
+        if ($format == 'Hm_Format_JSON') {
+            $mod->output_content($format, $lang_str, $protected);
+            $input = $mod->module_output();
+            $protected = $mod->output_protected();
         }
         else {
-            Hm_Debug::add(sprintf('Output module %s activated but not found', $name));
+            $mod_output = $mod->output_content($format, $lang_str, array());
+            $input = $mod->module_output();
         }
+        return $this->output_result($input, $protected, $mod_output);
+    }
+
+    /**
+     */
+    private function output_result($input, $protected, $mod_output) {
         if (!$mod_output) {
             return array($input, $protected, 'JSON');
         }
