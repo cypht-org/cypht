@@ -103,30 +103,70 @@ trait Hm_Modules {
      * @return bool true if the module was added or was already registered
      */
     public static function add($page, $module, $logged_in, $marker=false, $placement='after', $queue=true, $source=false) {
-        if (!array_key_exists($page, self::$module_list)) {
-            self::$module_list[$page] = array();
-        }
-        if (array_key_exists($page, self::$module_list) && array_key_exists($module, self::$module_list[$page])) {
+
+        self::add_page($page);
+
+        if (array_key_exists($module, self::$module_list[$page])) {
             Hm_Debug::add(sprintf("Already registered module for %s re-attempted: %s", $page, $module));
             return true;
         }
-        if ($source === false) {
-            $source = self::$source;
+        $source === false ? $source = self::$source : false;
+        $inserted = self::insert_module($marker, $page, $module, $logged_in, $placement, $source);
+        if (!$inserted) {
+            self::queue_module($queue, $page, $module, $logged_in, $marker, $placement, $source);
         }
+        return $inserted;
+    }
+
+    /**
+     * @param string $page page id to add
+     * @return boolean
+     */
+    private static function add_page($page) {
+        if (!array_key_exists($page, self::$module_list)) {
+            self::$module_list[$page] = array();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param bool $queue true to attempt to re-insert the module later on failure
+     * @param string $page the page to assign the module to
+     * @param string $module the module to add
+     * @param bool $logged_in true if the module requires the user to be logged in
+     * @param string $marker the module to insert before or after
+     * @param string $placement "before" or "after" the $marker module
+     * @param string $source the module set containing this module
+     * @return boolean
+     */
+    private static function queue_module($queue, $page, $module, $logged_in, $marker, $placement, $source) {
+        if ($queue) {
+            self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement, $source);
+            return true;
+        }
+        else {
+            Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
+        }
+        return false;
+    }
+
+    /**
+     * @param string $marker the module to insert before or after
+     * @param string $page the page to assign the module to
+     * @param string $module the module to add
+     * @param bool $logged_in true if the module requires the user to be logged in
+     * @param string $placement "before" or "after" the $marker module
+     * @param string $source the module set containing this module
+     * @return boolean
+     */
+    private static function insert_module($marker, $page, $module, $logged_in, $placement, $source) {
         if ($marker !== false) {
             $inserted = self::insert_at_marker($marker, $page, $module, $logged_in, $placement, $source);
         }
         else {
             self::$module_list[$page][$module] = array($source, $logged_in);
             $inserted = true;
-        }
-        if (!$inserted) {
-            if ($queue) {
-                self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement, $source);
-            }
-            else {
-                Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
-            }
         }
         return $inserted;
     }
