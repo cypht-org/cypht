@@ -401,7 +401,7 @@ abstract class Hm_Output_Module {
     protected $dir = 'ltr';
 
     /* Output format (AJAX or HTML5) */
-    protected $format = false;
+    protected $format = '';
 
     /**
      * Constructor
@@ -454,8 +454,8 @@ abstract class Hm_Output_Module {
 
     /**
      * Output modules need to override this method to add to a page or AJAX response
-     * @return mixed should output with $this->output() if $this->format == AJAX, or return an HTML5 formatted
-     *               string if set to HTML5
+     * @return mixed should output with $this->output() if $this->format == * AJAX,
+     *               or return an HTML5 formatted string if set to HTML5
      */
     abstract protected function output();
 }

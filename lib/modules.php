@@ -25,7 +25,7 @@ trait Hm_Modules {
     private static $module_list = array();
 
     /* current module set name, used for error tracking and limiting php file inclusion */
-    private static $source = false;
+    private static $source = '';
 
     /* a retry queue for modules that fail to insert immediately */
     private static $module_queue = array();

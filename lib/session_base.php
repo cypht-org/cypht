@@ -369,8 +369,7 @@ function setup_session($config) {
     }
     if (Hm_Functions::class_exists($auth_class)) {
         Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
-        $session = new $session_class($config, $auth_class);
-        return $session;
+        return new $session_class($config, $auth_class);
     }
     else {
         Hm_Functions::cease('Invalid auth configuration');
