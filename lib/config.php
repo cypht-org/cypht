@@ -282,11 +282,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return bool true on success
      */
     public function connect() {
-        $this->dbh = Hm_DB::connect($this->site_config);
-        if ($this->dbh) {
-            return true;
-        }
-        return false;
+        return ($this->dbh = Hm_DB::connect($this->site_config)) ? true : false;
     }
 
     /**

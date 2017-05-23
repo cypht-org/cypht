@@ -31,11 +31,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return bool true on success
      */
     public function connect() {
-        $this->dbh = Hm_DB::connect($this->site_config);
-        if ($this->dbh) {
-            return true;
-        }
-        return false;
+        return ($this->dbh = Hm_DB::connect($this->site_config)) ? true : false;
     }
 
     /**
