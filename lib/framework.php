@@ -91,11 +91,13 @@ if (!class_exists('Hm_Functions')) {
         }
 
         /**
-         * @param resource $handle
+         * @param resource|false $handle
          * @param integer $name
          */
         public static function c_setopt($handle, $name, $value) {
-            curl_setopt($handle, $name, $value);
+            if ($handle !== false) {
+                curl_setopt($handle, $name, $value);
+            }
         }
 
         /**
