@@ -353,7 +353,6 @@ function setup_auth($config) {
  * @return object
  */
 function setup_session($config) {
-
     $session_type = $config->get('session_type', false);
     $auth_class = setup_auth($config);
     if ($session_type == 'DB') {

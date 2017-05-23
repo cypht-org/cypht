@@ -27,10 +27,10 @@ class Hm_Request {
     public $server = array(); 
 
     /* request type. either AJAX or HTTP */
-    public $type = false;
+    public $type = '';
 
     /* PHP sapi method used for the request */
-    public $sapi = false;
+    public $sapi = '';
 
     /* Output format, either Hm_Format_JSON or Hm_Format_HTML5 */
     public $format = '';
