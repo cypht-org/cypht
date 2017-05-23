@@ -79,6 +79,13 @@ if (!class_exists('Hm_Functions')) {
         /**
          * @return boolean
          */
+        public static function session_destroy() {
+            return session_destroy();
+        }
+
+        /**
+         * @return boolean
+         */
         public static function session_start() {
             return session_start();
         }
