@@ -140,14 +140,25 @@ trait Hm_Uid_Cache {
      * @return void
      */
     public static function load($data) {
-        if (is_array($data) && count($data) == 2) {
-            if (count($data[0]) > 0) {
-                self::$read = array_combine($data[0], array_fill(0, count($data[0]), 0));
-            }
-            if (count($data[1]) > 0) {
-                self::$unread = array_combine($data[1], array_fill(0, count($data[1]), 0));
-            }
+        if (!is_array($data) || count($data) != 2) {
+            return;
         }
+        if (count($data[0]) > 0) {
+            self::update_count($data, 'read', 0);
+        }
+        if (count($data[1]) > 0) {
+            self::update_count($data, 'unread', 1);
+        }
+    }
+
+    /**
+     * @param array $data uids to merge
+     * @param string $type uid type (read or unread)
+     * @param integer $pos position in the $data array
+     * @return void
+     */
+    private static function update_count($data, $type, $pos) {
+        self::$$type = array_combine($data[$pos], array_fill(0, count($data[$pos]), 0));
     }
 
     /**
