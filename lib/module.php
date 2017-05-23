@@ -438,9 +438,8 @@ abstract class Hm_Output_Module {
      * @param string $format output type, either HTML5 or AJAX
      * @param array $lang_str list of language translation strings
      * @return mixed module output, a string for HTML5 and an array for AJAX
-     * @todo remove or fix $protected arg
      */
-    public function output_content($format, $lang_str, $protected) {
+    public function output_content($format, $lang_str) {
         $this->lstr = $lang_str;
         $this->format = str_replace('Hm_Format_', '', $format);
         if (array_key_exists('interface_lang', $lang_str)) {
@@ -454,8 +453,7 @@ abstract class Hm_Output_Module {
 
     /**
      * Output modules need to override this method to add to a page or AJAX response
-     * @return mixed should output with $this->output() if $this->format == * AJAX,
-     *               or return an HTML5 formatted string if set to HTML5
+     * @return string
      */
     abstract protected function output();
 }
