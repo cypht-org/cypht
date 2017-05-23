@@ -125,6 +125,7 @@ trait Hm_Handler_Module_Exec {
 
     public $request;
     public $site_config;
+    public $handler_response = array();
     public $page = '';
     public $session;
 
@@ -207,14 +208,13 @@ trait Hm_Handler_Module_Exec {
  */
 class Hm_Module_Exec {
 
+    use Hm_Output_Module_Exec;
+    use Hm_Handler_Module_Exec;
+
     public $user_config;
-    public $handler_response = array();
     public $filters = array();
     public $handlers = array();
     public $outputs = array();
-
-    use Hm_Output_Module_Exec;
-    use Hm_Handler_Module_Exec;
 
     /**
      * @param object $config site config
