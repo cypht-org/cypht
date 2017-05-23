@@ -146,17 +146,16 @@ class Hm_Request {
         if (!$data) {
             return array();
         }
+        $input = array();
         if ($type == INPUT_GET) {
-            $this->invalid_input_detected = count($_GET) > count($data);
-            if ($this->invalid_input_detected) {
-                $this->invalid_input_fields = array_keys(array_diff_assoc($_GET, $data));
-            }
+            $input = $_GET;
         }
-        if ($type == INPUT_POST) {
-            $this->invalid_input_detected = count($_POST) > count($data);
-            if ($this->invalid_input_detected) {
-                $this->invalid_input_fields = array_keys(array_diff_assoc($_POST, $data));
-            }
+        elseif ($type == 'INPUT_POST') {
+            $input = $_POST;
+        }
+        $this->invalid_input_detected = count($input) > count($data);
+        if ($this->invalid_input_detected) {
+            $this->invalid_input_fields = array_keys(array_diff_assoc($input, $data));
         }
         return $data;
     }
