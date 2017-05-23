@@ -256,7 +256,7 @@ class Hm_PHP_Session extends Hm_Session {
 
     /**
      * Destroy a session for good
-     * @param object $request request details
+     * @param Hm_Request $request request details
      * @return void
      */
     public function destroy($request) {
