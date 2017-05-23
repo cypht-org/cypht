@@ -62,16 +62,11 @@ else {
     ini_set('display_start_up_errors', 1);
 }
 
-/* open base dir */
 $base = dirname(dirname(__FILE__)).PATH_SEPARATOR.'/tmp'.PATH_SEPARATOR.'/dev/urandom';
-if ($config->get('app_data_dir', false) && is_readable($config->get('app_data_dir', false))) {
-    $base .= PATH_SEPARATOR.$config->get('app_data_dir', false);
-}
-if ($config->get('user_settings_dir', false) && is_readable($config->get('user_settings_dir', false))) {
-    $base .= PATH_SEPARATOR.$config->get('user_settings_dir', false);
-}
-if ($config->get('attachment_dir', false) && is_readable($config->get('attachment_dir', false))) {
-    $base .= PATH_SEPARATOR.$config->get('attachment_dir', false);
+foreach (array('app_data_dir', 'user_settings_dir', 'attachment_dir') as $dir) {
+    if ($config->get($dir, false) && is_readable($config->get($dir, false))) {
+        $base .= PATH_SEPARATOR.$config->get($dir, false);
+    }
 }
 if (!defined('HHVM_VERSION')) {
     ini_set('open_basedir', $base);
