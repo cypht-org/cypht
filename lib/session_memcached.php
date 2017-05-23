@@ -27,18 +27,7 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
      * @return void
      */
     public function start($request) {
-        $this->connect();
-        if ($this->conn->active()) {
-            if ($this->loaded) {
-                $this->start_new($request);
-            }
-            elseif (!array_key_exists($this->cname, $request->cookie)) {
-                $this->destroy($request);
-            }
-            else {
-                $this->start_existing($request->cookie[$this->cname]);
-            }
-        }
+        $this->db_start($request);
     }
 
     /**
@@ -105,7 +94,11 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
         Hm_Request_Key::load($this, $request, false);
     }
 
+    /**
+     * @return boolean
+     */
     public function connect() {
         $this->conn = new Hm_Memcached($this->site_config);
+        return $this->conn->active();
     }
 }

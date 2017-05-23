@@ -11,10 +11,28 @@
  */
 class Hm_PHP_Session extends Hm_Session {
 
-
     /* data store connection used by classes that extend this */
     public $conn;
 
+    /**
+     * Start the session. This could be an existing session or a new login
+     * Only used by db based classes that extend this one
+     * @param object $request request details
+     * @return void
+     */
+    public function db_start($request) {
+        if ($this->connect()) {
+            if ($this->loaded) {
+                $this->start_new($request);
+            }
+            elseif (!array_key_exists($this->cname, $request->cookie)) {
+                $this->destroy($request);
+            }
+            else {
+                $this->start_existing($request->cookie[$this->cname]);
+            }
+        }
+    }
 
     /**
      * Setup newly authenticated session

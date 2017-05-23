@@ -44,17 +44,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return void
      */
     public function start($request) {
-        if ($this->connect()) {
-            if ($this->loaded) {
-                $this->start_new_session($request);
-            }
-            else if (!array_key_exists($this->cname, $request->cookie)) {
-                $this->destroy($request);
-            }
-            else {
-                $this->start_existing($request->cookie[$this->cname]);
-            }
-        }
+        $this->db_start($request);
     }
 
     /**
@@ -62,7 +52,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @param object $request request details
      * @return void
      */
-    public function start_new_session($request) {
+    public function start_new($request) {
         $this->session_key = Hm_Crypt::unique_id(); 
         $this->secure_cookie($request, $this->cname, $this->session_key, 0);
         if ($this->insert_session_row()) {
