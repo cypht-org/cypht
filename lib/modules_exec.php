@@ -31,10 +31,11 @@ trait Hm_Output_Module_Exec {
      * @param Hm_Request $request details about the request
      * @param bool $active_session true if the session is active
      * @param string $page current page request
+     * @param array $handler_response data from handler modules
      * @return void
      */
-    public function run_output_modules($request, $active_session, $page) {
-        $input = $this->handler_response;
+    public function run_output_modules($request, $active_session, $page, $handler_response) {
+        $input = $handler_response;
         $protected = array();
         $modules = Hm_Output_Modules::get_for_page($page);
         $list_output = array();
@@ -125,6 +126,7 @@ trait Hm_Handler_Module_Exec {
     public $request;
     public $site_config;
     public $page = '';
+    public $session;
 
     /**
      * Setup a default language translation
@@ -206,7 +208,6 @@ trait Hm_Handler_Module_Exec {
 class Hm_Module_Exec {
 
     public $user_config;
-    public $session;
     public $handler_response = array();
     public $filters = array();
     public $handlers = array();

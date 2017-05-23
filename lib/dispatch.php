@@ -64,7 +64,8 @@ class Hm_Dispatch {
         $active_session = $this->save_session();
 
         /* run the output formatting modules */
-        $this->module_exec->run_output_modules($this->request, $active_session, $this->page);
+        $this->module_exec->run_output_modules($this->request, $active_session, $this->page,
+            $this->module_exec->handler_response);
 
         /* output content to the browser */
         $this->render_output();

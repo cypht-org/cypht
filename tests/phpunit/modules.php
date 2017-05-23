@@ -161,14 +161,14 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
     public function test_run_output_modules() {
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
-        $this->module_exec->run_output_modules($request, $session, 'home');
+        $this->module_exec->run_output_modules($request, $session, 'home', $this->module_exec->handler_response);
         $request = new Hm_Mock_Request('AJAX');
-        $this->module_exec->run_output_modules($request, $session, 'ajax_test');
+        $this->module_exec->run_output_modules($request, $session, 'ajax_test', $this->module_exec->handler_response);
         Hm_Output_Modules::add('test', 'date', false, false, false, true, 'core');
         Hm_Output_Modules::add('test', 'blah', false, false, false, true, 'core');
         $request = new Hm_Mock_Request('HTTP');
         $this->module_exec->load_module_set_files(array('core'), array('core'));
-        $this->module_exec->run_output_modules($request, $session, 'test');
+        $this->module_exec->run_output_modules($request, $session, 'test', $this->module_exec->handler_response);
         $this->assertEquals(array('<div class="date"></div>'), $this->module_exec->output_response);
     }
     /**
