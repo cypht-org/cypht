@@ -162,4 +162,23 @@ class Hm_DB_Session extends Hm_PHP_Session {
         $this->active = false;
         Hm_Request_Key::load($this, $request, false);
     }
+
+    /**
+     * Start the session. This could be an existing session or a new login
+     * @param object $request request details
+     * @return void
+     */
+    public function db_start($request) {
+        if ($this->connect()) {
+            if ($this->loaded) {
+                $this->start_new($request);
+            }
+            elseif (!array_key_exists($this->cname, $request->cookie)) {
+                $this->destroy($request);
+            }
+            else {
+                $this->start_existing($request->cookie[$this->cname]);
+            }
+        }
+    }
 }

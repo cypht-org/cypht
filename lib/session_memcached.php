@@ -10,7 +10,7 @@
  * This session class uses a memcached to manage session data. It does not
  * use PHP session handlers at all and is a completely indenpendant session system.
  */
-class Hm_Memcached_Session extends Hm_PHP_Session {
+class Hm_Memcached_Session extends Hm_DB_Session {
 
     /* session key */
     public $session_key = '';
@@ -101,4 +101,14 @@ class Hm_Memcached_Session extends Hm_PHP_Session {
         $this->conn = new Hm_Memcached($this->site_config);
         return $this->conn->active();
     }
+
+    /**
+     * Get session data from the DB
+     * @param string $key session key
+     * @return mixed array results or false on failure
+     */
+    public function get_session_data($key) {
+        return $this->plaintext($this->conn->get($key));
+    }
+
 }
