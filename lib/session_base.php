@@ -323,6 +323,42 @@ abstract class Hm_Session {
         }
         return Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
     }
+
+    /**
+     * Continue an existing session. Only used by db based classes that
+     * extend this one, or the PHP session class that extends this one
+     * @param string $key session key
+     * @return void
+     */
+    public function start_existing($key) {
+        $this->session_key = $key;
+        $data = $this->plaintext($this->conn->get($key));
+        if (is_array($data)) {
+            $this->active = true;
+            $this->data = $data;
+        }
+    }
+
+    /**
+     * Start the session. This could be an existing session or a new login
+     * Only used by db based classes that extend this one, or the PHP session
+     * class that extends this one.
+     * @param object $request request details
+     * @return void
+     */
+    public function db_start($request) {
+        if ($this->connect()) {
+            if ($this->loaded) {
+                $this->start_new($request);
+            }
+            elseif (!array_key_exists($this->cname, $request->cookie)) {
+                $this->destroy($request);
+            }
+            else {
+                $this->start_existing($request->cookie[$this->cname]);
+            }
+        }
+    }
 }
 
 /**
