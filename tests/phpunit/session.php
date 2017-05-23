@@ -101,14 +101,6 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $session->check($request);
         $this->assertFalse($session->is_active());
         $session->destroy($request);
-
-        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
-        $request->cookie['hm_session'] = 'testid';
-        $request->invalid_input_detected = true;
-        $request->invalid_input_fields = array('test');
-        $session->check($request, 'unittestuser', 'unittestpass');
-        $this->assertFalse($session->is_active());
-        $session->destroy($request);
     }
     /**
      * @preserveGlobalState disabled

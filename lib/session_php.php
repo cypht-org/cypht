@@ -55,10 +55,6 @@ class Hm_PHP_Session extends Hm_Session {
             $this->start($request, true);
             $this->check_fingerprint($request);
         }
-        if ($this->is_active() && $request->invalid_input_detected) {
-            Hm_Debug::add(sprintf('Invalid input fields: %s', implode(',', $request->invalid_input_fields)));
-            $this->destroy($request);
-        }
         return $this->is_active();
     }
 

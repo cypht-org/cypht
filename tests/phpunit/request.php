@@ -51,6 +51,15 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_filter_input() {
+        Hm_Functions::$filter_failure = true;
+        $req = new Hm_Request(filters());
+        $this->assertEquals(array(), $req->get);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_one_more_time() {
         $_SERVER['REQUEST_URI'] = 'test?hmm=1';
         $_SERVER['REQUEST_SCHEME'] = 'https';

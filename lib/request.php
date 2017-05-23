@@ -142,19 +142,8 @@ class Hm_Request {
      */
     public function filter_input($type, $filters) {
         $data = Hm_Functions::filter_input_array($type, $filters);
-        if (!$data) {
+        if ($data === false || $data === NULL) {
             return array();
-        }
-        $input = array();
-        if ($type == INPUT_GET) {
-            $input = $_GET;
-        }
-        elseif ($type == 'INPUT_POST') {
-            $input = $_POST;
-        }
-        $this->invalid_input_detected = count($input) > count($data);
-        if ($this->invalid_input_detected) {
-            $this->invalid_input_fields = array_keys(array_diff_assoc($input, $data));
         }
         return $data;
     }

@@ -109,6 +109,7 @@ class Hm_Functions {
         public static $memcache = true;
         public static $exists = true;
         public static $exec_res = '{"unit":"test"}';
+        public static $filter_failure = false;
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
         public static function header($header) { return true; }
         public static function cease() { return true; }
@@ -138,6 +139,9 @@ class Hm_Functions {
             }
         }
         public static function filter_input_array($type, $filters) {
+            if (self::$filter_failure) {
+                return false;
+            }
             switch ($type) {
             case INPUT_SERVER:
                 return filter_var_array($_SERVER, $filters, false);
