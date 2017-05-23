@@ -31,18 +31,10 @@ class Hm_Memcached_Session extends Hm_DB_Session {
     }
 
     /**
-     * Start a new session
-     * @param object $request request details
-     * @return void
+     * save data on session start
      */
-    public function start_new($request) {
-        $this->session_key = Hm_Crypt::unique_id(); 
-        $this->secure_cookie($request, $this->cname, $this->session_key, 0);
-        if ($this->save_data()) {
-            $this->active = true;
-            return;
-        }
-        Hm_Debug::add('MEM SESSION failed to start a new session');
+    public function insert_session_row() {
+        return $this->save_data();
     }
 
     /**

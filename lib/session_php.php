@@ -268,9 +268,7 @@ class Hm_PHP_Session extends Hm_Session {
             delete_uploaded_files($this);
         }
         session_unset();
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            Hm_Functions::session_destroy();
-        }
+        Hm_Functions::session_destroy();
         $params = session_get_cookie_params();
         $this->secure_cookie($request, $this->cname, '', time()-3600, $params['path'], $params['domain']);
         $this->secure_cookie($request, 'hm_id', '', time()-3600);

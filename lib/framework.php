@@ -80,7 +80,10 @@ if (!class_exists('Hm_Functions')) {
          * @return boolean
          */
         public static function session_destroy() {
-            return session_destroy();
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                return session_destroy();
+            }
+            return false;
         }
 
         /**

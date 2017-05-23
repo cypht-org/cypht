@@ -53,7 +53,9 @@ class Hm_DB_Session extends Hm_PHP_Session {
         $this->secure_cookie($request, $this->cname, $this->session_key, 0);
         if ($this->insert_session_row()) {
             $this->active = true;
+            return;
         }
+        Hm_Debug::add('Failed to start a new session');
     }
 
     /**
