@@ -137,6 +137,22 @@ class Hm_Functions {
                 throw(new Exception());
             }
         }
+        public static function filter_input_array($type, $filters) {
+            switch ($type) {
+            case INPUT_SERVER:
+                return filter_var_array($_SERVER, $filters, false);
+                break;
+            case INPUT_POST:
+                return filter_var_array($_POST, $filters, false);
+                break;
+            case INPUT_GET:
+                return filter_var_array($_GET, $filters, false);
+                break;
+            case INPUT_COOKIE:
+                return filter_var_array($_COOKIE, $filters, false);
+                break;
+            }
+        }
 }
 
 function setup_db($config) {

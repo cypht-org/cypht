@@ -151,5 +151,14 @@ if (!class_exists('Hm_Functions')) {
         public static function memcached() {
             return new Memcached();
         }
+
+        /**
+         * @param string $type input type
+         * @param array $filters filter list
+         * @return array filtered list
+         */
+        public static function filter_input_array($type, $filters) {
+            return filter_input_array($type, $filters, false);
+        }
     }
 }

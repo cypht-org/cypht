@@ -86,16 +86,16 @@ class Hm_Request {
      */
     private function filter_request_input() {
         if (array_key_exists('allowed_server', $this->filters)) {
-            $this->server = $this->filter_input(INPUT_SERVER, $_SERVER, $this->filters['allowed_server']);
+            $this->server = $this->filter_input(INPUT_SERVER, $this->filters['allowed_server']);
         }
         if (array_key_exists('allowed_post', $this->filters)) {
-            $this->post = $this->filter_input(INPUT_POST, $_POST, $this->filters['allowed_post']);
+            $this->post = $this->filter_input(INPUT_POST, $this->filters['allowed_post']);
         }
         if (array_key_exists('allowed_get', $this->filters)) {
-            $this->get = $this->filter_input(INPUT_GET, $_GET, $this->filters['allowed_get']);
+            $this->get = $this->filter_input(INPUT_GET, $this->filters['allowed_get']);
         }
         if (array_key_exists('allowed_cookie', $this->filters)) {
-            $this->cookie = $this->filter_input(INPUT_COOKIE, $_COOKIE, $this->filters['allowed_cookie']);
+            $this->cookie = $this->filter_input(INPUT_COOKIE, $this->filters['allowed_cookie']);
         }
     }
 
@@ -131,8 +131,7 @@ class Hm_Request {
         $_FILES = array();
         $_REQUEST = array();
         $_ENV = array();
-        $GLOBALS = array('_SERVER' => array(), '_POST' => array(), '_GET' => array(), '_COOKIE' => array(),
-            '_FILES' => array(), '_REQUEST' => array(), '_ENV' => array());
+        $GLOBALS = array();
     }
 
     /**
@@ -141,8 +140,8 @@ class Hm_Request {
      * @param filters array list of input filters from module sets
      * @return array filtered input data
      */
-    public function filter_input($type, $data, $filters) {
-        $data = filter_var_array($data, $filters, false);
+    public function filter_input($type, $filters) {
+        $data = Hm_Functions::filter_input_array($type, $filters);
         if (!$data) {
             return array();
         }
