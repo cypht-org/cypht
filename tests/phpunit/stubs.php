@@ -4,6 +4,28 @@ class Test_Uid_Cache {
     use Hm_Uid_Cache;
 }
 
+class Hm_Auth_None extends Hm_Auth {
+    /**
+     * This is the method new auth mechs need to override.
+     * @param string $user username
+     * @param string $pass password
+     * @return bool true if the user is authenticated, false otherwise
+     */
+    public function check_credentials($user, $pass) {
+        return true;
+    }
+
+    /*
+     * Create a new user
+     * @param string $user username
+     * @param string $pass password
+     * @return bool
+     */
+    public function create($user, $pass) {
+        return true;
+    }
+}
+
 class Hm_Handler_test_mod extends Hm_Handler_Module {
     public function process() {
         $this->out('test', 'foo');

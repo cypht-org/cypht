@@ -45,32 +45,6 @@ abstract class Hm_Auth {
 }
 
 /**
- * Used for testing
- */
-class Hm_Auth_None extends Hm_Auth {
-
-    /**
-     * This is the method new auth mechs need to override.
-     * @param string $user username
-     * @param string $pass password
-     * @return bool true if the user is authenticated, false otherwise
-     */
-    public function check_credentials($user, $pass) {
-        return true;
-    }
-
-    /*
-     * Create a new user
-     * @param string $user username
-     * @param string $pass password
-     * @return bool
-     */
-    public function create($user, $pass) {
-        return true;
-    }
-}
-
-/**
  * Authenticate against an included DB
  */
 class Hm_Auth_DB extends Hm_Auth {

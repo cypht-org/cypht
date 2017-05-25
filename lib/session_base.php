@@ -332,19 +332,24 @@ abstract class Hm_Session {
  */
 function setup_auth($config) {
     $auth_type = $config->get('auth_type', false);
+    $auth_class = '';
     if ($auth_type == 'dynamic' && !in_array('dynamic_login', $config->get_modules(), true)) {
         Hm_Functions::cease('Invalid auth configuration');
     }
-    if ($auth_type && $auth_type != 'dynamic' && $auth_type != 'custom') {
+    if ($auth_type && in_array($auth_type, array('DB', 'LDAP', 'IMAP', 'POP3'), true)) {
         $auth_class = sprintf('Hm_Auth_%s', $auth_type);
     }
     elseif ($auth_type == 'custom') {
         $auth_class = 'Custom_Auth';
     }
-    else {
-        $auth_class = 'Hm_Auth_None';
+    if (!$auth_class) {
+        Hm_Functions::cease('Invalid auth configuration');
     }
-    return $auth_class;
+    else {
+        return $auth_class;
+    }
+    /* this special case is for unit testing */
+    return 'Hm_Auth_None';
 }
 
 /**
