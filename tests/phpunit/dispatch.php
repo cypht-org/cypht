@@ -41,7 +41,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
         $router->site_config->set('disable_tls', false);
         $router->request->server['SERVER_NAME'] = 'test';
         $router->request->server['REQUEST_URI'] = 'asdf';
-        $this->assertTrue($router->check_for_tls_redirect());
+        $this->assertTrue($router->check_for_tls_redirect($router->request, $this->config));
     }
     /**
      * @preserveGlobalState disabled
@@ -73,23 +73,23 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
         ob_start();
         $router = new Hm_Dispatch($this->config);
         ob_end_clean();
-        $this->assertFalse($router->check_for_redirect());
+        $this->assertFalse($router->check_for_redirect($router->request, $router->module_exec, $router->session));
         $router->module_exec->handler_response = array('no_redirect' => true);
-        $this->assertEquals('noredirect', $router->check_for_redirect());
+        $this->assertEquals('noredirect', $router->check_for_redirect($router->request, $router->module_exec, $router->session));
 
         $router->module_exec->handler_response = array();
         Hm_Msgs::add('just a test');
         $router->request->post = array('test' => 'foo');
         $router->request->type = 'HTTP';
         $router->request->server['REQUEST_URI'] = 'asdf';
-        $this->assertEquals('redirect', $router->check_for_redirect());
+        $this->assertEquals('redirect', $router->check_for_redirect($router->request, $router->module_exec, $router->session));
 
         $router->module_exec->handler_response = array('redirect_url' => 'asdf');
-        $this->assertEquals('redirect', $router->check_for_redirect());
+        $this->assertEquals('redirect', $router->check_for_redirect($router->request, $router->module_exec, $router->session));
 
         $router->request->post = array();
         $router->request->cookie['hm_msgs'] = base64_encode(json_encode(array('test message')));
-        $this->assertEquals('msg_forward', $router->check_for_redirect());
+        $this->assertEquals('msg_forward', $router->check_for_redirect($router->request, $router->module_exec, $router->session));
     }
     /**
      * @preserveGlobalState disabled

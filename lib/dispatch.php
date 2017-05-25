@@ -6,10 +6,94 @@
  * @subpackage dispatch
  */
 
+trait Hm_Dispatch_Redirect {
+
+    /**
+     * Force TLS connections unless the site config has it disabled
+     * @return null|false
+     */
+    public function check_for_tls_redirect($request, $site_config) {
+        if (!$request->tls && !$site_config->get('disable_tls', false) &&
+            array_key_exists('SERVER_NAME', $request->server) && array_key_exists('REQUEST_URI', $request->server)) {
+            Hm_Debug::add('Page redirected to HTTPS. See "disable_tls" in the ini file to change this behavior');
+            return Hm_Dispatch::page_redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
+        }
+        return false;
+    }
+
+    /**
+     * Redirect after an HTTP POST form
+     * @return boolean
+     */
+    private function post_redirect($request, $session, $mod_exec) {
+        if (!empty($request->post) && $request->type == 'HTTP') {
+            $msgs = Hm_Msgs::get();
+            if (!empty($msgs)) {
+                $session->secure_cookie($request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
+            }
+            $session->end();
+            if (array_key_exists('redirect_url', $mod_exec->handler_response) && $mod_exec->handler_response['redirect_url']) {
+                Hm_Dispatch::page_redirect($mod_exec->handler_response['redirect_url']);
+            }
+            if (array_key_exists('REQUEST_URI', $request->server)) {
+                Hm_Dispatch::page_redirect($request->server['REQUEST_URI']);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Redirect the page after a POST form is submitted and forward any user notices
+     * @return string|false
+     */
+    public function check_for_redirect($request, $mod_exec, $session) {
+        if (array_key_exists('no_redirect', $mod_exec->handler_response) && $mod_exec->handler_response['no_redirect']) {
+            return 'noredirect';
+        }
+        if ($this->post_redirect($request, $session, $mod_exec)) {
+            return 'redirect';
+        }
+        elseif (array_key_exists('hm_msgs', $request->cookie) && trim($request->cookie['hm_msgs'])) {
+            $msgs = @json_decode(base64_decode($request->cookie['hm_msgs']), true);
+            if (is_array($msgs)) {
+                array_walk($msgs, function($v) { Hm_Msgs::add($v); });
+            }
+            $session->secure_cookie($request, 'hm_msgs', false, time()-3600);
+            return 'msg_forward';
+        }
+        return false;
+    }
+
+    /**
+     * Perform an HTTP redirect
+     * @param string $url url to redirect to
+     * @param int $status current HTTP status
+     * @return void
+     */
+    static public function page_redirect($url, $status=false) {
+        if (DEBUG_MODE) {
+            Hm_Debug::add(sprintf('Redirecting to %s', $url));
+            Hm_Debug::load_page_stats();
+            Hm_Debug::show('log');
+        }
+        if ($status == 303) {
+            Hm_Debug::add('Redirect loop found');
+            Hm_Functions::cease('Redirect loop discovered');
+        }
+        Hm_Functions::header('HTTP/1.1 303 Found');
+        Hm_Functions::header('Location: '.$url);
+        return Hm_Functions::cease();
+    }
+
+}
+
 /**
  * Page request router that ties all the framework peices together
  */
 class Hm_Dispatch {
+
+    use Hm_Dispatch_Redirect;
 
     public $site_config;
     public $request;
@@ -52,13 +136,13 @@ class Hm_Dispatch {
         $this->module_exec->load_module_sets($this->page);
 
         /* check for TLS connections */
-        $this->check_for_tls_redirect();
+        $this->check_for_tls_redirect($this->request, $this->site_config);
 
         /* run handler modules to process input and perform actions */
         $this->module_exec->run_handler_modules($this->request, $this->session, $this->page);
 
         /* check to see if a handler module told us to redirect the browser */
-        $this->check_for_redirect();
+        $this->check_for_redirect($this->request, $this->module_exec, $this->session);
 
         /* save and close a session if one is open */
         $active_session = $this->save_session();
@@ -69,63 +153,6 @@ class Hm_Dispatch {
 
         /* output content to the browser */
         $this->render_output();
-    }
-
-    /**
-     * Force TLS connections unless the site config has it disabled
-     * @return null|false
-     */
-    public function check_for_tls_redirect() {
-        if (!$this->request->tls && !$this->site_config->get('disable_tls', false) &&
-            array_key_exists('SERVER_NAME', $this->request->server) && array_key_exists('REQUEST_URI', $this->request->server)) {
-            Hm_Debug::add('Page redirected to HTTPS. See "disable_tls" in the ini file to change this behavior');
-            return Hm_Dispatch::page_redirect('https://'.$this->request->server['SERVER_NAME'].$this->request->server['REQUEST_URI']);
-        }
-        return false;
-    }
-
-    /**
-     * Redirect after an HTTP POST form
-     * @return boolean
-     */
-    private function post_redirect() {
-        if (!empty($this->request->post) && $this->request->type == 'HTTP') {
-            $msgs = Hm_Msgs::get();
-            if (!empty($msgs)) {
-                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
-            }
-            $this->session->end();
-            if (array_key_exists('redirect_url', $this->module_exec->handler_response) && $this->module_exec->handler_response['redirect_url']) {
-                Hm_Dispatch::page_redirect($this->module_exec->handler_response['redirect_url']);
-            }
-            if (array_key_exists('REQUEST_URI', $this->request->server)) {
-                Hm_Dispatch::page_redirect($this->request->server['REQUEST_URI']);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Redirect the page after a POST form is submitted and forward any user notices
-     * @return string|false
-     */
-    public function check_for_redirect() {
-        if (array_key_exists('no_redirect', $this->module_exec->handler_response) && $this->module_exec->handler_response['no_redirect']) {
-            return 'noredirect';
-        }
-        if ($this->post_redirect()) {
-            return 'redirect';
-        }
-        elseif (array_key_exists('hm_msgs', $this->request->cookie) && trim($this->request->cookie['hm_msgs'])) {
-            $msgs = @json_decode(base64_decode($this->request->cookie['hm_msgs']), true);
-            if (is_array($msgs)) {
-                array_walk($msgs, function($v) { Hm_Msgs::add($v); });
-            }
-            $this->session->secure_cookie($this->request, 'hm_msgs', false, time()-3600);
-            return 'msg_forward';
-        }
-        return false;
     }
 
     /**
@@ -200,27 +227,6 @@ class Hm_Dispatch {
         }
         $this->module_exec->page = $this->page;
         Hm_Debug::add('Page ID: '.$this->page);
-    }
-
-    /**
-     * Perform an HTTP redirect
-     * @param string $url url to redirect to
-     * @param int $status current HTTP status
-     * @return void
-     */
-    static public function page_redirect($url, $status=false) {
-        if (DEBUG_MODE) {
-            Hm_Debug::add(sprintf('Redirecting to %s', $url));
-            Hm_Debug::load_page_stats();
-            Hm_Debug::show('log');
-        }
-        if ($status == 303) {
-            Hm_Debug::add('Redirect loop found');
-            Hm_Functions::cease('Redirect loop discovered');
-        }
-        Hm_Functions::header('HTTP/1.1 303 Found');
-        Hm_Functions::header('Location: '.$url);
-        return Hm_Functions::cease();
     }
 
     /**
