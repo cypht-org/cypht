@@ -293,13 +293,13 @@ abstract class Hm_Session {
      * @param object $request request details
      * @param string $name cookie name
      * @param string $value cookie value
-     * @param string $lifetime cookie lifetime
+     * @param integer $lifetime cookie lifetime
      * @param string $path cookie path
      * @param string $domain cookie domain
      * @param boolean $html_only set html only cookie flag
      * @return boolean
      */
-    public function secure_cookie($request, $name, $value, $lifetime=false, $path='', $domain='', $html_only=true) {
+    public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='', $html_only=true) {
         if ($name == 'hm_reload_folders') {
             return Hm_Functions::setcookie($name, $value);
         }

@@ -351,7 +351,6 @@ abstract class Hm_Handler_Module {
      */
     public function process_form($form) {
         $post = $this->request->post;
-        $success = false;
         $new_form = array();
         foreach($form as $name) {
             if (array_key_exists($name, $post) && (is_array($post[$name]) ||
@@ -359,8 +358,7 @@ abstract class Hm_Handler_Module {
                 $new_form[$name] = $post[$name];
             }
         }
-        $success = count($form) === count($new_form);
-        return array($success, $new_form);
+        return array((count($form) === count($new_form)), $new_form);
     }
 
     /**
@@ -435,7 +433,7 @@ abstract class Hm_Output_Module {
      * Build output by calling module specific output functions
      * @param string $format output type, either HTML5 or AJAX
      * @param array $lang_str list of language translation strings
-     * @return mixed module output, a string for HTML5 and an array for AJAX
+     * @return string
      */
     public function output_content($format, $lang_str) {
         $this->lstr = $lang_str;
