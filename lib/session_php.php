@@ -28,7 +28,7 @@ class Hm_PHP_Session extends Hm_Session {
             $this->set_fingerprint($request);
         }
         else {
-            $this->set('fingerprint', false);
+            $this->set('fingerprint', '');
         }
         $this->save_auth_detail();
         $this->just_started();
