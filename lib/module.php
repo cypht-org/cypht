@@ -359,9 +359,7 @@ abstract class Hm_Handler_Module {
                 $new_form[$name] = $post[$name];
             }
         }
-        if (count($form) == count($new_form)) {
-            $success = true;
-        }
+        $success = count($form) === count($new_form);
         return array($success, $new_form);
     }
 

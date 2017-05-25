@@ -121,9 +121,6 @@ abstract class Hm_Session {
     /* session key */
     public $session_key = '';
 
-    /* session cookie lifetime - 0 means "session only" */
-    public $lifetime = 0;
-
     /**
      * check for an active session or an attempt to start one
      * @param object $request request object
@@ -306,22 +303,13 @@ abstract class Hm_Session {
         if ($name == 'hm_reload_folders') {
             return Hm_Functions::setcookie($name, $value);
         }
-        if ($request->tls) {
-            $secure = true;
-        }
-        else {
-            $secure = false;
-        }
         if (!$path && isset($request->path)) {
             $path = $request->path;
-        }
-        if ($lifetime === false) {
-            $lifetime = $this->lifetime;
         }
         if (!$domain) {
             $domain = $this->cookie_domain($request);
         }
-        return Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
+        return Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $request->tls, $html_only);
     }
 }
 
