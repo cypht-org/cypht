@@ -39,6 +39,22 @@ trait Hm_Server_Connect {
     }
 
     /**
+     * Enable server
+     * @param int $id server id
+     * @param string $user username
+     * @param string $pass password
+     * @param bool $save save user and pass
+     */
+    private static function enable_server($id, $user, $pass, $save) {
+        self::$server_list[$id]['connected'] = true;
+        if ($save) {
+            self::$server_list[$id]['user'] = $user;
+            self::$server_list[$id]['pass'] = $pass;
+        }
+        return self::$server_list[$id]['object'];
+    }
+
+    /**
      * Process user and pass args
      * @param string|false $user username
      * @param string|false $pass password
@@ -95,22 +111,6 @@ trait Hm_Server_Connect {
 }
 
 trait Hm_Server_Modify {
-
-    /**
-     * Enable server
-     * @param int $id server id
-     * @param string $user username
-     * @param string $pass password
-     * @param bool $save save user and pass
-     */
-    private static function enable_server($id, $user, $pass, $save) {
-        self::$server_list[$id]['connected'] = true;
-        if ($save) {
-            self::$server_list[$id]['user'] = $user;
-            self::$server_list[$id]['pass'] = $pass;
-        }
-        return self::$server_list[$id]['object'];
-    }
 
     /**
      * Update the oauth2 password and password expiration
