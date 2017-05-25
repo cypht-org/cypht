@@ -10,6 +10,8 @@ trait Hm_Dispatch_Redirect {
 
     /**
      * Force TLS connections unless the site config has it disabled
+     * @param Hm_Request $request request object
+     * @param Hm_Site_Config_File $site_config site configuration object
      * @return null|false
      */
     public function check_for_tls_redirect($request, $site_config) {
@@ -23,6 +25,9 @@ trait Hm_Dispatch_Redirect {
 
     /**
      * Redirect after an HTTP POST form
+     * @param Hm_Request $request request object
+     * @param object $session session object
+     * @param Hm_Module_Exec $mod_exec module manager object
      * @return boolean
      */
     private function post_redirect($request, $session, $mod_exec) {
@@ -45,6 +50,9 @@ trait Hm_Dispatch_Redirect {
 
     /**
      * Redirect the page after a POST form is submitted and forward any user notices
+     * @param Hm_Request $request request object
+     * @param Hm_Module_Exec $mod_exec module manager object
+     * @param object $session session object
      * @return string|false
      */
     public function check_for_redirect($request, $mod_exec, $session) {
