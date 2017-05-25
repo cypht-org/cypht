@@ -5,56 +5,10 @@
  * @package framework
  * @subpackage servers
  */
-
-/**
- * Struct that makes it easy for a module set to manage a list of server connections
- */
-trait Hm_Server_List {
+trait Hm_Server_Connect {
 
     /* list of server connections */
     private static $server_list = array();
-
-    /**
-     * Server lists must override this method to connect
-     * @param int $id server id
-     * @param string $server server hostname or ip
-     * @param string $user username for authentication
-     * @param string $pass password for authentication
-     * @param mixed $cache cached connection data
-     * @return bool true on success
-     */
-    public abstract function service_connect($id, $server, $user, $pass, $cache);
-
-
-    /**
-     * Process user and pass args
-     * @param string|false $user username
-     * @param string|false $pass password
-     * @param array $server server details
-     * @return string[]
-     */
-    private static function user_and_pass($user, $pass, $server) {
-        if (array_key_exists('user', $server) && array_key_exists('pass', $server)) {
-            return array($server['user'], $server['pass']);
-        }
-        return array($user, $pass);
-    }
-
-    /**
-     * Enable server
-     * @param int $id server id
-     * @param string $user username
-     * @param string $pass password
-     * @param bool $save save user and pass
-     */
-    private static function enable_server($id, $user, $pass, $save) {
-        self::$server_list[$id]['connected'] = true;
-        if ($save) {
-            self::$server_list[$id]['user'] = $user;
-            self::$server_list[$id]['pass'] = $pass;
-        }
-        return self::$server_list[$id]['object'];
-    }
 
     /**
      * Connect to a server
@@ -82,6 +36,80 @@ trait Hm_Server_List {
             return false;
         }
         return self::enable_server($id, $user, $pass, $save_credentials);
+    }
+
+    /**
+     * Process user and pass args
+     * @param string|false $user username
+     * @param string|false $pass password
+     * @param array $server server details
+     * @return string[]
+     */
+    private static function user_and_pass($user, $pass, $server) {
+        if (array_key_exists('user', $server) && array_key_exists('pass', $server)) {
+            return array($server['user'], $server['pass']);
+        }
+        return array($user, $pass);
+    }
+
+    /**
+     * Server lists must override this method to connect
+     * @param int $id server id
+     * @param string $server server hostname or ip
+     * @param string $user username for authentication
+     * @param string $pass password for authentication
+     * @param mixed $cache cached connection data
+     * @return bool true on success
+     */
+    public abstract function service_connect($id, $server, $user, $pass, $cache);
+
+    /**
+     * Try to disconnect cleanly
+     * @param int $id server id
+     * @return void
+     */
+    public static function clean_up($id=false) {
+        if ($id !== false && array_key_exists($id, self::$server_list)) {
+            self::disconnect($id);
+        }
+        else {
+            foreach (self::$server_list as $index => $server) {
+                self::disconnect($index);
+            }
+        }
+    }
+
+    /**
+     * Disconnect from a server
+     * @param int $id the server id to disconnect
+     * @return void
+     */
+    public static function disconnect($id) {
+        if (self::$server_list[$id]['connected'] && self::$server_list[$id]['object']) {
+            if (method_exists(self::$server_list[$id]['object'], 'disconnect')) {
+                self::$server_list[$id]['object']->disconnect();
+            }
+            self::$server_list[$id]['connected'] = false;
+        }
+    }
+}
+
+trait Hm_Server_Modify {
+
+    /**
+     * Enable server
+     * @param int $id server id
+     * @param string $user username
+     * @param string $pass password
+     * @param bool $save save user and pass
+     */
+    private static function enable_server($id, $user, $pass, $save) {
+        self::$server_list[$id]['connected'] = true;
+        if ($save) {
+            self::$server_list[$id]['user'] = $user;
+            self::$server_list[$id]['pass'] = $pass;
+        }
+        return self::$server_list[$id]['object'];
     }
 
     /**
@@ -129,6 +157,15 @@ trait Hm_Server_List {
             self::$server_list[$id]['hide'] = $hide;
         }
     }
+}
+
+/**
+ * Struct that makes it easy for a module set to manage a list of server connections
+ */
+trait Hm_Server_List {
+
+    use Hm_Server_Connect;
+    use Hm_Server_Modify;
 
     /**
      * Add a server definition
@@ -205,35 +242,5 @@ trait Hm_Server_List {
             }
         }
         return false;
-    }
-
-    /**
-     * Try to disconnect cleanly
-     * @param int $id server id
-     * @return void
-     */
-    public static function clean_up($id=false) {
-        if ($id !== false && array_key_exists($id, self::$server_list)) {
-            self::disconnect($id);
-        }
-        else {
-            foreach (self::$server_list as $index => $server) {
-                self::disconnect($index);
-            }
-        }
-    }
-
-    /**
-     * Disconnect from a server
-     * @param int $id the server id to disconnect
-     * @return void
-     */
-    public static function disconnect($id) {
-        if (self::$server_list[$id]['connected'] && self::$server_list[$id]['object']) {
-            if (method_exists(self::$server_list[$id]['object'], 'disconnect')) {
-                self::$server_list[$id]['object']->disconnect();
-            }
-            self::$server_list[$id]['connected'] = false;
-        }
     }
 }
