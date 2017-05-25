@@ -270,7 +270,7 @@ class Hm_Memcached {
     /**
      * @param string $key name of value to fetch
      * @param string $crypt_key encryption key
-     * @return false|string
+     * @return false|array|string
      */
     public function get($key, $crypt_key='') {
         if (!$this->active()) {
@@ -282,7 +282,7 @@ class Hm_Memcached {
     /**
      * @param array|string $data data to prep
      * @param string $crypt_key encryption key
-     * @return string
+     * @return string|array
      */
     private function prep_in($data, $crypt_key) {
         if ($crypt_key) {
@@ -294,7 +294,7 @@ class Hm_Memcached {
     /**
      * @param array $data data to prep
      * @param string $crypt_key encryption key
-     * @return array
+     * @return false|array|string
      */
     private function prep_out($data, $crypt_key) {
         if ($crypt_key && is_string($data) && trim($data)) {
