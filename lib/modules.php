@@ -6,14 +6,11 @@
  * @subpackage modules
  */
 
+
 /**
- * Trait used as the basic logic for module management
- *
- * Two classes use this trait, Hm_Handler_Modules and Hm_Output_Modules.
- * These are the interfaces module sets use (indirectly) to interact with a request
- * and produce output to the browser.
+ * Trait that manages queued modules
  */
-trait Hm_Modules {
+trait Hm_Modules_Queue {
 
     /* number of allowed queued module retries */
     private static $queue_limit = 2;
@@ -55,6 +52,58 @@ trait Hm_Modules {
             self::add_to_all_pages($mod[0], $mod[1], $mod[2], $mod[3], $mod[4]);
         }
     }
+
+    /**
+     * @param bool $queue true to attempt to re-insert the module later on failure
+     * @param string $page the page to assign the module to
+     * @param string $module the module to add
+     * @param bool $logged_in true if the module requires the user to be logged in
+     * @param string|false $marker the module to insert before or after
+     * @param string $placement "before" or "after" the $marker module
+     * @param string $source the module set containing this module
+     * @return boolean
+     */
+    private static function queue_module($queue, $page, $module, $logged_in, $marker, $placement, $source) {
+        if ($queue) {
+            self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement, $source);
+            return true;
+        }
+        else {
+            Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
+        }
+        return false;
+    }
+
+    /**
+     * Attempt to insert modules that initially failed
+     * @return void
+     */
+    public static function try_queued_modules() {
+        $requeue = true;
+        $new_queue = array();
+        if (self::$queue_attempts >= self::$queue_limit) {
+            $requeue = false;
+        }
+        foreach (self::$module_queue as $vals) {
+            if (!self::add($vals[0], $vals[1], $vals[2], $vals[3], $vals[4], $requeue, $vals[5])) {
+                $new_queue[] = $vals;
+            }
+        }
+        self::$module_queue = $new_queue;
+        self::$queue_attempts++;
+    }
+}
+
+/**
+ * Trait used as the basic logic for module management
+ *
+ * Two classes use this trait, Hm_Handler_Modules and Hm_Output_Modules.
+ * These are the interfaces module sets use (indirectly) to interact with a request
+ * and produce output to the browser.
+ */
+trait Hm_Modules {
+
+    use Hm_Modules_Queue;
 
     /**
      * Load a complete formatted module list
@@ -126,27 +175,6 @@ trait Hm_Modules {
         if (!array_key_exists($page, self::$module_list)) {
             self::$module_list[$page] = array();
             return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param bool $queue true to attempt to re-insert the module later on failure
-     * @param string $page the page to assign the module to
-     * @param string $module the module to add
-     * @param bool $logged_in true if the module requires the user to be logged in
-     * @param string|false $marker the module to insert before or after
-     * @param string $placement "before" or "after" the $marker module
-     * @param string $source the module set containing this module
-     * @return boolean
-     */
-    private static function queue_module($queue, $page, $module, $logged_in, $marker, $placement, $source) {
-        if ($queue) {
-            self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement, $source);
-            return true;
-        }
-        else {
-            Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
         }
         return false;
     }
@@ -239,25 +267,6 @@ trait Hm_Modules {
             }
         }
         return array_combine($keys, $values);
-    }
-
-    /**
-     * Attempt to insert modules that initially failed
-     * @return void
-     */
-    public static function try_queued_modules() {
-        $requeue = true;
-        $new_queue = array();
-        if (self::$queue_attempts >= self::$queue_limit) {
-            $requeue = false;
-        }
-        foreach (self::$module_queue as $vals) {
-            if (!self::add($vals[0], $vals[1], $vals[2], $vals[3], $vals[4], $requeue, $vals[5])) {
-                $new_queue[] = $vals;
-            }
-        }
-        self::$module_queue = $new_queue;
-        self::$queue_attempts++;
     }
 
     /**
