@@ -339,10 +339,10 @@ class Hm_Site_Config_File extends Hm_Config {
 
     /**
      * Return a list of modules as an array
-     * @return array
+     * @return array|false
      */
     public function get_modules() {
-        $mods = $this->get('modules', array());
+        $mods = $this->get('modules');
         if (is_string($mods)) {
             return explode(',', $mods);
         }

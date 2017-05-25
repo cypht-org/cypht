@@ -245,8 +245,8 @@ abstract class Hm_Session {
 
     /**
      * Decrypt session data
-     * @param array $data encrypted session data
-     * @return array decrpted session data
+     * @param string $data encrypted session data
+     * @return false|array decrpted session data
      */
     public function plaintext($data) {
         return Hm_transform::unstringify(Hm_Crypt::plaintext($data, $this->enc_key));
@@ -355,7 +355,7 @@ function setup_auth($config) {
 /**
  * Start up the selected session type
  * @param object $config site configuration
- * @return object
+ * @return object|null
  */
 function setup_session($config) {
     $session_type = $config->get('session_type', false);

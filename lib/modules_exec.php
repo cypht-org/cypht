@@ -281,7 +281,7 @@ class Hm_Module_Exec {
 
     /**
      * Get module data when in debug mode
-     * @return array list of filters, input, and output modules
+     * @return void
      */
     public function setup_debug_modules() {
         $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
