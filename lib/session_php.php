@@ -20,7 +20,7 @@ class Hm_PHP_Session extends Hm_Session {
      * @param boolean $fingerprint
      * @return null
      */
-    private function authed($request, $fingerprint) {
+    protected function authed($request, $fingerprint) {
         $this->set_key($request);
         $this->loaded = true;
         $this->start($request);

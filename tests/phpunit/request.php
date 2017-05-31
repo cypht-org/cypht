@@ -7,6 +7,8 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
+        define('CONFIG_FILE', APP_PATH.'hm3.rc');
+        $this->config = new Hm_Mock_Config();
     }
     /**
      * @preserveGlobalState disabled
@@ -19,7 +21,7 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
         $_GET['foo'] = 'bar';
         $_POST['bar'] = 1;
         $_POST['blah'] = 'blah';
-        $req = new Hm_Request(filters());
+        $req = new Hm_Request(filters(), $this->config);
         $this->assertEquals('HTTP', $req->type);
         $this->assertEquals(array('bar' => 1), $req->post);
         $this->assertEquals(array(), $req->cookie);
@@ -41,7 +43,7 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
         $_SERVER['HTTP_USER_AGENT'] = 'ipad';
         $_GET['foo'] = 'bar';
         $_GET['blah'] = 'blah';
-        $req = new Hm_Request(filters());
+        $req = new Hm_Request(filters(), $this->config);
         $this->assertEquals('AJAX', $req->type);
         $this->assertEquals('Hm_Format_JSON', $req->format);
         $this->assertTrue($req->tls);
@@ -53,7 +55,7 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
      */
     public function test_filter_input() {
         Hm_Functions::$filter_failure = true;
-        $req = new Hm_Request(filters());
+        $req = new Hm_Request(filters(), $this->config);
         $this->assertEquals(array(), $req->get);
     }
     /**
@@ -63,7 +65,7 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
     public function test_one_more_time() {
         $_SERVER['REQUEST_URI'] = 'test?hmm=1';
         $_SERVER['REQUEST_SCHEME'] = 'https';
-        $req = new Hm_Request(filters());
+        $req = new Hm_Request(filters(), $this->config);
         $this->assertTrue($req->tls);
     }
 }

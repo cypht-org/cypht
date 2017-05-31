@@ -125,7 +125,7 @@ class Hm_Dispatch {
         $this->module_exec = new Hm_Module_Exec($this->site_config);
 
         /* process request input using the white-lists defined in modules */
-        $this->request = new Hm_Request($this->module_exec->filters);
+        $this->request = new Hm_Request($this->module_exec->filters, $config);
 
         /* do it */
         $this->process_request();

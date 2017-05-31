@@ -65,14 +65,16 @@ class Hm_Request {
     /**
      * Process request details
      * @param array $filters list of input filters from module sets
+     * @param object $config site config object
      */
-    public function __construct($filters) {
+    public function __construct($filters, $config) {
         $this->filters = $filters;
         $this->filter_request_input();
         $this->get_other_request_details();
         $this->files = $_FILES;
-        $this->empty_super_globals();
-
+        if (!$config->get('disable_empty_superglobals', false)) {
+            $this->empty_super_globals();
+        }
         Hm_Debug::add('Using sapi: '.$this->sapi);
         Hm_Debug::add('Request type: '.$this->type);
         Hm_Debug::add('Request path: '.$this->path);
