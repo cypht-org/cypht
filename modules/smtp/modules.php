@@ -1191,10 +1191,10 @@ function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
 function outbound_address_check($mod, $from, $reply_to) {
     $domain = $mod->config->get('default_email_domain');
     if ($domain) {
-        if (!is_email($from)) {
+        if (!is_email_address($from)) {
             $from = $from.'@'.$domain;
         }
-        if (!is_email($reply_to)) {
+        if (!is_email_address($reply_to)) {
             if (!trim($reply_to)) {
                 $reply_to = $smtp_details['user'];
             }

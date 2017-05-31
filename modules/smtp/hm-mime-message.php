@@ -141,7 +141,7 @@ class Hm_MIME_Msg {
                 $res[] = $enc_val;
             }
             else {
-                if ($email && strpos($v, '@') !== false && is_email($v)) {
+                if ($email && strpos($v, '@') !== false && is_email_address($v)) {
                     $res[] = '<'.trim($v, " \t\n\r\0\x0B><").'>';
                 }
                 else {
@@ -180,7 +180,7 @@ class Hm_MIME_Msg {
                 }
                 if (strstr($val, '@')) {
                     $address = ltrim(rtrim($val ,'>'), '<');
-                    if (is_email($address)) {
+                    if (is_email_address($address)) {
                         $res[] = $address;
                     }
                 }

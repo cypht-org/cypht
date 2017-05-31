@@ -77,7 +77,7 @@ class Hm_Handler_feed_connect extends Hm_Handler_Module {
             if ($success) {
                 $feed_data = Hm_Feed_List::dump($form['feed_id']);
                 if ($feed_data) {
-                    $feed = is_feed($feed_data['server']);
+                    $feed = is_news_feed($feed_data['server']);
                     if ($feed) {
                         $failed = false;
                         Hm_Msgs::add("Successfully connected to the feed");
@@ -126,7 +126,7 @@ class Hm_Handler_feed_status extends Hm_Handler_Module {
                 $start_time = microtime(true);
                 $feed_data = Hm_Feed_List::dump($id);
                 if ($feed_data) {
-                    $feed = is_feed($feed_data['server']);
+                    $feed = is_news_feed($feed_data['server']);
                     if ($feed && $feed->parsed_data) {
                         $this->out('feed_connect_time', microtime(true) - $start_time);
                         $this->out('feed_connect_status', 'Connected');
@@ -220,7 +220,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                             $data = $cache;
                         }
                         else {
-                            $feed = is_feed($feed_data['server'], $limit);
+                            $feed = is_news_feed($feed_data['server'], $limit);
                             if ($feed && $feed->parsed_data) {
                                 $data = $feed->parsed_data;
                                 $cache = false;
@@ -295,7 +295,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                     $feed_items = $cache;
                 }
                 else {
-                    $feed = is_feed($feed_data['server']);
+                    $feed = is_news_feed($feed_data['server']);
                     if ($feed && $feed->parsed_data) {
                         $feed_items = $feed->parsed_data;
                         $cache = false;
@@ -350,7 +350,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
             if ($success) {
                 $connection_test = address_from_url($form['new_feed_address']);
                 if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
-                    $feed = is_feed($form['new_feed_address']);
+                    $feed = is_news_feed($form['new_feed_address']);
                     if (!$feed) {
                         $feed = new Hm_Feed();
                         $homepage = $feed->get_feed_data($form['new_feed_address']);
@@ -898,7 +898,7 @@ function address_from_url($str) {
 /**
  * @subpackage feeds/functions
  */
-function is_feed($url, $limit=20) {
+function is_news_feed($url, $limit=20) {
     $feed = new Hm_Feed();
     $feed->limit = $limit;
     $feed->parse_feed($url);

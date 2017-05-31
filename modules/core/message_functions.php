@@ -217,7 +217,7 @@ function process_address_fld($fld) {
     foreach ($data as $vals) {
         $parts = array();
         foreach ($vals as $i => $v) {
-            if (is_email($v)) {
+            if (is_email_address($v)) {
                 $parts['email'] = str_replace(array('<', '>'), '', $v);
                 array_splice($vals, $i, 1);
                 $parts['label'] = str_replace(array('"', "'"), '', implode(' ', $vals));

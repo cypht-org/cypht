@@ -163,7 +163,7 @@ function email_is_active($mod_list) {
  * @param bool $allow_local flag to allow local addresses with no domain
  * @return bool
  */
-function is_email($val, $allow_local=false) {
+function is_email_address($val, $allow_local=false) {
     $val = trim($val, "<>");
     $domain = false;
     $local = false;

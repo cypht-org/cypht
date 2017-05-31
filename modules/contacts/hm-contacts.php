@@ -173,7 +173,7 @@ class Hm_Address_Field {
 
         while ($marker !== false) {
             list($marker, $token, $string) = self::get_token($string);
-            if (is_email($token)) {
+            if (is_email_address($token)) {
                 list($name, $marker) = self::find_name_field($string);
                 if ($marker > -1) {
                     $string = substr($string, 0, $marker);
