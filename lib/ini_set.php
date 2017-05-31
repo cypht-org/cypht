@@ -63,7 +63,7 @@ else {
 }
 
 $base = dirname(dirname(__FILE__)).PATH_SEPARATOR.'/tmp'.PATH_SEPARATOR.'/dev/urandom';
-$disabled = $this->config->get('disable_open_basedir', false);
+$disabled = $config->get('disable_open_basedir', false);
 foreach (array('app_data_dir', 'user_settings_dir', 'attachment_dir') as $dir) {
     if ($config->get($dir, false) && is_readable($config->get($dir, false))) {
         $base .= PATH_SEPARATOR.$config->get($dir, false);
