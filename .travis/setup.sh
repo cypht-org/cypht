@@ -104,7 +104,10 @@ install_apache() {
 
     ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
     sudo cp -f .travis/travis-ci-apache /etc/apache2/sites-available/000-default
-    sudo ln -s /etc/apache2/sites-enabled/000-default /etc/apache2/sites-available/000-default
+    sudo rm -f /etc/apache2/sites-enabled/000-default
+    sudo ln -s /etc/apache2/sites-available/000-default /etc/apache2/sites-enabled/000-default
+    sudo ls -la /etc/apache2/sites-avilable/
+    sudo ls -la /etc/apache2/sites-enabled/
     sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/000-default
     sudo service apache2 restart
 }
