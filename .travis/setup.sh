@@ -87,11 +87,15 @@ install_phpunit() {
     sudo mv phpunit /usr/local/bin/phpunit
 }
 
+# install selenium
+install_selenium() {
+    sudo apt-get install python-pip
+    sudo pip install selenium
+}
+
 # install and configure Apache and PHP-FPM
 install_apache() {
     sudo apt-get install apache2 libapache2-mod-fastcgi
-    sudo apt-get install python-pip
-    sudo pip install selenium
     sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
     sudo a2enmod rewrite actions fastcgi alias
     echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
@@ -106,7 +110,7 @@ install_apache() {
     sudo rm -f /etc/apache2/sites-enabled/000-default.conf
     sudo rm -f /etc/apache2/sites-available/000-default.conf
     sudo cp -f .travis/travis-ci-apache /etc/apache2/sites-available/000-default.conf
-    sudo ln -s /etc/apache2/sites-available/000-default /etc/apache2/sites-enabled/000-default.conf
+    sudo ln -s /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-enabled/000-default.conf
     sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/000-default.conf
     sudo service apache2 restart
 }
@@ -172,6 +176,7 @@ selenium_config
 setup_cypht
 install_phpunit
 install_coveralls
+install_selenium
 install_apache
 install_sodium
 bootstrap_unit_tests
