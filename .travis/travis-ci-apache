@@ -18,4 +18,9 @@ ServerName cypht-test.org
     FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi -host 127.0.0.1:9000 -pass-header Authorization
   </IfModule>
 
+  <Directory /usr/lib/cgi-bin>
+    Options FollowSymLinks MultiViews ExecCGI
+    Require all granted
+  </Directory>
+
 </VirtualHost>
