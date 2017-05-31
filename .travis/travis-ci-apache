@@ -1,3 +1,5 @@
+ServerName cypht-test.org
+
 <VirtualHost *:80>
 
   DocumentRoot %TRAVIS_BUILD_DIR%/site
