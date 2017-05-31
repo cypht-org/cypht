@@ -138,6 +138,7 @@ class Hm_User_Config_File extends Hm_Config {
      */
     public function __construct($config) {
         $this->site_config = $config;
+        $this->config = array_merge($this->config, $config->user_defaults);
     }
 
     /**
@@ -215,6 +216,7 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function __construct($config) {
         $this->site_config = $config;
+        $this->config = array_merge($this->config, $config->user_defaults);
     }
 
     /**
@@ -314,6 +316,8 @@ class Hm_User_Config_DB extends Hm_Config {
  */
 class Hm_Site_Config_File extends Hm_Config {
 
+    public $user_defaults = array();
+
     /**
      * Load data based on source
      * @param string $source source location for site configuration
@@ -333,6 +337,19 @@ class Hm_Site_Config_File extends Hm_Config {
             $data = $this->decode(file_get_contents($source));
             if ($data) {
                 $this->config = array_merge($this->config, $data);
+                $this->get_user_defaults();
+            }
+        }
+    }
+
+    /*
+     * Determine default values for users without any settings
+     * @return void
+     */
+    private function get_user_defaults() {
+        foreach ($this->config as $name => $val) {
+            if (substr($name, 0, 15) == 'default_setting') {
+                $this->user_defaults[substr($name, 16).'_setting'] = $val;
             }
         }
     }

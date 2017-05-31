@@ -69,6 +69,7 @@ class Hm_Mock_Memcached {
 }
 class Hm_Mock_Config {
     public $mods = array();
+    public $user_defaults = array();
     public $data = array(
         'user_settings_dir' => './data',
         'default_language' => 'es',
