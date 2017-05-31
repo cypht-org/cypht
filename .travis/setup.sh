@@ -112,6 +112,9 @@ install_apache() {
     sudo cp -f .travis/travis-ci-apache /etc/apache2/sites-available/000-default.conf
     sudo ln -s /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-enabled/000-default.conf
     sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/000-default.conf
+    sudo chmod +x /home/travis
+    sudo chmod +x /home/travis/build
+    sudo chmod +x /home/travis/build/site
     sudo service apache2 restart
 }
 
