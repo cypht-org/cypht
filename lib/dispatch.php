@@ -26,12 +26,32 @@ trait Hm_Dispatch_Redirect {
                 Hm_Dispatch::page_redirect($mod_exec->handler_response['redirect_url']);
             }
             if (array_key_exists('REQUEST_URI', $request->server)) {
-                Hm_Dispatch::page_redirect($request->server['REQUEST_URI']);
+                Hm_Dispatch::page_redirect($this->validate_request_uri($request->server['REQUEST_URI']));
             }
             return true;
         }
         return false;
     }
+
+    /**
+     * Validate a request uri
+     * @param string $uri URI to validate
+     * @return string
+     */
+    public function validate_request_uri($uri) {
+        if ($uri === '') {
+            return '/';
+        }
+        $parts = parse_url($uri);
+        if (array_key_exists('scheme', $parts)) {
+            return '/';
+        }
+        if ($parts === false || !array_key_exists('path', $parts) || strpos($parts['path'], '..') !== false) {
+            return '/';
+        }
+        return $uri;
+    }
+
 
     /**
      * Redirect the page after a POST form is submitted and forward any user notices

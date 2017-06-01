@@ -54,6 +54,22 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_validate_request_uri() {
+        ob_start();
+        ob_start();
+        $router = new Hm_Dispatch($this->config);
+        ob_end_clean();
+        $this->assertEquals('asdf', $router->validate_request_uri('asdf'));
+        $this->assertEquals('/', $router->validate_request_uri('/'));
+        $this->assertEquals('/', $router->validate_request_uri('../'));
+        $this->assertEquals('/', $router->validate_request_uri(''));
+        $this->assertEquals('/', $router->validate_request_uri('http://someothersite'));
+        $this->assertEquals('/path/?foo=blah', $router->validate_request_uri('/path/?foo=blah'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_check_for_redirect() {
         ob_start();
         ob_start();
