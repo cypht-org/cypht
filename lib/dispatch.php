@@ -68,7 +68,7 @@ trait Hm_Dispatch_Redirect {
         if (DEBUG_MODE) {
             Hm_Debug::add(sprintf('Redirecting to %s', $url));
             Hm_Debug::load_page_stats();
-            Hm_Debug::show('log');
+            Hm_Debug::show();
         }
         if ($status == 303) {
             Hm_Debug::add('Redirect loop found');

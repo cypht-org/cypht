@@ -85,14 +85,8 @@ class Hm_Test_Msgs extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_show() {
-        Hm_Msgs::add('msg two');
-        $this->assertTrue(strstr(flatten(join('', Hm_Msgs::show('return'))), 'msgtwo') !== false);
-        ob_start();
-        Hm_Msgs::show();
-        $output = ob_get_contents();
-        ob_end_clean();
-        $this->assertTrue(strlen($output) > 0);
-        Hm_Msgs::show('log');
+        Hm_Msgs::add('msg');
+        $this->assertEquals("Array\n(\n    [0] => msg\n)\n", Hm_Msgs::show());
     }
     /**
      * @preserveGlobalState disabled
@@ -138,7 +132,7 @@ class Hm_Test_Elog extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_elog() {
-        $this->assertTrue(elog('test'));
+        $this->assertEquals('string: test', elog('test'));
     }
 }
 

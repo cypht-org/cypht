@@ -303,7 +303,7 @@ abstract class Hm_Handler_Module {
         if (DEBUG_MODE) {
             Hm_Debug::add('REQUEST KEY check failed');
             Hm_Debug::load_page_stats();
-            Hm_Debug::show('log');
+            Hm_Debug::show();
         }
         Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
         return 'exit';

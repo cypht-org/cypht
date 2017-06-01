@@ -71,7 +71,7 @@ class Hm_Handler_process_api_login extends Hm_Handler_login {
             echo json_encode($res);
             $this->session->end();
             Hm_Debug::load_page_stats();
-            Hm_Debug::show('log');
+            Hm_Debug::show();
             Hm_Functions::cease();
         }
     }

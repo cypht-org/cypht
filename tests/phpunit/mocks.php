@@ -116,7 +116,7 @@ class Hm_Functions {
         public static function cease() { return true; }
         public static function session_start() { $_SESSION['data'] = 'AT1R5eVsyEauGR/stxOdA7f1OaxFr7p8vhE9j/JfwQwX2Jk7RQh4PoS1t1/baEG9jvuF2Y5UmDPjt6/Hd0ESWfbh4uI80xlvd1+Vt1rXtQU1mIJ+c+W0zRgdXPTTjkoZwSk7CFxCqNbYUviCkpxnNYXlZc9aEl9hgERkStY3u6phskJtoy6+MWo8dB+btO0PulIqXNz6WEBnuWa0/KHrelM2O/6N+9sdANg2CNUYo2ZsOtOZ4jEF9G27qZM2ILlnXwa1HCRDYByzmvk4Teg+PA=='; }
         public static function session_destroy() { return true; }
-        public static function error_log() { return true; }
+        public static function error_log($str=true) { return $str; }
         public static function c_init() { return true; }
         public static function c_setopt() { return true; }
         public static function c_exec() { return self::$exec_res; }

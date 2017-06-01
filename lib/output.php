@@ -174,20 +174,11 @@ trait Hm_List {
     }
 
     /**
-     * Show all messages
-     * @param string $type can be one of "print", "log", or "return"
-     * @return mixed
+     * Log all messages
+     * @return bool
      */
-    public static function show($type='print') {
-        if ($type == 'log') {
-            Hm_Functions::error_log(print_r(self::$msgs, true));
-        }
-        elseif ($type == 'return') {
-            return self::$msgs;
-        }
-        else {
-            print_r(self::$msgs);
-        }
+    public static function show() {
+        return Hm_Functions::error_log(print_r(self::$msgs, true));
     }
 }
 
