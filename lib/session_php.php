@@ -9,6 +9,13 @@
 trait Hm_Session_Auth {
 
     /**
+     * Lazy loader for the auth mech so modules can define their own
+     * overrides
+     * @return void
+     */
+    abstract protected function load_auth_mech();
+
+    /**
      * Call the configured authentication method to check user credentials
      * @param string $user username
      * @param string $pass password
@@ -47,10 +54,7 @@ trait Hm_Session_Auth {
      */
     public function create($request, $user, $pass) {
         $this->load_auth_mech();
-        if ($this->auth_mech->create($user, $pass)) {
-            return $this->check($request, $user, $pass);
-        }
-        return false;
+        return $this->auth_mech->create($user, $pass);
     }
 }
 
