@@ -9,21 +9,6 @@
 trait Hm_Dispatch_Redirect {
 
     /**
-     * Force TLS connections unless the site config has it disabled
-     * @param Hm_Request $request request object
-     * @param Hm_Site_Config_File $site_config site configuration object
-     * @return null|false
-     */
-    public function check_for_tls_redirect($request, $site_config) {
-        if (!$request->tls && !$site_config->get('disable_tls', false) &&
-            array_key_exists('SERVER_NAME', $request->server) && array_key_exists('REQUEST_URI', $request->server)) {
-            Hm_Debug::add('Page redirected to HTTPS. See "disable_tls" in the ini file to change this behavior');
-            return Hm_Dispatch::page_redirect('https://'.$request->server['SERVER_NAME'].$request->server['REQUEST_URI']);
-        }
-        return false;
-    }
-
-    /**
      * Redirect after an HTTP POST form
      * @param Hm_Request $request request object
      * @param object $session session object
@@ -142,9 +127,6 @@ class Hm_Dispatch {
 
         /* load up the module requirements */
         $this->module_exec->load_module_sets($this->page);
-
-        /* check for TLS connections */
-        $this->check_for_tls_redirect($this->request, $this->site_config);
 
         /* run handler modules to process input and perform actions */
         $this->module_exec->run_handler_modules($this->request, $this->session, $this->page);

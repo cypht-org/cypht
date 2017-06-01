@@ -33,20 +33,6 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_check_for_tls_redirect() {
-        ob_start();
-        ob_start();
-        $router = new Hm_Dispatch($this->config);
-        ob_end_clean();
-        $router->site_config->set('disable_tls', false);
-        $router->request->server['SERVER_NAME'] = 'test';
-        $router->request->server['REQUEST_URI'] = 'asdf';
-        $this->assertTrue($router->check_for_tls_redirect($router->request, $this->config));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
     public function test_get_page() {
         ob_start();
         ob_start();
