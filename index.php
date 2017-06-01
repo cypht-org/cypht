@@ -1,7 +1,7 @@
 <?php
 
 /**
- * GIT VERSION: 10264
+ * GIT VERSION: 10266
  *
  * Some of the following constants are automatically filled in when
  * the build process is run. If you change them in site/index.php
@@ -46,5 +46,5 @@ new Hm_Dispatch($config);
 /* log some debug stats about the page */
 if (DEBUG_MODE) {
     Hm_Debug::load_page_stats();
-    Hm_Debug::show('log');
+    Hm_Debug::show();
 }
