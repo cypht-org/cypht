@@ -19,8 +19,10 @@ setup_ldap() {
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
         sudo apt-get install php7.1-ldap
+        sudo ln -s /usr/lib/php/20160303/ldap.so /home/travis/.phpenv/versions/7.1.5/lib/php/extensions/no-debug-zts-20160303/ldap.so
         echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
     fi
+
     ls -lR /home/travis/.phpenv/versions/7.1.5/lib/php/extensions/
 }
 
