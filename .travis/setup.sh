@@ -14,6 +14,7 @@ setup_ldap() {
     if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
         echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
     fi
+    ls -lR /home/travis/.phpenv/versions/7.1.5/lib/php/extensions/
 }
 
 # Add a system user dovecot will use for authentication

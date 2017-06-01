@@ -4,11 +4,11 @@ language: php
 
 # php versions
 php:
+    - '7.1'
     - '5.4'
     - '5.5'
     - '5.6'
     - '7.0'
-    - '7.1'
 
 # run the phpunit tests, then the selenium tests
 script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh && cd ../../
