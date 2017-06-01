@@ -47,12 +47,11 @@ trait Hm_Session_Auth {
 
     /**
      * Call the configuration authentication method to create an account
-     * @param object $request request details
      * @param string $user username
      * @param string $pass password
      * @return bool true if the account was created
      */
-    public function create($request, $user, $pass) {
+    public function create($user, $pass) {
         $this->load_auth_mech();
         return $this->auth_mech->create($user, $pass);
     }

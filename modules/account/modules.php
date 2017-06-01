@@ -42,19 +42,21 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
  */
 class Hm_Handler_process_create_account extends Hm_Handler_Module {
     public function process() {
-        if ($this->session->is_admin()) {
-            list($success, $form) = $this->process_form(array('create_username', 'create_password', 'create_password_again'));
-            if ($success) {
-                if ($form['create_password'] == $form['create_password_again']) {
-                    if ($this->session->internal_users) {
-                        $this->session->create($this->request, $form['create_username'], $form['create_password']);
-                    }
-                }
-                else {
-                    Hm_Msgs::add('ERRPasswords did not match');
-                }
-            }
+        if (!$this->session->is_admin()) {
+            return;
         }
+        list($success, $form) = $this->process_form(array('create_username', 'create_password', 'create_password_again'));
+        if (!$success) {
+            return;
+        }
+        if (!$this->session->internal_users) {
+            return;
+        }
+        if ($form['create_password'] != $form['create_password_again']) {
+            Hm_Msgs::add('ERRPasswords did not match');
+            return;
+        }
+        $this->session->create($form['create_username'], $form['create_password']);
     }
 }
 
