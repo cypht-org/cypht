@@ -869,7 +869,9 @@ var Hm_Folders = {
             Hm_Utils.restore_local_settings(ui_state);
             document.cookie = 'hm_reload_folders=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             Hm_Utils.expand_core_settings();
+            return true;
         }
+        return false;
     },
     sort_list: function(class_name, exclude_name) {
         var folder = $('.'+class_name+' ul');
@@ -1315,7 +1317,7 @@ $(function() {
     }
 
     /* check for folder reload */
-    Hm_Folders.reload_folders();
+    var reloaded = Hm_Folders.reload_folders();
 
     /* show any pending notices */
     Hm_Utils.show_sys_messages();
@@ -1328,7 +1330,7 @@ $(function() {
     Hm_Timer.fire();
 
     /* load folder list */
-    if (!Hm_Folders.load_from_local_storage()) {
+    if (!reloaded && !Hm_Folders.load_from_local_storage()) {
         Hm_Folders.update_folder_list();
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
