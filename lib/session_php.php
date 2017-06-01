@@ -6,10 +6,60 @@
  * @subpackage session
  */
 
+trait Hm_Session_Auth {
+
+    /**
+     * Call the configured authentication method to check user credentials
+     * @param string $user username
+     * @param string $pass password
+     * @return bool true if the authentication was successful
+     */
+    public function auth($user, $pass) {
+        $this->load_auth_mech();
+        return $this->auth_mech->check_credentials($user, $pass);
+    }
+
+    /**
+     * Save auth detail if i'ts needed (mech specific)
+     * @return void
+     */
+    public function save_auth_detail() {
+        $this->auth_mech->save_auth_detail($this);
+    }
+
+    /**
+     * Call the configuration authentication method to change the user password
+     * @param string $user username
+     * @param string $pass password
+     * @return bool true if the password was changed
+     */
+    public function change_pass($user, $pass) {
+        $this->load_auth_mech();
+        return $this->auth_mech->change_pass($user, $pass);
+    }
+
+    /**
+     * Call the configuration authentication method to create an account
+     * @param object $request request details
+     * @param string $user username
+     * @param string $pass password
+     * @return bool true if the account was created
+     */
+    public function create($request, $user, $pass) {
+        $this->load_auth_mech();
+        if ($this->auth_mech->create($user, $pass)) {
+            return $this->check($request, $user, $pass);
+        }
+        return false;
+    }
+}
+
 /**
  * PHP Sessions that extend the base session class
  */
 class Hm_PHP_Session extends Hm_Session {
+
+    use Hm_Session_Auth;
 
     /* data store connection used by classes that extend this */
     public $conn;
@@ -59,51 +109,6 @@ class Hm_PHP_Session extends Hm_Session {
     }
 
     /**
-     * Call the configured authentication method to check user credentials
-     * @param string $user username
-     * @param string $pass password
-     * @return bool true if the authentication was successful
-     */
-    public function auth($user, $pass) {
-        $this->load_auth_mech();
-        return $this->auth_mech->check_credentials($user, $pass);
-    }
-
-    /**
-     * Save auth detail if i'ts needed (mech specific)
-     * @return void
-     */
-    public function save_auth_detail() {
-        $this->auth_mech->save_auth_detail($this);
-    }
-
-    /**
-     * Call the configuration authentication method to change the user password
-     * @param string $user username
-     * @param string $pass password
-     * @return bool true if the password was changed
-     */
-    public function change_pass($user, $pass) {
-        $this->load_auth_mech();
-        return $this->auth_mech->change_pass($user, $pass);
-    }
-
-    /**
-     * Call the configuration authentication method to create an account
-     * @param object $request request details
-     * @param string $user username
-     * @param string $pass password
-     * @return bool true if the account was created
-     */
-    public function create($request, $user, $pass) {
-        $this->load_auth_mech();
-        if ($this->auth_mech->create($user, $pass)) {
-            return $this->check($request, $user, $pass);
-        }
-        return false;
-    }
-
-    /**
      * Start the session. This could be an existing session or a new login
      * @param Hm_Request $request request details
      * @param boolean $existing_session
@@ -134,6 +139,7 @@ class Hm_PHP_Session extends Hm_Session {
             $this->active = true;
         }
     }
+
     /**
      * @param Hm_Request $request request details
      * @return void
