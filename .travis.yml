@@ -29,7 +29,7 @@ after_script:
 
 # unit test coverage reporting
 after_success:
-     - if [ "$TRAVIS_PHP_VERSION" = "7.1" ] && [ "$DB" = "postgresql" ]; then php coveralls.phar -v; fi
+     - if [ "$TRAVIS_PHP_VERSION" = "7.0" ] && [ "$DB" = "postgresql" ]; then php coveralls.phar -v; fi
 
 # use browserstack
 addons:
