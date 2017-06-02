@@ -138,13 +138,13 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
     public function test_create() {
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
         $request = new Hm_Mock_Request('HTTP');
-        $this->assertFalse($session->create($request, 'unittestuser', 'unittestpass'));
+        $this->assertFalse($session->create('unittestuser', 'unittestpass'));
         $session->destroy($request);
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_None');
-        $this->assertTrue($session->create($request, 'unittestuser', 'unittestpass'));
+        $this->assertTrue($session->create('unittestuser', 'unittestpass'));
         $session->destroy($request);
         $session = new Hm_PHP_Session($this->config, 'Hm_Auth_None');
-        $this->assertTrue($session->create($request, 'unittestuser', 'unittestpass'));
+        $this->assertTrue($session->create('unittestuser', 'unittestpass'));
         $session->destroy($request);
     }
     /**
