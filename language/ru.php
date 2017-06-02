@@ -303,7 +303,7 @@ return array(
     'Message history' => 'История сообщений',
     'Bcc' => 'Скрытая копия',
     'Attach' => 'Вложение',
-    'Sent' => 'Отпрвленные',
+    'Sent' => 'Отправленные',
     'E-mail Address' => 'Адрес e-mail',
     'Full Name' => 'Полное имя',
     'Telephone Number' => 'Телефон',
