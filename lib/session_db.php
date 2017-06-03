@@ -20,7 +20,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Create a new session
-     * @return bool true on success
+     * @return boolean|false|array
      */
     public function insert_session_row() {
         return $this->upsert('insert');
@@ -100,7 +100,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
 
     /**
      * Write session data to the db
-     * @return boolean
+     * @return boolean|false|array
      */
     public function save_data() {
         return $this->upsert('update');
@@ -117,7 +117,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
     /**
      * Update or insert a row
      * @param string $type type of action (insert or update)
-     * @return bool true on success
+     * @return boolean|false|array
      */
     public function upsert($type) {
         $res = false;

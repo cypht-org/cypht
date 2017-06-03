@@ -32,6 +32,7 @@ class Hm_Memcached_Session extends Hm_DB_Session {
 
     /**
      * save data on session start
+     * @return boolean|false|array
      */
     public function insert_session_row() {
         return $this->save_data();
@@ -39,6 +40,7 @@ class Hm_Memcached_Session extends Hm_DB_Session {
 
     /**
      * update memcache with current data
+     * @return boolean|false|array
      */
     public function save_data() {
         $enc_data = $this->ciphertext($this->data);

@@ -227,7 +227,7 @@ class Hm_User_Config_DB extends Hm_Config {
         $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, ''));
         Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
         $this->config = array();
-        return true;
+        return $res ? true : false;
     }
 
     /**
@@ -286,7 +286,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * Save user settings to the DB
      * @param string $username username
      * @param string $key encryption key
-     * @return void
+     * @return integer|boolean|array
      */
     public function save($username, $key) {
         $this->shuffle();
