@@ -82,7 +82,7 @@ class Hm_Auth_DB extends Hm_Auth {
      * @return bool true if successful
      */
     public function delete($user) {
-        if (!$this->connect()) {
+        if ($this->connect()) {
             $sql = $this->dbh->prepare("delete from hm_user where username = ?");
             if ($sql->execute(array($user)) && $sql->rowCount() == 1) {
                 return true;
