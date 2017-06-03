@@ -65,20 +65,6 @@ class Hm_DB {
         if (self::$config['db_driver'] == 'sqlite') {
             return sprintf('%s:%s', self::$config['db_driver'], self::$config['db_socket']);
         }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_get_session_data() {
-        $_POST['user'] = 'unittestusers';
-        $_POST['pass'] = 'unittestpass';
-        $session = new Hm_DB_Session($this->config, 'Hm_Auth_DB');
-        $request = new Hm_Mock_Request('HTTP');
-        $this->assertTrue($session->connect());
-        $session->set('foo', 'blah');
-        $session->save_data();
-        print_r($session->get_session_data($session->session_key));
-    }
         if (self::$config['db_conn_type'] == 'socket') {
             return sprintf('%s:unix_socket=%s;dbname=%s', self::$config['db_driver'], self::$config['db_socket'], self::$config['db_name']);
         }
@@ -93,9 +79,12 @@ class Hm_DB {
      * @param array $args values to insert into the sql
      * @return false|integer|array
      */
-    static public function execute($dbh, $sql, $args, $type='select') {
+    static public function execute($dbh, $sql, $args, $type=false) {
         if (!$dbh) {
             return false;
+        }
+        if (!$type) {
+            $type = self::execute_type($sql);
         }
         $sql = $dbh->prepare($sql);
         if (!$sql || !$sql->execute($args)) {
@@ -105,6 +94,21 @@ class Hm_DB {
             return $sql->rowCount();
         }
         return $sql->fetch();
+    }
+    /**
+     * @param string $sql query string
+     * @return string
+     */
+    static private function execute_type($sql) {
+        switch(substr($sql, 0, 1)) {
+            case 'd':
+            case 'u':
+            case 'i':
+                return 'modify';
+            case 's':
+            default:
+                return 'select';
+        }
     }
 
     /**
