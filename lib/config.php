@@ -224,8 +224,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return boolean
      */
     private function new_settings($username) {
-        $sql = $this->dbh->prepare("insert into hm_user_settings values(?,?)");
-        $sql->execute(array($username, ''));
+        $res = Hm_DB::insert($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, ''));
         Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
         $this->config = array();
         return true;
@@ -257,12 +256,8 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return boolean
      */
     public function load($username, $key) {
-        if (!$this->connect()) {
-            return false;
-        }
-        $sql = $this->dbh->prepare("select * from hm_user_settings where username=?");
-        $sql->execute(array($username));
-        $data = $sql->fetch();
+        $this->connect();
+        $data = Hm_DB::select($this->dbh, 'select * from hm_user_settings where username=?', array($username));
         if (!$data || !array_key_exists('settings', $data)) {
             return $this->new_settings($username);
         }
@@ -296,17 +291,13 @@ class Hm_User_Config_DB extends Hm_Config {
     public function save($username, $key) {
         $this->shuffle();
         $config = Hm_Crypt::ciphertext(json_encode($this->config), $key);
-        if (!$this->connect()) {
-            return false;
-        }
-        $sql = $this->dbh->prepare("update hm_user_settings set settings=? where username=?");
-        if ($sql->execute(array($config, $username)) && $sql->rowCount() == 1) {
+        $this->connect();
+        if (Hm_DB::update($this->dbh, 'update hm_user_settings set settings=? where username=?', array($config, $username))) {
             Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
             return true;
         }
         else {
-            $sql = $this->dbh->prepare("insert into hm_user_settings values(?,?)");
-            return $sql->execute(array($username, $config));
+            return Hm_DB::insert($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, $config));
         }
     }
 }

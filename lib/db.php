@@ -74,6 +74,66 @@ class Hm_DB {
     }
 
     /**
+     * @param object $dbh PDO connection object
+     * @param string $sql sql with placeholders to execute
+     * @param array $args values to insert into the sql
+     * @return false|integer|array
+     */
+    static public function execute($dbh, $sql, $args, $type='select') {
+        if (!$dbh) {
+            return false;
+        }
+        $sql = $dbh->prepare($sql);
+        if (!$sql || !$sql->execute($args)) {
+            return false;
+        }
+        if ($type == 'modify' || $type == 'insert') {
+            return $sql->rowCount();
+        }
+        return $sql->fetch();
+    }
+
+    /**
+     * @param object $dbh PDO connection object
+     * @param string $sql sql with placeholders to execute
+     * @param array $args values to insert into the sql
+     * @return false|integer
+     */
+    static public function insert($dbh, $sql, $args) {
+        return self::execute($dbh, $sql, $args, 'insert');
+    }
+
+    /**
+     * @param object $dbh PDO connection object
+     * @param string $sql sql with placeholders to execute
+     * @param array $args values to insert into the sql
+     * @return false|integer
+     */
+    static public function delete($dbh, $sql, $args) {
+        return self::execute($dbh, $sql, $args, 'modify');
+    }
+
+    /**
+     * @param object $dbh PDO connection object
+     * @param string $sql sql with placeholders to execute
+     * @param array $args values to insert into the sql
+     * @return false|integer
+     */
+    static public function update($dbh, $sql, $args) {
+        return self::execute($dbh, $sql, $args, 'modify');
+    }
+
+    /**
+     * @param object $dbh PDO connection object
+     * @param string $sql sql with placeholders to execute
+     * @param array $args values to insert into the sql
+     * @return false|array
+     */
+    static public function select($dbh, $sql, $args) {
+        return self::execute($dbh, $sql, $args, 'select');
+    }
+
+    /**
      * Connect to a DB server
      * @param object $site_config site settings
      * @return object|false database connection on success

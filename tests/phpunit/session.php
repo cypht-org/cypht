@@ -453,7 +453,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $request = new Hm_Mock_Request('HTTP');
         $session->loaded = true;
         $session->start($request);
-        $this->assertTrue($session->save_data());
+        $this->assertEquals(1, $session->save_data());
         $session->destroy($request);
     }
     /**
@@ -499,7 +499,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $session = new Hm_DB_Session($this->config, 'Hm_Auth_None');
         $this->assertFalse($session->insert_session_row());
         $session->connect();
-        $this->assertTrue($session->insert_session_row());
+        $this->assertEquals(1, $session->insert_session_row());
         $session->destroy($request);
 
         $config = new Hm_Mock_Config();

@@ -21,6 +21,11 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $this->config->set('db_socket', '');
         $auth = new Hm_Auth_DB($this->config);
         $this->assertFalse($auth->create('unittestuser', 'unittestpass'));
+
+        $this->config->set('db_pass', 'asdf');
+        $this->config->set('db_socket', '/root/cantgetthere.db');
+        $auth = new Hm_Auth_DB($this->config);
+        $this->assertFalse($auth->create('unittestuser', 'unittestpass'));
     }
     /**
      * @preserveGlobalState disabled
@@ -105,7 +110,7 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $this->assertFalse($auth->change_pass('nobody', 'nopass'));
 
         $this->config->set('db_pass', 'asdf');
-        $this->config->set('db_socket', '');
+        $this->config->set('db_socket', '/root/cantgetthere.db');
         $auth = new Hm_Auth_DB($this->config);
         $this->assertFalse($auth->change_pass('unittestuser', 'unittestpass'));
     }

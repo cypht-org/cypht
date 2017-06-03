@@ -78,12 +78,9 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return mixed array results or false on failure
      */
     public function get_session_data($key) {
-        $sql = $this->dbh->prepare('select data from hm_user_session where hm_id=?');
-        if ($sql->execute(array($key))) {
-            $results = $sql->fetch();
-            if (is_array($results) && array_key_exists('data', $results)) {
-                return $this->plaintext($results['data']);
-            }
+        $results = Hm_DB::select($this->dbh, 'select data from hm_user_session where hm_id=?', array($key));
+        if (is_array($results) && array_key_exists('data', $results)) {
+            return $this->plaintext($results['data']);
         }
         Hm_Debug::add('DB SESSION failed to read session data');
         return false;
@@ -123,21 +120,18 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return bool true on success
      */
     public function upsert($type) {
-        if ($this->dbh) {
-            $sql = '';
-            $params = array(':key' => $this->session_key, ':data' => $this->ciphertext($this->data));
-            if ($type == 'update') {
-                $sql = $this->dbh->prepare("update hm_user_session set data=:data where hm_id=:key");
-            }
-            elseif ($type == 'insert') {
-                $sql = $this->dbh->prepare("insert into hm_user_session values(:key, :data, current_date)");
-            }
-            if ($sql) {
-                return $sql->execute($params);
-            }
+        $res = false;
+        $params = array(':key' => $this->session_key, ':data' => $this->ciphertext($this->data));
+        if ($type == 'update') {
+            $res = Hm_DB::update($this->dbh, 'update hm_user_session set data=:data where hm_id=:key', $params);
         }
-        Hm_Debug::add('DB SESSION failed to write session data');
-        return false;
+        elseif ($type == 'insert') {
+            $res = Hm_DB::insert($this->dbh, 'insert into hm_user_session values(:key, :data, current_date)', $params);
+        }
+        if (!$res) {
+            Hm_Debug::add('DB SESSION failed to write session data');
+        }
+        return $res;
     }
 
     /**
@@ -149,10 +143,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
         if (Hm_Functions::function_exists('delete_uploaded_files')) {
             delete_uploaded_files($this);
         }
-        if ($this->dbh) {
-            $sql = $this->dbh->prepare("delete from hm_user_session where hm_id=?");
-            $sql->execute(array($this->session_key));
-        }
+        Hm_DB::delete($this->dbh, 'delete from hm_user_session where hm_id=?', array($this->session_key));
         $this->secure_cookie($request, $this->cname, '', time()-3600);
         $this->secure_cookie($request, 'hm_id', '', time()-3600);
         $this->secure_cookie($request, 'hm_reload_folders', '', time()-3600);

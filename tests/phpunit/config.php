@@ -179,15 +179,6 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_db_load_failed() {
-        $site_config = new Hm_Mock_Config();
-        $user_config = new Hm_User_Config_DB($site_config);
-        $this->assertFalse($user_config->load('testuser', 'testkey'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
     public function test_db_load() {
         $site_config = new Hm_Mock_Config();
         setup_db($site_config);
@@ -228,7 +219,7 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $user_config = new Hm_User_Config_DB($site_config);
         $user_config->reload(array('foo' => 'bar'));
         $this->assertTrue($user_config->save('testuser', 'testkey'));
-        $this->assertTrue($user_config->save(uniqid(), 'testkey'));
+        $this->assertEquals(1, $user_config->save(uniqid(), 'testkey'));
         //$this->assertFalse($user_config->save(NULL, 'blah'));
     }
     public function tearDown() {

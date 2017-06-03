@@ -62,14 +62,10 @@ class Hm_Auth_DB extends Hm_Auth {
      * @return bool true if authentication worked
      */
     public function check_credentials($user, $pass) {
-        if ($this->connect()) {
-            $sql = $this->dbh->prepare("select hash from hm_user where username = ?");
-            if ($sql->execute(array($user))) {
-                $row = $sql->fetch();
-                if ($row['hash'] && Hm_Crypt::check_password($pass, $row['hash'])) {
-                    return true;
-                }
-            }
+        $this->connect();
+        $row = Hm_DB::select($this->dbh, 'select hash from hm_user where username = ?', array($user));
+        if ($row && array_key_exists('hash', $row) && $row['hash'] && Hm_Crypt::check_password($pass, $row['hash'])) {
+            return true;
         }
         sleep(2);
         Hm_Debug::add(sprintf('DB AUTH failed for %s', $user));
@@ -82,11 +78,9 @@ class Hm_Auth_DB extends Hm_Auth {
      * @return bool true if successful
      */
     public function delete($user) {
-        if ($this->connect()) {
-            $sql = $this->dbh->prepare("delete from hm_user where username = ?");
-            if ($sql->execute(array($user)) && $sql->rowCount() == 1) {
-                return true;
-            }
+        $this->connect();
+        if (Hm_DB::delete($this->dbh, 'delete from hm_user where username = ?', array($user))) {
+            return true;
         }
         return false;
     }
@@ -112,12 +106,8 @@ class Hm_Auth_DB extends Hm_Auth {
      */
     public function change_pass($user, $pass) {
         $this->connect();
-        if (!$this->connect()) {
-            return false;
-        }
         $hash = Hm_Crypt::hash_password($pass);
-        $sql = $this->dbh->prepare("update hm_user set hash=? where username=?");
-        if ($sql->execute(array($hash, $user)) && $sql->rowCount() == 1) {
+        if (Hm_DB::update($this->dbh, 'update hm_user set hash=? where username=?', array($hash, $user))) {
             Hm_Msgs::add("Password changed");
             return true;
         }
@@ -131,23 +121,16 @@ class Hm_Auth_DB extends Hm_Auth {
      * @return bool
      */
     public function create($user, $pass) {
-        if (!$this->connect()) {
-            return false;
-        }
+        $this->connect();
         $created = false;
-        $sql = $this->dbh->prepare("select username from hm_user where username = ?");
-        if ($sql->execute(array($user))) {
-            $res = $sql->fetch();
-            if (!empty($res)) {
-                Hm_Msgs::add("ERRThat username is already in use");
-            }
-            else {
-                $sql = $this->dbh->prepare("insert into hm_user values(?,?)");
-                $hash = Hm_Crypt::hash_password($pass);
-                if ($sql->execute(array($user, $hash))) {
-                    Hm_Msgs::add("Account created");
-                    $created = true;
-                }
+        $res = Hm_DB::select($this->dbh, 'select username from hm_user where username = ?', array($user));
+        if (!empty($res)) {
+            Hm_Msgs::add("ERRThat username is already in use");
+        }
+        else {
+            $hash = Hm_Crypt::hash_password($pass);
+            if (Hm_DB::insert($this->dbh, 'insert into hm_user values(?,?)', array($user, $hash))) {
+                $created = true;
             }
         }
         return $created;
