@@ -77,7 +77,7 @@ class Hm_DB {
      * @param object|false $dbh PDO connection object
      * @param string $sql sql with placeholders to execute
      * @param array $args values to insert into the sql
-     * @return false|integer|array
+     * @return boolean|integer|array
      */
     static public function execute($dbh, $sql, $args, $type=false) {
         if (!$dbh) {
