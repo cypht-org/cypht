@@ -231,7 +231,7 @@ class Hm_User_Config_DB extends Hm_Config {
     }
 
     /**
-     * @param string $data
+     * @param array $data
      * @param string $key
      * @return boolean
      */
