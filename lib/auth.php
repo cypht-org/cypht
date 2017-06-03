@@ -82,7 +82,7 @@ class Hm_Auth_DB extends Hm_Auth {
      * @return bool true if successful
      */
     public function delete($user) {
-        if ($this->connect()) {
+        if (!$this->connect()) {
             $sql = $this->dbh->prepare("delete from hm_user where username = ?");
             if ($sql->execute(array($user)) && $sql->rowCount() == 1) {
                 return true;
@@ -112,6 +112,9 @@ class Hm_Auth_DB extends Hm_Auth {
      */
     public function change_pass($user, $pass) {
         $this->connect();
+        if (!$this->connect()) {
+            return false;
+        }
         $hash = Hm_Crypt::hash_password($pass);
         $sql = $this->dbh->prepare("update hm_user set hash=? where username=?");
         if ($sql->execute(array($hash, $user)) && $sql->rowCount() == 1) {
@@ -128,7 +131,9 @@ class Hm_Auth_DB extends Hm_Auth {
      * @return bool
      */
     public function create($user, $pass) {
-        $this->connect();
+        if (!$this->connect()) {
+            return false;
+        }
         $created = false;
         $sql = $this->dbh->prepare("select username from hm_user where username = ?");
         if ($sql->execute(array($user))) {

@@ -38,6 +38,8 @@ if ($user && $pass) {
         die("User created\n\n");
     }
     else {
+        print_r(Hm_Debug::get());
+        print_r(Hm_Msgs::get());
         die("An error occured\n\n");
     }
 }
