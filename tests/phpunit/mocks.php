@@ -163,7 +163,7 @@ class Hm_Functions {
 function setup_db($config) {
     $config->set('db_connection_type', 'host');
     $config->set('db_socket', '/tmp/test.db');
-    $config->set('db_driver', 'mysql');
+    $config->set('db_driver', 'pgsql');
     $config->set('db_host', '127.0.0.1');
     $config->set('db_name', 'test');
     $config->set('db_user', 'test');

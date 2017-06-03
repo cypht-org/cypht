@@ -224,7 +224,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return boolean
      */
     private function new_settings($username) {
-        $res = Hm_DB::insert($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, ''));
+        $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, ''));
         Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
         $this->config = array();
         return true;
@@ -257,7 +257,7 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function load($username, $key) {
         $this->connect();
-        $data = Hm_DB::select($this->dbh, 'select * from hm_user_settings where username=?', array($username));
+        $data = Hm_DB::execute($this->dbh, 'select * from hm_user_settings where username=?', array($username));
         if (!$data || !array_key_exists('settings', $data)) {
             return $this->new_settings($username);
         }
@@ -292,12 +292,12 @@ class Hm_User_Config_DB extends Hm_Config {
         $this->shuffle();
         $config = Hm_Crypt::ciphertext(json_encode($this->config), $key);
         $this->connect();
-        if (Hm_DB::update($this->dbh, 'update hm_user_settings set settings=? where username=?', array($config, $username))) {
+        if (Hm_DB::execute($this->dbh, 'update hm_user_settings set settings=? where username=?', array($config, $username))) {
             Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
             return true;
         }
         else {
-            return Hm_DB::insert($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, $config));
+            return Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, $config));
         }
     }
 }

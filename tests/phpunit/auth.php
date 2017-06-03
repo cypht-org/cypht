@@ -111,6 +111,7 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
 
         $this->config->set('db_pass', 'asdf');
         $this->config->set('db_socket', '/root/cantgetthere.db');
+        $this->config->set('db_connection_type', 'socket');
         $auth = new Hm_Auth_DB($this->config);
         $this->assertFalse($auth->change_pass('unittestuser', 'unittestpass'));
     }

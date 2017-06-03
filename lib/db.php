@@ -112,46 +112,6 @@ class Hm_DB {
     }
 
     /**
-     * @param object|false $dbh PDO connection object
-     * @param string $sql sql with placeholders to execute
-     * @param array $args values to insert into the sql
-     * @return false|integer
-     */
-    static public function insert($dbh, $sql, $args) {
-        return self::execute($dbh, $sql, $args, 'insert');
-    }
-
-    /**
-     * @param object|false $dbh PDO connection object
-     * @param string $sql sql with placeholders to execute
-     * @param array $args values to insert into the sql
-     * @return false|integer
-     */
-    static public function delete($dbh, $sql, $args) {
-        return self::execute($dbh, $sql, $args, 'modify');
-    }
-
-    /**
-     * @param object|false $dbh PDO connection object
-     * @param string $sql sql with placeholders to execute
-     * @param array $args values to insert into the sql
-     * @return false|integer
-     */
-    static public function update($dbh, $sql, $args) {
-        return self::execute($dbh, $sql, $args, 'modify');
-    }
-
-    /**
-     * @param object|false $dbh PDO connection object
-     * @param string $sql sql with placeholders to execute
-     * @param array $args values to insert into the sql
-     * @return false|array
-     */
-    static public function select($dbh, $sql, $args) {
-        return self::execute($dbh, $sql, $args, 'select');
-    }
-
-    /**
      * Connect to a DB server
      * @param object $site_config site settings
      * @return object|false database connection on success
@@ -164,6 +124,7 @@ class Hm_DB {
             return self::$dbh[$key];
         }
         $dsn = self::build_dsn();
+        echo $dsn;
         try {
             self::$dbh[$key] = new PDO($dsn, self::$config['db_user'], self::$config['db_pass']);
             self::$dbh[$key]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);

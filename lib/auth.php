@@ -63,7 +63,7 @@ class Hm_Auth_DB extends Hm_Auth {
      */
     public function check_credentials($user, $pass) {
         $this->connect();
-        $row = Hm_DB::select($this->dbh, 'select hash from hm_user where username = ?', array($user));
+        $row = Hm_DB::execute($this->dbh, 'select hash from hm_user where username = ?', array($user));
         if ($row && array_key_exists('hash', $row) && $row['hash'] && Hm_Crypt::check_password($pass, $row['hash'])) {
             return true;
         }
@@ -79,7 +79,7 @@ class Hm_Auth_DB extends Hm_Auth {
      */
     public function delete($user) {
         $this->connect();
-        if (Hm_DB::delete($this->dbh, 'delete from hm_user where username = ?', array($user))) {
+        if (Hm_DB::execute($this->dbh, 'delete from hm_user where username = ?', array($user))) {
             return true;
         }
         return false;
@@ -107,7 +107,7 @@ class Hm_Auth_DB extends Hm_Auth {
     public function change_pass($user, $pass) {
         $this->connect();
         $hash = Hm_Crypt::hash_password($pass);
-        if (Hm_DB::update($this->dbh, 'update hm_user set hash=? where username=?', array($hash, $user))) {
+        if (Hm_DB::execute($this->dbh, 'update hm_user set hash=? where username=?', array($hash, $user))) {
             Hm_Msgs::add("Password changed");
             return true;
         }
@@ -123,13 +123,13 @@ class Hm_Auth_DB extends Hm_Auth {
     public function create($user, $pass) {
         $this->connect();
         $created = false;
-        $res = Hm_DB::select($this->dbh, 'select username from hm_user where username = ?', array($user));
+        $res = Hm_DB::execute($this->dbh, 'select username from hm_user where username = ?', array($user));
         if (!empty($res)) {
             Hm_Msgs::add("ERRThat username is already in use");
         }
         else {
             $hash = Hm_Crypt::hash_password($pass);
-            if (Hm_DB::insert($this->dbh, 'insert into hm_user values(?,?)', array($user, $hash))) {
+            if (Hm_DB::execute($this->dbh, 'insert into hm_user values(?,?)', array($user, $hash))) {
                 $created = true;
             }
         }
