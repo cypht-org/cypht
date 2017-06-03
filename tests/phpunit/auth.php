@@ -16,6 +16,10 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $auth->delete('unittestuser');
         $this->assertTrue($auth->create('unittestuser', 'unittestpass'));
         $this->assertFalse($auth->create('unittestuser', 'unittestpass'));
+
+        $this->config->set('db_pass', 'asdf');
+        $auth = new Hm_Auth_DB($this->config);
+        $this->assertFalse($auth->create('unittestuser', 'unittestpass'));
     }
     /**
      * @preserveGlobalState disabled
@@ -98,6 +102,10 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $this->assertFalse($auth->check_credentials('unittestuser', 'unittestpass'));
         $this->assertTrue($auth->check_credentials('unittestuser', 'newpass'));
         $this->assertFalse($auth->change_pass('nobody', 'nopass'));
+
+        $this->config->set('db_pass', 'asdf');
+        $auth = new Hm_Auth_DB($this->config);
+        $this->assertFalse($auth->change_pass('unittestuser', 'unittestpass'));
     }
     /**
      * @preserveGlobalState disabled
