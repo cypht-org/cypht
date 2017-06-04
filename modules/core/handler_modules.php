@@ -526,6 +526,9 @@ class Hm_Handler_login extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('username', 'password'));
             if ($success) {
                 $this->session->check($this->request, rtrim($form['username']), $form['password']);
+                if ($this->session->auth_failed) {
+                    Hm_Msgs::add("ERRInvalid username or password");
+                }
                 $this->session->set('username', rtrim($form['username']));
                 if ($this->config->get('redirect_after_login')) {
                     $this->out('redirect_url', $this->config->get('redirect_after_login'));
