@@ -132,7 +132,6 @@ class Hm_DB {
         }
         catch (Exception $oops) {
             Hm_Debug::add($oops->getMessage());
-            Hm_Msgs::add("An error occurred communicating with the database");
             self::$dbh[$key] = false;
             return false;
         }
