@@ -59,12 +59,10 @@ trait Hm_Session_Fingerprint {
      */
     public function build_fingerprint($env, $input='') {
         $id = $input;
-        $id .= (array_key_exists('REMOTE_ADDR', $env)) ? $env['REMOTE_ADDR'] : '';
-        $id .= (array_key_exists('HTTP_USER_AGENT', $env)) ? $env['HTTP_USER_AGENT'] : '';
-        $id .= (array_key_exists('REQUEST_SCHEME', $env)) ? $env['REQUEST_SCHEME'] : '';
-        $id .= (array_key_exists('HTTP_ACCEPT_LANGUAGE', $env)) ? $env['HTTP_ACCEPT_LANGUAGE'] : '';
-        $id .= (array_key_exists('HTTP_ACCEPT_CHARSET', $env)) ? $env['HTTP_ACCEPT_CHARSET'] : '';
-        $id .= (array_key_exists('HTTP_HOST', $env)) ? $env['HTTP_HOST'] : '';
+        foreach (array('REMOTE_ADDR', 'HTTP_USER_AGENT', 'REQUEST_SCHEME', 'HTTP_ACCEPT_LANGUAGE',
+            'HTTP_ACCEPT_CHARSET', 'HTTP_HOST') as $val) {
+            $id .= (array_key_exists($val, $env)) ? $env[$val] : '';
+        }
         return hash('sha256', $id);
     }
 
