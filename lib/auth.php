@@ -108,7 +108,6 @@ class Hm_Auth_DB extends Hm_Auth {
         $this->connect();
         $hash = Hm_Crypt::hash_password($pass);
         if (Hm_DB::execute($this->dbh, 'update hm_user set hash=? where username=?', array($hash, $user))) {
-            Hm_Msgs::add("Password changed");
             return true;
         }
         return false;
@@ -118,22 +117,22 @@ class Hm_Auth_DB extends Hm_Auth {
      * Create a new user in the DB
      * @param string $user username
      * @param string $pass password
-     * @return bool
+     * @return integer
      */
     public function create($user, $pass) {
         $this->connect();
-        $created = false;
+        $result = 0;
         $res = Hm_DB::execute($this->dbh, 'select username from hm_user where username = ?', array($user));
         if (!empty($res)) {
-            Hm_Msgs::add("ERRThat username is already in use");
+            $result = 1;
         }
         else {
             $hash = Hm_Crypt::hash_password($pass);
             if (Hm_DB::execute($this->dbh, 'insert into hm_user values(?,?)', array($user, $hash))) {
-                $created = true;
+                $result = 2;
             }
         }
-        return $created;
+        return $result;
     }
 }
 
