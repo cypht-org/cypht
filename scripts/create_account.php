@@ -34,7 +34,7 @@ if ($config->get('auth_type') != 'DB') {
 
 $auth = new Hm_Auth_DB($config);
 if ($user && $pass) {
-    if ($auth->create($user, $pass)) {
+    if ($auth->create($user, $pass) === 2) {
         die("User created\n\n");
     }
     else {
