@@ -17,23 +17,25 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
         }
 
         list($success, $form) = $this->process_form(array('new_pass1', 'new_pass2', 'old_pass', 'change_password'));
-        if ($success) {
-            if ($form['new_pass1'] !== $form['new_pass2']) {
-                Hm_Msgs::add("ERRNew passwords don't not match"); 
-                return;
-            }
-            $user = $this->session->get('username', false);
-            if (!$this->session->auth($user, $form['old_pass'])) {
-                Hm_Msgs::add("ERRCurrent password is incorrect");
-                return;
-            }
-            $user_config = load_user_config_object($this->config);
-            if (!$this->session->change_pass($user, $form['new_pass1'])) {
-                Hm_Msgs::add("ERRAn error Occurred");
-            }
-            $user_config->load($user, $form['old_pass']);
-            $user_config->save($user, $form['new_pass1']);
+        if (!$success) {
+            return;
         }
+        if ($form['new_pass1'] !== $form['new_pass2']) {
+            Hm_Msgs::add("ERRNew passwords don't not match"); 
+            return;
+        }
+        $user = $this->session->get('username', false);
+        if (!$this->session->auth($user, $form['old_pass'])) {
+            Hm_Msgs::add("ERRCurrent password is incorrect");
+            return;
+        }
+        $user_config = load_user_config_object($this->config);
+        if ($this->session->change_pass($user, $form['new_pass1'])) {
+            Hm_Msgs::add("Password changed");
+        }
+        Hm_Msgs::add("ERRAn error Occurred");
+        $user_config->load($user, $form['old_pass']);
+        $user_config->save($user, $form['new_pass1']);
     }
 }
 
@@ -56,7 +58,13 @@ class Hm_Handler_process_create_account extends Hm_Handler_Module {
             Hm_Msgs::add('ERRPasswords did not match');
             return;
         }
-        $this->session->create($form['create_username'], $form['create_password']);
+        $res = $this->session->create($form['create_username'], $form['create_password']);
+        if ($res === 1) {
+            Hm_Msgs::add("ERRThat username is already in use");
+        }
+        elseif ($res === 2) {
+            Hm_Msgs::add("Account Created");
+        }
     }
 }
 
