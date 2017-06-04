@@ -16,11 +16,13 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $auth->delete('unittestuser');
         $this->assertEquals(2, $auth->create('unittestuser', 'unittestpass'));
         $this->assertEquals(1, $auth->create('unittestuser', 'unittestpass'));
+        Hm_DB::close($auth->dbh);
 
         $this->config->set('db_pass', 'asdf');
         $this->config->set('db_socket', '');
         $auth = new Hm_Auth_DB($this->config);
         $this->assertEquals(0, $auth->create('unittestuser', 'unittestpass'));
+        Hm_DB::close($auth->dbh);
 
         $this->config->set('db_pass', 'asdf');
         $this->config->set('db_socket', '/root/cantgetthere.db');
