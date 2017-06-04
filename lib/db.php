@@ -136,4 +136,12 @@ class Hm_DB {
             return false;
         }
     }
+
+    /**
+     * @param object $db PDO object
+     * @return void
+     */
+    static public function close($dbh) {
+        $dbh = null;
+    }
 }

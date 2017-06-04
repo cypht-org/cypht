@@ -53,7 +53,7 @@ class Hm_Auth_DB extends Hm_Auth {
     static public $internal_users = true;
 
     /* database conneciton handle */
-    private $dbh;
+    public $dbh;
 
     /**
      * Send the username and password to the configured DB for authentication
