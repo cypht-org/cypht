@@ -67,6 +67,9 @@ class Hm_PHP_Session extends Hm_Session {
     /* data store connection used by classes that extend this */
     public $conn;
 
+    /* used to indicate failed auth */
+    public $auth_failed = false;
+
     /**
      * Setup newly authenticated session
      * @param Hm_Request $request
@@ -100,7 +103,7 @@ class Hm_PHP_Session extends Hm_Session {
                 $this->authed($request, $fingerprint);
             }
             else {
-                Hm_Msgs::add("ERRInvalid username or password");
+                $this->auth_failed = true;
             }
         }
         elseif (array_key_exists($this->cname, $request->cookie)) {
