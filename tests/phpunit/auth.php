@@ -14,18 +14,18 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
     public function test_create() {
         $auth = new Hm_Auth_DB($this->config);
         $auth->delete('unittestuser');
-        $this->assertTrue($auth->create('unittestuser', 'unittestpass'));
-        $this->assertFalse($auth->create('unittestuser', 'unittestpass'));
+        $this->assertEquals(2, $auth->create('unittestuser', 'unittestpass'));
+        $this->assertEquals(1, $auth->create('unittestuser', 'unittestpass'));
 
         $this->config->set('db_pass', 'asdf');
         $this->config->set('db_socket', '');
         $auth = new Hm_Auth_DB($this->config);
-        $this->assertFalse($auth->create('unittestuser', 'unittestpass'));
+        $this->assertEquals(0, $auth->create('unittestuser', 'unittestpass'));
 
         $this->config->set('db_pass', 'asdf');
         $this->config->set('db_socket', '/root/cantgetthere.db');
         $auth = new Hm_Auth_DB($this->config);
-        $this->assertFalse($auth->create('unittestuser', 'unittestpass'));
+        $this->assertEquals(0, $auth->create('unittestuser', 'unittestpass'));
     }
     /**
      * @preserveGlobalState disabled
@@ -127,7 +127,7 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $auth = new Hm_Auth_DB($config);
         $this->assertFalse($auth->delete('unittestuser'));
         $auth = new Hm_Auth_DB($this->config);
-        $this->assertTrue($auth->create('unittestuser', 'unittestpass'));
+        $this->assertEquals(2, $auth->create('unittestuser', 'unittestpass'));
     }
     public function tearDown() {
         unset($this->config);

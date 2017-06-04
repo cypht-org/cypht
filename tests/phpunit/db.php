@@ -36,6 +36,18 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_execute() {
+        $this->assertFalse(Hm_DB::connect($this->config));
+        setup_db($this->config);
+        $db = Hm_DB::connect($this->config);
+        $this->assertFalse(Hm_DB::execute($db, 'asdfasdfasdf', array()));
+        $this->assertFalse(Hm_DB::execute(false, 'iasdfasdfasdf', array()));
+        $this->assertEquals(0, Hm_DB::execute($db, 'update hm_user set username=foo where username=bar', array()));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_connect() {
         $this->assertFalse(Hm_DB::connect($this->config));
         setup_db($this->config);
