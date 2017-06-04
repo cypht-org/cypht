@@ -205,22 +205,44 @@ trait Hm_Server_List {
      */
     public static function dump($id=false, $full=false) {
         $list = array();
+        if ($id !== false) {
+            return self::get($id, $full);
+        }
         foreach (self::$server_list as $index => $server) {
-            if ($id !== false && $index != $id) {
-                continue;
-            }
             if (!$full) {
-                if (!array_key_exists('pass', $server) || !$server['pass']) {
-                    $server['nopass'] = true;
-                }
-                unset($server['pass']);
+                $server = self::clean($server);
             }
             $list[$index] = $server;
-            if ($id !== false) {
-                return $list[$index];
-            }
         }
         return $list;
+    }
+
+    /**
+     * @param int $id server id to fetch
+     * @param bool $full true to return passwords for server connections. CAREFUL!
+     * @return array
+     */
+    public static function get($id, $full) {
+        if (array_key_exists($id, self::$server_list)) {
+            $server = self::$server_list[$id];
+            if (!$full) {
+                return self::clean($server);
+            }
+            return $server;
+        }
+        return array();
+    }
+
+    /*
+     * @param array $server
+     * @return array
+     */
+    public static function clean($server) {
+        if (!array_key_exists('pass', $server) || !$server['pass']) {
+            $server['nopass'] = true;
+        }
+        unset($server['pass']);
+        return $server;
     }
 
     /**
