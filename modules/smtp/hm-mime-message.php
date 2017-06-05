@@ -116,6 +116,9 @@ class Hm_MIME_Msg {
         $this->headers['X-Auto-Bcc'] = 'cypht';
     }
 
+    /**
+     * TODO: refactor this
+     */
     function encode_header_fld($input, $email=true) {
         $res = array();
         $input = trim($input, ',; ');
@@ -142,12 +145,7 @@ class Hm_MIME_Msg {
                 $res[] = $enc_val;
             }
             else {
-                if ($email && strpos($v, '@') !== false && is_email_address($v)) {
-                    $res[] = '<'.trim($v, " \t\n\r\0\x0B><").'>';
-                }
-                else {
-                    $res[] = $v;
-                }
+                $res[] = $v;
             }
         }
         $string = preg_replace("/\s{2,}/", ' ', trim(implode(' ', $res)));
