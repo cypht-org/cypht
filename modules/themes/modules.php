@@ -16,12 +16,14 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_load_theme  extends Hm_Handler_Module {
     public function process() {
         $theme = $this->user_config->get('theme_setting', 'default');
+        $themes = custom_themes($this->config, hm_themes());
         if ($theme == 'hn') {
             $this->user_config->set('list_style', 'news_style');
         }
         if ($theme == 'dark') {
             hm_theme_icons();
         }
+        $this->out('themes', $themes);
         $this->out('theme', $theme);
     }
 }
@@ -56,7 +58,7 @@ class Hm_Output_theme_css extends Hm_Output_Module {
      * Add HTML head tag for theme css
      */
     protected function output() {
-        if ($this->get('theme') && in_array($this->get('theme'), array_keys(hm_themes($this)), true) && $this->get('theme') != 'default') {
+        if ($this->get('theme') && in_array($this->get('theme'), array_keys($this->get('themes', array())), true) && $this->get('theme') != 'default') {
             return '<link href="modules/themes/assets/'.$this->html_safe($this->get('theme')).'.css?v='.CACHE_ID.'" media="all" rel="stylesheet" type="text/css" />';
         }
     }
@@ -76,12 +78,12 @@ class Hm_Output_theme_setting extends Hm_Output_Module {
         $res = '<tr class="general_setting"><td><label for="theme_setting">'.
             $this->trans('Theme').'</label></td>'.
             '<td><select id="theme_setting" name="theme_setting">';
-        foreach (hm_themes($this) as $name => $label) {
+        foreach ($this->get('themes', array()) as $name => $label) {
             $res .= '<option ';
             if ($name == $current) {
                 $res .= 'selected="selected" ';
             }
-            $res .= 'value="'.$this->html_safe($name).'">'.$label.'</option>';
+            $res .= 'value="'.$this->html_safe($name).'">'.$this->trans($label).'</option>';
         }
         $res .= '</select>';
         return $res;
@@ -99,18 +101,18 @@ function icon_color($theme) {
  * Define available themes
  * @subpackage themes/functions
  */
-function hm_themes($output_mod) {
+function hm_themes() {
     return array(
-        'default' => $output_mod->trans('White Bread (Default)'),
-        'blue' => $output_mod->trans('Boring Blues'),
-        'dark' => $output_mod->trans('Dark But Not Too Dark'),
-        'gray' => $output_mod->trans('More Gray Than White Bread'),
-        'green' => $output_mod->trans('Poison Mist'),
-        'tan' => $output_mod->trans('A Bunch Of Browns'),
-        'terminal' => $output_mod->trans('VT100'),
-        'lightblue' => $output_mod->trans('Light Blue'),
-        'hn' => $output_mod->trans('Hacker News'),
-        'so_alone' => $output_mod->trans('So Alone'),
+        'default' => 'White Bread (Default)',
+        'blue' => 'Boring Blues',
+        'dark' => 'Dark But Not Too Dark',
+        'gray' => 'More Gray Than White Bread',
+        'green' => 'Poison Mist',
+        'tan' => 'A Bunch Of Browns',
+        'terminal' => 'VT100',
+        'lightblue' => 'Light Blue',
+        'hn' => 'Hacker News',
+        'so_alone' => 'So Alone',
     );
 }
 
@@ -182,4 +184,26 @@ function hm_theme_icons($color='white') {
     }
 }
 
-
+/**
+ * Custom theme check
+ */
+function custom_themes($config, $themes) {
+    $custom = get_ini($config, 'themes.ini');
+    if (!is_array($custom)) {
+        return $themes;
+    }
+    if (!array_key_exists('theme', $custom)) {
+        return $themes;
+    }
+    if (!is_array($custom['theme'])) {
+        return $themes;
+    }
+    foreach ($custom['theme'] as $val) {
+        if (strpos($val, '|') === false) {
+            continue;
+        }
+        $parts = explode('|', $val, 2);
+        $themes[$parts[0]] = $parts[1];
+    }
+    return $themes;
+}
