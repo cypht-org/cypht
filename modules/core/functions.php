@@ -508,7 +508,7 @@ function merge_folder_list_details($folder_sources) {
 
 /**
  * Get the contents of an ini file, first check the config
- * object (unless in debug mode
+ * @subpackage core/functions
  */
 function get_ini($config, $name, $sections=false) {
     if (!DEBUG_MODE) {
