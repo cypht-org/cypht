@@ -171,6 +171,7 @@ install_coveralls() {
 # install libsodium
 install_sodium() {
     sudo apt-get install libsodium-dev -y
+    pecl channel-update pecl.php.net
     pecl install libsodium
 }
 
