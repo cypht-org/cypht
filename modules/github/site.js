@@ -24,7 +24,6 @@ var display_github_data_background = function(res) {
     var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
     globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'github', cache);
     Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
-    Hm_Message_List.adjust_unread_total($('tr', cache).length, true);
 };
 
 var display_github_data = function(res) {

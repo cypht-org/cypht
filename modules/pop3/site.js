@@ -259,7 +259,6 @@ var update_pop3_unread_display_background = function(res) {
     var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
     globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'pop3', cache);
     Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
-    Hm_Message_List.adjust_unread_total($('tr', cache).length, true);
 };
 
 var pop3_combined_unread_content = function(id) {

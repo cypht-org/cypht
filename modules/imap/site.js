@@ -625,7 +625,6 @@ var imap_background_unread_content_result = function(res) {
     var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
     globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'imap', cache);
     Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
-    Hm_Message_List.adjust_unread_total($('tr', cache).length, true);
 };
 
 var check_select_for_imap = function() {
@@ -795,7 +794,11 @@ var imap_background_unread_content = function(id, folder) {
         {'name': 'imap_server_ids', 'value': id}],
         imap_background_unread_content_result,
         [],
-        true
+        true,
+        function() {
+            var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
+            Hm_Message_List.adjust_unread_total($('tr', cache).length, true);
+        }
     );
     return false;
 };
