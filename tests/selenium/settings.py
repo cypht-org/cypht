@@ -163,6 +163,27 @@ class SettingsTests(SettingsHelpers):
         self.number_fld_test('email_setting', 'all_email_per_source', 20, 100)
         self.close_section('email_setting')
 
+    def feeds_since_test(self):
+        self.dropdown_test('feeds_setting', 'feed_since', 'today', '-6 weeks')
+
+    def feeds_max_per_source_test(self):
+        self.number_fld_test('feeds_setting', 'feed_limit', 20, 100)
+        self.close_section('feeds_setting')
+
+    def sent_since_test(self):
+        self.dropdown_test('sent_setting', 'sent_since', '-1 week', '-6 weeks')
+
+    def sent_max_per_source_test(self):
+        self.number_fld_test('sent_setting', 'sent_per_source', 20, 100)
+        self.close_section('sent_setting')
+
+    def github_since_test(self):
+        self.dropdown_test('github_all_setting', 'github_since', '-1 week', '-6 weeks', 'github')
+
+    def github_max_per_source_test(self):
+        self.number_fld_test('github_all_setting', 'github_limit', 20, 100, 'github')
+        self.close_section('github_all_setting')
+
 
 if __name__ == '__main__':
 
@@ -202,9 +223,21 @@ if __name__ == '__main__':
         'all_since_test',
         'all_max_per_source_test',
 
-        # all E-mail  options
+        # all E-mail options
         'all_email_since_test',
         'all_email_max_per_source_test',
+
+        # feed options
+        'feeds_since_test',
+        'feeds_max_per_source_test',
+
+        # sent options
+        'sent_since_test',
+        'sent_max_per_source_test',
+
+        # github options
+        'github_since_test',
+        'github_max_per_source_test',
 
         # exit
         'logout'
