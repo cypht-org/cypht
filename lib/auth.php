@@ -45,6 +45,14 @@ abstract class Hm_Auth {
 }
 
 /**
+ * Stub for dynamic authentication
+ */
+class Hm_Auth_Dynamic extends Hm_Auth {
+    public function check_credentials($user, $pass) {
+        return false;
+    }
+}
+/**
  * Authenticate against an included DB
  */
 class Hm_Auth_DB extends Hm_Auth {

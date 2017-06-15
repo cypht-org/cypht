@@ -311,58 +311,83 @@ abstract class Hm_Session {
     }
 }
 
-/**
- * Set up auth
- * @param object $config site configuration
- * @return string
- */
-function setup_auth($config) {
-    $auth_type = $config->get('auth_type', false);
-    $auth_class = '';
-    if ($auth_type == 'dynamic' && !in_array('dynamic_login', $config->get_modules(), true)) {
-        Hm_Functions::cease('Invalid auth configuration');
+class Hm_Session_Setup {
+
+    private $config;
+    private $auth_type;
+    private $session_type;
+
+    function __construct($config) {
+        $this->config = $config;
+        $this->auth_type = $config->get('auth_type', false);
+        $this->session_type = $config->get('session_type', false);
+
     }
-    if ($auth_type && in_array($auth_type, array('DB', 'LDAP', 'IMAP', 'POP3'), true)) {
-        $auth_class = sprintf('Hm_Auth_%s', $auth_type);
+    public function setup_session() {
+        $auth_class = $this->setup_auth();
+        $session_class = $this->get_session_class();
+        if (!Hm_Functions::class_exists($auth_class)) {
+            Hm_Functions::cease('Invalid auth configuration');
+        }
+        Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
+        return new $session_class($this->config, $auth_class);
     }
-    elseif ($auth_type == 'custom') {
-        $auth_class = 'Custom_Auth';
+
+    private function get_session_class() {
+        if ($this->session_type == 'DB') {
+            $session_class = 'Hm_DB_Session';
+        }
+        elseif ($this->session_type == 'MEM') {
+            $session_class = 'Hm_Memcached_Session';
+        }
+        elseif ($this->session_type == 'custom' && class_exists('Custom_Session')) {
+            $session_class = 'Custom_Session';
+        }
+        else {
+            $session_class = 'Hm_PHP_Session';
+        }
+        return $session_class;
     }
-    if (!$auth_class) {
-        Hm_Functions::cease('Invalid auth configuration');
-    }
-    else {
+
+    private function setup_auth() {
+        $auth_class = $this->standard_auth();
+        if (!$auth_class) {
+            $auth_class = $this->dynamic_auth();
+        }
+        if (!$auth_class) {
+            $auth_class = $this->custom_auth();
+        }
+        if (!$auth_class) {
+            Hm_Functions::cease('Invalid auth configuration');
+            $auth_class = 'Hm_Auth_None';
+        }
         return $auth_class;
     }
-    /* this special case is for unit testing */
-    return 'Hm_Auth_None';
-}
 
-/**
- * Start up the selected session type
- * @param object $config site configuration
- * @return object|null
- */
-function setup_session($config) {
-    $session_type = $config->get('session_type', false);
-    $auth_class = setup_auth($config);
-    if ($session_type == 'DB') {
-        $session_class = 'Hm_DB_Session';
+    /**
+     */
+    private function dynamic_auth() {
+        if ($this->auth_type == 'dynamic' && in_array('dynamic_login', $this->config->get_modules(), true)) {
+            return 'Hm_Auth_Dynamic';
+        }
+        return false;
     }
-    elseif ($session_type == 'MEM') {
-        $session_class = 'Hm_Memcached_Session';
+
+    /**
+     */
+    private function standard_auth() {
+        if ($this->auth_type && in_array($this->auth_type, array('DB', 'LDAP', 'IMAP', 'POP3'), true)) {
+            return sprintf('Hm_Auth_%s', $this->auth_type);
+        }
+        return false;
     }
-    elseif ($session_type == 'custom' && is_readable(APP_PATH.'modules/site/lib.php')) {
-        $session_class = 'Custom_Session';
-    }
-    else {
-        $session_class = 'Hm_PHP_Session';
-    }
-    if (Hm_Functions::class_exists($auth_class)) {
-        Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
-        return new $session_class($config, $auth_class);
-    }
-    else {
-        Hm_Functions::cease('Invalid auth configuration');
+
+    /**
+     */
+    private function custom_auth() {
+        if ($this->auth_type == 'custom' && Hm_Functions::class_exists('Custom_Auth')) {
+            return 'Custom_Auth';
+        }
+        return false;
     }
 }

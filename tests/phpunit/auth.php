@@ -37,6 +37,11 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
      */
     public function test_check_credentials() {
         $session = new Hm_Mock_Session();
+        $auth = new Hm_Auth_Dynamic($this->config);
+        $this->assertFalse($auth->check_credentials('unittestuser', 'notthepass'));
+        $this->assertFalse($auth->check_credentials('unittestuser', 'unittestpass'));
+
+        $session = new Hm_Mock_Session();
         $auth = new Hm_Auth_DB($this->config);
         $this->assertFalse($auth->check_credentials('unittestuser', 'notthepass'));
         $this->assertTrue($auth->check_credentials('unittestuser', 'unittestpass'));

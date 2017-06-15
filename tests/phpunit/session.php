@@ -525,26 +525,38 @@ class Hm_Test_Session_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_setup_session() {
-        $this->assertEquals('Hm_PHP_Session', get_class((setup_session($this->config))));
+        $setup = new Hm_Session_Setup($this->config);
+        $this->assertEquals('Hm_PHP_Session', get_class(($setup->setup_session())));
+
         $this->config->set('session_type', 'DB');
         $this->config->set('auth_type', 'DB');
-        $this->assertEquals('Hm_DB_Session', get_class((setup_session($this->config))));
+        $setup = new Hm_Session_Setup($this->config);
+        $this->assertEquals('Hm_DB_Session', get_class(($setup->setup_session())));
+
+        $this->config->mods[] = 'dynamic_login';
+        $this->config->set('auth_type', 'dynamic');
+        $setup = new Hm_Session_Setup($this->config);
+        $this->assertEquals('Hm_DB_Session', get_class(($setup->setup_session())));
+
         $this->config->set('session_type', 'asdf');
         $this->config->set('auth_type', 'DB');
-        $this->assertEquals('Hm_PHP_Session', get_class((setup_session($this->config))));
+        $setup = new Hm_Session_Setup($this->config);
+        $this->assertEquals('Hm_PHP_Session', get_class(($setup->setup_session())));
 
         $this->config->set('session_type', 'custom');
         $this->config->set('auth_type', 'custom');
-        $this->assertEquals('Custom_Session', get_class((setup_session($this->config))));
+        $setup = new Hm_Session_Setup($this->config);
+        $this->assertEquals('Custom_Session', get_class(($setup->setup_session())));
 
         $this->config->set('session_type', 'MEM');
-        $this->assertEquals('Hm_Memcached_Session', get_class((setup_session($this->config))));
+        $setup = new Hm_Session_Setup($this->config);
+        $this->assertEquals('Hm_Memcached_Session', get_class(($setup->setup_session())));
+
         Hm_Functions::$exists = false;
         $this->config->set('session_type', 'PHP');
         $this->config->set('auth_type', 'asdf');
-        $this->assertNull(setup_session($this->config));
-        $this->config->set('auth_type', 'dynamic');
-        $this->assertNull(setup_session($this->config));
+        $setup = new Hm_Session_Setup($this->config);
+        $this->assertEquals('Hm_PHP_Session', get_class(($setup->setup_session())));
 
     }
     public function tearDown() {

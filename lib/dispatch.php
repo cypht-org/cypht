@@ -124,7 +124,8 @@ class Hm_Dispatch {
         $this->site_config = $config;
 
         /* setup a session handler, but don't actually start a session yet */
-        $this->session = setup_session($this->site_config); 
+        $session_config = new Hm_Session_Setup($this->site_config);
+        $this->session = $session_config->setup_session();
 
         /* instantiate the module runner */
         $this->module_exec = new Hm_Module_Exec($this->site_config);
