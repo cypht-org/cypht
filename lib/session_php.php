@@ -58,9 +58,100 @@ trait Hm_Session_Auth {
 }
 
 /**
+ * PHP session data methods
+ */
+abstract class Hm_PHP_Session_Data extends Hm_Session {
+
+    /**
+     * @param Hm_Request $request request details
+     * @param boolean $existing_session
+     * @return void
+     */
+    protected function validate_session_data($request, $existing_session) {
+        if ($existing_session && count($this->data) == 0) {
+            $this->destroy($request);
+        }
+        else {
+            $this->active = true;
+        }
+    }
+
+    /**
+     * @param Hm_Request $request request details
+     * @return void
+     */
+    protected function start_session_data($request) {
+        if (array_key_exists('data', $_SESSION)) {
+            $data = $this->plaintext($_SESSION['data']);
+            if (is_array($data)) {
+                $this->data = $data;
+            }
+            elseif (!$this->loaded) {
+                $this->destroy($request);
+                Hm_Debug::add('Mismatched session level encryption key');
+            }
+        }
+    }
+
+    /**
+     * Return a session value, or a user settings value stored in the session
+     * @param string $name session value name to return
+     * @param mixed $default value to return if $name is not found
+     * @param bool $user if true, only search the user_data section of the session
+     * @return mixed the value if found, otherwise $default
+     */
+    public function get($name, $default=false, $user=false) {
+        if ($user) {
+            return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data['user_data']) ? $this->data['user_data'][$name] : $default;
+        }
+        else {
+            return array_key_exists($name, $this->data) ? $this->data[$name] : $default;
+        }
+    }
+
+    /**
+     * Save a value in the session
+     * @param string $name the name to save
+     * @param string $value the value to save
+     * @param bool $user if true, save in the user_data section of the session
+     * @return void
+     */
+    public function set($name, $value, $user=false) {
+        if ($user) {
+            $this->data['user_data'][$name] = $value;
+        }
+        else {
+            $this->data[$name] = $value;
+        }
+    }
+
+    /**
+     * Delete a value from the session
+     * @param string $name name of value to delete
+     * @return void
+     */
+    public function del($name) {
+        if (array_key_exists($name, $this->data)) {
+            unset($this->data[$name]);
+        }
+    }
+
+    /**
+     * Save session data
+     * @return void
+     */
+    public function save_data() {
+        $enc_data = $this->ciphertext($this->data);
+        $_SESSION = array('data' => $enc_data);
+        session_write_close();
+        $_SESSION = array();
+    }
+}
+
+/**
  * PHP Sessions that extend the base session class
  */
-class Hm_PHP_Session extends Hm_Session {
+class Hm_PHP_Session extends Hm_PHP_Session_Data {
 
     use Hm_Session_Auth;
 
@@ -133,37 +224,6 @@ class Hm_PHP_Session extends Hm_Session {
     }
 
     /**
-     * @param Hm_Request $request request details
-     * @param boolean $existing_session
-     * @return void
-     */
-    private function validate_session_data($request, $existing_session) {
-        if ($existing_session && count($this->data) == 0) {
-            $this->destroy($request);
-        }
-        else {
-            $this->active = true;
-        }
-    }
-
-    /**
-     * @param Hm_Request $request request details
-     * @return void
-     */
-    private function start_session_data($request) {
-        if (array_key_exists('data', $_SESSION)) {
-            $data = $this->plaintext($_SESSION['data']);
-            if (is_array($data)) {
-                $this->data = $data;
-            }
-            elseif (!$this->loaded) {
-                $this->destroy($request);
-                Hm_Debug::add('Mismatched session level encryption key');
-            }
-        }
-    }
-
-    /**
      * Setup the cookie params for a session cookie
      * @param Hm_Request $request request details
      * @return array list of cookie fields
@@ -190,80 +250,12 @@ class Hm_PHP_Session extends Hm_Session {
     }
 
     /**
-     * Return a session value, or a user settings value stored in the session
-     * @param string $name session value name to return
-     * @param mixed $default value to return if $name is not found
-     * @param bool $user if true, only search the user_data section of the session
-     * @return mixed the value if found, otherwise $default
-     */
-    public function get($name, $default=false, $user=false) {
-        if ($user) {
-            return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data['user_data']) ? $this->data['user_data'][$name] : $default;
-        }
-        else {
-            return array_key_exists($name, $this->data) ? $this->data[$name] : $default;
-        }
-    }
-
-    /**
-     * Save a value in the session
-     * @param string $name the name to save
-     * @param string $value the value to save
-     * @param bool $user if true, save in the user_data section of the session
-     * @return void
-     */
-    public function set($name, $value, $user=false) {
-        if ($user) {
-            $this->data['user_data'][$name] = $value;
-        }
-        else {
-            $this->data[$name] = $value;
-        }
-    }
-
-    /**
-     * Delete a value from the session
-     * @param string $name name of value to delete
-     * @return void
-     */
-    public function del($name) {
-        if (array_key_exists($name, $this->data)) {
-            unset($this->data[$name]);
-        }
-    }
-
-    /**
-     * End a session after a page request is complete. This only closes the session and
-     * does not destroy it
-     * @return void
-     */
-    public function end() {
-        if ($this->active) {
-            if (!$this->session_closed) {
-                $this->save_data();
-            }
-            $this->active = false;
-        }
-    }
-
-    /**
      * Write session data to avoid locking, keep session active, but don't allow writing
      * @return void
      */
     public function close_early() {
         $this->session_closed = true;
         $this->save_data();
-    }
-
-    /**
-     * Save session data
-     * @return void
-     */
-    public function save_data() {
-        $enc_data = $this->ciphertext($this->data);
-        $_SESSION = array('data' => $enc_data);
-        session_write_close();
-        $_SESSION = array();
     }
 
     /**
@@ -283,5 +275,19 @@ class Hm_PHP_Session extends Hm_Session {
         $this->secure_cookie($request, 'hm_reload_folders', '', time()-3600);
         $this->secure_cookie($request, 'hm_msgs', '', time()-3600);
         $this->active = false;
+    }
+
+    /**
+     * End a session after a page request is complete. This only closes the session and
+     * does not destroy it
+     * @return void
+     */
+    public function end() {
+        if ($this->active) {
+            if (!$this->session_closed) {
+                $this->save_data();
+            }
+            $this->active = false;
+        }
     }
 }
