@@ -311,18 +311,29 @@ abstract class Hm_Session {
     }
 }
 
+
+/**
+ * Setup the session and authentication classes based on the site config
+ */
 class Hm_Session_Setup {
 
     private $config;
     private $auth_type;
     private $session_type;
 
-    function __construct($config) {
+    /**
+     * @param object $config site configuration
+     */
+    public function __construct($config) {
         $this->config = $config;
         $this->auth_type = $config->get('auth_type', false);
         $this->session_type = $config->get('session_type', false);
 
     }
+
+    /**
+     * @return object
+     */
     public function setup_session() {
         $auth_class = $this->setup_auth();
         $session_class = $this->get_session_class();
@@ -333,6 +344,9 @@ class Hm_Session_Setup {
         return new $session_class($this->config, $auth_class);
     }
 
+    /**
+     * @return string
+     */
     private function get_session_class() {
         if ($this->session_type == 'DB') {
             $session_class = 'Hm_DB_Session';
@@ -349,15 +363,18 @@ class Hm_Session_Setup {
         return $session_class;
     }
 
+    /**
+     * @return string
+     */
     private function setup_auth() {
         $auth_class = $this->standard_auth();
-        if (!$auth_class) {
+        if ($auth_class === false) {
             $auth_class = $this->dynamic_auth();
         }
-        if (!$auth_class) {
+        if ($auth_class === false) {
             $auth_class = $this->custom_auth();
         }
-        if (!$auth_class) {
+        if ($auth_class === false) {
             Hm_Functions::cease('Invalid auth configuration');
             $auth_class = 'Hm_Auth_None';
         }
@@ -365,6 +382,7 @@ class Hm_Session_Setup {
     }
 
     /**
+     * @return string|false
      */
     private function dynamic_auth() {
         if ($this->auth_type == 'dynamic' && in_array('dynamic_login', $this->config->get_modules(), true)) {
@@ -374,6 +392,7 @@ class Hm_Session_Setup {
     }
 
     /**
+     * @return string|false
      */
     private function standard_auth() {
         if ($this->auth_type && in_array($this->auth_type, array('DB', 'LDAP', 'IMAP', 'POP3'), true)) {
@@ -383,6 +402,7 @@ class Hm_Session_Setup {
     }
 
     /**
+     * @return string|false
      */
     private function custom_auth() {
         if ($this->auth_type == 'custom' && Hm_Functions::class_exists('Custom_Auth')) {
