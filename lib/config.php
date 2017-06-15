@@ -115,7 +115,6 @@ abstract class Hm_Config {
             return false;
         }
         return Hm_Transform::convert($data);
-        return false;
     }
 }
 
