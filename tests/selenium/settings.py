@@ -182,7 +182,8 @@ class SettingsTests(SettingsHelpers):
 
     def github_max_per_source_test(self):
         self.number_fld_test('github_all_setting', 'github_limit', 20, 100, 'github')
-        self.close_section('github_all_setting')
+        if self.mod_active('github):
+            self.close_section('github_all_setting')
 
 
 if __name__ == '__main__':
