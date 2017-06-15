@@ -282,11 +282,32 @@ abstract class Hm_Handler_Module {
             return true;
         }
         list($source, $target) = $this->source_and_target();
+        if (!$this->validate_target($target, $source) || !$this->validate_source($target, $source)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param string $target
+     * @param string $source
+     * @return boolean
+     */
+    private function validate_target($target, $source) {
         if (!$target || !$source) {
             $this->session->destroy($this->request);
             Hm_Debug::add('LOGGED OUT: missing target origin');
             return false;
         }
+        return true;
+    }
+
+    /**
+     * @param string $target
+     * @param string $source
+     * @return boolean
+     */
+    private function validate_source($target, $source) {
         $source = parse_url($source);
         if (!is_array($source) || !array_key_exists('host', $source) || $source['host'] !== $target) {
             $this->session->destroy($this->request);
