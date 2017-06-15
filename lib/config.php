@@ -114,12 +114,7 @@ abstract class Hm_Config {
         if (!is_string($data) || !trim($data)) {
             return false;
         }
-        if (substr($data, 0, 2) === 'a:') {
-            return @unserialize($data);
-        }
-        elseif (substr($data, 0, 1) === '{') {
-            return @json_decode($data, true);
-        }
+        return Hm_Transform::convert($data);
         return false;
     }
 }

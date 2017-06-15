@@ -128,7 +128,7 @@ class Hm_Transform {
      * @param string $data
      * @return array|false
      */
-    private static function convert($data) {
+    public static function convert($data) {
         if (substr($data, 0, 2) === 'a:') {
             return @unserialize($data);
         }
