@@ -125,23 +125,30 @@ class Hm_Transform {
     }
 
     /**
+     * @param string $data
+     * @return array|false
+     */
+    private static function convert($data) {
+        if (substr($data, 0, 2) === 'a:') {
+            return @unserialize($data);
+        }
+        elseif (substr($data, 0, 1) === '{' || substr($data, 0, 1) === '[') {
+            return @json_decode($data, true);
+        }
+        return false;
+    }
+
+    /**
      * Convert a stringified array back to an array
      * @param string|false $data data to be transformed from a string
      * @param string $encoding encoding to use for values
      * @return mixed array on success, false on failure
      */
     public static function unstringify($data, $encoding='base64_decode') {
-        $result = false;
         if (!is_string($data) || !trim($data)) {
             return false;
         }
-
-        if (substr($data, 0, 2) === 'a:') {
-            $result = @unserialize($data);
-        }
-        elseif (substr($data, 0, 1) === '{' || substr($data, 0, 1) === '[') {
-            $result = @json_decode($data, true);
-        }
+        $result = self::convert($data);
         if (is_array($result)) {
             return self::hm_encode($result, $encoding);
         }
