@@ -17,20 +17,47 @@ trait Hm_Dispatch_Redirect {
      */
     private function post_redirect($request, $session, $mod_exec) {
         if (!empty($request->post) && $request->type == 'HTTP') {
-            $msgs = Hm_Msgs::get();
-            if (!empty($msgs)) {
-                $session->secure_cookie($request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
-            }
+            $this->forward_messages($session, $request);
             $session->end();
-            if (array_key_exists('redirect_url', $mod_exec->handler_response) && $mod_exec->handler_response['redirect_url']) {
-                Hm_Dispatch::page_redirect($mod_exec->handler_response['redirect_url']);
-            }
-            if (array_key_exists('REQUEST_URI', $request->server)) {
-                Hm_Dispatch::page_redirect($this->validate_request_uri($request->server['REQUEST_URI']));
-            }
+            $this->redirect_to_url($mod_exec);
+            $this->redirect_to_current($request);
             return true;
         }
         return false;
+    }
+
+    /**
+     * Redirect to the current url
+     * @param Hm_Request $request
+     * @return void
+     */
+    private function redirect_to_current($request) {
+        if (array_key_exists('REQUEST_URI', $request->server)) {
+            Hm_Dispatch::page_redirect($this->validate_request_uri($request->server['REQUEST_URI']));
+        }
+    }
+
+    /**
+     * Redirect to a specified url
+     * @param object $mod_exec
+     * @return void
+     */
+    private function redirect_to_url($mod_exec) {
+        if (array_key_exists('redirect_url', $mod_exec->handler_response) && $mod_exec->handler_response['redirect_url']) {
+            Hm_Dispatch::page_redirect($mod_exec->handler_response['redirect_url']);
+        }
+    }
+
+    /**
+     * Forward messages on a POST redirect
+     * @param object $session session object
+     * @return void
+     */
+    private function forward_messages($session, $request) {
+        $msgs = Hm_Msgs::get();
+        if (!empty($msgs)) {
+            $session->secure_cookie($request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
+        }
     }
 
     /**

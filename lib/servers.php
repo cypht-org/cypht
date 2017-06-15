@@ -253,14 +253,27 @@ trait Hm_Server_List {
      */
     public static function fetch($username, $servername) {
         foreach (self::$server_list as $id => $server) {
-            if (array_key_exists('user', $server) && array_key_exists('server', $server)) {
-                if ($username == $server['user'] && $servername == $server['server']) {
-                    if (array_key_exists('pass', $server)) {
-                        unset($server['pass']);
-                    }
-                    $server['id'] = $id;
-                    return $server;
+            if (self::match($server, $username, $servername)) {
+                if (array_key_exists('pass', $server)) {
+                    unset($server['pass']);
                 }
+                $server['id'] = $id;
+                return $server;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array $server server details
+     * @param string $user username
+     * @param string $name server name
+     * @return boolean
+     */
+    private static function match($server, $user, $name) {
+        if (array_key_exists('user', $server) && array_key_exists('server', $server)) {
+            if ($user == $server['user'] && $name == $server['server']) {
+                return true;
             }
         }
         return false;
