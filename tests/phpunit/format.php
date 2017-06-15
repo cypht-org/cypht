@@ -20,7 +20,7 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
      */
     public function test_content() {
         $this->assertEquals('{"date":"today"}', $this->json->content(array('router_page_name' => 'test', 'language' => 'en', 'date' => 'today'), array('date' => array(FILTER_UNSAFE_RAW, false))));
-        $this->assertEquals('testtoday', $this->html5->content(array('router_page_name' => 'test', 'date' => 'today'), array()));
+        $this->assertEquals('testtoday', $this->html5->content(array('router_module_list' => array(), 'router_page_name' => 'test', 'date' => 'today'), array()));
         $config = new Hm_Mock_Config();
         $config->set('encrypt_ajax_requests', true);
         $this->json = new Hm_Format_JSON($config);
