@@ -190,12 +190,14 @@ trait Hm_Handler_Validate {
 
     /**
      * Validate HTTP request type, only GET and POST are allowed
+     * @param object $session
+     * @param object $request
      * @return bool
      */
-    public function validate_method() {
-        if (!in_array(strtolower($this->request->method), array('get', 'post'), true)) {
-            if ($this->session->loaded) {
-                $this->session->destroy($this->request);
+    public function validate_method($session, $request) {
+        if (!in_array(strtolower($request->method), array('get', 'post'), true)) {
+            if ($session->loaded) {
+                $session->destroy($request);
                 Hm_Debug::add('LOGGED OUT: mismatched origins');
             }
             return false;
@@ -207,12 +209,13 @@ trait Hm_Handler_Validate {
      * Validate that the request has matching source and target origins
      * @return bool
      */
-    public function validate_origin() {
-        if (!$this->session->loaded) {
+    public function validate_origin($session, $request, $config) {
+        if (!$session->loaded) {
             return true;
         }
-        list($source, $target) = $this->source_and_target();
-        if (!$this->validate_target($target, $source) || !$this->validate_source($target, $source)) {
+        list($source, $target) = $this->source_and_target($request, $config);
+        if (!$this->validate_target($target, $source, $session, $request) ||
+            !$this->validate_source($target, $source, $session, $request)) {
             return false;
         }
         return true;
@@ -222,9 +225,9 @@ trait Hm_Handler_Validate {
      * Find source and target values for validate_origin
      * @return string[]
      */
-    private function source_and_target() {
+    private function source_and_target($request, $config) {
         $source = false;
-        $target = $this->config->get('cookie_domain', false);
+        $target = $config->get('cookie_domain', false);
         if ($target == 'none') {
             $target = false;
         }
@@ -235,8 +238,8 @@ trait Hm_Handler_Validate {
             'HTTP_X_FORWARDED_HOST' => 'target'
         );
         foreach ($server_vars as $header => $type) {
-            if (array_key_exists($header, $this->request->server) && $this->request->server[$header]) {
-                $$type = $this->request->server[$header];
+            if (array_key_exists($header, $request->server) && $request->server[$header]) {
+                $$type = $request->server[$header];
             }
         }
         return array($source, $target);
@@ -247,9 +250,9 @@ trait Hm_Handler_Validate {
      * @param string $source
      * @return boolean
      */
-    private function validate_target($target, $source) {
+    private function validate_target($target, $source, $session, $request) {
         if (!$target || !$source) {
-            $this->session->destroy($this->request);
+            $session->destroy($request);
             Hm_Debug::add('LOGGED OUT: missing target origin');
             return false;
         }
@@ -261,10 +264,10 @@ trait Hm_Handler_Validate {
      * @param string $source
      * @return boolean
      */
-    private function validate_source($target, $source) {
+    private function validate_source($target, $source, $session, $request) {
         $source = parse_url($source);
         if (!is_array($source) || !array_key_exists('host', $source) || $source['host'] !== $target) {
-            $this->session->destroy($this->request);
+            $session->destroy($request);
             Hm_Debug::add('LOGGED OUT: invalid source origin');
             return false;
         }
