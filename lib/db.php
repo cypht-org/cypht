@@ -90,11 +90,9 @@ class Hm_DB {
         if (!$sql || !$sql->execute($args)) {
             return false;
         }
-        if ($type == 'modify' || $type == 'insert') {
-            return $sql->rowCount();
-        }
-        return $sql->fetch();
+        return $type == 'modify' || $type == 'insert' ? $sql->rowCount() : $sql->fetch();
     }
+
     /**
      * @param string $sql query string
      * @return string

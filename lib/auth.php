@@ -309,18 +309,21 @@ class Hm_Auth_LDAP extends Hm_Auth {
      */
     private function connect_details() {
         $prefix = 'ldaps://';
-        $server = 'localhost';
-        $port = 389;
-        if (array_key_exists('server', $this->config)) {
-            $server = $this->config['server'];
-        }
-        if (array_key_exists('port', $this->config)) {
-            $port = $this->config['port'];
-        }
+        $server = $this->apply_config_value('server', 'localhost');
+        $port = $this->apply_config_value('port', 389);
         if (array_key_exists('enable_tls', $this->config) && !$this->config['enable_tls']) {
             $prefix = 'ldap://';
         }
         return $prefix.$server.':'.$port;
+    }
+
+    /**
+     */
+    private function apply_config_value($name, $default) {
+        if (array_key_exists($name, $this->config) && trim($this->config[$name])) {
+            return $this->config[$name];
+        }
+        return $default;
     }
 
     /**
