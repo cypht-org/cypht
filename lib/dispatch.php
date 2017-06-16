@@ -94,13 +94,26 @@ trait Hm_Dispatch_Redirect {
         if ($this->post_redirect($request, $session, $mod_exec)) {
             return 'redirect';
         }
-        elseif (array_key_exists('hm_msgs', $request->cookie) && trim($request->cookie['hm_msgs'])) {
+        elseif ($this->unpack_messages($request, $session)) {
+            return 'msg_forward';
+        }
+        return false;
+    }
+
+    /**
+     * Unpack forwarded messages
+     * @param Hm_Request $request request object
+     * @param object $session session object
+     * @return boolean
+     */
+    public function unpack_messages($request, $session) {
+        if (array_key_exists('hm_msgs', $request->cookie) && trim($request->cookie['hm_msgs'])) {
             $msgs = @json_decode(base64_decode($request->cookie['hm_msgs']), true);
             if (is_array($msgs)) {
                 array_walk($msgs, function($v) { Hm_Msgs::add($v); });
             }
             $session->secure_cookie($request, 'hm_msgs', false, time()-3600);
-            return 'msg_forward';
+            return true;
         }
         return false;
     }
