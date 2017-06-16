@@ -168,10 +168,13 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_process_form() {
-        list($success, $form) = $this->handler_mod->process_form(array('fld1', 'fld2'));
+        list($success, $form) = $this->handler_mod->process_form(array('fld1', 'fld2', 'fld3'));
         $this->assertTrue($success);
-        $this->assertEquals(array('fld1' => '0', 'fld2' => '1'), $form);
+        $this->assertEquals(array('fld1' => '0', 'fld2' => '1', 'fld3' => 0), $form);
         list($success, $form) = $this->handler_mod->process_form(array('blah'));
+        $this->assertFalse($success);
+        $this->assertEquals(array(), $form);
+        list($success, $form) = $this->handler_mod->process_form(array('fld4'));
         $this->assertFalse($success);
         $this->assertEquals(array(), $form);
     }

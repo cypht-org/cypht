@@ -377,17 +377,38 @@ abstract class Hm_Handler_Module {
     }
 
     /**
+     * Validate a value in a HTTP POST form
+     * @param mixed $val
+     * @return mixed
+     */
+    private function check_field($val) {
+        switch (true) {
+            case is_array($val):
+            case trim($val):
+            case $val === '0':
+            case $val === 0:
+                return $val;
+                break;
+            default:
+                return NULL;
+                break;
+        }
+    }
+
+    /**
      * Process an HTTP POST form
      * @param array $form list of required field names in the form
      * @return array tuple with a bool indicating success, and an array of valid form values
      */
     public function process_form($form) {
-        $post = $this->request->post;
         $new_form = array();
         foreach($form as $name) {
-            if (array_key_exists($name, $post) && (is_array($post[$name]) ||
-                trim($post[$name]) || (($post[$name] === '0' ||  $post[$name] === 0 )))) {
-                $new_form[$name] = $post[$name];
+            if (!array_key_exists($name, $this->request->post)) {
+                continue;
+            }
+            $val = $this->check_field($this->request->post[$name]);
+            if ($val !== NULL) {
+                $new_form[$name] = $val;
             }
         }
         return array((count($form) === count($new_form)), $new_form);

@@ -318,6 +318,9 @@ class Hm_Auth_LDAP extends Hm_Auth {
     }
 
     /**
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
      */
     private function apply_config_value($name, $default) {
         if (array_key_exists($name, $this->config) && trim($this->config[$name])) {
