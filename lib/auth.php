@@ -191,21 +191,16 @@ class Hm_Auth_IMAP extends Hm_Auth {
     public function check_credentials($user, $pass) {
         $imap = new Hm_IMAP();
         list($server, $port, $tls) = get_auth_config($this->site_config, 'imap');
-        if ($user && $pass && $server && $port) {
-            $this->imap_settings = array(
-                'server' => $server,
-                'port' => $port,
-                'tls' => $tls,
-                'username' => $user,
-                'password' => $pass,
-                'no_caps' => false,
-                'blacklisted_extensions' => array('enable')
-            );
-            return $this->check_connection($imap);
+        if (!$user || !$pass || !$server || !$port) {
+            Hm_Debug::add($imap->show_debug(true));
+            Hm_Debug::add('Invalid IMAP auth configuration settings');
+            return false;
         }
-        Hm_Debug::add($imap->show_debug(true));
-        Hm_Debug::add('Invalid IMAP auth configuration settings');
-        return false;
+        $this->imap_settings = array('server' => $server, 'port' => $port,
+            'tls' => $tls, 'username' => $user, 'password' => $pass,
+            'no_caps' => false, 'blacklisted_extensions' => array('enable')
+        );
+        return $this->check_connection($imap);
     }
 
     /**
