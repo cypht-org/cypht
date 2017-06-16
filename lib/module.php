@@ -384,14 +384,12 @@ abstract class Hm_Handler_Module {
     private function check_field($val) {
         switch (true) {
             case is_array($val):
-            case trim($val):
+            case trim($val) !== '':
             case $val === '0':
             case $val === 0:
                 return $val;
-                break;
             default:
                 return NULL;
-                break;
         }
     }
 
