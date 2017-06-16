@@ -323,6 +323,19 @@ class Hm_Memcached {
         if (!$this->enabled) {
             return false;
         }
+        elseif (!$this->configured()) {
+            return false;
+        }
+        elseif (!$this->cache_con) {
+            return $this->connect();
+        }
+        return true;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function configured() {
         if (!$this->server || !$this->port) {
             Hm_Debug::add('Memcached enabled but no server or port found');
             return false;
@@ -330,9 +343,6 @@ class Hm_Memcached {
         if (!$this->supported) {
             Hm_Debug::add('Memcached enabled but not supported by PHP');
             return false;
-        }
-        if (!$this->cache_con) {
-            return $this->connect();
         }
         return true;
     }
