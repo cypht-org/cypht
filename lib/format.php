@@ -46,7 +46,7 @@ class Hm_Format_JSON extends HM_Format {
      */
     public function content($output, $allowed_output) {
         $output['router_user_msgs'] = Hm_Msgs::get();
-        $output = $this->filter_output($output, $allowed_output);
+        $output = $this->filter_all_output($output, $allowed_output);
         if ($this->config->get('encrypt_ajax_requests', false)) {
             $output = array('payload' => Hm_Crypt_Base::ciphertext(json_encode($output, JSON_FORCE_OBJECT), Hm_Request_Key::generate()));
         }
@@ -59,27 +59,40 @@ class Hm_Format_JSON extends HM_Format {
      * @param array $allowed set of white list filters
      * @return array filtered data
      */
-    public function filter_output($data, $allowed) {
+    public function filter_all_output($data, $allowed) {
         foreach ($data as $name => $value) {
             if (!array_key_exists($name, $allowed)) {
                 unset($data[$name]);
+                continue;
             }
-            else {
-                if ($allowed[$name][1]) {
-                    $new_value = filter_var($value, $allowed[$name][0], $allowed[$name][1]);
-                }
-                else {
-                    $new_value = filter_var($value, $allowed[$name][0]);
-                }
-                if ($new_value === false && $allowed[$name] != FILTER_VALIDATE_BOOLEAN) {
-                    unset($data[$name]);
-                }
-                else {
-                    $data[$name] = $new_value;
-                }
+            $new_value = $this->filter_output($name, $value, $allowed);
+            if ($new_value === NULL) {
+                unset($data[$name]);
+                continue;
             }
+            $data[$name] = $new_value;
         }
         return $data;
+    }
+
+    /**
+     * Filter a single output value
+     * @param string $name
+     * @param mixed $value
+     * @param array $allowed
+     * @return mixed
+     */
+    private function filter_output($name, $value, $allowed) {
+        if ($allowed[$name][1]) {
+            $new_value = filter_var($value, $allowed[$name][0], $allowed[$name][1]);
+        }
+        else {
+            $new_value = filter_var($value, $allowed[$name][0]);
+        }
+        if ($new_value === false && $allowed[$name] != FILTER_VALIDATE_BOOLEAN) {
+            return NULL;
+        }
+        return $new_value;
     }
 }
 

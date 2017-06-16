@@ -32,9 +32,9 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_filter_output() {
-        $this->assertEquals(array('date' => 'today'), $this->json->filter_output(array('date' => '<b>today</b>'), array('date' => array(FILTER_SANITIZE_STRING, false))));
-        $this->assertEquals(array(), $this->json->filter_output(array('date' => array()), array('date' => array(FILTER_SANITIZE_STRING, false))));
-        $this->assertEquals(array('test_array' => array('test')), $this->json->filter_output(array('test_array' => array('test')), array('test_array' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY))));
+        $this->assertEquals(array('date' => 'today'), $this->json->filter_all_output(array('date' => '<b>today</b>'), array('date' => array(FILTER_SANITIZE_STRING, false))));
+        $this->assertEquals(array(), $this->json->filter_all_output(array('date' => array()), array('date' => array(FILTER_SANITIZE_STRING, false))));
+        $this->assertEquals(array('test_array' => array('test')), $this->json->filter_all_output(array('test_array' => array('test')), array('test_array' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY))));
     }
     public function tearDown() {
         Hm_Output_Modules::del('test', 'blah');
