@@ -38,6 +38,7 @@ class Hm_Handler_process_dynamic_login extends Hm_Handler_login {
                     $this->session->site_config = $this->config;
                     Hm_Debug::add('Dynamic login override, using Hm_Auth_IMAP');
                     $auth_details = $details;
+                    $this->session->set('auth_class', 'Hm_Auth_IMAP');
                 }
                 elseif ($this->module_is_supported('pop3') && $details['type'] == 'pop3') {
                     $this->config->set('pop3_auth_server', $details['server']);
@@ -46,6 +47,7 @@ class Hm_Handler_process_dynamic_login extends Hm_Handler_login {
                     $this->session->auth_class = 'Hm_Auth_POP3';
                     $this->session->site_config = $this->config;
                     Hm_Debug::add('Dynamic login override, using Hm_Auth_POP3');
+                    $this->session->set('auth_class', 'Hm_Auth_POP3');
                     $auth_details = $details;
                 }
             }
@@ -72,6 +74,21 @@ class Hm_Handler_process_dynamic_login extends Hm_Handler_login {
                     $this->config->set('default_smtp_name', $auth_details['name']);
                 }
             }
+            else {
+                $imap_details = $this->session->get('imap_auth_server_settings', array());
+                if (count($imap_details) > 0) {
+                    $this->config->set('imap_auth_server', $imap_details['server']);
+                    $this->config->set('imap_auth_port', $imap_details['port']);
+                    $this->config->set('imap_auth_tls', $imap_details['tls']);
+                }
+                $pop3_details = $this->session->get('pop3_auth_server_settings', array());
+                if (count($pop3_details) > 0) {
+                    $this->config->set('pop3_auth_server', $pop3_details['server']);
+                    $this->config->set('pop3_auth_port', $pop3_details['port']);
+                    $this->config->set('pop3_auth_tls', $pop3_details['tls']);
+                }
+            }
+            $this->session->auth_class = $this->session->get('auth_class');
             Hm_Page_Cache::load($this->session);
             $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
         }
@@ -132,7 +149,6 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
         }
     }
 }
-
 
 /**
  * @subpackage dynamic_login/functions
