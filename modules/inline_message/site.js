@@ -2,52 +2,33 @@
 
 var inline_pop3_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
-    path = '.'+details['type']+'_'+details['server_id']+'_'+uid;
-    $('.msg_text').html('');
-    $('.msg_text').remove();
-    $('tr').removeClass('hl');
-    $('.content_title').after('<div class="msg_text"></div>');
-    $('.message_table').css('width', '50%');
-    $(path).addClass('hl');
+    var path = '.'+details['type']+'_'+details['server_id']+'_'+uid;
+    clear_open_msg(inline_msg_style());
+    msg_container(inline_msg_style(), path);
     pop3_message_view(uid, list_path, inline_msg_loaded_callback);
-    $(path).removeClass('unseen');
     $('div', $(path)).removeClass('unseen');
     return false;
 };
 
 var inline_wp_msg = function(uid, list_path, inline_msg_loaded_callback) {
-    $('.msg_text').html('');
-    $('.msg_text').remove();
-    $('tr').removeClass('hl');
-    $('.content_title').after('<div class="msg_text"></div>');
-    $('.message_table').css('width', '50%');
-    $('.'+uid).addClass('hl');
+    clear_open_msg(inline_msg_style());
+    msg_container(inline_msg_style(), '.'+uid);
     wp_notice_view(uid, inline_msg_loaded_callback);
-    $('.'+uid).removeClass('unseen');
     $('div', $('.'+uid)).removeClass('unseen');
     return false;
 };
 
 var inline_github_msg = function(uid, list_path, inline_msg_loaded_callback) {
-    $('.msg_text').html('');
-    $('.msg_text').remove();
-    $('tr').removeClass('hl');
-    $('.content_title').after('<div class="msg_text"></div>');
-    $('.message_table').css('width', '50%');
-    $('.'+uid).addClass('hl');
+    clear_open_msg(inline_msg_style());
+    msg_container(inline_msg_style(), '.'+uid);
     github_item_view(list_path, uid, inline_msg_loaded_callback);
-    $('.'+uid).removeClass('unseen');
     $('div', $('.'+uid)).removeClass('unseen');
     return false;
 };
 
 var inline_feed_msg = function(uid, list_path, inline_msg_loaded_callback) {
-    $('.msg_text').html('');
-    $('.msg_text').remove();
-    $('tr').removeClass('hl');
-    $('.content_title').after('<div class="msg_text"></div>');
-    $('.message_table').css('width', '50%');
-    $('.'+list_path+'_'+uid).addClass('hl');
+    clear_open_msg(inline_msg_style());
+    msg_container(inline_msg_style(), '.'+list_path+'_'+uid);
     feed_item_view(uid, list_path, inline_msg_loaded_callback);
     $('div', $('.'+list_path+'_'+uid)).removeClass('unseen');
     return false;
@@ -56,17 +37,39 @@ var inline_feed_msg = function(uid, list_path, inline_msg_loaded_callback) {
 var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
     var path = '.'+details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
-    $('.msg_text').html('');
-    $('.msg_text').remove();
-    $('tr').removeClass('hl');
-    $('.content_title').after('<div class="msg_text"></div>');
-    $('.message_table').css('width', '50%');
-    $(path).addClass('hl');
+    clear_open_msg(inline_msg_style());
+    msg_container(inline_msg_style(), path);
+
     imap_setup_message_view_page(uid, details, list_path, inline_msg_loaded_callback);
     $('.part_encoding').hide();
     $('.part_charset').hide();
     $('div', $(path)).removeClass('unseen');
     $(path).removeClass('unseen');
+};
+
+var msg_container = function(type, path) {
+    if (type == 'right') {
+        $('.content_title').after('<div class="inline_right msg_text"></div>');
+        $('.message_table').css('width', '50%');
+    }
+    else {
+        $(path).after('<tr class="inline_msg"><td colspan="6"><div class="msg_text"></div></td></tr>');
+    }
+    $(path).addClass('hl');
+    $(path).removeClass('unseen');
+};
+
+var clear_open_msg = function(type) {
+    if (type == 'right') {
+        $('.msg_text').html('');
+        $('.msg_text').remove();
+        $('tr').removeClass('hl');
+    }
+    else {
+        $('.inline_msg').html('');
+        $('.inline_msg').remove();
+        $('tr').removeClass('hl');
+    }
 };
 
 var get_inline_msg_details = function(link) {
@@ -97,16 +100,19 @@ var capture_subject_click = function() {
             $('.header_subject th').append('<span class="close_inline_msg">X</span>');
             $('.close_inline_msg').click(function() {
                 Hm_Message_List.load_sources();
-                Hm_Folders.open_folder_list();
-                $('.msg_text').remove();
-                $('.message_table').css('width', '100%');
+                if (inline_msg_style() == 'right') {
+                    $('.msg_text').remove();
+                    $('.message_table').css('width', '100%');
+                }
+                else {
+                    $('.inline_msg').remove();
+                }
                 $('tr').removeClass('hl');
             });
             $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
         };
 
         if (list_path && uid) {
-            Hm_Folders.hide_folder_list(true);
             var details = Hm_Utils.parse_folder_path(list_path);
             if (details['type'] == 'feeds') {
                 inline_feed_msg(uid, list_path, inline_msg_loaded_callback);
