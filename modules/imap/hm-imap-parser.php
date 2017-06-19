@@ -282,7 +282,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
                 $namespace .= $delim.$mailbox;
             }
             elseif ($mailbox) {
-                $namespace .= $mailbox.$delim.'%';
+                $namespace .= $mailbox.$delim;
             }
             if ($this->is_supported('LIST-STATUS')) {
                 $status = ' RETURN (';
