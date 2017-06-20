@@ -54,6 +54,20 @@ Nux_Quick_Services::add('outlook', array(
     )*/
 ));
 
+Nux_Quick_Services::add('office365', array(
+    'server' => 'outlook.office365.com',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Office365',
+    'scope' => 'wl.imap',
+    'smtp' => array(
+        'server' => 'outlook.office365.com',
+        'port' => 587,
+        'tls'=> 'yes'
+    )
+));
+
 Nux_Quick_Services::add('yahoo', array(
     'server' => 'imap.mail.yahoo.com',
     'type' => 'imap',
