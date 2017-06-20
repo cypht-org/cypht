@@ -16,7 +16,7 @@ return array(
     'TLS' => 'TLS',
     'IMAP Summary' => 'В целом по IMAP',
     'Home' => 'Домой',
-    'Unread' => 'Непрочтенные',
+    'Unread' => 'Непрочитано',
     'Servers' => 'Серверы',
     'Settings' => 'Настройки',
     'Logout' => 'Выход',
@@ -46,7 +46,7 @@ return array(
     'Everything' => 'Все',
     'You must enter your password to save your settings on the server' => 'Нужно ввести пароль, чтоб сохранить настройки',
     'Message_list' => 'Список сообщений',
-    'Read' => 'Прочтено',
+    'Read' => 'Прочитано',
     'Flag' => 'Флаг',
     'Unflag' => 'Убрать флаг',
     'Delete' => 'Удалить',
@@ -203,7 +203,7 @@ return array(
     'Dev' => 'Разработка',
     'Score' => 'Рейтинг',
     'Comments' => 'Комментарии',
-    'So alone' => 'Одиночка',
+    'So alone' => 'Ничего нет',
     'Unsaved Changes' => 'Изменения не сохранены',
     'Enable' => 'Доступно',
     'Development Updates' => 'Обновления от разработчика',
@@ -381,7 +381,7 @@ return array(
     'French' => 'Французский',
     'Romanian' => 'Румынский',
     'Shortcuts' => 'Гор. клавиши',
-    'Unfocus all input elements' => 'Снфть фокус со всех элементов',
+    'Unfocus all input elements' => 'Снять фокус со всех элементов',
     'Jump to the "Everything" page' => 'Перейти к странице "Все"',
     'Jump to the "Unread" page' => 'Перейти к странице "Непрочитанные"',
     'Jump to the "Flagged" page' => 'Перейти к странице "С флагом"',
@@ -525,6 +525,7 @@ return array(
     'Inline' => 'В списке',
     'Right' => 'Справа',
     'Messages per page for IMAP folder views' => 'Сообщений на странице для IMAP папок',
+    'Arrival' => 'Получено',
 ); 
 
 ?>
