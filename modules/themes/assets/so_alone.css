@@ -334,7 +334,11 @@ textarea { font-size: 100%; }
     /* color: #9397cd !important; */
 }
 
-@media screen and (max-device-width:1080px) and (orientation : portrait), @media screen and (max-device-width:1080px) and (orientation : landscape), @media screen and (max-device-width:480px) and (orientation : portrait) { .msg_controls { position: absolute; background: #363636 !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; } }
+@media screen and (max-device-width:1080px) and (orientation : portrait), @media screen and (max-device-width:1080px) and (orientation : landscape), @media screen and (max-device-width:480px) and (orientation : portrait) {
+    .msg_controls { position: absolute; background: #363636 !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; }
+    .content_title { padding-bottom: 10px; padding-top: 10px; padding-bottom: 10px; }
+    .src_name { }
+}
 
 .total_unread_count, .unread_count {  /* unread count indicators */
 	color: #ffffff,

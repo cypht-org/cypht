@@ -5,7 +5,7 @@ html { background-color: #fff; }
 img { opacity: .5 !important; }
 a { color: #222 !important; }
 .list_meta, a:hover { color: #000 !important; }
-.msg_controls a, textarea, select, input, .toggle_link { color: #aaa; background-color: #fff !important; }
+msg_controls a, textarea, select, input, .toggle_link { color: #aaa; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list { background-color: #f6f6ef !important; }
 .mailbox_list_title { color: #000; }
@@ -37,3 +37,6 @@ nav { padding-top: 0px !important; }
 .news_cell input[type="checkbox"]:checked + label { background-color: rgb(255,102,0) !important; }
 .list_controls { background: none !important; }
 .folder_toggle { top: 15px; }
+@media screen and (max-device-width:480px) and (orientation : portrait) {
+    .content_title { color: #333; background: none !important; background-color: rgb(255, 102, 0) !important; font-size: 140%; font-weight: bold; }
+}

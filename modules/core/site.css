@@ -235,17 +235,18 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .mailbox_list_title { font-size: 90%; }
     .folder_cell { display: block; max-width: 96%; width: 96%; padding: 0px !important;}
     .folder_list { padding: 0px !important; font-size: 120%; margin-right: 0px; display: none; width: 100%; }
-    .content_cell { display: block; width: 100%; }
-    .content_title { padding-left: 40px; padding-top: 20px; margin-bottom: 5px; }
+    .content_cell { padding-top: 60px; display: block; width: 100%; }
+    .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 40px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; }
     .folder_toggle { display: block; top: 19px; left: 0px; }
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
     .message_table { padding-left: 10px !important; }
     .list_settings_link, .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
     .refresh_list { margin-right: 5px; }
     .folder_toggle img { width: 30px; height: 36px; margin-top: -7px; }
+    .folder_toggle { position: fixed; z-index: 101; }
     .update_message_list { margin-right: 20px; }
     .msg_text { width: 100%; max-width: 480px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
-    .msg_controls { position: fixed; z-index: 100; right: -20px; height: 29px; font-size: 115%; background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; padding-left: 10px; padding-top: 9px; top: 10px; left: 70px !important; }
+    .msg_controls { background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; z-index: 100; position: fixed; right: -20px; height: 29px; font-size: 115%; padding-left: 10px; padding-top: 9px; top: 10px; left: 70px !important; }
     .header_subject th { white-space: normal !important; word-break: break-all !important; word-wrap: break-word !important; }
     .msg_headers th { padding-left: 10px !important; }
     .nlink, .plink, .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
@@ -266,7 +267,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     #username, #password { width: 75%; }
     .account_icon { width: 20px; height: 20px; }
     .imap_filter { display: none; }
-    .list_controls { background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; height: 50px; padding-left: 5px; padding-right: 5px; }
+    .list_controls { background-color: transparent !important; height: 50px; padding-left: 5px; padding-right: 5px; }
     .page_links { font-size: 150%; }
     .page_links a img { width: 24px; height: 24px; }
     .toggle_link { padding: 5px !important; line-height: auto !important; }

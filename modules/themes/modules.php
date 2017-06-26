@@ -23,6 +23,9 @@ class Hm_Handler_load_theme  extends Hm_Handler_Module {
         if ($theme == 'dark') {
             hm_theme_icons();
         }
+        if ($theme == 'terminal') {
+            hm_theme_icons('green');
+        }
         $this->out('themes', $themes);
         $this->out('theme', $theme);
     }
