@@ -19,16 +19,23 @@ class Hm_Gmail_Contact_XML {
     private $xml_parser = false;
     private $xml = false;
     private $index = 0;
+    private $xml_support = false;
 
     public function __construct($xml) {
         $this->xml = $xml;
+        if (!Hm_Functions::function_exists('xml_parser_create')) {
+            Hm_Debug::add('Gmail contacts enabled, but no PHP XML support found');
+            return;
+        }
+        $this->xml_support = true;
         $this->xml_parser = xml_parser_create( 'UTF-8');
         xml_set_object($this->xml_parser, $this);
         xml_set_element_handler($this->xml_parser, 'xml_start_element', 'xml_end_element');
         xml_set_character_data_handler($this->xml_parser, 'xml_character_data');
     }
     public function parse() {
-        if (xml_parse($this->xml_parser, $this->xml)) {
+        if ($this->xml_support) {
+            xml_parse($this->xml_parser, $this->xml);
         }
         return $this->results;
     }
