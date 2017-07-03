@@ -187,6 +187,11 @@ class Hm_Output_login extends Hm_Output_Module {
      * Looks at the current login state and outputs the correct form
      */
     protected function output() {
+        $stay_logged_in = '';
+        if ($this->get('allow_long_session')) {
+            $stay_logged_in = '<div class="long_session"><input type="checkbox" id="stay_logged_in" value="1" name="stay_logged_in" />'.
+            ' <label for="stay_logged_in">'.$this->trans('Stay logged in').'</label></div>';
+        }
         if (!$this->get('router_login_state')) {
             return '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
                 ' <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
@@ -194,7 +199,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
                 ' <label class="screen_reader" for="password">'.$this->trans('Password').'</label>'.
                 '<input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
-                ' <input type="submit" id="login" value="'.$this->trans('Login').'" />';
+                $stay_logged_in.' <input type="submit" id="login" value="'.$this->trans('Login').'" />';
         }
         else {
             $settings = $this->get('changed_settings', array());

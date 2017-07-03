@@ -449,6 +449,7 @@ function setup_base_ajax_page($name, $source=false) {
  * @return void
  */
 function setup_base_page($name, $source=false) {
+    add_handler($name, 'stay_logged_in', false, $source);
     add_handler($name, 'login', false, $source);
     add_handler($name, 'default_page_data', true, $source);
     add_handler($name, 'load_user_data', true, $source);

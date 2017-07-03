@@ -514,6 +514,25 @@ class Hm_Handler_date extends Hm_Handler_Module {
 }
 
 /**
+ * Check for the "stay logged in" option
+ */
+class Hm_Handler_stay_logged_in extends Hm_Handler_Module {
+    /**
+     * If "stay logged in" is checked, set the session lifetime
+     */
+    public function process() {
+        if ($this->config->get('allow_long_session')) {
+            $this->out('allow_long_session', true);
+        }
+        $lifetime = intval($this->config->get('long_session_lifetime', 30));
+        list($success, $form) = $this->process_form(array('stay_logged_in'));
+        if ($success && $form['stay_logged_in']) {
+            $this->session->lifetime = time()+60*60*24*$lifetime;
+        }
+    }
+}
+
+/**
  * Process a potential login attempt
  * @subpackage core/handler
  */

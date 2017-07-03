@@ -240,8 +240,8 @@ return array(
         'server_pw_id' => FILTER_SANITIZE_STRING,
         'message_list_since' => FILTER_SANITIZE_STRING,
         'no_password_save' => FILTER_VALIDATE_BOOLEAN,
-        'start_page' => FILTER_SANITIZE_STRING
-
+        'start_page' => FILTER_SANITIZE_STRING,
+        'stay_logged_in' => FILTER_VALIDATE_BOOLEAN
     )
 );
 
