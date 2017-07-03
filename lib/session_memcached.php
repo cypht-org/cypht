@@ -19,7 +19,7 @@ class Hm_Memcached_Session extends Hm_DB_Session {
     public $conn;
 
     /* default session lifetime */
-    public $lifetime = 86400;
+    public $cache_lifetime = 86400;
 
     /**
      * Start the session. This could be an existing session or a new login
@@ -44,7 +44,7 @@ class Hm_Memcached_Session extends Hm_DB_Session {
      */
     public function save_data() {
         $enc_data = $this->ciphertext($this->data);
-        return $this->conn->set($this->session_key, $enc_data, $this->lifetime);
+        return $this->conn->set($this->session_key, $enc_data, $this->cache_lifetime);
     }
 
     /**
@@ -80,8 +80,8 @@ class Hm_Memcached_Session extends Hm_DB_Session {
             delete_uploaded_files($this);
         }
         $this->conn->del($this->session_key);
-        $this->secure_cookie($request, $this->cname, '', time()-3600);
-        $this->secure_cookie($request, 'hm_id', '', time()-3600);
+        $this->delete_cookie($request, $this->cname);
+        $this->delete_cookie($request, 'hm_id');
         $this->session_closed = true;
         $this->conn->close();
         $this->active = false;

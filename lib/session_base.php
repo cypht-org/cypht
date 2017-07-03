@@ -53,14 +53,26 @@ trait Hm_Session_Fingerprint {
     }
 
     /**
+     * Browser request properties to build a fingerprint with
+     * @return array
+     */
+    private function fingerprint_flds() {
+        $flds = array('HTTP_USER_AGENT', 'REQUEST_SCHEME', 'HTTP_ACCEPT_LANGUAGE',
+            'HTTP_ACCEPT_CHARSET', 'HTTP_HOST');
+        if (!$this->site_config->get('allow_long_session')) {
+            $flds[] = 'REMOTE_ADDR';
+        }
+        return $flds;
+    }
+
+    /**
      * Build HTTP header "fingerprint"
      * @param array $env server env values
      * @return string fingerprint value
      */
     public function build_fingerprint($env, $input='') {
         $id = $input;
-        foreach (array('REMOTE_ADDR', 'HTTP_USER_AGENT', 'REQUEST_SCHEME', 'HTTP_ACCEPT_LANGUAGE',
-            'HTTP_ACCEPT_CHARSET', 'HTTP_HOST') as $val) {
+        foreach ($this->fingerprint_flds() as $val) {
             $id .= (array_key_exists($val, $env)) ? $env[$val] : '';
         }
         return hash('sha256', $id);
@@ -118,6 +130,9 @@ abstract class Hm_Session {
 
     /* session key */
     public $session_key = '';
+
+    /* session lifetime */
+    public $lifetime = 0;
 
     /**
      * check for an active session or an attempt to start one
@@ -291,15 +306,28 @@ abstract class Hm_Session {
      * @param object $request request details
      * @param string $name cookie name
      * @param string $value cookie value
-     * @param integer $lifetime cookie lifetime
      * @param string $path cookie path
      * @param string $domain cookie domain
      * @param boolean $html_only set html only cookie flag
      * @return boolean
      */
-    public function secure_cookie($request, $name, $value, $lifetime=0, $path='', $domain='', $html_only=true) {
+    public function secure_cookie($request, $name, $value, $path='', $domain='', $html_only=true) {
+        list($path, $domain, $html_only) = $this->prep_cookie_params($request, $name, $path, $domain);
+        return Hm_Functions::setcookie($name, $value, $this->lifetime, $path, $domain, $request->tls, $html_only);
+    }
+
+    /**
+     * Prep cookie paramaters
+     * @param object $request request details
+     * @param string $name cookie name
+     * @param string $path cookie path
+     * @param string $domain cookie domain
+     * @return array
+     */
+    private function prep_cookie_params($request, $name, $path, $domain) {
+        $html_only = true;
         if ($name == 'hm_reload_folders') {
-            return Hm_Functions::setcookie($name, $value);
+            $html_only = false;
         }
         if (!$path && isset($request->path)) {
             $path = $request->path;
@@ -307,7 +335,21 @@ abstract class Hm_Session {
         if (!$domain) {
             $domain = $this->cookie_domain($request);
         }
-        return Hm_Functions::setcookie($name, $value, $lifetime, $path, $domain, $request->tls, $html_only);
+        return array($path, $domain, $html_only);
+    }
+
+    /**
+     * Delete a cookie
+     * @param object $request request details
+     * @param string $name cookie name
+     * @param string $path cookie path
+     * @param string $domain cookie domain
+     * @param boolean $html_only set html only cookie flag
+     * @return boolean
+     */
+    public function delete_cookie($request, $name, $path='', $domain='', $html_only=true) {
+        list($path, $domain, $html_only) = $this->prep_cookie_params($request, $name, $path, $domain);
+        return Hm_Functions::setcookie($name, '', time()-3600, $path, $domain, $request->tls, $html_only);
     }
 }
 

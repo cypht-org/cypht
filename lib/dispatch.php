@@ -56,7 +56,7 @@ trait Hm_Dispatch_Redirect {
     private function forward_messages($session, $request) {
         $msgs = Hm_Msgs::get();
         if (!empty($msgs)) {
-            $session->secure_cookie($request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
+            $session->secure_cookie($request, 'hm_msgs', base64_encode(json_encode($msgs)));
         }
     }
 
@@ -112,7 +112,7 @@ trait Hm_Dispatch_Redirect {
             if (is_array($msgs)) {
                 array_walk($msgs, function($v) { Hm_Msgs::add($v); });
             }
-            $session->secure_cookie($request, 'hm_msgs', false, time()-3600);
+            $session->delete_cookie($request, 'hm_msgs');
             return true;
         }
         return false;

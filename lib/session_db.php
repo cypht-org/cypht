@@ -50,7 +50,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      */
     public function start_new($request) {
         $this->session_key = Hm_Crypt::unique_id(); 
-        $this->secure_cookie($request, $this->cname, $this->session_key, 0);
+        $this->secure_cookie($request, $this->cname, $this->session_key);
         if ($this->insert_session_row()) {
             $this->active = true;
             return;
@@ -144,10 +144,10 @@ class Hm_DB_Session extends Hm_PHP_Session {
             delete_uploaded_files($this);
         }
         Hm_DB::execute($this->dbh, 'delete from hm_user_session where hm_id=?', array($this->session_key));
-        $this->secure_cookie($request, $this->cname, '', time()-3600);
-        $this->secure_cookie($request, 'hm_id', '', time()-3600);
-        $this->secure_cookie($request, 'hm_reload_folders', '', time()-3600);
-        $this->secure_cookie($request, 'hm_msgs', '', time()-3600);
+        $this->delete_cookie($request, $this->cname);
+        $this->delete_cookie($request, 'hm_id');
+        $this->delete_cookie($request, 'hm_reload_folders');
+        $this->delete_cookie($request, 'hm_msgs');
         $this->active = false;
         Hm_Request_Key::load($this, $request, false);
     }

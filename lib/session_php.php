@@ -216,7 +216,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
             session_id($request->cookie[$this->cname]);
         }
         list($secure, $path, $domain) = $this->set_session_params($request);
-        session_set_cookie_params(0, $path, $domain, $secure);
+        session_set_cookie_params($this->lifetime, $path, $domain, $secure);
         Hm_Functions::session_start();
         $this->session_key = session_id();
         $this->start_session_data($request);
@@ -270,10 +270,10 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
         session_unset();
         Hm_Functions::session_destroy();
         $params = session_get_cookie_params();
-        $this->secure_cookie($request, $this->cname, '', time()-3600, $params['path'], $params['domain']);
-        $this->secure_cookie($request, 'hm_id', '', time()-3600);
-        $this->secure_cookie($request, 'hm_reload_folders', '', time()-3600);
-        $this->secure_cookie($request, 'hm_msgs', '', time()-3600);
+        $this->delete_cookie($request, $this->cname, $params['path'], $params['domain']);
+        $this->delete_cookie($request, 'hm_id');
+        $this->delete_cookie($request, 'hm_reload_folders');
+        $this->delete_cookie($request, 'hm_msgs');
         $this->active = false;
     }
 

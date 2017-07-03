@@ -55,8 +55,9 @@ if (!class_exists('Hm_Functions')) {
          * @return boolean
          */
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $secure=false, $html_only=false) {
-            Hm_Debug::add(sprintf('Setting cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',
-                $name, $lifetime, $path, $domain, $secure, $html_only));
+            $prefix = $lifetime != 0 && $lifetime < time() ? 'Deleting' : 'Setting';
+            Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',
+                $prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
             return setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
         }
 
