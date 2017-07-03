@@ -308,10 +308,9 @@ abstract class Hm_Session {
      * @param string $value cookie value
      * @param string $path cookie path
      * @param string $domain cookie domain
-     * @param boolean $html_only set html only cookie flag
      * @return boolean
      */
-    public function secure_cookie($request, $name, $value, $path='', $domain='', $html_only=true) {
+    public function secure_cookie($request, $name, $value, $path='', $domain='') {
         list($path, $domain, $html_only) = $this->prep_cookie_params($request, $name, $path, $domain);
         return Hm_Functions::setcookie($name, $value, $this->lifetime, $path, $domain, $request->tls, $html_only);
     }
@@ -344,10 +343,9 @@ abstract class Hm_Session {
      * @param string $name cookie name
      * @param string $path cookie path
      * @param string $domain cookie domain
-     * @param boolean $html_only set html only cookie flag
      * @return boolean
      */
-    public function delete_cookie($request, $name, $path='', $domain='', $html_only=true) {
+    public function delete_cookie($request, $name, $path='', $domain='') {
         list($path, $domain, $html_only) = $this->prep_cookie_params($request, $name, $path, $domain);
         return Hm_Functions::setcookie($name, '', time()-3600, $path, $domain, $request->tls, $html_only);
     }
