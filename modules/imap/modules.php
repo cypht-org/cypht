@@ -206,7 +206,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             if ($form['imap_move_action'] == 'move' && $form['imap_move_page'] == 'message') {
                 $msgs = Hm_Msgs::get();
                 Hm_Msgs::flush();
-                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
+                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
             }
             $this->out('move_count', $moved);
         }
@@ -660,7 +660,7 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
             }
             $msgs = Hm_Msgs::get();
             Hm_Msgs::flush();
-            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)), 0);
+            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
         }
     }
 }

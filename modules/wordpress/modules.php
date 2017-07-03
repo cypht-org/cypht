@@ -213,7 +213,7 @@ class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRAn Error Occured');
             }
             $msgs = Hm_Msgs::get();
-            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
+            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)));
             Hm_Dispatch::page_redirect('?page=servers');
         }
     }

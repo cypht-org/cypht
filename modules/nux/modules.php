@@ -141,7 +141,7 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRAn Error Occurred');
             }
             $msgs = Hm_Msgs::get();
-            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
+            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)));
             Hm_Dispatch::page_redirect('?page=servers');
         }
     }
@@ -195,7 +195,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     Hm_Msgs::add('E-mail account successfully added');
                     $msgs = Hm_Msgs::get();
                     if (!empty($msgs)) {
-                        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)), 0);
+                        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)));
                     }
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
