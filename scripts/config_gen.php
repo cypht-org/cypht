@@ -188,10 +188,7 @@ function get_module_assignments($settings) {
         'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
 
     if (isset($settings['modules'])) {
-        $mods = $settings['modules'];
-        if (is_string($mods)) {
-            $mods = explode(',', $mods);
-        }
+        $mods = get_modules($settings);
         foreach ($mods as $mod) {
             printf("scanning module %s ...\n", $mod);
             if (is_readable(sprintf("modules/%s/site.js", $mod))) {
@@ -212,6 +209,22 @@ function get_module_assignments($settings) {
 }
 
 /**
+ * get module list from settings
+ * @param array $settings site settings list
+ * @return array
+ */
+function get_modules($settings) {
+    $mods = array();
+    if (isset($settings['modules'])) {
+        $mods = $settings['modules'];
+        if (is_string($mods)) {
+            $mods = explode(',', $mods);
+        }
+    }
+    return $mods;
+}
+
+/**
  * Write out combined javascript and css files
  *
  * @param $js string combined javascript from all modules
@@ -228,7 +241,11 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
         printf("site.css file created\n");
     }
     if ($js) {
+        $mods = get_modules($settings);
         $js_lib = file_get_contents("third_party/zepto.min.js");
+        if (in_array('desktop_notifications', $mods, true)) {
+            $js_lib .= file_get_contents("third_party/push.min.js");
+        }
         if ((array_key_exists('encrypt_ajax_requests', $settings) &&
             $settings['encrypt_ajax_requests']) ||
             (array_key_exists('encrypt_local_storage', $settings) &&
