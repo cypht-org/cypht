@@ -59,7 +59,7 @@ trait Hm_Session_Fingerprint {
     private function fingerprint_flds() {
         $flds = array('HTTP_USER_AGENT', 'REQUEST_SCHEME', 'HTTP_ACCEPT_LANGUAGE',
             'HTTP_ACCEPT_CHARSET', 'HTTP_HOST');
-        if (!$this->site_config->get('allow_long_session')) {
+        if (!$this->site_config->get('allow_long_session') && !$this->site_config->get('disable_ip_check')) {
             $flds[] = 'REMOTE_ADDR';
         }
         return $flds;
