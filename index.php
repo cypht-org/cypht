@@ -1,7 +1,7 @@
 <?php
 
 /**
- * GIT VERSION: 10349
+ * GIT VERSION: 10362
  *
  * Some of the following constants are automatically filled in when
  * the build process is run. If you change them in site/index.php
@@ -38,7 +38,9 @@ require APP_PATH.'lib/framework.php';
 $config = new Hm_Site_Config_File(CONFIG_FILE);
 
 /* setup ini settings */
-require APP_PATH.'lib/ini_set.php';
+if (!$config->get('disable_ini_settings')) {
+    require APP_PATH.'lib/ini_set.php';
+}
 
 /* process the request */
 new Hm_Dispatch($config);
