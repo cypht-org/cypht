@@ -567,17 +567,18 @@ function start_page_opts() {
 function in_server_list($list, $id, $user) {
     $exists = false;
     $server = $list::dump($id);
-    if (count($server) == 0) {
-        return false;
+    $name = false;
+    if (is_array($server) && array_key_exists('server', $server)) {
+        $name = $server['server'];
     }
-    if (!array_key_exists('server', $server)) {
+    if (!$name) {
         return false;
     }
     foreach ($list::dump() as $server_id => $vals) {
         if ($id == $server_id) {
             continue;
         }
-        if (array_key_exists('user', $vals) && $vals['user'] == $user) {
+        if (array_key_exists('user', $vals) && $vals['user'] == $user && $vals['server'] == $name) {
             $exists = true;
             break;
         }
