@@ -169,9 +169,6 @@ install_sodium() {
     sudo apt-get install libsodium-dev -y
     pecl channel-update pecl.php.net
     pecl install libsodium
-    if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
-        echo 'extension=sodium.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-    fi
 }
 
 update_repos
