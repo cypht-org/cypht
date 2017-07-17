@@ -169,6 +169,7 @@ install_sodium() {
     sudo apt-get install libsodium-dev -y
     pecl channel-update pecl.php.net
     pecl install libsodium
+    ls -R ~/.phpenv/versions/$(phpenv version-name)/extension
 }
 
 update_repos
