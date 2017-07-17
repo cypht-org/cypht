@@ -180,6 +180,6 @@ setup_cypht
 install_phpunit
 install_coveralls
 install_selenium
-install_apache
 install_sodium
+install_apache
 bootstrap_unit_tests
