@@ -24,8 +24,7 @@ setup_ldap() {
         sudo ln -s /usr/lib/php/20160303/ldap.so ~/.phpenv/versions/$(phpenv version-name)/lib/php/extensions/no-debug-zts-20160303/ldap.so
         echo 'extension=ldap.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
     fi
-
-    ls -lR /home/travis/.phpenv/versions/7.1.5/lib/php/extensions/
+    ls -R ~/.phpenv/
 }
 
 # Add a system user dovecot will use for authentication
