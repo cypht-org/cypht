@@ -64,11 +64,10 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
 
     /**
      * @param Hm_Request $request request details
-     * @param boolean $existing_session
      * @return void
      */
-    protected function validate_session_data($request, $existing_session) {
-        if ($existing_session && count($this->data) == 0) {
+    protected function validate_session_data($request) {
+        if ($this->existing && count($this->data) == 0) {
             $this->destroy($request);
         }
         else {
@@ -161,6 +160,9 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
     /* used to indicate failed auth */
     public $auth_failed = false;
 
+    /* flag to indicate an existing session */
+    protected $existing = false;
+
     /**
      * Setup newly authenticated session
      * @param Hm_Request $request
@@ -199,7 +201,8 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
         }
         elseif (array_key_exists($this->cname, $request->cookie)) {
             $this->get_key($request);
-            $this->start($request, true);
+            $this->existing = true;
+            $this->start($request);
             $this->check_fingerprint($request);
         }
         return $this->is_active();
@@ -208,10 +211,9 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
     /**
      * Start the session. This could be an existing session or a new login
      * @param Hm_Request $request request details
-     * @param boolean $existing_session
      * @return void
      */
-    public function start($request, $existing_session=false) {
+    public function start($request) {
         if (array_key_exists($this->cname, $request->cookie)) {
             session_id($request->cookie[$this->cname]);
         }
@@ -220,7 +222,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
         Hm_Functions::session_start();
         $this->session_key = session_id();
         $this->start_session_data($request);
-        $this->validate_session_data($request, $existing_session);
+        $this->validate_session_data($request);
     }
 
     /**
