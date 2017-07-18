@@ -71,6 +71,6 @@ class Hm_Sodium_PHP {
     }
 
     public static function randombytes_buf() {
-        return sodium_randombytes_buf(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+        return random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
     }
 }
