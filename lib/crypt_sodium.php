@@ -33,8 +33,8 @@ class Hm_Crypt extends Hm_Crypt_Base {
         $hmac = substr($raw_string, 24, 32);
         $crypt_string = substr($raw_string, 56);
 
-        if (\Sodium\crypto_auth_verify($hmac, $crypt_string, $crypt_key)) {
-            $res = \Sodium\crypto_secretbox_open($crypt_string, $salt, $crypt_key);
+        if (Hm_Sodium_Compat::crypto_auth_verify($hmac, $crypt_string, $crypt_key)) {
+            $res = Hm_Sodium_Compat::crypto_secretbox_open($crypt_string, $salt, $crypt_key);
         }
         if ($res === false) {
             return parent::plaintext($string, $key);
@@ -53,8 +53,8 @@ class Hm_Crypt extends Hm_Crypt_Base {
             return parent::ciphertext($string, $key);
         }
         list($salt, $key) = self::keygen($key);
-        $ciphertext = \Sodium\crypto_secretbox($string, $salt, $key);
-        $mac = \Sodium\crypto_auth($ciphertext, $key);
+        $ciphertext = Hm_Sodium_Compat::crypto_secretbox($string, $salt, $key);
+        $mac = Hm_Sodium_Compat::crypto_auth($ciphertext, $key);
         return base64_encode($salt.$mac.$ciphertext);
     }
 
@@ -68,10 +68,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
         if (!LIBSODIUM) {
             return parent::hash_password($password, $salt, $count, $algo, $type);
         }
-        return \Sodium\crypto_pwhash_str( $password,
-            \Sodium\CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
-            \Sodium\CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE
-        );
+        return Hm_Sodium_Compat::crypto_pwhash_str($password);
     }
 
     /**
@@ -86,7 +83,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
         if (!LIBSODIUM) {
             return parent::check_password($password, $hash);
         }
-        if (!\Sodium\crypto_pwhash_str_verify($hash, $password)) {
+        if (!Hm_Sodium_Compat::crypto_pwhash_str_verify($hash, $password)) {
             return parent::check_password($password, $hash);
         }
         return true;
@@ -100,7 +97,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
      */
     protected static function keygen($key, $salt=false) {
         if ($salt === false) {
-            $salt = \Sodium\randombytes_buf(\Sodium\CRYPTO_SECRETBOX_NONCEBYTES);
+            $salt = Hm_Sodium_Compat::randombytes_buf();
         }
         return parent::keygen($key, $salt);
     }

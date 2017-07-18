@@ -50,6 +50,9 @@
             <exclude>
                 <file>../../lib/framework.php</file>
             </exclude>
+            <exclude>
+                <file>../../lib/sodium_compat.php</file>
+            </exclude>
         </whitelist>
     </filter>
 

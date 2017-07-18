@@ -8,6 +8,7 @@
 
 define('VERSION', .1);
 
+/* load the framework */
 require APP_PATH.'lib/module.php';
 require APP_PATH.'lib/modules.php';
 require APP_PATH.'lib/modules_exec.php';
@@ -25,20 +26,34 @@ require APP_PATH.'lib/cache.php';
 require APP_PATH.'lib/output.php';
 require APP_PATH.'lib/crypt.php';
 require APP_PATH.'lib/crypt_sodium.php';
+require APP_PATH.'lib/sodium_compat.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
 
-
+/* load the site module set library if found */
 if (is_readable(APP_PATH.'modules/site/lib.php')) {
     require APP_PATH.'modules/site/lib.php';
 }
+
+/* load random bytes polyfill if needed */
 if (!function_exists('random_bytes')) {
     require APP_PATH.'third_party/random_compat/lib/random.php';
 }
 
+/* check for and load the correct libsodium interface */
 if (!defined('LIBSODIUM')) {
-    define('LIBSODIUM', extension_loaded('libsodium') && function_exists('\Sodium\crypto_pwhash_str_verify'));
+    if (extension_loaded('libsodium') && function_exists('\Sodium\crypto_pwhash_str_verify')) {
+        define('LIBSODIUM', true);
+        class Hm_Sodium_Compat extends Hm_Sodium_PECL {}
+    }
+    if (extension_loaded('sodium') && function_exists('sodium_crypto_pwhash_str_verify')) {
+        define('LIBSODIUM', true);
+        class Hm_Sodium_Compat extends Hm_Sodium_PHP {}
+    }
+    if (!defined('LIBSODIUM')) {
+        define('LIBSODIUM', false);
+    }
 }
 
 if (!class_exists('Hm_Functions')) {
