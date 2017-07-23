@@ -21,7 +21,7 @@ return array(
     '%d configured' => false,
     'Today' => false,
     'You need to have Javascript enabled to use %s, sorry about that!' => false,
-    'Unsaved changes will be lost! Re-neter your password to save and exit.' => false,
+    'Unsaved changes will be lost! Re-enter your password to save and exit.' => false,
     'Save and Logout' => false,
     'Just Logout' => false,
     'Cancel' => false,

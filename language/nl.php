@@ -21,7 +21,7 @@ return array(
     '%d configured' => '%d geconfigureerd',
     'Today' => 'Vandaag',
     'You Need to have Javascript enabled to use HM3, sorry about that!' => 'Je hebt Javascript nodig om HM3 te gebruiken, sorry!',
-    'Unsaved changes will be lost! Re-neter your password to save and exit.' => 'Niet opgeslagen veranderingen gaan verloren! Geef je wachtwoord opnieuw in en sluit af.',
+    'Unsaved changes will be lost! Re-enter your password to save and exit.' => 'Niet opgeslagen veranderingen gaan verloren! Geef je wachtwoord opnieuw in en sluit af.',
     'Save and Logout' => 'Opslaan en uitloggen',
     'Just Logout' => 'Gewoon uitloggen',
     'Cancel' => 'Annuleren',

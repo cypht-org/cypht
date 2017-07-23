@@ -21,7 +21,7 @@ return array(
     '%d configured' => '%d configurato',
     'Today' => 'Oggi',
     'You Need to have Javascript enabled to use HM3, sorry about that!' => 'È necessario avere javascript abilitato HM3, mi dispiace!',
-    'Unsaved changes will be lost! Re-neter your password to save and exit.' => 'Le modifiche non salvate andranno perse. Re-inserire la password per salvare ed uscire.',
+    'Unsaved changes will be lost! Re-enter your password to save and exit.' => 'Le modifiche non salvate andranno perse. Re-inserire la password per salvare ed uscire.',
     'Save and Logout' => 'Salva ed esci',
     'Just Logout' => 'Esci',
     'Cancel' => 'Annulla',

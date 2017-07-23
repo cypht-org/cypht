@@ -23,7 +23,7 @@ return array(
     '%d configured' => '%d настроено',
     'Today' => 'Сегодня',
     'You Need to have Javascript enabled to use HM3, sorry about that!' => 'Нам нужен Javascript чтобы захватить мир и всё заработало!',
-    'Unsaved changes will be lost! Re-neter your password to save and exit.' => 'ВСЕ несохраненные изменения будут утеряны! Повторно введите пароль для сохранения и выхода.',
+    'Unsaved changes will be lost! Re-enter your password to save and exit.' => 'ВСЕ несохраненные изменения будут утеряны! Повторно введите пароль для сохранения и выхода.',
     'Save and Logout' => 'Сохраняемся и на выход',
     'Just Logout' => 'Просто уходим',
     'Cancel' => 'Отмена',

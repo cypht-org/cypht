@@ -21,7 +21,7 @@ return array(
     '%d configured' => '%d beállítva',
     'Today' => 'Ma',
     'You need to have Javascript enabled to use %s, sorry about that!' => 'Sajnáljuk, engedélyeznie kell a Javascripteet, hogy a %s-t használhassa!',
-    'Unsaved changes will be lost! Re-neter your password to save and exit.' => 'Elmentetlen beállítások el fognak veszni! Adja meg újra jelszavát a mentéshez és a kilépéshez.',
+    'Unsaved changes will be lost! Re-enter your password to save and exit.' => 'Elmentetlen beállítások el fognak veszni! Adja meg újra jelszavát a mentéshez és a kilépéshez.',
     'Save and Logout' => 'Ment és kilép',
     'Just Logout' => 'Csak kilép',
     'Cancel' => 'Mégse',

@@ -21,7 +21,7 @@ return array(
     '%d configured' => '%d configurat(e)',
     'Today' => 'Azi',
     'You Need to have Javascript enabled to use HM3, sorry about that!' => 'Îmi pare rău, dar trebuie activat Javascript pentru a utiliza HM3!',
-    'Unsaved changes will be lost! Re-neter your password to save and exit.' => 'Modificările neînregistrate vor fi pierdute! Introduceți-vă parola pt. a le înregistra și apoi părăsiți aplicația.',
+    'Unsaved changes will be lost! Re-enter your password to save and exit.' => 'Modificările neînregistrate vor fi pierdute! Introduceți-vă parola pt. a le înregistra și apoi părăsiți aplicația.',
     'Save and Logout' => 'Salvează și deconectează-te',
     'Just Logout' => 'Doar deconectare',
     'Cancel' => 'Anulează',

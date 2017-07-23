@@ -21,7 +21,7 @@ return array(
     '%d configured' => '%d 設定済み',
     'Today' => '今日',
     'You Need to have Javascript enabled to use HM3, sorry about that!' => 'HM3を利用するためにはJavaScriptを有効にする必要があります、ごめんなさい！',
-    'Unsaved changes will be lost! Re-neter your password to save and exit.' => '保存されなかった変更は失われます！保存して終了する場合はもう一度パスワードを入力してください。',
+    'Unsaved changes will be lost! Re-enter your password to save and exit.' => '保存されなかった変更は失われます！保存して終了する場合はもう一度パスワードを入力してください。',
     'Save and Logout' => '保存してログアウト',
     'Just Logout' => '保存せずにログアウト',
     'Cancel' => 'キャンセル',

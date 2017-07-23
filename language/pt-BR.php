@@ -21,7 +21,7 @@ return array(
     '%d configured' => '%d configurados',
     'Today' => 'Hoje',
     'You need to have Javascript enabled to use %s, sorry about that!' => 'Você deve ter Javascript habilitado para utilizar %s, desculpe por isso!',
-    'Unsaved changes will be lost! Re-neter your password to save and exit.' => 'Modificações não salvas serão perdidas! Entre com sua senha para salvar e sair.',
+    'Unsaved changes will be lost! Re-enter your password to save and exit.' => 'Modificações não salvas serão perdidas! Entre com sua senha para salvar e sair.',
     'Save and Logout' => 'Salvar e Sair',
     'Just Logout' => 'Somente Sair',
     'Cancel' => 'Cancelar',

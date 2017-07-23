@@ -138,7 +138,7 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
                 (!empty($settings) ? '1' : '0').'" />'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
-                $this->trans('Unsaved changes will be lost! Re-neter your password to save and exit.').' &nbsp;'.
+                $this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' &nbsp;'.
                 '<a href="?page=save">'.$this->trans('More info').'</a></div>'.
                 '<label class="screen_reader" for="logout_password">'.$this->trans('Password').'</label>'.
                 '<input id="logout_password" name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
