@@ -110,10 +110,7 @@ class Hm_Crypt_Base {
         $hmac_key = self::pbkdf2($key, $salt, 32, $rounds, self::$hmac);
 
         /* make sure the crypt text has not been tampered with */
-        if ($hmac !== hash_hmac(self::$hmac, $crypt_string, $hmac_key, true)) {
-            return false;
-        }
-        return true;
+        return self::hash_compare($hmac, hash_hmac(self::$hmac, $crypt_string, $hmac_key, true));
     }
 
     /**
@@ -156,6 +153,23 @@ class Hm_Crypt_Base {
      * @param string $a hash
      * @param string $b hash
      * @return bool
+    */
+    public static function hash_equals($a, $b) {
+        $res = 0;
+        $len = strlen($a);
+        for ($i = 0; $i < $len; $i++) {
+            $res |= ord($a[$i]) ^ ord($b[$i]);
+        }
+        return $res === 0;
+    }
+
+    /**
+     * Compare password hashes with hash_equals is available, otherwise use
+     * timing attack safe comparison
+     *
+     * @param string $a hash
+     * @param string $b hash
+     * @return bool
      */ 
     public static function hash_compare($a, $b) {
         if (!is_string($a) || !is_string($b) || strlen($a) !== strlen($b)) {
@@ -165,7 +179,7 @@ class Hm_Crypt_Base {
         if (Hm_Functions::function_exists('hash_equals')) {
             return hash_equals($a, $b);
         }
-        return $a === $b;
+        return self::hash_equals($a, $b);
     }
 
     /**
