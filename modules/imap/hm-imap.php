@@ -165,7 +165,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param array $config list of configuration options for this connections
      * @return bool true on connection sucess
      */
-    public function connect( $config ) {
+    public function connect($config) {
         if (isset($config['username']) && isset($config['password'])) {
             $this->commands = array();
             $this->debug = array();

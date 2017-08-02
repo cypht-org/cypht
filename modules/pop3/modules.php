@@ -56,7 +56,7 @@ class Hm_Handler_pop3_status extends Hm_Handler_Module {
             foreach ($ids as $id) {
                 $start_time = microtime(true);
                 $pop3 = Hm_POP3_List::connect($id, false);
-                if ($pop3->state == 'authed') {
+                if (pop3_authed($pop3)) {
                     $this->out('pop3_connect_time', microtime(true) - $start_time);
                     $this->out('pop3_connect_status', 'Authenticated');
                     $this->out('pop3_status_server_id', $id);
@@ -172,7 +172,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], $cache);
             $details = Hm_POP3_List::dump($form['pop3_server_id']);
             $path = sprintf("pop3_%d", $form['pop3_server_id']);
-            if ($pop3 && $pop3->state == 'authed') {
+            if (pop3_authed($pop3)) {
                 $this->out('pop3_mailbox_page_path', $path);
                 $list = array_reverse(array_unique(array_keys($pop3->mlist())));
                 $total = count($list);
@@ -226,7 +226,7 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
             $cache = Hm_POP3_List::get_cache($this->session, $this->config, $id);
             $pop3 = Hm_POP3_List::connect($id, $cache);
             $details = Hm_POP3_List::dump($id);
-            if ($pop3->state == 'authed') {
+            if (pop3_authed($pop3)) {
                 $msg_lines = $pop3->retr_full($form['pop3_uid']);
                 $header_list = array();
                 $body = array();
@@ -382,7 +382,7 @@ class Hm_Handler_pop3_save extends Hm_Handler_Module {
                 return;
             }
             $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false, $form['pop3_user'], $form['pop3_pass'], true);
-            if ($pop3->state == 'authed') {
+            if (pop3_authed($pop3)) {
                 $just_saved_credentials = true;
                 Hm_Msgs::add("Server saved");
                 $this->session->record_unsaved('POP3 server saved');
@@ -1108,4 +1108,11 @@ function bust_pop3_cache($session, $config, $id) {
     $memcache = new Hm_Memcached($config);
     $memcache->set($key, array(), 1, $session->enc_key);
     Hm_Debug::add('Busted POP3 cache for id '.$id);
+}
+
+/**
+ * @subpackage pop3/functions
+ */
+function pop3_authed($pop3) {
+    return is_object($pop3) && $pop3->state == 'authed';
 }

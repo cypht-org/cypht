@@ -318,7 +318,7 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
                     return;
                 }
                 $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
-                if ($smtp->state == 'authed') {
+                if (smtp_authed($smtp)) {
                     $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");
                     $this->session->record_unsaved('SMTP server saved');
@@ -464,7 +464,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* try to connect */
         $smtp = Hm_SMTP_List::connect($smtp_id, false);
-        if (!$smtp || $smtp->state != 'authed') {
+        if (!smtp_authed($smtp)) {
             Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             repopulate_compose_form($draft, $this);
             return;
@@ -1257,4 +1257,11 @@ function profile_from_compose_smtp_id($profiles, $id) {
         }
     }
     return false;
+}
+
+/**
+ * @subpackage smtp/functions
+ */
+function smtp_authed($smtp) {
+    return is_object($smtp) && $smtp->state == 'authed';
 }
