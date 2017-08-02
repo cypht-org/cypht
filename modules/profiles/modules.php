@@ -40,12 +40,16 @@ class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
     public function process() {
         $profiles = new Hm_Profiles($this);
         $compose_profiles = array();
+        $all_profiles = array();
         foreach ($profiles->list_all() as $id => $vals) {
+            $vals['id'] = $id;
             if ($vals['smtp_id'] !== false && $vals['smtp_id'] !== '') {
                 $compose_profiles[] = $vals;
             }
+            $all_profiles[] = $vals;
         }
         $this->out('compose_profiles', $compose_profiles);
+        $this->out('profiles', $all_profiles);
     }
 }
 
@@ -207,9 +211,29 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
     protected function output() {
         $res = '<script type="text/javascript">var profile_signatures = {';
         $sigs = array();
+        $used = array();
+        $profiles = $this->get('profiles');
         foreach ($this->get('compose_profiles', array()) as $vals) {
-            if (strlen(trim($vals['sig']))) {
-                $sigs[] = sprintf("%s: \"\\n%s\\n\"", $vals['smtp_id'], $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
+            $smtp_profiles = profiles_by_smtp_id($profiles, $vals['smtp_id']);
+            if (count($smtp_profiles) > 0) {
+                foreach ($smtp_profiles as $index => $smtp_vals) {
+                    if (in_array($smtp_vals['id'], $used, true)) {
+                        continue;
+                    }
+                    if (strlen(trim($smtp_vals['sig']))) {
+                        $sigs[] = sprintf("%s: \"\\n%s\\n\"", $smtp_vals['smtp_id'].'.'.($index+1), $this->html_safe(str_replace("\r\n", "\\n", $smtp_vals['sig'])));
+                        $used[] = $smtp_vals['id'];
+                    }
+                }
+            }
+            else {
+                if (in_array($vals['id'], $used, true)) {
+                    continue;
+                }
+                if (strlen(trim($vals['sig']))) {
+                    $sigs[] = sprintf("%s: \"\\n%s\\n\"", $vals['smtp_id'], $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
+                    $used[] = $vals['id'];
+                }
             }
         }
         $res .= implode(', ', $sigs).'}</script>';
