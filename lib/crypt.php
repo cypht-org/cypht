@@ -154,7 +154,7 @@ class Hm_Crypt_Base {
      * @param string $b hash
      * @return bool
     */
-    public static function hash_equals($a, $b) {
+    private static function hash_equals($a, $b) {
         $res = 0;
         $len = strlen($a);
         for ($i = 0; $i < $len; $i++) {
