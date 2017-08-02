@@ -1223,18 +1223,6 @@ function repopulate_compose_form($draft, $handler_mod) {
 /**
  * @subpackage smtp/functions
  */
-function profiles_by_smtp_id($profiles, $id) {
-    $res = array();
-    foreach ($profiles as $vals) {
-        if ($vals['smtp_id'] == $id) {
-            $res[] = $vals;
-        }
-    }
-    return $res;
-}
-/**
- * @subpackage smtp/functions
- */
 function server_from_compose_smtp_id($id) {
     $pos = strpos($id, '.');
     if ($pos === false) {

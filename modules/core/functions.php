@@ -585,3 +585,16 @@ function in_server_list($list, $id, $user) {
     }
     return $exists;
 }
+
+/**
+ * @subpackage core/functions
+ */
+function profiles_by_smtp_id($profiles, $id) {
+    $res = array();
+    foreach ($profiles as $vals) {
+        if ($vals['smtp_id'] == $id) {
+            $res[] = $vals;
+        }
+    }
+    return $res;
+}
