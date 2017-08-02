@@ -31,11 +31,10 @@ trait Hm_Server_Connect {
         if ($user === false || $pass === false) {
             return false;
         }
-        $res = self::service_connect($id, $server, $user, $pass, $cache);
-        if (!$res) {
-            return false;
+        if (self::service_connect($id, $server, $user, $pass, $cache)) {
+            return self::enable_server($id, $user, $pass, $save_credentials);
         }
-        return self::enable_server($id, $user, $pass, $save_credentials);
+        return self::$server_list[$id]['object'];
     }
 
     /**
