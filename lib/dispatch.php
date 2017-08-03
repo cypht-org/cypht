@@ -192,6 +192,9 @@ class Hm_Dispatch {
         /* run handler modules to process input and perform actions */
         $this->module_exec->run_handler_modules($this->request, $this->session, $this->page);
 
+        /* clean up any network connections */
+        $this->close_connections();
+
         /* check to see if a handler module told us to redirect the browser */
         $this->check_for_redirect($this->request, $this->module_exec, $this->session);
 
@@ -204,6 +207,18 @@ class Hm_Dispatch {
 
         /* output content to the browser */
         $this->render_output();
+    }
+
+    /**
+     * Close network connections if they exist
+     * @return void
+     */
+    private function close_connections() {
+        foreach (array('Hm_IMAP_List', 'Hm_POP3_List', 'Hm_SMTP_List') as $class) {
+            if (Hm_Functions::class_exists($class)) {
+                $class::clean_up();
+            }
+        }
     }
 
     /**

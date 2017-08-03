@@ -25,6 +25,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_process_request() {
         ob_start();
         ob_start();
+        Hm_Functions::$exists = false;
         $router = new Hm_Dispatch($this->config);
         $this->assertEquals('home', $router->page);
         ob_end_clean();
@@ -36,6 +37,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_get_page() {
         ob_start();
         ob_start();
+        Hm_Functions::$exists = false;
         $router = new Hm_Dispatch($this->config);
         ob_end_clean();
         $request = new Hm_Mock_Request('HTTP');
@@ -57,6 +59,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_validate_request_uri() {
         ob_start();
         ob_start();
+        Hm_Functions::$exists = false;
         $router = new Hm_Dispatch($this->config);
         ob_end_clean();
         $this->assertEquals('asdf', $router->validate_request_uri('asdf'));
@@ -73,6 +76,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_check_for_redirect() {
         ob_start();
         ob_start();
+        Hm_Functions::$exists = false;
         $router = new Hm_Dispatch($this->config);
         ob_end_clean();
         $this->assertFalse($router->check_for_redirect($router->request, $router->module_exec, $router->session));
@@ -107,6 +111,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     public function test_validate_ajax_request() {
         ob_start();
         ob_start();
+        Hm_Functions::$exists = false;
         $router = new Hm_Dispatch($this->config);
         ob_end_clean();
         $request = new Hm_Mock_Request('HTTP');
