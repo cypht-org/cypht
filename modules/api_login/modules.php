@@ -8,7 +8,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * @subpackage dynamic_login/handler
+ * @subpackage api_login/handler
  */
 class Hm_Handler_api_login_step_two extends Hm_Handler_login {
     public function process() {
@@ -27,7 +27,7 @@ class Hm_Handler_api_login_step_two extends Hm_Handler_login {
 }
 
 /**
- * @subpackage dynamic_login/handler
+ * @subpackage api_login/handler
  */
 class Hm_Handler_process_api_login extends Hm_Handler_login {
     public function process() {
