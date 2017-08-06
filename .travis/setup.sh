@@ -81,7 +81,10 @@ install_phpunit() {
     if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
         wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
     fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
+    if [ "$TRAVIS_PHP_VERSION" = "hhvm" ]; then
+        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then
         wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
     fi
     chmod +x phpunit
