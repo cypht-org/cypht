@@ -122,6 +122,8 @@ install_apache() {
     sudo chmod +x /home/travis
     sudo chmod +x /home/travis/build
     sudo chmod +x /home/travis/build/site
+    ls -R /home/travis/.phpenv/versions/master/
+    ls -R /home/travis/.phpenv/versions/master/etc/
     sudo service apache2 restart
 }
 
