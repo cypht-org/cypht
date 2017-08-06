@@ -112,6 +112,9 @@ install_apache() {
     if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
+    if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then
+        sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
+    fi
 
     ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
     sudo rm -f /etc/apache2/sites-enabled/000-default.conf
@@ -122,7 +125,6 @@ install_apache() {
     sudo chmod +x /home/travis
     sudo chmod +x /home/travis/build
     sudo chmod +x /home/travis/build/site
-    ls -R /home/travis/.phpenv/versions/master/
     ls -R /home/travis/.phpenv/versions/master/etc/
     sudo service apache2 restart
 }
