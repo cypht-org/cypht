@@ -220,6 +220,7 @@ class Hm_Memcached {
     private $supported;
     private $enabled;
     private $server;
+    private $config;
     private $port;
     private $cache_con;
 
@@ -231,6 +232,7 @@ class Hm_Memcached {
         $this->port = $config->get('memcached_port', false);
         $this->enabled = $config->get('enable_memcached', false);
         $this->supported = Hm_Functions::class_exists('Memcached');
+        $this->config = $config;
     }
 
     /**
@@ -303,11 +305,22 @@ class Hm_Memcached {
         return $data;
     }
 
+    /**
+     */
+    private function auth() {
+        if ($this->config->get('memcached_auth')) {
+            $this->cache_con->setOption(Memcached::OPT_BINARY_PROTOCOL, true);
+            $this->cache_con->setSaslAuthData($this->config->get('memcached_user'),
+                $this->config->get('memcached_pass'));
+        }
+    }
+
     /*
      * @return boolean
      */
     private function connect() {
         $this->cache_con = Hm_Functions::memcached();
+        $this->auth();
         if (!$this->cache_con->addServer($this->server, $this->port)) {
             Hm_Debug::add('Memcached addServer failed');
             $this->cache_con = false;
