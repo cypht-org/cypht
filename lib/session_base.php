@@ -40,6 +40,9 @@ trait Hm_Session_Fingerprint {
      * @return void
      */
     public function check_fingerprint($request) {
+        if ($this->site_config->get('disable_fingerprint')) {
+            return;
+        }
         $id = $this->build_fingerprint($request->server);
         $fingerprint = $this->get('fingerprint', null);
         if ($fingerprint === false) {
@@ -47,8 +50,8 @@ trait Hm_Session_Fingerprint {
             return;
         }
         if (!$fingerprint || $fingerprint !== $id) {
-            $this->destroy($request);
             Hm_Debug::add('HTTP header fingerprint check failed');
+            $this->destroy($request);
         }
     }
 
