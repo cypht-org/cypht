@@ -6,7 +6,7 @@
  */
 
 /* Constants */
-define('DEBUG_MODE', false);
+define('DEBUG_MODE', true);
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
 
 /* Init the framework */
@@ -22,21 +22,55 @@ require APP_PATH.'modules/core/functions.php';
  * @return bool
  */
 function cypht_login($user, $pass, $url, $lifetime=0) {
+    list($session, $request) = session_init();
+    $session->check($request, $user, $pass, false);
+    if ($session->is_active()) {
+        list($domain, $path, $secure) = url_parse($url);
+        Hm_Functions::setcookie('hm_id', stripslashes($session->enc_key), $lifetime, $path, $domain, $secure, true);
+        Hm_Functions::setcookie('hm_session', stripslashes($session->session_key), $lifetime, $path, $domain, $secure, true);
+        $session->end();
+        Hm_Debug::show();
+        return true;
+    }
+    Hm_Debug::show();
+    return false;
+}
+
+/**
+ * Log a user out of cypht
+ * @subpackage api_login/functions
+ * @return void
+ */
+function cypht_logout($url) {
+    list($session, $request) = session_init();
+    list($domain, $path, $secure) = url_parse($url);
+    $session->delete_cookie($request, 'hm_id', $path, $domain);
+    $session->delete_cookie($request, 'hm_session', $path, $domain);
+    Hm_Debug::show();
+}
+
+/**
+ * Parse URL
+ * @subpackage api_login/functions
+ * @param string $url location of the Cypht installation
+ * @return array
+ */
+function url_parse($url) {
     $parsed = parse_url($url);
+    $secure = $parsed['scheme'] === 'https' ? true : false;
+    return array($parsed['host'], $parsed['path'], $secure);
+}
+
+/**
+ * Startup the session and request objects
+ * @subpackage api_login/functions
+ * @return array
+ */
+function session_init() {
     $config = new Hm_Site_Config_File(APP_PATH.'hm3.rc');
     $module_exec = new Hm_Module_Exec($config);
     $request = new Hm_Request($module_exec->filters, $config);
     $session_config = new Hm_Session_Setup($config);
     $session = $session_config->setup_session();
-    $session->check($request, $user, $pass, false);
-    if ($session->is_active()) {
-        $secure = $parsed['scheme'] === 'https' ? true : false;
-        $domain = $parsed['host'];
-        $path = $parsed['path'];
-        Hm_Functions::setcookie('hm_id', stripslashes($session->enc_key), $lifetime, $path, $domain, $secure, true);
-        Hm_Functions::setcookie('hm_session', stripslashes($session->session_key), $lifetime, $path, $domain, $secure, true);
-        $session->end();
-        return true;
-    }
-    return false;
+    return array($session, $request);
 }
