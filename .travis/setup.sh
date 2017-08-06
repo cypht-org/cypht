@@ -49,6 +49,9 @@ selenium_config() {
     if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
         mv .travis/creds.py-safari creds.py
     fi
+    if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then
+        mv .travis/creds.py-chrome creds.py
+    fi
 }
 
 # Configure Cypht
