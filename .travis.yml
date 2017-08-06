@@ -4,21 +4,23 @@ language: php
 
 # php versions
 php:
-    - '5.4'
-    - '5.5'
-    - '5.6'
-    - '7.0'
-    - '7.1'
+    #- '5.4'
+    #- '5.5'
+    #- '5.6'
+    #- '7.0'
+    #- '7.1'
+    - hhvm
+    - nightly
 
 # run the phpunit tests, then the selenium tests
-script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh && cd ../../
-#script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../../
+#script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../selenium && sh ./runall.sh && cd ../../
+script: cd tests/phpunit && /usr/local/bin/phpunit && cd ../../
 
 # the unit tests need a DB setup, the selenium tests do not
 env:
     - DB=mysql
-    - DB=postgresql
-    - DB=sqlite
+    #- DB=postgresql
+    #- DB=sqlite
 
 # install and configure everything
 before_install:
