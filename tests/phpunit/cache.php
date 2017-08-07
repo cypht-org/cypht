@@ -205,6 +205,20 @@ class Hm_Test_Hm_Memcache extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_auth() {
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->close());
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $this->config->set('enable_memcached', true);
+        $this->config->set('memcached_auth', true);
+        $cache = new Hm_Memcached($this->config);
+        $this->assertTrue($cache->close());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_close() {
         $cache = new Hm_Memcached($this->config);
         $this->assertFalse($cache->close());
@@ -214,7 +228,6 @@ class Hm_Test_Hm_Memcache extends PHPUnit_Framework_TestCase {
         $cache = new Hm_Memcached($this->config);
         $this->assertTrue($cache->close());
     }
-
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess

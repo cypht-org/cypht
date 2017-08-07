@@ -66,6 +66,12 @@ class Hm_Mock_Memcached {
     function quit() {
         return true;
     }
+    function setOption($val) {
+        return true;
+    }
+    function setSaslAuthData($u, $p) {
+        return true;
+    }
 }
 class Hm_Mock_Config {
     public $mods = array();

@@ -120,6 +120,13 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $session->check_fingerprint($request);
         $session->destroy($request);
 
+        $this->config->set('disable_fingerprint', true);
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $session->check($request, 'unittestuser', 'unittestpass');
+        $this->assertTrue($session->is_active());
+        $this->assertNull($session->check_fingerprint($request));
+
     }
     /**
      * @preserveGlobalState disabled
