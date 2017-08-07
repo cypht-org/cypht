@@ -8,6 +8,7 @@
 /* Constants */
 define('DEBUG_MODE', true);
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
+define('CONFIG_FILE', APP_PATH.'hm3.rc');
 
 /* Init the framework */
 require_once APP_PATH.'lib/framework.php';
@@ -26,6 +27,11 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
     $session->check($request, $user, $pass, false);
     if ($session->is_active()) {
         list($domain, $path, $secure) = url_parse($url);
+        $config = new Hm_Site_Config_File(CONFIG_FILE);
+        $user_config = load_user_config_object($config);
+        $user_config->load($user, $pass);
+        $user_data = $user_config->dump();
+        $session->set('user_data', $user_data);
         Hm_Functions::setcookie('hm_id', stripslashes($session->enc_key), $lifetime, $path, $domain, $secure, true);
         Hm_Functions::setcookie('hm_session', stripslashes($session->session_key), $lifetime, $path, $domain, $secure, true);
         $session->end();
