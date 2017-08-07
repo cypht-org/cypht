@@ -12,6 +12,11 @@ update_repos() {
     sudo apt-get -qq update
 }
 
+# Enable memcached extension
+setup_memcached() {
+    echo 'extension=memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+}
+
 # PHP 7+ needs to have the LDAP extension manually enabled
 setup_ldap() {
     if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
@@ -183,6 +188,7 @@ install_sodium() {
 
 update_repos
 setup_ldap
+setup_memcached
 setup_user
 install_dovecot
 selenium_config
