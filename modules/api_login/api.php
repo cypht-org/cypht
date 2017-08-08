@@ -6,7 +6,7 @@
  */
 
 /* Constants */
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', false);
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
 define('CONFIG_FILE', APP_PATH.'hm3.rc');
 
@@ -35,10 +35,8 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
         Hm_Functions::setcookie('hm_id', stripslashes($session->enc_key), $lifetime, $path, $domain, $secure, true);
         Hm_Functions::setcookie('hm_session', stripslashes($session->session_key), $lifetime, $path, $domain, $secure, true);
         $session->end();
-        Hm_Debug::show();
         return true;
     }
-    Hm_Debug::show();
     return false;
 }
 
@@ -52,7 +50,6 @@ function cypht_logout($url) {
     list($domain, $path, $secure) = url_parse($url);
     $session->delete_cookie($request, 'hm_id', $path, $domain);
     $session->delete_cookie($request, 'hm_session', $path, $domain);
-    Hm_Debug::show();
 }
 
 /**
