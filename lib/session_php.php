@@ -71,6 +71,7 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
             $this->destroy($request);
         }
         else {
+            Hm_Debug::add('LOGGED IN');
             $this->active = true;
         }
     }
