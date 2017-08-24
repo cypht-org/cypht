@@ -1229,6 +1229,9 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
      * Outputs links to the Servers settings pages
      */
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return;
+        }
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).'" alt="" width="16" height="16" /> ';
@@ -1265,6 +1268,9 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
      * Outputs links to the Servers and Site Settings pages
      */
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return;
+        }
         $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$save).'" alt="" width="16" height="16" /> ';

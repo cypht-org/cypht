@@ -435,6 +435,7 @@ function filter_servers($handler) {
  */
 function setup_base_ajax_page($name, $source=false) {
     add_handler($name, 'login', false, $source);
+    add_handler($name, 'default_page_data', true, $source);
     add_handler($name, 'load_user_data', true, $source);
     add_handler($name, 'language',  true, $source);
     add_handler($name, 'date', true, $source);
