@@ -331,7 +331,7 @@ abstract class Hm_Session {
         if ($name == 'hm_reload_folders') {
             $html_only = false;
         }
-        if (!$path && isset($request->path)) {
+        if ($name != 'hm_reload_folders' && !$path && isset($request->path)) {
             $path = $request->path;
         }
         if (!$domain) {
