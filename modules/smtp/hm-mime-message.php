@@ -18,7 +18,6 @@ class Hm_MIME_Msg {
     private $body = '';
     private $text_body = '';
     private $html = false;
-    private $allow_unqualified_addresses = false;
     private $final_msg = '';
 
     /* build mime message data */
@@ -152,6 +151,23 @@ class Hm_MIME_Msg {
         return $string;
     }
 
+    function find_addresses($str) {
+        $res = array();
+        if (preg_match_all("/\S+@\S+/", $str, $matches)) {
+            foreach ($matches[0] as $val) {
+                $val = trim($val, ',;');
+                if (in_array($val{0}, array('"', "'"), true)) {
+                    continue;
+                }
+                $val = trim($val, '><\'"');
+                if (is_email_address($val)) {
+                    $res[] = $val;
+                }
+            }
+        }
+        return $res;
+    }
+
     function get_recipient_addresses() {
         $res = array();
         foreach (array('To', 'Cc', 'Bcc') as $fld) {
@@ -164,35 +180,7 @@ class Hm_MIME_Msg {
             else {
                 continue;
             }
-            $v = trim(preg_replace("/(\r|\n|\t)/m", ' ', $v));
-            $v = preg_replace("/(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", ' ', $v);
-            $v = str_replace(array(',', ';'), array(' , ', ' ; '), $v); 
-            $v = preg_replace("/\s+/", ' ', $v);
-            if (!$v) {
-                continue;
-            }
-            $bits = explode(' ', $v);
-            foreach ($bits as $val) {
-                $val = trim($val);
-                if (!$val) {
-                    continue;
-                }
-                if (strstr($val, '@')) {
-                    $address = ltrim(rtrim($val ,'>'), '<');
-                    if (is_email_address($address)) {
-                        $res[] = $address;
-                    }
-                }
-            }
-            if ($this->allow_unqualified_addresses) {
-                $bits = preg_split("/(;|,)/", $v);
-                foreach ($bits as $val) {
-                        $val = trim($val);
-                    if (!strstr($val, ' ') && !strstr($val, '@') && strlen($val) > 2) {
-                        $res[] = $val;
-                    }
-                }
-            }
+            $res = array_merge($res, $this->find_addresses($v));
         }
         return $res;
     }
