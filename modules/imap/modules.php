@@ -1596,7 +1596,12 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                 $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
             }
             else {
-                $txt .= format_msg_text($this->get('msg_text'), $this);
+                if ($this->get('imap_msg_part') === "0") {
+                    $txt .= format_msg_text($this->get('msg_text'), $this, false);
+                }
+                else {
+                    $txt .= format_msg_text($this->get('msg_text'), $this);
+                }
             }
         }
         $txt .= '</div>';
