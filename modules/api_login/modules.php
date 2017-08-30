@@ -31,38 +31,16 @@ class Hm_Handler_api_login_step_two extends Hm_Handler_login {
  */
 class Hm_Handler_process_api_login extends Hm_Handler_login {
     public function process() {
-        $api_login = false;
-        if (!$this->get('create_username', false)) {
-            list($success, $form) = $this->process_form(array('username', 'password'));
-            if ($success) {
-                $this->session->check($this->request, rtrim($form['username']), $form['password'], false);
-                $this->session->set('username', rtrim($form['username']));
-                if (array_key_exists('api_login_key', $this->request->post)) {
-                    if ($this->request->post['api_login_key'] == $this->config->get('api_login_key')) {
-                        $api_login = true;
-                        $this->user_config->load(rtrim($form['username']), $form['password']);
-                        $user_data = $this->user_config->dump();
-                        $this->session->set('user_data', $user_data);
-                    }
-                }
-            }
-            else {
-                $this->session->check($this->request);
-            }
-            if ($this->session->is_active()) {
-                Hm_Page_Cache::load($this->session);
-                $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
-            }
+        if (array_key_exists('api_login_key', $this->request->post) &&
+            $this->request->post['api_login_key'] == $this->config->get('api_login_key')) {
+            $this->validate_request = false;
         }
-        if (!$api_login) {
-            Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
-            $this->validate_method($this->session, $this->request);
-            $this->process_key();
-            if (!$this->config->get('disable_origin_check', false)) {
-                $this->validate_origin($this->session, $this->request, $this->config);
-            }
-        }
-        else {
+        parent::process();
+        if (!$this->validate_request && $this->session->is_active()) {
+            $this->user_config->load(rtrim($this->request->post['username']), $this->request->post['password']);
+            $user_data = $this->user_config->dump();
+            $this->session->set('user_data', $user_data);
+            elog($user_data);
             header('Content-Type: application/json');
             $res = array(
                 'hm_id' => $this->session->enc_key,

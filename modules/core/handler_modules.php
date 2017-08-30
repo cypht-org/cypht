@@ -540,32 +540,36 @@ class Hm_Handler_login extends Hm_Handler_Module {
     /**
      * Perform a new login if the form was submitted, otherwise check for and continue a session if it exists
      */
+    public $validate_request = true;
     public function process() {
-        if (!$this->get('create_username', false)) {
-            list($success, $form) = $this->process_form(array('username', 'password'));
-            if ($success) {
-                $this->session->check($this->request, rtrim($form['username']), $form['password']);
-                if ($this->session->auth_failed) {
-                    Hm_Msgs::add("ERRInvalid username or password");
-                }
-                $this->session->set('username', rtrim($form['username']));
-                if ($this->config->get('redirect_after_login')) {
-                    $this->out('redirect_url', $this->config->get('redirect_after_login'));
-                }
+        if ($this->get('create_username', false)) {
+            return;
+        }
+        list($success, $form) = $this->process_form(array('username', 'password'));
+        if ($success) {
+            $this->session->check($this->request, rtrim($form['username']), $form['password']);
+            if ($this->session->auth_failed) {
+                Hm_Msgs::add("ERRInvalid username or password");
             }
-            else {
-                $this->session->check($this->request);
-            }
-            if ($this->session->is_active()) {
-                Hm_Page_Cache::load($this->session);
-                $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
+            $this->session->set('username', rtrim($form['username']));
+            if ($this->config->get('redirect_after_login')) {
+                $this->out('redirect_url', $this->config->get('redirect_after_login'));
             }
         }
-        Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
-        $this->validate_method($this->session, $this->request);
-        $this->process_key();
-        if (!$this->config->get('disable_origin_check', false)) {
-            $this->validate_origin($this->session, $this->request, $this->config);
+        else {
+            $this->session->check($this->request);
+        }
+        if ($this->session->is_active()) {
+            Hm_Page_Cache::load($this->session);
+            $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
+        }
+        if ($this->validate_request) {
+            Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
+            $this->validate_method($this->session, $this->request);
+            $this->process_key();
+            if (!$this->config->get('disable_origin_check', false)) {
+                $this->validate_origin($this->session, $this->request, $this->config);
+            }
         }
     }
 }
