@@ -40,7 +40,6 @@ class Hm_Handler_process_api_login extends Hm_Handler_login {
             $this->user_config->load(rtrim($this->request->post['username']), $this->request->post['password']);
             $user_data = $this->user_config->dump();
             $this->session->set('user_data', $user_data);
-            elog($user_data);
             header('Content-Type: application/json');
             $res = array(
                 'hm_id' => $this->session->enc_key,
