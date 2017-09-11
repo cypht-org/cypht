@@ -310,7 +310,7 @@ function Message_List() {
         }
         var msg_rows;
         if (!cache) {
-            msg_rows = $('.message_table tbody');
+            msg_rows = Hm_Utils.tbody();
         }
         else {
             msg_rows = cache;
@@ -328,7 +328,7 @@ function Message_List() {
     };
 
     this.set_tab_index = function() {
-        var msg_rows = $('.message_table tbody');
+        var msg_rows = Hm_Utils.tbody();
         var count = 1;
         $('tr', msg_rows).each(function() {
             $(this).attr('tabindex', count);
@@ -370,7 +370,7 @@ function Message_List() {
     };
 
     this.sort = function(fld) {
-        var table = $('.message_table tbody');
+        var table = Hm_Utils.tbody();
         var listitems = $('tr', table);
         var aval;
         var bval;
@@ -560,7 +560,7 @@ function Message_List() {
         var source;
         if (!self.background) {
             $('.src_count').text(self.sources.length);
-            $('.total').text($('.message_table tbody tr').length);
+            $('.total').text(Hm_Utils.rows().length);
         }
         for (index in self.sources) {
             source = self.sources[index];
@@ -595,7 +595,7 @@ function Message_List() {
         var data = Hm_Utils.get_from_local_storage(cache_name);
         var interval = Hm_Utils.get_from_global('combined_view_refresh_interval', 60);
         if (data && data.length) {
-            $('.message_table tbody').html(data);
+            Hm_Utils.tbody().html(data);
             if (cache_name == 'formatted_unread_data') {
                 self.clear_read_messages();
             }
@@ -624,24 +624,26 @@ function Message_List() {
     /* TODO: remove module specific refs */
     this.update_title = function() {
         var count = 0;
+        var rows = Hm_Utils.rows();
+        var tbody = Hm_Utils.tbody();
         if (hm_list_path() == 'unread') {
-            count = $('.message_table tbody tr').length;
+            count = rows.length;
             document.title = count+' Unread';
         }
         else if (hm_list_path() == 'flagged') {
-            count = $('.message_table tbody tr').length;
+            count = rows.length;
             document.title = count+' Flagged';
         }
         else if (hm_list_path() == 'combined_inbox') {
-            count = $('tr .unseen', $('.message_table tbody')).length;
+            count = $('tr .unseen', tbody).length;
             document.title = count+' Unread in Everything';
         }
         else if (hm_list_path() == 'email') {
-            count = $('tr .unseen', $('.message_table tbody')).length;
+            count = $('tr .unseen', tbody).length;
             document.title = count+' Unread in Email';
         }
         else if (hm_list_path() == 'feeds') {
-            count = $('tr .unseen', $('.message_table tbody')).length;
+            count = $('tr .unseen', tbody).length;
             document.title = count+' Unread in Feeds';
         }
     };
@@ -693,7 +695,7 @@ function Message_List() {
     };
 
     this.check_empty_list = function() {
-        var count = $('.message_table tbody tr').length;
+        var count = Hm_Utils.rows().length;
         if (!count) {
             if (!$('.empty_list').length) {
                 if (hm_page_name() == 'search') {
@@ -728,9 +730,10 @@ function Message_List() {
     };
 
     this.adjust_unread_total = function(amount, replace) {
+        var missing = $('.total_unread_count').text() === '' ? true : false;
         var current = $('.total_unread_count').text()*1;
         var new_total;
-        if (replace && amount == current) {
+        if (replace && amount == current && amount != 0) {
             return;
         }
         if (!replace && amount == 0) {
@@ -745,7 +748,7 @@ function Message_List() {
         if (new_total < 0) {
             new_total = 0;
         }
-        if (new_total != current) {
+        if (new_total != current || missing) {
             $('.total_unread_count').html('&#160;'+new_total+'&#160;');
         }
         if (new_total > current && hm_page_name() != 'message_list' && hm_list_path() != 'unread') {
@@ -765,17 +768,17 @@ function Message_List() {
     };
 
     this.set_message_list_state = function(list_type) {
-        var data = $('.message_table tbody');
+        var data = Hm_Utils.tbody();
         data.find('*[style]').attr('style', '');
         Hm_Utils.save_to_local_storage(list_type, data.html());
         var empty = self.check_empty_list();
         if (!empty) {
             self.set_checkbox_callback();
         }
-        $('.total').text($('.message_table tbody tr').length);
+        $('.total').text(Hm_Utils.rows().length);
         self.update_title();
         if (list_type == 'formatted_unread_data') {
-            self.adjust_unread_total($('.message_table tbody tr').length, true);
+            self.adjust_unread_total(Hm_Utils.rows().length, true);
         }
     };
 
@@ -1206,6 +1209,12 @@ var Hm_Utils = {
         catch (e) {
             return false;
         }
+    },
+    rows: function() {
+        return $('.message_table_body tr');
+    },
+    tbody: function() {
+        return $('.message_table_body');
     }
 };
 
