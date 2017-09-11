@@ -153,17 +153,8 @@ class Hm_MIME_Msg {
 
     function find_addresses($str) {
         $res = array();
-        if (preg_match_all("/\S+@\S+/", $str, $matches)) {
-            foreach ($matches[0] as $val) {
-                $val = trim($val, ',;');
-                if (in_array($val{0}, array('"', "'"), true)) {
-                    continue;
-                }
-                $val = trim($val, '><\'"');
-                if (is_email_address($val)) {
-                    $res[] = $val;
-                }
-            }
+        foreach (process_address_fld($str) as $vals) {
+            $res[] = $vals['email'];
         }
         return $res;
     }
