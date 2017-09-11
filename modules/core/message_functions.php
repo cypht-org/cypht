@@ -167,7 +167,8 @@ function format_reply_address($fld, $excluded) {
  * @return array
  */
 function split_address_fld($str) {
-    $str = trim($str);
+    $str = str_replace(array('<"', "<'", '<\'"', '<"\''), '<', trim($str));
+    $str = str_replace(array('">', "'>", '\'">', '"\'>'), '>', $str);
     $pos = 0;
     $index = 0;
     $output = array();
@@ -193,7 +194,7 @@ function split_address_fld($str) {
             }
             $substr = '';
         }
-        elseif (!$in_quotes && $str{$pos} == ',') {
+        elseif (!$in_quotes && ($str{$pos} == ',' || $str{$pos} == ';')) {
             $output[$index][] = $substr;
             $substr = '';
             $index++;
@@ -219,8 +220,9 @@ function process_address_fld($fld) {
     foreach ($data as $vals) {
         $parts = array();
         foreach ($vals as $i => $v) {
+            $v = trim($v, '<>\'"');
             if (is_email_address($v)) {
-                $parts['email'] = str_replace(array('<', '>'), '', $v);
+                $parts['email'] = $v;
                 array_splice($vals, $i, 1);
                 $parts['label'] = str_replace(array('"', "'"), '', implode(' ', $vals));
                 $res[] = $parts;
