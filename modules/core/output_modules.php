@@ -1480,7 +1480,7 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
                 $res .= '<thead><tr>'.implode('', $header_flds).'</tr></thead>';
             }
         }
-        $res .= '<tbody>';
+        $res .= '<tbody class="message_table_body">';
         return $res;
     }
 }
