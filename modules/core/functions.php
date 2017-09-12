@@ -515,7 +515,7 @@ function merge_folder_list_details($folder_sources) {
 function get_ini($config, $name, $sections=false) {
     if (!DEBUG_MODE) {
         $data = $config->get($name, array());
-        if (count($data) > 0) {
+        if (is_array($data) && count($data) > 0) {
             return $data;
         }
     }
