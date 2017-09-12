@@ -14,7 +14,7 @@
  * @return string
  */
 function format_msg_html($str, $images=false) {
-    require APP_PATH.'third_party/HTMLPurifier.standalone.php';
+    require_once APP_PATH.'third_party/HTMLPurifier.standalone.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$images) {
