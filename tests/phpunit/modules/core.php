@@ -131,14 +131,21 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_save_user_settings() {
-        /* TODO: add assertions */
         $parent = build_parent_mock();
         $handler_mod = new Hm_Handler_Test($parent, 'home');
         $handler_mod->session->set('username', 'bar');
         save_user_settings($handler_mod, array('password' => 'foo'), false);
+        $msgs = Hm_Msgs::get();
+        $this->assertEquals('Settings saved', $msgs[0]);
+
         save_user_settings($handler_mod, array('password' => 'foo'), true);
+        $msgs = Hm_Msgs::get();
+        $this->assertEquals('Session destroyed on logout', $msgs[2]);
+
         $handler_mod->session->auth_state = false;
         save_user_settings($handler_mod, array('password' => 'foo'), false);
+        $msgs = Hm_Msgs::get();
+        $this->assertEquals('ERRIncorrect password, could not save settings to the server', $msgs[3]);
 
     }
     /**
@@ -146,16 +153,24 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_setup_base_ajax_page() {
-        /* TODO: add assertions */
         setup_base_ajax_page('foo');
+        $res = Hm_Handler_Modules::dump();
+        $len = count($res['foo']);
+        $this->assertEquals(6, $len);
+        $this->assertEquals(0, count(Hm_Output_Modules::dump()));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_setup_base_page() {
-        /* TODO: add assertions */
         setup_base_page('foo');
+        $res = Hm_Handler_Modules::dump();
+        $len =  count($res['foo']);
+        $res2 = Hm_Output_Modules::dump();
+        $len2 = count($res2['foo']);
+        $this->assertEquals(12, $len);
+        $this->assertEquals(20, $len2);
     }
     /**
      * @preserveGlobalState disabled
@@ -176,66 +191,63 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_restore_servers() {
-        /* TODO: add assertions */
         $parent = build_parent_mock();
         $handler_mod = new Hm_Handler_Test($parent, 'home');
         restore_servers(array(array(array('server' => 'foo'))), $handler_mod);
+        $this->assertEquals(2, count($handler_mod->user_config->dump()));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_filter_servers() {
-        /* TODO: add assertions*/
         $parent = build_parent_mock();
         $handler_mod = new Hm_Handler_Test($parent, 'home');
         $handler_mod->user_config->data['imap_servers'] = array(array());
-        filter_servers($handler_mod);
+        $this->assertEquals(array('imap_servers' => array(array())), filter_servers($handler_mod));
+
         $handler_mod->user_config->data['imap_servers'] = array(array('default' => 1, 'server' => 'localhost'));
-        filter_servers($handler_mod);
+        $this->assertEquals(array('imap_servers' => array(array('default' => 1, 'server' => 'localhost'))), filter_servers($handler_mod));
+
         $handler_mod->user_config->data['imap_servers'] = array(array('pass' => 'foo', 'server' => 'localhost'));
         $handler_mod->user_config->data['no_password_save_setting'] = true;
-        filter_servers($handler_mod);
+        $this->assertEquals(array('imap_servers' => array(array('pass' => 'foo'))), filter_servers($handler_mod));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_merge_folder_list_details() {
-        /* TODO: add assertions*/
-        merge_folder_list_details(false);
-        merge_folder_list_details(array());
-        merge_folder_list_details(array(array('foo', 'bar'), array('foo', 'bar')));
+        $this->assertEquals(array(), merge_folder_list_details(false));
+        $this->assertEquals(array(), merge_folder_list_details(array()));
+        $this->assertEquals(array('foo' => 'barbar'), merge_folder_list_details(array(array('foo', 'bar'), array('foo', 'bar'))));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_get_ini() {
-        /* TODO: add assertions*/
         $mock_config = new Hm_Mock_Config();
-        $mock_config->data['foo'] = 'bar';
-        get_ini($mock_config, 'foo');
+        $mock_config->data['foo'] = array('bar');
+        $this->assertEquals(array('bar'), get_ini($mock_config, 'foo'));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_in_server_list() {
-        /* TODO: add assertions*/
         Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 0);
-        in_server_list('Hm_Server_Wrapper', 0, 'foo');
-        in_server_list('Hm_Server_Wrapper', 1, 'foo');
+        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 0, 'foo'));
+        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 1, 'foo'));
         Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 1);
-        in_server_list('Hm_Server_Wrapper', 1, 'testuser');
+        $this->assertTrue(in_server_list('Hm_Server_Wrapper', 1, 'testuser'));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_profiles_by_server_id() {
-        /* TODO: add assertions*/
-        profiles_by_smtp_id(array('smtp_id' => 0), 0);
+        $this->assertEquals(array(0), profiles_by_smtp_id(array('smtp_id' => 0), 0));
     }
 }
 class Hm_Test_Core_Functions_Debug extends PHPUnit_Framework_TestCase {
@@ -250,12 +262,11 @@ class Hm_Test_Core_Functions_Debug extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get_ini_debug() {
-        /* TODO: add assertions*/
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['app_data_dir'] = './data';
         $mock_config->data['foo.ini'] = 'bar';
-        get_ini($mock_config, 'foo.ini');
-        get_ini($mock_config, 'no.ini');
+        $this->assertEquals(array('foo' => 'bar'), get_ini($mock_config, 'foo.ini'));
+        $this->assertEquals(array(), get_ini($mock_config, 'no.ini'));
     }
 }
 ?>
