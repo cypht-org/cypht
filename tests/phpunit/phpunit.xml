@@ -44,6 +44,9 @@
     <testsuite name="api">
         <file>./api.php</file>
     </testsuite>
+    <testsuite name="modules_core">
+        <file>./modules/core.php</file>
+    </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false" processUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">../../lib</directory>
@@ -52,6 +55,10 @@
             </exclude>
             <exclude>
                 <file>../../lib/sodium_compat.php</file>
+            </exclude>
+            <directory suffix=".php">../../modules/core/</directory>
+            <exclude>
+                <file>../../modules/core/modules.php</file>
             </exclude>
         </whitelist>
     </filter>

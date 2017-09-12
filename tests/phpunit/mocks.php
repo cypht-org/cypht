@@ -2,6 +2,7 @@
 
 class Hm_Mock_Session {
     public $loaded = true;
+    public $auth_state = true;
     public $data = array();
     public function get($id, $default) {
         if ($id == 'saved_pages') {
@@ -29,6 +30,9 @@ class Hm_Mock_Session {
     }
     public function secure_cookie($request, $name, $value, $lifetime) {
         return true;
+    }
+    public function auth($user, $pass) {
+        return $this->auth_state;
     }
 }
 
@@ -92,6 +96,14 @@ class Hm_Mock_Config {
     public function set($name, $value) {
         $this->data[$name] = $value;
     }
+    public function dump() {
+        return $this->data;
+    }
+    public function save() {
+    }
+    public function reload() {
+    }
+
 }
 
 class Hm_Mock_Request {
