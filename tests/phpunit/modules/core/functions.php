@@ -1,6 +1,5 @@
 <?php
 
-
 class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
