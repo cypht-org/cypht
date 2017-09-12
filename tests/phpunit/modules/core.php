@@ -186,9 +186,15 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_filter_servers() {
-        /* TODO: add assertions and coverage*/
+        /* TODO: add assertions*/
         $parent = build_parent_mock();
         $handler_mod = new Hm_Handler_Test($parent, 'home');
+        $handler_mod->user_config->data['imap_servers'] = array(array());
+        filter_servers($handler_mod);
+        $handler_mod->user_config->data['imap_servers'] = array(array('default' => 1, 'server' => 'localhost'));
+        filter_servers($handler_mod);
+        $handler_mod->user_config->data['imap_servers'] = array(array('pass' => 'foo', 'server' => 'localhost'));
+        $handler_mod->user_config->data['no_password_save_setting'] = true;
         filter_servers($handler_mod);
     }
     /**
@@ -196,16 +202,19 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_merge_folder_list_details() {
-        /* TODO: add assertions and coverage*/
+        /* TODO: add assertions*/
+        merge_folder_list_details(false);
         merge_folder_list_details(array());
+        merge_folder_list_details(array(array('foo', 'bar'), array('foo', 'bar')));
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_get_ini() {
-        /* TODO: add assertions and coverage*/
+        /* TODO: add assertions*/
         $mock_config = new Hm_Mock_Config();
+        $mock_config->data['foo'] = 'bar';
         get_ini($mock_config, 'foo');
     }
     /**
@@ -213,17 +222,40 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_in_server_list() {
-        /* TODO: add assertions and coverage*/
+        /* TODO: add assertions*/
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 0);
         in_server_list('Hm_Server_Wrapper', 0, 'foo');
+        in_server_list('Hm_Server_Wrapper', 1, 'foo');
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 1);
+        in_server_list('Hm_Server_Wrapper', 1, 'testuser');
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_profiles_by_server_id() {
-        /* TODO: add assertions and coverage*/
-        profiles_by_smtp_id(array(), 0);
+        /* TODO: add assertions*/
+        profiles_by_smtp_id(array('smtp_id' => 0), 0);
     }
 }
+class Hm_Test_Core_Functions_Debug extends PHPUnit_Framework_TestCase {
 
+    public function setUp() {
+        define('DEBUG_MODE', true);
+        require 'bootstrap.php';
+        require APP_PATH.'modules/core/modules.php';
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_ini_debug() {
+        /* TODO: add assertions*/
+        $mock_config = new Hm_Mock_Config();
+        $mock_config->data['app_data_dir'] = './data';
+        $mock_config->data['foo.ini'] = 'bar';
+        get_ini($mock_config, 'foo.ini');
+        get_ini($mock_config, 'no.ini');
+    }
+}
 ?>

@@ -58,7 +58,19 @@
             </exclude>
             <directory suffix=".php">../../modules/core/</directory>
             <exclude>
+                <file>../../modules/core/handler_modules.php</file>
+            </exclude>
+            <exclude>
+                <file>../../modules/core/output_modules.php</file>
+            </exclude>
+            <exclude>
                 <file>../../modules/core/modules.php</file>
+            </exclude>
+            <exclude>
+                <file>../../modules/core/message_functions.php</file>
+            </exclude>
+            <exclude>
+                <file>../../modules/core/message_list_functions.php</file>
             </exclude>
         </whitelist>
     </filter>
