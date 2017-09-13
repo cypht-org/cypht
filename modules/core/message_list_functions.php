@@ -181,12 +181,10 @@ function safe_output_callback($vals, $style, $output_mod) {
     if (count($vals) == 3 && $vals[2]) {
         $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
     }
-    if ($style == 'email') {
-        return sprintf('<td class="%s" title="%s">%s%s</td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
-    }
-    elseif ($style == 'news') {
+    if ($style == 'news') {
         return sprintf('<div class="%s" title="%s">%s%s</div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
     }
+    return sprintf('<td class="%s" title="%s">%s%s</td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
 }
 
 /**
@@ -198,18 +196,16 @@ function safe_output_callback($vals, $style, $output_mod) {
  * @return string
  */
 function checkbox_callback($vals, $style, $output_mod) {
-    if ($style == 'email') {
-        return sprintf('<td class="checkbox_cell">'.
-            '<input id="'.$output_mod->html_safe($vals[0]).'" type="checkbox" value="%s" />'.
-            '<label class="checkbox_label" for="'.$output_mod->html_safe($vals[0]).'"></label>'.
-            '</td>', $output_mod->html_safe($vals[0]));
-    }
-    elseif ($style == 'news') {
+    if ($style == 'news') {
         return sprintf('<input type="checkbox" id="%s" value="%s" />'.
             '<label class="checkbox_label" for="%s"></label>'.
             '</td><td class="news_cell">', $output_mod->html_safe($vals[0]),
             $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[0]));
     }
+    return sprintf('<td class="checkbox_cell">'.
+        '<input id="'.$output_mod->html_safe($vals[0]).'" type="checkbox" value="%s" />'.
+        '<label class="checkbox_label" for="'.$output_mod->html_safe($vals[0]).'"></label>'.
+        '</td>', $output_mod->html_safe($vals[0]));
 }
 
 /**
@@ -227,12 +223,10 @@ function subject_callback($vals, $style, $output_mod) {
     }
     $subject = $output_mod->html_safe($vals[0]);
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
-    if ($style == 'email') {
-        return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
-    }
-    elseif ($style == 'news') {
+    if ($style == 'news') {
         return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject);
     }
+    return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
 }
 
 /**
@@ -244,12 +238,10 @@ function subject_callback($vals, $style, $output_mod) {
  * @return string
  */
 function date_callback($vals, $style, $output_mod) {
-    if ($style == 'email') {
-        return sprintf('<td class="msg_date" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
-    }
-    elseif ($style == 'news') {
+    if ($style == 'news') {
         return sprintf('<div class="msg_date">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
     }
+    return sprintf('<td class="msg_date" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
 }
 
 /**
@@ -277,12 +269,10 @@ function icon_callback($vals, $style, $output_mod) {
         $title[] = $output_mod->trans('Attachment');
     }
     $title = implode(', ', $title);
-    if ($style == 'email') {
-        return sprintf('<td class="icon" title="%s">%s</td>', $title, $icons);
-    }
-    elseif ($style == 'news') {
+    if ($style == 'news') {
         return sprintf('<div class="icon" title="%s">%s</div>', $title, $icons);
     }
+    return sprintf('<td class="icon" title="%s">%s</td>', $title, $icons);
 }
 
 /**
