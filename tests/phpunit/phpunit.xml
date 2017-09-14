@@ -47,6 +47,7 @@
     <testsuite name="modules_core">
         <file>./modules/core/functions.php</file>
         <file>./modules/core/message_functions.php</file>
+        <file>./modules/core/message_list_functions.php</file>
     </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false" processUncoveredFilesFromWhitelist="false">
@@ -63,9 +64,6 @@
             </exclude>
             <exclude>
                 <file>../../modules/core/output_modules.php</file>
-            </exclude>
-            <exclude>
-                <file>../../modules/core/message_list_functions.php</file>
             </exclude>
         </whitelist>
     </filter>
