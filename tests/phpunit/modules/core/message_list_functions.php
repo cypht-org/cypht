@@ -3,6 +3,7 @@
 class Hm_Test_Core_Message_List_Functions extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
+        date_default_timezone_set('UTC');
         require 'bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
     }
@@ -84,7 +85,7 @@ class Hm_Test_Core_Message_List_Functions extends PHPUnit_Framework_TestCase {
      */
     public function test_date_callback() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->assertEquals('<td class="msg_date" title="Wed, 31 Dec 1969 18:00:01 -0600">foo<input type="hidden" class="msg_timestamp" value="1" /></td>', date_callback(array('foo', 1), 'email', $mod));
+        $this->assertEquals('<td class="msg_date" title="Thu, 01 Jan 1970 00:00:01 +0000">foo<input type="hidden" class="msg_timestamp" value="1" /></td>', date_callback(array('foo', 1), 'email', $mod));
         $this->assertEquals('<div class="msg_date">foo<input type="hidden" class="msg_timestamp" value="1" /></div>', date_callback(array('foo', 1), 'news', $mod));
     }
     /**
