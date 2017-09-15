@@ -48,6 +48,7 @@
         <file>./modules/core/functions.php</file>
         <file>./modules/core/message_functions.php</file>
         <file>./modules/core/message_list_functions.php</file>
+        <file>./modules/core/modules.php</file>
     </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false" processUncoveredFilesFromWhitelist="false">
@@ -59,12 +60,6 @@
                 <file>../../lib/sodium_compat.php</file>
             </exclude>
             <directory suffix=".php">../../modules/core/</directory>
-            <exclude>
-                <file>../../modules/core/handler_modules.php</file>
-            </exclude>
-            <exclude>
-                <file>../../modules/core/output_modules.php</file>
-            </exclude>
         </whitelist>
     </filter>
 
