@@ -15,3 +15,4 @@ tests/phpunit/data/testuser.txt
 website
 tests/phpunit/clover.xml
 tests/phpunit/coveralls-upload.json
+tests/phpunit/data/foo.txt
