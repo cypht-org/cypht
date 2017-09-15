@@ -410,7 +410,8 @@ class Hm_Output_header_css extends Hm_Output_Module {
         $res = '';
         $mods = $this->get('router_module_list');
         if (DEBUG_MODE) {
-            foreach (glob('modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+            foreach (glob(APP_PATH.'modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+                $name = str_replace(APP_PATH, '', $name);
                 $mod = str_replace(array('modules/', '/'), '', $name);
                 if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.css", $name))) {
                     $res .= '<link href="'.sprintf("%ssite.css", $name).'" media="all" rel="stylesheet" type="text/css" />';
@@ -442,7 +443,8 @@ class Hm_Output_page_js extends Hm_Output_Module {
             }
             $core = false;
             $mods = $this->get('router_module_list');
-            foreach (glob('modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+            foreach (glob(APP_PATH.'modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+                $name = str_replace(APP_PATH, '', $name);
                 if ($name == 'modules/core/') {
                     $core = $name;
                     continue;
