@@ -42,7 +42,7 @@ class Hm_MIME_Msg {
             $this->headers['Reply-To'] = $from;
         }
         $this->headers['To'] = $to;
-        $this->headers['Subject'] = $this->encode_header_fld(html_entity_decode($subject, ENT_QUOTES));
+        $this->headers['Subject'] = html_entity_decode($subject, ENT_QUOTES);
         $this->headers['Date'] = date('r');
         $this->headers['Message-Id'] = '<'.md5(uniqid(rand(),1)).'@'.php_uname('n').'>';
         $this->boundary = str_replace(array('=', '/', '+'), '', Hm_Crypt::unique_id(48));
@@ -84,7 +84,6 @@ class Hm_MIME_Msg {
 
     /* output mime message */
     function get_mime_msg() {
-        $this->headers['To'] = $this->encode_header_fld($this->headers['To']);
         $this->prep_message_body();
         $res = '';
         $headers = '';
@@ -92,7 +91,7 @@ class Hm_MIME_Msg {
             if (!trim($val)) {
                 continue;
             }
-            $headers .= sprintf("%s: %s\r\n", $name, $val);
+            $headers .= sprintf("%s: %s\r\n", $name, $this->encode_header_fld($val));
         }
         if (!$this->final_msg) {
             if ($this->html) {
