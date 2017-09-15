@@ -106,8 +106,8 @@ class Hm_IMAP_List extends Hm_Server_Wrapper {
     public static $state = false;
     public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
         self::$server_list[$id]['object'] = new Hm_IMAP();
-        self::$server_list[$id]['object']::$allow_connection = self::$state;
-        self::$server_list[$id]['object']::$allow_auth = self::$state;
+        self::$server_list[$id]['object']->$allow_connection = self::$state;
+        self::$server_list[$id]['object']->$allow_auth = self::$state;
         self::$server_list[$id]['object']->connect();
         self::$server_list[$id]['connected'] = true;
         return self::$server_list[$id]['object'];
