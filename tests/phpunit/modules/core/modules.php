@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * TODO: add assertions to all tests
+ */
+
 class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
