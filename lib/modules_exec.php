@@ -143,7 +143,7 @@ trait Hm_Handler_Module_Exec {
      * @return void
      */
     public function run_handler_modules($request, $session, $page) {
-        $input = array();
+        $input = $this->handler_response;
         $protected = array();
         $this->request = $request;
         $this->session = $session;
