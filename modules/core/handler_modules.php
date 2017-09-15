@@ -176,7 +176,8 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
         $headers['X-XSS-Protection'] = '1; mode=block';
         $headers['X-Content-Type-Options'] = 'nosniff';
         $headers['Expires'] = gmdate('D, d M Y H:i:s \G\M\T', strtotime('-1 year'));
-        $headers['Content-Security-Policy'] = "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';";
+        $headers['Content-Security-Policy'] = "default-src 'none'; script-src 'self' 'unsafe-inline'; ".
+            "connect-src 'self'; font-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';";
         if ($this->request->type == 'AJAX') {
             $headers['Content-Type'] = 'application/json';
         }
@@ -289,7 +290,9 @@ class Hm_Handler_process_no_password_setting extends Hm_Handler_Module {
      * Allowed vals are bool true/false
      */
     public function process() {
-        function no_password_callback($val) { return $val; }
+        function no_password_callback($val) {
+            return $val;
+        }
         process_site_setting('no_password_save', $this, 'no_password_callback', false, true);
     }
 }
@@ -303,7 +306,9 @@ class Hm_Handler_process_delete_prompt_setting extends Hm_Handler_Module {
      * Allowed vals are bool true/false
      */
     public function process() {
-        function delete_disabled_callback($val) { return $val; }
+        function delete_disabled_callback($val) {
+            return $val;
+        }
         process_site_setting('disable_delete_prompt', $this, 'delete_disabled_callback', false, true);
     }
 }
