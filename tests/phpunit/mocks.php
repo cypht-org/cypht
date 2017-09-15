@@ -4,7 +4,8 @@ class Hm_Mock_Session {
     public $loaded = true;
     public $auth_state = true;
     public $data = array();
-    public function get($id, $default) {
+    public $auth_failed = true;
+    public function get($id, $default=false) {
         if ($id == 'saved_pages') {
             return array('foo' => array('bar', false));
         }
@@ -19,23 +20,31 @@ class Hm_Mock_Session {
     public function build_fingerprint($request, $site_key) {
         return 'fakefingerprint';
     }
+    public function record_unsaved() {
+        return true;
+    }
     public function is_active() {
         return $this->loaded;
     }
     public function destroy() {
         return true;
     }
+    public function close_early() {
+        return true;
+    }
     public function end() {
        return true; 
     }
-    public function secure_cookie($request, $name, $value, $lifetime) {
+    public function secure_cookie($request, $name, $value, $path='', $domain='') {
         return true;
     }
     public function auth($user, $pass) {
         return $this->auth_state;
     }
+    public function check() {
+        return true;
+    }
 }
-
 class Hm_Mock_Memcached_No {
     function addServer($server, $port) {
         return false;
@@ -101,18 +110,18 @@ class Hm_Mock_Config {
     }
     public function save() {
     }
+    public function load() {
+    }
     public function reload() {
     }
-
 }
-
 class Hm_Mock_Request {
-
     public $invalid_input_detected;
     public $post = array('hm_page_key' => 'asdf', 'fld1' => '0', 'fld2' => '1', 'fld3' => 0, 'fld4' => NULL);
     public $get = array();
     public $cookie = array();
     public $server = array('SERVER_NAME' => 'test', 'REQUEST_URI' => 'test', 'HTTP_USER_AGENT' => 'android', 'REQUEST_METHOD' => 'GET');
+    public $mobile = false;
     public $tls = false;
     public $type;
     public $sapi = 'test';
