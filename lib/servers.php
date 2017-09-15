@@ -8,7 +8,7 @@
 trait Hm_Server_Connect {
 
     /* list of server connections */
-    private static $server_list = array();
+    protected static $server_list = array();
 
     /**
      * Connect to a server
