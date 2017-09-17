@@ -30,6 +30,7 @@ class Hm_Mock_Session {
         return true;
     }
     public function close_early() {
+        $this->loaded = false;
         return true;
     }
     public function end() {

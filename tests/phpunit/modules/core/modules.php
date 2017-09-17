@@ -27,27 +27,47 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_pw_update() {
         $test = new Handler_Test('process_pw_update', 'core');
         $test->run();
+        $this->assertEquals(array(), Hm_Msgs::get());
 
         $test->post = array('server_pw_id' => 0, 'password' => 'foo');
         $test->run();
+        $this->assertEquals(array(), Hm_Msgs::get());
 
         $test->input = array('missing_pw_servers' => array(0 => array('id' => 0, 'type' => 'POP3')));
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array('ERRUnable to authenticate to the POP3 server'), Hm_Msgs::get());
+        $this->assertFalse($res->handler_response['connect_status']);
+        Hm_Msgs::flush();
 
         Hm_POP3_List::change_state('authed');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array('Password Updated'), Hm_Msgs::get());
+        $this->assertTrue($res->handler_response['connect_status']);
+        Hm_Msgs::flush();
 
         $test->input = array('missing_pw_servers' => array(0 => array('id' => 0, 'type' => 'SMTP')));
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array('ERRUnable to authenticate to the SMTP server'), Hm_Msgs::get());
+        $this->assertFalse($res->handler_response['connect_status']);
+        Hm_Msgs::flush();
 
         Hm_SMTP_List::change_state('authed');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array('Password Updated'), Hm_Msgs::get());
+        $this->assertTrue($res->handler_response['connect_status']);
+        Hm_Msgs::flush();
 
         $test->input = array('missing_pw_servers' => array(0 => array('id' => 0, 'type' => 'IMAP')));
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array('ERRUnable to authenticate to the IMAP server'), Hm_Msgs::get());
+        $this->assertFalse($res->handler_response['connect_status']);
+        Hm_Msgs::flush();
 
         Hm_IMAP_List::change_state('authed');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array('Password Updated'), Hm_Msgs::get());
+        $this->assertTrue($res->handler_response['connect_status']);
+        Hm_Msgs::flush();
     }
     /**
      * @preserveGlobalState disabled
@@ -55,13 +75,15 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_check_missing_passwords() {
         $test = new Handler_Test('check_missing_passwords', 'core');
-        $test->run();
+        $res = $test->run();
+        $this->assertFalse(array_key_exists('missing_pw_servers', $res->handler_response));
         $test->modules = array('imap', 'pop3', 'smtp');
         $test->user_config = array('no_password_save_setting' => true);
         Hm_IMAP_List::add(array('nopass' => 1, 'user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1));
         Hm_POP3_List::add(array('nopass' => 1, 'user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1));
         Hm_SMTP_List::add(array('nopass' => 1, 'user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1));
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(9, count($res->handler_response['missing_pw_servers']));
     }
     /**
      * @preserveGlobalState disabled
@@ -69,7 +91,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_close_session_early() {
         $test = new Handler_Test('close_session_early', 'core');
-        $test->run();
+        $res = $test->run();
+        $this->assertFalse($res->session->is_active());
     }
     /**
      * @preserveGlobalState disabled
@@ -80,7 +103,19 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
         $test->tls = true;
         $test->rtype = 'AJAX';
         $test->input = array('language' => 'English');
-        $test->run();
+        $res = $test->run();
+		$out = array(
+			'Content-Language' => 'En',
+            'Strict-Transport-Security' => 'max-age=31536000',
+            'X-Frame-Options' => 'SAMEORIGIN',
+            'X-XSS-Protection' => '1; mode=block',
+            'X-Content-Type-Options' => 'nosniff',
+            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';",
+            'Content-Type' => 'application/json',
+		);
+        foreach ($out as $key => $val) {
+            $this->assertEquals($out[$key], $res->handler_response['http_headers'][$key]);
+        }
     }
     /**
      * @preserveGlobalState disabled
@@ -89,7 +124,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_list_style_setting_passed() {
         $test = new Handler_Test('process_list_style_setting', 'core');
         $test->post = array('save_settings' => true, 'list_style' => 'news_style');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('news_style', $res->handler_response['new_user_settings']['list_style_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -98,7 +134,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_list_style_setting_failed() {
         $test = new Handler_Test('process_list_style_setting', 'core');
         $test->post = array('save_settings' => true, 'list_style' => 'blah');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('email_style', $res->handler_response['new_user_settings']['list_style_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -107,7 +144,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_start_page_setting_passed() {
         $test = new Handler_Test('process_start_page_setting', 'core');
         $test->post = array('save_settings' => true, 'start_page' => 'page=message_list&list_path=unread');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('page=message_list&list_path=unread', $res->handler_response['new_user_settings']['start_page_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -116,7 +154,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_start_page_setting_failed() {
         $test = new Handler_Test('process_start_page_setting', 'core');
         $test->post = array('save_settings' => true, 'start_page' => 'blah');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('', $res->handler_response['new_user_settings']['start_page_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -124,8 +163,9 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_process_hide_folder_icons_setting_failed() {
         $test = new Handler_Test('process_hide_folder_icons', 'core');
-        $test->post = array('save_settings' => true, 'nod_folder_icons' => false);
-        $test->run();
+        $test->post = array('save_settings' => true, 'no_folder_icons' => false);
+        $res = $test->run();
+        $this->assertFalse($res->handler_response['new_user_settings']['no_folder_icons_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -134,7 +174,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_show_list_icons() {
         $test = new Handler_Test('process_show_list_icons', 'core');
         $test->post = array('save_settings' => true, 'show_list_icons' => false);
-        $test->run();
+        $res = $test->run();
+        $this->assertFalse($res->handler_response['new_user_settings']['show_list_icons_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -143,7 +184,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_unread_source_max_setting() {
         $test = new Handler_Test('process_unread_source_max_setting', 'core');
         $test->post = array('save_settings' => true, 'unread_per_source' => 10);
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(10, $res->handler_response['new_user_settings']['unread_per_source_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -152,7 +194,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_all_email_source_max_setting() {
         $test = new Handler_Test('process_all_email_source_max_setting', 'core');
         $test->post = array('save_settings' => true, 'all_email_per_source' => 10);
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(10, $res->handler_response['new_user_settings']['all_email_per_source_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -161,7 +204,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_no_password_setting() {
         $test = new Handler_Test('process_no_password_setting', 'core');
         $test->post = array('save_settings' => true, 'no_password_save' => true);
-        $test->run();
+        $res = $test->run();
+        $this->assertTrue($res->handler_response['new_user_settings']['no_password_save_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -170,7 +214,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_delete_prompt_setting() {
         $test = new Handler_Test('process_delete_prompt_setting', 'core');
         $test->post = array('save_settings' => true, 'disable_delete_prompt' => true);
-        $test->run();
+        $res = $test->run();
+        $this->assertTrue($res->handler_response['new_user_settings']['disable_delete_prompt_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -197,7 +242,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_flagged_since_setting() {
         $test = new Handler_Test('process_flagged_since_setting', 'core');
         $test->post = array('save_settings' => true, 'flagged_since' => 'foo');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('today', $res->handler_response['new_user_settings']['flagged_since_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -206,7 +252,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_all_since_setting() {
         $test = new Handler_Test('process_all_since_setting', 'core');
         $test->post = array('save_settings' => true, 'all_since' => 'foo');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('today', $res->handler_response['new_user_settings']['all_since_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -215,7 +262,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_all_email_since_setting() {
         $test = new Handler_Test('process_all_email_since_setting', 'core');
         $test->post = array('save_settings' => true, 'all_email_since' => 'foo');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('today', $res->handler_response['new_user_settings']['all_email_since_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -224,7 +272,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_unread_since_setting() {
         $test = new Handler_Test('process_unread_since_setting', 'core');
         $test->post = array('save_settings' => true, 'unread_since' => 'foo');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('today', $res->handler_response['new_user_settings']['unread_since_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -233,7 +282,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_language_setting_passed() {
         $test = new Handler_Test('process_language_setting', 'core');
         $test->post = array('save_settings' => true, 'language' => 'en');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('en', $res->handler_response['new_user_settings']['language_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -242,7 +292,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_language_setting_failed() {
         $test = new Handler_Test('process_language_setting', 'core');
         $test->post = array('save_settings' => true, 'language' => 'foo');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('en', $res->handler_response['new_user_settings']['language_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -251,7 +302,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_timezone_setting_passed() {
         $test = new Handler_Test('process_timezone_setting', 'core');
         $test->post = array('save_settings' => true, 'timezone' => 'America/Chicago');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('America/Chicago', $res->handler_response['new_user_settings']['timezone_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -260,7 +312,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_timezone_setting_failed() {
         $test = new Handler_Test('process_timezone_setting', 'core');
         $test->post = array('save_settings' => true, 'timezone' => 'foo');
-        $test->run();
+        $res = $test->run();
+        $this->assertFalse($res->handler_response['new_user_settings']['timezone_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -274,7 +327,6 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
         $test->post = array('save_settings_permanently' => 1, 'save_settings' => true, 'password' => 'foo');
         $test->run();
         $test->post = array('save_settings_permanently_then_logout' => 1, 'save_settings' => true, 'password' => 'foo');
-        $test->run();
     }
     /**
      * @preserveGlobalState disabled
