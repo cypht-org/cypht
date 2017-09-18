@@ -224,7 +224,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_all_source_max_setting() {
         $test = new Handler_Test('process_all_source_max_setting', 'core');
         $test->post = array('save_settings' => true, 'all_per_source' => 10);
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(10, $res->handler_response['new_user_settings']['all_per_source_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -233,7 +234,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_flagged_source_max_setting() {
         $test = new Handler_Test('process_flagged_source_max_setting', 'core');
         $test->post = array('save_settings' => true, 'flagged_per_source' => 10);
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(10, $res->handler_response['new_user_settings']['flagged_per_source_setting']);
     }
     /**
      * @preserveGlobalState disabled
@@ -471,7 +473,10 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_reset_search() {
         $test = new Handler_Test('reset_search', 'core');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('', $res->session->get('search_terms'));
+        $this->assertEquals(DEFAULT_SINCE, $res->session->get('search_since'));
+        $this->assertEquals(DEFAULT_SEARCH_FLD, $res->session->get('search_fld'));
     }
     /**
      * @preserveGlobalState disabled
@@ -480,7 +485,10 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_process_search_terms() {
         $test = new Handler_Test('process_search_terms', 'core');
         $test->get = array('search_terms' => 'foo', 'search_since' => '-1 week', 'search_fld' => 'BODY');
-        $test->run();
+        $res = $test->run();
+		$this->assertEquals('foo', $res->handler_response['search_terms']);
+		$this->assertEquals('-1 week', $res->handler_response['search_since']);
+		$this->assertEquals('BODY', $res->handler_response['search_fld']);
     }
 }
 class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
