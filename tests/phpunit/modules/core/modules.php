@@ -1,9 +1,5 @@
 <?php
 
-/**
- * TODO: add assertions to all tests
- */
-
 class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
@@ -322,6 +318,7 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_process_save_form() {
+        /* TODO: add assertions */
         $test = new Handler_Test('process_save_form', 'core');
         $test->run();
         $test->post = array('save_settings' => true, 'password' => 'foo');
@@ -335,6 +332,7 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_save_user_settings() {
+        /* TODO: add assertions */
         $test = new Handler_Test('save_user_settings', 'core');
         $test->run();
         $test->post = array('save_settings' => true);
@@ -347,7 +345,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_title() {
         $test = new Handler_Test('title', 'core');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('', $res->handler_response['title']);
     }
     /**
      * @preserveGlobalState disabled
@@ -355,7 +354,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_language() {
         $test = new Handler_Test('language', 'core');
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals('en', $res->handler_response['language']);
     }
     /**
      * @preserveGlobalState disabled
@@ -363,7 +363,8 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_date() {
         $test = new Handler_Test('date', 'core');
-        $test->run();
+        $res = $test->run();
+        $this->assertTrue(array_key_exists('date', $res->handler_response));
     }
     /**
      * @preserveGlobalState disabled
@@ -371,10 +372,12 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_stay_logged_in() {
         $test = new Handler_Test('stay_logged_in', 'core');
-        $test->run();
+        $res = $test->run();
+        $this->assertFalse(array_key_exists('allow_long_session', $res->handler_response));
         $test->post = array('stay_logged_in' => true);
         $test->config = array('allow_long_session' => true);
-        $test->run();
+        $res = $test->run();
+        $this->assertTrue($res->session->lifetime > 0);
     }
     /**
      * @preserveGlobalState disabled
@@ -383,11 +386,14 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_login() {
         $test = new Handler_Test('login', 'core');
         $test->input = array('create_username' => true);
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array(), Hm_Msgs::get());
         $test->input = array();
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array(), Hm_Msgs::get());
         $test->post = array('username' => 'foo', 'password' => 'bar');
         $test->run();
+        $this->assertEquals(array('ERRInvalid username or password'), Hm_Msgs::get());
     }
     /**
      * @preserveGlobalState disabled
@@ -396,7 +402,11 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_default_page_data() {
         $test = new Handler_Test('default_page_data', 'core');
         $test->config = array('single_server_mode' => true);
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array(), $res->handler_response['data_sources']);
+        $this->assertEquals('', $res->handler_response['encrypt_ajax_requests']);
+        $this->assertEquals('', $res->handler_response['encrypt_local_storage']);
+        $this->assertTrue($res->handler_response['single_server_mode']);
     }
     /**
      * @preserveGlobalState disabled
@@ -405,17 +415,21 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_load_user_data() {
         $test = new Handler_Test('load_user_data', 'core');
         $test->user_config = array('start_page_setting' => 'page=message_list&list_path=unread', 'saved_pages' => 'foo');
-        $test->run();
+        $res = $test->run();
         $test->session = array('user_data' => array('foo' => 'bar'));
-        $test->run();
+        $res = $test->run();
+        $this->assertEquals(array('start_page_setting' => 'page=message_list&list_path=unread', 'saved_pages' => 'foo'), $test->user_config);
         $test->post = array('username' => 'foo', 'password' => 'bar');
-        $test->run();
+        $res = $test->run();
+        $this->assertFalse($res->handler_response['disable_delete_prompt']);
+        $this->assertFalse($res->handler_response['is_mobile']);
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_save_user_data() {
+        /* TODO: add assertions */
         $test = new Handler_Test('save_user_data', 'core');
         $test->run();
     }
@@ -424,6 +438,7 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_logout() {
+        /* TODO: add assertions */
         $test = new Handler_Test('logout', 'core');
         $test->post = array('logout' => true);
         $test->prep();
@@ -451,6 +466,7 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_message_list_type() {
+        /* TODO: add assertions */
         $test = new Handler_Test('message_list_type', 'core');
         $test->get = array('uid' => 1, 'list_parent' => 'unread', 'list_page' => 1, 'list_path' => 'unread');
         $test->input = array('is_mobile' => true);
@@ -463,6 +479,7 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_reload_folder_cookie() {
+        /* TODO: add assertions */
         $test = new Handler_Test('reload_folder_cookie', 'core');
         $test->input = array('reload_folders' => true);
         $test->run();
@@ -491,6 +508,10 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('BODY', $res->handler_response['search_fld']);
     }
 }
+/**
+ * TODO: add assertions to all tests
+ */
+
 class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
