@@ -8,26 +8,25 @@ class LoginTests(WebTest):
     def bad_login_values(self):
         self.load()
         self.login('asdf', 'asdf')
-        self.rest()
-        self.rest()
+        self.wait()
         assert self.by_class('err') != None
 
     def missing_password(self):
         self.load()
         self.login('asdf', '')
-        self.rest()
+        self.wait()
         assert self.by_class('login_form') != None
 
     def missing_username(self):
         self.load()
         self.login('', 'asdf')
-        self.rest()
+        self.wait()
         assert self.by_class('login_form') != None
 
     def missing_username_and_password(self):
         self.load()
         self.login('', '')
-        self.rest()
+        self.wait()
         assert self.by_class('login_form') != None
 
     def bad_login_key(self):
@@ -35,18 +34,18 @@ class LoginTests(WebTest):
         hidden_el = self.by_name('hm_page_key')
         self.change_val(hidden_el, 'asdf')
         self.login(USER, PASS)
-        self.rest()
+        self.wait()
         assert self.by_class('login_form') != None
 
     def good_login(self):
         self.load()
         self.login(USER, PASS)
-        self.rest()
+        self.wait()
         assert self.by_class('content_title') != None
 
     def good_logout(self):
         self.logout()
-        self.rest()
+        self.wait()
         assert self.by_class('sys_messages').text == 'Session destroyed on logout'
 
 

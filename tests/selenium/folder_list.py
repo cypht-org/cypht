@@ -9,7 +9,7 @@ class FolderListTests(WebTest):
     def __init__(self):
         WebTest.__init__(self)
         self.login(USER, PASS)
-        self.rest()
+        self.wait()
 
     def reload_folder_list(self):
         assert self.by_class('main_menu').text == 'Main'
@@ -21,7 +21,7 @@ class FolderListTests(WebTest):
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_home')
         list_item.find_element_by_tag_name('a').click()
-        self.rest()
+        self.wait()
         assert self.by_class('content_title').text == 'Home'
 
     def collapse_section(self):
@@ -35,13 +35,13 @@ class FolderListTests(WebTest):
         list_item = self.by_class('menu_home')
         link = list_item.find_element_by_tag_name('a');
         assert link.is_displayed() == False
-        self.rest()
+        self.wait()
 
     def show_folders(self):
         self.by_class('folder_toggle').click()
         list_item = self.by_class('menu_home')
         list_item.find_element_by_tag_name('a').click()
-        self.rest()
+        self.wait()
         assert self.by_class('content_title').text == 'Home'
         self.by_css('[data-source=".main"]').click()
 

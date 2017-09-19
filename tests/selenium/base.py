@@ -11,6 +11,9 @@ import re
 from time import sleep
 from creds import SITE_URL, USER, PASS, get_driver, SLEEP_INT
 from selenium.common import exceptions
+from contextlib import contextmanager
+from selenium.webdriver.support.ui import WebDriverWait 
+from selenium.webdriver.support.expected_conditions import staleness_of
 
 INI_PATH = '../../hm3.ini'
 
@@ -79,3 +82,11 @@ class WebTest:
 
     def by_class(self, class_name):
         return self.driver.find_element_by_class_name(class_name)
+
+    @contextmanager
+    def wait(self, timeout=30):
+        old_page = self.driver.find_element_by_tag_name('html')
+        yield
+        WebDriverWait(self.browser, timeout).until(
+            staleness_of(old_page)
+        )
