@@ -90,7 +90,7 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $auth = new Hm_Auth_LDAP($this->config);
         $this->assertFalse($auth->check_credentials('any', 'thing'));
 
-        $this->config->set('ldap_auth_server', 'test');
+        $this->config->set('ldap_auth_server', 'localhost');
         $this->config->set('ldap_auth_port', 123);
         $this->config->set('ldap_auth_tls', false);
         $this->config->set('ldap_auth_base_dn', 'asdf');

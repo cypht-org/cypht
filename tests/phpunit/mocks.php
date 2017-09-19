@@ -3,6 +3,7 @@
 class Hm_Mock_Session {
     public $loaded = true;
     public $auth_state = true;
+    public $cookie_set = false;
     public $data = array();
     public $auth_failed = true;
     public function get($id, $default=false) {
@@ -37,6 +38,7 @@ class Hm_Mock_Session {
        return true; 
     }
     public function secure_cookie($request, $name, $value, $path='', $domain='') {
+        $this->cookie_set = true;
         return true;
     }
     public function auth($user, $pass) {

@@ -27,7 +27,6 @@ class Output_Test {
         $this->prep();
         return $this->run_only();
     }
-
 }
 class Handler_Test {
     public $post = array();
@@ -121,5 +120,4 @@ class Hm_IMAP_List extends Hm_Server_Wrapper {
         }
     }
 }
-
 ?>
