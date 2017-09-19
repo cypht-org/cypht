@@ -183,16 +183,47 @@ install_sodium() {
     pecl install libsodium
 }
 
-update_repos
-setup_ldap
-setup_memcached
-setup_user
-install_dovecot
-selenium_config
-setup_cypht
-install_phpunit
-install_coveralls
-install_selenium
-install_sodium
-install_apache
-bootstrap_unit_tests
+# setup just what is needed for the phpunit unit tests
+setup_unit_tests() {
+    update_repos
+    setup_ldap
+    setup_memcached
+    setup_cypht
+    install_phpunit
+    install_coveralls
+    install_sodium
+    bootstrap_unit_tests
+}
+
+# setup just what is needed for the selenium UI tests
+setup_ui_tests() {
+    update_repos
+    setup_ldap
+    setup_memcached
+    setup_cypht
+    install_sodium
+    setup_user
+    install_dovecot
+    selenium_config
+    install_selenium
+    install_apache
+}
+
+# setup both UI and unit tests
+setup_all_tests() {
+    update_repos
+    setup_ldap
+    setup_memcached
+    setup_user
+    install_dovecot
+    selenium_config
+    setup_cypht
+    install_phpunit
+    install_coveralls
+    install_selenium
+    install_sodium
+    install_apache
+    bootstrap_unit_tests
+}
+
+setup_unit_tests
