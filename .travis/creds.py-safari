@@ -20,8 +20,8 @@ def get_driver(cap):
     capabilities = {
         'browserstack.local': 'true',
         'browserstack.localIdentifier': config['id'],
-        'os': 'Windows',
-        'os_version': '10',
+        'os': 'OS X',
+        'os_version': 'Sierra',
         'browser': 'Safari',
         'resolution': '1920x1080',
         'name': config['name']
