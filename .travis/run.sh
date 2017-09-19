@@ -5,6 +5,7 @@ phpunit_tests() {
 }
 
 selenium_tests() {
+    true
     #cd tests/selenium/ && sh ./runall.sh && cd ../../
 }
 
