@@ -96,7 +96,7 @@ var display_pop3_mailbox = function(res) {
         $('.page_links').html(res.page_links);
     }
     var key = 'pop3_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
-    var data = $('.message_table tbody');
+    var data = Hm_Message_List.filter_list();
     data.find('*[style]').attr('style', '');
     Hm_Utils.save_to_local_storage(key, data.html());
 };

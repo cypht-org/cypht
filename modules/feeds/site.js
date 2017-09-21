@@ -82,7 +82,7 @@ var feeds_combined_content = function(id) {
 };
 
 var set_combined_feeds_state = function() {
-    var data = $('.message_table tbody');
+    var data = Hm_Message_List.filter_list();
     data.find('*[style]').attr('style', '');
     Hm_Utils.save_to_local_storage('formatted_feed_data', data.html());
     $('input[type=checkbox]').click(function() {
@@ -184,7 +184,7 @@ var display_feed_list = function(res) {
     var ids = [res.feed_server_ids];
     Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
     var key = 'feeds_'+res.feed_server_ids;
-    var data = $('.message_table tbody');
+    var data = Hm_Message_List.filter_list();
     data.find('*[style]').attr('style', '');
     $('.total').text($('.message_table tbody tr').length);
     Hm_Utils.save_to_local_storage(key, data.html());

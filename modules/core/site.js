@@ -328,9 +328,9 @@ function Message_List() {
     };
 
     this.set_tab_index = function() {
-        var msg_rows = Hm_Utils.tbody();
+        var msg_rows = Hm_Utils.rows();
         var count = 1;
-        $('tr', msg_rows).each(function() {
+        msg_rows.each(function() {
             $(this).attr('tabindex', count);
             count++;
         });
@@ -1223,7 +1223,7 @@ var Hm_Utils = {
         }
     },
     rows: function() {
-        return $('.message_table_body > tr');
+        return $('.message_table_body > tr').not('.inline_msg');
     },
     tbody: function() {
         return $('.message_table_body');

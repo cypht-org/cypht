@@ -30,7 +30,7 @@ var display_github_data = function(res) {
     var path = hm_list_path();
     Hm_Message_List.update([res.github_server_id], res.formatted_message_list, 'github');
     if (path != 'github_all') {
-        var data = $('.message_table tbody');
+        var data = Hm_Message_List.filter_list();
         data.find('*[style]').attr('style', '');
         Hm_Utils.save_to_local_storage(path, data.html());
     }
