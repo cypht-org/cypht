@@ -767,8 +767,20 @@ function Message_List() {
         return false;
     };
 
+    this.filter_list = function() {
+        var data = Hm_Utils.rows().clone().filter(function() {
+            if (this.className == 'inline_msg') {
+                return false;
+            }
+            return true;
+        });
+        var res = $('<tbody class="message_table_body"></tbody>');
+        data.appendTo(res);
+        return res;
+    };
+
     this.set_message_list_state = function(list_type) {
-        var data = Hm_Utils.tbody();
+        var data = this.filter_list();
         data.find('*[style]').attr('style', '');
         Hm_Utils.save_to_local_storage(list_type, data.html());
         var empty = self.check_empty_list();
@@ -1211,7 +1223,7 @@ var Hm_Utils = {
         }
     },
     rows: function() {
-        return $('.message_table_body tr');
+        return $('.message_table_body > tr');
     },
     tbody: function() {
         return $('.message_table_body');
