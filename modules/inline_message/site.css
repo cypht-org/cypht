@@ -5,6 +5,7 @@
 .close_inline_msg { float: right; margin-right: 10px; cursor: pointer;}
 .search_content .tag_icon, .search_content .add_contact_row, .message_list .tag_icon, .message_list .add_contact_row { display: none; }
 .msg_headers th, .msg_headers td{ display: table-cell; border: none; }
+.msg_headers th:hover {color: #777 !important; }
 .msg_parts th, .msg_parts td { border: none; }
 .inline_msg .msg_text, .inline_msg .msg_text_inner { min-height: 100px; }
 /*.inline_msg * { background-color: #f5f5f5; }*/
