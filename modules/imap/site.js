@@ -829,6 +829,10 @@ var imap_folder_status = function() {
     }
 };
 
+if (hm_list_path() == 'sent') {
+    Hm_Message_List.page_caches.sent = 'formatted_sent_data';
+}
+
 $(function() {
     if (hm_page_name() === 'message_list' && hm_list_path().substr(0, 4) === 'imap') {
         setup_imap_folder_page();
@@ -841,9 +845,6 @@ $(function() {
     }
     else if (hm_page_name() === 'info') {
         setTimeout(imap_status_update, 100);
-    }
-    else if (hm_list_path() == 'sent') {
-        Hm_Message_List.page_caches.sent = 'formatted_sent_data';
     }
 
     if ($('.imap_move').length > 0) {
