@@ -728,6 +728,9 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
      * Build the HTML for the add server dialog
      */
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         $count = count($this->get('pop3_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="pop3_server_setup"><div data-target=".pop3_section" class="server_section">'.
@@ -756,6 +759,9 @@ class Hm_Output_display_configured_pop3_servers extends Hm_Output_Module {
      * Build HTML for configured POP3 servers on the servers page
      */
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         $res = '';
         foreach ($this->get('pop3_servers', array()) as $index => $vals) {
 

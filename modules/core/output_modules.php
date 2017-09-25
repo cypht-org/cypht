@@ -1003,9 +1003,6 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
      * Closes the table, form and div opened in Hm_Output_start_settings_form
      */
     protected function output() {
-        if ($this->get('single_server_mode')) {
-            return '';
-        }
         return '<tr><td class="submit_cell" colspan="2">'.
             '<input class="save_settings" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
             '</td></tr></table></form></div>';
@@ -1258,9 +1255,6 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
      * Outputs links to the Servers settings pages
      */
     protected function output() {
-        if ($this->get('single_server_mode')) {
-            return;
-        }
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).'" alt="" width="16" height="16" /> ';

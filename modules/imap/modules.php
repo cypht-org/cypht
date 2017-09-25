@@ -1732,6 +1732,9 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
      * Build HTML for configured IMAP servers
      */
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
 
@@ -1814,6 +1817,9 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
      * Build the HTML for the add server dialog
      */
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         $count = count($this->get('imap_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section">'.

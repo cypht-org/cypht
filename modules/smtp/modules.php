@@ -703,6 +703,9 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
  */
 class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         $count = count($this->get('smtp_servers', array()));
         $count = sprintf($this->trans('%d configured'), $count);
         $name = '';
@@ -795,6 +798,9 @@ class Hm_Output_filter_upload_file_details extends Hm_Output_Module {
  */
 class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         $res = '';
         foreach ($this->get('smtp_servers', array()) as $index => $vals) {
 

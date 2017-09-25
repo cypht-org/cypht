@@ -244,6 +244,9 @@ class Hm_Handler_process_nux_service extends Hm_Handler_Module {
  */
 class Hm_Output_quick_add_dialog extends Hm_Output_Module {
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         return '<div class="quick_add_section">'.
             '<div class="nux_step_one">'.
             $this->trans('Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP/POP3 sections below.').
@@ -311,6 +314,9 @@ class Hm_Output_nux_help extends Hm_Output_Module {
  */
 class Hm_Output_welcome_dialog extends Hm_Output_Module {
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         $server_data = $this->get('nux_server_setup', array());
         $tz = $this->get('tzone');
         $protos = array('imap', 'pop3', 'smtp', 'feeds');
@@ -374,6 +380,9 @@ class Hm_Output_nux_message_list_notice extends Hm_Output_Module {
  */
 class Hm_Output_quick_add_section extends Hm_Output_Module {
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
             '<img src="'.Hm_Image_Sources::$circle_check.'" alt="" width="16" height="16" /> '.
             $this->trans('Add an E-mail Account').'</div>';

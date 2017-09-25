@@ -1079,7 +1079,7 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form></div>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
-        $this->assertEquals(array('single_server_mode' => true), $res->output_response);
+        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1199,9 +1199,6 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test = new Output_Test('settings_servers_link', 'core');
         $res = $test->run();
         $this->assertEquals(array('formatted_folder_list' => '<li class="menu_servers"><a class="unread_link" href="?page=servers"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M.344%200a.5.5%200%200%200-.344.5v5a.5.5%200%200%200%20.5.5h2.5v1h-1c-.55%200-1%20.45-1%201h6c0-.55-.45-1-1-1h-1v-1h2.5a.5.5%200%200%200%20.5-.5v-5a.5.5%200%200%200-.5-.5h-7a.5.5%200%200%200-.094%200%20.5.5%200%200%200-.063%200zm.656%201h6v4h-6v-4z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Servers</a></li>'), $res->output_response);
-        $test->handler_response = array('single_server_mode' => true);
-        $res = $test->run();
-        $this->assertEquals(array('single_server_mode' => 1), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

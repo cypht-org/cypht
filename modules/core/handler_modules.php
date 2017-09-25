@@ -611,7 +611,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             else {
                 $user_data = $this->session->get('user_data', array());
                 if (!empty($user_data)) {
-                    $this->user_config->reload($user_data);
+                    $this->user_config->reload($user_data, $this->session->get('username'));
                 }
                 $pages = $this->user_config->get('saved_pages', array());
                 if (!empty($pages)) {
