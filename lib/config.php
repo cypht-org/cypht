@@ -126,11 +126,18 @@ class Hm_User_Config_File extends Hm_Config {
     /* config values */
     private $site_config;
 
+    /* encrption class */
+    private $crypt_class;
+
+    /* username */
+    private $username;
+
     /**
      * Load site configuration
      * @param object $config site config
      */
     public function __construct($config) {
+        $this->crypt_class = crypt_type($config);
         $this->site_config = $config;
         $this->config = array_merge($this->config, $config->user_defaults);
     }
@@ -152,11 +159,12 @@ class Hm_User_Config_File extends Hm_Config {
      * @return void
      */
     public function load($username, $key) {
+        $this->username = $username;
         $source = $this->get_path($username);
         if (is_readable($source)) {
             $str_data = file_get_contents($source);
             if ($str_data) {
-                $data = $this->decode(Hm_Crypt::plaintext($str_data, $key));
+                $data = $this->decode($this->crypt_class::plaintext($str_data, $key));
                 if (is_array($data)) {
                     $this->config = array_merge($this->config, $data);
                     $this->set_tz();
@@ -188,8 +196,21 @@ class Hm_User_Config_File extends Hm_Config {
     public function save($username, $key) {
         $this->shuffle();
         $destination = $this->get_path($username);
-        $data = Hm_Crypt::ciphertext(json_encode($this->config), $key);
+        $data = $this->crypt_class::ciphertext(json_encode($this->config), $key);
         file_put_contents($destination, $data);
+    }
+
+    /**
+     * Set a config value
+     * @param string $name config value name
+     * @param string $value config value
+     * @return void
+     */
+    public function set($name, $value) {
+        $this->config[$name] = $value;
+        if ($this->crypt_class == 'Hm_Crypt_None') {
+            $this->save($this->username, false);
+        }
     }
 }
 
@@ -204,11 +225,18 @@ class Hm_User_Config_DB extends Hm_Config {
     /* DB connection handle */
     private $dbh;
 
+    /* encrption class */
+    private $crypt_class;
+
+    /* username */
+    private $username;
+
     /**
      * Load site config
      * @param object $config site config
      */
     public function __construct($config) {
+        $this->crypt_class = crypt_type($config);
         $this->site_config = $config;
         $this->config = array_merge($this->config, $config->user_defaults);
     }
@@ -230,7 +258,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return boolean
      */
     private function decrypt_settings($data, $key) {
-        $data = $this->decode(Hm_Crypt::plaintext($data['settings'], $key));
+        $data = $this->decode($this->crypt_class::plaintext($data['settings'], $key));
         if (is_array($data)) {
             $this->config = array_merge($this->config, $data);
             $this->set_tz();
@@ -250,6 +278,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return boolean
      */
     public function load($username, $key) {
+        $this->username = $username;
         $this->connect();
         $data = Hm_DB::execute($this->dbh, 'select * from hm_user_settings where username=?', array($username));
         if (!$data || !array_key_exists('settings', $data)) {
@@ -284,7 +313,7 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function save($username, $key) {
         $this->shuffle();
-        $config = Hm_Crypt::ciphertext(json_encode($this->config), $key);
+        $config = $this->crypt_class::ciphertext(json_encode($this->config), $key);
         $this->connect();
         if (Hm_DB::execute($this->dbh, 'update hm_user_settings set settings=? where username=?', array($config, $username))) {
             Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
@@ -292,6 +321,19 @@ class Hm_User_Config_DB extends Hm_Config {
         }
         else {
             return Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, $config));
+        }
+    }
+
+    /**
+     * Set a config value
+     * @param string $name config value name
+     * @param string $value config value
+     * @return void
+     */
+    public function set($name, $value) {
+        $this->config[$name] = $value;
+        if ($this->crypt_class == 'Hm_Crypt_None') {
+            $this->save($this->username, false);
         }
     }
 }
@@ -370,4 +412,17 @@ function load_user_config_object($config) {
             break;
     }
     return $user_config;
+}
+
+/**
+ * Determine encryption for user settings
+ * @param object $config site configuration
+ * @return string
+ */
+function crypt_type($config) {
+    if ($config->get('single_server_mode') &&
+        in_array($config->get('auth_type'), array('IMAP', 'POP3'), true)) {
+        return 'Hm_Crypt_None';
+    }
+    return 'Hm_Crypt';
 }
