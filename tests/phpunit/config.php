@@ -45,6 +45,13 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
         $this->assertFalse($this->config->get('name', false));
         $this->config->set('name', 'value');
         $this->assertEquals('value', $this->config->get('name'));
+        $mock_config = new Hm_Mock_Config();
+        $mock_config->set('single_server_mode', true);
+        $mock_config->set('auth_type', 'IMAP');
+        $config = new Hm_User_Config_File($mock_config);
+        $config->load('testuser', 'testkey');
+        $config->set('foo', 'bar');
+        $this->assertEquals('bar', $config->get('foo'));
     }
     /**
      * @preserveGlobalState disabled
@@ -149,6 +156,17 @@ class Hm_Test_Site_Config_File extends PHPUnit_Framework_TestCase {
         $config = new Hm_Site_Config_File('./data/siteconfig.rc');
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar'), $config->dump());
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_crypt_type() {
+        $site_config = new Hm_Mock_Config();
+        $this->assertEquals('Hm_Crypt', crypt_type($site_config));
+        $site_config->set('auth_type', 'IMAP');
+        $site_config->set('single_server_mode', true);
+        $this->assertEquals('Hm_Crypt_None', crypt_type($site_config));
+    }
 
     public function tearDown() {
         unset($this->config);
@@ -224,6 +242,22 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
     }
     public function tearDown() {
         unset($this->config);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_set() {
+        $site_config = new Hm_Mock_Config();
+        setup_db($site_config);
+        $user_config = new Hm_User_Config_DB($site_config);
+        $user_config->set('foo',  'bar');
+        $this->assertEquals('bar', $user_config->get('foo'));
+        $site_config->set('auth_type', 'IMAP');
+        $site_config->set('single_server_mode', true);
+        $user_config = new Hm_User_Config_DB($site_config);
+        $user_config->set('foo',  'bar');
+        $this->assertEquals('bar', $user_config->get('foo'));
     }
 }
 

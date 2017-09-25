@@ -407,7 +407,7 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_default_page_data() {
         $test = new Handler_Test('default_page_data', 'core');
-        $test->config = array('single_server_mode' => true);
+        $test->config = array('auth_type' => 'IMAP', 'single_server_mode' => true);
         $res = $test->run();
         $this->assertEquals(array(), $res->handler_response['data_sources']);
         $this->assertEquals('', $res->handler_response['encrypt_ajax_requests']);
@@ -582,6 +582,9 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test->handler_response = array('changed_settings' => array('foo', 'bar'));
         $res = $test->run();
         $this->assertEquals(array('<div class="save_reminder"><a title="You have unsaved changes" href="?page=save"><img alt="Save" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3%200v3h-2l3%203%203-3h-2v-3h-2zm-3%207v1h8v-1h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a></div>'), $res->output_response);
+        $test->handler_response = array('single_server_mode' => true);
+        $res = $test->run();
+        $this->assertEquals(array('single_server_mode' => true), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -661,6 +664,9 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test->handler_response = array('allow_long_session' => true, 'router_login_state' => false);
         $res = $test->run();
         $this->assertEquals(array('<h1 class="title"></h1> <input type="hidden" name="hm_page_key" value="" /> <label class="screen_reader" for="username">Username</label><input autofocus required type="text" placeholder="Username" id="username" name="username" value=""> <label class="screen_reader" for="password">Password</label><input required type="password" id="password" placeholder="Password" name="password"><div class="long_session"><input type="checkbox" id="stay_logged_in" value="1" name="stay_logged_in" /> <label for="stay_logged_in">Stay logged in</label></div> <input type="submit" id="login" value="Login" />'), $res->output_response);
+        $test->handler_response = array('changed_settings' => array('foo'), 'router_login_state' => true);
+        $res = $test->run();
+        $this->assertEquals(array('<input type="hidden" id="unsaved_changes" value="1" /><input type="hidden" name="hm_page_key" value="" /><div class="confirm_logout"><div class="confirm_text">Unsaved changes will be lost! Re-enter your password to save and exit. &nbsp;<a href="?page=save">More info</a></div><label class="screen_reader" for="logout_password">Password</label><input id="logout_password" name="password" class="save_settings_password" type="password" placeholder="Password" /><input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" /><input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="Just Logout" /><input class="cancel_logout save_settings" type="button" value="Cancel" /></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -893,6 +899,9 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test = new Output_Test('start_everything_settings', 'core');
         $res = $test->run();
         $this->assertEquals(array('<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v1h8v-1h-8zm0%202v5.906c0%20.06.034.094.094.094h7.813c.06%200%20.094-.034.094-.094v-5.906h-2.969v1.031h-2.031v-1.031h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="16" />Everything</td></tr>'), $res->output_response);
+        $test->handler_response = array('single_server_mode' => true);
+        $res = $test->run();
+        $this->assertEquals(array('single_server_mode' => true), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -915,6 +924,9 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test->handler_response = array('router_module_list' => array('imap'));
         $res = $test->run();
         $this->assertEquals(array('<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%201v1l4%202%204-2v-1h-8zm0%202v4h8v-4l-4%202-4-2z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="16" />All Email</td></tr>'), $res->output_response);
+        $test->handler_response = array('router_module_list' => array('imap'), 'single_server_mode' => true);
+        $res = $test->run();
+        $this->assertEquals(array('router_module_list' => array('imap'), 'single_server_mode' => true), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1065,6 +1077,9 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test = new Output_Test('end_settings_form', 'core');
         $res = $test->run();
         $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form></div>'), $res->output_response);
+        $test->handler_response = array('single_server_mode' => true);
+        $res = $test->run();
+        $this->assertEquals(array('single_server_mode' => true), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1142,6 +1157,9 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
      */
     public function test_email_menu_content() {
         $test = new Output_Test('email_menu_content', 'core');
+        $test->handler_response = array('single_server_mode' => true, 'folder_sources' => array(array('email_folders', 'baz')));
+        $res = $test->run();
+        $this->assertEquals(array('<div class="email_folders"><ul class="folders">baz</ul></div>'), $res->output_response);
         $test->handler_response = array('folder_sources' => array(array('email_folders', 'baz')));
         $res = $test->run();
         $this->assertEquals(array('<div class="src_name" data-source=".email_folders">Email<img class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="8" height="8" /></div><div style="display: none;" class="email_folders"><ul class="folders"><li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.21%200-4%201.79-4%204s1.79%204%204%204%204-1.79%204-4-1.79-4-4-4zm0%201c.333%200%20.637.086.938.188-.214.197-.45.383-.406.563.04.18.688.13.688.5%200%20.27-.425.346-.125.656.35.35-.636.978-.656%201.438-.03.83.841.969%201.531.969.424%200%20.503.195.469.438-.546.758-1.438%201.25-2.438%201.25-.378%200-.729-.09-1.063-.219.224-.442-.313-1.344-.781-1.625-.226-.226-.689-.114-.969-.219-.092-.271-.178-.545-.188-.844.031-.05.081-.094.156-.094.19%200%20.454.374.594.344.18-.04-.742-1.313-.313-1.563.2-.12.609.394.469-.156-.12-.51.366-.276.656-.406.26-.11.455-.414.125-.594l-.219-.188c.45-.27.972-.438%201.531-.438zm2.313%201.094c.184.222.323.481.438.75l-.188.219c-.29.27-.327-.212-.438-.313-.13-.11-.638.025-.688-.125-.077-.181.499-.418.875-.531z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> All</a> <span class="unread_mail_count"></span></li>baz</ul></div>'), $res->output_response);
