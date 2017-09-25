@@ -64,6 +64,9 @@ class Hm_Output_search_content_end extends Hm_Output_Module {
  */
 class Hm_Output_save_reminder extends Hm_Output_Module {
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
@@ -203,8 +206,12 @@ class Hm_Output_login extends Hm_Output_Module {
         }
         else {
             $settings = $this->get('changed_settings', array());
-            return '<input type="hidden" id="unsaved_changes" value="'.
-                (!empty($settings) ? '1' : '0').'" />'.
+            $single = $this->get('single_server_mode');
+            $changed = 0;
+            if (!$single && count($settings) > 0) {
+                $changed = 1;
+            }
+            return '<input type="hidden" id="unsaved_changes" value="'.$changed.'" />'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' &nbsp;'.
@@ -682,6 +689,9 @@ class Hm_Output_start_everything_settings extends Hm_Output_Module {
      * Setttings in this section control the Everything view
      */
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle">'.
             '<img alt="" src="'.Hm_Image_Sources::$box.'" width="16" height="16" />'.
             $this->trans('Everything').'</td></tr>';
@@ -714,6 +724,9 @@ class Hm_Output_start_all_email_settings extends Hm_Output_Module {
      */
     protected function output() {
         if (!email_is_active($this->get('router_module_list'))) {
+            return '';
+        }
+        if ($this->get('single_server_mode')) {
             return '';
         }
         return '<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle">'.
@@ -990,6 +1003,9 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
      * Closes the table, form and div opened in Hm_Output_start_settings_form
      */
     protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
         return '<tr><td class="submit_cell" colspan="2">'.
             '<input class="save_settings" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
             '</td></tr></table></form></div>';
@@ -1062,14 +1078,17 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
      */
     protected function output() {
         $email = false;
+        $single = $this->get('single_server_mode');
         if (array_key_exists('email_folders', merge_folder_list_details($this->get('folder_sources', array())))) {
             $email = true;
         }
-        $res = '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> ';
+        if (!$single) {
+            $res = '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> ';
+            }
+            $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
         }
-        $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
         $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> ';
@@ -1132,16 +1151,24 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
     protected function output() {
         $res = '';
         $folder_sources = merge_folder_list_details($this->get('folder_sources'));
+        $single = $this->get('single_server_mode');
         foreach ($folder_sources as $src => $content) {
             $parts = explode('_', $src);
             array_pop($parts);
             $name = ucwords(implode(' ', $parts));
-            $res .= '<div class="src_name" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
-                '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" /></div>';
+            if (!$single) {
+                $res .= '<div class="src_name" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
+                    '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" /></div>';
+            }
 
-            $res .= '<div style="display: none;" ';
+            if ($single) {
+                $res .= '<div ';
+            }
+            else {
+                $res .= '<div style="display: none;" ';
+            }
             $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
-            if ($name == 'Email') {
+            if ($name == 'Email' && !$single) {
                 $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> ';
