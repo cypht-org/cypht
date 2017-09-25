@@ -185,9 +185,11 @@ class Hm_User_Config_File extends Hm_Config {
     /**
      * Reload from outside input
      * @param array $data new user data
+     * @param string $username
      * @return void
      */
-    public function reload($data) {
+    public function reload($data, $username=false) {
+        $this->username = $username;
         $this->config = $data;
         $this->set_tz();
     }
@@ -305,9 +307,11 @@ class Hm_User_Config_DB extends Hm_Config {
     /**
      * Reload from outside input
      * @param array $data new user data
+     * @param string $username
      * @return void
      */
-    public function reload($data) {
+    public function reload($data, $username=false) {
+        $this->username = $username;
         $this->config = $data;
         $this->set_tz();
     }
@@ -437,7 +441,7 @@ function load_user_config_object($config) {
 /**
  * Determine encryption for user settings
  * @param object $config site configuration
- * @return string
+ * @return boolean
  */
 function crypt_state($config) {
     if ($config->get('single_server_mode') &&
