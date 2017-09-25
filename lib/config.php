@@ -126,8 +126,8 @@ class Hm_User_Config_File extends Hm_Config {
     /* config values */
     private $site_config;
 
-    /* encrption class */
-    private $crypt_class;
+    /* encrption flag */
+    private $crypt;
 
     /* username */
     private $username;
@@ -137,7 +137,7 @@ class Hm_User_Config_File extends Hm_Config {
      * @param object $config site config
      */
     public function __construct($config) {
-        $this->crypt_class = crypt_type($config);
+        $this->crypt = crypt_state($config);
         $this->site_config = $config;
         $this->config = array_merge($this->config, $config->user_defaults);
     }
@@ -164,7 +164,12 @@ class Hm_User_Config_File extends Hm_Config {
         if (is_readable($source)) {
             $str_data = file_get_contents($source);
             if ($str_data) {
-                $data = $this->decode($this->crypt_class::plaintext($str_data, $key));
+                if (!$this->crypt) {
+                    $data = $this->decode($str_data);
+                }
+                else {
+                    $data = $this->decode(Hm_Crypt::plaintext($str_data, $key));
+                }
                 if (is_array($data)) {
                     $this->config = array_merge($this->config, $data);
                     $this->set_tz();
@@ -196,7 +201,12 @@ class Hm_User_Config_File extends Hm_Config {
     public function save($username, $key) {
         $this->shuffle();
         $destination = $this->get_path($username);
-        $data = $this->crypt_class::ciphertext(json_encode($this->config), $key);
+        if (!$this->crypt) {
+            $data = json_encode($this->config);
+        }
+        else {
+            $data = Hm_Crypt::ciphertext(json_encode($this->config), $key);
+        }
         file_put_contents($destination, $data);
     }
 
@@ -208,7 +218,7 @@ class Hm_User_Config_File extends Hm_Config {
      */
     public function set($name, $value) {
         $this->config[$name] = $value;
-        if ($this->crypt_class == 'Hm_Crypt_None') {
+        if (!$this->crypt) {
             $this->save($this->username, false);
         }
     }
@@ -226,7 +236,7 @@ class Hm_User_Config_DB extends Hm_Config {
     private $dbh;
 
     /* encrption class */
-    private $crypt_class;
+    private $crypt;
 
     /* username */
     private $username;
@@ -236,7 +246,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * @param object $config site config
      */
     public function __construct($config) {
-        $this->crypt_class = crypt_type($config);
+        $this->crypt = crypt_state($config);
         $this->site_config = $config;
         $this->config = array_merge($this->config, $config->user_defaults);
     }
@@ -258,7 +268,12 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return boolean
      */
     private function decrypt_settings($data, $key) {
-        $data = $this->decode($this->crypt_class::plaintext($data['settings'], $key));
+        if (!$this->crypt) {
+            $data = $this->decode($data['settings']);
+        }
+        else {
+            $data = $this->decode(Hm_Crypt::plaintext($data['settings'], $key));
+        }
         if (is_array($data)) {
             $this->config = array_merge($this->config, $data);
             $this->set_tz();
@@ -313,7 +328,12 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function save($username, $key) {
         $this->shuffle();
-        $config = $this->crypt_class::ciphertext(json_encode($this->config), $key);
+        if (!$this->crypt) {
+            $config = json_encode($this->config);
+        }
+        else {
+            $config = Hm_Crypt::ciphertext(json_encode($this->config), $key);
+        }
         $this->connect();
         if (Hm_DB::execute($this->dbh, 'update hm_user_settings set settings=? where username=?', array($config, $username))) {
             Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
@@ -332,7 +352,7 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function set($name, $value) {
         $this->config[$name] = $value;
-        if ($this->crypt_class == 'Hm_Crypt_None') {
+        if (!$this->crypt) {
             $this->save($this->username, false);
         }
     }
@@ -419,10 +439,10 @@ function load_user_config_object($config) {
  * @param object $config site configuration
  * @return string
  */
-function crypt_type($config) {
+function crypt_state($config) {
     if ($config->get('single_server_mode') &&
         in_array($config->get('auth_type'), array('IMAP', 'POP3'), true)) {
-        return 'Hm_Crypt_None';
+        return false;
     }
-    return 'Hm_Crypt';
+    return true;
 }

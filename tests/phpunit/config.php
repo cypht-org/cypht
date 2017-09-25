@@ -69,6 +69,8 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get() {
+        $this->config->reload(array('foo' => 'bar'));
+        $this->config->save('testuser', 'testkey');
         $this->config->load('testuser', 'testkey');
         $this->assertEquals('default', $this->config->get('asdf', 'default'));
         $this->assertEquals('bar', $this->config->get('foo', 'default'));
@@ -156,18 +158,6 @@ class Hm_Test_Site_Config_File extends PHPUnit_Framework_TestCase {
         $config = new Hm_Site_Config_File('./data/siteconfig.rc');
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar'), $config->dump());
     }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_crypt_type() {
-        $site_config = new Hm_Mock_Config();
-        $this->assertEquals('Hm_Crypt', crypt_type($site_config));
-        $site_config->set('auth_type', 'IMAP');
-        $site_config->set('single_server_mode', true);
-        $this->assertEquals('Hm_Crypt_None', crypt_type($site_config));
-    }
-
     public function tearDown() {
         unset($this->config);
     }
@@ -210,6 +200,11 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $user_config->reload(array());
         $user_config->load(uniqid(), 'blah');
         $this->assertEquals(array(), $user_config->dump());
+        $site_config->set('auth_type', 'IMAP');
+        $site_config->set('single_server_mode', true);
+        $user_config = new Hm_User_Config_DB($site_config);
+        $user_config->load('testuser', 'testkey');
+        $this->assertTrue(array_key_exists('version', $user_config->dump()));
     }
     /**
      * @preserveGlobalState disabled
@@ -240,14 +235,11 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $this->assertEquals(1, $user_config->save(uniqid(), 'testkey'));
         //$this->assertFalse($user_config->save(NULL, 'blah'));
     }
-    public function tearDown() {
-        unset($this->config);
-    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_set() {
+    public function test_db_set() {
         $site_config = new Hm_Mock_Config();
         setup_db($site_config);
         $user_config = new Hm_User_Config_DB($site_config);
@@ -258,6 +250,9 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $user_config = new Hm_User_Config_DB($site_config);
         $user_config->set('foo',  'bar');
         $this->assertEquals('bar', $user_config->get('foo'));
+    }
+    public function tearDown() {
+        unset($this->config);
     }
 }
 
@@ -279,7 +274,19 @@ class Hm_Test_User_Config_Functions extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Hm_User_Config_File', get_class(load_user_config_object($mock_config)));
         $mock_config->set('user_config_type', 'DB');
         $this->assertEquals('Hm_User_Config_DB', get_class(load_user_config_object($mock_config)));
-   }
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_crypt_state() {
+        $site_config = new Hm_Mock_Config();
+        $this->assertTrue(crypt_state($site_config));
+        $site_config->set('auth_type', 'IMAP');
+        $site_config->set('single_server_mode', true);
+        $this->assertFalse(crypt_state($site_config));
+    }
+
     public function tearDown() {
         unset($this->config);
     }
