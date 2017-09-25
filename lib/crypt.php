@@ -291,3 +291,15 @@ class Hm_Crypt_Base {
         return $res;
     }
 }
+
+/**
+ * Stub for single server mode
+ */
+class Hm_Crypt_None {
+    public static function plaintext($string, $key=false) {
+        return $string;
+    }
+    public static function ciphertext($string, $key=false) {
+        return $string;
+    }
+}
