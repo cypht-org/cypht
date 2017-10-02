@@ -239,7 +239,7 @@ class Hm_IMAP_Base {
             $n++;
 
             /* if we loose connection to the server while reading terminate */
-            if (!is_resource($this->handle) || feof($this->handle)) {
+            if (Hm_Functions::stream_ended($this->handle)) {
                 break;
             }
 

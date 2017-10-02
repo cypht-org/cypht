@@ -176,5 +176,28 @@ if (!class_exists('Hm_Functions')) {
         public static function filter_input_array($type, $filters) {
             return filter_input_array($type, $filters, false);
         }
+
+        /**
+         * @param string $server host to connect to
+         * @param integer $port port to connect to
+         * @param integer $errno error number
+         * @param string $errstr error string
+         * @param integer $mode connection mode
+         * @param object $ctx context
+         */
+        public static function stream_socket_client($server, $port, &$errno, &$errstr, $timeout, $mode, $ctx) {
+            return @stream_socket_client($server.':'.$port, $errno, $errstr, $timeout, $mode, $ctx);
+        }
+
+        /**
+         * @param resource $resource socket connection
+         * @return boolean
+         */
+        public static function stream_ended($resource) {
+            if (!is_resource($resource) || feof($resource)) {
+                return true;
+            }
+            return false;
+        }
     }
 }
