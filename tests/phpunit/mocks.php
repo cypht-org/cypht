@@ -135,59 +135,125 @@ class Hm_Mock_Request {
         $this->type = $type;
     }
 }
+class Fake_Server {
+    protected $position;
+    protected $response = '';
+    function stream_open($path, $mode, $options, &$opened) {
+        $this->position = 0;
+        return true;
+    }
+    function stream_read($count) {
+        $this->position += strlen($this->response);
+        return $this->response;
+    }
+    function stream_write($data) {
+        return strlen($data);
+    }
+    function stream_tell() {
+        return $this->position;
+    }
+    function stream_seek() {
+        $this->position = 0;
+        return true;
+    }
+    function stream_metadata($path, $option, $var) {
+        return true;
+    }
+    function stream_eof() {
+        $res = $this->position >= strlen($this->response);
+        return $res;
+    }
+}
+class Fake_IMAP_Server extends Fake_Server {
+    function stream_write($data) {
+        switch (trim($data)) {
+            case 'A1 CAPABILITY':
+                $this->response = "* CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE AUTH=PLAIN\r\n";
+                break;
+            case 'A2 LOGIN "testuser" "testpass"':
+                $this->response = "A2 OK [CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE] Logged in\r\n";
+                break;
+            case 'A4 ENABLE CONDSTORE QRESYNC':
+                $this->response = "* ENABLED CONDSTORE\r\nA4 OK Enabled (0.001 + 0.000 secs).\r\n";
+                break;
+        }
+        $this->stream_seek(0, SEEK_SET);
+        return strlen($data);
+    }
+}
+
+
 class Hm_Functions {
-        public static $rand_bytes = 'good';
-        public static $memcache = true;
-        public static $exists = true;
-        public static $exec_res = '{"unit":"test"}';
-        public static $filter_failure = false;
-        public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
-        public static function header($header) { return true; }
-        public static function cease() { return true; }
-        public static function session_start() { $_SESSION['data'] = 'AT1R5eVsyEauGR/stxOdA7f1OaxFr7p8vhE9j/JfwQwX2Jk7RQh4PoS1t1/baEG9jvuF2Y5UmDPjt6/Hd0ESWfbh4uI80xlvd1+Vt1rXtQU1mIJ+c+W0zRgdXPTTjkoZwSk7CFxCqNbYUviCkpxnNYXlZc9aEl9hgERkStY3u6phskJtoy6+MWo8dB+btO0PulIqXNz6WEBnuWa0/KHrelM2O/6N+9sdANg2CNUYo2ZsOtOZ4jEF9G27qZM2ILlnXwa1HCRDYByzmvk4Teg+PA=='; }
-        public static function session_destroy() { return true; }
-        public static function error_log($str=true) { return $str; }
-        public static function c_init() { return true; }
-        public static function c_setopt() { return true; }
-        public static function c_exec() { return self::$exec_res; }
-        public static function function_exists($func) {
-            if ((float) substr(phpversion(), 0, 3) < 5.6) {
-                return false;
-            }
-            return self::$exists;
+    public static $rand_bytes = 'good';
+    public static $memcache = true;
+    public static $exists = true;
+    public static $exec_res = '{"unit":"test"}';
+    public static $filter_failure = false;
+    public static $no_stream = false;
+    public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
+    public static function header($header) { return true; }
+    public static function cease() { return true; }
+    public static function session_start() { $_SESSION['data'] = 'AT1R5eVsyEauGR/stxOdA7f1OaxFr7p8vhE9j/JfwQwX2Jk7RQh4PoS1t1/baEG9jvuF2Y5UmDPjt6/Hd0ESWfbh4uI80xlvd1+Vt1rXtQU1mIJ+c+W0zRgdXPTTjkoZwSk7CFxCqNbYUviCkpxnNYXlZc9aEl9hgERkStY3u6phskJtoy6+MWo8dB+btO0PulIqXNz6WEBnuWa0/KHrelM2O/6N+9sdANg2CNUYo2ZsOtOZ4jEF9G27qZM2ILlnXwa1HCRDYByzmvk4Teg+PA=='; }
+    public static function session_destroy() { return true; }
+    public static function error_log($str=true) { return $str; }
+    public static function c_init() { return true; }
+    public static function c_setopt() { return true; }
+    public static function c_exec() { return self::$exec_res; }
+    public static function function_exists($func) {
+        if ((float) substr(phpversion(), 0, 3) < 5.6) {
+            return false;
         }
-        public static function class_exists($func) { return self::$exists; }
-        public static function memcached() { return self::$memcache ? new Hm_Mock_Memcached() : new Hm_Mock_Memcached_No(); }
-        public static function random_bytes($size) {
-            if (self::$rand_bytes == 'good') {
-                return random_bytes($size);
-            }
-            else if (self::$rand_bytes == 'bad') {
-                throw(new Error());
-            }
-            else if (self::$rand_bytes == 'ugly') {
-                throw(new Exception());
-            }
+        return self::$exists;
+    }
+    public static function class_exists($func) { return self::$exists; }
+    public static function memcached() { return self::$memcache ? new Hm_Mock_Memcached() : new Hm_Mock_Memcached_No(); }
+    public static function random_bytes($size) {
+        if (self::$rand_bytes == 'good') {
+            return random_bytes($size);
+        $imap = new Hm_IMAP();
         }
-        public static function filter_input_array($type, $filters) {
-            if (self::$filter_failure) {
-                return false;
-            }
-            switch ($type) {
-            case INPUT_SERVER:
-                return filter_var_array($_SERVER, $filters, false);
-                break;
-            case INPUT_POST:
-                return filter_var_array($_POST, $filters, false);
-                break;
-            case INPUT_GET:
-                return filter_var_array($_GET, $filters, false);
-                break;
-            case INPUT_COOKIE:
-                return filter_var_array($_COOKIE, $filters, false);
-                break;
-            }
+        else if (self::$rand_bytes == 'bad') {
+            throw(new Error());
         }
+        else if (self::$rand_bytes == 'ugly') {
+            throw(new Exception());
+        }
+    }
+    public static function filter_input_array($type, $filters) {
+        if (self::$filter_failure) {
+            return false;
+        }
+        switch ($type) {
+        case INPUT_SERVER:
+            return filter_var_array($_SERVER, $filters, false);
+            break;
+        case INPUT_POST:
+            return filter_var_array($_POST, $filters, false);
+            break;
+        case INPUT_GET:
+            return filter_var_array($_GET, $filters, false);
+            break;
+        case INPUT_COOKIE:
+            return filter_var_array($_COOKIE, $filters, false);
+            break;
+        }
+    }
+    public static function stream_socket_client($server, $port, &$errno, &$errstr, $timeout, $mode, $ctx) {
+        if (self::$no_stream) {
+            return false;
+        }
+        if (!in_array('foo', stream_get_wrappers(), true)) {
+            stream_wrapper_register('foo', 'Fake_IMAP_Server');
+        }
+        return fopen('foo://', 'w+');
+    }
+    public static function stream_ended($resource) {
+        if (!is_resource($resource) || feof($resource)) {
+            rewind($resource);
+            return true;
+        }
+        return false;
+    }
 }
 
 function setup_db($config) {

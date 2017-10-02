@@ -67,13 +67,15 @@ class Hm_Server_Wrapper {
     }
 }
 
-class Hm_IMAP {
-    static public $allow_connection = true;
-    static public $allow_auth = true;
-    private $connected = false;
-    public function get_state() { if (self::$allow_auth) { return $this->connected ? 'authenticated' : false; } return 'connected'; }
-    public function connect() { if (self::$allow_connection) { $this->connected = true; return true; } return false; }
-    public function show_debug() {}
+if (!defined("IMAP_TEST")) {
+    class Hm_IMAP {
+        static public $allow_connection = true;
+        static public $allow_auth = true;
+        private $connected = false;
+        public function get_state() { if (self::$allow_auth) { return $this->connected ? 'authenticated' : false; } return 'connected'; }
+        public function connect() { if (self::$allow_connection) { $this->connected = true; return true; } return false; }
+        public function show_debug() {}
+    }
 }
 
 class Hm_POP3 {
@@ -83,6 +85,5 @@ class Hm_POP3 {
     public function auth() { if (self::$allow_auth) { return true; } return false; }
     public function puke() {}
 }
-
 
 ?>
