@@ -171,7 +171,10 @@ class Fake_IMAP_Server extends Fake_Server {
                 $this->response = "* CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE AUTH=PLAIN\r\n";
                 break;
             case 'A2 LOGIN "testuser" "testpass"':
-                $this->response = "A2 OK [CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE] Logged in\r\n";
+                $this->response = "A2 OK [CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT ".
+                    "SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE ".
+                    "UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT ".
+                    "SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE] Logged in\r\n";
                 break;
             case 'A4 ENABLE CONDSTORE QRESYNC':
                 $this->response = "* ENABLED CONDSTORE\r\nA4 OK Enabled (0.001 + 0.000 secs).\r\n";
@@ -181,8 +184,6 @@ class Fake_IMAP_Server extends Fake_Server {
         return strlen($data);
     }
 }
-
-
 class Hm_Functions {
     public static $rand_bytes = 'good';
     public static $memcache = true;
@@ -193,7 +194,9 @@ class Hm_Functions {
     public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $html_only='') { return true; }
     public static function header($header) { return true; }
     public static function cease() { return true; }
-    public static function session_start() { $_SESSION['data'] = 'AT1R5eVsyEauGR/stxOdA7f1OaxFr7p8vhE9j/JfwQwX2Jk7RQh4PoS1t1/baEG9jvuF2Y5UmDPjt6/Hd0ESWfbh4uI80xlvd1+Vt1rXtQU1mIJ+c+W0zRgdXPTTjkoZwSk7CFxCqNbYUviCkpxnNYXlZc9aEl9hgERkStY3u6phskJtoy6+MWo8dB+btO0PulIqXNz6WEBnuWa0/KHrelM2O/6N+9sdANg2CNUYo2ZsOtOZ4jEF9G27qZM2ILlnXwa1HCRDYByzmvk4Teg+PA=='; }
+    public static function session_start() { $_SESSION['data'] = 'AT1R5eVsyEauGR/stxOdA7f1OaxFr7p8vhE9j/JfwQwX2Jk7RQh4PoS1t1'.
+        '/baEG9jvuF2Y5UmDPjt6/Hd0ESWfbh4uI80xlvd1+Vt1rXtQU1mIJ+c+W0zRgdXPTTjkoZwSk7CFxCqNbYUviCkpxnNYXlZc9aEl9hgERkStY3u6phsk'.
+        'Jtoy6+MWo8dB+btO0PulIqXNz6WEBnuWa0/KHrelM2O/6N+9sdANg2CNUYo2ZsOtOZ4jEF9G27qZM2ILlnXwa1HCRDYByzmvk4Teg+PA=='; }
     public static function session_destroy() { return true; }
     public static function error_log($str=true) { return $str; }
     public static function c_init() { return true; }
@@ -255,7 +258,6 @@ class Hm_Functions {
         return false;
     }
 }
-
 function setup_db($config) {
     $config->set('db_connection_type', 'host');
     $config->set('db_socket', '/tmp/test.db');
@@ -273,7 +275,9 @@ function filters() {
         'allowed_pages' => array('test'),
         'allowed_post' => array('bar' => FILTER_VALIDATE_INT),
         'allowed_output' => array(),
-        'allowed_server' => array('REQUEST_METHOD' => FILTER_SANITIZE_STRING, 'REQUEST_SCHEME' => FILTER_SANITIZE_STRING, 'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING, 'HTTPS' => FILTER_SANITIZE_STRING, 'HTTP_X_REQUESTED_WITH' => FILTER_SANITIZE_STRING, 'REQUEST_URI' => FILTER_SANITIZE_STRING),
+        'allowed_server' => array('REQUEST_METHOD' => FILTER_SANITIZE_STRING, 'REQUEST_SCHEME' => FILTER_SANITIZE_STRING,
+            'HTTP_USER_AGENT' => FILTER_SANITIZE_STRING, 'HTTPS' => FILTER_SANITIZE_STRING,
+            'HTTP_X_REQUESTED_WITH' => FILTER_SANITIZE_STRING, 'REQUEST_URI' => FILTER_SANITIZE_STRING),
         'allowed_get' => array('foo' => FILTER_UNSAFE_RAW),
         'allowed_cookie' => array()
     );
