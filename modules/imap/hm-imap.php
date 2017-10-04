@@ -1683,9 +1683,22 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * output IMAP session debug info
      * @param bool $full flag to enable full IMAP response display
      * @param bool $return flag to return the debug results instead of printing them
+     * @param bool $list flag to return array
      * @return void/string 
      */
-    public function show_debug($full=false, $return=false) {
+    public function show_debug($full=false, $return=false, $list=false) {
+        if ($list) {
+            if ($full) {
+                return array(
+                    'debug' => $this->debug,
+                    'commands' => $this->commands,
+                    'responses' => $this->responses
+                );
+            }
+            else {
+                return array_merge($this->debug, $this->commands);
+            }
+        }
         $res = sprintf("\nDebug %s\n", print_r(array_merge($this->debug, $this->commands), true));
         if ($full) {
             $res .= sprintf("Response %s", print_r($this->responses, true));
