@@ -161,6 +161,7 @@ class Hm_POP3_Base {
      * @return bool
      */
     public function connect() {
+        /* TODO update to use stream_socket_client */
         if ($this->ssl) {
             $this->server = 'tls://'.$this->server;
         } 
