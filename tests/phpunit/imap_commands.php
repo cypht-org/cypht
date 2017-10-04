@@ -45,11 +45,26 @@ return array(
         "* STATUS INBOX (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
         "A6 OK List completed (0.005 + 0.000 + 0.004 secs).\r\n",
 
-    'A7 LSUB "" "*" RETURN (CHILDREN STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' =>
+    'A6 LSUB "" "*" RETURN (CHILDREN STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' =>
         "* LSUB (\NoInferiors \UnMarked \Sent) \"/\" Sent\r\n".
         "* STATUS Sent (MESSAGES 0 RECENT 0 UIDNEXT 1 UIDVALIDITY 1474301542 UNSEEN 0)\r\n".
         "* A7 OK Lsub completed (0.005 + 0.000 + 0.004 secs).\r\n",
 
     'A5 NAMESPACE' =>
         "* NAMESPACE ((\"\" \"/\")) NIL NIL\r\nA5 OK Namespace completed (0.001 + 0.000 secs).\r\n",
+
+    'A5 STATUS "INBOX" (UNSEEN UIDVALIDITY UIDNEXT MESSAGES RECENT)' =>
+        "* STATUS INBOX (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
+        "A5 OK Status completed (0.001 + 0.000 secs).\r\n",
+
+    'A6 SELECT "INBOX"' =>
+        "* FLAGS (\Answered \Flagged \Deleted \Seen \Draft)\r\n".
+        "* OK [PERMANENTFLAGS (\Answered \Flagged \Deleted \Seen \Draft \*)] Flags permitted.\r\n".
+        "* 93 EXISTS\r\n".
+        "* 0 RECENT\r\n".
+        "* OK [UIDVALIDITY 1422554786] UIDs valid\r\n".
+        "* OK [UIDNEXT 1736] Predicted next UID\r\n".
+        "* OK [HIGHESTMODSEQ 91323] Highest\r\n".
+        "A6 OK [READ-WRITE] Select completed (0.001 + 0.000 secs).\r\n",
+
 );
