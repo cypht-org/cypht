@@ -239,8 +239,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $cram1 = 'AUTHENTICATE CRAM-MD5'."\r\n";
                 $this->send_command($cram1);
                 $response = $this->get_response();
-                $challenge = base64_decode(substr(trim($response), 1));
-                $pass .= str_repeat(chr(0x00), (64-strlen($password)));
+                $challenge = base64_decode(substr(trim($response[0]), 1));
+                $pass = str_repeat(chr(0x00), (64-strlen($password)));
                 $ipad = str_repeat(chr(0x36), 64);
                 $opad = str_repeat(chr(0x5c), 64);
                 $digest = bin2hex(pack("H*", md5(($pass ^ $opad).pack("H*", md5(($pass ^ $ipad).$challenge)))));
@@ -333,8 +333,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
             $this->debug['CAPS'] = $this->capability;
             $this->parse_extensions_from_capability();
-            return $this->capability;
         }
+        return $this->capability;
     }
 
     /**
