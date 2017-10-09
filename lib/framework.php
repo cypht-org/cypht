@@ -199,5 +199,12 @@ if (!class_exists('Hm_Functions')) {
             }
             return false;
         }
+        /**
+         * @param resource $socket socket connection to flip to TLS
+         * @return boolean
+         */
+        public static function stream_socket_enable_crypto($socket, $type) {
+            return stream_socket_enable_crypto($socket, true, $type);
+        }
     }
 }
