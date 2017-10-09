@@ -302,7 +302,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             if (!empty($response)) {
                 $end = array_pop($response);
                 if (substr($end, 0, strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
-                    stream_socket_enable_crypto($this->handle, true, get_tls_stream_type());
+                    Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type());
                 }
                 else {
                     $this->debug[] = 'Unexpected results from STARTTLS: '.implode(' ', $response);
@@ -820,6 +820,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      */
     public function get_message_structure($uid) {
         $result = $this->get_raw_bodystructure($uid);
+        if (count($result) == 0) {
+            return $result;
+        }
         $struct = $this->parse_bodystructure_response($result);
         return $struct;
     }
