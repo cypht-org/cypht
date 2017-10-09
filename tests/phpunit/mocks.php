@@ -175,8 +175,10 @@ class Fake_Server {
 }
 class Fake_IMAP_Server extends Fake_Server {
     public $command_responses;
+    public static $custom_responses = array();
     function __construct() {
-        $this->command_responses = require_once('imap_commands.php');
+        $this->command_responses = require 'imap_commands.php';
+        $this->command_responses = array_merge($this->command_responses, self::$custom_responses);
     }
     function error_resp($data) {
         $bits = explode(' ', $data);
@@ -258,6 +260,9 @@ class Hm_Functions {
             return true;
         }
         return false;
+    }
+    public static function stream_socket_enable_crypto($socket, $type) {
+        return true;
     }
 }
 function setup_db($config) {
