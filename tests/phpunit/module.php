@@ -141,14 +141,18 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
      */
     public function test_validate_origin() {
         $this->assertFalse($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
+        $this->handler_mod->session->loaded = true;
+        $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://localhost';
+        $this->handler_mod->request->server['HTTP_HOST'] = 'localhost';
+        $this->assertTrue($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
         $this->handler_mod->session->loaded = false;
         $this->assertTrue($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
         $this->handler_mod->session->loaded = true;
         $this->handler_mod->request->server['HTTP_ORIGIN'] = 'asdf';
         $this->handler_mod->request->server['HTTP_HOST'] = 'localhost';
         $this->assertFalse($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
-        $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://localhost';
-        $this->assertTrue($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
+        $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://localhost:123';
+        $this->assertFalse($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
         $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://otherhost';
         $this->assertFalse($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
         $this->handler_mod->config->set('cookie_domain', 'none');

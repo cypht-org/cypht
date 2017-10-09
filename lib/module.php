@@ -266,7 +266,15 @@ trait Hm_Handler_Validate {
      */
     private function validate_source($target, $source, $session, $request) {
         $source = parse_url($source);
-        if (!is_array($source) || !array_key_exists('host', $source) || $source['host'] !== $target) {
+        if (!is_array($source) || !array_key_exists('host', $source)) {
+            $session->destroy($request);
+            Hm_Debug::add('LOGGED OUT: invalid source origin');
+            return false;
+        }
+        if (array_key_exists('port', $source)) {
+            $source['host'] .= ':'.$source['port'];
+        }
+        if ($source['host'] !== $target) {
             $session->destroy($request);
             Hm_Debug::add('LOGGED OUT: invalid source origin');
             return false;

@@ -337,6 +337,9 @@ abstract class Hm_Session {
         if (!$domain) {
             $domain = $this->cookie_domain($request);
         }
+        if (preg_match("/:\d+$/", $domain, $matches)) {
+            $domain = str_replace($matches[0], '', $domain);
+        }
         return array($path, $domain, $html_only);
     }
 

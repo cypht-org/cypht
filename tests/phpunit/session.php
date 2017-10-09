@@ -495,6 +495,7 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $request->tls = true;
         $request->path = 'test';
         $this->assertTrue($session->secure_cookie($request, 'name', 'value'));
+        $this->assertTrue($session->secure_cookie($request, 'name', 'value', '/', 'http://localhost:123'));
         $session->destroy($request);
     }
     /**
