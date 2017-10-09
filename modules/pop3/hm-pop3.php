@@ -161,12 +161,12 @@ class Hm_POP3_Base {
      * @return bool
      */
     public function connect() {
-        /* TODO update to use stream_socket_client */
         if ($this->ssl) {
             $this->server = 'tls://'.$this->server;
         } 
         $this->debug[] = 'Connecting to '.$this->server.' on port '.$this->port;
-        $this->handle = @fsockopen($this->server, $this->port, $errorno, $errorstr, 30);
+        $ctx = stream_context_create();
+        $this->handle = Hm_Functions::stream_socket_client($this->server, $this->port, $errorno, $errorstr, 30, STREAM_CLIENT_CONNECT, $ctx);
         if (is_resource($this->handle)) {
             $this->debug[] = 'Successfully opened port to the POP3 server';
             $this->connected = true;
@@ -535,7 +535,7 @@ class Hm_POP3 extends Hm_POP3_Base {
         if ($this->starttls) {
             $this->send_command('STLS');
             if ($this->is_error($this->get_response()) == false && is_resource($this->handle)) {
-                stream_socket_enable_crypto($this->handle, true, get_tls_stream_type());
+                Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type());
             }
         }
         if (!$this->no_apop && preg_match('/<[0-9.]+@[^>]+>/', $this->banner, $matches)) {
