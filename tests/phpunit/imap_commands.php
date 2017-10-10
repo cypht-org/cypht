@@ -38,11 +38,15 @@ return array(
         "* LIST (\NoInferiors \UnMarked \Sent) \"/\" Sent\r\n".
         "A6 OK List completed (0.003 + 0.000 + 0.002 secs).\r\n",
 
-    'A6 LIST "" "*" RETURN (CHILDREN STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' => 
+    'A6 LIST "" "*" RETURN (CHILDREN STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' =>
+        "* LIST (\NoInferiors \UnMarked \Noselect) \"/\" Sent\r\n".
+        "* STATUS Sent (MESSAGES 0 RECENT 0 UIDNEXT 1 UIDVALIDITY 1474301542 UNSEEN 0)\r\n".
         "* LIST (\NoInferiors \UnMarked) \"/\" Sent\r\n".
         "* STATUS Sent (MESSAGES 0 RECENT 0 UIDNEXT 1 UIDVALIDITY 1474301542 UNSEEN 0)\r\n".
-        "* LIST (\HasNoChildren) \"/\" INBOX\r\n".
+        "* LIST (\HasChildren) \"/\" INBOX\r\n".
         "* STATUS INBOX (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
+        "* LIST (\HasNoChildren) \"/\" INBOX/test\r\n".
+        "* STATUS INBOX/test (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
         "A6 OK List completed (0.005 + 0.000 + 0.004 secs).\r\n",
 
     'A6 LSUB "" "*" RETURN (CHILDREN STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' =>
@@ -123,4 +127,56 @@ return array(
         ")\r\n".
         "A5 OK Fetch completed (0.001 + 0.000 secs).\r\n",
 
+    'A5 UID SEARCH (ALL) ALL BODY "debian" NOT DELETED NOT HEADER X-Auto-Bcc cypht' =>
+        "* SEARCH 23 34 43 47 1680 1682 1683 1684 1685 1689 1690 1700 1701 1702 1705 1709 1715 1716 1717 1719 1720 1721 1724 1725 1726 1727 1730 1731 1732\r\n".
+        "A5 OK Search completed (0.007 + 0.000 + 0.006 secs).\r\n",
+
+    'A6 UID SEARCH (ALL) UID 1680,1682 BODY "debian" NOT DELETED NOT HEADER X-Auto-Bcc cypht' =>
+        "* SEARCH 1680 1682\r\n".
+        "A5 OK Search completed (0.007 + 0.000 + 0.006 secs).\r\n",
+
+    'A5 UID FETCH 1731 (FLAGS BODY[HEADER])' =>
+        "* 92 FETCH (UID 1731 FLAGS (\Seen) BODY[HEADER] {623}\r\n".
+        "Return-path: <root@shop.jackass.com>\r\n".
+        "Envelope-to: root@shop.jackass.com\r\n".
+        "Delivery-date: Tue, 02 May 2017 16:32:24 -0500\r\n".
+        "Received: from root by shop with local (Exim 4.89)\r\n".
+        "        (envelope-from <root@shop.jackass.com>)\r\n".
+        "        id 1d5fPE-0005Vm-8L\r\n".
+        "        for root@shop.jackass.com; Tue, 02 May 2017 16:32:24 -0500\r\n".
+        "Auto-Submitted: auto-generated\r\n".
+        "Subject: =?utf-8?q?apt-listchanges=3A_news_for_shop?=\r\n".
+        "To: root@shop.jackass.com\r\n".
+        "MIME-Version: 1.0\r\n".
+        "Content-Type: text/plain; charset=\"utf-8\"\r\n".
+        "Content-Transfer-Encoding: 7bit\r\n".
+        "Message-Id: <E1d5fPE-0005Vm-8L@shop>\r\n".
+        "From: root <root@shop.jackass.com>\r\n".
+        "Date: Tue, 02 May 2017 16:32:24 -0500\r\n".
+        ")\r\n".
+        "A5 OK Fetch completed (0.001 + 0.000 secs).\r\n",
+
+    'A5 UID FETCH 1731 BODY[1]' =>
+            "* 92 FETCH (UID 1731 BODY[1] {1317}\r\n",
+
+    'A5 UID FETCH 1:* (FLAGS BODY.PEEK[HEADER.FIELDS (DATE)])' =>
+
+        "* 1 FETCH (UID 4 FLAGS (\Seen) BODY[HEADER.FIELDS (DATE)] {41}\r\n".
+        "Date: Thu, 29 Jan 2015 11:56:27 -0600\r\n".
+        "\r\n".
+        ")\r\n".
+        "* 93 FETCH (UID 1732 FLAGS (\Seen) BODY[HEADER.FIELDS (DATE)] {41}\r\n".
+        "Date: Thu, 11 May 2017 14:28:40 -0500\r\n".
+        "\r\n".
+        ")\r\n".
+        "A5 OK Fetch completed (0.004 + 0.000 + 0.003 secs).\r\n",
+
+    'A5 CREATE "foo"' =>
+        "A5 OK Create completed (0.004 + 0.000 + 0.003 secs).\r\n",
+
+    'A5 RENAME "foo" "bar"' =>
+        "A5 OK Rename completed (0.003 + 0.000 + 0.002 secs).\r\n",
+
+    'A5 DELETE "bar"' =>
+        "A5 OK Delete completed (0.003 + 0.000 + 0.002 secs).\r\n",
 );
