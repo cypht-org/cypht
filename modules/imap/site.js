@@ -149,6 +149,9 @@ var imap_delete_message = function(state) {
             {'name': 'folder', 'value': detail.folder}],
             function(res) {
                 if (!res.imap_delete_error) {
+                    if (Hm_Utils.get_from_global('msg_uid', false)) {
+                        return;
+                    }
                     var nlink = $('.nlink');
                     if (nlink.length) {
                         window.location.href = nlink.attr('href');

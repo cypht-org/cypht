@@ -90,6 +90,18 @@ var get_inline_msg_details = function(link) {
     return [uid, list_path];
 };
 
+var msg_inline_close = function() {
+    $('.refresh_link').trigger('click');
+    if (inline_msg_style() == 'right') {
+        $('.msg_text').remove();
+        $('.message_table').css('width', '100%');
+    }
+    else {
+        $('.inline_msg').remove();
+    }
+    $('tr').removeClass('hl');
+};
+
 var capture_subject_click = function() {
     $('a', $('.subject')).off('click');
     $('a', $('.subject')).click(function(e) {
@@ -98,22 +110,13 @@ var capture_subject_click = function() {
         var list_path = msg_details[1];
         var inline_msg_loaded_callback = function() {
             $('.header_subject th').append('<span class="close_inline_msg">X</span>');
-            $('.close_inline_msg').click(function() {
-                Hm_Message_List.load_sources();
-                if (inline_msg_style() == 'right') {
-                    $('.msg_text').remove();
-                    $('.message_table').css('width', '100%');
-                }
-                else {
-                    $('.inline_msg').remove();
-                }
-                $('tr').removeClass('hl');
-            });
+            $('.close_inline_msg').click(function() { msg_inline_close(); });
             $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
         };
 
         if (list_path && uid) {
             var details = Hm_Utils.parse_folder_path(list_path);
+            globals.msg_uid = uid;
             if (details['type'] == 'feeds') {
                 inline_feed_msg(uid, list_path, inline_msg_loaded_callback);
                 return false;
@@ -146,9 +149,9 @@ $(function() {
             setTimeout(capture_subject_click, 100);
             $('tr').removeClass('hl');
             Hm_Ajax.add_callback_hook('*', capture_subject_click);
+            Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
             if (hm_list_path().substr(0, 4) === 'imap') {
                 Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
-                $('.refresh_link').click(function() { select_imap_folder(hm_list_path(), capture_subject_click); });
             }
         }
     }

@@ -502,7 +502,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_page_name = function() { return "'.$this->html_safe($this->get('router_page_name')).'"; };'.
             'var hm_list_path = function() { return "'.$this->html_safe($this->get('list_path', '')).'"; };'.
             'var hm_list_parent = function() { return "'.$this->html_safe($this->get('list_parent', '')).'"; };'.
-            'var hm_msg_uid = function() { return "'.$this->html_safe($this->get('uid', '')).'"; };'.
+            'var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", "'.$this->html_safe($this->get('uid', '')).'"); };'.
             'var hm_encrypt_ajax_requests = function() { return "'.$this->html_safe($this->get('encrypt_ajax_requests', '')).'"; };'.
             'var hm_encrypt_local_storage = function() { return "'.$this->html_safe($this->get('encrypt_local_storage', '')).'"; };'.
             'var hm_flag_image_src = function() { return "'.Hm_Image_Sources::$star.'"; };'.
