@@ -20,9 +20,16 @@ class Hm_Profiles {
     }
 
     public function load($hmod) {
-        $this->data = $hmod->user_config->get('profiles', array());
+        $this->load_new($hmod);
         if (count($this->data) == 0) {
             $this->load_legacy($hmod);
+        }
+    }
+
+    public function load_new($hmod) {
+        $profiles = $hmod->user_config->get('profiles', array());
+        foreach ($profiles as $profile) {
+            $this->data[] = $profile;
         }
     }
 
@@ -38,9 +45,9 @@ class Hm_Profiles {
         if (!array_key_exists($id, $this->data)) {
             return false;
         }
-        foreach ($this->data as $id => $vals) {
+        foreach ($this->data as $p_id => $vals) {
             if ($vals['default']) {
-                $this->data[$id]['default'] = false;
+                $this->data[$p_id]['default'] = false;
             }
         }
         $this->data[$id]['default'] = true;
