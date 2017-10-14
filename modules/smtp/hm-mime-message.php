@@ -181,8 +181,7 @@ class Hm_MIME_Msg {
         $lines = explode("\n", $message);
         $new_lines = array();
         foreach($lines as $line) {
-            $line = trim($line, "\r\n")."\r\n";
-            $new_lines[] = preg_replace("/^\.\r\n/", "..\r\n", $line);
+            $new_lines[] = trim($line, "\r\n")."\r\n";
         }
         return $this->qp_encode(implode('', $new_lines));
     }
@@ -232,7 +231,7 @@ class Hm_MIME_Msg {
     }
 
     function qp_encode($string) {
-        return quoted_printable_encode($string);
+        return str_replace('.', '=2E', quoted_printable_encode($string));
     }
 }
 
