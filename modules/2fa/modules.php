@@ -20,14 +20,21 @@ class Hm_Handler_process_enable_2fa extends Hm_Handler_Module {
             process_site_setting('2fa_backup_codes', $this, 'backup_2fa_callback', false, false);
             $this->session->set('2fa_confirmed', true);
         }
-        $secret = get_2fa_key($this->config);
+        list($secret, $simple) = get_2fa_key($this->config);
         if ($secret) {
+            if ($simple) {
+                $len = 15;
+            }
+            else {
+                $len = 64;
+            }
             $username = $this->session->get('username', false);
-            $secret = base32_encode_str(create_secret($secret, $username));
+            $secret = base32_encode_str(create_secret($secret, $username, $len));
             $app_name = $this->config->get('app_name', 'Cypht');
             $uri = sprintf('otpauth://totp/%s:%s?secret=%s&issuer=%s', $app_name, $username, $secret, $app_name);
             $this->out('2fa_png_path', generate_qr_code($this->config, $username, $uri));
             $this->out('2fa_backup_codes', backup_codes($this->user_config));
+            $this->out('2fa_secret', $secret);
         }
     }
 }
@@ -43,7 +50,7 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
             return;
         }
 
-        $secret = get_2fa_key($this->config);
+        list($secret, $simple) = get_2fa_key($this->config);
         if (!$secret) {
             Hm_Debug::add('2FA module set enabled, but no shared secret configured');
             return;
@@ -61,8 +68,14 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
         $passed = false;
         $backup_codes = $this->user_config->get('2fa_backup_codes_setting', array());
         if (array_key_exists('2fa_code', $this->request->post)) {
+            if ($simple) {
+                $len = 15;
+            }
+            else {
+                $len = 64;
+            }
             $username = $this->session->get('username', false);
-            $secret = create_secret($secret, $username);
+            $secret = create_secret($secret, $username, $len);
             if (check_2fa_pin($this->request->post['2fa_code'], $secret)) {
                 $passed = true;
             }
@@ -121,6 +134,8 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
 
             $qr_code .= '<img alt="" width="128" height="128" src="data:image/png;base64,'.base64_encode($png).'" />';
             $qr_code .= '</td></tr>';
+            $qr_code .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</td></tr>';
+            $qr_code .= '<tr class="tfa_setting"><td></td><td>'.wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true).'</td></tr>';
         }
         else {
             $qr_code .= '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
@@ -197,10 +212,15 @@ function check_2fa_pin($pin, $secret, $pass_len=6) {
  */
 function get_2fa_key($config) {
     $settings = get_ini($config, '2fa.ini');
+    $secret = false;
+    $simple = false;
     if (array_key_exists('2fa_secret', $settings)) {
-        return $settings['2fa_secret'];
+        $secret = $settings['2fa_secret'];
     }
-    return false;
+    if (array_key_exists('2fa_simple', $settings)) {
+        $simple = $settings['2fa_simple'];
+    }
+    return array($secret, $simple);
 }
 
 /**
@@ -224,8 +244,8 @@ function generate_qr_code($config, $username, $str) {
 /**
  * @subpackage 2fa/functions
  */
-function create_secret($key, $user) {
-    return Hm_Crypt::pbkdf2($key, $user, 64, 256, 'sha512');
+function create_secret($key, $user, $len) {
+    return Hm_Crypt::pbkdf2($key, $user, $len, 256, 'sha512');
 }
 
 /**

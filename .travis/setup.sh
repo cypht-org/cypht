@@ -180,7 +180,8 @@ install_coveralls() {
 install_sodium() {
     sudo apt-get install libsodium-dev -y
     pecl channel-update pecl.php.net
-    pecl install libsodium
+    pecl uninstall libsodium
+    pecl install libsodium-2.0.7
 }
 
 # setup just what is needed for the phpunit unit tests
