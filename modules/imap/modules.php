@@ -409,17 +409,21 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                                 header('Content-Type: '.$part_struct['type'].'/'.$part_struct['subtype'].$charset);
                                 header('Content-Transfer-Encoding: binary');
                                 ob_end_clean();
+                                $output_line = '';
                                 while($line = $imap->read_stream_line()) {
                                     if ($encoding == 'quoted-printable') {
-                                        echo quoted_printable_decode($line);
+                                        $line = quoted_printable_decode($line);
                                     }
                                     elseif ($encoding == 'base64') {
-                                        echo base64_decode($line);
+                                        $line = base64_decode($line);
                                     }
-                                    else {
-                                        echo $line;
-                                    }
+                                    echo $output_line;
+                                    $output_line = $line;
                                 }
+                                if ($part_struct['type'] == 'text') {
+                                    $output_line = preg_replace("/\)(\r\n)$/m", '$1', $output_line);
+                                }
+                                echo $output_line;
                                 Hm_Functions::cease();
                             }
                         }
