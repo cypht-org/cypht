@@ -314,7 +314,7 @@ function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $htm
     if (array_key_exists('type', $struct) && array_key_exists('subtype', $struct)) {
         $type = strtolower($struct['type']).strtolower($struct['subtype']);
     }
-    if ($html) {
+    if ($html == 1) {
         $msg = format_reply_as_html($body, $type, $reply_type, $lead_in);
     }
     else {

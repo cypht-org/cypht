@@ -19,3 +19,8 @@
 .draft_title { position: absolute; top: 10px; right: 10px; }
 .draft_list a { font-size: 115%; padding-right: 10px; }
 .draft_list img { float: right; opacity: .4; vertical-align: -3px; cursor: pointer; }
+.CodeMirror { border: solid 1px #ddd; border-top: none; margin-left: 5px; border-radius: 0px 0px 3px 3px; width: 100%; }
+.editor-toolbar * { border: none !important; }
+.editor-toolbar { margin-left: 5px; margin-top: 10px; border: solid 1px #ccc; width: 100%; border-radius: 3px 3px 0px 0px; }
+.editor-statusbar { border-top: none !important; }
+.editor-toolbar:before, .editor-toolbar:after { background: none !important; background-color: none !important; }

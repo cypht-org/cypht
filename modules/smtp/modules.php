@@ -434,6 +434,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $smtp_id = server_from_compose_smtp_id($form['compose_smtp_id']);
         $to = $form['compose_to'];
         $subject = $form['compose_subject'];
+        $body_type = $this->get('smtp_compose_type', 0);
         $draft = array(
             'draft_to' => $form['compose_to'],
             'draft_body' => '',
@@ -442,7 +443,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         );
 
         /* msg details */
-        list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft);
+        list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
 
         /* smtp server details */
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
@@ -471,8 +472,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* build message */
-        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $this->get('smtp_compose_type', 0),
-            $cc, $bcc, $in_reply_to, $from_name, $reply_to);
+        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $body_type, $cc, $bcc, $in_reply_to, $from_name, $reply_to);
 
         /* add attachments */
         $mime->add_attachments(get_uploaded_files($form['draft_id'], $this->session));
@@ -682,8 +682,14 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             '</div><div id="bcc_contacts"></div><input value="'.$this->html_safe($subject).
             '" required name="compose_subject" class="compose_subject" type="text" placeholder="'.
             $this->trans('Subject').'" /><textarea id="compose_body" name="compose_body" class="compose_body">'.
-            $this->html_safe($body).'</textarea><table class="uploaded_files">';
-
+            $this->html_safe($body).'</textarea>';
+        if ($html == 2) {
+            $res .= '<link href="modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
+                '<script type="text/javascript" src="modules/smtp/assets/markdown/editor.js"></script>'.
+                '<script type="text/javascript" src="modules/smtp/assets/markdown/marked.js"></script>'.
+                '<script type="text/javascript">var editor = new Editor(); editor.render();</script>';
+        }
+        $res .= '<table class="uploaded_files">';
         foreach ($files as $file) {
             $res .= format_attachment_row($file, $this);
         }
@@ -757,7 +763,11 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if ($selected == 1) {
             $res .= 'selected="selected" ';
         }
-        $res .= 'value="1">'.$this->trans('HTML').'</option></select></td></tr>';
+        $res .= 'value="1">'.$this->trans('HTML').'</option><option ';
+        if ($selected == 2) {
+            $res .= 'selected="selected" ';
+        }
+        $res .= 'value="2">'.$this->trans('Markdown').'</option></select></td></tr>';
         return $res;
     }
 }
@@ -1124,7 +1134,7 @@ function attach_file($content, $file, $filepath, $draft_id, $mod) {
 /**
  * @subpackage smtp/functions
  */
-function get_outbound_msg_detail($post, $draft) {
+function get_outbound_msg_detail($post, $draft, $body_type) {
     $body = '';
     $cc = '';
     $bcc = '';
@@ -1145,6 +1155,11 @@ function get_outbound_msg_detail($post, $draft) {
     if (array_key_exists('compose_in_reply_to', $post)) {
         $in_reply_to = $post['compose_in_reply_to'];
         $draft['draft_in_reply_to'] = $post['compose_in_reply_to'];
+    }
+    if ($body_type == 2) {
+        require_once APP_PATH.'third_party/Parsedown.php';
+        $parsedown = new Parsedown();
+        $body = $parsedown->text($body);
     }
     return array($body, $cc, $bcc, $in_reply_to, $draft);
 }
