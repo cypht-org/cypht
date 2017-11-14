@@ -30,3 +30,4 @@ textarea { font-size: 100%; }
 .hl { background-color: #222; }
 .draft_list { background-color: #222; }
 .list_controls { background: none !important; }
+.editor-toolbar a { color: #fff !important; }

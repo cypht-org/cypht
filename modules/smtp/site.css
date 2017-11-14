@@ -24,4 +24,3 @@
 .editor-toolbar { z-index: 0; margin-left: 5px; margin-top: 10px; border: solid 1px #ccc; width: 100%; border-radius: 3px 3px 0px 0px; }
 .editor-statusbar { border-top: none !important; }
 .editor-toolbar:before, .editor-toolbar:after { background: none !important; }
-.editor-toolbar a { z-index: 0; }
