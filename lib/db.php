@@ -77,9 +77,11 @@ class Hm_DB {
      * @param object|false $dbh PDO connection object
      * @param string $sql sql with placeholders to execute
      * @param array $args values to insert into the sql
+     * @param bool $type optional type of sql query
+     * @param bool $all optional flag to return multiple rows
      * @return boolean|integer|array
      */
-    static public function execute($dbh, $sql, $args, $type=false) {
+    static public function execute($dbh, $sql, $args, $type=false, $all=false) {
         if (!$dbh) {
             return false;
         }
@@ -90,7 +92,13 @@ class Hm_DB {
         if (!$sql || !$sql->execute($args)) {
             return false;
         }
-        return $type == 'modify' || $type == 'insert' ? $sql->rowCount() : $sql->fetch();
+        if ($type == 'modify' || $type == 'insert') {
+            return $sql->rowCount();
+        }
+        if ($all) {
+            return $sql->fetchAll(PDO::FETCH_ASSOC);
+        }
+        return $sql->fetch(PDO::FETCH_ASSOC);
     }
 
     /**
