@@ -5,3 +5,6 @@
 .create_account_link { margin-left: 120px; float: left; clear: left; font-size: 115%; padding: 5px; }
 .change_pass { margin-left: 20px; margin-top: 20px; }
 .change_pass input { margin-bottom: 20px; }
+.user_list { padding-left: 40px; padding-top: 20px; }
+.user_list td {padding-bottom: 10px; }
+.user_list .user_delete { cursor: pointer; margin-right: 10px; }

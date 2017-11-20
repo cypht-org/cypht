@@ -6,10 +6,13 @@ handler_source('account');
 output_source('account');
 
 /* create account page */
-setup_base_page('create_account', 'core');
-add_handler('create_account', 'process_create_account', true, 'account', 'login', 'after');
-add_handler('create_account', 'check_internal_users', true, 'account', 'login', 'after');
-add_output('create_account', 'create_form', true, 'account', 'content_section_start', 'after');
+setup_base_page('accounts', 'core');
+add_handler('accounts', 'process_create_account', true, 'account', 'login', 'after');
+add_handler('accounts', 'process_delete_account', true, 'account', 'process_create_account', 'after');
+add_handler('accounts', 'check_internal_users', true, 'account', 'login', 'after');
+add_handler('accounts', 'account_list', true, 'account', 'check_internal_users', 'after');
+add_output('accounts', 'create_form', true, 'account', 'content_section_start', 'after');
+add_output('accounts', 'user_list', true, 'account', 'create_form', 'after');
 
 setup_base_page('change_password', 'core');
 add_handler('change_password', 'process_change_password', true, 'account', 'load_user_data', 'after');
@@ -24,13 +27,14 @@ add_output('ajax_hm_folders', 'change_password_link', true, 'account', 'settings
 /* input/output */
 return array(
     'allowed_pages' => array(
-        'create_account',
+        'accounts',
         'change_password'
     ),
     'allowed_post' => array(
         'create_username' => FILTER_SANITIZE_STRING,
         'create_password' => FILTER_UNSAFE_RAW,
         'create_password_again' => FILTER_UNSAFE_RAW,
+        'delete_username' => FILTER_SANITIZE_STRING,
         'new_pass1' => FILTER_UNSAFE_RAW,
         'new_pass2' => FILTER_UNSAFE_RAW,
         'old_pass' => FILTER_UNSAFE_RAW,
