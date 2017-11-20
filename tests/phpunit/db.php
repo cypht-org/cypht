@@ -43,6 +43,7 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
         $this->assertFalse(Hm_DB::execute($db, 'asdfasdfasdf', array()));
         $this->assertFalse(Hm_DB::execute(false, 'iasdfasdfasdf', array()));
         $this->assertEquals(0, Hm_DB::execute($db, 'update hm_user set username=foo where username=bar', array()));
+        $this->assertTrue(count(Hm_DB::execute($db, 'select * from hm_user', array(), false, true)) > 0);
     }
     /**
      * @preserveGlobalState disabled
