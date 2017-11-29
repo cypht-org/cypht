@@ -340,6 +340,9 @@ function list_sources($sources, $output_mod) {
         if (array_key_exists('group', $src) && $src['group'] == 'background') {
             continue;
         }
+        if (array_key_exists('nodisplay', $src) && $src['nodisplay']) {
+            continue;
+        }
         if ($src['type'] == 'imap' && !array_key_exists('folder', $src)) {
             $folder = '_INBOX';
         }
