@@ -816,7 +816,7 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            if (hex2bin($folder) == 'INBOX') {
+            if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
                 list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, array(hex2bin($folder)), $limit, array('SINCE' => $date), true);
             }
             else {
@@ -2266,19 +2266,15 @@ function imap_sent_sources($callback, $configured, $inbox) {
         if (array_key_exists('hide', $vals) && $vals['hide']) {
             continue;
         }
-        if ($inbox) {
+        if (array_key_exists($index, $configured) && array_key_exists('sent', $configured[$index]) && $configured[$index]['sent']) {
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex($configured[$index]['sent']), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+        }
+        elseif ($inbox) {
             $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
-        if (!array_key_exists($index, $configured)) {
-            continue;
+        else {
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex('SPECIAL_USE_CHECK'), 'nodisplay' => true, 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
-        if (!array_key_exists('sent', $configured[$index])) {
-            continue;
-        }
-        if (!$configured[$index]['sent']) {
-            continue;
-        }
-        $sources[] = array('callback' => $callback, 'folder' => bin2hex($configured[$index]['sent']), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
     }
     return $sources;
 }
@@ -2793,6 +2789,9 @@ function merge_imap_search_results($ids, $search_type, $session, $config, $folde
                 if (array_key_exists('sent', $sent_folder)) {
                     list($sent_status, $sent_results) = merge_imap_search_results($ids, $search_type, $session, $config, array($sent_folder['sent']), $limit, $terms, false);
                     $status = array_merge($status, $sent_status);
+                }
+                if ($folder == 'SPECIAL_USE_CHECK') {
+                    continue;
                 }
             }
             if ($imap->select_mailbox($folder)) {
