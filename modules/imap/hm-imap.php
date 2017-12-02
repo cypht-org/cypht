@@ -1033,7 +1033,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $command .= 'RETURN ('.implode(' ', $valid).') ';
             }
         }
-        $command .= '('.$target.')'.$charset.$uids.$fld."\r\n";
+        $command .= $charset.'('.$target.') '.$uids.$fld."\r\n";
         $cache = $this->check_cache($command);
         if ($cache !== false) {
             return $cache;
