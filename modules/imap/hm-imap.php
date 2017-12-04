@@ -1006,9 +1006,17 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             $charset = ' ';
         }
         if (!empty($terms)) {
+            $search_key = false;
+            $search_lit = false;
             $flds = array();
             foreach ($terms as $fld => $term) {
-                $flds[] = $fld.' "'.str_replace('"', '\"', $term).'"';
+                if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'), true)) {
+                    $search_key = $fld;
+                    $search_lit = $term;
+                }
+                else {
+                    $flds[] = $fld.' "'.str_replace('"', '\"', $term).'"';
+                }
             }
             $fld = ' '.implode(' ', $flds);
         }
@@ -1033,12 +1041,24 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $command .= 'RETURN ('.implode(' ', $valid).') ';
             }
         }
-        $command .= $charset.'('.$target.') '.$uids.$fld."\r\n";
-        $cache = $this->check_cache($command);
+        $cache_command = $command.$charset.'('.$target.') '.$uids.$fld.' '.$search_key.' '.$search_lit."\r\n";
+        $cache = $this->check_cache($cache_command);
         if ($cache !== false) {
             return $cache;
         }
-        $this->send_command($command);
+        if (!$search_lit) {
+            $command .= $charset.'('.$target.') '.$uids.$fld."\r\n";
+            $this->send_command($command);
+        }
+        else {
+            $command .= $charset.'('.$target.') '.$uids.$fld.' '.$search_key.' {'.strlen($search_lit)."}\r\n";
+            $this->send_command($command);
+            $lit_res = $result = $this->fgets(1024);
+            if (substr($lit_res, 0, 1) != '+') {
+                return array();
+            }
+            $this->send_command($search_lit."\r\n", true);
+        }
         $result = $this->get_response(false, true);
         $status = $this->check_response($result, true);
         $res = array();
@@ -1061,7 +1081,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             if ($esearch_enabled) {
                 $res = $esearch_res;
             }
-            return $this->cache_return_val($res, $command);
+            return $this->cache_return_val($res, $cache_command);
         }
         return $res;
     }
