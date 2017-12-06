@@ -80,7 +80,7 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
                     $server = Hm_IMAP_List::dump($id, true);
                 }
             }
-            $url = 'https://www.google.com/m8/feeds/contacts/'.$server['user'].'/full';
+            $url = 'https://www.google.com/m8/feeds/contacts/'.$server['user'].'/full?max-results=500';
             $contacts = parse_contact_xml(gmail_contacts_request($server['pass'], $url), $server['name']);
             if (count($contacts) > 0) {
                 $contact_store->import($contacts);

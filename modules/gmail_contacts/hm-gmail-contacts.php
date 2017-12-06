@@ -17,6 +17,7 @@ class Hm_Gmail_Contact_XML {
     private $misc_tag_name = false;
     private $results = array();
     private $xml_parser = false;
+    private $current;
     private $xml = false;
     private $index = 0;
     private $xml_support = false;
@@ -28,7 +29,7 @@ class Hm_Gmail_Contact_XML {
             return;
         }
         $this->xml_support = true;
-        $this->xml_parser = xml_parser_create( 'UTF-8');
+        $this->xml_parser = xml_parser_create('UTF-8');
         xml_set_object($this->xml_parser, $this);
         xml_set_element_handler($this->xml_parser, 'xml_start_element', 'xml_end_element');
         xml_set_character_data_handler($this->xml_parser, 'xml_character_data');
@@ -41,6 +42,7 @@ class Hm_Gmail_Contact_XML {
     }
     public function xml_start_element($parser, $tagname, $attrs) {
         $this->all_fields = false;
+        $this->current = false;
         if ($tagname == 'ENTRY') {
             if (!array_key_exists($this->index, $this->results)) {
                 $this->results[$this->index] = array();
@@ -66,15 +68,22 @@ class Hm_Gmail_Contact_XML {
         if ($tagname == 'ENTRY') {
             $this->index++;
         }
+        $this->current = false;
+        $this->collect = false;
     }
     public function xml_character_data($parser, $data) {
         if ($this->collect) {
-            $this->results[$this->index]['display_name'] = $data;
-            $this->collect = false;
+            if ($this->current) {
+                $this->results[$this->index]['display_name'] .= $data;
+            }
+            else {
+                $this->results[$this->index]['display_name'] = $data;
+            }
         }
         elseif ($this->all_fields && trim($data)) {
             $this->results[$this->index]['all_fields'][$this->misc_tag_name] = $data;
         }
+        $this->current = true;
     }
 }
 
