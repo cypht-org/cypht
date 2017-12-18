@@ -114,31 +114,30 @@ class Hm_MIME_Msg {
         $this->headers['X-Auto-Bcc'] = 'cypht';
     }
 
-    /**
-     * TODO: refactor this
-     */
     function encode_header_fld($input, $email=true) {
         $res = array();
         $input = trim($input, ',; ');
-        $parts[] = $input;
+        $parts = explode(' ', $input);
         foreach ($parts as $v) {
             if (preg_match('/(?:[^\x00-\x7F])/',$v) === 1) {
                 $leading_quote = false;
                 $trailing_quote = false;
-                if (substr($v, 0, 1) == '"') {
+                if (substr($v, 0, 1) == '"' || substr($v, 0, 1) == "'") {
+                    $quote = substr($v, 0, 1);
                     $v = substr($v, 1);
                     $leading_quote = true;
                 }
-                if (substr($v, -1) == '"') {
+                if (substr($v, -1) == '"' || substr($v, -1) == "'") {
+                    $quote = substr($v, -1);
                     $trailing_quote = true;
                     $v = substr($v, 0, -1);
                 }
                 $enc_val = '=?UTF-8?B?'.base64_encode($v).'?=';
                 if ($leading_quote) {
-                    $enc_val = '"'.$enc_val;
+                    $enc_val = $quote.$enc_val;
                 }
                 if ($trailing_quote) {
-                    $enc_val = $enc_val.'"';
+                    $enc_val = $enc_val.$quote;
                 }
                 $res[] = $enc_val;
             }
