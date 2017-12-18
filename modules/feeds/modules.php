@@ -262,6 +262,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 }
             }
             if (!$cache) {
+                # TODO: fix potential warning about feed_data
                 feed_memcached_save($this->config, $feed_data, $res);
             }
             $this->out('feed_list_data', $res);
