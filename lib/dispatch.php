@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Process a page request
+ * Deal with redirects
  * @package framework
  * @subpackage dispatch
  */
@@ -143,7 +143,10 @@ trait Hm_Dispatch_Redirect {
 
 /**
  * Page request router that ties all the framework peices together
+ * @package framework
+ * @subpackage dispatch
  */
+
 class Hm_Dispatch {
 
     use Hm_Dispatch_Redirect;

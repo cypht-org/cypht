@@ -59,6 +59,8 @@ trait Hm_Session_Auth {
 
 /**
  * PHP session data methods
+ * @package framework
+ * @subpackage session
  */
 abstract class Hm_PHP_Session_Data extends Hm_Session {
 
@@ -150,6 +152,8 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
 
 /**
  * PHP Sessions that extend the base session class
+ * @package framework
+ * @subpackage session
  */
 class Hm_PHP_Session extends Hm_PHP_Session_Data {
 

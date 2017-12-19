@@ -109,6 +109,11 @@ trait Hm_Server_Connect {
     }
 }
 
+/**
+ * Server list manager
+ * @package framework
+ * @subpackage servers
+ */
 trait Hm_Server_Modify {
 
     /**
@@ -160,6 +165,8 @@ trait Hm_Server_Modify {
 
 /**
  * Struct that makes it easy for a module set to manage a list of server connections
+ * @package framework
+ * @subpackage servers
  */
 trait Hm_Server_List {
 

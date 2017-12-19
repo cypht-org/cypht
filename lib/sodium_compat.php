@@ -44,6 +44,10 @@ class Hm_Sodium_PECL {
     }
 }
 
+/**
+ * @package framework
+ * @subpackage crypt
+ */
 class Hm_Sodium_PHP {
     public static function crypto_auth_verify($hmac, $crypt_string, $crypt_key) {
         return sodium_crypto_auth_verify($hmac, $crypt_string, $crypt_key);

@@ -18,6 +18,8 @@
  * DB or Memcached classes, or the base session class. In this example we just
  * defer to the PHP session class methods.
  *
+ * @package modules
+ * @subpackage site
  */
 class Custom_Session extends Hm_PHP_Session {
 
@@ -108,6 +110,8 @@ class Custom_Session extends Hm_PHP_Session {
  *
  * This example extends the auth DB class, and simply defers the parent class
  * method
+ * @package modules
+ * @subpackage site
  */
 class Custom_Auth extends Hm_Auth_DB {
 
