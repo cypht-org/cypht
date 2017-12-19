@@ -166,6 +166,7 @@ class Hm_Output_nasa_folders extends Hm_Output_Module {
 /**
  * @subpackage nasa/functions
  */
+if (!hm_exists('apod_date_form')) {
 function apod_date_form($date, $output_mod) {
     $next = '';
     if (strtotime(date('Y-m-d')) > strtotime($date)) {
@@ -182,4 +183,5 @@ function apod_date_form($date, $output_mod) {
     }
     $res .= '</form>';
     return $res;
-}
+}}
+

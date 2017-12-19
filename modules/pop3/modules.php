@@ -1000,6 +1000,7 @@ class Hm_Output_filter_pop3_status_data extends Hm_Output_Module {
  * @param string $list_parent list type
  * @return array
  */
+if (!hm_exists('format_pop3_message_list')) {
 function format_pop3_message_list($msg_list, $output_module, $style, $login_time, $list_parent) {
     $res = array();
     $show_icons = $output_module->get('msg_list_icons');
@@ -1077,7 +1078,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
         }
     }
     return $res;
-}
+}}
 
 /**
  * Search a POP3 message
@@ -1088,6 +1089,7 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
  * @param string $fld field to search
  * @return bool
  */
+if (!hm_exists('search_pop3_msg')) {
 function search_pop3_msg($body, $headers, $terms, $fld) {
     if ($fld == 'TEXT') {
         if (stristr($body, $terms)) {
@@ -1104,21 +1106,24 @@ function search_pop3_msg($body, $headers, $terms, $fld) {
             return true;
         }
     }
-}
+}}
 
 /**
  * @subpackage pop3/functions
  */
+if (!hm_exists('bust_pop3_cache')) {
 function bust_pop3_cache($session, $config, $id) {
     $key = hash('sha256', (sprintf('pop3%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
     $memcache = new Hm_Memcached($config);
     $memcache->set($key, array(), 1, $session->enc_key);
     Hm_Debug::add('Busted POP3 cache for id '.$id);
-}
+}}
 
 /**
  * @subpackage pop3/functions
  */
+if (!hm_exists('pop3_authed')) {
 function pop3_authed($pop3) {
     return is_object($pop3) && $pop3->state == 'authed';
-}
+}}
+

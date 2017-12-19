@@ -884,6 +884,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('smtp_server_dropdown')) {
 function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
     $res = '<select name="compose_smtp_id" class="compose_server">';
     $profiles = array();
@@ -941,7 +942,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
     }
     $res .= '</select>';
     return $res;
-}
+}}
 
 /**
  * Check for and do an Oauth2 token reset if needed
@@ -949,8 +950,8 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
  * @param object $config site config object
  * @return mixed
  */
+if (!hm_exists('smtp_refresh_oauth2_token')) {
 function smtp_refresh_oauth2_token($server, $config) {
-
     if (array_key_exists('expiration', $server) && (int) $server['expiration'] <= time()) {
         $oauth2_data = get_oauth2_data($config);
         $details = array();
@@ -966,13 +967,13 @@ function smtp_refresh_oauth2_token($server, $config) {
         }
     }
     return array();
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('delete_uploaded_files')) {
 function delete_uploaded_files($session, $draft_id=false, $filename=false) {
-
     $files = $session->get('uploaded_files', array());
     $deleted = 0;
     foreach ($files as $id => $file_list) {
@@ -996,22 +997,24 @@ function delete_uploaded_files($session, $draft_id=false, $filename=false) {
     }
     $session->set('uploaded_files', $files);
     return $deleted;
-}
+}}
 
 /**
  * @subpackage/functions
  */
+if (!hm_exists('get_uploaded_files')) {
 function get_uploaded_files($id, $session) {
     $files = $session->get('uploaded_files', array());
     if (array_key_exists($id, $files)) {
         return $files[$id];
     }
     return array();
-}
+}}
 
 /**
  * @subpackage/functions
  */
+if (!hm_exists('save_uploaded_file')) {
 function save_uploaded_file($id, $atts, $session) {
     $files = $session->get('uploaded_files', array());
     if (array_key_exists($id, $files)) {
@@ -1021,11 +1024,12 @@ function save_uploaded_file($id, $atts, $session) {
         $files[$id] = array($atts);
     }
     $session->set('uploaded_files', $files);
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('format_attachment_row')) {
 function format_attachment_row($file, $output_mod) {
     return '<tr><td>'.
         '<img src="'.Hm_Image_Sources::$paperclip.'" alt="" width="16" height="16" />'.
@@ -1038,11 +1042,12 @@ function format_attachment_row($file, $output_mod) {
         '</a>'.
         '</td>'.
         '</tr>';
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('get_primary_recipients')) {
 function get_primary_recipients($headers, $smtp_servers) {
     $recip_headers = array('to', 'cc', 'envelope-to');
     $lc_headers = array();
@@ -1069,11 +1074,12 @@ function get_primary_recipients($headers, $smtp_servers) {
         }
     }
     return false;
-}
+}}
 
 /**
  * @subpackage/functions
  */
+if (!hm_exists('delete_draft')) {
 function delete_draft($id, $session) {
     $drafts = $session->get('compose_drafts', array());
     if (array_key_exists($id, $drafts)) {
@@ -1082,11 +1088,12 @@ function delete_draft($id, $session) {
         return true;
     }
     return false;
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('save_draft')) {
 function save_draft($atts, $id, $session) {
     if (!trim($atts['draft_subject'])) {
         return false;
@@ -1101,22 +1108,24 @@ function save_draft($atts, $id, $session) {
     }
     $session->set('compose_drafts', $drafts);
     return $id;
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('get_draft')) {
 function get_draft($id, $session) {
     $drafts = $session->get('compose_drafts', array());
     if (array_key_exists($id, $drafts)) {
         return $drafts[$id];
     }
     return false;
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('attach_file')) {
 function attach_file($content, $file, $filepath, $draft_id, $mod) {
     $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
     $filename = hash('sha512', $content);
@@ -1129,11 +1138,12 @@ function attach_file($content, $file, $filepath, $draft_id, $mod) {
         return true;
     }
     return false;
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('get_outbound_msg_detail')) {
 function get_outbound_msg_detail($post, $draft, $body_type) {
     $body = '';
     $cc = '';
@@ -1162,11 +1172,12 @@ function get_outbound_msg_detail($post, $draft, $body_type) {
         $body = $parsedown->text($body);
     }
     return array($body, $cc, $bcc, $in_reply_to, $draft);
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('get_outbound_msg_profile_detail')) {
 function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod) {
     $imap_server = false;
     $from_name = '';
@@ -1187,11 +1198,12 @@ function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod)
         }
     }
     return array($imap_server, $from_name, $reply_to, $from);
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('smtp_refresh_oauth2_token_on_send')) {
 function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
     if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
         $results = smtp_refresh_oauth2_token($smtp_details, $mod->config);
@@ -1204,11 +1216,12 @@ function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
             }
         }
     }
-}
+}}
 
 /*
  * @subpackage smtp/functions
  */
+if (!hm_exists('outbound_address_check')) {
 function outbound_address_check($mod, $from, $reply_to) {
     $domain = $mod->config->get('default_email_domain');
     if ($domain) {
@@ -1223,11 +1236,12 @@ function outbound_address_check($mod, $from, $reply_to) {
         }
     }
     return array($from, $reply_to);
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('repopulate_compose_form')) {
 function repopulate_compose_form($draft, $handler_mod) {
     $handler_mod->out('no_redirect', true);
     $handler_mod->out('compose_draft', $draft);
@@ -1239,21 +1253,24 @@ function repopulate_compose_form($draft, $handler_mod) {
         && $handler_mod->request->post['compose_msg_uid']) {
         $handler_mod->out('compose_msg_uid', $handler_mod->request->post['compose_msg_uid']);
     }
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('server_from_compose_smtp_id')) {
 function server_from_compose_smtp_id($id) {
     $pos = strpos($id, '.');
     if ($pos === false) {
         return intval($id);
     }
     return intval(substr($id, 0, $pos));
-}
+}}
+
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('profile_from_compose_smtp_id')) {
 function profile_from_compose_smtp_id($profiles, $id) {
     if (strpos($id, '.') === false) {
         return false;
@@ -1266,11 +1283,13 @@ function profile_from_compose_smtp_id($profiles, $id) {
         }
     }
     return false;
-}
+}}
 
 /**
  * @subpackage smtp/functions
  */
+if (!hm_exists('smtp_authed')) {
 function smtp_authed($smtp) {
     return is_object($smtp) && $smtp->state == 'authed';
-}
+}}
+

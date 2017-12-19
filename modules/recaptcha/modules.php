@@ -64,13 +64,15 @@ class Hm_Output_recaptcha_form extends Hm_Output_Module {
 /**
  * @subpackage recaptcha/functions
  */
+if (!hm_exists('recaptcha_config')) {
 function recaptcha_config($config) {
     return get_ini($config, 'recaptcha.ini');
-}
+}}
 
 /**
  * @subpackage recaptcha/functions
  */
+if (!hm_exists('check_recaptcha')) {
 function check_recaptcha($secret, $response, $ip) {
     $api = new Hm_API_Curl();
     $url = 'https://www.google.com/recaptcha/api/siteverify';
@@ -80,5 +82,5 @@ function check_recaptcha($secret, $response, $ip) {
         return true;
     }
     return false;
-}
+}}
 

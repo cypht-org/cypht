@@ -688,13 +688,15 @@ class Hm_Output_github_limit_setting extends Hm_Output_Module {
 /**
  * @subpackage github/functions
  */
+if (!hm_exists('github_connect_details')) {
 function github_connect_details($config) {
     return get_ini($config, 'github.ini');
-}
+}}
 
 /**
  * @subpackage github/functions
  */
+if (!hm_exists('build_github_subject')) {
 function build_github_subject($event, $output_mod) {
     $pre = '['.trim(str_replace('Event', '', trim(preg_replace("/([A-Z])/", " $1", $event['type'])))).']';
     $post = '';
@@ -741,11 +743,12 @@ function build_github_subject($event, $output_mod) {
             break;
     }
     return $pre.' '.$post;
-}
+}}
 
 /**
  * @subpackage github/functions
  */
+if (!hm_exists('github_parse_headers')) {
 function github_parse_headers($data, $output_mod) {
     $res = '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
     if (array_key_exists('type', $data)) {
@@ -783,11 +786,12 @@ function github_parse_headers($data, $output_mod) {
     $res .= '<tr><th>'.$output_mod->trans('Repository').'</th><td>'.$output_mod->html_safe($name).$repo_link.'</td></tr>';
     $res .= '<tr><td></td><td></td></tr></table>';
     return $res;
-}
+}}
 
 /**
  * @subpackage github/functions
  */
+if (!hm_exists('github_parse_payload')) {
 function github_parse_payload($data, $output_mod) {
     $type = false;
     if (array_key_exists('type', $data)) {
@@ -826,11 +830,12 @@ function github_parse_payload($data, $output_mod) {
     }
     $res .= '</div>';
     return $res;
-}
+}}
 
 /**
  * @subpackage github/functions
  */
+if (!hm_exists('payload_search')) {
 function payload_search($data) {
     $res = array();
     $data_flds = array('url', 'sha', 'body', 'description', 'message', 'name');
@@ -856,4 +861,4 @@ function payload_search($data) {
         }
     }
     return $res;
-}
+}}

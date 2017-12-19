@@ -13,6 +13,7 @@
  * @param object $handler hm handler module
  * @return array
  */
+if (!hm_exists('get_message_list_settings')) {
 function get_message_list_settings($path, $handler) {
     $list_path = $path;
     $mailbox_list_title = array();
@@ -44,7 +45,7 @@ function get_message_list_settings($path, $handler) {
         $mailbox_list_title = array('Everything');
     }
     return array($list_path, $mailbox_list_title, $message_list_since, $per_source_limit);
-}
+}}
 
 /**
  * Build meta information for a message list
@@ -53,6 +54,7 @@ function get_message_list_settings($path, $handler) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('message_list_meta')) {
 function message_list_meta($input, $output_mod) {
     if (!array_key_exists('list_meta', $input) || !$input['list_meta']) {
         return '';
@@ -90,7 +92,7 @@ function message_list_meta($input, $output_mod) {
         '<span class="src_count"></span> '.$max.
         '<b>-</b>'.
         '<span class="total"></span> '.$output_mod->trans('total').'</div>';
-}
+}}
 
 /**
  * Build a human readable interval string
@@ -98,6 +100,7 @@ function message_list_meta($input, $output_mod) {
  * @param string $date_str date string parsable by strtotime()
  * @return string
  */
+if (!hm_exists('human_readable_interval')) {
 function human_readable_interval($date_str) {
     $precision     = 2;
     $interval_time = array();
@@ -134,7 +137,7 @@ function human_readable_interval($date_str) {
         }
     }
     return implode(', ', $res);
-}
+}}
 
 /**
  * Output a message list row of data using callbacks
@@ -146,6 +149,7 @@ function human_readable_interval($date_str) {
  * @param string $row_class optional table row css class
  * @return array
  */
+if (!hm_exists('message_list_row')) {
 function message_list_row($values, $id, $style, $output_mod, $row_class='') {
     $res = '<tr class="'.$output_mod->html_safe($id);
     if ($row_class) {
@@ -166,7 +170,7 @@ function message_list_row($values, $id, $style, $output_mod, $row_class='') {
     }
     $res .= '</tr>';
     return array($res, $id);
-}
+}}
 
 /**
  * Generic callback for a message list table cell
@@ -176,6 +180,7 @@ function message_list_row($values, $id, $style, $output_mod, $row_class='') {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('safe_output_callback')) {
 function safe_output_callback($vals, $style, $output_mod) {
     $img = '';
     if (count($vals) == 3 && $vals[2]) {
@@ -185,7 +190,7 @@ function safe_output_callback($vals, $style, $output_mod) {
         return sprintf('<div class="%s" title="%s">%s%s</div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
     }
     return sprintf('<td class="%s" title="%s">%s%s</td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
-}
+}}
 
 /**
  * Callback for a message list checkbox
@@ -195,6 +200,7 @@ function safe_output_callback($vals, $style, $output_mod) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('checkbox_callback')) {
 function checkbox_callback($vals, $style, $output_mod) {
     if ($style == 'news') {
         return sprintf('<input type="checkbox" id="%s" value="%s" />'.
@@ -206,7 +212,7 @@ function checkbox_callback($vals, $style, $output_mod) {
         '<input id="'.$output_mod->html_safe($vals[0]).'" type="checkbox" value="%s" />'.
         '<label class="checkbox_label" for="'.$output_mod->html_safe($vals[0]).'"></label>'.
         '</td>', $output_mod->html_safe($vals[0]));
-}
+}}
 
 /**
  * Callback for a subject cell in a message list
@@ -216,6 +222,7 @@ function checkbox_callback($vals, $style, $output_mod) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('subject_callback')) {
 function subject_callback($vals, $style, $output_mod) {
     $img = '';
     if (count($vals) == 4 && $vals[3]) {
@@ -227,7 +234,7 @@ function subject_callback($vals, $style, $output_mod) {
         return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject);
     }
     return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
-}
+}}
 
 /**
  * Callback for a date cell in a message list
@@ -237,12 +244,13 @@ function subject_callback($vals, $style, $output_mod) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('date_callback')) {
 function date_callback($vals, $style, $output_mod) {
     if ($style == 'news') {
         return sprintf('<div class="msg_date">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
     }
     return sprintf('<td class="msg_date" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
-}
+}}
 
 /**
  * Callback for an icon in a message list row
@@ -252,6 +260,7 @@ function date_callback($vals, $style, $output_mod) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('icon_callback')) {
 function icon_callback($vals, $style, $output_mod) {
     $icons = '';
     $title = array();
@@ -273,7 +282,7 @@ function icon_callback($vals, $style, $output_mod) {
         return sprintf('<div class="icon" title="%s">%s</div>', $title, $icons);
     }
     return sprintf('<td class="icon" title="%s">%s</td>', $title, $icons);
-}
+}}
 
 /**
  * Output message controls
@@ -281,6 +290,7 @@ function icon_callback($vals, $style, $output_mod) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
     $res = '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
         '<div class="msg_controls">'.
@@ -294,7 +304,7 @@ function message_controls($output_mod) {
     }
     $res .= '</div>';
     return $res;
-}
+}}
 
 /**
  * Output select element for "received since" options
@@ -304,6 +314,7 @@ function message_controls($output_mod) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('message_since_dropdown')) {
 function message_since_dropdown($since, $name, $output_mod) {
     $times = array(
         'today' => 'Today',
@@ -325,7 +336,7 @@ function message_since_dropdown($since, $name, $output_mod) {
     }
     $res .= '</select>';
     return $res;
-}
+}}
 
 /**
  * Output a source list for a message list
@@ -333,6 +344,7 @@ function message_since_dropdown($since, $name, $output_mod) {
  * @param array $sources source of the list
  * @param object $output_mod Hm_Output_Module
  */
+if (!hm_exists('list_sources')) {
 function list_sources($sources, $output_mod) {
     $res = '<div class="list_sources">';
     $res .= '<div class="src_title">'.$output_mod->html_safe('Sources').'</div>';
@@ -358,7 +370,7 @@ function list_sources($sources, $output_mod) {
     }
     $res .= '</div>';
     return $res;
-}
+}}
 
 /**
  * Output message list controls
@@ -368,10 +380,11 @@ function list_sources($sources, $output_mod) {
  * @param string $source_link source link tag
  * @return string
  */
+if (!hm_exists('list_controls')) {
 function list_controls($refresh_link, $config_link, $source_link=false) {
     return '<div class="list_controls">'.
         $refresh_link.$source_link.$config_link.'</div>';
-}
+}}
 
 /**
  * Validate search terms
@@ -379,13 +392,14 @@ function list_controls($refresh_link, $config_link, $source_link=false) {
  * @param string $terms search terms to validate
  * @return string
  */
+if (!hm_exists('validate_search_terms')) {
 function validate_search_terms($terms) {
     $terms = trim(strip_tags($terms));
     if (!$terms) {
         $terms = '';
     }
     return $terms;
-}
+}}
 
 /**
  * Validate the name of a search field
@@ -393,12 +407,13 @@ function validate_search_terms($terms) {
  * @param string $fld name to validate
  * @return mixed
  */
+if (!hm_exists('validate_search_fld')) {
 function validate_search_fld($fld) {
     if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'))) {
         return $fld;
     }
     return false;
-}
+}}
 
 /**
  * Output a select element for the search field
@@ -407,6 +422,7 @@ function validate_search_fld($fld) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('search_field_selection')) {
 function search_field_selection($current, $output_mod) {
     $flds = array(
         'TEXT' => 'Entire message',
@@ -424,7 +440,7 @@ function search_field_selection($current, $output_mod) {
     }
     $res .= '</select>';
     return $res;
-}
+}}
 
 /**
  * Build pagination links for a list of messages
@@ -437,6 +453,7 @@ function search_field_selection($current, $output_mod) {
  * @param string $sort list sort
  * @return string
  */
+if (!hm_exists('build_page_links')) {
 function build_page_links($page_size, $current_page, $total, $path, $filter=false, $sort=false) {
     $links = '';
     $first = '';
@@ -493,5 +510,5 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
         $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.$filter_str.$sort_str.'">'.$i.'</a>';
     }
     return $prev.' '.$first.$links.$last.' '.$next;
-}
+}}
 

@@ -13,6 +13,7 @@
  * @param bool $images allow external images
  * @return string
  */
+if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
     require_once APP_PATH.'third_party/HTMLPurifier.standalone.php';
     $config = HTMLPurifier_Config::createDefault();
@@ -26,18 +27,19 @@ function format_msg_html($str, $images=false) {
     $purifier = new HTMLPurifier($config);
     $res = @$purifier->purify($str);
     return $res;
-}
+}}
 
 /**
  * Convert HTML to plain text
  * @param string $html content to convert
  * @return string
  */
+if (!hm_exists('convert_html_to_text')) {
 function convert_html_to_text($html) {
     require_once APP_PATH.'third_party/Html2Text.php';
     $html = new \Html2Text\Html2Text($html, array('do_links' => 'table', 'width' => 0));
     return $html->getText();
-}
+}}
 
 /**
  * Format image data
@@ -46,9 +48,10 @@ function convert_html_to_text($html) {
  * @param string $mime_type type of image
  * return string
  */
+if (!hm_exists('format_msg_image')) {
 function format_msg_image($str, $mime_type) {
     return '<img class="msg_img" alt="" src="data:image/'.$mime_type.';base64,'.chunk_split(base64_encode($str)).'" />';
-}
+}}
 
 /**
  * Format a plain text message
@@ -56,6 +59,7 @@ function format_msg_image($str, $mime_type) {
  * @param string $str message text
  * @param object $output_mod Hm_Output_Module
  */
+if (!hm_exists('format_msg_text')) {
 function format_msg_text($str, $output_mod, $links=true) {
     $str = str_replace("\t", '    ', $str);
     $str = nl2br(str_replace(' ', '<wbr>', ($output_mod->html_safe($str))));
@@ -67,7 +71,7 @@ function format_msg_text($str, $output_mod, $links=true) {
     $str = preg_replace("/ (&[^;]+;)/", "$1", $str);
     $str = str_replace('<wbr>', '&#160;<wbr>', $str);
     return preg_replace("/^(&gt;.*<br \/>)/m", "<span class=\"reply_quote\">$1</span>", $str);
-}
+}}
 
 /**
  * Format reply text
@@ -75,6 +79,7 @@ function format_msg_text($str, $output_mod, $links=true) {
  * @param string $txt message text
  * @return string
  */
+if (!hm_exists('format_reply_text')) {
 function format_reply_text($txt) {
     $lines = explode("\n", $txt);
     $new_lines = array();
@@ -87,7 +92,7 @@ function format_reply_text($txt) {
         $new_lines[] = preg_replace("/$pre /", "$pre", "> ".wordwrap($line, $wrap, "\n$pre"));
     }
     return implode("\n", $new_lines);
-}
+}}
 
 /**
  * Get reply to address
@@ -97,6 +102,7 @@ function format_reply_text($txt) {
  * @param array $excluded list of email addresses to exclude from reply-all
  * @return string
  */
+if (!hm_exists('reply_to_address')) {
 function reply_to_address($headers, $type, $excluded) {
     $msg_to = '';
     $msg_cc = '';
@@ -126,7 +132,7 @@ function reply_to_address($headers, $type, $excluded) {
         }
     }
     return array($msg_to, $msg_cc);
-}
+}}
 
 /*
  * Format a reply address line
@@ -134,6 +140,7 @@ function reply_to_address($headers, $type, $excluded) {
  * @param array $excluded list of E-mail addresses to exclude
  * @return string
  */
+if (!hm_exists('format_reply_address')) {
 function format_reply_address($fld, $excluded) {
     $addr = process_address_fld($fld);
     $res = array();
@@ -159,13 +166,14 @@ function format_reply_address($fld, $excluded) {
         }, $res));
     }
     return '';
-}
+}}
 
 /**
  * Split an E-mail address header in to a list
  * @param string $str value to split
  * @return array
  */
+if (!hm_exists('split_address_fld')) {
 function split_address_fld($str) {
     $str = str_replace(array('<"', "<'", '<\'"', '<"\''), '<', trim($str));
     $str = str_replace(array('">', "'>", '\'">', '"\'>'), '>', $str);
@@ -206,13 +214,14 @@ function split_address_fld($str) {
     }
     $output[$index][] = $substr;
     return $output;
-}
+}}
 
 /**
  * Break up an address field into something usable
  * @param string $fld address field to parse
  * @return array
  */
+if (!hm_exists('process_address_fld')) {
 function process_address_fld($fld) {
     $res = array();
     $data = split_address_fld($fld);
@@ -231,7 +240,7 @@ function process_address_fld($fld) {
         }
     }
     return $res;
-}
+}}
 
 /**
  * Get reply to subject
@@ -240,6 +249,7 @@ function process_address_fld($fld) {
  * @param string $type type (forward, reply, reply_all)
  * @return string
  */
+if (!hm_exists('reply_to_subject')) {
 function reply_to_subject($headers, $type) {
     $subject = '';
     if (array_key_exists('Subject', $headers)) {
@@ -258,7 +268,7 @@ function reply_to_subject($headers, $type) {
         }
     }
     return $subject;
-}
+}}
 
 /**
  * Get reply message lead in
@@ -269,6 +279,7 @@ function reply_to_subject($headers, $type) {
  * @param object $output_mod output module object
  * @return string
  */
+if (!hm_exists('reply_lead_in')) {
 function reply_lead_in($headers, $type, $to, $output_mod) {
     $lead_in = '';
     if ($type == 'reply' || $type == 'reply_all') {
@@ -295,7 +306,7 @@ function reply_lead_in($headers, $type, $to, $output_mod) {
         $lead_in .= "\n";
     }
     return $lead_in;
-}
+}}
 
 /**
  * Format reply field details
@@ -308,6 +319,7 @@ function reply_lead_in($headers, $type, $to, $output_mod) {
  * @param int $html set to 1 if the output should be HTML
  * @return array
  */
+if (!hm_exists('reply_format_body')) {
 function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $html) {
     $msg = '';
     $type = 'textplain';
@@ -321,7 +333,7 @@ function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $htm
         $msg = format_reply_as_text($body, $type, $reply_type, $lead_in);
     }
     return $msg;
-}
+}}
 
 /**
  * Format reply text as HTML
@@ -332,6 +344,7 @@ function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $htm
  * @param string $lead_in body lead in text
  * @return string
  */
+if (!hm_exists('format_reply_as_html')) {
 function format_reply_as_html($body, $type, $reply_type, $lead_in) {
     if ($type == 'textplain') {
         if ($reply_type == 'reply' || $reply_type == 'reply_all') {
@@ -345,7 +358,7 @@ function format_reply_as_html($body, $type, $reply_type, $lead_in) {
         $msg = nl2br($lead_in).'<hr /><blockquote>'.format_msg_html($body).'</blockquote>';
     }
     return $msg;
-}
+}}
 
 /**
  * Format reply text as text
@@ -356,6 +369,7 @@ function format_reply_as_html($body, $type, $reply_type, $lead_in) {
  * @param string $lead_in body lead in text
  * @return string
  */
+if (!hm_exists('format_reply_as_text')) {
 function format_reply_as_text($body, $type, $reply_type, $lead_in) {
     $msg = '';
     if ($type == 'texthtml') {
@@ -375,16 +389,17 @@ function format_reply_as_text($body, $type, $reply_type, $lead_in) {
         }
     }
     return $msg;
-}
+}}
 
 /**
  * Convert header keys to lowercase versions
  * @param array $headers message headers
  * @return array
  */
+if (!hm_exists('lc_headers')) {
 function lc_headers($headers) {
     return array_change_key_case($headers, CASE_LOWER);
-}
+}}
 
 /**
  * Get the in-reply-to message id for replied
@@ -393,6 +408,7 @@ function lc_headers($headers) {
  * @param string $type reply type
  * @return string
  */
+if (!hm_exists('reply_to_id')) {
 function reply_to_id($headers, $type) {
     $id = '';
     $headers = lc_headers($headers);
@@ -400,7 +416,7 @@ function reply_to_id($headers, $type) {
         $id = $headers['message-id'];
     }
     return $id;
-}
+}}
 
 /**
  * Get reply field details
@@ -415,6 +431,7 @@ function reply_to_id($headers, $type) {
  * @param array $excluded list of email addresses to exclude from reply-all
  * @return array
  */
+if (!hm_exists('format_reply_fields')) {
 function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type='reply', $excluded) {
     $msg_to = '';
     $msg = '';
@@ -424,13 +441,14 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type
     $lead_in = reply_lead_in($headers, $type, $msg_to, $output_mod);
     $msg = reply_format_body($headers, $body, $lead_in, $type, $struct, $html);
     return array($msg_to, $msg_cc, $subject, $msg, $msg_id);
-}
+}}
 
 /**
  * decode mail fields to human readable text
  * @param string $string field to decode
  * @return string decoded field
  */
+if (!hm_exists('decode_fld')) {
 function decode_fld($string) {
     if (strpos($string, '=?') === false) {
         return $string;
@@ -453,4 +471,4 @@ function decode_fld($string) {
         }
     }
     return trim($string);
-}
+}}

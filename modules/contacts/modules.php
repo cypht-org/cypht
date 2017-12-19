@@ -233,6 +233,7 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
 /**
  * @subpackage contacts/functions
  */
+if (!hm_exists('build_contact_detail')) {
 function build_contact_detail($output_mod, $contact, $id) {
     $res = '<div class="contact_detail" /><table><thead></thead><tbody>';
     $all_fields = false;
@@ -257,11 +258,12 @@ function build_contact_detail($output_mod, $contact, $id) {
     }
     $res .= '</tbody></table></div>';
     return $res;
-}
+}}
 
 /**
  * @subpackage contacts/functions
  */
+if (!hm_exists('name_map')) {
 function name_map($val) {
     $names = array(
         'display_name' => 'Display Name',
@@ -297,4 +299,4 @@ function name_map($val) {
         return $names[$val];
     }
     return $val;
-}
+}}

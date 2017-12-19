@@ -2260,6 +2260,7 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
  * @param string $inbox include inbox in search for auto-bcc messages
  * @return array
  */
+if (!hm_exists('imap_sent_sources')) {
 function imap_sent_sources($callback, $configured, $inbox) {
     $sources = array();
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
@@ -2277,7 +2278,7 @@ function imap_sent_sources($callback, $configured, $inbox) {
         }
     }
     return $sources;
-}
+}}
 
 /**
  * Build a source list
@@ -2286,6 +2287,7 @@ function imap_sent_sources($callback, $configured, $inbox) {
  * @param array $custom user specific assignments
  * @return array
  */
+if (!hm_exists('imap_data_sources')) {
 function imap_data_sources($callback, $custom=array()) {
     $sources = array();
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
@@ -2320,7 +2322,7 @@ function imap_data_sources($callback, $custom=array()) {
         }
     }
     return $sources;
-}
+}}
 
 /**
  * Prepare and format message list data 
@@ -2329,6 +2331,7 @@ function imap_data_sources($callback, $custom=array()) {
  * @param object $mod Hm_Output_Module
  * @return void
  */
+if (!hm_exists('prepare_imap_message_list')) {
 function prepare_imap_message_list($msgs, $mod, $type) {
     $style = $mod->get('news_list_style') ? 'news' : 'email';
     if ($mod->get('is_mobile')) {
@@ -2336,7 +2339,7 @@ function prepare_imap_message_list($msgs, $mod, $type) {
     }
     $res = format_imap_message_list($msgs, $mod, $type, $style);
     $mod->out('formatted_message_list', $res);
-}
+}}
 
 /**
  * Build HTML for a list of IMAP folders
@@ -2346,6 +2349,7 @@ function prepare_imap_message_list($msgs, $mod, $type) {
  * @param object $mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('format_imap_folder_section')) {
 function format_imap_folder_section($folders, $id, $output_mod) {
     $results = '<ul class="inner_list">';
     $manage = $output_mod->get('imap_folder_manage_link');
@@ -2374,7 +2378,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
     }
     $results .= '</ul>';
     return $results;
-}
+}}
 
 /**
  * Format a list of message headers
@@ -2385,6 +2389,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
  * @param string $style list style (email or news)
  * @return array
  */
+if (!hm_exists('format_imap_message_list')) {
 function format_imap_message_list($msg_list, $output_module, $parent_list=false, $style='email') {
     $res = array();
     if ($msg_list === array(false)) {
@@ -2495,7 +2500,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
     }
     return $res;
-}
+}}
 
 /**
  * Process message ids
@@ -2503,6 +2508,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
  * @param array $ids list of ids
  * @return array
  */
+if (!hm_exists('process_imap_message_ids')) {
 function process_imap_message_ids($ids) {
     $res = array();
     foreach (explode(',', $ids) as $id) {
@@ -2520,7 +2526,7 @@ function process_imap_message_ids($ids) {
         }
     }
     return $res;
-}
+}}
 
 /**
  * Format a message part row
@@ -2535,6 +2541,7 @@ function process_imap_message_ids($ids) {
  * @param bool $simmple_view flag to hide complex message structure
  * @return string
  */
+if (!hm_exists('format_msg_part_row')) {
 function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $use_icons=false, $simple_view=false) {
     $allowed = array(
         'textplain',
@@ -2660,13 +2667,14 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     $res .= '</td><td>'.$output_mod->html_safe(decode_fld($desc)).'</td>';
     $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
     return $res;
-}
+}}
 
 /*
  * Get a human readable message size
  * @param array $vals bodystructure info for this message part
  * @return string
  */
+if (!hm_exists('get_imap_size')) {
 function get_imap_size($vals) {
     if (!array_key_exists('size', $vals) || !$vals['size']) {
         return '';
@@ -2689,7 +2697,7 @@ function get_imap_size($vals) {
             $label = 'B';
     }
     return sprintf('%s %s', round($size, 2), $label);
-}
+}}
 
 /**
  * Format the message part section of the message view page
@@ -2701,6 +2709,7 @@ function get_imap_size($vals) {
  * @param int $level indention level
  * @return string
  */
+if (!hm_exists('format_msg_part_section')) {
 function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0) {
     $res = '';
     $simple_view = $output_mod->get('simple_msg_part_view', false);
@@ -2727,13 +2736,14 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
         }
     }
     return $res;
-}
+}}
 
 /**
  * Filter out message parts that are not attachments
  * @param array message structure
  * @return bool
  */
+if (!hm_exists('filter_message_part')) {
 function filter_message_part($vals) {
     if (array_key_exists('disposition', $vals) && is_array($vals['disposition']) && array_key_exists('inline', $vals['disposition'])) {
         return true;
@@ -2745,7 +2755,7 @@ function filter_message_part($vals) {
         return true;
     }
     return false;
-}
+}}
 
 /**
  * Sort callback to sort by internal date
@@ -2754,10 +2764,11 @@ function filter_message_part($vals) {
  * @param array $b second message detail
  * @return int
  */
+if (!hm_exists('sort_by_internal_date')) {
 function sort_by_internal_date($a, $b) {
     if ($a['internal_date'] == $b['internal_date']) return 0;
     return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
-}
+}}
 
 /**
  * Merge IMAP search results
@@ -2772,6 +2783,7 @@ function sort_by_internal_date($a, $b) {
  * @param bool $sent flag to fetch auto-bcc'ed messages
  * @return array
  */
+if (!hm_exists('merge_imap_search_results')) {
 function merge_imap_search_results($ids, $search_type, $session, $config, $folders = array('INBOX'), $limit=0, $terms=array(), $sent=false) {
     $msg_list = array();
     $connection_failed = false;
@@ -2840,7 +2852,7 @@ function merge_imap_search_results($ids, $search_type, $session, $config, $folde
         $msg_list = array_merge($msg_list, $sent_results);
     }
     return array($status, $msg_list);
-}
+}}
 
 /**
  * Replace inline images in an HTML message part
@@ -2850,6 +2862,7 @@ function merge_imap_search_results($ids, $search_type, $session, $config, $folde
  * @param array $struct message structure array
  * @param object $imap IMAP server object
  */
+if (!hm_exists('add_attached_images')) {
 function add_attached_images($txt, $uid, $struct, $imap) {
     if (preg_match_all("/src=('|\"|)cid:([^\s'\"]+)/", $txt, $matches)) {
         $cids = array_pop($matches);
@@ -2862,7 +2875,7 @@ function add_attached_images($txt, $uid, $struct, $imap) {
         }
     }
     return $txt;
-}
+}}
 
 /**
  * Check for and do an Oauth2 token reset if needed
@@ -2871,8 +2884,8 @@ function add_attached_images($txt, $uid, $struct, $imap) {
  * @param object $config site config object
  * @return mixed
  */
+if (!hm_exists('imap_refresh_oauth2_token')) {
 function imap_refresh_oauth2_token($server, $config) {
-
     if ((int) $server['expiration'] <= time()) {
         $oauth2_data = get_oauth2_data($config);
         $details = array();
@@ -2891,7 +2904,7 @@ function imap_refresh_oauth2_token($server, $config) {
         }
     }
     return array();
-}
+}}
 
 /**
  * Copy/Move messages on the same IMAP server
@@ -2903,6 +2916,7 @@ function imap_refresh_oauth2_token($server, $config) {
  * @param object $config site config interface
  * @return int count of messages moved
  */
+if (!hm_exists('imap_move_same_server')) {
 function imap_move_same_server($ids, $action, $session, $dest_path, $config) {
     $moved = array();
     $keys = array_keys($ids);
@@ -2919,7 +2933,7 @@ function imap_move_same_server($ids, $action, $session, $dest_path, $config) {
         }
     }
     return $moved;
-}
+}}
 
 /**
  * Copy/Move messages on different IMAP servers
@@ -2931,6 +2945,7 @@ function imap_move_same_server($ids, $action, $session, $dest_path, $config) {
  * @param object $config site config interface
  * @return int count of messages moved
  */
+if (!hm_exists('imap_move_different_server')) {
 function imap_move_different_server($ids, $action, $dest_path, $session, $config) {
     $moved = array();
     $cache = Hm_IMAP_List::get_cache($session, $config, $dest_path[1]);
@@ -2975,7 +2990,7 @@ function imap_move_different_server($ids, $action, $dest_path, $session, $config
         }
     }
     return $moved;
-}
+}}
 
 /**
  * Group info about move/copy messages
@@ -2983,6 +2998,7 @@ function imap_move_different_server($ids, $action, $dest_path, $session, $config
  * @param array $form move copy input
  * @return array grouped lists of messages to move/copy
  */
+if (!hm_exists('process_move_to_arguments')) {
 function process_move_to_arguments($form) {
     $msg_ids = explode(',', $form['imap_move_ids']);
     $same_server_ids = array();
@@ -3002,7 +3018,7 @@ function process_move_to_arguments($form) {
         }
     }
     return array($msg_ids, $dest_path, $same_server_ids, $other_server_ids);
-}
+}}
 
 /**
  * Get a file extension for a mime type
@@ -3012,6 +3028,7 @@ function process_move_to_arguments($form) {
  * @todo add tons more type conversions!
  * @return string
  */
+if (!hm_exists('get_imap_mime_extension')) {
 function get_imap_mime_extension($type, $subtype) {
     $extension = $subtype;
     if ($type == 'multipart' || ($type == 'message' && $subtype == 'rfc822')) {
@@ -3028,7 +3045,7 @@ function get_imap_mime_extension($type, $subtype) {
         }
     }
     return '.'.$extension;
-}
+}}
 
 /**
  * Try to find a filename for a message part download
@@ -3039,6 +3056,7 @@ function get_imap_mime_extension($type, $subtype) {
  * @param bool $no_default don't return a default value
  * @return string
  */
+if (!hm_exists('get_imap_part_name')) {
 function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
     $extension = get_imap_mime_extension(strtolower($struct['type']), strtolower($struct['subtype']));
     if (array_key_exists('file_attributes', $struct) && is_array($struct['file_attributes']) && array_key_exists('attachment', $struct['file_attributes'])) {
@@ -3071,31 +3089,34 @@ function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
         return '';
     }
     return 'message_'.$uid.'_part_'.$part_id.$extension;
-}
+}}
 
 /**
  * @subpackage imap/functions
  */
+if (!hm_exists('clear_existing_reply_details')) {
 function clear_existing_reply_details($session) {
     foreach ($session->dump() as $name => $val) {
         if (substr($name, 0, 19) == 'reply_details_imap_') {
             $session->del($name);
         }
     }
-}
+}}
 
 /**
  * @subpackage imap/functions
  * @param object $imap imap library object
  * @return bool
  */
+if (!hm_exists('imap_authed')) {
 function imap_authed($imap) {
     return is_object($imap) && ($imap->get_state() == 'authenticated' || $imap->get_state() == 'selected');
-}
+}}
 
 /**
  * @subpackage imap/functions
  */
+if (!hm_exists('process_sort_arg')) {
 function process_sort_arg($sort) {
     if (!$sort) {
         return array('ARRIVAL', true);
@@ -3110,4 +3131,4 @@ function process_sort_arg($sort) {
         $rev = $rev ? false : true;
     }
     return array($sort, $rev);
-}
+}}

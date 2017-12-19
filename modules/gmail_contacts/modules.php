@@ -27,6 +27,7 @@ class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
 /**
  * @subpackage gmail_contacts/functions
  */
+if (!hm_exists('gmail_contacts_request')) {
 function gmail_contacts_request($token, $url) {
     $result = array();
     $headers = array('Authorization: OAuth '.$token, 'GData-Version: 3.0');
@@ -36,11 +37,12 @@ function gmail_contacts_request($token, $url) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     return curl_exec($ch);
-}
+}}
 
 /**
  * @subpackage gmail_contacts/functions
  */
+if (!hm_exists('parse_contact_xml')) {
 function parse_contact_xml($xml, $source) {
     $parser = new Hm_Gmail_Contact_XML($xml);
     $results = array();
@@ -60,11 +62,12 @@ function parse_contact_xml($xml, $source) {
         $results[] = $contact;
     }
     return $results;
-}
+}}
 
 /**
  * @subpackage gmail_contacts/functions
  */
+if (!hm_exists('fetch_gmail_contacts')) {
 function fetch_gmail_contacts($config, $contact_store, $session=false) {
     if ($session && $session->get('gmail_contacts') && is_array($session->get('gmail_contacts')) && count($session->get('gmail_contacts')) > 0) {
         $contact_store->import($session->get('gmail_contacts'));
@@ -92,4 +95,4 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
         }
     }
     return $contact_store;
-}
+}}

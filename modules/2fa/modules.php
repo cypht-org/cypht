@@ -194,6 +194,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
 /**
  * @subpackage 2fa/functions
  */
+if (!hm_exists('check_2fa_pin')) {
 function check_2fa_pin($pin, $secret, $pass_len=6) {
     $pin_mod = pow(10, $pass_len);
     $time = floor(time()/30);
@@ -205,11 +206,12 @@ function check_2fa_pin($pin, $secret, $pass_len=6) {
     $input = unpack("N",substr($input, 0, 4));
     $inthash = $input[1] & 0x7FFFFFFF;
     return $pin === str_pad($inthash % $pin_mod, 6, "0", STR_PAD_LEFT);
-}
+}}
 
 /**
  * @subpackage 2fa/functions
  */
+if (!hm_exists('get_2fa_key')) {
 function get_2fa_key($config) {
     $settings = get_ini($config, '2fa.ini');
     $secret = false;
@@ -221,40 +223,44 @@ function get_2fa_key($config) {
         $simple = $settings['2fa_simple'];
     }
     return array($secret, $simple);
-}
+}}
 
 /**
  * @subpackage 2fa/functions
  */
+if (!hm_exists('base32_encode_str')) {
 function base32_encode_str($str) {
     require_once APP_PATH.'third_party/Base32.php';
     return Base32\Base32::encode($str);
-}
+}}
 
 /**
  * @subpackage 2fa/functions
  */
+if (!hm_exists('generate_qr_code')) {
 function generate_qr_code($config, $username, $str) {
     $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png';
     require_once APP_PATH.'third_party/phpqrcode.php';
     QRcode::png($str, $qr_code);
     return $qr_code;
-}
+}}
 
 /**
  * @subpackage 2fa/functions
  */
+if (!hm_exists('create_secret')) {
 function create_secret($key, $user, $len) {
     return Hm_Crypt::pbkdf2($key, $user, $len, 256, 'sha512');
-}
+}}
 
 /**
  * @subpackage 2fa/functions
  */
+if (!hm_exists('backup_codes')) {
 function backup_codes($config) {
     $codes = $config->get('2fa_backup_codes_setting', array());
     if (is_array($codes) && count($codes) == 3) {
         return $codes;
     }
     return array(random_int(100000000, 999999999), random_int(100000000, 999999999), random_int(100000000, 999999999));
-}
+}}

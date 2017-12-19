@@ -15,6 +15,7 @@
  * @param mixed $default value to return if the name is not found
  * @return string
  */
+if (!hm_exists('display_value')) {
 function display_value($name, $haystack, $type=false, $default='') {
     if (!array_key_exists($name, $haystack)) {
         return $default;
@@ -40,13 +41,14 @@ function display_value($name, $haystack, $type=false, $default='') {
             break;
     }
     return $res;
-}
+}}
 
 /**
  * Valid interface langs
  * @subpackage core/functions
  * @return array
  */
+if (!hm_exists('interface_langs')) {
 function interface_langs() {
     return array(
         'en' => 'English',
@@ -61,7 +63,7 @@ function interface_langs() {
         'hu' => 'Hungarian',
         'pt-br' => 'Brazilian Portuguese',
     );
-}
+}}
 
 /**
  * Tranlate a human readable time string
@@ -70,6 +72,7 @@ function interface_langs() {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('translate_time_str')) {
 function translate_time_str($str, $output_mod) {
     $parts = explode(',', $str);
     $res = array();
@@ -83,7 +86,7 @@ function translate_time_str($str, $output_mod) {
         return implode(', ', $res);
     }
     return $str;
-}
+}}
 
 /**
  * Format a data source to be a valid JS object
@@ -92,6 +95,7 @@ function translate_time_str($str, $output_mod) {
  * @param object $output_mod Hm_Output_Module
  * @return string
  */
+if (!hm_exists('format_data_sources')) {
 function format_data_sources($array, $output_mod) {
     $result = '';
     $default = false;
@@ -123,7 +127,7 @@ function format_data_sources($array, $output_mod) {
         $result .= 'var hm_data_sources = function() { return []; };';
     }
     return $result;
-}
+}}
 
 /**
  * Group data sources by the "group" attribute if it exists, otherwise use "default"
@@ -131,6 +135,7 @@ function format_data_sources($array, $output_mod) {
  * @param array $array list of data sources
  * @return array
  */
+if (!hm_exists('group_data_sources')) {
 function group_data_sources($array) {
     $groups = array();
     foreach($array as $vals) {
@@ -141,7 +146,7 @@ function group_data_sources($array) {
         $groups[$key][] = $vals;
     }
     return $groups;
-}
+}}
 
 /**
  * Determine if E-mail modules are active
@@ -149,12 +154,13 @@ function group_data_sources($array) {
  * @param array $mod_list list of active module sets
  * @return mixed
  */
+if (!hm_exists('email_is_active')) {
 function email_is_active($mod_list) {
     if (in_array('imap', $mod_list, true) || in_array('pop3', $mod_list, true)) {
         return true;
     }
     return false;
-}
+}}
 
 /**
  * Validate an E-mail using RFC 3696
@@ -163,6 +169,7 @@ function email_is_active($mod_list) {
  * @param bool $allow_local flag to allow local addresses with no domain
  * @return bool
  */
+if (!hm_exists('is_email_address')) {
 function is_email_address($val, $allow_local=false) {
     $val = trim($val, "<>");
     $domain = false;
@@ -189,7 +196,7 @@ function is_email_address($val, $allow_local=false) {
         }
     }
     return true;
-}
+}}
 
 /**
  * Do email domain part checks per RFC 3696 section 2
@@ -197,6 +204,7 @@ function is_email_address($val, $allow_local=false) {
  * @param string $val value to check
  * @return bool
  */
+if (!hm_exists('validate_domain_full')) {
 function validate_domain_full($val) {
     /* check for a dot, max allowed length and standard ASCII characters */
     if (strpos($val, '.') === false || strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
@@ -204,7 +212,7 @@ function validate_domain_full($val) {
         return false;
     }
     return true;
-}
+}}
 
 /**
  * Do email local part checks per RFC 3696 section 3
@@ -212,6 +220,7 @@ function validate_domain_full($val) {
  * @param string $val value to check
  * @return bool
  */
+if (!hm_exists('validate_local_full')) {
 function validate_local_full($val) {
     /* check length, "." rules, and for characters > ASCII 127 */
     if (strlen($val) > 64 || $val{0} == '.' || $val{(strlen($val) -1)} == '.' || strstr($val, '..') ||
@@ -227,7 +236,7 @@ function validate_local_full($val) {
         return true;
     }
     return false;
-}
+}}
 
 /**
  * Get Oauth2 server info
@@ -235,9 +244,10 @@ function validate_local_full($val) {
  * @param object $config site config object
  * @return array
  */
+if (!hm_exists('get_oauth2_data')) {
 function get_oauth2_data($config) {
     return get_ini($config, 'oauth2.ini', true);
-}
+}}
 
 /**
  * Process user input for a site setting and prep it to be saved
@@ -249,6 +259,7 @@ function get_oauth2_data($config) {
  * @param bool $checkbox true if this is a checkbox setting
  * @return void
  */
+if (!hm_exists('process_site_setting')) {
 function process_site_setting($type, $handler, $callback=false, $default=false, $checkbox=false) {
     if ($checkbox) {
         list($success, $form) = $handler->process_form(array('save_settings'));
@@ -279,7 +290,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
     }
     $handler->out('new_user_settings', $new_settings, false);
     $handler->out('user_settings', $settings, false);
-}
+}}
 
 /**
  * Return a date for a "received since" value, or just sanitize it
@@ -287,6 +298,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
  * @param string $val "received since" value to process
  * @param bool $validate flag to limit to validation only
  */
+if (!hm_exists('process_since_argument')) {
 function process_since_argument($val, $validate=false) {
     $date = false;
     $valid = false;
@@ -303,7 +315,7 @@ function process_since_argument($val, $validate=false) {
         return $valid;
     }
     return $date;
-}
+}}
 
 /**
  * Sanitize a "since" setting value for combined pages
@@ -311,9 +323,10 @@ function process_since_argument($val, $validate=false) {
  * @param string $val value to check
  * @return sanitized value
  */
+if (!hm_exists('since_setting_callback')) {
 function since_setting_callback($val) {
     return process_since_argument($val, true);
-}
+}}
 
 /**
  * Sanitize a max per source value
@@ -321,12 +334,13 @@ function since_setting_callback($val) {
  * @param int $val request max
  * @return sanitized max
  */
+if (!hm_exists('max_source_setting_callback')) {
 function max_source_setting_callback($val) {
     if ($val > MAX_PER_SOURCE || $val < 0) {
         return DEFAULT_PER_SOURCE;
     }
     return $val;
-}
+}}
 
 /**
  * Save user settings from the session to permanent storage
@@ -336,6 +350,7 @@ function max_source_setting_callback($val) {
  * @param bool $logout true if this is a save + logout request
  * @return void
  */
+if (!hm_exists('save_user_settings')) {
 function save_user_settings($handler, $form, $logout) {
     $user = $handler->session->get('username', false);
     $path = $handler->config->get('user_settings_dir', false);
@@ -361,7 +376,7 @@ function save_user_settings($handler, $form, $logout) {
             Hm_Msgs::add('Settings saved');
         }
     }
-}
+}}
 
 /**
  * Restore server definitions removed before saving
@@ -369,6 +384,7 @@ function save_user_settings($handler, $form, $logout) {
  * @param object $handler hm handler module object
  * @return void
  */
+if (!hm_exists('restore_servers')) {
 function restore_servers($removed, $handler) {
     if (count($removed) > 0) {
         $config = $handler->user_config->dump();
@@ -384,7 +400,7 @@ function restore_servers($removed, $handler) {
         }
         $handler->user_config->reload($config);
     }
-}
+}}
 
 /**
  * Filter out default auth and SMTP servers so they don't get saved
@@ -394,6 +410,7 @@ function restore_servers($removed, $handler) {
  * @param object $handler hm handler module object
  * @return array of items removed
  */
+if (!hm_exists('filter_servers')) {
 function filter_servers($handler) {
     $removed = array();
     $excluded = array('pop3_servers', 'imap_servers','smtp_servers');
@@ -424,7 +441,7 @@ function filter_servers($handler) {
     }
     $handler->user_config->reload($config);
     return $removed;
-}
+}}
 
 /**
  * Setup commonly used modules for an ajax request
@@ -433,6 +450,7 @@ function filter_servers($handler) {
  * @param string $source the module set name
  * @return void
  */
+if (!hm_exists('setup_base_ajax_page')) {
 function setup_base_ajax_page($name, $source=false) {
     add_handler($name, 'login', false, $source);
     add_handler($name, 'default_page_data', true, $source);
@@ -440,7 +458,7 @@ function setup_base_ajax_page($name, $source=false) {
     add_handler($name, 'language',  true, $source);
     add_handler($name, 'date', true, $source);
     add_handler($name, 'http_headers', true, $source);
-}
+}}
 
 /**
  * Setup commonly used modules for a page
@@ -449,6 +467,7 @@ function setup_base_ajax_page($name, $source=false) {
  * @param string $source the module set name
  * @return void
  */
+if (!hm_exists('setup_base_page')) {
 function setup_base_page($name, $source=false) {
     add_handler($name, 'stay_logged_in', false, $source);
     add_handler($name, 'login', false, $source);
@@ -483,7 +502,7 @@ function setup_base_page($name, $source=false) {
     add_output($name, 'save_reminder', true, $source);
     add_output($name, 'page_js', true, $source);
     add_output($name, 'content_end', false, $source);
-}
+}}
 
 /**
  * Merge array details for folder sources
@@ -491,6 +510,7 @@ function setup_base_page($name, $source=false) {
  * @param array $folder_sources list of folder list entries
  * @return array
  */
+if (!hm_exists('merge_folder_list_details')) {
 function merge_folder_list_details($folder_sources) {
     $res = array();
     if (!is_array($folder_sources)) {
@@ -506,12 +526,13 @@ function merge_folder_list_details($folder_sources) {
     }
     ksort($res);
     return $res;
-}
+}}
 
 /**
  * Get the contents of an ini file, first check the config
  * @subpackage core/functions
  */
+if (!hm_exists('get_ini')) {
 function get_ini($config, $name, $sections=false) {
     if (!DEBUG_MODE) {
         $data = $config->get($name, array());
@@ -527,13 +548,14 @@ function get_ini($config, $name, $sections=false) {
         }
     }
     return array();
-}
+}}
 
 /**
  * Determine the correct TLS connection type to use based
  * on what this version of PHP supports
  * @return const
  */
+if (!hm_exists('get_tls_stream_type')) {
 function get_tls_stream_type() {
     $method = STREAM_CRYPTO_METHOD_TLS_CLIENT;
     if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
@@ -541,12 +563,13 @@ function get_tls_stream_type() {
         $method |= STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
     }
     return $method;
-}
+}}
 
 /**
  * List of valid start page options
  * @return array
  */
+if (!hm_exists('start_page_opts')) {
 function start_page_opts() {
     return array(
         'None' => 'none',
@@ -556,7 +579,7 @@ function start_page_opts() {
         'Flagged' => 'page=message_list&list_path=flagged',
         'Compose' => 'page=compose'
     );
-}
+}}
 
 /**
  * See if a host + username is already in a server list
@@ -565,6 +588,7 @@ function start_page_opts() {
  * @param string $user username to check for
  * @return bool
  */
+if (!hm_exists('in_server_list')) {
 function in_server_list($list, $id, $user) {
     $exists = false;
     $server = $list::dump($id);
@@ -585,11 +609,12 @@ function in_server_list($list, $id, $user) {
         }
     }
     return $exists;
-}
+}}
 
 /**
  * @subpackage core/functions
  */
+if (!hm_exists('profiles_by_smtp_id')) {
 function profiles_by_smtp_id($profiles, $id) {
     $res = array();
     foreach ($profiles as $vals) {
@@ -598,4 +623,4 @@ function profiles_by_smtp_id($profiles, $id) {
         }
     }
     return $res;
-}
+}}

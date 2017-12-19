@@ -292,6 +292,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
 /**
  * @subpackage profile/functions
  */
+if (!hm_exists('profile_form')) {
 function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res = '';
     if ($form_vals['name']) {
@@ -343,5 +344,5 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     }
     $res .= '</td></tr></table></form>';
     return $res;
-}
+}}
 

@@ -153,6 +153,7 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
 /**
  * @subpackage dynamic_login/functions
  */
+if (!hm_exists('dynamic_login_config')) {
 function dynamic_login_config($config) {
     $settings = array(
         'host' => false,
@@ -178,4 +179,4 @@ function dynamic_login_config($config) {
         $settings['smtp_pre'] = $res['dynamic_smtp_subdomain'];
     }
     return $settings;
-}
+}}

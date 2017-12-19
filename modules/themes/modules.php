@@ -96,14 +96,15 @@ class Hm_Output_theme_setting extends Hm_Output_Module {
 /**
  * icon colors for theme selection
  */
+if (!hm_exists('icon_color')) {
 function icon_color($theme) {
-
-}
+}}
 
 /**
  * Define available themes
  * @subpackage themes/functions
  */
+if (!hm_exists('hm_themes')) {
 function hm_themes() {
     return array(
         'default' => 'White Bread (Default)',
@@ -117,12 +118,13 @@ function hm_themes() {
         'hn' => 'Hacker News',
         'so_alone' => 'So Alone',
     );
-}
+}}
 
 /**
  * White UI icons
  * @subpackage themes/functions
  */
+if (!hm_exists('hm_theme_icons')) {
 function hm_theme_icons($color='white') {
     $icons = array(
         'power' => false,
@@ -185,11 +187,12 @@ function hm_theme_icons($color='white') {
             Hm_Image_Sources::$$name = $pre.rawurlencode(str_replace('/>', 'fill="'.$color.'" />', $img));
         }
     }
-}
+}}
 
 /**
  * Custom theme check
  */
+if (!hm_exists('custom_themes')) {
 function custom_themes($config, $themes) {
     $custom = get_ini($config, 'themes.ini');
     if (!is_array($custom)) {
@@ -209,4 +212,5 @@ function custom_themes($config, $themes) {
         $themes[$parts[0]] = $parts[1];
     }
     return $themes;
-}
+}}
+

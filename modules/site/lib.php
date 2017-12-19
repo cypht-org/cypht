@@ -122,4 +122,7 @@ class Custom_Auth extends Hm_Auth_DB {
     }
 }
 
+/*function format_msg_html($str, $images=false) {
+    return '';
+}*/
 ?>

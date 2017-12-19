@@ -204,6 +204,7 @@ class Hm_Output_calendar_content extends Hm_Output_Module {
     }
 }
 
+if (!hm_exists('get_date_bounds')) {
 function get_date_bounds($data, $view) {
     if ($view == 'week') {
         $start = $data[0];
@@ -221,4 +222,4 @@ function get_date_bounds($data, $view) {
         $end = array_pop($last_week);
     }
     return array($start, $end);
-}
+}}

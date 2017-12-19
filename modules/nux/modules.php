@@ -392,6 +392,7 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
 /**
  * @subpackage nux/functions
  */
+if (!hm_exists('oauth2_form')) {
 function oauth2_form($details, $mod) {
     $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
     $url = $oauth2->request_authorization_url($details['auth_uri'], $details['scope'], 'nux_authorization', $details['email']);
@@ -402,11 +403,12 @@ function oauth2_form($details, $mod) {
     $res .= '</div><a class="enable_auth2" href="'.$url.'">'.$mod->trans('Enable').'</a>';
     $res .= '<a href="" class="reset_nux_form">Reset</a>';
     return $res;
-}
+}}
 
 /**
  * @subpackage nux/functions
  */
+if (!hm_exists('credentials_form')) {
 function credentials_form($details, $mod) {
     $res = '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
     $res .= '<input type="hidden" name="nux_name" class="nux_name" value="'.$mod->html_safe($details['name']).'" />';
@@ -419,17 +421,18 @@ function credentials_form($details, $mod) {
     $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
     $res .= '<a href="" class="reset_nux_form">Reset</a>';
     return $res;
-}
+}}
 
 /**
  * @subpackage nux/functions
  */
+if (!hm_exists('data_source_available')) {
 function data_source_available($mods, $types) {
     if (!is_array($types)) {
         $types = array($types);
     }
     return count( array_intersect($types, $mods) ) == count( $types );
-}
+}}
 
 /**
  * @subpackage nux/lib

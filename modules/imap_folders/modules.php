@@ -422,6 +422,7 @@ class Hm_Output_folders_page_link extends Hm_Output_Module {
 /**
  * @subpackage imap_folders/functions
  */
+if (!hm_exists('decode_folder_str')) {
 function decode_folder_str($folder) {
     $folder_name = false;
     $parts = explode('_', $folder, 3);
@@ -429,11 +430,12 @@ function decode_folder_str($folder) {
         $folder_name = hex2bin($parts[2]);
     }
     return $folder_name;
-}
+}}
 
 /**
  * @subpackage imap_folders/functions
  */
+if (!hm_exists('prep_folder_name')) {
 function prep_folder_name($imap, $folder, $decode_folder=false, $parent=false) {
     if ($parent) {
         $parent = decode_folder_str($parent);
@@ -455,11 +457,12 @@ function prep_folder_name($imap, $folder, $decode_folder=false, $parent=false) {
         $folder = sprintf('%s%s', $ns['prefix'], $folder);
     }
     return $folder;
-}
+}}
 
 /**
  * @subpackage imap_folders/functions
  */
+if (!hm_exists('get_personal_ns')) {
 function get_personal_ns($imap) {
     $namespaces = $imap->get_namespaces();
     foreach ($namespaces as $ns) {
@@ -471,5 +474,5 @@ function get_personal_ns($imap) {
         'prefix' => false,
         'delim'=> false
     );
-}
+}}
 

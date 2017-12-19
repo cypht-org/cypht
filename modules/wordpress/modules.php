@@ -438,13 +438,15 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
 /**
  * @subpackage wordpress/functions
  */
+if (!hm_exists('wp_connect_details')) {
 function wp_connect_details($config) {
     return get_ini($config, 'wordpress.ini');
-}
+}}
 
 /**
  * @subpackage wordpress/functions
  */
+if (!hm_exists('wp_build_notice_headers')) {
 function wp_build_notice_headers($data, $output_mod) {
     return '<table class="msg_headers">'.
         '<col class="header_name_col"><col class="header_val_col"></colgroup>'.
@@ -454,11 +456,12 @@ function wp_build_notice_headers($data, $output_mod) {
         ' ('.human_readable_interval(date('r', $data['timestamp'])).')</td></tr>'.
         '<tr class="header_type"><th>'.$output_mod->trans('Type').'</th><td>'.$data['type'].'</td></tr>'.
         '<tr class="header_cid"><th>'.$output_mod->trans('Id').'</th><td>'.$data['id'].'</td></tr><tr><td></td><td></td></tr></table>';
-}
+}}
 
 /**
  * @subpackage wordpress/functions
  */
+if (!hm_exists('wp_build_notice_text')) {
 function wp_build_notice_text($type, $data) {
     $res = array();
     if ($type == 'comment') {
@@ -467,32 +470,35 @@ function wp_build_notice_text($type, $data) {
         }
     }
     return '<div class="msg_text_inner">'.format_msg_html(implode('<div class="hr"></div>', $res)).'</div>';
-}
+}}
 
 /**
  * @subpackage wordpress/functions
  */
+if (!hm_exists('wp_get_notifications')) {
 function wp_get_notifications($details) {
     $result = array();
     return wp_fetch_content($details, WPCOM_NOTICES_URL);
-}
+}}
 
 /**
  * @subpackage wordpress/functions
  */
+if (!hm_exists('wp_get_notice_detail')) {
 function wp_get_notice_detail($details, $uid) {
     $uid = (int) $uid;
     return wp_fetch_content($details, WPCOM_NOTICE_URL.$uid);
-}
+}}
 
 /**
  * @subpackage wordpress/functions
  */
+if (!hm_exists('wp_fetch_content')) {
 function wp_fetch_content($details, $url, $post=array()) {
     if (!is_array($details) || empty($details) || !array_key_exists('access_token', $details)) {
         return array();
     }
     $api = new Hm_API_Curl();
     return $api->command($url, array('Authorization: Bearer ' . $details['access_token']), $post);
-}
+}}
 

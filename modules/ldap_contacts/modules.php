@@ -751,6 +751,7 @@ class Hm_Output_ldap_form_postalcode extends Hm_Output_Module {
 /**
  * @subpackage ldap_contacts/functions
  */
+if (!hm_exists('get_ldap_value')) {
 function get_ldap_value($fld, $mod) {
     $current = $mod->get('current_ldap_contact');
     if (!is_array($current) || !array_key_exists('all_fields', $current)) {
@@ -763,11 +764,12 @@ function get_ldap_value($fld, $mod) {
         return $current[$fld];
     }
     return '';
-}
+}}
 
 /**
  * @subpackage ldap_contacts/functions
  */
+if (!hm_exists('fetch_ldap_contacts')) {
 function fetch_ldap_contacts($config, $contact_store, $session=false) {
     $ldap_config = ldap_config($config);
     if (count($ldap_config) > 0) {
@@ -783,11 +785,12 @@ function fetch_ldap_contacts($config, $contact_store, $session=false) {
         }
     }
     return array($contact_store, $ldap_config);
-}
+}}
 
 /**
  * @subpackage ldap_contacts/functions
  */
+if (!hm_exists('ldap_add_user_auth')) {
 function ldap_add_user_auth($ldap_config, $auths) {
     if (!is_array($ldap_config) || !is_array($auths)) {
         return $ldap_config;
@@ -804,16 +807,17 @@ function ldap_add_user_auth($ldap_config, $auths) {
         }
     }
     return $ldap_config;
-}
+}}
 
 /**
  * @subpackage ldap_contacts/functions
  */
+if (!hm_exists('ldap_config')) {
 function ldap_config($config, $key=false) {
     $details = get_ini($config, 'ldap.ini', true);
     if ($key && array_key_exists($key, $details)) {
         return $details[$key];
     }
     return $details;
-}
+}}
 

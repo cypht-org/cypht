@@ -748,28 +748,6 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
 }
 
 /**
- * @subpackage feeds/functions
- */
-function feed_source_callback($vals, $style, $output_mod) {
-    if ($vals[2]) {
-        $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
-    }
-    else {
-        $img = '';
-    }
-    if ($style == 'email') {
-        return sprintf('<td class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</td>',
-            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
-            $img, $output_mod->html_safe($vals[1]));
-    }
-    elseif ($style == 'news') {
-        return sprintf('<div class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</div>',
-            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
-            $img, $output_mod->html_safe($vals[1]));
-    }
-}
-
-/**
  * @subpackage feeds/output
  */
 class Hm_Output_filter_feed_folders extends Hm_Output_Module {
@@ -887,6 +865,30 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
 /**
  * @subpackage feeds/functions
  */
+if (!hm_exists('feed_source_callback')) {
+function feed_source_callback($vals, $style, $output_mod) {
+    if ($vals[2]) {
+        $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+    }
+    else {
+        $img = '';
+    }
+    if ($style == 'email') {
+        return sprintf('<td class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</td>',
+            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
+            $img, $output_mod->html_safe($vals[1]));
+    }
+    elseif ($style == 'news') {
+        return sprintf('<div class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</div>',
+            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
+            $img, $output_mod->html_safe($vals[1]));
+    }
+}}
+
+/**
+ * @subpackage feeds/functions
+ */
+if (!hm_exists('address_from_url')) {
 function address_from_url($str) {
     $res = $str;
     $url_bits = parse_url($str);
@@ -894,11 +896,12 @@ function address_from_url($str) {
         $res = $url_bits['host'];
     }
     return $res;
-}
+}}
 
 /**
  * @subpackage feeds/functions
  */
+if (!hm_exists('is_news_feed')) {
 function is_news_feed($url, $limit=20) {
     $feed = new Hm_Feed();
     $feed->limit = $limit;
@@ -910,11 +913,12 @@ function is_news_feed($url, $limit=20) {
     else {
         return $feed;
     }
-}
+}}
 
 /**
  * @subpackage feeds/functions
  */
+if (!hm_exists('search_for_feeds')) {
 function search_for_feeds($html) {
     $type = false;
     $href = false;
@@ -931,13 +935,13 @@ function search_for_feeds($html) {
         }
     }
     return array($type, $href);
-}
+}}
 
 /**
  * @subpackage feeds/functions
  */
+if (!hm_exists('search_feed_item')) {
 function search_feed_item($item, $terms, $since, $fld) {
-
     if (array_key_exists('pubdate', $item)) {
         if (strtotime($item['pubdate']) < strtotime($since)) {
             return false;
@@ -971,22 +975,24 @@ function search_feed_item($item, $terms, $since, $fld) {
         }
     }
     return false;
-}
+}}
 
 /**
  * @subpackage feeds/functions
  */
+if (!hm_exists('feed_memcached_save')) {
 function feed_memcached_save($config, $feed_data, $data) {
     $key = hash('sha256', (sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port'])));
     $cache = new Hm_Memcached($config);
     return $cache->set($key, $data);
-}
+}}
 
 /**
  * @subpackage feeds/functions
  */
+if (!hm_exists('feed_memcached_fetch')) {
 function feed_memcached_fetch($config, $feed_data) {
     $key = hash('sha256', (sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port'])));
     $cache = new Hm_Memcached($config);
     return $cache->get($key);
-}
+}}

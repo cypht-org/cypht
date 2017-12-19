@@ -120,29 +120,6 @@ class Hm_Output_start_shortcuts_page extends Hm_Output_Module {
 }
 
 /**
- * @subpackage keyboard_shortcuts/functions
- */
-function format_shortcut_section($data, $type, $output_mod) {
-    $res = '';
-    $codes = keycodes();
-    foreach ($data as $index => $vals) {
-        if ($vals['group'] == $type) {
-            $c_keys = ucfirst(implode(' + ', $vals['control_chars']));
-            if ($c_keys) {
-                $c_keys .= ' +';
-            }
-            $char = array_search($vals['char'], $codes);
-            $res .= sprintf('<tr><th class="keys">%s %s</th><th>%s</th>'.
-                '<td><a href="?page=shortcuts&edit_id=%s"><img alt="'.
-                $output_mod->trans('Update').'" class="kbd_config" src="%s" /><a></td></tr>',
-                $output_mod->html_safe($c_keys), $output_mod->html_safe($char),
-                $output_mod->trans($vals['label']), $index, Hm_Image_Sources::$cog);
-        }
-    }
-    return $res;
-}
-
-/**
  * @subpackage keyboard_shortcuts/output
  */
 class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
@@ -243,6 +220,31 @@ class Hm_Output_shortcuts_page_link extends Hm_Output_Module {
 /**
  * @subpackage keyboard_shortcuts/functions
  */
+if (!hm_exists('format_shortcut_section')) {
+function format_shortcut_section($data, $type, $output_mod) {
+    $res = '';
+    $codes = keycodes();
+    foreach ($data as $index => $vals) {
+        if ($vals['group'] == $type) {
+            $c_keys = ucfirst(implode(' + ', $vals['control_chars']));
+            if ($c_keys) {
+                $c_keys .= ' +';
+            }
+            $char = array_search($vals['char'], $codes);
+            $res .= sprintf('<tr><th class="keys">%s %s</th><th>%s</th>'.
+                '<td><a href="?page=shortcuts&edit_id=%s"><img alt="'.
+                $output_mod->trans('Update').'" class="kbd_config" src="%s" /><a></td></tr>',
+                $output_mod->html_safe($c_keys), $output_mod->html_safe($char),
+                $output_mod->trans($vals['label']), $index, Hm_Image_Sources::$cog);
+        }
+    }
+    return $res;
+}}
+
+/**
+ * @subpackage keyboard_shortcuts/functions
+ */
+if (!hm_exists('shortcut_defaults')) {
 function shortcut_defaults($user_config=false) {
     $res = array(
         array('label' => 'Unfocus all input elements', 'group' => 'general', 'page' => '*', 'control_chars' => array(), 'char' => 27, 'action' => 'Keyboard_Shortcuts.unfocus', 'target' => 'false'),
@@ -283,11 +285,12 @@ function shortcut_defaults($user_config=false) {
         $res[$index]['control_chars'] = $vals['meta'];
     }
     return $res;
-}
+}}
 
 /**
  * @subpackage keyboard_shortcuts/functions
  */
+if (!hm_exists('format_shortcuts')) {
 function format_shortcuts($data) {
     $res = "var shortcuts = [\n";
     foreach ($data as $vals) {
@@ -297,11 +300,12 @@ function format_shortcuts($data) {
     }
     $res .= "];\n";
     return $res;
-}
+}}
 
 /**
  * @subpackage keyboard_shortcuts/functions
  */
+if (!hm_exists('keycodes')) {
 function keycodes() {
 	return array(
 		'backspace' => 8, 'enter' => 13, 'pause/break' => 19, 'escape' => 27, 'page up' => 33, 'page down' => 34,
@@ -315,4 +319,5 @@ function keycodes() {
 		'semi-colon' => 186, 'equal sign' => 187, 'comma' => 188, 'dash' => 189, 'period' => 190, 'forward slash' => 191, 'grave accent' => 192,
 		'open bracket' => 219, 'back slash' => 220, 'close bracket' => 221, 'single quote' => 222
 	);
-}
+}}
+
