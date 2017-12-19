@@ -163,6 +163,9 @@ class Hm_Dispatch {
         /* get the site config defined in the hm3.rc file */
         $this->site_config = $config;
 
+        /* check for the site module set override */
+        $this->load_site_lib();
+
         /* setup a session handler, but don't actually start a session yet */
         $session_config = new Hm_Session_Setup($this->site_config);
         $this->session = $session_config->setup_session();
@@ -175,6 +178,20 @@ class Hm_Dispatch {
 
         /* do it */
         $this->process_request();
+    }
+
+    /**
+     * Possibly include the site module lib.php overrides
+     * @return void
+     */
+    private function load_site_lib() {
+        if (!in_array('site', $this->site_config->get_modules(), true)) {
+            return;
+        }
+        if (is_readable(APP_PATH.'modules/site/lib.php')) {
+            Hm_Debug::add('Including site module set lib.php');
+            require APP_PATH.'modules/site/lib.php';
+        }
     }
 
     /**

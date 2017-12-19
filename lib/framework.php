@@ -31,11 +31,6 @@ require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
 
-/* load the site module set library if found */
-if (is_readable(APP_PATH.'modules/site/lib.php')) {
-    require APP_PATH.'modules/site/lib.php';
-}
-
 /* load random bytes polyfill if needed */
 if (!function_exists('random_bytes')) {
     require APP_PATH.'third_party/random_compat/lib/random.php';
@@ -207,4 +202,39 @@ if (!class_exists('Hm_Functions')) {
             return stream_socket_enable_crypto($socket, true, $type);
         }
     }
+}
+
+/**
+ * See if a function already exists
+ * @param string $name function name to check
+ * @return boolean
+ */
+function hm_exists($name) {
+    $bt = debug_backtrace();
+    $caller = array_shift($bt);
+    $module = hm_get_module_from_path($caller['file']);
+    if (function_exists($name)) {
+        Hm_Debug::add(sprintf('Function in %s replaced: %s', $module, $name));
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Return the module set name from a file path
+ * @param string $path file path
+ * @return string
+ */
+function hm_get_module_from_path($path) {
+    $data = pathinfo($path);
+    if (!is_array($data) || !array_key_exists('dirname', $data)) {
+        return 'unknown';
+    }
+    $parts = array_reverse(explode(DIRECTORY_SEPARATOR, $data['dirname']));
+    foreach ($parts as $i => $v) {
+        if ($v == 'modules') {
+            return $parts[($i - 1)];
+        }
+    }
+    return 'unknown';
 }
