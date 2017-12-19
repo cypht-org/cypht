@@ -22,6 +22,19 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_init_with_site_lib() {
+        ob_start();
+        ob_start();
+        $this->config->mods[] = 'site';
+        Hm_Functions::$exists = false;
+        $router = new Hm_Dispatch($this->config);
+        $this->assertEquals('home', $router->page);
+        ob_end_clean();
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_process_request() {
         ob_start();
         ob_start();

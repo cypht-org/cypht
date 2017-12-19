@@ -527,6 +527,7 @@ class Hm_Test_Session_Functions extends PHPUnit_Framework_TestCase {
     public function setUp() {
         require 'bootstrap.php'; 
         $this->config = new Hm_Mock_Config();
+        require APP_PATH.'modules/site/lib.php';
     }
     /**
      * @preserveGlobalState disabled
