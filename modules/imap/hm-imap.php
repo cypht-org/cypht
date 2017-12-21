@@ -1003,7 +1003,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             $charset = 'CHARSET '.strtoupper($this->search_charset).' ';
         }
         else {
-            $charset = ' ';
+            $charset = '';
         }
         if (!empty($terms)) {
             $search_key = false;
@@ -1059,6 +1059,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
             $this->send_command($search_lit."\r\n", true);
         }
+        elog($command);
         $result = $this->get_response(false, true);
         $status = $this->check_response($result, true);
         $res = array();
