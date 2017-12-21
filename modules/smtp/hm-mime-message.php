@@ -127,8 +127,13 @@ class Hm_MIME_Msg {
         return str_split($val, $size);
     }
 
-    function encode_fld($val) {
-        $parts = explode(' ', $val);
+    function encode_fld($val, $single=false) {
+        if ($single) {
+            $parts = array($val);
+        }
+        else {
+            $parts = explode(' ', $val);
+        }
         $res = array();
         foreach ($parts as $v) {
             if (preg_match('/(?:[^\x00-\x7F])/',$v) === 1) {
@@ -154,9 +159,10 @@ class Hm_MIME_Msg {
             $res = array();
             foreach(process_address_fld($val) as $vals) {
                 $display_name = $this->quote_fld($vals['label']);
+                $display_name = $this->encode_fld($display_name, true);
                 $res[] = sprintf('%s <%s>', $display_name, $vals['email']);
             }
-            $val = implode(', ', $res);
+            return implode(', ', $res);
         }
         return $this->encode_fld($val);
     }
