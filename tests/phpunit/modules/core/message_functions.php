@@ -59,11 +59,11 @@ class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
             'From' => 'foo@bar.com',
             'Cc' => 'baz@bar.com, not@me.com'
         );
-        $this->assertEquals(array('<foo@bar.com>', ''), reply_to_address($headers, 'reply', array()));
+        $this->assertEquals(array('foo@bar.com', ''), reply_to_address($headers, 'reply', array()));
         $this->assertEquals('', reply_to_address($headers, 'forward', array()));
-        $this->assertEquals(array('<foo@bar.com>', '<baz@bar.com>, <not@me.com>, "me" <some@body.com>'), reply_to_address($headers, 'reply_all', array()));
+        $this->assertEquals(array('foo@bar.com', 'baz@bar.com, not@me.com, me some@body.com'), reply_to_address($headers, 'reply_all', array()));
         unset($headers['Cc']);
-        $this->assertEquals(array('<foo@bar.com>', '"me" <some@body.com>'), reply_to_address($headers, 'reply_all', array('not@me.com')));
+        $this->assertEquals(array('foo@bar.com', 'me some@body.com'), reply_to_address($headers, 'reply_all', array('not@me.com')));
         $this->assertEquals(array('', ''), reply_to_address(array('From' => 'not@me.com'), 'reply_all', array('not@me.com')));
     }
     /**
@@ -130,7 +130,7 @@ class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
             'Cc' => 'baz@bar.com, not@me.com'
         );
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->assertEquals(array('<foo@bar.com>', '', '', '> this is a message', ''), format_reply_fields('this is a message', $headers, array('type' => 'text', 'subtype' => 'plain'), false, $mod, 'reply', array()));
+        $this->assertEquals(array('foo@bar.com', '', '', '> this is a message', ''), format_reply_fields('this is a message', $headers, array('type' => 'text', 'subtype' => 'plain'), false, $mod, 'reply', array()));
     }
     /**
      * @preserveGlobalState disabled
