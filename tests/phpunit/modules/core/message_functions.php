@@ -141,5 +141,35 @@ class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
         $this->assertEquals('foo', decode_fld('=?iso-8859-1?B?'.base64_encode('foo').'?='));
         $this->assertEquals('foo', decode_fld('foo'));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_process_address_fld() {
+        $res = array(
+            array (
+                'email' => 'blah@tests.com',
+                'comment' => '(comment here)',
+                'label' => 'stuff foo',
+            ),
+            array(
+                'email' => 'foo@blah.com',
+                'comment' => '',
+                'label' => 'bad address',
+            ),
+            array(
+                'email' => 'brack@ets.org',
+                'comment' => '',
+                'label' => 'good address',
+            ),
+            array(
+                'email' => 'actual@foo.com',
+                'comment' => '',
+                'label' => 'not@addy.com'
+            )
+        );
+        $this->assertEquals($res, process_address_fld('"stuff" foo blah@tests.com (comment here), bad address <"foo@blah.com">, good address <brack@ets.org>, \'not@addy.com\' actual@foo.com'));
+    }
+
 }
 ?>

@@ -123,6 +123,7 @@ class Hm_Test_Core_Message_List_Functions extends PHPUnit_Framework_TestCase {
         $this->assertEquals('<div class="list_sources"><div class="src_title">Sources</div><div class="list_src">imap blah foo</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap', 'folder' => bin2hex('foo'))), $mod));
         $this->assertEquals('<div class="list_sources"><div class="src_title">Sources</div><div class="list_src">imap blah INBOX</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap')), $mod));
         $this->assertEquals('<div class="list_sources"><div class="src_title">Sources</div><div class="list_src">pop3 blah </div></div>', list_sources(array(array('name' => 'blah', 'type' => 'pop3')), $mod));
+        $this->assertEquals('<div class="list_sources"><div class="src_title">Sources</div></div>', list_sources(array(array('nodisplay' => true, 'name' => 'blah', 'type' => 'pop3')), $mod));
     }
     /**
      * @preserveGlobalState disabled

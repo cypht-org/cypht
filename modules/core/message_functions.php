@@ -158,10 +158,10 @@ function format_reply_address($fld, $excluded) {
     if ($res) {
         return implode(', ', array_map(function($v) {
             if (trim($v['label'])) {
-                return '"'.$v['label'].'"'.' <'.$v['email'].'>';
+                return $v['label'].' '.$v['email'];
             }
             else {
-                return '<'.$v['email'].'>';
+                return $v['email'];
             }
         }, $res));
     }
@@ -175,19 +175,22 @@ function format_reply_address($fld, $excluded) {
  */
 if (!hm_exists('split_address_fld')) {
 function split_address_fld($str) {
-    $str = str_replace(array('<"', "<'", '<\'"', '<"\''), '<', trim($str));
-    $str = str_replace(array('">', "'>", '\'">', '"\'>'), '>', $str);
-    $pos = 0;
-    $index = 0;
     $output = array();
     $in_quotes = false;
+    $pos = 0;
+    $index = 0;
     $end = strlen($str);
     $substr = '';
 
     while ($pos < $end) {
-        if (!$in_quotes && ($str{$pos} == '"' || $str{$pos} == "'")) {
+        if (!$in_quotes && ($str{$pos} == '(' || $str{$pos} == '"' || $str{$pos} == "'")) {
             $substr = $str{$pos};
-            $in_quotes = $str{$pos};
+            if ($substr == '(') {
+                $in_quotes = ')';
+            }
+            else {
+                $in_quotes = $str{$pos};
+            }
         }
         elseif ($in_quotes && $str{$pos} == $in_quotes) {
             $substr .= $str{$pos};
@@ -200,7 +203,12 @@ function split_address_fld($str) {
             if ($substr) {
                 $output[$index][] = $substr;
             }
-            $substr = '';
+            if ($str{$pos} == '<') {
+                $substr = $str{$pos};
+            }
+            else {
+                $substr = '';
+            }
         }
         elseif (!$in_quotes && ($str{$pos} == ',' || $str{$pos} == ';')) {
             $output[$index][] = $substr;
@@ -227,16 +235,42 @@ function process_address_fld($fld) {
     $data = split_address_fld($fld);
 
     foreach ($data as $vals) {
-        $parts = array();
+        $email = false;
+        $email_pos = false;
+        $label = array();
+        $parts = array('email' => '', 'comment' => '', 'label' => '');
         foreach ($vals as $i => $v) {
-            $v = trim($v, '<>\'"');
             if (is_email_address($v)) {
-                $parts['email'] = $v;
-                array_splice($vals, $i, 1);
-                $parts['label'] = str_replace(array('"', "'"), '', implode(' ', $vals));
-                $res[] = $parts;
+                $email = trim($v, '<>\'"');
+                $email_pos = $i;
                 break;
             }
+        }
+        if (!$email) {
+            foreach ($vals as $i => $v) {
+                $v = trim($v, '<>\'"');
+                if (is_email_address($v)) {
+                    $email = trim($v, '<>\'"');
+                    $email_pos = $i;
+                    break;
+                }
+            }
+        }
+        if ($email) {
+            $parts['email'] = $email;
+            foreach ($vals as $i => $v) {
+                if ($i == $email_pos) {
+                    continue;
+                }
+                if ($v{0} == '(') {
+                    $parts['comment'] = $v;
+                }
+                else {
+                    $label[] = $v;
+                }
+            }
+            $parts['label'] = str_replace(array('"', "'"), '', implode(' ', $label));
+            $res[] = $parts;
         }
     }
     return $res;

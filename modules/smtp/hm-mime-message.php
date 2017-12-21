@@ -91,7 +91,7 @@ class Hm_MIME_Msg {
             if (!trim($val)) {
                 continue;
             }
-            $headers .= sprintf("%s: %s\r\n", $name, $this->encode_header_fld($val));
+            $headers .= sprintf("%s: %s\r\n", $name, $this->prep_fld($val, $name));
         }
         if (!$this->final_msg) {
             if ($this->html) {
@@ -114,39 +114,51 @@ class Hm_MIME_Msg {
         $this->headers['X-Auto-Bcc'] = 'cypht';
     }
 
-    function encode_header_fld($input, $email=true) {
+    function quote_fld($val) {
+        if (!preg_match("/^[a-zA-Z0-9 !#$%&'\*\+\-\/\=\?\^_`\{\|\}]+$/", $val)) {
+            return sprintf('"%s"', $val);
+        }
+        return $val;
+    }
+
+    function split_val($val, $bsize) {
+        $count = ceil($bsize/75);
+        $size = round(strlen($val)/$count);
+        return str_split($val, $size);
+    }
+
+    function encode_fld($val) {
+        $parts = explode(' ', $val);
         $res = array();
-        $input = trim($input, ',; ');
-        $parts = explode(' ', $input);
         foreach ($parts as $v) {
             if (preg_match('/(?:[^\x00-\x7F])/',$v) === 1) {
-                $leading_quote = false;
-                $trailing_quote = false;
-                if (substr($v, 0, 1) == '"' || substr($v, 0, 1) == "'") {
-                    $quote = substr($v, 0, 1);
-                    $v = substr($v, 1);
-                    $leading_quote = true;
+                $bsize = round(((strlen($v)*4)/3)+13);
+                if ($bsize > 75) {
+                    foreach ($this->split_val($v, $bsize) as $slice) {
+                        $res[] = $this->encode_fld($slice);
+                    }
                 }
-                if (substr($v, -1) == '"' || substr($v, -1) == "'") {
-                    $quote = substr($v, -1);
-                    $trailing_quote = true;
-                    $v = substr($v, 0, -1);
+                else {
+                    $res[] = '=?UTF-8?B?'.base64_encode($v).'?=';
                 }
-                $enc_val = '=?UTF-8?B?'.base64_encode($v).'?=';
-                if ($leading_quote) {
-                    $enc_val = $quote.$enc_val;
-                }
-                if ($trailing_quote) {
-                    $enc_val = $enc_val.$quote;
-                }
-                $res[] = $enc_val;
             }
             else {
                 $res[] = $v;
             }
         }
-        $string = preg_replace("/\s{2,}/", ' ', trim(implode(' ', $res)));
-        return $string;
+        return implode(' ', $res);
+    }
+
+    function prep_fld($val, $name) {
+        if (in_array($name, array('To', 'From', 'Cc', 'Reply-to'), true)) {
+            $res = array();
+            foreach(process_address_fld($val) as $vals) {
+                $display_name = $this->quote_fld($vals['label']);
+                $res[] = sprintf('%s <%s>', $display_name, $vals['email']);
+            }
+            $val = implode(', ', $res);
+        }
+        return $this->encode_fld($val);
     }
 
     function find_addresses($str) {

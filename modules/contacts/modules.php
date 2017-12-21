@@ -62,7 +62,7 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
             $contacts = $this->get('contact_store');
             $contact = $contacts->get($this->request->get['contact_id']);
             if ($contact) {
-                $to = sprintf('"%s" <%s>', $contact->value('display_name'), $contact->value('email_address'));
+                $to = sprintf('%s <%s>', $contact->value('display_name'), $contact->value('email_address'));
                 $this->out('compose_draft', array('draft_to' => $to, 'draft_subject' => '', 'draft_body' => ''));
             }
         }
@@ -217,7 +217,7 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
         foreach ($this->get('contact_suggestions', array()) as $contact) {
             if (trim($contact->value('display_name'))) {
                 $suggestions[] = $this->html_safe(sprintf(
-                    '"%s" %s', $contact->value('display_name'), $contact->value('email_address')
+                    '%s %s', $contact->value('display_name'), $contact->value('email_address')
                 ));
             }
             else {
