@@ -2809,7 +2809,12 @@ function merge_imap_search_results($ids, $search_type, $session, $config, $folde
             if ($imap->select_mailbox($folder)) {
                 $status['imap_'.$id.'_'.bin2hex($folder)] = $imap->folder_state;
                 if (!empty($terms)) {
-                    $imap->search_charset = 'UTF-8';
+                    foreach ($terms as $term) {
+                        if (preg_match('/(?:[^\x00-\x7F])/', $term) === 1) {
+                            $imap->search_charset = 'UTF-8';
+                            break;
+                        }
+                    }
                     if ($sent) {
                         $msgs = $imap->search($search_type, false, $terms, array(), true, false, true);
                     }
