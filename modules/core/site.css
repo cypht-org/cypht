@@ -261,6 +261,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .search_update { clear: both; }
     .search_content .refresh_list { display: none; }
     .search_content .content_title { max-height: 500px; }
+    .search_content { padding-top: 60px; }
     .unsaved_reminder { display: none; }
     .checkbox_cell { width: 35px; }
     .checkbox_cell label { width: 30px; height: 30px; }
