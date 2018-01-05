@@ -158,8 +158,8 @@ class Hm_MIME_Msg {
         if (in_array($name, array('To', 'From', 'Cc', 'Reply-to'), true)) {
             $res = array();
             foreach(process_address_fld($val) as $vals) {
-                $display_name = $this->quote_fld($vals['label']);
-                $display_name = $this->encode_fld($display_name, true);
+                $display_name = $this->encode_fld($vals['label'], true);
+                $display_name = $this->quote_fld($display_name);
                 $res[] = sprintf('%s <%s>', $display_name, $vals['email']);
             }
             return implode(', ', $res);
