@@ -115,6 +115,9 @@ class Hm_MIME_Msg {
     }
 
     function quote_fld($val) {
+        if (!trim($val)) {
+            return '';
+        }
         if (!preg_match("/^[a-zA-Z0-9 !#$%&'\*\+\-\/\=\?\^_`\{\|\}]+$/", $val)) {
             return sprintf('"%s"', $val);
         }
@@ -160,7 +163,12 @@ class Hm_MIME_Msg {
             foreach(process_address_fld($val) as $vals) {
                 $display_name = $this->encode_fld($vals['label'], true);
                 $display_name = $this->quote_fld($display_name);
-                $res[] = sprintf('%s <%s>', $display_name, $vals['email']);
+                if ($display_name) {
+                    $res[] = sprintf('%s <%s>', $display_name, $vals['email']);
+                }
+                else {
+                    $res[] = sprintf('<%s>', $vals['email']);
+                }
             }
             return implode(', ', $res);
         }
