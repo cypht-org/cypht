@@ -22,8 +22,9 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
             $res .= '" alt="'.$this->trans('Search').'" width="16" height="16" /></a>';
         }
         $res .= '<input type="hidden" name="page" value="search" />'.
-            '<label class="screen_reader" for="search_terms">'.$this->trans('Search').'</label><input type="search" id="search_terms" class="search_terms" name="search_terms" placeholder="'.
-            $this->trans('Search').'" /></form></li>';
+            '<label class="screen_reader" for="search_terms">'.$this->trans('Search').
+            '</label><input type="search" id="search_terms" class="search_terms" '.
+            'name="search_terms" placeholder="'.$this->trans('Search').'" /></form></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -70,7 +71,8 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
-                '" href="?page=save"><img alt="'.$this->trans('Save').'" src="'.Hm_Image_Sources::$save.'" width="20" height="20" /></a></div>';
+                '" href="?page=save"><img alt="'.$this->trans('Save').'" src="'.
+                Hm_Image_Sources::$save.'" width="20" height="20" /></a></div>';
         }
         return '';
     }
@@ -113,7 +115,9 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
  */
 class Hm_Output_search_form_end extends Hm_Output_Module {
     protected function output() {
-        $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+        $source_link = '<a href="#" title="'.$this->trans('Sources').
+            '" class="source_link"><img alt="Sources" class="refresh_list" src="'.
+            Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
         $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
             $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.
             '" width="20" height="20" /></a>';
