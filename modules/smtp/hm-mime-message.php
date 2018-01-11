@@ -138,6 +138,7 @@ class Hm_MIME_Msg {
             $parts = explode(' ', $val);
         }
         $res = array();
+        $prior = false;
         foreach ($parts as $v) {
             if (preg_match('/(?:[^\x00-\x7F])/',$v) === 1) {
                 $bsize = round(((strlen($v)*4)/3)+13);
@@ -147,10 +148,17 @@ class Hm_MIME_Msg {
                     }
                 }
                 else {
-                    $res[] = '=?UTF-8?B?'.base64_encode($v).'?=';
+                    if ($prior && !$single) {
+                        $res[] = '=?UTF-8?B?'.base64_encode(' '.$v).'?=';
+                    }
+                    else {
+                        $res[] = '=?UTF-8?B?'.base64_encode($v).'?=';
+                    }
+                    $prior = true;
                 }
             }
             else {
+                $prior = false;
                 $res[] = $v;
             }
         }
