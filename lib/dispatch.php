@@ -142,7 +142,7 @@ trait Hm_Dispatch_Redirect {
 }
 
 /**
- * Page request router that ties all the framework peices together
+ * Page request router that ties all the framework pieces together
  * @package framework
  * @subpackage dispatch
  */
