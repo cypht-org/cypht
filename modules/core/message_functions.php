@@ -99,11 +99,10 @@ function format_reply_text($txt) {
  * @subpackage core/functions
  * @param array $headers message headers
  * @param string $type type (forward, reply, reply_all)
- * @param array $excluded list of email addresses to exclude from reply-all
  * @return string
  */
 if (!hm_exists('reply_to_address')) {
-function reply_to_address($headers, $type, $excluded) {
+function reply_to_address($headers, $type) {
     $msg_to = '';
     $msg_cc = '';
     $headers = lc_headers($headers);
@@ -111,16 +110,20 @@ function reply_to_address($headers, $type, $excluded) {
         return $msg_to;
     }
     foreach (array('reply-to', 'from', 'sender', 'return-path') as $fld) {
-        if (array_key_exists($fld, $headers) && $msg_to = format_reply_address($headers[$fld], $excluded)) {
-            break;
+        if (array_key_exists($fld, $headers)) { 
+            list($parsed, $msg_to) = format_reply_address($headers[$fld], array());
+            if ($msg_to) {
+                break;
+            }
         }
     }
     if ($type == 'reply_all') {
         if (array_key_exists('cc', $headers)) {
-            $msg_cc = format_reply_address($headers['cc'], $excluded);
+            list($cc_parsed, $msg_cc) = format_reply_address($headers['cc'], $parsed);
+            $parsed += $cc_parsed;
         }
         if (array_key_exists('to', $headers)) {
-            $recips = format_reply_address($headers['to'], $excluded);
+            list($parsed, $recips) = format_reply_address($headers['to'], $parsed);
             if ($recips) {
                 if ($msg_cc) {
                     $msg_cc .= ', '.$recips;
@@ -137,35 +140,36 @@ function reply_to_address($headers, $type, $excluded) {
 /*
  * Format a reply address line
  * @param string $fld the field values from the E-mail being replied to
- * @param array $excluded list of E-mail addresses to exclude
+ * @param array $excluded list of parsed addresses to exclude
  * @return string
  */
 if (!hm_exists('format_reply_address')) {
 function format_reply_address($fld, $excluded) {
     $addr = process_address_fld($fld);
     $res = array();
-    foreach ($addr as $vals) {
+    foreach ($addr as $v) {
         $skip = false;
-        foreach ($excluded as $v) {
-            if (strtolower(trim($vals['email'], '<>')) == strtolower(trim($v, '<>'))) {
+        foreach ($excluded as $ex) {
+            if (strtolower($v['email']) == strtolower($ex['email'])) {
                 $skip = true;
+                break;
             }
         }
         if (!$skip) {
-            $res[] = $vals;
+            $res[] = $v;
         }
     }
     if ($res) {
-        return implode(', ', array_map(function($v) {
+        return array($addr, implode(', ', array_map(function($v) {
             if (trim($v['label'])) {
                 return $v['label'].' '.$v['email'];
             }
             else {
                 return $v['email'];
             }
-        }, $res));
+        }, $res)));
     }
-    return '';
+    return array($addr, '');
 }}
 
 /**
@@ -462,16 +466,15 @@ function reply_to_id($headers, $type) {
  * @param string $type optional type (forward, reply, reply_all)
  * @param object $output_mod output module object
  * @param string $type the reply type
- * @param array $excluded list of email addresses to exclude from reply-all
  * @return array
  */
 if (!hm_exists('format_reply_fields')) {
-function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type='reply', $excluded) {
+function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type='reply') {
     $msg_to = '';
     $msg = '';
     $subject = reply_to_subject($headers, $type);
     $msg_id = reply_to_id($headers, $type);
-    list($msg_to, $msg_cc) = reply_to_address($headers, $type, $excluded);
+    list($msg_to, $msg_cc) = reply_to_address($headers, $type);
     $lead_in = reply_lead_in($headers, $type, $msg_to, $output_mod);
     $msg = reply_format_body($headers, $body, $lead_in, $type, $struct, $html);
     return array($msg_to, $msg_cc, $subject, $msg, $msg_id);

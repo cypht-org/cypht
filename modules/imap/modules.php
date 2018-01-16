@@ -1434,7 +1434,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                                     $subtype = 'plain';
                                 }
                                 list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', $subtype, $msg_struct);
-                                $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
+                                $struct = $imap->search_bodystructure($msg_struct, array('imap_part_number' => $part));
                                 $msg_struct_current = array_shift($struct);
                             }
                         }
