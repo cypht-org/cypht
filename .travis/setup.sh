@@ -14,6 +14,9 @@ update_repos() {
 
 # Enable memcached extension
 setup_memcached() {
+    if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then
+        sudo apt-get install -y php-memcached
+    fi
     echo 'extension=memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 }
 
