@@ -6,6 +6,7 @@ img { opacity: .4 !important; }
 a { color: #aaa !important; }
 a:hover { color: #fff !important; }
 .selected_part, .toggle_recipients, textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !important; }
+.move_to_location, .move_to_title { background-color: #363636; }
 textarea { font-size: 100%; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 #to_contacts, #cc_contacts, #bcc_contacts, .msg_parts, .info_content, .profile_content, .user_settings, .settings_table, .server_content div, .list_controls, .msg_controls a, .checkbox_label, .search_content, .msg_text, .compose_page, .list_sources, .confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background: none !important; background-color: #363636 !important; }
