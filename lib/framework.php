@@ -42,7 +42,7 @@ if (!defined('LIBSODIUM')) {
         define('LIBSODIUM', true);
         class Hm_Sodium_Compat extends Hm_Sodium_PECL {}
     }
-    if (!LIBSODIUM && extension_loaded('sodium') && function_exists('sodium_crypto_pwhash_str_verify')) {
+    if (!defined('LIBSODIUM') && extension_loaded('sodium') && function_exists('sodium_crypto_pwhash_str_verify')) {
         define('LIBSODIUM', true);
         class Hm_Sodium_Compat extends Hm_Sodium_PHP {}
     }
