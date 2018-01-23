@@ -330,7 +330,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                     break;
                 }
             }
-            if ($content) {
+            if ($title) {
                 feed_memcached_save($this->config, $feed_data, $feed_items);
                 Hm_Feed_Uid_Cache::read($form['feed_uid']);
                 $this->out('feed_message_content', $content);
@@ -577,7 +577,7 @@ class Hm_Output_feed_ids extends Hm_Output_Module {
  */
 class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('feed_message_content')) {
+        if ($this->get('feed_message_headers')) {
             $header_str = '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($this->get('feed_message_headers', array()) as $name => $value) {
