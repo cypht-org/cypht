@@ -675,6 +675,7 @@ var imap_move_copy = function(action) {
     var label;
     var move_to = $('.move_to_location');
     var folders = $('.email_folders').clone(false);
+    folders.find('.manage_folders_li').remove();
     $('.menu_email', folders).remove();
     folders.removeClass('email_folders');
     folders.show();
@@ -760,7 +761,9 @@ var imap_perform_move_copy = function(dest_id) {
 var expand_imap_move_to_mailbox = function(res) {
     if (res.imap_expanded_folder_path) {
         var move_to = $('.move_to_location');
-        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.move_to_location')).append(res.imap_expanded_folder_formatted);
+        var folders = $(res.imap_expanded_folder_formatted);
+        folders.find('.manage_folders_li').remove();
+        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.move_to_location')).append(folders);
         $('.imap_folder_link', move_to).addClass('imap_move_folder_link').removeClass('imap_folder_link');
         $('.imap_move_folder_link', move_to).unbind('click');
         $('.imap_move_folder_link', move_to).click(function() { return expand_imap_move_to_folders($(this).data('target')); });

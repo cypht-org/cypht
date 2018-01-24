@@ -2374,7 +2374,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span></li>';
     }
     if ($manage) {
-        $results .= '<li><a class="manage_folder_link" href="'.$manage.'"><img class="folder_icon manage_folder_icon" src="'.Hm_Image_Sources::$cog.'" alt="" width="16" height="16" />'.$output_mod->trans('Manage Folders').'</a>';
+        $results .= '<li class="manage_folders_li"><a class="manage_folder_link" href="'.$manage.'"><img class="folder_icon manage_folder_icon" src="'.Hm_Image_Sources::$cog.'" alt="" width="16" height="16" />'.$output_mod->trans('Manage Folders').'</a>';
     }
     $results .= '</ul>';
     return $results;

@@ -5,6 +5,7 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     var folder_location = $('.'+container);
     $('li', folder_location).not('.'+title).remove();
     var folders = $('.folder_list .imap_'+id+'_').clone(false);
+    folders.find('.manage_folders_li').remove();
     $('.imap_folder_link', folders).addClass(link_class).removeClass('imap_folder_link');
     folder_location.prepend(folders);
     folder_location.show();
@@ -35,7 +36,9 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
                 function(res) {
                     if (res.imap_expanded_folder_path) {
                         var folder_location = $('.'+container);
-                        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), folder_location).append(res.imap_expanded_folder_formatted);
+                        var folders = $(res.imap_expanded_folder_formatted);
+                        folders.find('.manage_folders_li').remove();
+                        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), folder_location).append(folders);
                         $('.imap_folder_link', folder_location).addClass(link_class).removeClass('imap_folder_link');
                         $('.'+link_class, folder_location).unbind('click');
                         $('.'+link_class, folder_location).click(function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest); });
