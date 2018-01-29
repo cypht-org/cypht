@@ -623,11 +623,13 @@ var display_reply_content = function(res) {
 };
 
 var imap_background_unread_content_result = function(res) {
-    var detail = Hm_Utils.parse_folder_path(Object.keys(res.folder_status)[0], 'imap');
-    var ids = [detail.server_id+'_'+detail.folder];
-    var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
-    globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'imap', cache);
-    Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
+    if (!$.isEmptyObject(res.folder_status)) {
+        var detail = Hm_Utils.parse_folder_path(Object.keys(res.folder_status)[0], 'imap');
+        var ids = [detail.server_id+'_'+detail.folder];
+        var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
+        globals.Hm_Background_Unread.update(ids, res.formatted_message_list, 'imap', cache);
+        Hm_Utils.save_to_local_storage('formatted_unread_data', cache.html());
+    }
 };
 
 var check_select_for_imap = function() {
