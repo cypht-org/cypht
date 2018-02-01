@@ -1078,13 +1078,14 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
      * @todo break this up into smaller modules
      */
     protected function output() {
+        $res = '';
         $email = false;
         $single = $this->get('single_server_mode');
         if (array_key_exists('email_folders', merge_folder_list_details($this->get('folder_sources', array())))) {
             $email = true;
         }
         if (!$single) {
-            $res = '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
+            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> ';
             }
