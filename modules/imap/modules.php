@@ -2381,6 +2381,26 @@ function format_imap_folder_section($folders, $id, $output_mod) {
 }}
 
 /**
+ * Format a from/to field for message list display
+ * @subpackage imap/functions
+ * @param string $fld field to format
+ * @return string
+ */
+if (!hm_exists('format_imap_from_fld')) {
+function format_imap_from_fld($fld) {
+    $res = array();
+    foreach (process_address_fld($fld) as $vals) {
+        if (trim($vals['label'])) {
+            $res[] = $vals['label'];
+        }
+        elseif (trim($vals['email'])) {
+            $res[] = $vals['email'];
+        }
+    }
+    return implode(', ', $res);
+}}
+
+/**
  * Format a list of message headers
  * @subpackage imap/functions
  * @param array $msg_list list of message headers
@@ -2420,14 +2440,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         else {
             $from = $msg['from'];
         }
-        $tmp_from = str_replace('"', '', $from);
-        $tmp_from = preg_replace("/(\<.+\>)/U", '', $tmp_from);
+        $from = format_imap_from_fld($from);
         $nofrom = '';
-
-        if (trim($tmp_from)) {
-            $from = trim($tmp_from);
-        }
-        elseif (!trim($from) && $style == 'email') {
+        if (!trim($from)) {
             $from = '[No From]';
             $nofrom = ' nofrom';
         }
