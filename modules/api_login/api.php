@@ -73,6 +73,12 @@ function session_init() {
     $config = new Hm_Site_Config_File(APP_PATH.'hm3.rc');
     $module_exec = new Hm_Module_Exec($config);
     $request = new Hm_Request($module_exec->filters, $config);
+    if (in_array('site', $config->get_modules(), true)) {
+        if (is_readable(APP_PATH.'modules/site/lib.php')) {
+            Hm_Debug::add('Including site module set lib.php');
+            require APP_PATH.'modules/site/lib.php';
+        }
+    }
     $session_config = new Hm_Session_Setup($config);
     $session = $session_config->setup_session();
     return array($session, $request);
