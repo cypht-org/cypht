@@ -48,8 +48,7 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
 function cypht_logout($url) {
     list($session, $request) = session_init();
     list($domain, $path, $secure) = url_parse($url);
-    $session->delete_cookie($request, 'hm_id', $path, $domain);
-    $session->delete_cookie($request, 'hm_session', $path, $domain);
+    $session->destroy($request);
 }
 
 /**
