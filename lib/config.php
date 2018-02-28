@@ -116,6 +116,60 @@ abstract class Hm_Config {
         }
         return Hm_Transform::convert($data);
     }
+
+    /**
+     * Filter out default auth and SMTP servers so they don't get saved
+     * to the permanent user config. These are dynamically reloaded on
+     * login
+     * @return array of items removed
+     */
+    public function filter_servers() {
+        $removed = array();
+        $excluded = array('pop3_servers', 'imap_servers','smtp_servers');
+        $no_password = $this->get('no_password_save_setting', false);
+        foreach ($this->config as $key => $vals) {
+            if (in_array($key, $excluded, true)) {
+                foreach ($vals as $index => $server) {
+                    if (array_key_exists('default', $server) && $server['default']) {
+                        $removed[$key][$index] = $server;
+                        unset($this->config[$key][$index]);
+                    }
+                    elseif (!array_key_exists('server', $server)) {
+                        $removed[$key][$index] = $server;
+                        unset($this->config[$key][$index]);
+                    }
+                    else {
+                        $this->config[$key][$index]['object'] = false;
+                        if ($no_password) {
+                            if (!array_key_exists('auth', $server) || $server['auth'] != 'xoauth2') {
+                                $removed[$key][$index]['pass'] = $server['pass'];
+                                unset($this->config[$key][$index]['pass']);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $removed;
+    }
+
+    /**
+     * Restore server definitions removed before saving
+     * @param array $removed server info to restore
+     * @return void
+     */
+    public function restore_servers($removed) {
+        foreach ($removed as $key => $vals) {
+            foreach ($vals as $index => $server) {
+                if (is_array($server)) {
+                    $this->config[$key][$index] = $server;
+                }
+                else {
+                    $this->config[$key][$index]['pass'] = $server;
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -203,6 +257,7 @@ class Hm_User_Config_File extends Hm_Config {
     public function save($username, $key) {
         $this->shuffle();
         $destination = $this->get_path($username);
+        $removed = $this->filter_servers();
         if (!$this->crypt) {
             $data = json_encode($this->config);
         }
@@ -210,6 +265,7 @@ class Hm_User_Config_File extends Hm_Config {
             $data = Hm_Crypt::ciphertext(json_encode($this->config), $key);
         }
         file_put_contents($destination, $data);
+        $this->restore_servers($removed);
     }
 
     /**
@@ -332,6 +388,7 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function save($username, $key) {
         $this->shuffle();
+        $removed = $this->filter_servers();
         if (!$this->crypt) {
             $config = json_encode($this->config);
         }
@@ -341,11 +398,13 @@ class Hm_User_Config_DB extends Hm_Config {
         $this->connect();
         if (Hm_DB::execute($this->dbh, 'update hm_user_settings set settings=? where username=?', array($config, $username))) {
             Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
-            return true;
+            $res = true;
         }
         else {
-            return Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, $config));
+            $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, $config));
         }
+        $this->restore_servers($removed);
+        return $res;
     }
 
     /**
