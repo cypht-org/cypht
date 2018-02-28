@@ -189,33 +189,6 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_restore_servers() {
-        $parent = build_parent_mock();
-        $handler_mod = new Hm_Handler_Test($parent, 'home');
-        restore_servers(array(array(array('server' => 'foo'))), $handler_mod);
-        $this->assertEquals(2, count($handler_mod->user_config->dump()));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_filter_servers() {
-        $parent = build_parent_mock();
-        $handler_mod = new Hm_Handler_Test($parent, 'home');
-        $handler_mod->user_config->data['imap_servers'] = array(array());
-        $this->assertEquals(array('imap_servers' => array(array())), filter_servers($handler_mod));
-
-        $handler_mod->user_config->data['imap_servers'] = array(array('default' => 1, 'server' => 'localhost'));
-        $this->assertEquals(array('imap_servers' => array(array('default' => 1, 'server' => 'localhost'))), filter_servers($handler_mod));
-
-        $handler_mod->user_config->data['imap_servers'] = array(array('pass' => 'foo', 'server' => 'localhost'));
-        $handler_mod->user_config->data['no_password_save_setting'] = true;
-        $this->assertEquals(array('imap_servers' => array(array('pass' => 'foo'))), filter_servers($handler_mod));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
     public function test_merge_folder_list_details() {
         $this->assertEquals(array(), merge_folder_list_details(false));
         $this->assertEquals(array(), merge_folder_list_details(array()));

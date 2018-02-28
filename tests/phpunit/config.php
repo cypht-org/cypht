@@ -24,6 +24,29 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_restore_servers() {
+        $this->config->restore_servers(array(array(array('server' => 'foo'))));
+        $this->assertEquals(2, count($this->config->dump()));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_filter_servers() {
+        $this->config->set('imap_servers', array(array()));
+        $this->assertEquals(array('imap_servers' => array(array())), $this->config->filter_servers());
+
+        $this->config->set('imap_servers', array(array('default' => 1, 'server' => 'localhost')));
+        $this->assertEquals(array('imap_servers' => array(array('default' => 1, 'server' => 'localhost'))), $this->config->filter_servers());
+
+        $this->config->set('imap_servers', array(array('pass' => 'foo', 'server' => 'localhost')));
+        $this->config->set('no_password_save_setting', true);
+        $this->assertEquals(array('imap_servers' => array(array('pass' => 'foo'))), $this->config->filter_servers());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_dump() {
         $this->config->load('testuser', 'testkey');
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar'), $this->config->dump());

@@ -41,6 +41,7 @@ class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals("foo<br />\nbar", format_msg_text("foo\nbar", $mod));
         $this->assertEquals('<a target="_blank" href="http://foo.com">http://foo.com</a>', format_msg_text('http://foo.com', $mod));
+        $this->assertEquals('<a target="_blank" href="http://foo.com">http://foo.com</a>]', format_msg_text('http://foo.com]', $mod));
     }
     /**
      * @preserveGlobalState disabled
