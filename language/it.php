@@ -519,6 +519,12 @@ return array(
     'pager' => false,
     'Brazilian Portuguese' => false,
     'Debug',
+    'STARTTLS or unencrypted',
+    'Inline Message Style' => false,
+    'Inline' => false,
+    'Right' => false,
+    'Messages per page for IMAP folder views' => false,
+    'Arrival' => false,
 );
 
 ?>

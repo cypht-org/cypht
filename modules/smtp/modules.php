@@ -255,7 +255,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
             }
             else {
                 $tls = false;
-                if (isset($this->request->post['tls'])) {
+                if (array_key_exists('tls', $this->request->post) && $this->request->post['tls']) {
                     $tls = true;
                 }
                 if ($con = @fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
@@ -737,8 +737,9 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
             '<input required type="text" id="new_smtp_address" name="new_smtp_address" value="'.$address.'" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" /></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_port" class="screen_reader">'.$this->trans('SMTP port').'</label>'.
             '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="'.$port.'" placeholder="'.$this->trans('Port').'"></td></tr>'.
-            '<tr><td><input type="checkbox" name="tls" value="1" id="smtp_tls" checked="checked" /> <label for="smtp_tls">'.$this->trans('Use TLS').'</label></td>'.
-            '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" /></td></tr>'.
+            '<tr><td><input type="radio" name="tls" value="1" id="smtp_tls" checked="checked" /> <label for="smtp_tls">'.$this->trans('Use TLS').'</label>'.
+            '<br /><input type="radio" name="tls" id="smtp_notls" value="0" /><label for="smtp_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
+            '</tr><tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" /></td></tr>'.
             '</table></form>';
     }
 }

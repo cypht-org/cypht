@@ -521,6 +521,7 @@ return array(
     'pager' => 'пайджер',
     'Brazilian Portuguese' => 'Бразильский Португальский',
     'Debug',
+    'STARTTLS or unencrypted',
     'Inline Message Style' => 'Стиль просмотра сообщений',
     'Inline' => 'В списке',
     'Right' => 'Справа',

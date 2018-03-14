@@ -641,7 +641,7 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
             }
             else {
                 $tls = false;
-                if (isset($this->request->post['tls'])) {
+                if (array_key_exists('tls', $this->request->post) && $this->request->post['tls']) {
                     $tls = true;
                 }
                 if ($con = fsockopen($form['new_pop3_address'], $form['new_pop3_port'], $errno, $errstr, 2)) {
@@ -744,8 +744,9 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
             '<input required type="text" id="new_pop3_address" name="new_pop3_address" class="txt_fld" placeholder="'.$this->trans('POP3 server address').'" value=""/></td></tr>'.
             '<tr><td colspan="2"><label for="new_pop3_port" class="screen_reader">'.$this->trans('POP3 port').'</label>'.
             '<input required type="number" id="new_pop3_port" name="new_pop3_port" class="port_fld" value="995" placeholder="'.$this->trans('Port').'"></td></tr>'.
-            '<tr><td><input type="checkbox" name="tls" value="1" id="pop3_tls" checked="checked" /> <label for="pop3_tls">'.$this->trans('Use TLS').'</label></td>'.
-            '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_pop3_server" /></td></tr>'.
+            '<tr><td><input type="radio" name="tls" value="1" id="pop3_tls" checked="checked" /> <label for="pop3_tls">'.$this->trans('Use TLS').'</label>'.
+            '<br /><input type="radio" name="tls" value="0" id="pop3_notls"><abel for="pop3_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
+            '</tr><tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_pop3_server" /></td></tr>'.
             '</table></form>';
     }
 }

@@ -971,7 +971,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
             }
             else {
                 $tls = false;
-                if (isset($this->request->post['tls'])) {
+                if (array_key_exists('tls', $this->request->post) && $this->request->post['tls']) {
                     $tls = true;
                 }
                 $hidden = false;
@@ -1839,8 +1839,9 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             '<input required type="number" id="new_imap_port" name="new_imap_port" class="port_fld" value="993" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr><td colspan="2"><input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="" value="1">'.
             '<label for="new_imap_hidden">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
-            '<tr><td><input type="checkbox" name="tls" value="1" id="imap_tls" checked="checked" /> <label for="imap_tls">'.$this->trans('Use TLS').'</label></td>'.
-            '<td><input type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" /></td></tr>'.
+            '<tr><td><input type="radio" name="tls" value="1" id="imap_tls" checked="checked" /> <label for="imap_tls">'.$this->trans('Use TLS').'</label>'.
+            '<br /><input type="radio" name="tls" value="0" id="imap_notls" /><label for="imap_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
+            '</tr><tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" /></td></tr>'.
             '</table></form>';
     }
 }
