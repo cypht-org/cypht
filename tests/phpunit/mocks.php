@@ -148,6 +148,7 @@ class Fake_Server {
         return $this->response;
     }
     function stream_write($data) {
+        //print_r($data);
         $data = trim($data);
         if (array_key_exists($data, $this->command_responses)) {
             $this->response =  $this->command_responses[$data];
@@ -155,6 +156,7 @@ class Fake_Server {
         else {
             $this->response = $this->error_resp($data);
         }
+        //print_r($this->response);
         rewind(Hm_Functions::$resource);
         return (strlen($data)+2);
     }

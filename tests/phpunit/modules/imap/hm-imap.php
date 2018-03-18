@@ -383,6 +383,65 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
         $this->assertTrue(array_key_exists('A5 LOGOUT', $res['commands']));
         $this->disconnect();
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_message_action() {
+        /* TODO: coverage and assertions */
+        $this->connect();
+        $this->assertTrue($this->imap->message_action('DELETE', array(1), 'foo'));
+        $this->assertTrue($this->imap->message_action('READ', array(1), 'foo'));
+        $this->assertTrue($this->imap->message_action('FLAG', array(1), 'foo'));
+        $this->assertTrue($this->imap->message_action('UNFLAG', array(1), 'foo'));
+        $this->assertTrue($this->imap->message_action('ANSWERED', array(1), 'foo'));
+        $this->assertTrue($this->imap->message_action('UNREAD', array(1), 'foo'));
+        $this->assertTrue($this->imap->message_action('UNDELETE', array(1), 'foo'));
+        $this->assertTrue($this->imap->message_action('CUSTOM', array(1), 'foo', 'bar'));
+        $this->assertTrue($this->imap->message_action('MOVE', array(1), 'Sent'));
+        $this->assertTrue($this->imap->message_action('EXPUNGE', array(1)));
+        $this->assertTrue($this->imap->message_action('COPY', array(1), 'Sent'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_convert_sequence() {
+        /* TODO: coverage */
+        $this->assertEquals('1:6', $this->imap->convert_array_to_sequence(array(1,2,3,6)));
+        $this->assertEquals(array(1,2,3,4,5,6), $this->imap->convert_sequence_to_array('1:6'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_decode_fld() {
+        $this->assertEquals('foo', $this->imap->decode_fld('foo'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_is_supported() {
+        $this->assertEquals(false, $this->imap->is_supported('foo'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_state() {
+        $this->assertEquals('disconnected', $this->imap->get_state());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_show_debug() {
+        $this->assertEquals("\nDebug Array\n(\n)\n\n", $this->imap->show_debug());
+        $this->assertEquals(array(), $this->imap->show_debug(false, false, true));
+        $this->assertEquals(array('debug' => array(), 'commands' => array(), 'responses' => array()), $this->imap->show_debug(true, false, true));
+        $this->assertEquals("\nDebug Array\n(\n)\n\nResponse Array\n(\n)\n", $this->imap->show_debug(true, false, false));
+    }
     public function tearDown() {
     }
 }

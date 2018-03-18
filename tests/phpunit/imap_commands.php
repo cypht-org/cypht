@@ -179,4 +179,47 @@ return array(
 
     'A5 DELETE "bar"' =>
         "A5 OK Delete completed (0.003 + 0.000 + 0.002 secs).\r\n",
+
+    'A5 UID STORE 1 +FLAGS (\Deleted)' =>
+        "* 1 FETCH (FLAGS (\Deleted \Seen))\r\n".
+        "A5 OK Store completed (0.001 + 0.000 secs).\r\n",
+
+    'A6 UID STORE 1 +FLAGS (\Seen)' =>
+        "* 1 FETCH (FLAGS (\Seen))\r\n".
+        "A6 OK Store completed (0.001 + 0.000 secs).\r\n",
+
+    'A7 UID STORE 1 +FLAGS (\Flagged)' =>
+        "* 1 FETCH (FLAGS (\Flagged \Seen))\r\n".
+        "A7 OK Store completed (0.001 + 0.000 secs).\r\n",
+
+    'A8 UID STORE 1 -FLAGS (\Flagged)' =>
+        "* 1 FETCH (FLAGS (\Unflag \Seen))\r\n".
+        "A8 OK Store completed (0.001 + 0.000 secs).\r\n",
+
+    'A9 UID STORE 1 +FLAGS (\Answered)' =>
+        "* 1 FETCH (FLAGS (\Answered \Seen))\r\n".
+        "A9 OK Store completed (0.001 + 0.000 secs).\r\n",
+
+    'A10 UID STORE 1 -FLAGS (\Seen)' =>
+        "* 1 FETCH (FLAGS (\Seen))\r\n".
+        "A10 OK Store completed (0.001 + 0.000 secs).\r\n",
+
+    'A11 UID STORE 1 -FLAGS (\Deleted)' =>
+        "* 1 FETCH (FLAGS (\Deleted \Seen))\r\n".
+        "A11 OK Store completed (0.001 + 0.000 secs).\r\n",
+
+    'A12 UID STORE 1 +FLAGS (bar)' =>
+        "* FLAGS (\Answered \Flagged \Deleted \Seen \Draft bar)\r\n".
+        "* OK [PERMANENTFLAGS (\Answered \Flagged \Deleted \Seen \Draft bar \*)] Flags permitted.\r\n".
+        "A12 OK Store completed (0.001 + 0.000 secs).\r\n",
+
+    'A13 UID MOVE 1 "Sent"' =>
+        "A13 OK No messages found (0.003 + 0.000 + 0.002 secs).\r\n",
+
+    'A14 EXPUNGE' =>
+        "* 1 EXPUNGE\r\n".
+        "A14 OK Expunge completed (0.006 + 0.000 + 0.005 secs).\r\n",
+
+    'A15 UID COPY 1 "Sent"' =>
+        "A15 OK No messages found (0.001 + 0.000 secs).\r\n",
 );
