@@ -45,7 +45,13 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     $('.part_charset').hide();
     $('div', $(path)).removeClass('unseen');
     $(path).removeClass('unseen');
+    $('#delete_message').unbind('click');
+    $('#delete_message').click(function() { return inline_imap_delete_message(uid, details); });
 };
+
+var inline_imap_delete_message = function(uid, details) {
+    return imap_delete_message(false, uid, details);
+}
 
 var msg_container = function(type, path) {
     if (type == 'right') {
