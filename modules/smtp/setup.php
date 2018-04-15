@@ -94,6 +94,7 @@ return array(
         'forward' => FILTER_VALIDATE_INT,
         'draft_id' => FILTER_VALIDATE_INT,
         'compose_to' => FILTER_SANITIZE_STRING,
+        'mailto_uri' => FILTER_SANITIZE_STRING,
     ),
     'allowed_output' => array(
         'file_details' => array(FILTER_UNSAFE_RAW, false),

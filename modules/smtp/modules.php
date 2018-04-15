@@ -237,7 +237,14 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $compose_type = 0;
         }
         if (is_array($this->get('compose_draft')) && strlen(trim(join('', $this->get('compose_draft')))) == 0 && array_key_exists('compose_to', $this->request->get)) {
-            $this->out('compose_draft', array('draft_to' => preg_replace('/^mailto:/', '', $this->request->get['compose_to'])));
+            $draft = array();
+            foreach (parse_mailto($this->request->get['compose_to']) as $name => $val) {
+                if (!$val) {
+                    continue;
+                }
+                $draft[$name] = $val;
+            }
+            $this->out('compose_draft', $draft);
         }
         $this->out('smtp_compose_type', $compose_type);
     }
@@ -1291,5 +1298,32 @@ function profile_from_compose_smtp_id($profiles, $id) {
 if (!hm_exists('smtp_authed')) {
 function smtp_authed($smtp) {
     return is_object($smtp) && $smtp->state == 'authed';
+}}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('parse_mailto')) {
+function parse_mailto($str) {
+    $res = array(
+        'draft_to' => '',
+        'draft_cc' => '',
+        'draft_bcc' => '',
+        'draft_subject' => '',
+        'draft_body' => ''
+    );
+    $mailto = parse_url(urldecode($str));
+    if (!is_array($mailto) || !array_key_exists('path', $mailto) || !$mailto['path']) {
+        return $res;
+    }
+    $res['draft_to'] = $mailto['path'];
+    if (!array_key_exists('query', $mailto) || !$mailto['query']) {
+        return $res;
+    }
+    parse_str($mailto['query'], $args);
+    foreach ($args as $name => $val) {
+        $res['draft_'.$name] = $val;
+    }
+    return $res;
 }}
 
