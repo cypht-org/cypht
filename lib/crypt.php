@@ -33,6 +33,9 @@ class Hm_Request_Key {
                 $session->set('request_key', Hm_Crypt::unique_id());
             }
         }
+        if (!defined('SITE_ID')) {
+            define('SITE_ID', '');
+        }
         self::$site_hash = $session->build_fingerprint($request->server, $key.$user.SITE_ID);
     }
 
