@@ -46,9 +46,9 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
  * @subpackage api_login/functions
  * @return void
  */
-function cypht_logout($url) {
+function cypht_logout() {
     list($session, $request) = session_init();
-    list($domain, $path, $secure) = url_parse($url);
+    $session->check($request);
     $session->destroy($request);
 }
 
@@ -61,7 +61,7 @@ function cypht_logout($url) {
 function url_parse($url) {
     $parsed = parse_url($url);
     $secure = $parsed['scheme'] === 'https' ? true : false;
-    return array($parsed['host'], $parsed['path'], $secure);
+    return array($parsed['host'], '/', $secure);
 }
 
 /**
