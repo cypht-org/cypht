@@ -45,13 +45,15 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     $('.part_charset').hide();
     $('div', $(path)).removeClass('unseen');
     $(path).removeClass('unseen');
-    $('#delete_message').unbind('click');
-    $('#delete_message').click(function() { return inline_imap_delete_message(uid, details); });
-};
 
-var inline_imap_delete_message = function(uid, details) {
-    return imap_delete_message(false, uid, details);
-}
+    $('#delete_message').unbind('click');
+    $('#move_message').unbind('click');
+    $('#copy_message').unbind('click');
+
+    $('#delete_message').click(function() { return imap_delete_message(false, uid, details); });
+    $('#move_message').click(function(e) { return imap_move_copy(e, 'move', [path.substr(1)]) });
+    $('#copy_message').click(function(e) { return imap_move_copy(e, 'copy', [path.substr(1)]) });
+};
 
 var msg_container = function(type, path) {
     if (type == 'right') {
@@ -156,6 +158,7 @@ $(function() {
             $('tr').removeClass('hl');
             Hm_Ajax.add_callback_hook('*', capture_subject_click);
             Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
+            Hm_Ajax.add_callback_hook('ajax_imap_move_copy_action', msg_inline_close);
             if (hm_list_path().substr(0, 4) === 'imap') {
                 Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
             }
