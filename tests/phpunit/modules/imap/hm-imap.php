@@ -173,6 +173,21 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
             'basename' => 'test', 'realname' => 'INBOX/test', 'namespace' => '',
             'marked' => false, 'noselect' => false, 'can_have_kids' => true,
             'has_kids' => false)), $this->imap->get_mailbox_list());
+        $this->imap->supported_extensions[] = 'special-use';
+        $this->imap->bust_cache('LIST');
+        $this->assertEquals(array('INBOX' => array( 'parent' => '',
+            'delim' => '/', 'name' => 'INBOX', 'name_parts' => array('INBOX'),
+            'basename' => 'INBOX', 'realname' => 'INBOX', 'namespace' => '',
+            'marked' => false, 'noselect' => false, 'can_have_kids' => true,
+            'has_kids' => true), 'Sent' => array( 'parent' => false,
+            'delim' => '/', 'name' => 'Sent', 'name_parts' => array('Sent'),
+            'basename' => 'Sent', 'realname' => 'Sent', 'namespace' => '',
+            'marked' => true, 'noselect' => true, 'can_have_kids' => false,
+            'has_kids' => false), 'INBOX/test' => array( 'parent' => 'INBOX',
+            'delim' => '/', 'name' => 'INBOX/test', 'name_parts' => array('INBOX', 'test'),
+            'basename' => 'test', 'realname' => 'INBOX/test', 'namespace' => '',
+            'marked' => false, 'noselect' => false, 'can_have_kids' => true,
+            'has_kids' => false)), $this->imap->get_mailbox_list());
         $this->disconnect();
     }
     /**
@@ -183,7 +198,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
         /* TODO: assertions + coverage */
         $this->connect();
         $this->imap->get_mailbox_list(true);
-        //print_r($this->debug());
         $this->disconnect();
     }
     /**
@@ -437,10 +451,81 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_show_debug() {
+        ob_start();
         $this->assertEquals("\nDebug Array\n(\n)\n\n", $this->imap->show_debug());
         $this->assertEquals(array(), $this->imap->show_debug(false, false, true));
         $this->assertEquals(array('debug' => array(), 'commands' => array(), 'responses' => array()), $this->imap->show_debug(true, false, true));
         $this->assertEquals("\nDebug Array\n(\n)\n\nResponse Array\n(\n)\n", $this->imap->show_debug(true, false, false));
+        ob_end_clean();
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_quota() {
+        $this->connect();
+        $this->imap->supported_extensions[] = 'quota';
+        $this->assertEquals(array(array('name' => '', 'max' => 512, 'current' => 10)), $this->imap->get_quota());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_quota_root() {
+        $this->connect();
+        $this->imap->supported_extensions[] = 'quota';
+        $this->assertEquals(array(array('name' => '', 'max' => 512, 'current' => 10)), $this->imap->get_quota_root("INBOX"));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_enable() {
+        $this->connect();
+        $this->assertEquals(array(), $this->imap->enable());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_unselect() {
+        $this->connect();
+        $this->assertEquals(true, $this->imap->unselect_mailbox("INBOX"));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_id() {
+        $this->connect();
+        $this->imap->supported_extensions[] = 'id';
+        $this->assertEquals(array(), $this->imap->id());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_message_sort_order() {
+        $this->connect();
+        $this->assertEquals(array("882", "84", "2"), $this->imap->get_message_sort_order());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_google_search() {
+        $this->connect();
+        $this->imap->supported_extensions[] = 'x-gm-ext-1';
+        $this->assertEquals(array(123, 12344, 5992), $this->imap->google_search("foo"));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_enable_compression() {
+        $this->connect();
+        //$this->imap->supported_extensions[] = 'compress=deflate';
+        $this->assertEquals(false, $this->imap->enable_compression());
     }
     public function tearDown() {
     }

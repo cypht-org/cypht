@@ -21,10 +21,13 @@ return array(
     'A4 ENABLE QRESYNC' =>
         "* ENABLED QRESYNC\r\nA4 OK Enabled (0.001 + 0.000 secs).\r\n",
 
+    'A5 ENABLE QRESYNC' =>
+        "* ENABLED QRESYNC\r\nA4 OK Enabled (0.001 + 0.000 secs).\r\n",
+
     'A2 AUTHENTICATE CRAM-MD5' =>
         "+ PDBFOTRCMUMwMkY5NDFFEFU2QkM5MjVFMUITFCMjZAbG9naW5wcm94eTZiLLmFsaWNlLml0Pg==\r\n",
 
-    'dGVzdHVzZXIgMGYxMzE5YmIxMzMxOWViOWU4ZDdkM2JiZDJiZDJlOTQ=' =>
+    'dGVzdHVzZXIgNTRmMDgwM2FhZTA2MzVmOWM3Y2M0YWVmZTUzODYzZTU=' =>
         "A2 OK authentication successful\r\n",
 
     'A2 AUTHENTICATE XOAUTH2 dXNlcj10ZXN0dXNlcgFhdXRoPUJlYXJlciB0ZXN0cGFzcwEB' =>
@@ -48,6 +51,17 @@ return array(
         "* LIST (\HasNoChildren) \"/\" INBOX/test\r\n".
         "* STATUS INBOX/test (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
         "A6 OK List completed (0.005 + 0.000 + 0.004 secs).\r\n",
+
+    'A7 LIST "" "*" RETURN (CHILDREN SPECIAL-USE STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' =>
+        "* LIST (\NoInferiors \UnMarked \Noselect) \"/\" Sent\r\n".
+        "* STATUS Sent (MESSAGES 0 RECENT 0 UIDNEXT 1 UIDVALIDITY 1474301542 UNSEEN 0)\r\n".
+        "* LIST (\NoInferiors \UnMarked) \"/\" Sent\r\n".
+        "* STATUS Sent (MESSAGES 0 RECENT 0 UIDNEXT 1 UIDVALIDITY 1474301542 UNSEEN 0)\r\n".
+        "* LIST (\HasChildren) \"/\" INBOX\r\n".
+        "* STATUS INBOX (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
+        "* LIST (\HasNoChildren) \"/\" INBOX/test\r\n".
+        "* STATUS INBOX/test (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
+        "A7 OK List completed (0.005 + 0.000 + 0.004 secs).\r\n",
 
     'A6 LSUB "" "*" RETURN (CHILDREN STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' =>
         "* LSUB (\NoInferiors \UnMarked \Sent) \"/\" Sent\r\n".
@@ -222,4 +236,31 @@ return array(
 
     'A15 UID COPY 1 "Sent"' =>
         "A15 OK No messages found (0.001 + 0.000 secs).\r\n",
+
+    'A5 GETQUOTAROOT "INBOX"' =>
+        "* QUOTAROOT INBOX \"\"\r\n".
+        "* QUOTA \"\" (STORAGE 10 512)\r\n".
+        "A5 OK Getquota completed\r\n",
+
+    'A5 GETQUOTA ""' =>
+        "* QUOTA \"\" (STORAGE 10 512)\r\n".
+        "A5 OK Getquota completed\r\n",
+
+    'A5 UNSELECT' =>
+        "A5 OK Unselect completed\r\n",
+
+    'A5 ID ("name" "Hm_IMAP" "version" "3.0" "vendor" "Hastymail Development Group" "support-url" "http://hastymail.org/contact_us/")' =>
+        "* ID NIL\r\n".
+        "a023 OK ID completed\r\n",
+
+    'A5 UID SORT (ARRIVAL) US-ASCII ALL' =>
+        "* SORT 2 84 882\r\n".
+        "A5 OK SORT completed\r\n",
+
+    'A5 UID SEARCH X-GM-RAW "foo"' =>
+        "* SEARCH 123 12344 5992\r\n".
+        "A5 OK SEARCH (Success)\r\n",
+
+    'A5 COMPRESS DEFLATE' =>
+        "A5 OK DEFLATE active\r\n",
 );
