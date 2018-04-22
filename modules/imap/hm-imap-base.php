@@ -16,6 +16,7 @@
 class Hm_IMAP_Base {
 
     public $cached_response = false;           // flag to indicate we are using a cached response
+    public $supported_extensions = array(); // IMAP extensions in the CAPABILITY response
     protected $handle = false;                 // fsockopen handle to the IMAP server
     protected $debug = array();                // debug messages
     protected $commands = array();             // list of IMAP commands issued
@@ -24,7 +25,6 @@ class Hm_IMAP_Base {
     protected $max_read = false;               // limit on allowable read size
     protected $command_count = 0;              // current command number
     protected $cache_data = array();           // cache data
-    protected $supported_extensions = array(); // IMAP extensions in the CAPABILITY response
     protected $enabled_extensions = array();   // IMAP extensions validated by the ENABLE response
     protected $capability = false;             // IMAP CAPABILITY response
     protected $server_id = array();            // server ID response values

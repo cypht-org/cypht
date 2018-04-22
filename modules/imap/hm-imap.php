@@ -1985,11 +1985,14 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             $this->send_command("COMPRESS DEFLATE\r\n");
             $res = $this->get_response(false, true);
             if ($this->check_response($res, true)) {
+                $params = array('level' => 6, 'window' => 15, 'memory' => 9);
                 stream_filter_prepend($this->handle, 'zlib.inflate', STREAM_FILTER_READ);
-                stream_filter_append($this->handle, 'zlib.deflate', STREAM_FILTER_WRITE, 6);
+                stream_filter_append($this->handle, 'zlib.deflate', STREAM_FILTER_WRITE, $params);
                 $this->debug[] = 'DEFLATE compression extension activated';
+                return true;
             }
         }
+        return false;
     }
 
     /* ------------------ HIGH LEVEL --------------------------------------- */
