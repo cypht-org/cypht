@@ -41,6 +41,17 @@ return array(
         "* LIST (\NoInferiors \UnMarked \Sent) \"/\" Sent\r\n".
         "A6 OK List completed (0.003 + 0.000 + 0.002 secs).\r\n",
 
+    'A6 LIST "" "%" RETURN (CHILDREN STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' =>
+        "* LIST (\NoInferiors \UnMarked \Noselect) \"/\" Sent\r\n".
+        "* STATUS Sent (MESSAGES 0 RECENT 0 UIDNEXT 1 UIDVALIDITY 1474301542 UNSEEN 0)\r\n".
+        "* LIST (\NoInferiors \UnMarked) \"/\" Sent\r\n".
+        "* STATUS Sent (MESSAGES 0 RECENT 0 UIDNEXT 1 UIDVALIDITY 1474301542 UNSEEN 0)\r\n".
+        "* LIST (\HasChildren) \"/\" INBOX\r\n".
+        "* STATUS INBOX (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
+        "* LIST (\HasNoChildren) \"/\" INBOX/test\r\n".
+        "* STATUS INBOX/test (MESSAGES 93 RECENT 0 UIDNEXT 1736 UIDVALIDITY 1422554786 UNSEEN 0)\r\n".
+        "A6 OK List completed (0.005 + 0.000 + 0.004 secs).\r\n",
+
     'A6 LIST "" "*" RETURN (CHILDREN STATUS (MESSAGES UNSEEN UIDVALIDITY UIDNEXT RECENT))' =>
         "* LIST (\NoInferiors \UnMarked \Noselect) \"/\" Sent\r\n".
         "* STATUS Sent (MESSAGES 0 RECENT 0 UIDNEXT 1 UIDVALIDITY 1474301542 UNSEEN 0)\r\n".
@@ -91,6 +102,26 @@ return array(
     'A5 NOOP' =>
         "* 23 EXISTS\r\n".
         "A5 OK NOOP Completed\r\n",
+    'A8 UID FETCH 1731,1732 (FLAGS INTERNALDATE RFC822.SIZE BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)])' =>
+        "* 92 FETCH (UID 1731 FLAGS (\Seen) INTERNALDATE \"02-May-2017 16:32:24 -0500\" RFC822.SIZE 1940 BODY[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)] {240}\r\n".
+        "Subject: =?utf-8?q?apt-listchanges=3A_news_for_shop?=\r\n".
+        "To: root@shop.jackass.com\r\n".
+        "Content-Type: text/plain; charset=\"utf-8\"\r\n".
+        "Message-Id: <E1d5fPE-0005Vm-8L@shop>\r\n".
+        "From: root <root@shop.jackass.com>\r\n".
+        "Date: Tue, 02 May 2017 16:32:24 -0500\r\n".
+        "\r\n".
+        ")\r\n".
+        "* 93 FETCH (UID 1732 FLAGS (\Seen) INTERNALDATE \"11-May-2017 14:28:40 -0500\" RFC822.SIZE 1089 BODY[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)] {240}\r\n".
+        "Subject: =?utf-8?q?apt-listchanges=3A_news_for_shop?=\r\n".
+        "To: root@shop.jackass.com\r\n".
+        "Content-Type: text/plain; charset=\"utf-8\"\r\n".
+        "Message-Id: <E1d8tlQ-00065l-4t@shop>\r\n".
+        "From: root <root@shop.jackass.com>\r\n".
+        "Date: Thu, 11 May 2017 14:28:40 -0500\r\n".
+        "\r\n".
+        ")\r\n".
+        "A5 OK Fetch completed (0.001 + 0.000 secs).\r\n",
 
     'A5 UID FETCH 1731,1732 (FLAGS INTERNALDATE RFC822.SIZE BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)])' =>
         "* 92 FETCH (UID 1731 FLAGS (\Seen) INTERNALDATE \"02-May-2017 16:32:24 -0500\" RFC822.SIZE 1940 BODY[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)] {240}\r\n".
@@ -169,6 +200,10 @@ return array(
         "Date: Tue, 02 May 2017 16:32:24 -0500\r\n".
         ")\r\n".
         "A5 OK Fetch completed (0.001 + 0.000 secs).\r\n",
+
+    'A6 UID FETCH 1731 BODY[1]' =>
+        "* 92 FETCH (UID 1731 BODY[1] {10}\r\n".
+        "0123456789\r\n",
 
     'A5 UID FETCH 1731 BODY[1]' =>
             "* 92 FETCH (UID 1731 BODY[1] {1317}\r\n",
@@ -252,6 +287,10 @@ return array(
     'A5 ID ("name" "Hm_IMAP" "version" "3.0" "vendor" "Hastymail Development Group" "support-url" "http://hastymail.org/contact_us/")' =>
         "* ID NIL\r\n".
         "a023 OK ID completed\r\n",
+
+    'A7 UID SORT (ARRIVAL) US-ASCII ALL' =>
+        "* SORT 1731 1732\r\n".
+        "A5 OK SORT completed\r\n",
 
     'A5 UID SORT (ARRIVAL) US-ASCII ALL' =>
         "* SORT 2 84 882\r\n".

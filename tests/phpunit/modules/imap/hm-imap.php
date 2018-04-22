@@ -8,6 +8,7 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
         require APP_PATH.'modules/imap/hm-imap.php';
         require APP_PATH.'modules/core/message_functions.php';
         $this->create();
+        $this->connect();
     }
     public function reset() {
         $this->imap = NULL;
@@ -36,87 +37,81 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_connect_working() {
-        $this->connect();
         $res = $this->debug();
         $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_connect_tls() {
+        $this->reset();
         $this->config['tls'] = true;
         $this->connect();
         $res = $this->debug();
         $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_connect_failed() {
+        $this->reset();
         Hm_Functions::$no_stream = true;
         $this->connect();
         $res = $this->debug();
         $this->assertEquals('Could not connect to the IMAP server', $res['debug'][1]);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_connect_bad_args() {
+        $this->reset();
         unset($this->config['username']);
         $this->connect();
         $res = $this->debug();
         $this->assertEquals('username and password must be set in the connect() config argument', $res['debug'][0]);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_authenticate_login() {
-        $this->connect();
         $res = $this->debug();
         $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_authenticate_cram() {
+        $this->reset();
         $this->config['auth'] = 'cram-md5';
         $this->connect();
         $res = $this->debug();
         $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_authenticate_oauth() {
+        $this->reset();
         $this->config['auth'] = 'xoauth2';
         $this->connect();
         $res = $this->debug();
         $this->assertEquals('Log in for testuser FAILED', $res['debug'][2]);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_get_special_use_mailboxes() {
-        $this->connect();
         $boxes = $this->imap->get_special_use_mailboxes();
         $this->assertEquals(array('sent' => 'Sent'), $boxes);
         $boxes = $this->imap->get_special_use_mailboxes('sent');
         $this->assertEquals(array('sent' => 'Sent'), $boxes);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -124,7 +119,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_get_namespaces() {
         /* TODO: coverage */
-        $this->connect();
         $this->assertEquals(array(array('delim' => '/', 'prefix' => '', 'class' => 'personal')), $this->imap->get_namespaces());
         $this->assertEquals(array(array('delim' => '/', 'prefix' => '', 'class' => 'personal')), $this->imap->get_namespaces());
         $this->disconnect();
@@ -138,7 +132,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
             "SASL-IR LOGIN-REFERRALS ID ENABLE IDLE AUTH=PLAIN STARTTLS\r\n";
         $this->connect();
         $this->assertEquals(array(array('delim' => '/', 'prefix' => '', 'class' => 'personal')), $this->imap->get_namespaces());
-        $this->disconnect();
 
     }
     /**
@@ -146,7 +139,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get_mailbox_list_simple() {
-        $this->connect();
         $this->assertEquals(array('INBOX' => array( 'parent' => '',
             'delim' => '/', 'name' => 'INBOX', 'name_parts' => array('INBOX'),
             'basename' => 'INBOX', 'realname' => 'INBOX', 'namespace' => '',
@@ -188,7 +180,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
             'basename' => 'test', 'realname' => 'INBOX/test', 'namespace' => '',
             'marked' => false, 'noselect' => false, 'can_have_kids' => true,
             'has_kids' => false)), $this->imap->get_mailbox_list());
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -196,9 +187,7 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_get_mailbox_list_lsub() {
         /* TODO: assertions + coverage */
-        $this->connect();
         $this->imap->get_mailbox_list(true);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -206,7 +195,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_select_mailbox() {
         /* TODO: coverage */
-        $this->connect();
         $this->assertEquals(array( 'selected' => 1, 'uidvalidity' => 1422554786,
             'exists' => 93, 'first_unseen' => false, 'uidnext' => 1736, 'flags' =>
             array( '0' => '\Answered', '1' => '\Flagged', '2' => '\Deleted', '3' =>
@@ -214,7 +202,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
             '1' => '\Flagged', '2' => '\Deleted', '3' => '\Seen', '4' => '\Draft', '5' => '\*',
             ), 'recent' => '*', 'nomodseq' => false, 'modseq' => 91323),
             $this->imap->select_mailbox("INBOX"));
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -222,6 +209,7 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_starttls() {
         require_once APP_PATH.'modules/core/functions.php';
+        $this->reset();
         Fake_IMAP_Server::$custom_responses['A1 CAPABILITY'] = "* CAPABILITY IMAP4rev1 LITERAL+ ".
             "SASL-IR LOGIN-REFERRALS ID ENABLE IDLE AUTH=PLAIN STARTTLS\r\n";
         $this->connect();
@@ -233,7 +221,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
         $this->connect();
         $res = $this->debug();
         $this->assertEquals(array(), $res['responses'][1]);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -241,7 +228,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_poll() {
         /* TODO: coverage */
-        $this->connect();
         $this->assertTrue($this->imap->poll());
     }
     /**
@@ -250,7 +236,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_get_message_list() {
         /* TODO: coverage */
-        $this->connect();
         $res = array(1731 => array(
             'uid' => '1731', 'flags' => '\Seen', 'internal_date' => '02-May-2017 16:32:24 -0500',
             'size' => '1940', 'date' => ' Tue, 02 May 2017 16:32:24 -0500', 'from' => ' root <root@shop.jackass.com>',
@@ -269,7 +254,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
         unset($list[1731]['timestamp']);
         unset($list[1732]['timestamp']);
         $this->assertEquals($res, $list);
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -282,10 +266,8 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
             'encoding' => '7bit', 'size' => '1317', 'lines' => '32', 'md5' => '',
             'disposition' => '', 'file_attributes' => '', 'langauge' => '', 'location' => ''));
 
-        $this->connect();
         $this->assertEquals(array(), $this->imap->get_message_structure('foo'));
         $this->assertEquals($res, $this->imap->get_message_structure(1731));
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -315,9 +297,7 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
             ")\r\n".
             "A5 OK Fetch completed (0.001 + 0.000 secs).";
 
-        $this->connect();
         $this->assertEquals($res, $this->imap->get_message_content(1731, 0));
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -325,7 +305,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_search() {
         /* TODO: coverage and assertions */
-        $this->connect();
         $this->imap->search('ALL', false, array('BODY' => 'debian'));
         $this->imap->search('ALL', array(1680, 1682), array('BODY' => 'debian'));
     }
@@ -335,10 +314,8 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_get_message_headers() {
         /* TODO: coverage and assertions */
-        $this->connect();
         $res = $this->imap->get_message_headers(1731);
         $this->assertEquals($res['Flags'], '\Seen');
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -346,7 +323,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_start_message_stream() {
         /* TODO: coverage and assertions, add read stream line support */
-        $this->connect();
         $this->imap->start_message_stream(1731, 1);
     }
     /**
@@ -355,9 +331,7 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_sort_by_fetch() {
         /* TODO: coverage and assertions */
-        $this->connect();
         $this->assertEquals(array(1732, 4), $this->imap->sort_by_fetch('DATE', false, 'ALL'));
-        $this->disconnect();
     }
     /**
      * @preserveGlobalState disabled
@@ -365,7 +339,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_create_mailbox() {
         /* TODO: coverage and assertions */
-        $this->connect();
         $this->assertTrue($this->imap->create_mailbox('foo'));
     }
     /**
@@ -374,7 +347,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_rename_mailbox() {
         /* TODO: coverage and assertions */
-        $this->connect();
         $this->assertTrue($this->imap->rename_mailbox('foo', 'bar'));
     }
     /**
@@ -383,7 +355,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_delete_mailbox() {
         /* TODO: coverage and assertions */
-        $this->connect();
         $this->assertTrue($this->imap->delete_mailbox('bar'));
     }
     /**
@@ -391,7 +362,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_disconnect() {
-        $this->connect();
         $this->disconnect();
         $res = $this->debug();
         $this->assertTrue(array_key_exists('A5 LOGOUT', $res['commands']));
@@ -403,7 +373,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_message_action() {
         /* TODO: coverage and assertions */
-        $this->connect();
         $this->assertTrue($this->imap->message_action('DELETE', array(1), 'foo'));
         $this->assertTrue($this->imap->message_action('READ', array(1), 'foo'));
         $this->assertTrue($this->imap->message_action('FLAG', array(1), 'foo'));
@@ -444,13 +413,14 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get_state() {
-        $this->assertEquals('disconnected', $this->imap->get_state());
+        $this->assertEquals('authenticated', $this->imap->get_state());
     }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
     public function test_show_debug() {
+        $this->reset();
         ob_start();
         $this->assertEquals("\nDebug Array\n(\n)\n\n", $this->imap->show_debug());
         $this->assertEquals(array(), $this->imap->show_debug(false, false, true));
@@ -463,7 +433,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get_quota() {
-        $this->connect();
         $this->imap->supported_extensions[] = 'quota';
         $this->assertEquals(array(array('name' => '', 'max' => 512, 'current' => 10)), $this->imap->get_quota());
     }
@@ -472,7 +441,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get_quota_root() {
-        $this->connect();
         $this->imap->supported_extensions[] = 'quota';
         $this->assertEquals(array(array('name' => '', 'max' => 512, 'current' => 10)), $this->imap->get_quota_root("INBOX"));
     }
@@ -481,7 +449,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_enable() {
-        $this->connect();
         $this->assertEquals(array(), $this->imap->enable());
     }
     /**
@@ -489,7 +456,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_unselect() {
-        $this->connect();
         $this->assertEquals(true, $this->imap->unselect_mailbox("INBOX"));
     }
     /**
@@ -497,7 +463,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_id() {
-        $this->connect();
         $this->imap->supported_extensions[] = 'id';
         $this->assertEquals(array(), $this->imap->id());
     }
@@ -506,7 +471,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_get_message_sort_order() {
-        $this->connect();
         $this->assertEquals(array("882", "84", "2"), $this->imap->get_message_sort_order());
     }
     /**
@@ -514,7 +478,6 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_google_search() {
-        $this->connect();
         $this->imap->supported_extensions[] = 'x-gm-ext-1';
         $this->assertEquals(array(123, 12344, 5992), $this->imap->google_search("foo"));
     }
@@ -523,10 +486,56 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_enable_compression() {
-        $this->connect();
         //$this->imap->supported_extensions[] = 'compress=deflate';
         $this->assertEquals(false, $this->imap->enable_compression());
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_mailbox_page() {
+        $res = array(2, array(1731 => array(
+            'uid' => '1731', 'flags' => '\Seen', 'internal_date' => '02-May-2017 16:32:24 -0500',
+            'size' => '1940', 'date' => ' Tue, 02 May 2017 16:32:24 -0500', 'from' => ' root <root@shop.jackass.com>',
+            'to' => ' root@shop.jackass.com', 'subject' => 'apt-listchanges: news for shop',
+            'content-type' => ' text/plain; charset="utf-8"', 'charset' => 'utf-8', 'x-priority' => 0,
+            'google_msg_id' => '', 'google_thread_id' => '', 'google_labels' => '', 'list_archive' => '',
+            'references' => '', 'message_id' => ' <E1d5fPE-0005Vm-8L@shop>', 'x_auto_bcc' => ''),
+            1732 => array('uid' => '1732', 'flags' => '\Seen', 'internal_date' => '11-May-2017 14:28:40 -0500',
+            'size' => '1089', 'date' => ' Thu, 11 May 2017 14:28:40 -0500', 'from' => ' root <root@shop.jackass.com>',
+            'to' =>  ' root@shop.jackass.com', 'subject' => 'apt-listchanges: news for shop',
+            'content-type' => ' text/plain; charset="utf-8"', 'charset' => 'utf-8', 'x-priority' => 0,
+            'google_msg_id' => '', 'google_thread_id' => '', 'google_labels' => '', 'list_archive' => '',
+            'references' => '', 'message_id' =>  ' <E1d8tlQ-00065l-4t@shop>', 'x_auto_bcc' => '')));
+        $list = $this->imap->get_mailbox_page('INBOX', 'ARRIVAL', false, 'ALL');
+        unset($list[1][1731]['timestamp']);
+        unset($list[1][1732]['timestamp']);
+        $this->assertEquals($res, $list);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_folder_list_by_level() {
+        $res = array('INBOX' => array('delim' => '/', 'name_parts' => array('INBOX'),
+            'basename' => 'INBOX', 'noselect' => false, 'children' => true), 'Sent' => array(
+            'delim' => '/', 'name_parts' => array('Sent'), 'basename' => 'Sent',
+            'noselect' => true, 'children' => false), 'INBOX/test' => array(
+            'delim' => '/', 'name_parts' => array('INBOX', 'test'),
+            'basename' => 'test', 'children' => false, 'noselect' => false));
+        $this->assertEquals($res, $this->imap->get_folder_list_by_level());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_first_message_part() {
+        $this->assertEquals(array(1, '0123456789'), $this->imap->get_first_message_part(1731, 'text'));
+        $this->reset();
+        $this->connect();
+        $this->assertEquals(array(1, '0123456789'), $this->imap->get_first_message_part(1731, 'text', 'plain'));
+    }
     public function tearDown() {
+        $this->disconnect();
     }
 }
