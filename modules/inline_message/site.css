@@ -8,4 +8,4 @@
 .msg_headers th:hover {color: #777 !important; }
 .msg_parts th, .msg_parts td { border: none; }
 .inline_msg .msg_text, .inline_msg .msg_text_inner { min-height: 100px; }
-/*.inline_msg * { background-color: #f5f5f5; }*/
+.inline_msg td { border-bottom: none !important; }

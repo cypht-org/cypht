@@ -34,6 +34,12 @@ var inline_feed_msg = function(uid, list_path, inline_msg_loaded_callback) {
     return false;
 };
 
+
+var inline_msg_prep_imap_delete = function(path, uid, details) {
+    $('#'+path.substr(1)).prop('checked', false);
+    return imap_delete_message(false, uid, details);
+};
+
 var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
     var path = '.'+details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
@@ -50,7 +56,7 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     $('#move_message').unbind('click');
     $('#copy_message').unbind('click');
 
-    $('#delete_message').click(function() { return imap_delete_message(false, uid, details); });
+    $('#delete_message').click(function() { return inline_msg_prep_imap_delete(path, uid, details); });
     $('#move_message').click(function(e) { return imap_move_copy(e, 'move', [path.substr(1)]) });
     $('#copy_message').click(function(e) { return imap_move_copy(e, 'copy', [path.substr(1)]) });
 };
