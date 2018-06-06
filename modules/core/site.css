@@ -80,6 +80,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .main_menu { padding-top: 20px; }
 .content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px; }
 .header_subject .content_title { color: #555; }
+.header_subject th { white-space: normal !important; }
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
 .submit_cell { padding-top: 30px !important; }
