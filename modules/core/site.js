@@ -675,6 +675,7 @@ function Message_List() {
     this.prev_next_links = function(cache, class_name) {
         var href;
         var target;
+        var subject;
         var plink = false;
         var nlink = false;
         var list = Hm_Utils.get_from_local_storage(cache);
@@ -684,12 +685,14 @@ function Message_List() {
         target = $('.msg_headers tr').last();
         if (prev.length) {
             href = prev.find('.subject').find('a').prop('href');
-            plink = '<a class="plink" href="'+href+'"><div class="prevnext prev_img"></div> '+prev.find('.subject').text()+'</a>';
+            subject = new Option(prev.find('.subject').text()).innerHTML;
+            plink = '<a class="plink" href="'+href+'"><div class="prevnext prev_img"></div> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
         if (next.length) {
             href = next.find('.subject').find('a').prop('href');
-            nlink = '<a class="nlink" href="'+href+'"><div class="prevnext next_img"></div> '+next.find('.subject').text()+'</a>';
+            subject = new Option(next.find('.subject').text()).innerHTML;
+            nlink = '<a class="nlink" href="'+href+'"><div class="prevnext next_img"></div> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
     };
