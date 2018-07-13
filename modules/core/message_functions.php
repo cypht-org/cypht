@@ -62,7 +62,7 @@ function format_msg_image($str, $mime_type) {
 if (!hm_exists('format_msg_text')) {
 function format_msg_text($str, $output_mod, $links=true) {
     $str = str_replace("\t", '    ', $str);
-    $str = nl2br(str_replace(' ', '<wbr>', ($output_mod->html_safe($str))));
+    $str = nl2br(str_replace(' ', '<wbr>', ($output_mod->html_safe($str)))).'<br />';
     $str = preg_replace("/(&(?!amp)[^;]+;)/", " $1", $str);
     if ($links) {
         $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,%[:alnum:]])+)/m";
