@@ -35,12 +35,12 @@ if ($config->get('auth_type') != 'DB') {
 $auth = new Hm_Auth_DB($config);
 if ($user && $pass) {
     if ($auth->create($user, $pass) === 2) {
-        die("User created\n\n");
+        die("User '" . $user . "' created\n\n");
     }
     else {
         print_r(Hm_Debug::get());
         print_r(Hm_Msgs::get());
-        die("An error occured\n\n");
+        die("An error occured when creating user  '" . $user . "'\n\n");
     }
 }
 
