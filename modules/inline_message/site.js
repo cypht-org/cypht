@@ -56,6 +56,9 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     $('#move_message').unbind('click');
     $('#copy_message').unbind('click');
 
+    $('#move_message').addClass('inline');
+    $('#copy_message').addClass('inline');
+
     $('#delete_message').click(function() { return inline_msg_prep_imap_delete(path, uid, details); });
     $('#move_message').click(function(e) { return imap_move_copy(e, 'move', [path.substr(1)]) });
     $('#copy_message').click(function(e) { return imap_move_copy(e, 'copy', [path.substr(1)]) });
