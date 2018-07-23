@@ -62,6 +62,8 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     $('#delete_message').click(function() { return inline_msg_prep_imap_delete(path, uid, details); });
     $('#move_message').click(function(e) { return imap_move_copy(e, 'move', [path.substr(1)]) });
     $('#copy_message').click(function(e) { return imap_move_copy(e, 'copy', [path.substr(1)]) });
+    $('#flag_msg').click(function() { return imap_flag_message($(this).data('state'), uid, details); });
+    $('#unflag_msg').click(function() { return imap_flag_message($(this).data('state', uid, details)); });
 };
 
 var msg_container = function(type, path) {

@@ -177,9 +177,15 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
     return false;
 };
 
-var imap_flag_message = function(state) {
+var imap_flag_message = function(state, supplied_uid, supplied_detail) {
     var uid = hm_msg_uid();
     var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    if (supplied_uid) {
+        uid = supplied_uid;
+    }
+    if (supplied_detail) {
+        detail = supplied_detail;
+    }
     if (detail && uid) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_flag_message'},
