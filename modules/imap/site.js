@@ -545,8 +545,12 @@ var imap_message_view_finished = function(msg_uid, detail) {
     $('#flag_msg').click(function() { return imap_flag_message($(this).data('state')); });
     $('#unflag_msg').click(function() { return imap_flag_message($(this).data('state')); });
     $('#delete_message').click(function() { return imap_delete_message(); });
-    $('#move_message').click(function(e) { return imap_move_copy(e, 'move');});
-    $('#copy_message').click(function(e) { return imap_move_copy(e, 'copy');});
+    if (!$('#move_message').hasClass('inline')) {
+        $('#move_message').click(function(e) { return imap_move_copy(e, 'move');});
+    }
+    if (!$('#copy_message').hasClass('inline')) {
+        $('#copy_message').click(function(e) { return imap_move_copy(e, 'copy');});
+    }
 };
 
 var get_local_message_content = function(msg_uid, path) {
