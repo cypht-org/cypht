@@ -37,7 +37,7 @@ class Hm_Request_Key {
         if (defined('SITE_ID')) {
             $site_id = SITE_ID;
         }
-        self::$site_hash = $session->build_fingerprint($request->server, $key.$user.SITE_ID);
+        self::$site_hash = $session->build_fingerprint($request->server, $key.$user.$site_id);
     }
 
     /**
