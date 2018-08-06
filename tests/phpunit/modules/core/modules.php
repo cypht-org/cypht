@@ -117,6 +117,24 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_http_headers_allow_images() {
+        $test = new Handler_Test('http_headers', 'core');
+        $test->tls = true;
+        $test->rtype = 'AJAX';
+        $test->input = array('language' => 'English');
+        $test->config['allow_external_image_sources'] = true;
+        $res = $test->run();
+		$out = array(
+            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline';",
+		);
+        foreach ($out as $key => $val) {
+            $this->assertEquals($out[$key], $res->handler_response['http_headers'][$key]);
+        }
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_process_list_style_setting_passed() {
         $test = new Handler_Test('process_list_style_setting', 'core');
         $test->post = array('save_settings' => true, 'list_style' => 'news_style');
