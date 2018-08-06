@@ -1,5 +1,6 @@
 .imap_debug_data { margin-left: 10px; }
 .imap_connect { display: inline; }
+.allow_image_link { margin-right: 20px; float: right; margin-top: -10px; margin-bottom: 10px; }
 .imap_debug { border: solid 1px #aaa; float: left; padding: 10px; height: 300px; width: 300px; overflow: scroll; white-space: pre; margin-top: 50px; font-size: 75%; }
 .save_settings, .server_link { line-height: 10pt; margin: 2px; margin-left: 5px; display: block; padding: 5px; border: solid 1px #ddd; background-color: #fff; float: right; clear: none; color: #333; text-decoration: none; border-radius: 3px; }
 .hl { padding-right: 5px; color: #666; }

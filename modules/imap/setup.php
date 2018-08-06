@@ -301,6 +301,7 @@ return array(
         'text_only' => FILTER_VALIDATE_BOOLEAN,
         'msg_part_icons' => FILTER_VALIDATE_BOOLEAN,
         'simple_msg_parts' => FILTER_VALIDATE_BOOLEAN,
+        'imap_allow_images' => FILTER_VALIDATE_BOOLEAN,
         'imap_delete' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
         'imap_remember' => FILTER_VALIDATE_INT,

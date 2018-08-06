@@ -1394,8 +1394,14 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             elseif (isset($this->request->post['imap_prefetch']) && $this->request->post['imap_prefetch']) {
                 $prefetch = true;
             }
+            if (array_key_exists('imap_allow_images', $this->request->post) && $this->request->post['imap_allow_images']) {
+                $this->out('imap_allow_images', true);
+            }
+            $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
+
             $cache = Hm_IMAP_List::get_cache($this->session, $this->config, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+
             if (imap_authed($imap)) {
                 $imap->read_only = $prefetch;
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
@@ -1594,7 +1600,20 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
         if ($this->get('msg_text')) {
             $struct = $this->get('msg_struct_current', array());
             if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
-                $txt .= format_msg_html($this->get('msg_text'), $this->get('external_images', false));
+
+                $allowed = $this->get('header_allow_images');
+                $images = $this->get('imap_allow_images', false);
+
+                if ($allowed && stripos($this->get('msg_text'), 'img')) {
+                    if (!$images) {
+                        $id = $this->get('imap_msg_part');
+                        $txt .= '<div class="allow_image_link">'.
+                            '<a href="#" class="msg_part_link" data-allow-images="1" '.
+                            'data-message-part="'.$this->html_safe($id).'">'.
+                            $this->trans('Allow Images').'</a></div>';
+                    }
+                }
+                $txt .= format_msg_html($this->get('msg_text'), $images);
             }
             elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
                 $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
