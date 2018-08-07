@@ -769,6 +769,11 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
                 $res .= $this->html_safe($folder).'</a></li>';
             }
         }
+        $res .= '<li class="feeds_add_new"><a href="?page=servers#feeds_section">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$plus).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Add a feed').'</a></li>';
         if ($res) {
             $this->append('folder_sources', array('feeds_folders', $res));
         }

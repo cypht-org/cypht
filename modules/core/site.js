@@ -891,7 +891,7 @@ var Hm_Folders = {
         }
         return false;
     },
-    sort_list: function(class_name, exclude_name) {
+    sort_list: function(class_name, exclude_name, last_name) {
         var folder = $('.'+class_name+' ul');
         var listitems;
         if (exclude_name) {
@@ -901,7 +901,7 @@ var Hm_Folders = {
             listitems = $('li', folder);
         }
         listitems.sort(function(a, b) {
-            if ($(b).attr('class') == 'menu_logout') {
+            if (last_name && $(b).attr('class') == last_name) {
                 return false;
             }
             if ($(b).text().toUpperCase() == 'ALL') {
@@ -914,8 +914,8 @@ var Hm_Folders = {
     update_folder_list_display: function(res) {
         $('.folder_list').html(res.formatted_folder_list);
         Hm_Folders.sort_list('email_folders', 'menu_email');
-        Hm_Folders.sort_list('feeds_folders', 'menu_feeds');
-        Hm_Folders.sort_list('main', 'menu_search');
+        Hm_Folders.sort_list('feeds_folders', 'menu_feeds', 'feeds_add_new');
+        Hm_Folders.sort_list('main', 'menu_search', 'menu_logout');
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         Hm_Folders.hl_selected_menu();
         Hm_Folders.folder_list_events();
