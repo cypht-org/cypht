@@ -62,7 +62,8 @@ else {
     ini_set('display_start_up_errors', 1);
 }
 
-$base = dirname(dirname(__FILE__)).PATH_SEPARATOR.'/tmp'.PATH_SEPARATOR.'/dev/urandom';
+$tmp_dir = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();
+$base = dirname(dirname(__FILE__)).PATH_SEPARATOR.$tmp_dir.PATH_SEPARATOR.'/dev/urandom';
 $disabled = $config->get('disable_open_basedir', false);
 foreach (array('app_data_dir', 'user_settings_dir', 'attachment_dir') as $dir) {
     if ($config->get($dir, false) && is_readable($config->get($dir, false))) {
