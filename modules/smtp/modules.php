@@ -634,7 +634,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
                 $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
 
-            $recip = get_primary_recipients($reply['msg_headers'], $this->get('smtp_servers', array()));
+            $recip = get_primary_recipient($this->get('compose_profiles', array()), $reply['msg_headers'],
+                $this->get('smtp_servers', array()));
         }
         elseif (!empty($draft)) {
             if (array_key_exists('draft_to', $draft)) {
@@ -1054,29 +1055,25 @@ function format_attachment_row($file, $output_mod) {
 /**
  * @subpackage smtp/functions
  */
-if (!hm_exists('get_primary_recipients')) {
-function get_primary_recipients($headers, $smtp_servers) {
-    $recip_headers = array('to', 'cc', 'envelope-to');
-    $lc_headers = array();
-    foreach ($headers as $name => $value) {
-        if (in_array(strtolower($name), $recip_headers, true)) {
-            $lc_headers[strtolower($name)] = $value;
+if (!hm_exists('get_primary_recipient')) {
+function get_primary_recipient($profiles, $headers, $smtp_servers) {
+    $addresses = array();
+    $flds = array('delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'to', 'cc');
+    $headers = lc_headers($headers);
+    foreach ($flds as $fld) {
+        if (array_key_exists($fld, $headers)) {
+            foreach (process_address_fld($headers[$fld]) as $address) {
+                $addresses[] = $address['email'];
+            }
         }
     }
-    if (array_key_exists('envelope-to', $lc_headers)) {
-        return $lc_headers['envelope-to'];
-    }
-    $users = array_map(function($a) { return $a['user']; }, $smtp_servers);
-    foreach ($users as $user) {
-        if (strpos($user, '@') !== false) {
-            $testuser = explode('@', $user)[1];
-        }
-        else {
-            $testuser = $user;
-        }
-        foreach ($lc_headers as $header) {
-            if (stristr($header, $testuser) !== false) {
-                return $user;
+    $addresses = array_unique($addresses);
+    foreach ($addresses as $address) {
+        foreach ($smtp_servers as $id => $vals) {
+            foreach (profiles_by_smtp_id($profiles, $id) as $profile) {
+                if ($profile['address'] == $address) {
+                    return $address;
+                }
             }
         }
     }
