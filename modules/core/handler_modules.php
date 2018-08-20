@@ -571,6 +571,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
         if ($this->session->is_active()) {
             Hm_Page_Cache::load($this->session);
             $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
+            $this->out('username', $this->session->get('username'));
         }
         if ($this->validate_request) {
             Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
