@@ -792,6 +792,26 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_header_css_integrity() {
+        define('CSS_HASH', 'foo');
+        $test = new Output_Test('header_css', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<link href="site.css?v=asdf" integrity="foo" media="all" rel="stylesheet" type="text/css" />'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_page_js_integrity() {
+        define('JS_HASH', 'foo');
+        $test = new Output_Test('page_js', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<script type="text/javascript" integrity="foo" src="site.js?v=asdf"></script>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_page_js() {
         $test = new Output_Test('page_js', 'core');
         $res = $test->run();
