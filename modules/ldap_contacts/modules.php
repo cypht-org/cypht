@@ -341,7 +341,7 @@ class Hm_Output_ldap_auth_settings extends Hm_Output_Module {
                     }
                 }
                 $res .= '<tr class="ldap_settings"><td>'.$this->html_safe($name).'</td><td>';
-                $res .= '<input type="text" value="'.$user.'" name="ldap_usernames['.$this->html_safe($name).']" ';
+                $res .= '<input autocomplete="username" type="text" value="'.$user.'" name="ldap_usernames['.$this->html_safe($name).']" ';
                 $res .= 'placeholder="'.$this->trans('Username').'" /> <input type="password" ';
                 if ($pass) {
                     $res .= 'disabled="disabled" placeholder="'.$this->trans('Password saved').'" ';
@@ -349,7 +349,7 @@ class Hm_Output_ldap_auth_settings extends Hm_Output_Module {
                     $res .= 'value="'.$this->trans('Unlock').'" class="ldap_password_change" /></td></tr>';
                 }
                 else {
-                    $res .= 'placeholder="'.$this->trans('Password').'" ';
+                    $res .= 'autocomplete="new-password" placeholder="'.$this->trans('Password').'" ';
                     $res .= 'name="ldap_passwords['.$this->html_safe($name).']" /></td></tr>';
                 }
             }
