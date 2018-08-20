@@ -220,8 +220,9 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' &nbsp;'.
                 '<a href="?page=save">'.$this->trans('More info').'</a></div>'.
+                '<input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>'.
                 '<label class="screen_reader" for="logout_password">'.$this->trans('Password').'</label>'.
-                '<input id="logout_password" name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
+                '<input id="logout_password" autocomplete="current-password" name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
                 '<input class="save_settings" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />'.
                 '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
                 '<input class="cancel_logout save_settings" type="button" value="'.$this->trans('Cancel').'" />'.
@@ -430,7 +431,11 @@ class Hm_Output_header_css extends Hm_Output_Module {
             }
         }
         else {
-            $res .= '<link href="site.css?v='.CACHE_ID.'" media="all" rel="stylesheet" type="text/css" />';
+            $res .= '<link href="site.css?v='.CACHE_ID.'" ';
+            if (defined('CSS_HASH') && CSS_HASH) {
+                $res .= 'integrity="'.CSS_HASH.'" ';
+            }
+            $res .= 'media="all" rel="stylesheet" type="text/css" />';
         }
         return $res;
     }
@@ -471,7 +476,12 @@ class Hm_Output_page_js extends Hm_Output_Module {
             return $js_lib.$res;
         }
         else {
-            return '<script type="text/javascript" src="site.js?v='.CACHE_ID.'"></script>';
+            $res = '<script type="text/javascript" ';
+            if (defined('JS_HASH') && JS_HASH) {
+                $res .= 'integrity="'.JS_HASH.'" ';
+            }
+            $res .= 'src="site.js?v='.CACHE_ID.'"></script>';
+            return $res;
         }
     }
 }
@@ -1238,8 +1248,9 @@ class Hm_Output_save_form extends Hm_Output_Module {
         }
         $res .= '</ul></div><div class="save_perm_form"><form method="post">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+            '<input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
-            'name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
+            'name="password" autocomplete="current-password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
             '<input class="save_settings" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
             '<input class="save_settings" type="submit" name="save_settings_permanently_then_logout" value="'.$this->trans('Save and Logout').'" />'.
             '</form><form method="post"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
