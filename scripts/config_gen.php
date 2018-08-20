@@ -50,6 +50,13 @@ function check_php() {
 }
 
 /**
+ * build sub-resource integrity hash
+ */
+function build_integrity_hash($data) {
+    return sprintf('sha512-%s', base64_encode(hash('sha512', $data, true)));
+}
+
+/**
  * include module ini files in the main config
  */
 function parse_module_ini_files($settings) {
@@ -109,13 +116,13 @@ function build_config() {
         list($js, $css, $filters, $assets) = get_module_assignments($settings);
 
         /* combine and compress page content */
-        combine_includes($js, $js_compress, $css, $css_compress, $settings);
+        $hashes = combine_includes($js, $js_compress, $css, $css_compress, $settings);
 
         /* write out the hm3.rc file */
         write_config_file($settings, $filters);
 
         /* create the production version */
-        create_production_site($assets, $settings);
+        create_production_site($assets, $settings, $hashes);
     }
     else {
         printf("\nNo settings found in ini file\n");
@@ -236,8 +243,12 @@ function get_modules($settings) {
  * @return void
  */
 function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
+    $js_hash = '';
+    $css_hash = '';
     if ($css) {
-        file_put_contents('site.css', compress($css, $css_compress));
+        $css_out = compress($css, $css_compress);
+        $css_hash = build_integrity_hash($css_out);
+        file_put_contents('site.css', $css_out);
         printf("site.css file created\n");
     }
     if ($js) {
@@ -253,10 +264,13 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
             $js_lib .= file_get_contents("third_party/forge.min.js");
         }
         file_put_contents('tmp.js', $js);
-        file_put_contents('site.js', $js_lib.compress($js, $js_compress, 'tmp.js'));
+        $js_out = $js_lib.compress($js, $js_compress, 'tmp.js');
+        $js_hash = build_integrity_hash($js_out);
+        file_put_contents('site.js', $js_out);
         unlink('./tmp.js');
         printf("site.js file created\n");
     }
+    return array('js' => $js_hash, 'css' => $css_hash);
 }
 
 /**
@@ -287,7 +301,7 @@ function write_config_file($settings, $filters) {
  *
  * @return void
  */
-function create_production_site($assets, $settings) {
+function create_production_site($assets, $settings, $hashes) {
     if (!is_readable('site/')) {
         mkdir('site', 0755);
     }
@@ -299,6 +313,8 @@ function create_production_site($assets, $settings) {
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
     $index_file = preg_replace("/SITE_ID', ''/", "SITE_ID', '".urlencode(Hm_Crypt::unique_id(64))."'", $index_file);
     $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
+    $index_file = preg_replace("/JS_HASH', ''/", "JS_HASH', '".$hashes['js']."'", $index_file);
+    $index_file = preg_replace("/CSS_HASH', ''/", "CSS_HASH', '".$hashes['css']."'", $index_file);
     file_put_contents('site/index.php', $index_file);
     foreach ($assets as $path) {
         copy_recursive($path);
