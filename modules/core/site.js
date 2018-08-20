@@ -815,6 +815,7 @@ function Message_List() {
 var Hm_Folders = {
     expand_after_update: false,
     unread_counts: {},
+    observer : false,
 
     save_folder_list: function() {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
@@ -923,6 +924,7 @@ var Hm_Folders = {
             Hm_Utils.toggle_section(Hm_Folders.expand_after_update);
         }
         Hm_Folders.expand_after_update = false;
+        Hm_Folders.listen_for_new_messages();
         hl_save_link();
     },
     update_folder_list: function() {
@@ -968,6 +970,18 @@ var Hm_Folders = {
             $('.menu_'+page).addClass('selected_menu');
         }
     },
+    listen_for_new_messages: function() {
+        var target = $('.total_unread_count').get(0);
+        if (!Hm_Folders.observer) {
+            Hm_Folders.observer = new MutationObserver(function(mutations) {
+                $('body').trigger('new_message');
+            });
+        }
+        else {
+            Hm_Folders.observer.disconnect();
+        }
+        Hm_Folders.observer.observe(target, {attributes: true, childList: true, characterData: true});
+    },
     load_from_local_storage: function() {
         var folder_list = Hm_Utils.get_from_local_storage('formatted_folder_list');
         if (folder_list) {
@@ -981,6 +995,7 @@ var Hm_Folders = {
             Hm_Folders.folder_list_events();
             Hm_Folders.load_unread_counts();
             Hm_Folders.update_unread_counts();
+            Hm_Folders.listen_for_new_messages();
             return true;
         }
         return false;
@@ -1323,10 +1338,6 @@ var hl_save_link = function() {
 
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
-
-$("body").on('DOMSubtreeModified', ".total_unread_count", function(data) {
-    $('body').trigger('new_message');
-});
 
 /* executes on onload, has access to other module code */
 $(function() {
