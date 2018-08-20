@@ -1,7 +1,7 @@
 <?php
 
 /**
- * GIT VERSION: 10617
+ * GIT VERSION: 10620
  *
  * Some of the following constants are automatically filled in when
  * the build process is run. If you change them in site/index.php
@@ -16,6 +16,8 @@ define('APP_PATH', '');
 define('DEBUG_MODE', true);
 define('CACHE_ID', '');
 define('SITE_ID', '');
+define('JS_HASH', '');
+define('CSS_HASH', '');
 
 /* show all warnings in debug mode */
 if (DEBUG_MODE) {
