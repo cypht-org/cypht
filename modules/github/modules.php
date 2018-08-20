@@ -101,6 +101,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
                             Hm_Github_Uid_Cache::unread($guid);
                             break;
                         case 'read':
+                        case 'delete':
                             Hm_Github_Uid_Cache::read($guid);
                             break;
                     }
