@@ -20,7 +20,7 @@ var Hm_Ajax = {
         return;
     },
 
-    request: function(args, callback, extra, no_icon, batch_callback) {
+    request: function(args, callback, extra, no_icon, batch_callback, on_failure) {
         var name = Hm_Ajax.get_ajax_hook_name(args);
         var ajax = new Hm_Ajax_Request();
         if (Hm_Ajax.request_count === 0) {
@@ -33,14 +33,14 @@ var Hm_Ajax = {
         if (batch_callback) {
             Hm_Ajax.batch_callback = batch_callback;
         }
-        return ajax.make_request(args, callback, extra, name);
+        return ajax.make_request(args, callback, extra, name, on_failure);
     },
 
     show_loading_icon: function() {
-        var hm_loading_pos = 0;
+        var hm_loading_pos = $('.loading_icon').width()/40;
         $('.loading_icon').show();
         function move_background_image() {
-            hm_loading_pos = hm_loading_pos + ($('.loading_icon').width()/20);
+            hm_loading_pos = hm_loading_pos + 50;
             $('.loading_icon').css('background-position', hm_loading_pos+'px 0');
             Hm_Ajax.icon_loading_id = setTimeout(move_background_image, 100);
         }
@@ -80,13 +80,17 @@ var Hm_Ajax_Request = function() { return {
     callback: false,
     name: false,
     index: 0,
+    on_failure: false,
     start_time: 0,
 
-    make_request: function(args, callback, extra, request_name) {
+    make_request: function(args, callback, extra, request_name, on_failure) {
         var name;
         var arg;
         this.name = request_name;
         this.callback = callback;
+        if (on_failure) {
+            this.on_failure = true;
+        }
         if (extra) {
             for (name in extra) {
                 args.push({'name': name, 'value': extra[name]});
@@ -119,7 +123,7 @@ var Hm_Ajax_Request = function() { return {
 
     done: function(res) {
         if (Hm_Ajax.aborted) {
-            return;
+            return this.run_on_failure();
         }
         else if (typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
             this.fail(res);
@@ -160,9 +164,17 @@ var Hm_Ajax_Request = function() { return {
         }
     },
 
+    run_on_failure: function() {
+        if (this.on_failure && this.callback) {
+            this.callback(false);
+        }
+        return false;
+    },
+
     fail: function() {
         Hm_Ajax.err_condition = true;
         setTimeout(function() { Hm_Notices.show({0: 'ERRAn error occurred communicating with the server'}); }, 1000);
+        this.run_on_failure();
     },
 
     always: function(res) {
