@@ -666,6 +666,7 @@ function Message_List() {
         }
         var msg_list = $('.message_table');
         var selected = [];
+        var current_list = self.filter_list();
         $('input[type=checkbox]', msg_list).each(function() {
             if (this.checked) {
                 selected.push($(this).val());
@@ -676,8 +677,17 @@ function Message_List() {
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
                 {'name': 'action_type', 'value': action_type},
                 {'name': 'message_ids', 'value': selected}],
+                function(res) {
+                    if (!res) {
+                        $('.message_table_body').replaceWith(current_list);
+                        self.save_updated_list();
+                        self.toggle_msg_controls();
+                    }
+                },
+                [],
                 false,
-                []
+                false,
+                true
             );
             self.update_after_action(action_type, selected);
         }
@@ -1060,7 +1070,7 @@ var Hm_Utils = {
         }
     },
     reset_search_form: function() {
-        Hm_Utils.save_to_local_storage('formatted_sent_data', '');
+        Hm_Utils.save_to_local_storage('formatted_search_data', '');
         Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}],
             function(res) { window.location = '?page=search'; }, false, true);
         return false;
