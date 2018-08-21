@@ -229,6 +229,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .unsaved_reminder { display: none; }
 }
 @media screen and (max-device-width:480px) and (orientation : portrait) {
+    .sys_messages { position: absolute; z-index: 1002; }
     .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
     .save_settings { margin-left: 0px !important; }
     .save_settings_password { margin-right: 10px; }
