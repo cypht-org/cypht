@@ -9,6 +9,7 @@ class PageTests(WebTest):
         WebTest.__init__(self)
         self.login(USER, PASS)
         self.wait()
+        self.rest()
 
     def search(self):
         list_item = self.by_class('menu_search')

@@ -76,6 +76,10 @@ class SettingsTests(SettingsHelpers):
         WebTest.__init__(self)
         self.login(USER, PASS)
         self.wait()
+        self.rest()
+
+    def list_style_test(self):
+        self.dropdown_test('general_setting', 'list_style', 'email_style', 'news_style')
 
     def auto_bcc_test(self):
         self.checkbox_test('general_setting', 'smtp_auto_bcc', False, 'smtp')
@@ -119,9 +123,6 @@ class SettingsTests(SettingsHelpers):
 
     def tz_test(self):
         self.dropdown_test('general_setting', 'timezone', 'Africa/Abidjan', 'Africa/Algiers')
-
-    def list_style_test(self):
-        self.dropdown_test('general_setting', 'list_style', 'email_style', 'news_style')
 
     def start_page_test(self):
         self.dropdown_test('general_setting', 'start_page', 'none', 'page=home')

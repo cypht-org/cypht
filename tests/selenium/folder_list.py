@@ -10,11 +10,11 @@ class FolderListTests(WebTest):
         WebTest.__init__(self)
         self.login(USER, PASS)
         self.wait()
+        self.rest()
 
     def reload_folder_list(self):
         assert self.by_class('main_menu').text == 'Main'
         self.by_class('update_message_list').click()
-        self.rest()
         self.rest()
         assert self.by_class('main_menu').text == 'Main'
 
