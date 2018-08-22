@@ -14,7 +14,7 @@ update_repos() {
 
 # Enable memcached extension
 setup_memcached() {
-    if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then
+    if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
         sudo apt-get install -y php-memcached
     fi
     echo 'extension=memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
@@ -48,10 +48,10 @@ selenium_config() {
     if [ "$TRAVIS_PHP_VERSION" = "5.4" ] && [ "$DB" = "mysql" ]; then
         mv .travis/creds.py-edge creds.py
     fi
-    if [ "$TRAVIS_PHP_VERSION" = "nightly" ] && [ "$DB" = "postgresql" ]; then
+    if [ "$TRAVIS_PHP_VERSION" = "7.2" ] && [ "$DB" = "postgresql" ]; then
         mv .travis/creds.py-safari creds.py
     fi
-    if [ "$TRAVIS_PHP_VERSION" = "nightly" ] && [ "$DB" = "mysql" ]; then
+    if [ "$TRAVIS_PHP_VERSION" = "7.2" ] && [ "$DB" = "mysql" ]; then
         mv .travis/creds.py-chrome creds.py
     fi
 }
@@ -89,7 +89,7 @@ install_phpunit() {
     if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
         wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
     fi
-    if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then
+    if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
         wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
     fi
     chmod +x phpunit
@@ -114,7 +114,7 @@ install_apache() {
     if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
-    if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then
+    if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
 
