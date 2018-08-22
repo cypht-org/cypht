@@ -5,8 +5,7 @@ phpunit_tests() {
 }
 
 selenium_tests() {
-    true
-    #cd tests/selenium/ && sh ./runall.sh && cd ../../
+    cd tests/selenium/ && sh ./runall.sh && cd ../../
 }
 
 BUILD="$DB$TRAVIS_PHP_VERSION"
