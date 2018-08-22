@@ -24,6 +24,10 @@ class WebTest:
     def __init__(self, cap=None):
         self.read_ini()
         self.driver = get_driver(cap)
+        try:
+            self.driver.manage().window().maximize()
+        except Exception:
+            print "Can't maximize window :("
         self.load()
 
     def read_ini(self):
