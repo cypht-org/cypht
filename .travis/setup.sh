@@ -230,4 +230,4 @@ setup_all_tests() {
     bootstrap_unit_tests
 }
 
-setup_unit_tests
+setup_all_tests
