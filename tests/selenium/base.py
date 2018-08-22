@@ -24,10 +24,6 @@ class WebTest:
     def __init__(self, cap=None):
         self.read_ini()
         self.driver = get_driver(cap)
-        try:
-            self.driver.manage().window().maximize()
-        except Exception:
-            print "Can't maximize window :("
         self.load()
 
     def read_ini(self):
@@ -40,6 +36,7 @@ class WebTest:
 
     def load(self):
         self.go(SITE_URL)
+        self.driver.maximize_window()
 
     def mod_active(self, name):
         if name in self.modules:
