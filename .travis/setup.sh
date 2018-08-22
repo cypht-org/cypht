@@ -98,7 +98,8 @@ install_phpunit() {
 
 # install selenium
 install_selenium() {
-    sudo apt-get install python-pip
+    sudo -H apt-get install python-pip
+    sudo -H pip install --upgrade urllib3
     sudo pip install selenium
 }
 
