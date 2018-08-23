@@ -9,7 +9,7 @@
 
 import re
 from time import sleep
-from creds import SITE_URL, USER, PASS, get_driver, SLEEP_INT
+from creds import SITE_URL, USER, PASS, get_driver
 from selenium.webdriver.common.by import By
 from selenium.common import exceptions
 from contextlib import contextmanager
@@ -48,13 +48,6 @@ class WebTest:
 
     def go(self, url):
         self.driver.get(url)
-
-    def rest(self, INT=None):
-        if INT:
-            print " - resting for {0} seconds".format(INT)
-        else:
-            print " - resting for {0} seconds".format(SLEEP_INT)
-            sleep(SLEEP_INT)
 
     def login(self, user, password):
         print " - logging in"

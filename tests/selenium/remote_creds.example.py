@@ -25,9 +25,6 @@ USER = 'testuser'
 # A valid password for the username
 PASS = 'testpass'
 
-# delay time for the res() function in seconds
-SLEEP_INT = 2
-
 # A function that returns a webdriver object.
 def get_driver(cap):
     if not cap:

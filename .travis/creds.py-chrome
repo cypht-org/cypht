@@ -7,7 +7,6 @@ DESIRED_CAP = None
 SITE_URL = 'http://cypht-test.org/'
 USER = 'testuser'
 PASS = 'testuser'
-SLEEP_INT = 2
 
 config = {
     'user': os.environ['BROWSERSTACK_USER'],
@@ -27,7 +26,7 @@ def get_driver(cap):
         'resolution': '1920x1080'
     }
     driver_url='http://{0}:{1}@hub-cloud.browserstack.com/wd/hub'.format(config['user'], config['key'])
-    print capabilities['browser']
+    print "BROWSER {0}".format(capabilities['browser'])
     return webdriver.Remote(desired_capabilities=capabilities, command_executor=driver_url)
 
 def success(driver):
