@@ -8,7 +8,6 @@
 # local_creds.example.py:   Configure the Selenium tests to run locally
 
 import re
-from time import sleep
 from creds import SITE_URL, USER, PASS, get_driver
 from selenium.webdriver.common.by import By
 from selenium.common import exceptions
@@ -38,7 +37,10 @@ class WebTest:
     def load(self):
         print(" - loading site")
         self.go(SITE_URL)
-        self.driver.maximize_window()
+        try:
+            self.driver.maximize_window()
+        except Exception:
+            pass
 
     def mod_active(self, name):
         if name in self.modules:

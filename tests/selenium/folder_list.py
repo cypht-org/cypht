@@ -11,11 +11,11 @@ class FolderListTests(WebTest):
         self.login(USER, PASS)
         self.wait_with_folder_list()
 
-    def reload_folder_list(self):
-        assert self.by_class('main_menu').text == 'Main'
-        self.by_class('update_message_list').click()
-        self.wait_with_folder_list()
-        assert self.by_class('main_menu').text == 'Main'
+    #def reload_folder_list(self):
+        #assert self.by_class('main_menu').text == 'Main'
+        #self.by_class('update_message_list').click()
+        #self.wait_with_folder_list()
+        #assert self.by_class('main_menu').text == 'Main'
 
     def expand_section(self):
         self.by_css('[data-source=".settings"]').click()
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
     print "FOLDER LIST TESTS"
     test_runner(FolderListTests, [
-        'reload_folder_list',
+        #'reload_folder_list',
         'expand_section',
         'collapse_section',
         'hide_folders',
