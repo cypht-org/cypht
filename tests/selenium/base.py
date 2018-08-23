@@ -40,7 +40,7 @@ class WebTest:
         try:
             self.driver.maximize_window()
         except Exception:
-            pass
+            print " - Could not maximize browser :("
 
     def mod_active(self, name):
         if name in self.modules:
