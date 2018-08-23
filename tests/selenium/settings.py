@@ -23,7 +23,7 @@ class SettingsHelpers(WebTest):
     def save_settings(self):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         self.by_name('save_settings').click()
-        self.wait()
+        self.wait_with_folder_list()
         assert self.by_class('sys_messages').text == 'Settings updated'
 
     def settings_section(self, section):
@@ -31,7 +31,7 @@ class SettingsHelpers(WebTest):
             self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_settings')
         list_item.find_element_by_tag_name('a').click()
-        self.wait()
+        self.wait_with_folder_list()
         if not self.by_class(section).is_displayed():
             self.by_css('[data-target=".'+section+'"]').click()
 
@@ -75,8 +75,7 @@ class SettingsTests(SettingsHelpers):
     def __init__(self):
         WebTest.__init__(self)
         self.login(USER, PASS)
-        self.wait()
-        self.rest()
+        self.wait_with_folder_list()
 
     def list_style_test(self):
         self.dropdown_test('general_setting', 'list_style', 'email_style', 'news_style')

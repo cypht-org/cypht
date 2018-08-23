@@ -40,7 +40,7 @@ class LoginTests(WebTest):
     def good_login(self):
         self.load()
         self.login(USER, PASS)
-        self.wait()
+        self.wait_with_folder_list()
         assert self.by_class('content_title') != None
 
     def good_logout(self):

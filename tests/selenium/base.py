@@ -91,3 +91,11 @@ class WebTest:
         WebDriverWait(self.browser, timeout).until(
             staleness_of(old_page)
         )
+
+    @contextmanager
+    def wait_with_folder_list(self, timeout=30):
+        old_page = self.driver.find_element_by_class_name('main_menu')
+        yield
+        WebDriverWait(self.browser, timeout).until(
+            staleness_of(old_page)
+        )
