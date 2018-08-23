@@ -14,7 +14,7 @@ class PageTests(WebTest):
         list_item = self.by_class('menu_search')
         list_item.find_element_by_tag_name('a').click()
         self.wait_with_folder_list()
-        assert self.by_class('content_title').text[0:6] == 'Search'
+        assert 'Search' in self.by_class('content_title').text
 
     def sent(self):
         list_item = self.by_class('menu_sent')
@@ -83,7 +83,6 @@ class PageTests(WebTest):
         list_item = self.by_class('menu_servers')
         list_item.find_element_by_tag_name('a').click()
         self.wait_with_folder_list()
-        print ':{0}:'.format(self.by_class('content_title').text)
         assert self.by_class('content_title').text.strip() == 'Servers'
 
     def site(self):

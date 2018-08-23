@@ -42,6 +42,9 @@ install_dovecot() {
 
 # Select the browser and driver config for Selenium tests
 selenium_config() {
+    if [ "$TRAVIS_PHP_VERSION" = "5.5" ]; then
+        mv .travis/creds.py-safari creds.py
+    fi
     if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
         mv .travis/creds.py-ff creds.py
     fi
