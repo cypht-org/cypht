@@ -10,10 +10,11 @@
 import re
 from time import sleep
 from creds import SITE_URL, USER, PASS, get_driver, SLEEP_INT
+from selenium.webdriver.common.by import By
 from selenium.common import exceptions
 from contextlib import contextmanager
 from selenium.webdriver.support.ui import WebDriverWait 
-from selenium.webdriver.support.expected_conditions import staleness_of
+from selenium.webdriver.support import expected_conditions as exp_cond
 
 INI_PATH = '../../hm3.ini'
 
@@ -48,9 +49,12 @@ class WebTest:
     def go(self, url):
         self.driver.get(url)
 
-    def rest(self):
-        print " - resting for {0} seconds".format(SLEEP_INT)
-        sleep(SLEEP_INT)
+    def rest(self, INT=None):
+        if INT:
+            print " - resting for {0} seconds".format(INT)
+        else:
+            print " - resting for {0} seconds".format(SLEEP_INT)
+            sleep(SLEEP_INT)
 
     def login(self, user, password):
         print " - logging in"
@@ -93,20 +97,12 @@ class WebTest:
         print " - finding element by class {0}".format(class_name)
         return self.driver.find_element_by_class_name(class_name)
 
-    @contextmanager
     def wait(self, timeout=30):
-        print(' - waiting for page ...')
-        old_page = self.driver.find_element_by_tag_name('html')
-        yield
-        WebDriverWait(self.browser, timeout).until(
-            staleness_of(old_page)
-        )
+        print " - waiting for page ..."
+        element = WebDriverWait(self.driver, timeout).until(
+            exp_cond.presence_of_element_located((By.TAG_NAME, "body")))
 
-    @contextmanager
     def wait_with_folder_list(self, timeout=30):
-        print(' - waiting for page with folder list ...')
-        old_page = self.driver.find_element_by_class_name('main_menu')
-        yield
-        WebDriverWait(self.browser, timeout).until(
-            staleness_of(old_page)
-        )
+        print " - waiting for page with folder list ..."
+        element = WebDriverWait(self.driver, timeout).until(
+            exp_cond.presence_of_element_located((By.CLASS_NAME, "main_menu")))

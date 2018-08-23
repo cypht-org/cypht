@@ -14,8 +14,7 @@ class FolderListTests(WebTest):
     def reload_folder_list(self):
         assert self.by_class('main_menu').text == 'Main'
         self.by_class('update_message_list').click()
-        self.rest()
-        self.rest()
+        self.rest(4)
         assert self.by_class('main_menu').text == 'Main'
 
     def expand_section(self):

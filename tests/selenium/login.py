@@ -6,7 +6,6 @@ from runner import test_runner
 class LoginTests(WebTest):
 
     def bad_login_values(self):
-        self.load()
         self.login('asdf', 'asdf')
         self.wait()
         assert self.by_class('err') != None
