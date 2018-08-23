@@ -10,7 +10,6 @@ END = '\033[0m'
 
 def run_tests(obj, tests):
     passed = 0
-    print
     for name in tests:
         func = getattr(obj, name)
         try:
@@ -23,12 +22,12 @@ def run_tests(obj, tests):
             print_exception(exc_type, exc_value, exc_traceback)
     print
     print '%s%s of %s PASSED%s' % (GREEN, passed, len(tests), END)
+    print
     if (len(tests) > passed):
         print '%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), END)
         obj.end()
         exit(1);
     success(obj.driver)
-    print
     obj.end()
     return True
 

@@ -35,6 +35,7 @@ class WebTest:
                 self.modules.append(parts[1].strip())
 
     def load(self):
+        print(" - loading site")
         self.go(SITE_URL)
         self.driver.maximize_window()
 
@@ -48,9 +49,11 @@ class WebTest:
         self.driver.get(url)
 
     def rest(self):
+        print " - resting for {0} seconds".format(SLEEP_INT)
         sleep(SLEEP_INT)
 
     def login(self, user, password):
+        print " - logging in"
         user_el = self.by_name('username')
         pass_el = self.by_name('password')
         user_el.send_keys(user)
@@ -63,29 +66,36 @@ class WebTest:
             el, val)
 
     def logout_no_save(self):
+        print " - logging out"
         self.driver.find_element_by_class_name('logout_link').click()
         logout = self.by_id('logout_without_saving').click()
 
     def logout(self):
+        print " - logging out"
         self.driver.find_element_by_class_name('logout_link').click()
 
     def end(self):
         self.driver.quit()
 
     def by_id(self, el_id):
+        print " - finding element by id {0}".format(el_id)
         return self.driver.find_element_by_id(el_id)
 
     def by_name(self, name):
+        print " - finding element by name {0}".format(name)
         return self.driver.find_element_by_name(name)
 
     def by_css(self, selector):
+        print " - finding element by selector {0}".format(selector)
         return self.driver.find_element_by_css_selector(selector)
 
     def by_class(self, class_name):
+        print " - finding element by class {0}".format(class_name)
         return self.driver.find_element_by_class_name(class_name)
 
     @contextmanager
     def wait(self, timeout=30):
+        print(' - waiting for page ...')
         old_page = self.driver.find_element_by_tag_name('html')
         yield
         WebDriverWait(self.browser, timeout).until(
@@ -94,6 +104,7 @@ class WebTest:
 
     @contextmanager
     def wait_with_folder_list(self, timeout=30):
+        print(' - waiting for page with folder list ...')
         old_page = self.driver.find_element_by_class_name('main_menu')
         yield
         WebDriverWait(self.browser, timeout).until(
