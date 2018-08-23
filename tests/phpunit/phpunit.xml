@@ -44,6 +44,9 @@
     <testsuite name="api">
         <file>./api.php</file>
     </testsuite>
+    <!--<testsuite name="modules_imap">
+        <file>./modules/imap/hm-imap.php</file>
+    </testsuite>-->
     <testsuite name="modules_core">
         <file>./modules/core/functions.php</file>
         <file>./modules/core/message_functions.php</file>
@@ -60,6 +63,11 @@
                 <file>../../lib/sodium_compat.php</file>
             </exclude>
             <directory suffix=".php">../../modules/core/</directory>
+            <!--<directory suffix=".php">../../modules/imap/hm-imap-base.php</directory>
+            <directory suffix=".php">../../modules/imap/hm-imap-cache.php</directory>
+            <directory suffix=".php">../../modules/imap/hm-imap-parser.php</directory>
+            <directory suffix=".php">../../modules/imap/hm-imap-bodystructure.php</directory>
+            <directory suffix=".php">../../modules/imap/hm-imap.php</directory>-->
         </whitelist>
     </filter>
     <!--<logging>
