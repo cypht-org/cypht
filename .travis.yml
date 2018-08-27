@@ -26,7 +26,7 @@ before_install:
 
 # dump some useful info to the logs
 after_script:
-    - sudo cat /var/log/apache2/error.log
+    - sudo cat /var/log/apache2/error.log; sudo cat /var/log/mail.log
 
 # unit test coverage reporting
 after_success:

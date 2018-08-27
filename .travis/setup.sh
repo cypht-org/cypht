@@ -118,7 +118,7 @@ install_postfix() {
 sys_info() {
     df -h
     sudo netstat -lntp
-    sudo cat /etc/postfix/master.cf
+    sudo -H postconf -n
 }
 
 # install and configure Apache and PHP-FPM
