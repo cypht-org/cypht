@@ -23,7 +23,7 @@ case "$BUILD" in
         phpunit_tests && selenium_tests
     ;;
     postgresql7.2)
-        selenium_tests && phpunit_tests
+        phpunit_tests && selenium_tests
     ;;
     *)
         phpunit_tests
