@@ -1201,6 +1201,11 @@ function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod)
             $from = $profile['address'];
         }
     }
+    if ($from == $smtp_details['user'] && strpos($from, '@') === false) {
+        if (array_key_exists('HTTP_HOST', $hmod->request->server)) {
+            $from .= sprintf('@%s', $hmod->request->server['HTTP_HOST']);
+        }
+    }
     return array($imap_server, $from_name, $reply_to, $from);
 }}
 
