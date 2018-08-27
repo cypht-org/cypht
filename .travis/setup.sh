@@ -110,6 +110,7 @@ install_selenium() {
 install_postfix() {
     sudo -H apt-get install -y -qq postfix
     sudo service postfix stop
+    sudo -H postconf virtual_transport=lmtp:unix:private/dovecot-lmtp
     sudo service postfix start
 }
 

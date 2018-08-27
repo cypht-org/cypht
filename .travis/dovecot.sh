@@ -1,4 +1,4 @@
-apt-get install -y dovecot-imapd
+apt-get install -y dovecot-imapd dovecot-lmtpd
 sleep 10
 stop dovecot
 echo "mail_location = maildir:/home/%u/Maildir" | tee --append /etc/dovecot/conf.d/10-mail.conf
