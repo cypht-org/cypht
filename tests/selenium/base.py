@@ -93,17 +93,13 @@ class WebTest:
         print " - finding element by class {0}".format(class_name)
         return self.driver.find_element_by_class_name(class_name)
 
-    def wait(self, timeout=30):
-        print " - waiting for page ..."
+    def wait(self, el_type=By.TAG_NAME, el_value="body", timeout=30):
+        print " - waiting for page by {0} {0} ...".format(el_type, el_value)
         element = WebDriverWait(self.driver, timeout).until(
-            exp_cond.presence_of_element_located((By.TAG_NAME, "body")))
+            exp_cond.presence_of_element_located((el_type, el_value)))
 
     def wait_on_class(self, class_name, timeout=30):
-        print " - waiting for page with class: {0}".format(class_name)
-        element = WebDriverWait(self.driver, timeout).until(
-            exp_cond.presence_of_element_located((By.CLASS_NAME, class_name)))
+        self.wait(By.CLASS_NAME, class_name)
 
-    def wait_with_folder_list(self, timeout=30):
-        print " - waiting for page with folder list ..."
-        element = WebDriverWait(self.driver, timeout).until(
-            exp_cond.presence_of_element_located((By.CLASS_NAME, "main_menu")))
+    def wait_with_folder_list(self):
+        self.wait(By.CLASS_NAME, "main_menu")
