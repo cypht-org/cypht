@@ -94,7 +94,7 @@ class WebTest:
         return self.driver.find_element_by_class_name(class_name)
 
     def wait(self, el_type=By.TAG_NAME, el_value="body", timeout=30):
-        print " - waiting for page by {0} {0} ...".format(el_type, el_value)
+        print " - waiting for page by {0}: {1} ...".format(el_type, el_value)
         element = WebDriverWait(self.driver, timeout).until(
             exp_cond.presence_of_element_located((el_type, el_value)))
 
