@@ -106,6 +106,12 @@ install_selenium() {
     sudo pip install selenium
 }
 
+# install postfix
+install_postfix() {
+    sudo -H apt-get install -y -qq postfix
+    sudo service postfix start
+}
+
 # install and configure Apache and PHP-FPM
 install_apache() {
     sudo apt-get install apache2-mpm-prefork libapache2-mod-fastcgi
@@ -215,6 +221,7 @@ setup_ui_tests() {
     selenium_config
     install_selenium
     install_apache
+    install_postfix
 }
 
 # setup both UI and unit tests
@@ -234,4 +241,24 @@ setup_all_tests() {
     bootstrap_unit_tests
 }
 
-setup_all_tests
+BUILD="$DB$TRAVIS_PHP_VERSION"
+case "$BUILD" in
+    #postgresql5.5)
+        #phpunit_tests && selenium_tests
+    #;;
+    postgresql5.6)
+        setup_all_tests
+    ;;
+    postgresql7.0)
+        setup_all_tests
+    ;;
+    postgresql7.1)
+        setup_all_tests
+    ;;
+    postgresql7.2)
+        setup_all_tests
+    ;;
+    *)
+        setup_unit_tests
+    ;;
+esac
