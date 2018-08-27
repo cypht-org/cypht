@@ -42,9 +42,12 @@ install_dovecot() {
 
 # Select the browser and driver config for Selenium tests
 selenium_config() {
-    if [ "$TRAVIS_PHP_VERSION" = "5.5" ]; then
-        mv .travis/creds.py-safari creds.py
+    if [ "$TRAVIS_PHP_VERSION" = "5.4" ]; then
+        mv .travis/creds.py-chrome creds.py
     fi
+    #if [ "$TRAVIS_PHP_VERSION" = "5.5" ]; then
+        #mv .travis/creds.py-safari creds.py
+    #fi
     if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
         mv .travis/creds.py-ff creds.py
     fi
@@ -118,7 +121,6 @@ install_postfix() {
 sys_info() {
     df -h
     sudo netstat -lntp
-    sudo -H postconf -n
 }
 
 # install and configure Apache and PHP-FPM
@@ -252,13 +254,13 @@ setup_all_tests() {
 
 BUILD="$DB$TRAVIS_PHP_VERSION"
 case "$BUILD" in
-    #postgresql5.5)
+    #mysql5.5)
         #phpunit_tests && selenium_tests
     #;;
-    postgresql5.6)
+    mysql5.4)
         setup_all_tests
     ;;
-    postgresql7.0)
+    sqlite5.6)
         setup_all_tests
     ;;
     postgresql7.1)
