@@ -24,4 +24,3 @@ chown root $SSL_KEY || true
 chgrp dovecot $SSL_KEY || true
 chmod 0600 $SSL_KEY || true
 start dovecot
-netstat -lnt
