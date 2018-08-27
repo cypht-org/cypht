@@ -109,7 +109,14 @@ install_selenium() {
 # install postfix
 install_postfix() {
     sudo -H apt-get install -y -qq postfix
+    sudo service postfix stop
     sudo service postfix start
+}
+
+# output some system info
+sys_info() {
+    df -h
+    sudo netstat -lntp
 }
 
 # install and configure Apache and PHP-FPM
@@ -221,7 +228,6 @@ setup_ui_tests() {
     selenium_config
     install_selenium
     install_apache
-    install_postfix
 }
 
 # setup both UI and unit tests
@@ -238,6 +244,7 @@ setup_all_tests() {
     install_selenium
     install_sodium
     install_apache
+    install_postfix
     bootstrap_unit_tests
 }
 
@@ -262,3 +269,4 @@ case "$BUILD" in
         setup_unit_tests
     ;;
 esac
+sys_info
