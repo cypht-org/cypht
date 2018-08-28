@@ -340,7 +340,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
         $res .= '<a href="?page=profiles"><input type="button" value="'.$out_mod->trans('Cancel').'" /></a>';
     }
     else {
-        $res .= '<input type="submit" value="'.$out_mod->trans('Create').'" />';
+        $res .= '<input type="submit" class="submit_profile" value="'.$out_mod->trans('Create').'" />';
     }
     $res .= '</td></tr></table></form>';
     return $res;
