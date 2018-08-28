@@ -105,8 +105,10 @@ install_phpunit() {
 # install selenium
 install_selenium() {
     sudo -H apt-get install python-pip
+    sudo -H pip install --upgrade pip
     sudo -H pip install --upgrade urllib3
     sudo pip install selenium
+    sudo -H pip install --upgrade selenium
 }
 
 # install postfix
