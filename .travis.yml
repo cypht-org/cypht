@@ -4,12 +4,12 @@ language: php
 
 # php versions
 php:
-    - '5.4'
+    #- '5.4'
     - '5.5'
-    - '5.6'
-    - '7.0'
-    - '7.1'
-    - '7.2'
+    #- '5.6'
+    #- '7.0'
+    #- '7.1'
+    #- '7.2'
 
 # run the phpunit tests, then the selenium tests
 script: sh .travis/run.sh
@@ -17,8 +17,8 @@ script: sh .travis/run.sh
 # the unit tests need a DB setup, the selenium tests do not
 env:
     - DB=mysql
-    - DB=postgresql
-    - DB=sqlite
+    #- DB=postgresql
+    #- DB=sqlite
 
 # install and configure everything
 before_install:

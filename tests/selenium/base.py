@@ -103,3 +103,14 @@ class WebTest:
 
     def wait_with_folder_list(self):
         self.wait(By.CLASS_NAME, "main_menu")
+
+    def safari_workaround(self, timeout=1):
+        if self.browser == 'safari':
+            print " - waiting {0} extra second for Safari".format(timeout)
+            self.driver.implicitly_wait(timeout)
+
+    def safari_skip(self):
+        if self.browser == 'safari':
+            print " - Skip test assertion for Safari"
+            return True
+        return False

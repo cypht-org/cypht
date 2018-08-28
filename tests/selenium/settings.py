@@ -24,8 +24,7 @@ class SettingsHelpers(WebTest):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
-        if self.browser == 'safari':
-            self.driver.implicitly_wait(1)
+        self.safari_workaround()
         assert self.by_class('sys_messages').text == 'Settings updated'
 
     def settings_section(self, section):

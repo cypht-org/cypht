@@ -45,9 +45,9 @@ selenium_config() {
     if [ "$TRAVIS_PHP_VERSION" = "5.4" ]; then
         mv .travis/creds.py-chrome creds.py
     fi
-    #if [ "$TRAVIS_PHP_VERSION" = "5.5" ]; then
-        #mv .travis/creds.py-safari creds.py
-    #fi
+    if [ "$TRAVIS_PHP_VERSION" = "5.5" ]; then
+        mv .travis/creds.py-safari creds.py
+    fi
     if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
         mv .travis/creds.py-ff creds.py
     fi
@@ -254,9 +254,9 @@ setup_all_tests() {
 
 BUILD="$DB$TRAVIS_PHP_VERSION"
 case "$BUILD" in
-    #mysql5.5)
-        #phpunit_tests && selenium_tests
-    #;;
+    mysql5.5)
+        setup_all_tests
+    ;;
     mysql5.4)
         setup_all_tests
     ;;

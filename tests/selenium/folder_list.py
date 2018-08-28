@@ -14,8 +14,7 @@ class FolderListTests(WebTest):
     def reload_folder_list(self):
         assert self.by_class('main_menu').text == 'Main'
         self.by_class('update_message_list').click()
-        if self.browser == 'safari':
-            self.driver.implicitly_wait(3)
+        self.safari_workaround(3)
         assert self.by_class('main_menu').text == 'Main'
 
     def expand_section(self):
@@ -29,11 +28,7 @@ class FolderListTests(WebTest):
         self.by_css('[data-source=".main"]').click()
         list_item = self.by_class('menu_unread')
         link = list_item.find_element_by_tag_name('a')
-        # TODO: figure out whats wrong with safari here
-        if self.browser != 'safari':
-            assert link.is_displayed() == False
-        else:
-            print "SKIPPED ASSERTION WITH SAFARI"
+        assert link.is_displayed() == False
         
     def hide_folders(self):
         self.by_class('hide_folders').click()
