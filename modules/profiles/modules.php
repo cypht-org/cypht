@@ -335,7 +335,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     }
     $res .= 'name="profile_default" /></td></tr><tr><td></td><td>';
     if ($form_vals['name']) {
-        $res .= '<input type="submit" value="'.$out_mod->trans('Update').'" /> ';
+        $res .= '<input type="submit" class="profile_update" value="'.$out_mod->trans('Update').'" /> ';
         $res .= '<input type="submit" name="profile_delete" value="'.$out_mod->trans('Delete').'" /> ';
         $res .= '<a href="?page=profiles"><input type="button" value="'.$out_mod->trans('Cancel').'" /></a>';
     }
