@@ -8,6 +8,7 @@ class LoginTests(WebTest):
     def bad_login_values(self):
         self.login('asdf', 'asdf')
         self.wait()
+        self.safari_workaround()
         assert self.by_class('err') != None
 
     def missing_password(self):

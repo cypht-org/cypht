@@ -43,7 +43,10 @@ class WebTest:
         except Exception:
             print " - Could not maximize browser :("
         if self.browser == 'safari':
-            self.driver.set_window_size(1920,1080)
+            try:
+                self.driver.set_window_size(1920,1080)
+            except Exception:
+                print " - Could not maximize Safari"
 
     def mod_active(self, name):
         if name in self.modules:
@@ -110,9 +113,3 @@ class WebTest:
         if self.browser == 'safari':
             print " - waiting {0} extra second for Safari".format(timeout)
             self.driver.implicitly_wait(timeout)
-
-    def safari_skip(self):
-        if self.browser == 'safari':
-            print " - Skip test assertion for Safari"
-            return True
-        return False
