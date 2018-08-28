@@ -19,6 +19,7 @@ def get_driver(cap):
     capabilities = {
         'browserstack.local': 'true',
         'browserstack.localIdentifier': config['id'],
+        'browserstack.safari.driver': '2.48',
         'os': 'OS X',
         'os_version': 'Sierra',
         'browser': 'Safari',
