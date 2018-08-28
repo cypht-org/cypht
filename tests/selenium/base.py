@@ -42,6 +42,8 @@ class WebTest:
             self.driver.maximize_window()
         except Exception:
             print " - Could not maximize browser :("
+        if self.browser == 'safari':
+            self.driver.set_window_size(1920,1080)
 
     def mod_active(self, name):
         if name in self.modules:
