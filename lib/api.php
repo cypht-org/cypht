@@ -11,15 +11,31 @@
  */
 class Hm_API_Curl {
 
+    private $format = false;
+
     /**
      * Init
+     * @param string $format format of the result
+     */
+    public function __construct($format='json') {
+        $this->format = $format;
+    }
+
+    /**
+     * Execute command
      * @param string $url url to fetch content from
      * @param array $headers HTTP header array
      * @param array $post post fields
      * @return array
      */
-    public function command($url, $headers=array(), $post=array()) {
-        return $this->curl_execute($url, $headers, $post);
+    public function command($url, $headers=array(), $post=array(), $method=false) {
+        $ch = Hm_Functions::c_init();
+        $this->curl_setopt($ch, $url, $headers);
+        $this->curl_setopt_post($ch, $post);
+        if ($method) {
+            Hm_Functions::c_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        }
+        return $this->curl_result($ch);
     }
 
     /**
@@ -50,26 +66,15 @@ class Hm_API_Curl {
     }
 
     /**
-     * Prep a curl connection and run it
-     * @param string $url url to fetch content from
-     * @param array $headers HTTP header array
-     * @param array $post post fields
-     * @return array
-     */
-    private function curl_execute($url, $headers, $post) {
-        $ch = Hm_Functions::c_init();
-        $this->curl_setopt($ch, $url, $headers);
-        $this->curl_setopt_post($ch, $post);
-        return $this->curl_result($ch);
-    }
-
-    /**
      * Process a curl request result
      * @param resource|false $ch curl connection
      * @return array
      */
     private function curl_result($ch) {
         $curl_result = Hm_Functions::c_exec($ch);
+        if ($this->format != 'json') {
+            return $curl_result;
+        }
         $result = @json_decode($curl_result, true);
         if ($result === NULL) {
             return array();
