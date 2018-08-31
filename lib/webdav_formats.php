@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Structures to parse/build vCards (RFC-6350)
+ * Structures to parse/build vCards (RFC-6350) and Ical events (RFC-5545)
  * @package framework
  * @subpackage webdav
  */
