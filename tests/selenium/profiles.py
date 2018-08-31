@@ -2,7 +2,7 @@ from base import WebTest, USER, PASS
 from runner import test_runner
 from selenium.common.exceptions import ElementNotVisibleException
 
-class SendTest(WebTest):
+class ProfileTest(WebTest):
 
     def __init__(self):
         WebTest.__init__(self)
@@ -52,7 +52,7 @@ class SendTest(WebTest):
 if __name__ == '__main__':
 
     print "PROFIILE TEST"
-    test_runner(SendTest, [
+    test_runner(ProfileTest, [
         'load_profile_page',
         'add_profile',
         'edit_profile',
