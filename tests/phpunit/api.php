@@ -38,7 +38,7 @@ class Hm_Test_API_Curl extends PHPUnit_Framework_TestCase {
      */
     public function test_curl_custom() {
         $api = new Hm_API_Curl('xml');
-        $this->assertEquals('{"unit":"test"}', $api->command('asdf', array(), array(), 'FOO'));
+        $this->assertEquals('{"unit":"test"}', $api->command('asdf', array(), array(), 'foo', 'FOO'));
     }
 }
 

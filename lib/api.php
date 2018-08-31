@@ -11,7 +11,7 @@
  */
 class Hm_API_Curl {
 
-    private $format = false;
+    private $format = '';
 
     /**
      * Init
@@ -28,12 +28,15 @@ class Hm_API_Curl {
      * @param array $post post fields
      * @return array
      */
-    public function command($url, $headers=array(), $post=array(), $method=false) {
+    public function command($url, $headers=array(), $post=array(), $body='', $method=false) {
         $ch = Hm_Functions::c_init();
         $this->curl_setopt($ch, $url, $headers);
         $this->curl_setopt_post($ch, $post);
         if ($method) {
             Hm_Functions::c_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        }
+        if ($body) {
+            Hm_Functions::c_setopt($ch, CURLOPT_POSTFIELDS, $body);
         }
         return $this->curl_result($ch);
     }
