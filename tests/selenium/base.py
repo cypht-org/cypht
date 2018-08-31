@@ -70,6 +70,11 @@ class WebTest:
             var e=arguments[0]; var v=arguments[1]; e.value=v;''',
             el, val)
 
+    def confirm_alert(self):
+        WebDriverWait(self.driver, 3).until(exp_cond.alert_is_present(), 'timed out')
+        alert = self.driver.switch_to.alert
+        alert.accept()
+
     def logout_no_save(self):
         print " - logging out"
         self.driver.find_element_by_class_name('logout_link').click()
@@ -109,7 +114,25 @@ class WebTest:
     def wait_with_folder_list(self):
         self.wait(By.CLASS_NAME, "main_menu")
 
+    def wait_on_sys_message(self, timeout=30):
+        wait = WebDriverWait(self.driver, timeout)
+        element = wait.until(wait_for_non_empty_text((By.CLASS_NAME, "sys_messages"))
+)
+
     def safari_workaround(self, timeout=1):
         if self.browser == 'safari':
             print " - waiting {0} extra second for Safari".format(timeout)
             self.driver.implicitly_wait(timeout)
+
+class wait_for_non_empty_text(object):
+    def __init__(self, locator):
+        self.locator = locator
+
+    def __call__(self, driver):
+        try:
+            element_text = exp_cond._find_element(driver, self.locator).text.strip()
+            print(element_text)
+            return element_text != ""
+        except exceptions.StaleElementReferenceException:
+            print('hmmm')
+            return False
