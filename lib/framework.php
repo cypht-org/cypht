@@ -30,6 +30,7 @@ require APP_PATH.'lib/sodium_compat.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
+require APP_PATH.'lib/webdav_formats.php';
 
 /* load random bytes polyfill if needed */
 if (!function_exists('random_bytes')) {
