@@ -41,6 +41,9 @@
     <testsuite name="servers">
         <file>./servers.php</file>
     </testsuite>
+    <testsuite name="webdav_formats">
+        <file>./webdav_formats.php</file>
+    </testsuite>
     <testsuite name="api">
         <file>./api.php</file>
     </testsuite>
