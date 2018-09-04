@@ -123,7 +123,7 @@ var Hm_Ajax_Request = function() { return {
 
     done: function(res) {
         if (Hm_Ajax.aborted) {
-            return this.run_on_failure();
+            return;
         }
         else if (typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
             this.fail(res);
