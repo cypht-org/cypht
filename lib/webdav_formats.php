@@ -11,6 +11,9 @@
  */
 class Hm_Card_Parse {
 
+    /* input format version */
+    protected $version = '';
+
     /* original input data unchanged */
     protected $raw_card = '';
 
@@ -59,7 +62,7 @@ class Hm_Card_Parse {
      * @param integer $limit max number of splits (-1 for all)
      * @return array
      */
-    private function split_value($line, $delim, $limit) {
+    protected function split_value($line, $delim, $limit) {
         return preg_split("/\\\\.(*SKIP)(*FAIL)|$delim/s", $line, $limit);
     }
 
@@ -88,7 +91,7 @@ class Hm_Card_Parse {
      * @return array|string
      */
     private function flatten($arr) {
-        if (count($arr) == 1) {
+        if (is_array($arr) && count($arr) == 1) {
             return array_pop($arr);
         }
         return $arr;
@@ -130,6 +133,7 @@ class Hm_Card_Parse {
                 $this->data[strtolower($prop['prop'])] = array($data);
             }
         }
+        $this->parse_values();
         $this->flatten_all();
         return count($this->data) > 0;
     }
@@ -205,6 +209,18 @@ class Hm_Card_Parse {
         }
         return $res;
     }
+    /**
+     * Unnest an array
+     */
+    private function unnest($vals) {
+        $res = array();
+        foreach ($vals as $val) {
+            foreach ($val as $v) {
+                $res[] = $v;
+            }
+        }
+        return $res;
+    }
 
     /**
      * Replace single element lists with scaler values
@@ -212,7 +228,12 @@ class Hm_Card_Parse {
      */
     private function flatten_all() {
         foreach ($this->data as $prop => $vals) {
-            $this->data[$prop] = $this->flatten($this->flatten($vals));
+            if ($prop == 'begin' || $prop == 'end') {
+                $this->data[$prop] = $this->unnest($vals);
+            }
+            else {
+                $this->data[$prop] = $this->flatten($this->flatten($vals));
+            }
         }
     }
 
@@ -237,8 +258,26 @@ class Hm_Card_Parse {
         }
         if (!$res) {
             Hm_Debug::add(sprintf('Invalid %s format', $this->format));
+            return false;
         }
-        return $res;
+        $version = $this->split_value($lines[1], ':', 2);
+        if (count($version) > 1) {
+            $this->version = $version[1];
+        }
+        return true;
+    }
+
+    /**
+     * Parse values that require it
+     * @return void
+     */
+    private function parse_values() {
+        foreach ($this->data as $prop => $values) {
+            $method = sprintf('parse_%s', $prop);
+            if (method_exists($this, $method)) {
+                $this->data[$prop] = $this->$method($values);
+            }
+        }
     }
 }
 
@@ -265,6 +304,22 @@ class Hm_VCard extends Hm_Card_Parse {
         'CLIENTPIDMAP', 'PHOTO', 'URL', 'KEY',
         'FBURL', 'CALADRURI', 'CALURI'
     );
+
+    protected function parse_adr($vals) {
+        foreach ($vals as $index => $addr) {
+            $flds = $this->split_value($addr['value'], ';', 7);
+            $vals[$index]['value'] = array(
+                'po' => $flds[0],
+                'apartment' => $flds[1],
+                'street' => $flds[2],
+                'locality' => $flds[3],
+                'region' => $flds[4],
+                'postal_code' => $flds[5],
+                'country' => $flds[6]
+            );
+        }
+        return $vals;
+    }
 }
 
 /**
@@ -296,4 +351,9 @@ class Hm_ICal extends Hm_Card_Parse {
         'CREATED', 'DTSTAMP', 'LAST-MODIFIED',
         'SEQUENCE', 'REQUEST-STATUS'
     );
+
+    protected function parse_due($vals) {
+        //$dt = DateTime::createFromFormat('
+        print_r($vals);
+    }
 }
