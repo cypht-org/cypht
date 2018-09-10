@@ -59,7 +59,6 @@ REV:20080424T195243Z
 x-qq:21588891
 END:VCARD';
         $this->assertTrue($parser->import($card));
-        //print_r($parser->parsed_data());
         $this->assertEquals(13, count($parser->parsed_data()));
     }
     /**
@@ -89,7 +88,6 @@ END:VALARM
 END:VTODO
 END:VCALENDAR';
         $this->assertTrue($parser->import($card));
-        //print_r($parser->parsed_data());
         $this->assertEquals(15, count($parser->parsed_data()));
     }
 }

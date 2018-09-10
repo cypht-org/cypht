@@ -354,6 +354,7 @@ class Hm_ICal extends Hm_Card_Parse {
 
     protected function parse_due($vals) {
         //$dt = DateTime::createFromFormat('
-        print_r($vals);
+        //print_r($vals);
+        return $vals;
     }
 }
