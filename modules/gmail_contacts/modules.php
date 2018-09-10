@@ -29,14 +29,9 @@ class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
  */
 if (!hm_exists('gmail_contacts_request')) {
 function gmail_contacts_request($token, $url) {
-    $result = array();
     $headers = array('Authorization: OAuth '.$token, 'GData-Version: 3.0');
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'hm3');
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    return curl_exec($ch);
+    $api = new Hm_API_Curl('xml');
+    return $api->command($url, $headers);
 }}
 
 /**
