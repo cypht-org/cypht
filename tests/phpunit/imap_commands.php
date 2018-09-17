@@ -27,6 +27,9 @@ return array(
     'A2 AUTHENTICATE CRAM-MD5' =>
         "+ PDBFOTRCMUMwMkY5NDFFEFU2QkM5MjVFMUITFCMjZAbG9naW5wcm94eTZiLLmFsaWNlLml0Pg==\r\n",
 
+    'dGVzdHVzZXIgNTRmMDgwM2FhZTA2MzVmOWM3Y2M0YWVmZTUzODYzZTU=' =>
+        "A2 OK authentication successful\r\n",
+
     'dGVzdHVzZXIgMGYxMzE5YmIxMzMxOWViOWU4ZDdkM2JiZDJiZDJlOTQ=' =>
         "A2 OK authentication successful\r\n",
 

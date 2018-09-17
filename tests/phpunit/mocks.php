@@ -56,6 +56,7 @@ class Hm_Mock_Memcached_No {
 class Hm_Mock_Memcached {
     private $data = array();
     public static $set_failure = false;
+    const OPT_BINARY_PROTOCOL = false;
     function addServer($server, $port) {
         return true;
     }
@@ -88,6 +89,10 @@ class Hm_Mock_Memcached {
     function setSaslAuthData($u, $p) {
         return true;
     }
+}
+
+if (!class_exists('Memcached')) {
+    class Memcached extends Hm_Mock_Memcached {}
 }
 class Hm_Mock_Config {
     public $mods = array();
