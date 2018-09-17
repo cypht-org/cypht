@@ -353,8 +353,32 @@ class Hm_ICal extends Hm_Card_Parse {
     );
 
     protected function parse_due($vals) {
-        //$dt = DateTime::createFromFormat('
-        //print_r($vals);
+        return $this->parse_dt($vals);
+    }
+
+    protected function parse_dtstamp($vals) {
+        return $this->parse_dt($vals);
+    }
+
+    protected function parse_dtend($vals) {
+        return $this->parse_dt($vals);
+    }
+    protected function parse_dtstart($vals) {
+        return $this->parse_dt($vals);
+    }
+    protected function parse_trigger($vals) {
+        return $this->parse_dt($vals);
+    }
+
+    protected function parse_dt($vals) {
+        foreach ($vals as $index => $dates) {
+            $dt = $vals[0]['value'];
+            if (substr($dt, -1, 1) == 'Z') {
+                $vals[0]['tzid'] = 'UTC';
+                $dt = substr($dt, 0, -1);
+            }
+            $vals[$index]['value'] = date_parse_from_format('Ymd\THis', $dt);
+        }
         return $vals;
     }
 }
