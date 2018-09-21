@@ -188,7 +188,7 @@ class Hm_Dispatch {
      * @return void
      */
     private function load_site_lib() {
-        if (!in_array('site', $this->site_config->get_modules(), true)) {
+        if (!is_array($this->site_config->get_modules()) || !in_array('site', $this->site_config->get_modules(), true)) {
             return;
         }
         if (is_readable(APP_PATH.'modules/site/lib.php')) {
