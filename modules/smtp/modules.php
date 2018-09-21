@@ -664,7 +664,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             }
         }
         $send_disabled = '';
-        if (count($this->get('smtp_servers'), array()) == 0) {
+        if (count($this->get('smtp_servers', array())) == 0) {
             $send_disabled = 'disabled="disabled" ';
         }
         $res = '';
