@@ -1541,33 +1541,35 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             $sorts = array('arrival' => $this->trans('Arrival'), 'from' => $this->trans('From'),
                 'to' => $this->trans('To'), 'subject' => $this->trans('Subject'), 'date' => $this->trans('Date'));
 
-            $custom = '<form id="imap_filter_form" method="GET">';
-            $custom .= '<input type="hidden" name="page" value="message_list" />';
-            $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
-            $custom .= '<select name="sort" class="imap_sort">';
-            foreach ($sorts as $name => $val) {
-                $custom .= '<option ';
-                if ($name == $sort) {
-                    $custom .= 'selected="selected" ';
+            if (!$this->get('is_mobile', false)) {
+                $custom = '<form id="imap_filter_form" method="GET">';
+                $custom .= '<input type="hidden" name="page" value="message_list" />';
+                $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
+                $custom .= '<select name="sort" class="imap_sort">';
+                foreach ($sorts as $name => $val) {
+                    $custom .= '<option ';
+                    if ($name == $sort) {
+                        $custom .= 'selected="selected" ';
+                    }
+                    $custom .= 'value="'.$name.'">'.$val.' &darr;</option>';
+                    $custom .= '<option ';
+                    if ('-'.$name == $sort) {
+                        $custom .= 'selected="selected" ';
+                    }
+                    $custom .= 'value="-'.$name.'">'.$val.' &uarr;</option>';
                 }
-                $custom .= 'value="'.$name.'">'.$val.' &darr;</option>';
-                $custom .= '<option ';
-                if ('-'.$name == $sort) {
-                    $custom .= 'selected="selected" ';
-                }
-                $custom .= 'value="-'.$name.'">'.$val.' &uarr;</option>';
-            }
-            $custom .= '</select>';
+                $custom .= '</select>';
 
-            $custom .= '<select name="filter" class="imap_filter">';
-            foreach ($opts as $name => $val) {
-                $custom .= '<option ';
-                if ($name == $filter) {
-                    $custom .= 'selected="selected" ';
+                $custom .= '<select name="filter" class="imap_filter">';
+                foreach ($opts as $name => $val) {
+                    $custom .= '<option ';
+                    if ($name == $filter) {
+                        $custom .= 'selected="selected" ';
+                    }
+                    $custom .= 'value="'.$name.'">'.$val.'</option>';
                 }
-                $custom .= 'value="'.$name.'">'.$val.'</option>';
+                $custom .= '</select></form>';
             }
-            $custom .= '</select></form>';
             if ($this->get('custom_list_controls_type') == 'remove') {
                 $custom .= '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
                     '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.
