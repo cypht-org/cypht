@@ -210,6 +210,9 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         foreach ($servers as $index => $server) {
             Hm_SMTP_List::add( $server, $index );
         }
+        if (count($servers) == 0 && $this->page == 'compose') {
+            Hm_Msgs::add('ERRYou need at least one configured SMTP server to send outbound messages');
+        }
         $draft = array();
         $draft_id = count($this->session->get('compose_drafts', array()));
         $reply_type = false;
@@ -660,6 +663,10 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 $bcc = $draft['draft_bcc'];
             }
         }
+        $send_disabled = '';
+        if (count($this->get('smtp_servers'), array()) == 0) {
+            $send_disabled = 'disabled="disabled" ';
+        }
         $res = '';
         if ($html == 1) {
             $res .= '<script type="text/javascript" src="modules/smtp/assets/kindeditor/kindeditor-all-min.js"></script>'.
@@ -702,7 +709,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         }
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $smtp_id).
-            '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" />'.
+            '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>'.
             '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
             '<input class="compose_attach_button" value="'.$this->trans('Attach').
