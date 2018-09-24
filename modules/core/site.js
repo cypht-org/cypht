@@ -1392,7 +1392,7 @@ $(function() {
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         Hm_Message_List.select_combined_view();
-        $('.content_cell').swipeDown(function() { Hm_Message_List.load_sources(); });
+        $('.content_cell').swipeDown(function(e) { e.preventDefault(); Hm_Message_List.load_sources(); });
         $('.source_link').click(function() { $('.list_sources').toggle(); return false; });
         if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
             $('.menu_unread > a').css('font-weight', 'normal');
