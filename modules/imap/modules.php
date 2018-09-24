@@ -2576,10 +2576,11 @@ function process_imap_message_ids($ids) {
  * @param string $dl_args base arguments for a download link URL
  * @param bool $use_icons flag to enable/disable message part icons
  * @param bool $simmple_view flag to hide complex message structure
+ * @param bool $mobile flag to indicate a mobile browser
  * @return string
  */
 if (!hm_exists('format_msg_part_row')) {
-function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $use_icons=false, $simple_view=false) {
+function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $use_icons=false, $simple_view=false, $mobile=false) {
     $allowed = array(
         'textplain',
         'texthtml',
@@ -2648,25 +2649,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     else {
         $class = 'row_indent_'.$level;
     }
-    if (isset($vals['description']) && trim($vals['description'])) {
-        $desc = $vals['description'];
-    }
-    elseif (isset($vals['name']) && trim($vals['name'])) {
-        $desc = $vals['name'];
-    }
-    elseif (isset($vals['filename']) && trim($vals['filename'])) {
-        $desc = $vals['filename'];
-    }
-    elseif (isset($vals['envelope']['subject']) && trim($vals['envelope']['subject'])) {
-        $desc = $vals['envelope']['subject'];
-    }
-    else {
-        $desc = '';
-    }
-    $filename = get_imap_part_name($vals, $id, $part, true);
-    if (!$desc && $filename) {
-        $desc = $filename;
-    }
+    $desc = get_part_desc($vals, $id, $part);
     $size = get_imap_size($vals);
     $res = '<tr';
     if ($id == $part) {
@@ -2693,17 +2676,50 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     else {
         $res .= $output_mod->html_safe(strtolower($vals['type'])).' / '.$output_mod->html_safe(strtolower($vals['subtype']));
     }
-    /*if (!$simple_view) {
-        $res .= '</td><td>'.$output_mod->html_safe($filename);
-    }*/
-    $res .= '</td><td class="part_size">'.$output_mod->html_safe($size);
-    if (!$simple_view) {
-        $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
+    if ($mobile) {
+        $res .= '<div class="part_size">'.$output_mod->html_safe($size);
+        $res .= '</div><div class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</div>';
+        $res .= '<div class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></div></td></tr>';
     }
-    $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
-    $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
+    else {
+        $res .= '</td><td class="part_size">'.$output_mod->html_safe($size);
+        if (!$simple_view) {
+            $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
+                '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
+        }
+        $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
+        $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
+    }
     return $res;
+}}
+
+/*
+ * Find a message part description/filename
+ * @param array $vals bodystructure info for this message part
+ * @param int $uid message number
+ * @param string $part_id message part number
+ * @return string
+ */
+if (!hm_exists('get_part_desc')) {
+function get_part_desc($vals, $id, $part) {
+    $desc = '';
+    if (isset($vals['description']) && trim($vals['description'])) {
+        $desc = $vals['description'];
+    }
+    elseif (isset($vals['name']) && trim($vals['name'])) {
+        $desc = $vals['name'];
+    }
+    elseif (isset($vals['filename']) && trim($vals['filename'])) {
+        $desc = $vals['filename'];
+    }
+    elseif (isset($vals['envelope']['subject']) && trim($vals['envelope']['subject'])) {
+        $desc = $vals['envelope']['subject'];
+    }
+    $filename = get_imap_part_name($vals, $id, $part, true);
+    if (!$desc && $filename) {
+        $desc = $filename;
+    }
+    return $desc;
 }}
 
 /*
@@ -2757,7 +2773,7 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
     }
     foreach ($struct as $id => $vals) {
         if (is_array($vals) && isset($vals['type'])) {
-            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view);
+            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view, $mobile);
             if (!$row) {
                 $level--;
             }
@@ -2783,9 +2799,6 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
 if (!hm_exists('filter_message_part')) {
 function filter_message_part($vals) {
     if (array_key_exists('disposition', $vals) && is_array($vals['disposition']) && array_key_exists('inline', $vals['disposition'])) {
-        return true;
-    }
-    if (array_key_exists('file_attributes', $vals) && is_array($vals['file_attributes']) && array_key_exists('inline', $vals['file_attributes'])) {
         return true;
     }
     if (array_key_exists('type', $vals) && $vals['type'] == 'multipart') {

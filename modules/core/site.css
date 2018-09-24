@@ -236,7 +236,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     body { font-size: 90%; min-width: 100%; }
     .list_meta { display: block; }
     .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
-    .mailbox_list_title { font-size: 90%; }
+    .mailbox_list_title { font-size: 80%; }
     .folder_cell { display: block; max-width: 96%; width: 96%; padding: 0px !important;}
     .folder_list { padding: 0px !important; font-size: 120%; margin-right: 0px; display: none; width: 100%; }
     .content_cell { padding-top: 60px; display: block; width: 100%; }
@@ -274,7 +274,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     #username, #password { width: 75%; }
     .account_icon { width: 20px; height: 20px; }
     .imap_filter { display: none; }
-    .list_controls { background-color: transparent !important; height: 50px; padding-left: 5px; padding-right: 5px; }
+    .list_controls { color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; height: 48px; padding-left: 5px; padding-right: 5px; }
     .page_links { font-size: 150%; }
     .page_links a img { width: 24px; height: 24px; }
     .toggle_link { padding: 5px !important; line-height: auto !important; }
