@@ -43,6 +43,7 @@ var inline_msg_prep_imap_delete = function(path, uid, details) {
 var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
     var path = '.'+details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
+    globals['inline_move_uuid'] = path.substr(1);
     clear_open_msg(inline_msg_style());
     msg_container(inline_msg_style(), path);
 
@@ -52,16 +53,11 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     $('div', $(path)).removeClass('unseen');
     $(path).removeClass('unseen');
 
+    $('#unflag_msg').unbind('click');
+    $('#flag_msg').unbind('click');
     $('#delete_message').unbind('click');
-    $('#move_message').unbind('click');
-    $('#copy_message').unbind('click');
-
-    $('#move_message').addClass('inline');
-    $('#copy_message').addClass('inline');
 
     $('#delete_message').click(function() { return inline_msg_prep_imap_delete(path, uid, details); });
-    $('#move_message').click(function(e) { return imap_move_copy(e, 'move', [path.substr(1)]) });
-    $('#copy_message').click(function(e) { return imap_move_copy(e, 'copy', [path.substr(1)]) });
     $('#flag_msg').click(function() { return imap_flag_message($(this).data('state'), uid, details); });
     $('#unflag_msg').click(function() { return imap_flag_message($(this).data('state', uid, details)); });
 };
