@@ -1,5 +1,8 @@
 <?php
 
+if (strtolower(php_sapi_name()) !== 'cli') {
+    die("Must be run from the command line\n");
+}
 /* debug mode has to be set to something or include files will die() */
 define('DEBUG_MODE', false);
 
