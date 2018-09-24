@@ -1409,5 +1409,6 @@ $(function() {
         $('.pw_update').click(function() { update_password($(this).data('id')); });
     }
     $('body').swipeRight(function() { Hm_Folders.open_folder_list(); });
+    $('body').swipeLeft(function() { Hm_Folders.hide_folder_list(); });
 
 });
