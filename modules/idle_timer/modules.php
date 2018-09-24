@@ -22,7 +22,7 @@ class Hm_Handler_idle_time_check extends Hm_Handler_Module {
             $logout = true;
         }
         else {
-            $max = $this->user_config->get('idle_time', 1)*60*60;
+            $max = $this->user_config->get('idle_time', 0)*60*60;
             if ($max && (time() - $start) > $max) {
                 $logout = true;
             }
