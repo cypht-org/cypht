@@ -14,7 +14,7 @@ class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
         $test = '<script></script><body>foo</body>';
         $this->assertEquals('foo', format_msg_html($test));
         $test = '<a href="http://blah.com">';
-        $this->assertEquals('<a href="http://blah.com" target="_blank" rel="noreferrer"></a>', format_msg_html($test));
+        $this->assertEquals('<a href="http://blah.com"></a>', format_msg_html($test));
     }
     /**
      * @preserveGlobalState disabled
@@ -40,8 +40,8 @@ class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
     public function test_format_msg_text() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals("foo<br />\nbar<br />", format_msg_text("foo\nbar", $mod));
-        $this->assertEquals('<a target="_blank" href="http://foo.com">http://foo.com</a><br />', format_msg_text('http://foo.com', $mod));
-        $this->assertEquals('<a target="_blank" href="http://foo.com">http://foo.com</a>]<br />', format_msg_text('http://foo.com]', $mod));
+        $this->assertEquals('<a href="http://foo.com">http://foo.com</a><br />', format_msg_text('http://foo.com', $mod));
+        $this->assertEquals('<a href="http://foo.com">http://foo.com</a>]<br />', format_msg_text('http://foo.com]', $mod));
     }
     /**
      * @preserveGlobalState disabled
