@@ -21,7 +21,7 @@ function format_msg_html($str, $images=false) {
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
     }
-    $config->set('HTML.TargetBlank', true);
+    //$config->set('HTML.TargetBlank', true);
     $config->set('URI.AllowedSchemes', array('mailto' => true, 'data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
     $purifier = new HTMLPurifier($config);
@@ -66,7 +66,7 @@ function format_msg_text($str, $output_mod, $links=true) {
     $str = preg_replace("/(&(?!amp)[^;]+;)/", " $1", $str);
     if ($links) {
         $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,%[:alnum:]])+)/m";
-        $str = preg_replace($link_regex, "<a target=\"_blank\" href=\"$1\">$1</a>", $str);
+        $str = preg_replace($link_regex, "<a href=\"$1\">$1</a>", $str);
     }
     $str = preg_replace("/ (&[^;]+;)/", "$1", $str);
     $str = str_replace('<wbr>', '&#160;<wbr>', $str);

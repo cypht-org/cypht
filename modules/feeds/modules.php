@@ -591,7 +591,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                     $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
                 }
                 elseif ($name == 'link' || $name == 'link_alternate') {
-                    $header_str .= '<tr class="header_'.$name.'"><th>'.$this->trans($name).'</th><td><a target="_blank" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
+                    $header_str .= '<tr class="header_'.$name.'"><th>'.$this->trans($name).'</th><td><a href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
                 }
                 elseif ($name == 'author' || $name == 'dc:creator' || $name == 'name') {
                     $header_str .= '<tr class="header_from"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
