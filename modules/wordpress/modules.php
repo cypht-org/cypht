@@ -315,6 +315,9 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
                     $style = 'news';
                 }
                 $subject = html_entity_decode($vals['subject']['text']);
+                if (!$subject) {
+                    $subject = '[No subject]';
+                }
                 $from = ucfirst(str_replace('_', ' ', $vals['type']));
                 $ts = intval($vals['timestamp']);
                 if ($ts < $cutoff) {
@@ -448,6 +451,10 @@ function wp_connect_details($config) {
  */
 if (!hm_exists('wp_build_notice_headers')) {
 function wp_build_notice_headers($data, $output_mod) {
+    $subject = $data['subject']['text'];
+    if (!$subject) {
+        $subject = '[No subject]';
+    }
     return '<table class="msg_headers">'.
         '<col class="header_name_col"><col class="header_val_col"></colgroup>'.
         '<tr class="header_subject"><th colspan="2">'.$output_mod->html_safe(html_entity_decode($data['subject']['text'])).
