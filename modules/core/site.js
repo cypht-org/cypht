@@ -327,7 +327,7 @@ function Message_List() {
         else {
             msg_rows = cache;
         }
-        if (!$.isEmptyObject(msgs)) {
+        if (!this.background && !$.isEmptyObject(msgs)) {
             $('.empty_list').remove();
         }
         var msg_ids = this.add_rows(msgs, msg_rows);
