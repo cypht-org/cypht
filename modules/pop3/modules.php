@@ -321,7 +321,12 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                             $multipart_header_list = array();
                         }
                         else {
-                            $body['text'] .= $line;
+                            if (array_key_exists('text', $body)) {
+                                $body['text'] .= $line;
+                            }
+                            else {
+                                $body['text'] = $line;
+                            }
                         }
                     }
 
@@ -345,8 +350,10 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                     }
                     if (array_key_exists('Content-Type', $header_list)
                         && $charset = strstr($header_list['Content-Type'], 'charset=')) {
-                        $charset = str_replace('charset=', '', $charset);
-                        $body['text'] = mb_convert_encoding($body['text'], 'UTF-8', $charset);
+                        $charset = trim(str_replace('charset=', '', $charset));
+                        if (strtolower($charset) != 'utf-8') {
+                            $body['text'] = mb_convert_encoding($body['text'], 'UTF-8', $charset);
+                        }
                     }
                     $bodies[] = $body;
                 }
@@ -898,7 +905,7 @@ class Hm_Output_filter_pop3_message_content extends Hm_Output_Module {
         $txt = '<div class="msg_text_inner">';
         if ($this->get('pop3_message_body')) {
             foreach ($this->get('pop3_message_body') as $body) {
-                if ($body['content-type'] === 'html') {
+                if (array_key_exists('content-type', $body) && $body['content-type'] === 'html') {
                     $txt .= format_msg_html($body['text']);
                 }
                 else {
