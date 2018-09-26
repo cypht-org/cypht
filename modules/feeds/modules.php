@@ -303,6 +303,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                     }
                 }
             }
+            $title = false;
             foreach ($feed_items as $item) {
                 if (isset($item['id']) && !isset($item['guid'])) {
                     $item['guid'] = $item['id'];
@@ -577,6 +578,7 @@ class Hm_Output_feed_ids extends Hm_Output_Module {
  */
 class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
     protected function output() {
+        /* TODO: show "cannot find feed item if feed_message_headers is not present */
         if ($this->get('feed_message_headers')) {
             $header_str = '<table class="msg_headers">'.
                 '<col class="header_name_col"><col class="header_val_col"></colgroup>';
