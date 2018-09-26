@@ -373,12 +373,18 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
             }
-            elseif ($this->page == 'message_list' && $path == 'combined_inbox' || $path == 'unread') {
+            elseif ($this->page == 'message_list' && ($path == 'combined_inbox' || $path == 'unread')) {
                 $github_list = true;
                 if (!$excluded || $path == 'combined_inbox') {
                     foreach ($repos as $repo) {
                         $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                     }
+                }
+            }
+            elseif ($this->page == 'message' && preg_match("/^github_(.+)$/", $path)) {
+                if (!$parent) {
+                    $repo = substr($path, 7);
+                    $this->out('mailbox_list_title', array('Github', urldecode($repo)));
                 }
             }
         }
