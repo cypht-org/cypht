@@ -80,6 +80,7 @@ class Hm_Feed {
         $this->sort = true;
         $this->limit = 20;
         $this->cache_limit = 0;
+        $this->status_code = false;
         $this->url = false;
         $this->xml_data = false;
         $this->id = 0;
@@ -118,7 +119,11 @@ class Hm_Feed {
                 curl_setopt($curl_handle, CURLOPT_URL, $url);
                 curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT,15);
                 curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER,1);
-                $buffer = curl_exec($curl_handle);
+                $buffer = trim(curl_exec($curl_handle));
+                $this->status_code = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+                if ($this->status_code !== false && $this->status_code !== 200) {
+                    Hm_Debug::add(sprintf('BAD STATUS CODE %s from url %s', $this->status_code, $url));
+                }
                 curl_close($curl_handle);
                 unset($curl_handle);
                 break;
@@ -207,6 +212,7 @@ class Hm_Feed {
             }
             else {
                 Hm_Debug::add(sprintf('XML Parse error: %s', xml_error_string(xml_get_error_code($xml_parser))));
+                Hm_Debug::add($this->xml_data);
                 return false; 
             }
         }
