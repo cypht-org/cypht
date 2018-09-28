@@ -119,6 +119,7 @@ class Hm_Feed {
                 curl_setopt($curl_handle, CURLOPT_URL, $url);
                 curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT,15);
                 curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER,1);
+                curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, true);
                 $buffer = trim(curl_exec($curl_handle));
                 $this->status_code = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
                 if ($this->status_code !== false && $this->status_code !== 200) {
