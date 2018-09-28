@@ -14,19 +14,19 @@ def run_tests(obj, tests):
         func = getattr(obj, name)
         try:
             func()
-            print '%s %sPASSED%s' % (name, GREEN, END)
+            print('%s %sPASSED%s' % (name, GREEN, END))
             passed += 1
         except Exception:
-            print '%s %sFAILED%s' % (name, RED, END)
+            print('%s %sFAILED%s' % (name, RED, END))
             exc_type, exc_value, exc_traceback = exc_info()
             print_exception(exc_type, exc_value, exc_traceback)
-    print
-    print '%s%s of %s PASSED%s' % (GREEN, passed, len(tests), END)
-    print
+    print('')
+    print('%s%s of %s PASSED%s' % (GREEN, passed, len(tests), END))
+    print('')
     if (len(tests) > passed):
-        print '%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), END)
+        print('%s%s of %s FAILED%s' % (RED, (len(tests) - passed), len(tests), END))
         if obj.browser == 'safari':
-            print "Safari unresolved failures, continuing..."
+            print("Safari unresolved failures, continuing...")
         else:
             obj.end()
             exit(1);

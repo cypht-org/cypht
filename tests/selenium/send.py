@@ -47,7 +47,7 @@ class SendTest(WebTest):
         
 if __name__ == '__main__':
 
-    print "SEND TEST"
+    print("SEND TEST")
     test_runner(SendTest, [
         'load_compose_page',
         'compose_message',

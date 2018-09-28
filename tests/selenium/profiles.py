@@ -29,6 +29,7 @@ class ProfileTest(WebTest):
         self.by_name('profile_default').click()
         self.by_class('submit_profile').click()
         self.wait_with_folder_list()
+        from time import sleep; sleep(5)
         assert 'test@test.com' in self.by_class('profile_details').text
         
     def edit_profile(self):
@@ -51,7 +52,7 @@ class ProfileTest(WebTest):
 
 if __name__ == '__main__':
 
-    print "PROFIILE TEST"
+    print("PROFIILE TEST")
     test_runner(ProfileTest, [
         'load_profile_page',
         'add_profile',

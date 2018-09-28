@@ -189,7 +189,7 @@ class SettingsTests(SettingsHelpers):
 
 if __name__ == '__main__':
 
-    print "SETTINGS TESTS"
+    print("SETTINGS TESTS")
     test_runner(SettingsTests, [
 
         # general options

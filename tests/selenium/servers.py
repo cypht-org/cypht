@@ -66,7 +66,7 @@ class ServersTest(WebTest):
 
 if __name__ == '__main__':
 
-    print "SERVERS TEST"
+    print("SERVERS TEST")
     test_runner(ServersTest, [
         'load_servers_page',
         'smtp_add',

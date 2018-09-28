@@ -139,7 +139,7 @@ class PageTests(WebTest):
 
 if __name__ == '__main__':
 
-    print "PAGE TESTS"
+    print("PAGE TESTS")
     test_runner(PageTests, [
         'search',
         'combined_inbox',
