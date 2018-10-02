@@ -283,3 +283,6 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .toggle_recipients { top: 8px !important; right: 0px !important; }
     .prevnext, .news_cell .subject div img { width: 20px; height: 20px; }
 }
+@media print {
+    .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
+}

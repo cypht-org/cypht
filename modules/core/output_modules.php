@@ -360,7 +360,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '<input type="hidden" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         }
         if (!$this->get('single_server_mode') && count($this->get('changed_settings', array())) > 0) {
-            $res .= '<a href="?page=save" title="'.$this->trans('Unsaved Changes').
+            $res .= '<a class="unsaved_icon" href="?page=save" title="'.$this->trans('Unsaved Changes').
                 '"><img src="'.Hm_Image_Sources::$save_reminder.
                 '" alt="'.$this->trans('Unsaved changes').
                 '" class="unsaved_reminder" /></a>';
