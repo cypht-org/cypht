@@ -38,7 +38,7 @@ var Hm_Ajax = {
 
     show_loading_icon: function() {
         if (Hm_Ajax.icon_loading_id) {
-            self.stop_loading_icon(Hm_Ajax.icon_loading_id);
+            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
         }
         var hm_loading_pos = $('.loading_icon').width()/40;
         $('.loading_icon').show();
