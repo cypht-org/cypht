@@ -62,7 +62,7 @@ class Hm_MIME_Msg {
             $content = Hm_Crypt::plaintext(@file_get_contents($file['filename']), Hm_Request_Key::generate());
             if ($content) {
                 $closing = true;
-                if (array_key_exists('no_encoding', $file)) {
+                if (array_key_exists('no_encoding', $file) || (array_key_exists('type', $file) && $file['type'] == 'message/rfc822')) {
                     $res .= sprintf("\r\n--%s\r\nContent-Type: %s; name=\"%s\"\r\nContent-Description: %s\r\n".
                         "Content-Disposition: attachment; filename=\"%s\"\r\nContent-Transfer-Encoding: 7bit\r\n\r\n%s",
                         $this->boundary, $file['type'], $file['name'], $file['name'], $file['name'], $content);
