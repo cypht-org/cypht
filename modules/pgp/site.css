@@ -11,3 +11,4 @@
 .key_count { float: right; margin-right: 120px; font-size: 90%; }
 .pgp_msg_controls { display: none; position: absolute; right: 20px; top: 70px; }
 .pgp_sign { display: none; }
+.delete_pgp_key { border: none !important; width: 16px; height: 16px; cursor: pointer; opacity: .7}

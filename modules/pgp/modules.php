@@ -14,11 +14,56 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_load_pgp_data extends Hm_Handler_Module {
     public function process() {
-        $headers = $this->get('http_headers');
-        $key_servers = array('https://pgp.mit.edu');
-        $key_servers = implode(' ', $key_servers);
-        $headers['Content-Security-Policy'] = str_replace('connect-src', 'connect-src '.$key_servers, $headers['Content-Security-Policy']);
-        $this->out('http_headers', $headers);
+        $this->out('pgp_public_keys', $this->user_config->get('pgp_public_keys', array()));
+    }
+}
+
+/**
+ * @subpackage pgp/handler
+ */
+class Hm_Handler_pgp_delete_public_key extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('delete_public_key_id'));
+        if (!$success) {
+            return;
+        }
+        $keys = $this->user_config->get('pgp_public_keys', array());
+        if (!array_key_exists($form['delete_public_key_id'], $keys)) {
+            Hm_Msgs::add('ERRCould not find public key to remove');
+            return;
+        }
+        unset($keys[$form['delete_public_key_id']]);
+        $this->session->set('pgp_public_keys', $keys, true);
+        $this->session->record_unsaved('Public key deleted');
+        Hm_Msgs::add('Public key deleted');
+    }
+}
+
+/**
+ * @subpackage pgp/handler
+ */
+class Hm_Handler_pgp_import_public_key extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('public_key_email'));
+        if (!$success) {
+            return;
+        }
+        if (!is_array($this->request->files) || !array_key_exists('public_key', $this->request->files)) {
+            return;
+        }
+        if (!is_array($this->request->files['public_key']) || !array_key_exists('tmp_name', $this->request->files['public_key'])) {
+            return;
+        }
+        $fingerprint = validate_public_key($this->request->files['public_key']['tmp_name']);
+        if (!$fingerprint) {
+            Hm_Msgs::add('ERRUnable to import public key');
+            return;
+        }
+        $keys = $this->user_config->get('pgp_public_keys', array());
+        $keys[] = array('fingerprint' => $fingerprint, 'key' => file_get_contents($this->request->files['public_key']['tmp_name']), 'email' => $form['public_key_email']);
+        $this->session->set('pgp_public_keys', $keys, true);
+        $this->session->record_unsaved('Public key imported');
+        Hm_Msgs::add('Public key imported');
     }
 }
 
@@ -60,16 +105,18 @@ class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
         if ($this->get('html_mail', 0)) {
             return;
         }
-        $pub_keys = $this->get('pgp_public_keys');
-        $res = '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>'.
-            '<div class="pgp_section"><div class="pgp_sign"><label for="pgp_sign">'.$this->trans('PGP Sign').'</label>'.
-            '<select id="pgp_sign" size="1"></select></div>';
+        $pub_keys = $this->get('pgp_public_keys', array());
+        $res = '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>';
+        $res .= '<div class="pgp_section">';
+
+        $res .= '<div class="pgp_sign"><label for="pgp_sign">'.$this->trans('PGP Sign').'</label>';
+        $res .= '<select id="pgp_sign" size="1"></select></div>';
 
         if (count($pub_keys) > 0) {
             $res .= '<label for="pgp_encrypt">'.$this->trans('Encrypt for:').
-                '</label><select id="pgp_encrypt" size="1">';
+                '</label><select id="pgp_encrypt" size="1"><option disabled selected value=""></option>';
             foreach ($pub_keys as $vals) {
-                $res .= '<option value="'.$vals[0].'">'.$vals[1].'</option>';
+                $res .= '<option value="'.$vals['key'].'">'.$vals['email'].'</option>';
             }
             $res .= '</select>';
         }
@@ -95,19 +142,26 @@ class Hm_Output_pgp_settings_start extends Hm_Output_Module {
 class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="public_title settings_subtitle">'.$this->trans('Public Keys');
-        $res .= '<span class="key_count">'.sprintf($this->trans('%s imported'), 0).'</span></div>';
+        $res .= '<span class="key_count">'.sprintf($this->trans('%s imported'), count($this->get('pgp_public_keys', array()))).'</span></div>';
         $res .= '<div class="public_keys pgp_block">';
-        $res .= '<div class="pgp_subblock">'.$this->trans('Import a public key from a file').'<br /><br />';
-        $res .= '<input id="public_key" type="file"> for <input id="public_email" placeholder="'.$this->trans('E-mail Address');
-        $res .= '" type="email"> <input type="button" value="'.$this->trans('Import').'">';
-        $res .= '</div><div class="pgp_subblock">'.$this->trans('Or Search a key server for a key to import').'<br /><br />';
-        $res .= '<input id="hkp_email" placeholder="'.$this->trans('E-mail Address').'" type="email" /> <select id="hkp_server">';
-        $res .= '<option value="https://pgp.mit.edu">https://pgp.mit.edu</option></select> ';
-        $res .= '<input type="button" id="hkp_search" value="'.$this->trans('Search').'" />';
-        $res .= '<div class="hkp_search_results"></div>';
-        $res .= '</div>'.$this->trans('Existing Keys').'<table class="pgp_keys"><thead><tr><th>'.$this->trans('Key').'</th>';
-        $res .= '<th>'.$this->trans('E-mail').'</th></tr>';
-        $res .= '</thead><tbody></tbody></table>';
+        $res .= '<form enctype="multipart/form-data" method="post" action="?page=pgp#public_keys" class="pgp_subblock">'.$this->trans('Import a public key from a file').'<br /><br />';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        $res .= '<input required id="public_key" name="public_key" type="file"> for ';
+        $res .= '<input required id="public_email" name="public_key_email" placeholder="'.$this->trans('E-mail Address');
+        $res .= '" type="email"> <input type="submit" value="'.$this->trans('Import').'">';
+        $res .= '</form>';
+        $res .= '<br /><br /><table class="pgp_keys"><thead><tr><th>'.$this->trans('Fingerprint').'</th>';
+        $res .= '<th>'.$this->trans('E-mail').'</th><th></th></tr>';
+        $res .= '</thead><tbody>';
+        foreach ($this->get('pgp_public_keys', array()) as $index => $vals) {
+            $res .= '<tr><td>'.$this->html_safe($vals['fingerprint']).'</td><td>'.$this->html_safe($vals['email']).'</td>';
+            $res .= '</td><td><form method="post" action="?page=pgp#public_keys">';
+            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+            $res .= '<input type="hidden" value="'.$this->html_safe($index).'" name="delete_public_key_id" />'.
+                '<input type="image" class="delete_pgp_key" alt="'.$this->trans('Delete');
+            $res .= '" src="'.Hm_Image_Sources::$circle_x.'"/></button></form></td></tr>';
+        }
+        $res .= '</tbody></table>';
         $res .= '</div>';
         return $res;
     }
@@ -167,3 +221,29 @@ class Hm_Output_pgp_settings_link extends Hm_Output_Module {
     }
 }
 
+/**
+ * @subpackage pgp/functions
+ */
+function validate_public_key($file_location) {
+    if (!class_exists('gnupg')) {
+        Hm_Debug::add('Gnupg PECL extension not found');
+        return false;
+    }
+    if (!is_readable($file_location)) {
+        Hm_Debug::add('Uploaded public key not readable');
+        return false;
+    }
+    $data = file_get_contents($file_location);
+    if (!$data) {
+        Hm_Debug::add('Uploaded public key not readable');
+        return false;
+    }
+    $tmp_dir = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();
+    putenv(sprintf('GNUPGHOME=%s/.gnupg', $tmp_dir));
+    $gpg = new gnupg();
+    $info = $gpg->import($data);
+    if (is_array($info) && array_key_exists('fingerprint', $info)) {
+        return $info['fingerprint'];
+    }
+    return false;
+}

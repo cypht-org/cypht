@@ -6,7 +6,9 @@ handler_source('pgp');
 output_source('pgp');
 
 setup_base_page('pgp', 'core');
-add_handler('pgp', 'load_pgp_data', true, 'pbp', 'http_headers', 'after');
+add_handler('pgp', 'pgp_delete_public_key', true, 'pgp', 'http_headers', 'after');
+add_handler('pgp', 'pgp_import_public_key', true, 'pgp', 'pgp_delete_public_key', 'after');
+add_handler('pgp', 'load_pgp_data', true, 'pgp', 'pgp_import_public_key', 'after');
 add_output('pgp', 'pgp_settings_start', true, 'pgp', 'content_section_start', 'after');
 add_output('pgp', 'pgp_settings_public_keys', true, 'pgp', 'pgp_settings_start', 'after');
 add_output('pgp', 'pgp_settings_private_key', true, 'pgp', 'pgp_settings_public_keys', 'after');
@@ -21,13 +23,15 @@ add_output('compose', 'pgp_compose_controls', true, 'pgp', 'compose_form_end', '
 
 return array(
     'allowed_pages' => array('pgp'),
-    'allowed_cookie' => array(),
-    'allowed_server' => array(),
     'allowed_output' => array(
         'pgp_msg_part' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
     'allowed_get' => array(),
-    'allowed_post' => array()
+    'allowed_post' => array(
+        'public_key' => FILTER_SANITIZE_STRING,
+        'public_key_email' => FILTER_SANITIZE_STRING,
+        'delete_public_key_id' => FILTER_VALIDATE_INT
+    )
 );
 
 
