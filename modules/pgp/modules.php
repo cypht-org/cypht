@@ -109,18 +109,18 @@ class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
         $res = '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>';
         $res .= '<div class="pgp_section">';
 
-        $res .= '<div class="pgp_sign"><label for="pgp_sign">'.$this->trans('PGP Sign').'</label>';
-        $res .= '<select id="pgp_sign" size="1"></select></div>';
+        $res .= '<span class="pgp_sign"><label for="pgp_sign">'.$this->trans('PGP Sign as:').'</label>';
+        $res .= '<select id="pgp_sign" size="1"></select></span>';
 
         if (count($pub_keys) > 0) {
-            $res .= '<label for="pgp_encrypt">'.$this->trans('Encrypt for:').
+            $res .= '<label for="pgp_encrypt">'.$this->trans('PGP Encrypt for:').
                 '</label><select id="pgp_encrypt" size="1"><option disabled selected value=""></option>';
             foreach ($pub_keys as $vals) {
                 $res .= '<option value="'.$vals['key'].'">'.$vals['email'].'</option>';
             }
             $res .= '</select>';
         }
-        $res .= '</div>';
+        $res .= '<input type="button" class="pgp_apply" value="'.$this->trans('Apply').'" /></div>'.prompt_for_passhrase($this);
         return $res;
     }
 }
@@ -173,13 +173,11 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
 class Hm_Output_pgp_settings_private_key extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="priv_title settings_subtitle">'.$this->trans('Private Keys');
-        $res .= '<span class="key_count">'.sprintf($this->trans('%s imported'), 0).'</span></div>';
+        $res .= '<span class="private_key_count">'.sprintf($this->trans('%s imported'), 0).'</span></div>';
         $res .= '<div class="priv_keys pgp_block"><div class="pgp_subblock">';
         $res .= $this->trans('Private keys never leave your browser, and are deleted when you logout');
-        $res .= '<br /><br /><input id="priv_key" type="file"> for <input id="priv_email" placeholder="'.$this->trans('E-mail Address');
-        $res .= '" type="email"> <input type="button" value="'.$this->trans('Import').'">';
-        $res .= '</div>'.$this->trans('Existing Keys').'<table class="pgp_keys"><thead><tr><th>'.$this->trans('Key').'</th>';
-        $res .= '<th>'.$this->trans('E-mail').'</th></tr>';
+        $res .= '<br /><br /><input id="priv_key" type="file">';
+        $res .= '</div>'.$this->trans('Existing Keys').'<table class="pgp_keys private_key_list"><thead><tr><th>'.$this->trans('Identity').'</th><th></th></tr>';
         $res .= '</thead><tbody></tbody></table>';
         $res .= '</div>';
         return $res;
@@ -200,7 +198,8 @@ class Hm_Output_pgp_settings_end extends Hm_Output_Module {
  */
 class Hm_Output_pgp_msg_controls extends Hm_Output_Module {
     protected function output() {
-        return '<div class="pgp_msg_controls"><select class="pgp_private_keys"></select> <input type="button" class="pgp_btn" value="Decrypt" /></div>';
+        return '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>'.
+        '<div class="pgp_msg_controls"><select class="pgp_private_keys"></select> <input type="button" class="pgp_btn" value="Decrypt" /></div>'.prompt_for_passhrase($this);
     }
 }
 
@@ -246,4 +245,11 @@ function validate_public_key($file_location) {
         return $info['fingerprint'];
     }
     return false;
+}
+
+/**
+ * @subpackage pgp/functions
+ */
+function prompt_for_passhrase($mod) {
+    return '<div class="passphrase_prompt"><div class="title">'.$mod->trans('Please enter your passphrase').'</div><input type="password" value="" id="pgp_pass" /> <input id="submit_pgp_pass" type="button" value="'.$mod->trans('Submit').'" /></div>';
 }

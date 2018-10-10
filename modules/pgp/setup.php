@@ -19,7 +19,7 @@ add_handler('ajax_imap_message_content', 'pgp_message_check',  true, 'pgp', 'ima
 add_output('ajax_hm_folders', 'pgp_settings_link', true, 'pgp', 'settings_menu_end', 'before');
 
 add_handler('compose', 'pgp_compose_data', true, 'pgp', 'load_user_data', 'after');
-add_output('compose', 'pgp_compose_controls', true, 'pgp', 'compose_form_end', 'before');
+add_output('compose', 'pgp_compose_controls', true, 'pgp', 'compose_form_end', 'after');
 
 return array(
     'allowed_pages' => array('pgp'),
