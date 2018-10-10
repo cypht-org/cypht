@@ -241,9 +241,9 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .folder_list { padding: 0px !important; font-size: 120%; margin-right: 0px; display: none; width: 100%; }
     .content_cell { padding-top: 60px; display: block; width: 100%; }
     .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 40px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; }
-    .folder_toggle { display: block; top: 19px; left: 0px; }
+    .folder_toggle { display: block; top: 19px; left: 5px; }
     .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
-    .message_table { padding-left: 10px !important; }
+    .message_table { padding-left: 5px !important; }
     .list_settings_link, .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
     .refresh_list { margin-right: 5px; }
     .folder_toggle img { width: 30px; height: 36px; margin-top: -7px; }
@@ -277,7 +277,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .list_controls { color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; height: 48px; padding-left: 5px; padding-right: 5px; }
     .page_links { font-size: 150%; }
     .page_links a img { width: 24px; height: 24px; }
-    .toggle_link { padding: 5px !important; line-height: auto !important; }
+    .toggle_link { padding: 5px !important; line-height: auto !important; margin-left: 5px !important; }
     .toggle_link img { vertical-align: -3px !important; width: 16px; height: 16px; }
     .compose_form { padding: 0px !important; padding-left: 5px !important; width: 92% !important; }
     .toggle_recipients { top: 8px !important; right: 0px !important; }
