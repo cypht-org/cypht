@@ -314,7 +314,9 @@ var Hm_Pgp = {
 
 $(function() {
     if (hm_page_name() == 'compose') {
-        Hm_Pgp.load_private_keys();
+        if (($('#pgp_encrypt option').size() + $('#pgp_sign option').size()) == 0) {
+            $('.pgp_section').hide();
+        }
         $('.pgp_apply').click(function() { Hm_Pgp.process_settings(); return false; });
     }
     else if (hm_page_name() == 'message') {
