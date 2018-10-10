@@ -1270,6 +1270,9 @@ var Hm_Utils = {
     },
     tbody: function() {
         return $('.message_table_body');
+    },
+    html_entities: function(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 };
 
