@@ -223,6 +223,7 @@ class Hm_Output_pgp_settings_link extends Hm_Output_Module {
 /**
  * @subpackage pgp/functions
  */
+if (!hm_exists('validate_public_key')) {
 function validate_public_key($file_location) {
     if (!class_exists('gnupg')) {
         Hm_Debug::add('Gnupg PECL extension not found');
@@ -245,11 +246,12 @@ function validate_public_key($file_location) {
         return $info['fingerprint'];
     }
     return false;
-}
+}}
 
 /**
  * @subpackage pgp/functions
  */
+if (!hm_exists('prompt_for_passhrase')) {
 function prompt_for_passhrase($mod) {
     return '<div class="passphrase_prompt"><div class="title">'.$mod->trans('Please enter your passphrase').'</div><input type="password" value="" id="pgp_pass" /> <input id="submit_pgp_pass" type="button" value="'.$mod->trans('Submit').'" /></div>';
-}
+}}
