@@ -38,36 +38,8 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('username', 'password'));
         if ($success) {
-            $smtp_server = $this->config->get('default_smtp_server', false);
-            if ($smtp_server) {
-                $smtp_port = $this->config->get('default_smtp_port', 465);
-                $smtp_tls = $this->config->get('default_smtp_tls', true);
-                $servers = $this->user_config->get('smtp_servers', array());
-                foreach ($servers as $index => $server) {
-                    if ($server['server'] == $smtp_server && $server['tls'] == $smtp_tls && $server['port'] == $smtp_port) {
-                        continue;
-                    }
-                    Hm_SMTP_List::add($server, $index);
-                }
-                $attributes = array(
-                    'name' => $this->config->get('default_smtp_name', 'Default'),
-                    'default' => true,
-                    'server' => $smtp_server,
-                    'port' => $smtp_port,
-                    'tls' => $smtp_tls,
-                    'user' => $form['username'],
-                    'pass' => $form['password']
-                );
-                if ($this->config->get('default_smtp_no_auth', false)) {
-                    $attributes['no_auth'] = true;
-                }
-                Hm_SMTP_List::add($attributes);
-                $smtp_servers = Hm_SMTP_List::dump(false, true);
-                $this->user_config->set('smtp_servers', $smtp_servers);
-                $user_data = $this->user_config->dump();
-                $this->session->set('user_data', $user_data);
-                Hm_Debug::add('Default SMTP server added');
-            }
+            default_smtp_server($this->user_config, $this->session, $this->request,
+                $this->config, $form['username'], $form['password']);
         }
     }
 }
@@ -1336,3 +1308,40 @@ function parse_mailto($str) {
     return $res;
 }}
 
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('default_smtp_server')) {
+function default_smtp_server($user_config, $session, $request, $config, $user, $pass) {
+    $smtp_server = $config->get('default_smtp_server', false);
+    if (!$smtp_server) {
+        return;
+    }
+    $smtp_port = $config->get('default_smtp_port', 465);
+    $smtp_tls = $config->get('default_smtp_tls', true);
+    $servers = $user_config->get('smtp_servers', array());
+    foreach ($servers as $index => $server) {
+        if ($server['server'] == $smtp_server && $server['tls'] == $smtp_tls && $server['port'] == $smtp_port) {
+            continue;
+        }
+        Hm_SMTP_List::add($server, $index);
+    }
+    $attributes = array(
+        'name' => $config->get('default_smtp_name', 'Default'),
+        'default' => true,
+        'server' => $smtp_server,
+        'port' => $smtp_port,
+        'tls' => $smtp_tls,
+        'user' => $user,
+        'pass' => $pass
+    );
+    if ($config->get('default_smtp_no_auth', false)) {
+        $attributes['no_auth'] = true;
+    }
+    Hm_SMTP_List::add($attributes);
+    $smtp_servers = Hm_SMTP_List::dump(false, true);
+    $user_config->set('smtp_servers', $smtp_servers);
+    $user_data = $user_config->dump();
+    $session->set('user_data', $user_data);
+    Hm_Debug::add('Default SMTP server added');
+}}
