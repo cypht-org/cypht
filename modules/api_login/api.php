@@ -30,6 +30,7 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
         $config = new Hm_Site_Config_File(CONFIG_FILE);
         $user_config = load_user_config_object($config);
         $user_config->load($user, $pass);
+        module_init_functions($user_config, $session, $request, $config, $user, $pass);
         $user_data = $user_config->dump();
         $session->set('user_data', $user_data);
         $session->set('username', rtrim($user));
@@ -39,6 +40,26 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
         return true;
     }
     return false;
+}
+
+/**
+ * Run functions assigned to the "page" functional_api
+ * @subpackage api_login/functions
+ * @param object $user_config user configuration object
+ * @param object $session user session object
+ * @param object $request page request object
+ * @param object $config site configuration object
+ * @param string $user username
+ * @param string $pass password
+ * @return void
+ */
+function module_init_functions($user_config, $session, $request, $config, $user, $pass) {
+    foreach (Hm_Handler_Modules::get_for_page('functional_api') as $func => $vals) {
+        if (is_readable(sprintf("%smodules/%s/modules.php", APP_PATH, $vals[0]))) {
+            require_once sprintf("%smodules/%s/modules.php", APP_PATH, $vals[0]);
+            $func($user_config, $session, $request, $config, $user, $pass);
+        }
+    }
 }
 
 /**
@@ -72,6 +93,7 @@ function url_parse($url) {
 function session_init() {
     $config = new Hm_Site_Config_File(APP_PATH.'hm3.rc');
     $module_exec = new Hm_Module_Exec($config);
+    $module_exec->load_module_sets('functional_api');
     $request = new Hm_Request($module_exec->filters, $config);
     if (in_array('site', $config->get_modules(), true)) {
         if (is_readable(APP_PATH.'modules/site/lib.php')) {

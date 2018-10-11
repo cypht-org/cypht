@@ -16,6 +16,8 @@ add_output('compose', 'compose_form_content', true, 'smtp', 'compose_form_start'
 add_output('compose', 'compose_form_end', true, 'smtp', 'compose_form_content', 'after');
 add_output('compose', 'compose_form_attach', true, 'smtp', 'compose_form_end', 'after');
 
+add_handler('functional_api', 'default_smtp_server', true, 'smtp');
+
 add_handler('profiles', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 add_handler('profiles', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 
