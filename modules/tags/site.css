@@ -1,2 +1,0 @@
-.tag_icon { position: absolute; right: 50px; top: 18px; }
-@media screen and (max-device-width:480px) and (orientation : portrait) { .tag_icon { display: none; } }
