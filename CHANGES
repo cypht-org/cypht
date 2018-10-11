@@ -1,0 +1,615 @@
+bdcafb3c6 - (HEAD -> release-1.1.0) update pgp module readme (29 seconds ago) <Jason Munro>
+04e4a630c - (origin/master, origin/HEAD, master) update pgp module readme (5 minutes ago) <Jason Munro>
+e14c80e87 - third party lib updates (12 minutes ago) <Jason Munro>
+ac72e9a2b - third party lib updates (15 minutes ago) <Jason Munro>
+8af230bfe - initial checkin of WIP CardDav contact support (29 minutes ago) <Jason Munro>
+5d0529c07 - (origin/release-1.1.0) re-add some files that should be in the release (oops) (45 minutes ago) <Jason Munro>
+86c2f3fc0 - update travis coverage report for new library file (58 minutes ago) <Jason Munro>
+f10cfaa22 - update travis coverage report for new library file (59 minutes ago) <Jason Munro>
+8f5bab9c7 - remove more stuff not needed in a release (69 minutes ago) <Jason Munro>
+f2dd26766 - remove hello world module set for release (71 minutes ago) <Jason Munro>
+6dabf0cf5 - remove site module set for the release (73 minutes ago) <Jason Munro>
+cd0aff475 - disable add to calendar link that does not work yet (2 hours ago) <Jason Munro>
+2e79c23e6 - remove tags module set for release (2 hours ago) <Jason Munro>
+dad0d58f3 - disable add to calendar link that does not work yet (2 hours ago) <Jason Munro>
+d2a03f491 - (tag: v1.1.0-rc1) don't show the apply button for pgp if no keys are setup (6 hours ago) <Jason Munro>
+032a2d0db - version bump (7 hours ago) <Jason Munro>
+b339b2b45 - lots more work on PGP support (7 hours ago) <Jason Munro>
+d0736af2f - small tweak to the compose page layout (7 hours ago) <Jason Munro>
+97b07bd39 - htmlentities in js (7 hours ago) <Jason Munro>
+03ba56a2b - mobile layout css tweaks (7 hours ago) <Jason Munro>
+3f00fe6c1 - openpgpjs update to latest release version (7 hours ago) <Jason Munro>
+30d499c56 - fix typo I just committed (33 hours ago) <Jason Munro>
+d5f79ecbf - work on pgp module (basic outbound encrypting is working) (33 hours ago) <Jason Munro>
+4e502736e - version bump (33 hours ago) <Jason Munro>
+a0fd3f721 - don't re-encode rfc822 message attachments (33 hours ago) <Jason Munro>
+01e2947f6 - don't double up on loading animation speed if we overlap (33 hours ago) <Jason Munro>
+78796a8fe - fix for maintaining prev/next on flag/unflag message (2 days ago) <Jason Munro>
+87b5c99b1 - fix unit test I just broke (again). Thanks Travis (again)! (9 days ago) <Jason Munro>
+d81823065 - media query for nicely formatting printing of messages (9 days ago) <Jason Munro>
+0a4944204 - make selenium tests python 3 compatible (13 days ago) <Jason Munro>
+e7489ed1c - follow http redirects when finding a feed (13 days ago) <Jason Munro>
+354536bf1 - add some debugging for feed connection/parsing issues (13 days ago) <Jason Munro>
+728475956 - version bump (2 weeks ago) <Jason Munro>
+031639d8e - rewrite history module set to work server side issue #285 (2 weeks ago) <Jason Munro>
+5562d2985 - add subject placeholders if missing for wordpress notices (2 weeks ago) <Jason Munro>
+f2b7c5b86 - clean up some POP3 processing logic (2 weeks ago) <Jason Munro>
+68d5be7b6 - fix missing page title on specific github repo list views (2 weeks ago) <Jason Munro>
+9fdb3a037 - fix a warning when feed items are loaded but no longer present and add a todo (2 weeks ago) <Jason Munro>
+dd8367268 - don't remove the empty list div when working in background mode (2 weeks ago) <Jason Munro>
+743e166bf - disable web config builder for now for a couple reasons: (2 weeks ago) <Jason Munro>
+96a32a569 - FINALLY correctly fix issue #253 (2 weeks ago) <Jason Munro>
+34d5ddf50 - try to disable chrome on android default swipe down reload (2 weeks ago) <Jason Munro>
+4f4adbb45 - various mobile clean up, fix missing downloadable message parts (2 weeks ago) <Jason Munro>
+54e68f2b3 - zepto upgrade fixed swiping (WOOT), add swipe to hide folder list (2 weeks ago) <Jason Munro>
+d608766b1 - version bump (2 weeks ago) <Jason Munro>
+df53934bb - test updates for target changes (2 weeks ago) <Jason Munro>
+568163c35 - stop using target=_blank, and don't allow it in html message parts (2 weeks ago) <Jason Munro>
+2695ff34b - default to no forced logout in the idle timer (2 weeks ago) <Jason Munro>
+9190d6dfa - update HTMLPurifier to the latest release (4.10.0) (2 weeks ago) <Jason Munro>
+a89d9a365 - update zepto to latest git checkout (the last release is very old) (2 weeks ago) <Jason Munro>
+3bd2830c7 - hide imap folder filter and sort on mobile (3 weeks ago) <Jason Munro>
+7dc48690a - fix sending bug I just introduced (3 weeks ago) <Jason Munro>
+8fef1e4c1 - notify the user and disable sending if no SMTP servers are setup (3 weeks ago) <Jason Munro>
+549fcaa85 - squelch a warning if the site is not configured (3 weeks ago) <Jason Munro>
+5d5d6cd3a - couple test tweaks (3 weeks ago) <Jason Munro>
+abe054e1d - webdave format parsing updates (3 weeks ago) <Jason Munro>
+9c7dc63f0 - initial version of per module set readme files issue #276 (4 weeks ago) <Jason Munro>
+4c4407f72 - clean up the gmail contacts module slightly (4 weeks ago) <Jason Munro>
+8f80098e6 - fix unit tests, remove debug from webdav formats code (4 weeks ago) <Jason Munro>
+21d31c0cf - Azerbaijani interface translation thanks to Aziz Ibrahimov (4 weeks ago) <Jason Munro>
+1b063a821 - more work on webdav formats (vcard, ical) (5 weeks ago) <Jason Munro>
+0daa0f163 - don't reset list actions on abort, only failed server calls (5 weeks ago) <Jason Munro>
+4d33ec296 - add webdav formats test suite to phpunit config (6 weeks ago) <Jason Munro>
+c1c4abe33 - add some server page tests (6 weeks ago) <Jason Munro>
+41d739ccd - add some more helper functions for selenium tests (6 weeks ago) <Jason Munro>
+cbd5270a4 - fix test class name for profile tests (6 weeks ago) <Jason Munro>
+0156ef992 - comment update (6 weeks ago) <Jason Munro>
+387374836 - initial commit for webdav format parsing (6 weeks ago) <Jason Munro>
+0059bee3b - api interface update (6 weeks ago) <Jason Munro>
+2c6a900ed - clean up the api code, support custom HTTP methods, update tests (6 weeks ago) <Jason Munro>
+569abbda9 - add profile add/update/delete selenium tests (6 weeks ago) <Jason Munro>
+8a60aa3d2 - add a class to profile update for easier testing (6 weeks ago) <Jason Munro>
+40b311474 - add class to submit profile button for easier testing (6 weeks ago) <Jason Munro>
+80b657ea0 - re-enable other builds in travis (6 weeks ago) <Jason Munro>
+fa98b3249 - still trying to clean up safari on browserstack (wtf) (6 weeks ago) <Jason Munro>
+14853dd89 - more browserstack/travis/safari tweaking (damnit) (6 weeks ago) <Jason Munro>
+b811d1ab0 - more travis tweaking (6 weeks ago) <Jason Munro>
+b5b39c71f - see if the newer safari diver is any better than the default (6 weeks ago) <Jason Munro>
+3070a2145 - more travis + browserstack testing (6 weeks ago) <Jason Munro>
+f3d08240e - more travis tweaks (6 weeks ago) <Jason Munro>
+cc6304f70 - re-enable all travis tests (6 weeks ago) <Jason Munro>
+aaae8e682 - another travis test (6 weeks ago) <Jason Munro>
+bf8843b0c - more travis debugging (6 weeks ago) <Jason Munro>
+0f87f4580 - more travis testing (6 weeks ago) <Jason Munro>
+b4a6ae5e3 - more travis debugging/tweaks (6 weeks ago) <Jason Munro>
+fc18b48de - travis debugging (6 weeks ago) <Jason Munro>
+c3d04d1bb - fix debug output bug (6 weeks ago) <Jason Munro>
+a591f0ae8 - actually install postfix in travis this time, add some debug (6 weeks ago) <Jason Munro>
+0fe5dd3c3 - wait code clean up (6 weeks ago) <Jason Munro>
+01499759d - see if local sending in travis is possible without auth (6 weeks ago) <Jason Munro>
+3e7692e99 - more travis tweaks around smtp, don't install ui stuff for just unit tests (6 weeks ago) <Jason Munro>
+0fa741f48 - enable an SMTP server by default in Travis (6 weeks ago) <Jason Munro>
+38eee3d2f - start on a selenium test to send + recieve a message. Probably fail in travis (6 weeks ago) <Jason Munro>
+d77293559 - try to build a valid from address when we don't have one (6 weeks ago) <Jason Munro>
+c16c81f3c - disable safari again, hopefully correct the rest of the tests I broke (7 weeks ago) <Jason Munro>
+c8625d42f - add safari back to browserstack, test tweaks (crosses fingers) (7 weeks ago) <Jason Munro>
+01a4a974a - move the coverage report again (7 weeks ago) <Jason Munro>
+5458a4b0d - _actually_ move the coverage report to a different build this time (7 weeks ago) <Jason Munro>
+c32cb0336 - move the coverage report to a travis build with no selenium tests (7 weeks ago) <Jason Munro>
+dee9dafd0 - limit which build run selenium, add some more browsers (7 weeks ago) <Jason Munro>
+06b517605 - disable a selenium test, more cleanup (7 weeks ago) <Jason Munro>
+5c8111da3 - even more selenium/browserstack/travis tweaking (7 weeks ago) <Jason Munro>
+754855f83 - more selenium/travis/browserstack tweaking (7 weeks ago) <Jason Munro>
+3531671e7 - add a bunch of selenium debug output (7 weeks ago) <Jason Munro>
+48c743a4e - more selenium tweaks to try to make browserstack happy (7 weeks ago) <Jason Munro>
+98a064a50 - selenium: remove delay test, add a single rest for a specific test (7 weeks ago) <Jason Munro>
+526367637 - add a stupid long delay for browserstack to see if it helps (it won't) (7 weeks ago) <Jason Munro>
+41dcfae9c - more browserstack/travis testing (7 weeks ago) <Jason Munro>
+43259c2fd - attemtp to maximize browser windows in browserstack (7 weeks ago) <Jason Munro>
+1354a48d1 - extend rest times to see if it helps browserstack via travis (7 weeks ago) <Jason Munro>
+099068cb7 - limited selenium tests worked, lets try all instances in travis! (7 weeks ago) <Jason Munro>
+079539804 - try to force travis to upgrade python urllib3 for selenium (7 weeks ago) <Jason Munro>
+a35bb8182 - actually enable the selenium tests this time ... (7 weeks ago) <Jason Munro>
+bc6ce7a4c - re-enable selenium tests on travis see if they work any better (7 weeks ago) <Jason Munro>
+c0c3c9a09 - clean up selenium tests so they complete (locally at least) (7 weeks ago) <Jason Munro>
+11211cb03 - testing travis to see if php 7.2 is supported yet (7 weeks ago) <Jason Munro>
+004b444a9 - fix notification placement on mobile issue #280 (7 weeks ago) <Jason Munro>
+e2a49df47 - fix a typo, and finish a fix for issue #190 (7 weeks ago) <Jason Munro>
+b4dd5a488 - fix settimeout warning in chrome, allow callbacks on failed ajax (7 weeks ago) <Jason Munro>
+a77406c21 - fix tests I just broke (7 weeks ago) <Jason Munro>
+ad3b61592 - add tests for SRI integrity attributes (7 weeks ago) <Jason Munro>
+46b53edc2 - populate SRI values for site.js and site.css (7 weeks ago) <Jason Munro>
+ff1f7c4e6 - add SRI placeholders (7 weeks ago) <Jason Munro>
+6bbe2c7d3 - couple more form clean ups based on chrom dev tool recommendations (7 weeks ago) <Jason Munro>
+fd4eb511d - you can't delete github notices, but mark them unread if you try at least (7 weeks ago) <Jason Munro>
+3ec22e9f1 - output sri integrity attributes if set, clean up forms for chrome (7 weeks ago) <Jason Munro>
+898ee8192 - make the current username available to output modules when logged in (7 weeks ago) <Jason Munro>
+3fe7c9e0f - use MutationObserver since DOMSubtreeModified is deprecated (7 weeks ago) <Jason Munro>
+e690b13e1 - better reply profile selection logic, issue #279 (8 weeks ago) <Jason Munro>
+eda6bb3ec - don't assume the system temp directory is /tmp (8 weeks ago) <Jason Munro>
+0371cdffe - version bump (9 weeks ago) <Jason Munro>
+bb4c3d9a4 - "add a feed" link to the bottom of the feeds section in the folder list (9 weeks ago) <Jason Munro>
+b9b4e203e - use correct site_id var when building the request key (9 weeks ago) <Jason Munro>
+b1134a09e - add a new unit test for allowing external image sources (9 weeks ago) <Jason Munro>
+cd52f1e33 - small refactor for test coverage (no functional change) (9 weeks ago) <Jason Munro>
+878c4342d - check for allowed external image sources and provide a link to load them (9 weeks ago) <Jason Munro>
+1b6e0959c - add new ini opiton to allow sites to enable external image sources (9 weeks ago) <Jason Munro>
+0588967c5 - allow sites to enable external image sources (9 weeks ago) <Jason Munro>
+c6da36e97 - update flag/unflag message to support inline message view issue #278 (3 months ago) <Jason Munro>
+bb343a5de - Merge branch 'master' of github.com:jasonmunro/cypht (3 months ago) <Jason Munro>
+d1386992e - add class on inline message open to stop further event assignment (3 months ago) <Jason Munro>
+34a594d0a - don't re-assign move/copy events if message is opened inline (3 months ago) <Jason Munro>
+85f4ef45c - add class for easier styling of imap message part description (3 months ago) <Jason Munro>
+cfd73d802 - Merge pull request #277 from benyanke/patch-1 (3 months ago) <Jason Munro>
+64f6f8c18 - Adding username of created user to output for easier debugging (3 months ago) <Ben Yanke>
+8f8b714d2 - css tweak to the unread counters in the folder list (3 months ago) <Jason Munro>
+fdf43c62b - reduce required size for db session key field (3 months ago) <Jason Munro>
+83fbcad5b - update for imap module unit test (3 months ago) <Jason Munro>
+020f9b2cf - fix unit test that broke with the last commit (3 months ago) <Jason Munro>
+b646d81b6 - fix for missing reply quote on last line for issue #275 (3 months ago) <Jason Munro>
+9f01e68b5 - limit cascading styles to keep inline message rendering clean (4 months ago) <Jason Munro>
+a8e564a17 - fix for delete inline message issue #225 (4 months ago) <Jason Munro>
+d38d1a70b - fix for subject not wrapping issue #274 (4 months ago) <Jason Munro>
+dff6759b8 - fix HTML escape bug in previous/next links (4 months ago) <Jason Munro>
+087402ea2 - more imap unit test updates (6 months ago) <Jason Munro>
+6ed19e1f2 - imap module unit test updates (6 months ago) <Jason Munro>
+a6bf24ae7 - minor changes to make testing easier (6 months ago) <Jason Munro>
+6be8b6147 - testing fixes for issues #253 and #244 (6 months ago) <Jason Munro>
+511503459 - proper mailto link support - issue #251 (6 months ago) <Jason Munro>
+8ac79a88d - version bump (6 months ago) <Jason Munro>
+736f44820 - attempted fix for api logout issue #263 (6 months ago) <Jason Munro>
+3f7e9f973 - avoid undefined warning with api logout (6 months ago) <Jason Munro>
+d08c63837 - testing a fix for inline message delete issue #225 (7 months ago) <Jason Munro>
+3f52a9bcc - imap unit test updates (7 months ago) <Jason Munro>
+777885659 - don't lowercase folder names in inline message move dialog issue #254 (7 months ago) <Jason Munro>
+2be14308f - better TLS/STARTTLS options when adding servers issue #267 (7 months ago) <Jason Munro>
+b87783efc - test updates (7 months ago) <Jason Munro>
+22eb1dbb7 - move server filtering into the framework (7 months ago) <Jason Munro>
+3747a3630 - version bump (7 months ago) <Jason Munro>
+6980166b4 - test a fix for empty username when saving settings in single server mode issue #265 (7 months ago) <Jason Munro>
+ae259d77d - testing a fix for api logout not deleting the session issue #263 (8 months ago) <Jason Munro>
+7a716ed64 - theme fix for the add contact icon (8 months ago) <Jason Munro>
+ec44c73c6 - clean up from/to field formatting in message lists, issue #246 (8 months ago) <Jason Munro>
+de0926ce1 - don't match unencoded square brackets in text message links. issue #264 (8 months ago) <Jason Munro>
+760c4dff2 - support custom session/auth with api login (8 months ago) <Jason Munro>
+83ca0ecf6 - Merge branch 'master' of github.com:jasonmunro/cypht (8 months ago) <Jason Munro>
+8b84c50a0 - fix warning when using single server mode (8 months ago) <Jason Munro>
+41241f7f6 - handle empty folder update details so we don't throw (8 months ago) <Jason Munro>
+651e3f934 - dark theme tweak (8 months ago) <Jason Munro>
+f836a1d17 - don't show the manage folders link in folder dialogs issue #256 (9 months ago) <Jason Munro>
+53459ee45 - dark theme tweak (9 months ago) <Jason Munro>
+ab5d5829d - show feed item detail even if no summary text is available (9 months ago) <Jason Munro>
+4e16293ba - add mailto link scheme to HTMLPurifier whitelist issue #255 (9 months ago) <Jason Munro>
+1a61f4c07 - style fix for move/copy dialog with the dark theme (9 months ago) <Jason Munro>
+2a09f433a - disable php nightly in travis for now due to breakage (9 months ago) <Jason Munro>
+e862bac44 - correct bad constant def fix (9 months ago) <Jason Munro>
+65eac172d - test a possible fix for travis breakage with php nightly (9 months ago) <Jason Munro>
+95339a819 - fix for libsodium check (9 months ago) <Jason Munro>
+5eca7950a - handle reply and reply-to address colleciton differently issue #249 (9 months ago) <Jason Munro>
+34d70a024 - another attempt at fixing search layout on mobile issue #234 (9 months ago) <Jason Munro>
+2ac6f7f10 - wrap a couple long lines (9 months ago) <Jason Munro>
+f419149d2 - comment typo fix (9 months ago) <Jason Munro>
+2c243ae33 - another fix for header encoding issue #238 (9 months ago) <Jason Munro>
+4f6df4c6d - don't quote empty display names in outbound address headers (9 months ago) <Jason Munro>
+ff17d9261 - test a fix for issue #238 (9 months ago) <Jason Munro>
+ed4cd35c7 - fix for search results being hidden by the form on mobile #243 (9 months ago) <Jason Munro>
+ee98aa067 - remove debug (10 months ago) <Jason Munro>
+9d6e33197 - fix search command double space bug (10 months ago) <Jason Munro>
+1c6232c8f - another fix for issue #238 (10 months ago) <Jason Munro>
+38ebdc9d4 - only set an imap search charset if the terms are non-ascii (10 months ago) <Jason Munro>
+162f823ae - fix the unit tests I just broke (10 months ago) <Jason Munro>
+24a96747b - attempt to correct header formatting for address fields issue #238 (10 months ago) <Jason Munro>
+1cab352fe - comment updates (10 months ago) <Jason Munro>
+c1094a906 - unit test updates (10 months ago) <Jason Munro>
+261941144 - add hm_exists() wrappers to all module functions (10 months ago) <Jason Munro>
+11d0e5e3e - move the site module libs.php include, add hm_exists for module functions (10 months ago) <Jason Munro>
+b9b53c8fc - another irc integration test (10 months ago) <Jason Munro>
+c429eaf27 - version bump (10 months ago) <Jason Munro>
+1fa6d9c7b - add a TODO, and test the git -> irc integration (10 months ago) <Jason Munro>
+6820d416d - testing a header encoding fix for issue #238 (10 months ago) <Jason Munro>
+577e16e5a - attempt at fixing non-ascii chars in gmail contact xml #237 (10 months ago) <Jason Munro>
+398f3c8da - another attempted fix for searching on non-ascii chars (10 months ago) <Jason Munro>
+ecc155578 - another attempt at fixing search with non-ascii chars #235 (10 months ago) <Jason Munro>
+34b0a896b - revert commit that added charset support to search (for now) (10 months ago) <Jason Munro>
+9d68f31e7 - add a search charset of UTF-8 (11 months ago) <Jason Munro>
+1fc0abfd8 - fix for issue #233 (11 months ago) <Jason Munro>
+babf2cc83 - add missing js for account delete (11 months ago) <Jason Munro>
+5b58fc1db - allow registered sources that don't display on the source list (11 months ago) <Jason Munro>
+d3f2e2290 - css tweak for toggle all checkbox (11 months ago) <Jason Munro>
+2d4d69066 - update accounts module with a user list + delete option (11 months ago) <Jason Munro>
+20c597b9f - update unit test for db lib change (11 months ago) <Jason Munro>
+85ea35ea3 - enable multiple results for the sql execute method (11 months ago) <Jason Munro>
+c0d210094 - style tweaks for compose with markdown (11 months ago) <Jason Munro>
+d57912266 - couple display tweaks for compose with markdown (11 months ago) <Jason Munro>
+f63ea6374 - version bump (11 months ago) <Jason Munro>
+7242b3562 - Add the ability to compose messages in Markdown (11 months ago) <Jason Munro>
+1e2baaa42 - another unit test correction (11 months ago) <Jason Munro>
+e3eea3fa5 - unit test fix (12 months ago) <Jason Munro>
+5bcce5168 - fix for issue #231 (12 months ago) <Jason Munro>
+e4e225198 - unread count style tweak (12 months ago) <Jason Munro>
+b2aa113aa - Merge branch 'master' of github.com:jasonmunro/cypht (12 months ago) <Jason Munro>
+0a2ab08e4 - testing a travis tweak (12 months ago) <Jason Munro>
+a74aec4ff - add 2fa code to the settings page for manual entry (12 months ago) <Jason Munro>
+b417383a9 - version bump (12 months ago) <Jason Munro>
+5c365c203 - couple type casting fixes for the inline message module set (12 months ago) <Jason Munro>
+c781580d9 - couple profile related fixes (12 months ago) <Jason Munro>
+6a3f5aac1 - instead of "dot stuffing", qp encode dots for SMTP (12 months ago) <Jason Munro>
+33bee9175 - unit test fix (12 months ago) <Jason Munro>
+5c45ab5f9 - testing a fix for issue #225 (12 months ago) <Jason Munro>
+828088b26 - more work on IMAP unit tests (1 year ago) <Jason Munro>
+ce3ae9b8d - more work on IMAP module set unit tests (1 year ago) <Jason Munro>
+b4dcc1ba0 - version bump (1 year ago) <Jason Munro>
+3fe89cea9 - update smtp to use socket overrides so it can be unit tested (1 year ago) <Jason Munro>
+5bc67e426 - update pop3 to use the same socket connections as imap and smtp (1 year ago) <Jason Munro>
+b25f2858f - fix a potential bug and use an override for testing (1 year ago) <Jason Munro>
+993849652 - add new static method override for unit testing (1 year ago) <Jason Munro>
+87e7b3ee2 - fix for hosting cypht on non-standard ports, issue #226 (1 year ago) <Jason Munro>
+5960f56d8 - more imap unit test work (1 year ago) <Jason Munro>
+b403b3dc5 - more work on IMAP module set unit tests (1 year ago) <Jason Munro>
+2f9499443 - add option to the imap debug to make unit testing easier (1 year ago) <Jason Munro>
+763b5c5af - IMAP unit test updates (1 year ago) <Jason Munro>
+62e4cca28 - unit test mock updates (1 year ago) <Jason Munro>
+2ae4f7250 - add todo comment (1 year ago) <Jason Munro>
+696d7f749 - IMAP lib fixes (thanks to the new unit tests!) (1 year ago) <Jason Munro>
+06bb2c717 - wrap a couple long lines (1 year ago) <Jason Munro>
+e3681f35f - start working on unit tests for the IMAP module set (1 year ago) <Jason Munro>
+3c6ca279e - unit test update (1 year ago) <Jason Munro>
+d1b12cb04 - unit test framework updates (1 year ago) <Jason Munro>
+458623cc8 - abstract some parts of IMAP communication for unit testing (1 year ago) <Jason Munro>
+59ff05f71 - another single server mode tweak (1 year ago) <Jason Munro>
+d6bb8164a - add single server mode option to the hm3.ini (1 year ago) <Jason Munro>
+617439aae - version bump (1 year ago) <Jason Munro>
+400d8cec5 - more single server mode updates (1 year ago) <Jason Munro>
+75d395011 - single server mode fix (1 year ago) <Jason Munro>
+2095e871a - refactor single server mode for PHP 5 (1 year ago) <Jason Munro>
+73060539e - unit test updates for single server mode (1 year ago) <Jason Munro>
+c9c7babc5 - version bump (1 year ago) <Jason Munro>
+13c0d7b44 - single server mode updates (1 year ago) <Jason Munro>
+6b41b323b - add non-encrypted user settings support (1 year ago) <Jason Munro>
+2cf26c9ce - stub for saving settings without encryption (1 year ago) <Jason Munro>
+de4f6a17e - style tweak for inline message viewing (1 year, 1 month ago) <Jason Munro>
+c6be04ea3 - version bump (1 year, 1 month ago) <Jason Munro>
+8572e1bd6 - fixes around inline message view (1 year, 1 month ago) <Jason Munro>
+9e1527939 - fixes for inline message view messing with the message list (1 year, 1 month ago) <Jason Munro>
+f06f77c75 - fix combined sent view cache not being used on refresh (1 year, 1 month ago) <Jason Munro>
+603f34c77 - testing some travis ci build speed ups (1 year, 1 month ago) <Jason Munro>
+577d5d4c8 - travis ci tweaks to speed up builds (1 year, 1 month ago) <Jason Munro>
+240c6f07e - fix bash syntax error in travis run script (1 year, 1 month ago) <Jason Munro>
+ea0122829 - disable UI tests for now because browserstack is pissing me off (1 year, 1 month ago) <Jason Munro>
+b4d39821c - add a longer wait to the folder list reload test (1 year, 1 month ago) <Jason Munro>
+4a56b68e6 - update safari creds for browserstack (1 year, 1 month ago) <Jason Munro>
+b5c574f4c - speed up selenium tests by removing fixed wait times (1 year, 1 month ago) <Jason Munro>
+3c063cf3f - fix a unit test: timezones differ on different systems (1 year, 1 month ago) <Jason Munro>
+98f218098 - disable test coverage for travis ci runs that don't need it (1 year, 1 month ago) <Jason Munro>
+3b17d2c07 - unit test update (1 year, 1 month ago) <Jason Munro>
+3b5e44450 - more unit test updates (1 year, 1 month ago) <Jason Munro>
+417cd5eb0 - add a couple more core handler module set unit test assertions (1 year, 1 month ago) <Jason Munro>
+978c85d97 - unit test updates for the core module set (1 year, 1 month ago) <Jason Munro>
+3803a55a5 - encode all headers fields that have non-ascii values (1 year, 1 month ago) <Jason Munro>
+641fd1ecf - another stab at fixing unit test helpers properly (1 year, 1 month ago) <Jason Munro>
+dfd545bac - syntax fix for the unit test helper (1 year, 1 month ago) <Jason Munro>
+a4124b2e6 - add a comment (1 year, 1 month ago) <Jason Munro>
+9ad9cf5d1 - unit tests for handler and output modules in the core set round one (1 year, 1 month ago) <Jason Munro>
+9fcd3d828 - remove some unit test excludes for the core module set (1 year, 1 month ago) <Jason Munro>
+ec17a8698 - add some missing methods/props to unit test mocks (1 year, 1 month ago) <Jason Munro>
+d2deb8865 - helpers to created unit tests for module sets (1 year, 1 month ago) <Jason Munro>
+527519642 - ignore list update for git (1 year, 1 month ago) <Jason Munro>
+2e702bcc4 - testing a change to make unit testing easier (1 year, 1 month ago) <Jason Munro>
+e743ec55c - minor style changes to the core handler mods, no functional change (1 year, 1 month ago) <Jason Munro>
+cd9627890 - small change to make unit testing easier (1 year, 1 month ago) <Jason Munro>
+0bf7772e7 - small change to make unit testing easier (1 year, 1 month ago) <Jason Munro>
+a5e62b7b4 - unit test timezone fix (1 year, 1 month ago) <Jason Munro>
+2d0d0a813 - more unit tests for the core module set (1 year, 1 month ago) <Jason Munro>
+5077d1bd7 - refactor some functions to always return something [ci-skip] (1 year, 1 month ago) <Jason Munro>
+26a3870e5 - more unit test updates (1 year, 1 month ago) <Jason Munro>
+a1228a8bb - more travis tweaking (1 year, 1 month ago) <Jason Munro>
+7597e2bbe - require once for easier unit testing (1 year, 1 month ago) <Jason Munro>
+9f6288701 - unit test updates (1 year, 1 month ago) <Jason Munro>
+3d2b4408f - php nightly bug fix (1 year, 1 month ago) <Jason Munro>
+3fc4e194e - travis selenium test tweaks (1 year, 1 month ago) <Jason Munro>
+cab5ee34e - unit test updates (1 year, 1 month ago) <Jason Munro>
+fa7f5d921 - more travis tweaking (1 year, 1 month ago) <Jason Munro>
+b3ba6eb9b - another travis tweak (1 year, 1 month ago) <Jason Munro>
+893caf217 - more tweaking for travis ci (1 year, 1 month ago) <Jason Munro>
+7b7d87bd0 - unit test updates (1 year, 1 month ago) <Jason Munro>
+e56470c07 - testing travis breakage on php 7.0 with ldap (1 year, 1 month ago) <Jason Munro>
+fa7a6dab2 - version bump (1 year, 1 month ago) <Jason Munro>
+26f1e3fd6 - add a class to the message table tbody element (1 year, 1 month ago) <Jason Munro>
+6bfb68dda - refactor some core module set js (1 year, 1 month ago) <Jason Munro>
+53a1497cb - unify some code around address field parsing (1 year, 1 month ago) <Jason Munro>
+a969b7b5c - tweaks to address field parsing (1 year, 1 month ago) <Jason Munro>
+a4f454853 - remove debug (1 year, 1 month ago) <Jason Munro>
+2fc185722 - fix for link formatting in text message parts (again) (1 year, 1 month ago) <Jason Munro>
+5aa16a42d - clean up api login method, fix normal logins with it enabled (1 year, 1 month ago) <Jason Munro>
+c85220382 - test a fix for url matching being a bit too greedy (1 year, 2 months ago) <Jason Munro>
+ba780a558 - don't insert links into raw message view (1 year, 2 months ago) <Jason Munro>
+b9dd0e697 - testing better recipient parsing on send [ci-skip] (1 year, 2 months ago) <Jason Munro>
+f6135b885 - fix a bug that caused the folder list to keep reloading [ci-skip] (1 year, 2 months ago) <Jason Munro>
+4ce06da3d - UI fix for move to dialog for issue #220 (1 year, 2 months ago) <Jason Munro>
+f5576d423 - start working on a "single server" mode (1 year, 2 months ago) <Jason Munro>
+690c800cd - add a debug to indicate if a user is logged in (1 year, 2 months ago) <Jason Munro>
+1c814c7e0 - remove debug from the functional api login interface (1 year, 2 months ago) <Jason Munro>
+18719040a - enable memcached extension in travis ci (1 year, 2 months ago) <Jason Munro>
+8c3836de7 - make sure we load user data on the functional api login (1 year, 2 months ago) <Jason Munro>
+c163b7e73 - unit test updates (1 year, 2 months ago) <Jason Munro>
+012ff270c - fix php 7.1 in travis, re-enable all dbs (1 year, 2 months ago) <Jason Munro>
+9986e3e4d - add memcached auth support [ci-skip] (1 year, 2 months ago) <Jason Munro>
+9fd98ee72 - add nighty PHP to the list of builds (1 year, 2 months ago) <Jason Munro>
+b2206bb92 - more work on a functional interface to login/out (1 year, 2 months ago) <Jason Munro>
+0066170e0 - another tweak to try to get PHP nightly working on travis ci (1 year, 2 months ago) <Jason Munro>
+5fbc4dac5 - more travis + PHP nightly testing (1 year, 2 months ago) <Jason Munro>
+c39f009f7 - another travis tweak/test (1 year, 2 months ago) <Jason Munro>
+ecc72c5b4 - more travis tweaking (1 year, 2 months ago) <Jason Munro>
+511d78fa5 - work on supporting hhvm and php nightly builds in travis ci (1 year, 2 months ago) <Jason Munro>
+f8a9708a6 - testing hhvm and nightly PHP versions on travis CI (1 year, 2 months ago) <Jason Munro>
+774374c5e - function based login option for the api login module set (1 year, 2 months ago) <Jason Munro>
+c970c7c46 - comment fix (1 year, 2 months ago) <Jason Munro>
+274966061 - add an option to disable the browser fingerprint (1 year, 2 months ago) <Jason Munro>
+6eb343f9b - testing a generic disconnect for any option connections to data sources (1 year, 2 months ago) <Jason Munro>
+54916f243 - version bump (1 year, 2 months ago) <Jason Munro>
+5400a3be6 - fix signatures for issue #215 (1 year, 2 months ago) <Jason Munro>
+199b54b51 - move a function to core so it can be called from multiple module sets (1 year, 2 months ago) <Jason Munro>
+63d940de6 - hash_equals should not be called directly, so change it to private (1 year, 2 months ago) <Jason Munro>
+c12ffd058 - testing another include order tweak [ci skip] (1 year, 2 months ago) <Jason Munro>
+efb569933 - testing a tweak to the order of includes [ci skip] (1 year, 2 months ago) <Jason Munro>
+5c9170a8d - version bump (1 year, 2 months ago) <Jason Munro>
+999997280 - make sure we are checking authed state for servers correctly (1 year, 2 months ago) <Jason Munro>
+fbd4623dd - slight change in behavior for the server connect method (1 year, 2 months ago) <Jason Munro>
+e382f09fc - better hash comparison to avoid timing attacks (1 year, 2 months ago) <Jason Munro>
+531c90775 - Merge pull request #214 from hartois/master (1 year, 2 months ago) <Jason Munro>
+d41696235 - Russian localization update (1 year, 2 months ago) <hartois>
+5f2d5c5f8 - typo fix for issue #211 (1 year, 3 months ago) <Jason Munro>
+d630a26d9 - re-enable full travis build and selenium tests (1 year, 3 months ago) <Jason Munro>
+50301bade - lib sodium compat layer fix for PHP 7.2 (1 year, 3 months ago) <Jason Munro>
+d1519b9d8 - PHP 7.2 fix for abstraction method signature (1 year, 3 months ago) <Jason Munro>
+c7b84468b - libsodium support for PHP 7.2 and newer PECL packages (1 year, 3 months ago) <Jason Munro>
+6e2c5dd7e - re-enable php version in travis build (1 year, 3 months ago) <Jason Munro>
+507612dc6 - remove test that breaks travis build (1 year, 3 months ago) <Jason Munro>
+dc9fc51a6 - still trying to get libsodium working in travis (1 year, 3 months ago) <Jason Munro>
+6c375bfe0 - yet another travis ci debug attempt for libsodium (1 year, 3 months ago) <Jason Munro>
+a0514203f - trying to fix libsodium in travis (1 year, 3 months ago) <Jason Munro>
+767d5cf1a - send coverage report from Travis with PHP 7.1 (1 year, 3 months ago) <Jason Munro>
+bc8d4cbe2 - enable all unit tests in travis but disable browserstack for now (1 year, 3 months ago) <Jason Munro>
+1f2dfeeb3 - another tweak to hopefully resolve travis issues (1 year, 3 months ago) <Jason Munro>
+016afe56b - more travis testing (1 year, 3 months ago) <Jason Munro>
+83f900366 - almost got php 7.1 + travis working ... (1 year, 3 months ago) <Jason Munro>
+f8255c644 - another travis php 7.1 ldap test (1 year, 3 months ago) <Jason Munro>
+6d99dc216 - still trying to fix PHP 7.1 with travis ci (1 year, 3 months ago) <Jason Munro>
+45a42c580 - another travis + PHP 7.1 + LDAP test fix (1 year, 3 months ago) <Jason Munro>
+30411fe54 - another travis + php 7.1 test fix (1 year, 3 months ago) <Jason Munro>
+38844bfb4 - debugging travis PHP 7.1 ldap issue (1 year, 3 months ago) <Jason Munro>
+6477d8148 - test a bug fix when adding servers with the same username (1 year, 3 months ago) <Jason Munro>
+2108e8364 - add an option to disable the client ip check (1 year, 3 months ago) <Jason Munro>
+3b8c60f79 - travis tweaks (1 year, 3 months ago) <Jason Munro>
+87c3fa71f - change which build sends coveralls the coverage report in travis (1 year, 3 months ago) <Jason Munro>
+721cac3b2 - add an option to disable ini tweaks (1 year, 3 months ago) <Jason Munro>
+79d8a1990 - remove poorly thought out code of conduct (1 year, 3 months ago) <Jason Munro>
+1ab697162 - better push notice integration that does not require an extra js include (1 year, 3 months ago) <Jason Munro>
+6ccf913f9 - load css before javascript (1 year, 3 months ago) <Jason Munro>
+5f621a9e8 - expand the detail about the "stay logged in" option in the hm3.ini (1 year, 3 months ago) <Jason Munro>
+fd0b79728 - Create CODE_OF_CONDUCT.md (1 year, 3 months ago) <Jason Munro>
+0ccc89592 - (origin/add-code-of-conduct-1) Create CODE_OF_CONDUCT.md (1 year, 3 months ago) <Jason Munro>
+87eb09208 - Create CONTRIBUTING.md (1 year, 3 months ago) <Jason Munro>
+464f41848 - remove unused arg after cookie refactor (1 year, 3 months ago) <Jason Munro>
+5b9f40ea9 - version bump (1 year, 3 months ago) <Jason Munro>
+21aa51105 - update modules to use the changed secure cookie method (1 year, 3 months ago) <Jason Munro>
+661a4b710 - add the "stay logged in" settings to the default hm3.ini file (1 year, 3 months ago) <Jason Munro>
+a73a79a3f - add a "stay logged in" option to the login page (1 year, 3 months ago) <Jason Munro>
+ec88e1bf6 - refactor to allow setting the session lifetime (1 year, 3 months ago) <Jason Munro>
+051d1ccad - check for xml support and fail gracefully if not found (1 year, 3 months ago) <Jason Munro>
+88a730964 - theme tweaks to "stick" the title bar on mobile (1 year, 4 months ago) <Jason Munro>
+5ca23eec2 - Merge pull request #207 from hartois/master (1 year, 4 months ago) <Jason Munro>
+ec67db71d - Adding Office365 Nux service (1 year, 4 months ago) <hartois>
+44e49d81c - Russian localization update (1 year, 4 months ago) <hartois>
+6856c20f5 - test a fix for exchange for expanding folders into subfolders (1 year, 4 months ago) <Jason Munro>
+87c297f26 - inline message module updates (1 year, 4 months ago) <Jason Munro>
+c9a980c6a - fix for saving data with dynamic login (1 year, 4 months ago) <Jason Munro>
+84ad71422 - another small refactory [ci skip] (1 year, 4 months ago) <Jason Munro>
+62b52a22f - yet another small refactor [ci skip] (1 year, 4 months ago) <Jason Munro>
+f15b4f798 - another small refactor to simplify a method in the framework (1 year, 4 months ago) <Jason Munro>
+da020aa90 - split out another method in the framework [ci skip] (1 year, 4 months ago) <Jason Munro>
+2b85028c0 - couple more small refactor tweaks [ci skip] (1 year, 4 months ago) <Jason Munro>
+bc6a543bb - testing some minor refactoring in the framework [ci skip] (1 year, 4 months ago) <Jason Munro>
+9b6cd1926 - refactoring to simplify some things (no functional change) [ci skip] (1 year, 4 months ago) <Jason Munro>
+dac4f9672 - split up some methods into smaller bits [ci skip] (1 year, 4 months ago) <Jason Munro>
+ea5411f7f - split up a large class, no functional change [ci skip] (1 year, 4 months ago) <Jason Munro>
+7250559c6 - decouple a trait from the handler module class [ci skip] (1 year, 4 months ago) <Jason Munro>
+63e687c49 - refactor, no functional changes [ci skip] (1 year, 4 months ago) <Jason Munro>
+b890b5856 - refactor to split out some logic (1 year, 4 months ago) <Jason Munro>
+a281bd391 - remove unused return statement [ci skip] (1 year, 4 months ago) <Jason Munro>
+43d8adac8 - typo fix in the selenium tests (1 year, 4 months ago) <Jason Munro>
+684540fdf - reduce some duplicate code [ci skip] (1 year, 4 months ago) <Jason Munro>
+bd3661aad - version bump (1 year, 4 months ago) <Jason Munro>
+c5375ec76 - test coverage update (1 year, 4 months ago) <Jason Munro>
+2afbb4a03 - refactoring to clean up some code (1 year, 4 months ago) <Jason Munro>
+d5b1a6551 - fix for selenium tests (1 year, 4 months ago) <Jason Munro>
+58eef3d9a - auth class cleanup [ci skip] (1 year, 4 months ago) <Jason Munro>
+27305932f - fix dynamic login, clean up auth/session setup code (1 year, 4 months ago) <Jason Munro>
+f11321f36 - more selenium tests [ci skip] (1 year, 4 months ago) <Jason Munro>
+4c649a66b - travis build config update for new settings selenium tests (1 year, 4 months ago) <Jason Munro>
+d8dc6a1fe - many new selenium tests for the settings page. Lots left to do! (1 year, 4 months ago) <Jason Munro>
+3bcd48ba8 - testing a fix for "fluttering" unread count updates (1 year, 4 months ago) <Jason Munro>
+d6dd82114 - typo fix (1 year, 4 months ago) <Jason Munro>
+f2f223370 - try to fix libsodium install on travis ci (1 year, 4 months ago) <Jason Munro>
+6456dfb8a - work on making it easier to add custom themes (1 year, 4 months ago) <Jason Munro>
+4439ae11e - doc string update (1 year, 4 months ago) <Jason Munro>
+85c1fb819 - travis + coveralls build tweak (1 year, 4 months ago) <Jason Munro>
+58f059554 - fix for incorrectly formatted outbound message header (1 year, 4 months ago) <Jason Munro>
+51e9745fe - another postgresql workaround for this unit test (1 year, 4 months ago) <Jason Munro>
+c65800feb - version bump (1 year, 4 months ago) <Jason Munro>
+82eafcf7d - unit test work around for postgresql (1 year, 4 months ago) <Jason Munro>
+b35977cff - remove new close method since it did not fix the unit test (1 year, 4 months ago) <Jason Munro>
+50e08e1c1 - try to fix a unit test broken with postgresql (1 year, 4 months ago) <Jason Munro>
+ee6b8a767 - create a close connection method for the db class (1 year, 4 months ago) <Jason Munro>
+77adda8d7 - refactor some logic to be simpler [ci skip] (1 year, 4 months ago) <Jason Munro>
+6a06351b8 - unit test improvements (1 year, 4 months ago) <Jason Munro>
+9ff5ef0e2 - update for new return value type (1 year, 4 months ago) <Jason Munro>
+74dfb1731 - don't set user notices in the framework (1 year, 4 months ago) <Jason Munro>
+cd29d4fc1 - refactor a method for simplicity (1 year, 4 months ago) <Jason Munro>
+70141c82a - don't set user notices in the framework (1 year, 4 months ago) <Jason Munro>
+eaac6657f - dont' set user notices in the framework (1 year, 4 months ago) <Jason Munro>
+de4fa6780 - slight clean up, add user notices (1 year, 4 months ago) <Jason Munro>
+c912f92d2 - add a user notice being removed from the framework to the core mod (1 year, 4 months ago) <Jason Munro>
+180e2a1c9 - doc string update [ci skip] (1 year, 4 months ago) <Jason Munro>
+f3734d79c - doc string update [ci skip] (1 year, 4 months ago) <Jason Munro>
+d77636fda - docstring update [ci skip] (1 year, 4 months ago) <Jason Munro>
+d5ae3015a - doc string updates [ci skip] (1 year, 4 months ago) <Jason Munro>
+e3915a59b - reset accidentally changed default db for unit tests (1 year, 4 months ago) <Jason Munro>
+c28b6c0ee - misc fixes around db access (1 year, 4 months ago) <Jason Munro>
+8bd3befb7 - fix accidental copy/paste, more db access work (1 year, 4 months ago) <Jason Munro>
+4f17e784f - doc string update (1 year, 4 months ago) <Jason Munro>
+bc356e73c - simplify database access, hopefully fix some unit test errors in travis (1 year, 4 months ago) <Jason Munro>
+e92d3b559 - testing a fix for unit tests + sqlite (1 year, 4 months ago) <Jason Munro>
+8b1cc8bf5 - unit test update (1 year, 4 months ago) <Jason Munro>
+58c836fa2 - fix typo that breaks deleting db users (1 year, 4 months ago) <Jason Munro>
+92e61fbf0 - add CII Best Practices badge to our readme (1 year, 4 months ago) <Jason Munro>
+17a933206 - add a placeholder for release notes (1 year, 4 months ago) <Jason Munro>
+e1806ae42 - improve deubgging around creating db accounts (1 year, 4 months ago) <Jason Munro>
+453b1c31c - tweak to the travis build to include coveralls since PHP 7.1 was disabled (1 year, 4 months ago) <Jason Munro>
+3f4b3e3be - unit test update (1 year, 4 months ago) <Jason Munro>
+1361ddd26 - Merge branch 'master' of github.com:jasonmunro/cypht (1 year, 4 months ago) <Jason Munro>
+2dd1ddc25 - fix for no valid recipients found bug [#201] (1 year, 4 months ago) <Jason Munro>
+e4177b2ac - Merge pull request #200 from hartois/master (1 year, 4 months ago) <Jason Munro>
+86a787911 - small russian localization fix (1 year, 4 months ago) <hartois>
+153fef6eb - remove unused argument, refactor ugly handler module (1 year, 4 months ago) <Jason Munro>
+1c8c0e8c3 - add abstract method for php session auth trait (1 year, 4 months ago) <Jason Munro>
+f987f13de - default ini file comment updates (1 year, 4 months ago) <Jason Munro>
+4c28f06fc - split up the php session class a bit (1 year, 4 months ago) <Jason Munro>
+6ff648b00 - testing some validation on request uri values (1 year, 4 months ago) <Jason Munro>
+9a47b62bd - fix a bug causing the folder list to be loaded twice on settings save (1 year, 4 months ago) <Jason Munro>
+d50944e08 - remove unused argument (1 year, 4 months ago) <Jason Munro>
+2ca73ac8a - remove an unused code path in the debug output logic (1 year, 4 months ago) <Jason Munro>
+63495c904 - version bump (1 year, 4 months ago) <Jason Munro>
+74aecd27b - remove forced tls redirect - should be handled by a web server (and it's been a cause of problems) (1 year, 4 months ago) <Jason Munro>
+37ff13397 - use better type checks on a few server vars (1 year, 4 months ago) <Jason Munro>
+a6a254411 - disable php 7.1 build for now (1 year, 4 months ago) <Jason Munro>
+609564733 - even more travis tweaking (1 year, 4 months ago) <Jason Munro>
+9fa597765 - testing another travis tweak (1 year, 4 months ago) <Jason Munro>
+209e4d047 - another travis test (1 year, 4 months ago) <Jason Munro>
+3e81a2306 - testing a refactor of the travis config (1 year, 4 months ago) <Jason Munro>
+e747e87a5 - testing another tweak with travis ci (1 year, 4 months ago) <Jason Munro>
+e45d33789 - yet another tweak for apache + travis + trusty (1 year, 4 months ago) <Jason Munro>
+6ac22aa99 - more travis tweaking to get apache + trusty working (1 year, 4 months ago) <Jason Munro>
+e36cc487e - still trying to get travis + trusty + apache working. Gettting closer! (1 year, 4 months ago) <Jason Munro>
+ec86267b4 - still trying to get apache + trusty + travis ci working (1 year, 4 months ago) <Jason Munro>
+ae1af96f6 - another fix for apache running in trusty in travis ci (1 year, 4 months ago) <Jason Munro>
+a47f6dc77 - yet another attempt to fix travis ci builds on trusty (1 year, 4 months ago) <Jason Munro>
+b61ba4256 - more tweaks to get travis ci on trusty working (1 year, 4 months ago) <Jason Munro>
+211ca83ea - another attempt at fixing travis ci with trusty (1 year, 4 months ago) <Jason Munro>
+9cbc0070e - try to fix broken travis build after trusty update (1 year, 4 months ago) <Jason Munro>
+a9cd3f75b - work on adding user default settings to the example ini file (1 year, 4 months ago) <Jason Munro>
+ac4aa0d18 - libsodium is not available for precise images in travis anymore, so start testing trusty (which I think is going to break us for a bit) (1 year, 4 months ago) <Jason Munro>
+316e1a5b3 - support for defining default user settings in the main ini file (1 year, 4 months ago) <Jason Munro>
+abff48601 - typo fix in the ini set file (1 year, 4 months ago) <Jason Munro>
+24a22f232 - version bump (1 year, 4 months ago) <Jason Munro>
+ff4af36d4 - add a couple site wide options to ease integration with other apps (1 year, 4 months ago) <Jason Munro>
+cf7170ed7 - rename a few functions until we have proper namespace support (1 year, 4 months ago) <Jason Munro>
+86e57ad67 - testing a refactor of the hm_modules trait (1 year, 5 months ago) <Jason Munro>
+74d9f816d - doc string updates (1 year, 5 months ago) <Jason Munro>
+4b31db206 - refactoring to help simplify the dispatch class (1 year, 5 months ago) <Jason Munro>
+8f094d363 - move a method to the correct trait in the server list code (1 year, 5 months ago) <Jason Munro>
+5d0b5f100 - testing some refactoring of a large trait (server list) (1 year, 5 months ago) <Jason Munro>
+1b7af4367 - minor tweaks for static analysis (1 year, 5 months ago) <Jason Munro>
+d1efdc9fe - simplify some framework methods (1 year, 5 months ago) <Jason Munro>
+7d48de01b - small type tweak to make static analysis happier (1 year, 5 months ago) <Jason Munro>
+56751fd5d - small tweaks to doc strings and a type check (1 year, 5 months ago) <Jason Munro>
+09658c8c0 - move the auth_none class to the test framework, only enable it for tests (1 year, 5 months ago) <Jason Munro>
+3e551e1c0 - unit test fix for config return type (1 year, 5 months ago) <Jason Munro>
+97d57f1fe - data type correction (1 year, 5 months ago) <Jason Munro>
+e417260d9 - doc string updates (1 year, 5 months ago) <Jason Munro>
+a39a68a51 - remove unused arg (1 year, 5 months ago) <Jason Munro>
+1b3afd123 - doc string update (1 year, 5 months ago) <Jason Munro>
+051f69653 - remove the invalid input feature that does not work as expected (1 year, 5 months ago) <Jason Munro>
+8c1933668 - some tweaks to request input processing (1 year, 5 months ago) <Jason Munro>
+61af8d3cc - last static analysis tweak of the night (unless it breaks!) (1 year, 5 months ago) <Jason Munro>
+4fb3fd788 - more code tweaking to resolve static analysis issues (1 year, 5 months ago) <Jason Munro>
+2032d42ef - small code refactor to simplify and reduce duplication (1 year, 5 months ago) <Jason Munro>
+d3e724979 - small code clean up for open basedir assignment (1 year, 5 months ago) <Jason Munro>
+bb8317865 - refactor some duplicate code (1 year, 5 months ago) <Jason Munro>
+9f3eccf31 - misc small static analysis fixes (1 year, 5 months ago) <Jason Munro>
+07f281357 - another attempt at fixing some static analysis issues (1 year, 5 months ago) <Jason Munro>
+94bc72357 - move some methods to the base session class from the php class (1 year, 5 months ago) <Jason Munro>
+9d30d3d86 - small init changes for request property types (1 year, 5 months ago) <Jason Munro>
+2a0daf159 - slight refactor to hopefully fix the last "major" static analysis issue (1 year, 5 months ago) <Jason Munro>
+f5e167d63 - yet another static analysis refactor (1 year, 5 months ago) <Jason Munro>
+d72b8dbf9 - refactoring to fix some static anlysis issues (hopefully) (1 year, 5 months ago) <Jason Munro>
+0c790afdc - doc string update (1 year, 5 months ago) <Jason Munro>
+2126832b2 - reduce some duplicated code (1 year, 5 months ago) <Jason Munro>
+ba2f244d3 - typo fix in the README update (1 year, 5 months ago) <Jason Munro>
+184caa34c - doc string and readme updates, and version a version bump (1 year, 5 months ago) <Jason Munro>
+39d0fa828 - doc string updates (1 year, 5 months ago) <Jason Munro>
+54a3e6b57 - refactor to reduce some duplication (1 year, 5 months ago) <Jason Munro>
+089c14983 - more refactoring to reduce method complexity (1 year, 5 months ago) <Jason Munro>
+22a525343 - more refactoring, and a unit test update (1 year, 5 months ago) <Jason Munro>
+d712c1e8a - more refactoring to reduce method complexity (1 year, 5 months ago) <Jason Munro>
+e9bd79f90 - unit test coverage update (1 year, 5 months ago) <Jason Munro>
+e908090a5 - another refactor to reduce method complexity (1 year, 5 months ago) <Jason Munro>
+0cb90bb6d - refactor some methods to reduce complexity (1 year, 5 months ago) <Jason Munro>
+771d0562a - doc string update (1 year, 5 months ago) <Jason Munro>
+fa523cb6f - some refactoring to simplify the modules class methods (1 year, 5 months ago) <Jason Munro>
+c64f8efdb - reduce some duplication in the db session class (1 year, 5 months ago) <Jason Munro>
+56aef2147 - doc string updates (1 year, 5 months ago) <Jason Munro>
+f68fc83bc - fix phpunit test coverage so it's back to 100% (1 year, 5 months ago) <Jason Munro>
+e1cf5e87d - change scope for unit testing (1 year, 5 months ago) <Jason Munro>
+b75cd1877 - refactor to reduce complexity (1 year, 5 months ago) <Jason Munro>
+3507e5e0f - refactor to simplify the php session check method (1 year, 5 months ago) <Jason Munro>
+daa2f7061 - doc string update (1 year, 5 months ago) <Jason Munro>
+7d351c8b2 - doc string updates (1 year, 5 months ago) <Jason Munro>
+5e3dad3bb - doc string fixes (1 year, 5 months ago) <Jason Munro>
+627c1c67c - I think I'm obsessed with this static analysis tool. Must keep improving... (1 year, 5 months ago) <Jason Munro>
+5a8d4a002 - more refactoring based on static analysis (1 year, 5 months ago) <Jason Munro>
+83c82ee35 - slight refactoring to simplify the connect method (1 year, 5 months ago) <Jason Munro>
+c666472e9 - refactor setup_session to have less complexity (1 year, 5 months ago) <Jason Munro>
+a77b98517 - another static analysis refactor (1 year, 5 months ago) <Jason Munro>
+d14770bb9 - still doing static analysis refactoring (1 year, 5 months ago) <Jason Munro>
+b2f3eabcb - another static analysis refactor (1 year, 5 months ago) <Jason Munro>
+ea71c6710 - another static code analysis related refactor (1 year, 5 months ago) <Jason Munro>
+d8c4b8b3b - more refactoring for the static analysis gods (1 year, 5 months ago) <Jason Munro>
+0fa8639f6 - some refactoring to reduce duplication (1 year, 5 months ago) <Jason Munro>
+be35f05b2 - couple more static analysis tweaks (1 year, 5 months ago) <Jason Munro>
+d71801d43 - yet another static analysis change (1 year, 5 months ago) <Jason Munro>
+1dac79644 - tweak for some static analysis fixes (1 year, 5 months ago) <Jason Munro>
+790ea879c - still trying to fix class compilation in php5 (1 year, 5 months ago) <Jason Munro>
+fe5b3e99f - another attempt to fix class compisition in php 5* (and keep from breaking static analysis) (1 year, 5 months ago) <Jason Munro>
+d7cf666e6 - fix some stuff I broke and add some more static analysis changes (1 year, 5 months ago) <Jason Munro>
+924f74045 - MOAR static analysis updates, and a few unit test tweaks to match (1 year, 5 months ago) <Jason Munro>
+a6fd1cf9e - even more static analysis tweaking for scrutinizer ci (1 year, 5 months ago) <Jason Munro>
+d9fedf60e - more tweaks for static analysis (1 year, 5 months ago) <Jason Munro>
+0d20d1e0e - another round of tweaks for static analysis (1 year, 5 months ago) <Jason Munro>
+07b1624ef - more static analysis related tweaks to the framework (1 year, 5 months ago) <Jason Munro>
+b999e6fb6 - more comment clean up for static analysis (1 year, 5 months ago) <Jason Munro>
+e9ff544d6 - comment clean up to help with static analysis (1 year, 5 months ago) <Jason Munro>
+0e4804c19 - testing some slight changes to improve static analysis (1 year, 5 months ago) <Jason Munro>
+ae9564c28 - add doc strings produced by scrutinizer ci (1 year, 5 months ago) <Jason Munro>
+56d94d111 - Merge branch 'master' of github.com:jasonmunro/cypht (1 year, 5 months ago) <Jason Munro>
+1dbbad8f1 - fix small type mismatch in functions for setting cookies (1 year, 5 months ago) <Jason Munro>
+c7276dfa3 - Merge pull request #198 from mav-/master (1 year, 5 months ago) <Jason Munro>
+bda35ad95 - Added initial wip version of So Alone theme (1 year, 5 months ago) <mav>
+8717e5671 - Allow to load local fonts in CSP (1 year, 5 months ago) <mav>
+c569bc0cc - add coveralls coverage status to the readme (1 year, 5 months ago) <Jason Munro>
+2f416fec1 - more travis ci tweaking (1 year, 5 months ago) <Jason Munro>
+b60d15473 - another travis ci tweak for libsodium (1 year, 5 months ago) <Jason Munro>
+7526dc623 - see if we can get libsodium installed in the travis container (1 year, 5 months ago) <Jason Munro>
+65adfde6a - still trying to get coveralls working in travis (1 year, 5 months ago) <Jason Munro>
+fea0ff854 - more testing with coveralls + travis ci (1 year, 5 months ago) <Jason Munro>
+1cfeb7e36 - testing out coveralls with travis ci builds (1 year, 5 months ago) <Jason Munro>
+17e39b84b - add a new ignore path (1 year, 5 months ago) <Jason Munro>
+cda308c7d - generate clover coverage report for phpunit tests (1 year, 5 months ago) <Jason Munro>
+a567483f2 - add a new ignore path (1 year, 5 months ago) <Jason Munro>
+73de99b24 - version bump (1 year, 5 months ago) <Jason Munro>
+a1515de91 - unit test update for better code coverage (1 year, 5 months ago) <Jason Munro>
+8d8630892 - slight refactore for brevity and better unit testing (1 year, 5 months ago) <Jason Munro>
+9940353d1 - version bump (1 year, 5 months ago) <Jason Munro>
+e89b59e59 - unit test updates for changes to the framework (1 year, 5 months ago) <Jason Munro>
+40ca661d4 - don't allow dynamic auth type without the dynamic login module activiated (1 year, 5 months ago) <Jason Munro>
+ed58c2983 - typo fix, thanks mwolfeu! (1 year, 5 months ago) <Jason Munro>
+06afef0ec - comment fix (1 year, 5 months ago) <Jason Munro>
+447286744 - version bump (1 year, 5 months ago) <Jason Munro>
+adc025ee6 - attempt to make it easier to override sessions and auth for a site (1 year, 5 months ago) <Jason Munro>
+cd5061fd2 - unit test update for the changes to includes in the framework (1 year, 5 months ago) <Jason Munro>
+c3f684c36 - move some includes and start work on a configurable session limit (1 year, 5 months ago) <Jason Munro>
+f1c01f8cc - some work on javascript sorting a message list (1 year, 5 months ago) <Jason Munro>
+29ae57721 - maintain list sort and filter when linking back from a message view (1 year, 5 months ago) <Jason Munro>
+637a09d33 - (tag: v1.0.0, origin/release-1.0.0) version bump (1 year, 5 months ago) <Jason Munro>
+18ee06878 - (refs/original/refs/heads/master) version bump (1 year, 5 months ago) <Jason Munro>
