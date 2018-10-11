@@ -112,6 +112,7 @@ class Html2Text
         '/&#151;/i',                                     // m-dash in win-1252
         '/&(amp|#38);/i',                                // Ampersand: see converter()
         '/[ ]{2,}/',                                     // Runs of spaces, post-handling
+        '/&#39;/i',                                      // The apostrophe symbol
     );
 
     /**
@@ -125,6 +126,7 @@ class Html2Text
         '—',         // m-dash
         '|+|amp|+|', // Ampersand: see converter()
         ' ',         // Runs of spaces, post-handling
+        '\'',        // Apostrophe
     );
 
     /**
@@ -434,10 +436,16 @@ class Html2Text
 
             return $display . ' [' . ($index + 1) . ']';
         } elseif ($linkMethod == 'nextline') {
+            if ($url === $display) {
+                return $display;
+            }
             return $display . "\n[" . $url . ']';
         } elseif ($linkMethod == 'bbcode') {
             return sprintf('[url=%s]%s[/url]', $url, $display);
         } else { // link_method defaults to inline
+            if ($url === $display) {
+                return $display;
+            }
             return $display . ' [' . $url . ']';
         }
     }
