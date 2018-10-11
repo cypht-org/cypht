@@ -27,7 +27,6 @@ function propfind($url, $headers) {
     $req_xml = '<d:propfind xmlns:d="DAV:" xmlns:cs="http://calendarserver.org/ns/"><d:prop>'.
         '<cs:getctag /></d:prop></d:propfind>';
     $api = new Hm_API_Curl('xml');
-    elog($api->command($url, $headers, array(), $req_xml, 'PROPFIND'));
 }
 
 /**
@@ -39,5 +38,4 @@ function report($url, $user, $pass) {
     $req_xml = '<card:addressbook-query xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav">'.
         '<d:prop><d:getetag /><card:address-data /></d:prop></card:addressbook-query>';
     $api = new Hm_API_Curl('xml');
-    elog($api->command($url, $headers, array(), $req_xml, 'REPORT'));
 }
