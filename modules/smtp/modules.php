@@ -1212,14 +1212,19 @@ function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
 if (!hm_exists('outbound_address_check')) {
 function outbound_address_check($mod, $from, $reply_to) {
     $domain = $mod->config->get('default_email_domain');
+    if (!$domain) {
+        if (array_key_exists('HTTP_HOST', $mod->request->server)) {
+            $domain = $mod->request->server['HTTP_HOST'];
+        }
+    }
     if ($domain) {
         if (!is_email_address($from)) {
             $from = $from.'@'.$domain;
         }
-        if (!is_email_address($reply_to)) {
-            if (!trim($reply_to)) {
-                $reply_to = $smtp_details['user'];
-            }
+        if (!trim($reply_to)) {
+            $reply_to = $from;
+        }
+        elseif (!is_email_address($reply_to)) {
             $reply_to = $reply_to.'@'.$domain;
         }
     }
