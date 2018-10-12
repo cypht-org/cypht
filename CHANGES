@@ -1,615 +1,627 @@
-bdcafb3c6 - (HEAD -> release-1.1.0) update pgp module readme (29 seconds ago) <Jason Munro>
-04e4a630c - (origin/master, origin/HEAD, master) update pgp module readme (5 minutes ago) <Jason Munro>
-e14c80e87 - third party lib updates (12 minutes ago) <Jason Munro>
-ac72e9a2b - third party lib updates (15 minutes ago) <Jason Munro>
-8af230bfe - initial checkin of WIP CardDav contact support (29 minutes ago) <Jason Munro>
-5d0529c07 - (origin/release-1.1.0) re-add some files that should be in the release (oops) (45 minutes ago) <Jason Munro>
-86c2f3fc0 - update travis coverage report for new library file (58 minutes ago) <Jason Munro>
-f10cfaa22 - update travis coverage report for new library file (59 minutes ago) <Jason Munro>
-8f5bab9c7 - remove more stuff not needed in a release (69 minutes ago) <Jason Munro>
-f2dd26766 - remove hello world module set for release (71 minutes ago) <Jason Munro>
-6dabf0cf5 - remove site module set for the release (73 minutes ago) <Jason Munro>
-cd0aff475 - disable add to calendar link that does not work yet (2 hours ago) <Jason Munro>
-2e79c23e6 - remove tags module set for release (2 hours ago) <Jason Munro>
-dad0d58f3 - disable add to calendar link that does not work yet (2 hours ago) <Jason Munro>
-d2a03f491 - (tag: v1.1.0-rc1) don't show the apply button for pgp if no keys are setup (6 hours ago) <Jason Munro>
-032a2d0db - version bump (7 hours ago) <Jason Munro>
-b339b2b45 - lots more work on PGP support (7 hours ago) <Jason Munro>
-d0736af2f - small tweak to the compose page layout (7 hours ago) <Jason Munro>
-97b07bd39 - htmlentities in js (7 hours ago) <Jason Munro>
-03ba56a2b - mobile layout css tweaks (7 hours ago) <Jason Munro>
-3f00fe6c1 - openpgpjs update to latest release version (7 hours ago) <Jason Munro>
-30d499c56 - fix typo I just committed (33 hours ago) <Jason Munro>
-d5f79ecbf - work on pgp module (basic outbound encrypting is working) (33 hours ago) <Jason Munro>
-4e502736e - version bump (33 hours ago) <Jason Munro>
-a0fd3f721 - don't re-encode rfc822 message attachments (33 hours ago) <Jason Munro>
-01e2947f6 - don't double up on loading animation speed if we overlap (33 hours ago) <Jason Munro>
-78796a8fe - fix for maintaining prev/next on flag/unflag message (2 days ago) <Jason Munro>
-87b5c99b1 - fix unit test I just broke (again). Thanks Travis (again)! (9 days ago) <Jason Munro>
-d81823065 - media query for nicely formatting printing of messages (9 days ago) <Jason Munro>
-0a4944204 - make selenium tests python 3 compatible (13 days ago) <Jason Munro>
-e7489ed1c - follow http redirects when finding a feed (13 days ago) <Jason Munro>
-354536bf1 - add some debugging for feed connection/parsing issues (13 days ago) <Jason Munro>
-728475956 - version bump (2 weeks ago) <Jason Munro>
-031639d8e - rewrite history module set to work server side issue #285 (2 weeks ago) <Jason Munro>
-5562d2985 - add subject placeholders if missing for wordpress notices (2 weeks ago) <Jason Munro>
-f2b7c5b86 - clean up some POP3 processing logic (2 weeks ago) <Jason Munro>
-68d5be7b6 - fix missing page title on specific github repo list views (2 weeks ago) <Jason Munro>
-9fdb3a037 - fix a warning when feed items are loaded but no longer present and add a todo (2 weeks ago) <Jason Munro>
-dd8367268 - don't remove the empty list div when working in background mode (2 weeks ago) <Jason Munro>
-743e166bf - disable web config builder for now for a couple reasons: (2 weeks ago) <Jason Munro>
-96a32a569 - FINALLY correctly fix issue #253 (2 weeks ago) <Jason Munro>
-34d5ddf50 - try to disable chrome on android default swipe down reload (2 weeks ago) <Jason Munro>
-4f4adbb45 - various mobile clean up, fix missing downloadable message parts (2 weeks ago) <Jason Munro>
-54e68f2b3 - zepto upgrade fixed swiping (WOOT), add swipe to hide folder list (2 weeks ago) <Jason Munro>
-d608766b1 - version bump (2 weeks ago) <Jason Munro>
-df53934bb - test updates for target changes (2 weeks ago) <Jason Munro>
-568163c35 - stop using target=_blank, and don't allow it in html message parts (2 weeks ago) <Jason Munro>
-2695ff34b - default to no forced logout in the idle timer (2 weeks ago) <Jason Munro>
-9190d6dfa - update HTMLPurifier to the latest release (4.10.0) (2 weeks ago) <Jason Munro>
-a89d9a365 - update zepto to latest git checkout (the last release is very old) (2 weeks ago) <Jason Munro>
-3bd2830c7 - hide imap folder filter and sort on mobile (3 weeks ago) <Jason Munro>
-7dc48690a - fix sending bug I just introduced (3 weeks ago) <Jason Munro>
-8fef1e4c1 - notify the user and disable sending if no SMTP servers are setup (3 weeks ago) <Jason Munro>
-549fcaa85 - squelch a warning if the site is not configured (3 weeks ago) <Jason Munro>
-5d5d6cd3a - couple test tweaks (3 weeks ago) <Jason Munro>
-abe054e1d - webdave format parsing updates (3 weeks ago) <Jason Munro>
-9c7dc63f0 - initial version of per module set readme files issue #276 (4 weeks ago) <Jason Munro>
-4c4407f72 - clean up the gmail contacts module slightly (4 weeks ago) <Jason Munro>
-8f80098e6 - fix unit tests, remove debug from webdav formats code (4 weeks ago) <Jason Munro>
-21d31c0cf - Azerbaijani interface translation thanks to Aziz Ibrahimov (4 weeks ago) <Jason Munro>
-1b063a821 - more work on webdav formats (vcard, ical) (5 weeks ago) <Jason Munro>
-0daa0f163 - don't reset list actions on abort, only failed server calls (5 weeks ago) <Jason Munro>
-4d33ec296 - add webdav formats test suite to phpunit config (6 weeks ago) <Jason Munro>
-c1c4abe33 - add some server page tests (6 weeks ago) <Jason Munro>
-41d739ccd - add some more helper functions for selenium tests (6 weeks ago) <Jason Munro>
-cbd5270a4 - fix test class name for profile tests (6 weeks ago) <Jason Munro>
-0156ef992 - comment update (6 weeks ago) <Jason Munro>
-387374836 - initial commit for webdav format parsing (6 weeks ago) <Jason Munro>
-0059bee3b - api interface update (6 weeks ago) <Jason Munro>
-2c6a900ed - clean up the api code, support custom HTTP methods, update tests (6 weeks ago) <Jason Munro>
-569abbda9 - add profile add/update/delete selenium tests (6 weeks ago) <Jason Munro>
-8a60aa3d2 - add a class to profile update for easier testing (6 weeks ago) <Jason Munro>
-40b311474 - add class to submit profile button for easier testing (6 weeks ago) <Jason Munro>
-80b657ea0 - re-enable other builds in travis (6 weeks ago) <Jason Munro>
-fa98b3249 - still trying to clean up safari on browserstack (wtf) (6 weeks ago) <Jason Munro>
-14853dd89 - more browserstack/travis/safari tweaking (damnit) (6 weeks ago) <Jason Munro>
-b811d1ab0 - more travis tweaking (6 weeks ago) <Jason Munro>
-b5b39c71f - see if the newer safari diver is any better than the default (6 weeks ago) <Jason Munro>
-3070a2145 - more travis + browserstack testing (6 weeks ago) <Jason Munro>
-f3d08240e - more travis tweaks (6 weeks ago) <Jason Munro>
-cc6304f70 - re-enable all travis tests (6 weeks ago) <Jason Munro>
-aaae8e682 - another travis test (6 weeks ago) <Jason Munro>
-bf8843b0c - more travis debugging (6 weeks ago) <Jason Munro>
-0f87f4580 - more travis testing (6 weeks ago) <Jason Munro>
-b4a6ae5e3 - more travis debugging/tweaks (6 weeks ago) <Jason Munro>
-fc18b48de - travis debugging (6 weeks ago) <Jason Munro>
-c3d04d1bb - fix debug output bug (6 weeks ago) <Jason Munro>
-a591f0ae8 - actually install postfix in travis this time, add some debug (6 weeks ago) <Jason Munro>
-0fe5dd3c3 - wait code clean up (6 weeks ago) <Jason Munro>
-01499759d - see if local sending in travis is possible without auth (6 weeks ago) <Jason Munro>
-3e7692e99 - more travis tweaks around smtp, don't install ui stuff for just unit tests (6 weeks ago) <Jason Munro>
-0fa741f48 - enable an SMTP server by default in Travis (6 weeks ago) <Jason Munro>
-38eee3d2f - start on a selenium test to send + recieve a message. Probably fail in travis (6 weeks ago) <Jason Munro>
-d77293559 - try to build a valid from address when we don't have one (6 weeks ago) <Jason Munro>
-c16c81f3c - disable safari again, hopefully correct the rest of the tests I broke (7 weeks ago) <Jason Munro>
-c8625d42f - add safari back to browserstack, test tweaks (crosses fingers) (7 weeks ago) <Jason Munro>
-01a4a974a - move the coverage report again (7 weeks ago) <Jason Munro>
-5458a4b0d - _actually_ move the coverage report to a different build this time (7 weeks ago) <Jason Munro>
-c32cb0336 - move the coverage report to a travis build with no selenium tests (7 weeks ago) <Jason Munro>
-dee9dafd0 - limit which build run selenium, add some more browsers (7 weeks ago) <Jason Munro>
-06b517605 - disable a selenium test, more cleanup (7 weeks ago) <Jason Munro>
-5c8111da3 - even more selenium/browserstack/travis tweaking (7 weeks ago) <Jason Munro>
-754855f83 - more selenium/travis/browserstack tweaking (7 weeks ago) <Jason Munro>
-3531671e7 - add a bunch of selenium debug output (7 weeks ago) <Jason Munro>
-48c743a4e - more selenium tweaks to try to make browserstack happy (7 weeks ago) <Jason Munro>
-98a064a50 - selenium: remove delay test, add a single rest for a specific test (7 weeks ago) <Jason Munro>
-526367637 - add a stupid long delay for browserstack to see if it helps (it won't) (7 weeks ago) <Jason Munro>
-41dcfae9c - more browserstack/travis testing (7 weeks ago) <Jason Munro>
-43259c2fd - attemtp to maximize browser windows in browserstack (7 weeks ago) <Jason Munro>
-1354a48d1 - extend rest times to see if it helps browserstack via travis (7 weeks ago) <Jason Munro>
-099068cb7 - limited selenium tests worked, lets try all instances in travis! (7 weeks ago) <Jason Munro>
-079539804 - try to force travis to upgrade python urllib3 for selenium (7 weeks ago) <Jason Munro>
-a35bb8182 - actually enable the selenium tests this time ... (7 weeks ago) <Jason Munro>
-bc6ce7a4c - re-enable selenium tests on travis see if they work any better (7 weeks ago) <Jason Munro>
-c0c3c9a09 - clean up selenium tests so they complete (locally at least) (7 weeks ago) <Jason Munro>
-11211cb03 - testing travis to see if php 7.2 is supported yet (7 weeks ago) <Jason Munro>
-004b444a9 - fix notification placement on mobile issue #280 (7 weeks ago) <Jason Munro>
-e2a49df47 - fix a typo, and finish a fix for issue #190 (7 weeks ago) <Jason Munro>
-b4dd5a488 - fix settimeout warning in chrome, allow callbacks on failed ajax (7 weeks ago) <Jason Munro>
-a77406c21 - fix tests I just broke (7 weeks ago) <Jason Munro>
-ad3b61592 - add tests for SRI integrity attributes (7 weeks ago) <Jason Munro>
-46b53edc2 - populate SRI values for site.js and site.css (7 weeks ago) <Jason Munro>
-ff1f7c4e6 - add SRI placeholders (7 weeks ago) <Jason Munro>
-6bbe2c7d3 - couple more form clean ups based on chrom dev tool recommendations (7 weeks ago) <Jason Munro>
-fd4eb511d - you can't delete github notices, but mark them unread if you try at least (7 weeks ago) <Jason Munro>
-3ec22e9f1 - output sri integrity attributes if set, clean up forms for chrome (7 weeks ago) <Jason Munro>
-898ee8192 - make the current username available to output modules when logged in (7 weeks ago) <Jason Munro>
-3fe7c9e0f - use MutationObserver since DOMSubtreeModified is deprecated (7 weeks ago) <Jason Munro>
-e690b13e1 - better reply profile selection logic, issue #279 (8 weeks ago) <Jason Munro>
-eda6bb3ec - don't assume the system temp directory is /tmp (8 weeks ago) <Jason Munro>
-0371cdffe - version bump (9 weeks ago) <Jason Munro>
-bb4c3d9a4 - "add a feed" link to the bottom of the feeds section in the folder list (9 weeks ago) <Jason Munro>
-b9b4e203e - use correct site_id var when building the request key (9 weeks ago) <Jason Munro>
-b1134a09e - add a new unit test for allowing external image sources (9 weeks ago) <Jason Munro>
-cd52f1e33 - small refactor for test coverage (no functional change) (9 weeks ago) <Jason Munro>
-878c4342d - check for allowed external image sources and provide a link to load them (9 weeks ago) <Jason Munro>
-1b6e0959c - add new ini opiton to allow sites to enable external image sources (9 weeks ago) <Jason Munro>
-0588967c5 - allow sites to enable external image sources (9 weeks ago) <Jason Munro>
-c6da36e97 - update flag/unflag message to support inline message view issue #278 (3 months ago) <Jason Munro>
-bb343a5de - Merge branch 'master' of github.com:jasonmunro/cypht (3 months ago) <Jason Munro>
-d1386992e - add class on inline message open to stop further event assignment (3 months ago) <Jason Munro>
-34a594d0a - don't re-assign move/copy events if message is opened inline (3 months ago) <Jason Munro>
-85f4ef45c - add class for easier styling of imap message part description (3 months ago) <Jason Munro>
-cfd73d802 - Merge pull request #277 from benyanke/patch-1 (3 months ago) <Jason Munro>
-64f6f8c18 - Adding username of created user to output for easier debugging (3 months ago) <Ben Yanke>
-8f8b714d2 - css tweak to the unread counters in the folder list (3 months ago) <Jason Munro>
-fdf43c62b - reduce required size for db session key field (3 months ago) <Jason Munro>
-83fbcad5b - update for imap module unit test (3 months ago) <Jason Munro>
-020f9b2cf - fix unit test that broke with the last commit (3 months ago) <Jason Munro>
-b646d81b6 - fix for missing reply quote on last line for issue #275 (3 months ago) <Jason Munro>
-9f01e68b5 - limit cascading styles to keep inline message rendering clean (4 months ago) <Jason Munro>
-a8e564a17 - fix for delete inline message issue #225 (4 months ago) <Jason Munro>
-d38d1a70b - fix for subject not wrapping issue #274 (4 months ago) <Jason Munro>
-dff6759b8 - fix HTML escape bug in previous/next links (4 months ago) <Jason Munro>
-087402ea2 - more imap unit test updates (6 months ago) <Jason Munro>
-6ed19e1f2 - imap module unit test updates (6 months ago) <Jason Munro>
-a6bf24ae7 - minor changes to make testing easier (6 months ago) <Jason Munro>
-6be8b6147 - testing fixes for issues #253 and #244 (6 months ago) <Jason Munro>
-511503459 - proper mailto link support - issue #251 (6 months ago) <Jason Munro>
-8ac79a88d - version bump (6 months ago) <Jason Munro>
-736f44820 - attempted fix for api logout issue #263 (6 months ago) <Jason Munro>
-3f7e9f973 - avoid undefined warning with api logout (6 months ago) <Jason Munro>
-d08c63837 - testing a fix for inline message delete issue #225 (7 months ago) <Jason Munro>
-3f52a9bcc - imap unit test updates (7 months ago) <Jason Munro>
-777885659 - don't lowercase folder names in inline message move dialog issue #254 (7 months ago) <Jason Munro>
-2be14308f - better TLS/STARTTLS options when adding servers issue #267 (7 months ago) <Jason Munro>
-b87783efc - test updates (7 months ago) <Jason Munro>
-22eb1dbb7 - move server filtering into the framework (7 months ago) <Jason Munro>
-3747a3630 - version bump (7 months ago) <Jason Munro>
-6980166b4 - test a fix for empty username when saving settings in single server mode issue #265 (7 months ago) <Jason Munro>
-ae259d77d - testing a fix for api logout not deleting the session issue #263 (8 months ago) <Jason Munro>
-7a716ed64 - theme fix for the add contact icon (8 months ago) <Jason Munro>
-ec44c73c6 - clean up from/to field formatting in message lists, issue #246 (8 months ago) <Jason Munro>
-de0926ce1 - don't match unencoded square brackets in text message links. issue #264 (8 months ago) <Jason Munro>
-760c4dff2 - support custom session/auth with api login (8 months ago) <Jason Munro>
-83ca0ecf6 - Merge branch 'master' of github.com:jasonmunro/cypht (8 months ago) <Jason Munro>
-8b84c50a0 - fix warning when using single server mode (8 months ago) <Jason Munro>
-41241f7f6 - handle empty folder update details so we don't throw (8 months ago) <Jason Munro>
-651e3f934 - dark theme tweak (8 months ago) <Jason Munro>
-f836a1d17 - don't show the manage folders link in folder dialogs issue #256 (9 months ago) <Jason Munro>
-53459ee45 - dark theme tweak (9 months ago) <Jason Munro>
-ab5d5829d - show feed item detail even if no summary text is available (9 months ago) <Jason Munro>
-4e16293ba - add mailto link scheme to HTMLPurifier whitelist issue #255 (9 months ago) <Jason Munro>
-1a61f4c07 - style fix for move/copy dialog with the dark theme (9 months ago) <Jason Munro>
-2a09f433a - disable php nightly in travis for now due to breakage (9 months ago) <Jason Munro>
-e862bac44 - correct bad constant def fix (9 months ago) <Jason Munro>
-65eac172d - test a possible fix for travis breakage with php nightly (9 months ago) <Jason Munro>
-95339a819 - fix for libsodium check (9 months ago) <Jason Munro>
-5eca7950a - handle reply and reply-to address colleciton differently issue #249 (9 months ago) <Jason Munro>
-34d70a024 - another attempt at fixing search layout on mobile issue #234 (9 months ago) <Jason Munro>
-2ac6f7f10 - wrap a couple long lines (9 months ago) <Jason Munro>
-f419149d2 - comment typo fix (9 months ago) <Jason Munro>
-2c243ae33 - another fix for header encoding issue #238 (9 months ago) <Jason Munro>
-4f6df4c6d - don't quote empty display names in outbound address headers (9 months ago) <Jason Munro>
-ff17d9261 - test a fix for issue #238 (9 months ago) <Jason Munro>
-ed4cd35c7 - fix for search results being hidden by the form on mobile #243 (9 months ago) <Jason Munro>
-ee98aa067 - remove debug (10 months ago) <Jason Munro>
-9d6e33197 - fix search command double space bug (10 months ago) <Jason Munro>
-1c6232c8f - another fix for issue #238 (10 months ago) <Jason Munro>
-38ebdc9d4 - only set an imap search charset if the terms are non-ascii (10 months ago) <Jason Munro>
-162f823ae - fix the unit tests I just broke (10 months ago) <Jason Munro>
-24a96747b - attempt to correct header formatting for address fields issue #238 (10 months ago) <Jason Munro>
-1cab352fe - comment updates (10 months ago) <Jason Munro>
-c1094a906 - unit test updates (10 months ago) <Jason Munro>
-261941144 - add hm_exists() wrappers to all module functions (10 months ago) <Jason Munro>
-11d0e5e3e - move the site module libs.php include, add hm_exists for module functions (10 months ago) <Jason Munro>
-b9b53c8fc - another irc integration test (10 months ago) <Jason Munro>
-c429eaf27 - version bump (10 months ago) <Jason Munro>
-1fa6d9c7b - add a TODO, and test the git -> irc integration (10 months ago) <Jason Munro>
-6820d416d - testing a header encoding fix for issue #238 (10 months ago) <Jason Munro>
-577e16e5a - attempt at fixing non-ascii chars in gmail contact xml #237 (10 months ago) <Jason Munro>
-398f3c8da - another attempted fix for searching on non-ascii chars (10 months ago) <Jason Munro>
-ecc155578 - another attempt at fixing search with non-ascii chars #235 (10 months ago) <Jason Munro>
-34b0a896b - revert commit that added charset support to search (for now) (10 months ago) <Jason Munro>
-9d68f31e7 - add a search charset of UTF-8 (11 months ago) <Jason Munro>
-1fc0abfd8 - fix for issue #233 (11 months ago) <Jason Munro>
-babf2cc83 - add missing js for account delete (11 months ago) <Jason Munro>
-5b58fc1db - allow registered sources that don't display on the source list (11 months ago) <Jason Munro>
-d3f2e2290 - css tweak for toggle all checkbox (11 months ago) <Jason Munro>
-2d4d69066 - update accounts module with a user list + delete option (11 months ago) <Jason Munro>
-20c597b9f - update unit test for db lib change (11 months ago) <Jason Munro>
-85ea35ea3 - enable multiple results for the sql execute method (11 months ago) <Jason Munro>
-c0d210094 - style tweaks for compose with markdown (11 months ago) <Jason Munro>
-d57912266 - couple display tweaks for compose with markdown (11 months ago) <Jason Munro>
-f63ea6374 - version bump (11 months ago) <Jason Munro>
-7242b3562 - Add the ability to compose messages in Markdown (11 months ago) <Jason Munro>
-1e2baaa42 - another unit test correction (11 months ago) <Jason Munro>
-e3eea3fa5 - unit test fix (12 months ago) <Jason Munro>
-5bcce5168 - fix for issue #231 (12 months ago) <Jason Munro>
-e4e225198 - unread count style tweak (12 months ago) <Jason Munro>
-b2aa113aa - Merge branch 'master' of github.com:jasonmunro/cypht (12 months ago) <Jason Munro>
-0a2ab08e4 - testing a travis tweak (12 months ago) <Jason Munro>
-a74aec4ff - add 2fa code to the settings page for manual entry (12 months ago) <Jason Munro>
-b417383a9 - version bump (12 months ago) <Jason Munro>
-5c365c203 - couple type casting fixes for the inline message module set (12 months ago) <Jason Munro>
-c781580d9 - couple profile related fixes (12 months ago) <Jason Munro>
-6a3f5aac1 - instead of "dot stuffing", qp encode dots for SMTP (12 months ago) <Jason Munro>
-33bee9175 - unit test fix (12 months ago) <Jason Munro>
-5c45ab5f9 - testing a fix for issue #225 (12 months ago) <Jason Munro>
-828088b26 - more work on IMAP unit tests (1 year ago) <Jason Munro>
-ce3ae9b8d - more work on IMAP module set unit tests (1 year ago) <Jason Munro>
-b4dcc1ba0 - version bump (1 year ago) <Jason Munro>
-3fe89cea9 - update smtp to use socket overrides so it can be unit tested (1 year ago) <Jason Munro>
-5bc67e426 - update pop3 to use the same socket connections as imap and smtp (1 year ago) <Jason Munro>
-b25f2858f - fix a potential bug and use an override for testing (1 year ago) <Jason Munro>
-993849652 - add new static method override for unit testing (1 year ago) <Jason Munro>
-87e7b3ee2 - fix for hosting cypht on non-standard ports, issue #226 (1 year ago) <Jason Munro>
-5960f56d8 - more imap unit test work (1 year ago) <Jason Munro>
-b403b3dc5 - more work on IMAP module set unit tests (1 year ago) <Jason Munro>
-2f9499443 - add option to the imap debug to make unit testing easier (1 year ago) <Jason Munro>
-763b5c5af - IMAP unit test updates (1 year ago) <Jason Munro>
-62e4cca28 - unit test mock updates (1 year ago) <Jason Munro>
-2ae4f7250 - add todo comment (1 year ago) <Jason Munro>
-696d7f749 - IMAP lib fixes (thanks to the new unit tests!) (1 year ago) <Jason Munro>
-06bb2c717 - wrap a couple long lines (1 year ago) <Jason Munro>
-e3681f35f - start working on unit tests for the IMAP module set (1 year ago) <Jason Munro>
-3c6ca279e - unit test update (1 year ago) <Jason Munro>
-d1b12cb04 - unit test framework updates (1 year ago) <Jason Munro>
-458623cc8 - abstract some parts of IMAP communication for unit testing (1 year ago) <Jason Munro>
-59ff05f71 - another single server mode tweak (1 year ago) <Jason Munro>
-d6bb8164a - add single server mode option to the hm3.ini (1 year ago) <Jason Munro>
-617439aae - version bump (1 year ago) <Jason Munro>
-400d8cec5 - more single server mode updates (1 year ago) <Jason Munro>
-75d395011 - single server mode fix (1 year ago) <Jason Munro>
-2095e871a - refactor single server mode for PHP 5 (1 year ago) <Jason Munro>
-73060539e - unit test updates for single server mode (1 year ago) <Jason Munro>
-c9c7babc5 - version bump (1 year ago) <Jason Munro>
-13c0d7b44 - single server mode updates (1 year ago) <Jason Munro>
-6b41b323b - add non-encrypted user settings support (1 year ago) <Jason Munro>
-2cf26c9ce - stub for saving settings without encryption (1 year ago) <Jason Munro>
-de4f6a17e - style tweak for inline message viewing (1 year, 1 month ago) <Jason Munro>
-c6be04ea3 - version bump (1 year, 1 month ago) <Jason Munro>
-8572e1bd6 - fixes around inline message view (1 year, 1 month ago) <Jason Munro>
-9e1527939 - fixes for inline message view messing with the message list (1 year, 1 month ago) <Jason Munro>
-f06f77c75 - fix combined sent view cache not being used on refresh (1 year, 1 month ago) <Jason Munro>
-603f34c77 - testing some travis ci build speed ups (1 year, 1 month ago) <Jason Munro>
-577d5d4c8 - travis ci tweaks to speed up builds (1 year, 1 month ago) <Jason Munro>
-240c6f07e - fix bash syntax error in travis run script (1 year, 1 month ago) <Jason Munro>
-ea0122829 - disable UI tests for now because browserstack is pissing me off (1 year, 1 month ago) <Jason Munro>
-b4d39821c - add a longer wait to the folder list reload test (1 year, 1 month ago) <Jason Munro>
-4a56b68e6 - update safari creds for browserstack (1 year, 1 month ago) <Jason Munro>
-b5c574f4c - speed up selenium tests by removing fixed wait times (1 year, 1 month ago) <Jason Munro>
-3c063cf3f - fix a unit test: timezones differ on different systems (1 year, 1 month ago) <Jason Munro>
-98f218098 - disable test coverage for travis ci runs that don't need it (1 year, 1 month ago) <Jason Munro>
-3b17d2c07 - unit test update (1 year, 1 month ago) <Jason Munro>
-3b5e44450 - more unit test updates (1 year, 1 month ago) <Jason Munro>
-417cd5eb0 - add a couple more core handler module set unit test assertions (1 year, 1 month ago) <Jason Munro>
-978c85d97 - unit test updates for the core module set (1 year, 1 month ago) <Jason Munro>
-3803a55a5 - encode all headers fields that have non-ascii values (1 year, 1 month ago) <Jason Munro>
-641fd1ecf - another stab at fixing unit test helpers properly (1 year, 1 month ago) <Jason Munro>
-dfd545bac - syntax fix for the unit test helper (1 year, 1 month ago) <Jason Munro>
-a4124b2e6 - add a comment (1 year, 1 month ago) <Jason Munro>
-9ad9cf5d1 - unit tests for handler and output modules in the core set round one (1 year, 1 month ago) <Jason Munro>
-9fcd3d828 - remove some unit test excludes for the core module set (1 year, 1 month ago) <Jason Munro>
-ec17a8698 - add some missing methods/props to unit test mocks (1 year, 1 month ago) <Jason Munro>
-d2deb8865 - helpers to created unit tests for module sets (1 year, 1 month ago) <Jason Munro>
-527519642 - ignore list update for git (1 year, 1 month ago) <Jason Munro>
-2e702bcc4 - testing a change to make unit testing easier (1 year, 1 month ago) <Jason Munro>
-e743ec55c - minor style changes to the core handler mods, no functional change (1 year, 1 month ago) <Jason Munro>
-cd9627890 - small change to make unit testing easier (1 year, 1 month ago) <Jason Munro>
-0bf7772e7 - small change to make unit testing easier (1 year, 1 month ago) <Jason Munro>
-a5e62b7b4 - unit test timezone fix (1 year, 1 month ago) <Jason Munro>
-2d0d0a813 - more unit tests for the core module set (1 year, 1 month ago) <Jason Munro>
-5077d1bd7 - refactor some functions to always return something [ci-skip] (1 year, 1 month ago) <Jason Munro>
-26a3870e5 - more unit test updates (1 year, 1 month ago) <Jason Munro>
-a1228a8bb - more travis tweaking (1 year, 1 month ago) <Jason Munro>
-7597e2bbe - require once for easier unit testing (1 year, 1 month ago) <Jason Munro>
-9f6288701 - unit test updates (1 year, 1 month ago) <Jason Munro>
-3d2b4408f - php nightly bug fix (1 year, 1 month ago) <Jason Munro>
-3fc4e194e - travis selenium test tweaks (1 year, 1 month ago) <Jason Munro>
-cab5ee34e - unit test updates (1 year, 1 month ago) <Jason Munro>
-fa7f5d921 - more travis tweaking (1 year, 1 month ago) <Jason Munro>
-b3ba6eb9b - another travis tweak (1 year, 1 month ago) <Jason Munro>
-893caf217 - more tweaking for travis ci (1 year, 1 month ago) <Jason Munro>
-7b7d87bd0 - unit test updates (1 year, 1 month ago) <Jason Munro>
-e56470c07 - testing travis breakage on php 7.0 with ldap (1 year, 1 month ago) <Jason Munro>
-fa7a6dab2 - version bump (1 year, 1 month ago) <Jason Munro>
-26f1e3fd6 - add a class to the message table tbody element (1 year, 1 month ago) <Jason Munro>
-6bfb68dda - refactor some core module set js (1 year, 1 month ago) <Jason Munro>
-53a1497cb - unify some code around address field parsing (1 year, 1 month ago) <Jason Munro>
-a969b7b5c - tweaks to address field parsing (1 year, 1 month ago) <Jason Munro>
-a4f454853 - remove debug (1 year, 1 month ago) <Jason Munro>
-2fc185722 - fix for link formatting in text message parts (again) (1 year, 1 month ago) <Jason Munro>
-5aa16a42d - clean up api login method, fix normal logins with it enabled (1 year, 1 month ago) <Jason Munro>
-c85220382 - test a fix for url matching being a bit too greedy (1 year, 2 months ago) <Jason Munro>
-ba780a558 - don't insert links into raw message view (1 year, 2 months ago) <Jason Munro>
-b9dd0e697 - testing better recipient parsing on send [ci-skip] (1 year, 2 months ago) <Jason Munro>
-f6135b885 - fix a bug that caused the folder list to keep reloading [ci-skip] (1 year, 2 months ago) <Jason Munro>
-4ce06da3d - UI fix for move to dialog for issue #220 (1 year, 2 months ago) <Jason Munro>
-f5576d423 - start working on a "single server" mode (1 year, 2 months ago) <Jason Munro>
-690c800cd - add a debug to indicate if a user is logged in (1 year, 2 months ago) <Jason Munro>
-1c814c7e0 - remove debug from the functional api login interface (1 year, 2 months ago) <Jason Munro>
-18719040a - enable memcached extension in travis ci (1 year, 2 months ago) <Jason Munro>
-8c3836de7 - make sure we load user data on the functional api login (1 year, 2 months ago) <Jason Munro>
-c163b7e73 - unit test updates (1 year, 2 months ago) <Jason Munro>
-012ff270c - fix php 7.1 in travis, re-enable all dbs (1 year, 2 months ago) <Jason Munro>
-9986e3e4d - add memcached auth support [ci-skip] (1 year, 2 months ago) <Jason Munro>
-9fd98ee72 - add nighty PHP to the list of builds (1 year, 2 months ago) <Jason Munro>
-b2206bb92 - more work on a functional interface to login/out (1 year, 2 months ago) <Jason Munro>
-0066170e0 - another tweak to try to get PHP nightly working on travis ci (1 year, 2 months ago) <Jason Munro>
-5fbc4dac5 - more travis + PHP nightly testing (1 year, 2 months ago) <Jason Munro>
-c39f009f7 - another travis tweak/test (1 year, 2 months ago) <Jason Munro>
-ecc72c5b4 - more travis tweaking (1 year, 2 months ago) <Jason Munro>
-511d78fa5 - work on supporting hhvm and php nightly builds in travis ci (1 year, 2 months ago) <Jason Munro>
-f8a9708a6 - testing hhvm and nightly PHP versions on travis CI (1 year, 2 months ago) <Jason Munro>
-774374c5e - function based login option for the api login module set (1 year, 2 months ago) <Jason Munro>
-c970c7c46 - comment fix (1 year, 2 months ago) <Jason Munro>
-274966061 - add an option to disable the browser fingerprint (1 year, 2 months ago) <Jason Munro>
-6eb343f9b - testing a generic disconnect for any option connections to data sources (1 year, 2 months ago) <Jason Munro>
-54916f243 - version bump (1 year, 2 months ago) <Jason Munro>
-5400a3be6 - fix signatures for issue #215 (1 year, 2 months ago) <Jason Munro>
-199b54b51 - move a function to core so it can be called from multiple module sets (1 year, 2 months ago) <Jason Munro>
-63d940de6 - hash_equals should not be called directly, so change it to private (1 year, 2 months ago) <Jason Munro>
-c12ffd058 - testing another include order tweak [ci skip] (1 year, 2 months ago) <Jason Munro>
-efb569933 - testing a tweak to the order of includes [ci skip] (1 year, 2 months ago) <Jason Munro>
-5c9170a8d - version bump (1 year, 2 months ago) <Jason Munro>
-999997280 - make sure we are checking authed state for servers correctly (1 year, 2 months ago) <Jason Munro>
-fbd4623dd - slight change in behavior for the server connect method (1 year, 2 months ago) <Jason Munro>
-e382f09fc - better hash comparison to avoid timing attacks (1 year, 2 months ago) <Jason Munro>
-531c90775 - Merge pull request #214 from hartois/master (1 year, 2 months ago) <Jason Munro>
-d41696235 - Russian localization update (1 year, 2 months ago) <hartois>
-5f2d5c5f8 - typo fix for issue #211 (1 year, 3 months ago) <Jason Munro>
-d630a26d9 - re-enable full travis build and selenium tests (1 year, 3 months ago) <Jason Munro>
-50301bade - lib sodium compat layer fix for PHP 7.2 (1 year, 3 months ago) <Jason Munro>
-d1519b9d8 - PHP 7.2 fix for abstraction method signature (1 year, 3 months ago) <Jason Munro>
-c7b84468b - libsodium support for PHP 7.2 and newer PECL packages (1 year, 3 months ago) <Jason Munro>
-6e2c5dd7e - re-enable php version in travis build (1 year, 3 months ago) <Jason Munro>
-507612dc6 - remove test that breaks travis build (1 year, 3 months ago) <Jason Munro>
-dc9fc51a6 - still trying to get libsodium working in travis (1 year, 3 months ago) <Jason Munro>
-6c375bfe0 - yet another travis ci debug attempt for libsodium (1 year, 3 months ago) <Jason Munro>
-a0514203f - trying to fix libsodium in travis (1 year, 3 months ago) <Jason Munro>
-767d5cf1a - send coverage report from Travis with PHP 7.1 (1 year, 3 months ago) <Jason Munro>
-bc8d4cbe2 - enable all unit tests in travis but disable browserstack for now (1 year, 3 months ago) <Jason Munro>
-1f2dfeeb3 - another tweak to hopefully resolve travis issues (1 year, 3 months ago) <Jason Munro>
-016afe56b - more travis testing (1 year, 3 months ago) <Jason Munro>
-83f900366 - almost got php 7.1 + travis working ... (1 year, 3 months ago) <Jason Munro>
-f8255c644 - another travis php 7.1 ldap test (1 year, 3 months ago) <Jason Munro>
-6d99dc216 - still trying to fix PHP 7.1 with travis ci (1 year, 3 months ago) <Jason Munro>
-45a42c580 - another travis + PHP 7.1 + LDAP test fix (1 year, 3 months ago) <Jason Munro>
-30411fe54 - another travis + php 7.1 test fix (1 year, 3 months ago) <Jason Munro>
-38844bfb4 - debugging travis PHP 7.1 ldap issue (1 year, 3 months ago) <Jason Munro>
-6477d8148 - test a bug fix when adding servers with the same username (1 year, 3 months ago) <Jason Munro>
-2108e8364 - add an option to disable the client ip check (1 year, 3 months ago) <Jason Munro>
-3b8c60f79 - travis tweaks (1 year, 3 months ago) <Jason Munro>
-87c3fa71f - change which build sends coveralls the coverage report in travis (1 year, 3 months ago) <Jason Munro>
-721cac3b2 - add an option to disable ini tweaks (1 year, 3 months ago) <Jason Munro>
-79d8a1990 - remove poorly thought out code of conduct (1 year, 3 months ago) <Jason Munro>
-1ab697162 - better push notice integration that does not require an extra js include (1 year, 3 months ago) <Jason Munro>
-6ccf913f9 - load css before javascript (1 year, 3 months ago) <Jason Munro>
-5f621a9e8 - expand the detail about the "stay logged in" option in the hm3.ini (1 year, 3 months ago) <Jason Munro>
-fd0b79728 - Create CODE_OF_CONDUCT.md (1 year, 3 months ago) <Jason Munro>
-0ccc89592 - (origin/add-code-of-conduct-1) Create CODE_OF_CONDUCT.md (1 year, 3 months ago) <Jason Munro>
-87eb09208 - Create CONTRIBUTING.md (1 year, 3 months ago) <Jason Munro>
-464f41848 - remove unused arg after cookie refactor (1 year, 3 months ago) <Jason Munro>
-5b9f40ea9 - version bump (1 year, 3 months ago) <Jason Munro>
-21aa51105 - update modules to use the changed secure cookie method (1 year, 3 months ago) <Jason Munro>
-661a4b710 - add the "stay logged in" settings to the default hm3.ini file (1 year, 3 months ago) <Jason Munro>
-a73a79a3f - add a "stay logged in" option to the login page (1 year, 3 months ago) <Jason Munro>
-ec88e1bf6 - refactor to allow setting the session lifetime (1 year, 3 months ago) <Jason Munro>
-051d1ccad - check for xml support and fail gracefully if not found (1 year, 3 months ago) <Jason Munro>
-88a730964 - theme tweaks to "stick" the title bar on mobile (1 year, 4 months ago) <Jason Munro>
-5ca23eec2 - Merge pull request #207 from hartois/master (1 year, 4 months ago) <Jason Munro>
-ec67db71d - Adding Office365 Nux service (1 year, 4 months ago) <hartois>
-44e49d81c - Russian localization update (1 year, 4 months ago) <hartois>
-6856c20f5 - test a fix for exchange for expanding folders into subfolders (1 year, 4 months ago) <Jason Munro>
-87c297f26 - inline message module updates (1 year, 4 months ago) <Jason Munro>
-c9a980c6a - fix for saving data with dynamic login (1 year, 4 months ago) <Jason Munro>
-84ad71422 - another small refactory [ci skip] (1 year, 4 months ago) <Jason Munro>
-62b52a22f - yet another small refactor [ci skip] (1 year, 4 months ago) <Jason Munro>
-f15b4f798 - another small refactor to simplify a method in the framework (1 year, 4 months ago) <Jason Munro>
-da020aa90 - split out another method in the framework [ci skip] (1 year, 4 months ago) <Jason Munro>
-2b85028c0 - couple more small refactor tweaks [ci skip] (1 year, 4 months ago) <Jason Munro>
-bc6a543bb - testing some minor refactoring in the framework [ci skip] (1 year, 4 months ago) <Jason Munro>
-9b6cd1926 - refactoring to simplify some things (no functional change) [ci skip] (1 year, 4 months ago) <Jason Munro>
-dac4f9672 - split up some methods into smaller bits [ci skip] (1 year, 4 months ago) <Jason Munro>
-ea5411f7f - split up a large class, no functional change [ci skip] (1 year, 4 months ago) <Jason Munro>
-7250559c6 - decouple a trait from the handler module class [ci skip] (1 year, 4 months ago) <Jason Munro>
-63e687c49 - refactor, no functional changes [ci skip] (1 year, 4 months ago) <Jason Munro>
-b890b5856 - refactor to split out some logic (1 year, 4 months ago) <Jason Munro>
-a281bd391 - remove unused return statement [ci skip] (1 year, 4 months ago) <Jason Munro>
-43d8adac8 - typo fix in the selenium tests (1 year, 4 months ago) <Jason Munro>
-684540fdf - reduce some duplicate code [ci skip] (1 year, 4 months ago) <Jason Munro>
-bd3661aad - version bump (1 year, 4 months ago) <Jason Munro>
-c5375ec76 - test coverage update (1 year, 4 months ago) <Jason Munro>
-2afbb4a03 - refactoring to clean up some code (1 year, 4 months ago) <Jason Munro>
-d5b1a6551 - fix for selenium tests (1 year, 4 months ago) <Jason Munro>
-58eef3d9a - auth class cleanup [ci skip] (1 year, 4 months ago) <Jason Munro>
-27305932f - fix dynamic login, clean up auth/session setup code (1 year, 4 months ago) <Jason Munro>
-f11321f36 - more selenium tests [ci skip] (1 year, 4 months ago) <Jason Munro>
-4c649a66b - travis build config update for new settings selenium tests (1 year, 4 months ago) <Jason Munro>
-d8dc6a1fe - many new selenium tests for the settings page. Lots left to do! (1 year, 4 months ago) <Jason Munro>
-3bcd48ba8 - testing a fix for "fluttering" unread count updates (1 year, 4 months ago) <Jason Munro>
-d6dd82114 - typo fix (1 year, 4 months ago) <Jason Munro>
-f2f223370 - try to fix libsodium install on travis ci (1 year, 4 months ago) <Jason Munro>
-6456dfb8a - work on making it easier to add custom themes (1 year, 4 months ago) <Jason Munro>
-4439ae11e - doc string update (1 year, 4 months ago) <Jason Munro>
-85c1fb819 - travis + coveralls build tweak (1 year, 4 months ago) <Jason Munro>
-58f059554 - fix for incorrectly formatted outbound message header (1 year, 4 months ago) <Jason Munro>
-51e9745fe - another postgresql workaround for this unit test (1 year, 4 months ago) <Jason Munro>
-c65800feb - version bump (1 year, 4 months ago) <Jason Munro>
-82eafcf7d - unit test work around for postgresql (1 year, 4 months ago) <Jason Munro>
-b35977cff - remove new close method since it did not fix the unit test (1 year, 4 months ago) <Jason Munro>
-50e08e1c1 - try to fix a unit test broken with postgresql (1 year, 4 months ago) <Jason Munro>
-ee6b8a767 - create a close connection method for the db class (1 year, 4 months ago) <Jason Munro>
-77adda8d7 - refactor some logic to be simpler [ci skip] (1 year, 4 months ago) <Jason Munro>
-6a06351b8 - unit test improvements (1 year, 4 months ago) <Jason Munro>
-9ff5ef0e2 - update for new return value type (1 year, 4 months ago) <Jason Munro>
-74dfb1731 - don't set user notices in the framework (1 year, 4 months ago) <Jason Munro>
-cd29d4fc1 - refactor a method for simplicity (1 year, 4 months ago) <Jason Munro>
-70141c82a - don't set user notices in the framework (1 year, 4 months ago) <Jason Munro>
-eaac6657f - dont' set user notices in the framework (1 year, 4 months ago) <Jason Munro>
-de4fa6780 - slight clean up, add user notices (1 year, 4 months ago) <Jason Munro>
-c912f92d2 - add a user notice being removed from the framework to the core mod (1 year, 4 months ago) <Jason Munro>
-180e2a1c9 - doc string update [ci skip] (1 year, 4 months ago) <Jason Munro>
-f3734d79c - doc string update [ci skip] (1 year, 4 months ago) <Jason Munro>
-d77636fda - docstring update [ci skip] (1 year, 4 months ago) <Jason Munro>
-d5ae3015a - doc string updates [ci skip] (1 year, 4 months ago) <Jason Munro>
-e3915a59b - reset accidentally changed default db for unit tests (1 year, 4 months ago) <Jason Munro>
-c28b6c0ee - misc fixes around db access (1 year, 4 months ago) <Jason Munro>
-8bd3befb7 - fix accidental copy/paste, more db access work (1 year, 4 months ago) <Jason Munro>
-4f17e784f - doc string update (1 year, 4 months ago) <Jason Munro>
-bc356e73c - simplify database access, hopefully fix some unit test errors in travis (1 year, 4 months ago) <Jason Munro>
-e92d3b559 - testing a fix for unit tests + sqlite (1 year, 4 months ago) <Jason Munro>
-8b1cc8bf5 - unit test update (1 year, 4 months ago) <Jason Munro>
-58c836fa2 - fix typo that breaks deleting db users (1 year, 4 months ago) <Jason Munro>
-92e61fbf0 - add CII Best Practices badge to our readme (1 year, 4 months ago) <Jason Munro>
-17a933206 - add a placeholder for release notes (1 year, 4 months ago) <Jason Munro>
-e1806ae42 - improve deubgging around creating db accounts (1 year, 4 months ago) <Jason Munro>
-453b1c31c - tweak to the travis build to include coveralls since PHP 7.1 was disabled (1 year, 4 months ago) <Jason Munro>
-3f4b3e3be - unit test update (1 year, 4 months ago) <Jason Munro>
-1361ddd26 - Merge branch 'master' of github.com:jasonmunro/cypht (1 year, 4 months ago) <Jason Munro>
-2dd1ddc25 - fix for no valid recipients found bug [#201] (1 year, 4 months ago) <Jason Munro>
-e4177b2ac - Merge pull request #200 from hartois/master (1 year, 4 months ago) <Jason Munro>
-86a787911 - small russian localization fix (1 year, 4 months ago) <hartois>
-153fef6eb - remove unused argument, refactor ugly handler module (1 year, 4 months ago) <Jason Munro>
-1c8c0e8c3 - add abstract method for php session auth trait (1 year, 4 months ago) <Jason Munro>
-f987f13de - default ini file comment updates (1 year, 4 months ago) <Jason Munro>
-4c28f06fc - split up the php session class a bit (1 year, 4 months ago) <Jason Munro>
-6ff648b00 - testing some validation on request uri values (1 year, 4 months ago) <Jason Munro>
-9a47b62bd - fix a bug causing the folder list to be loaded twice on settings save (1 year, 4 months ago) <Jason Munro>
-d50944e08 - remove unused argument (1 year, 4 months ago) <Jason Munro>
-2ca73ac8a - remove an unused code path in the debug output logic (1 year, 4 months ago) <Jason Munro>
-63495c904 - version bump (1 year, 4 months ago) <Jason Munro>
-74aecd27b - remove forced tls redirect - should be handled by a web server (and it's been a cause of problems) (1 year, 4 months ago) <Jason Munro>
-37ff13397 - use better type checks on a few server vars (1 year, 4 months ago) <Jason Munro>
-a6a254411 - disable php 7.1 build for now (1 year, 4 months ago) <Jason Munro>
-609564733 - even more travis tweaking (1 year, 4 months ago) <Jason Munro>
-9fa597765 - testing another travis tweak (1 year, 4 months ago) <Jason Munro>
-209e4d047 - another travis test (1 year, 4 months ago) <Jason Munro>
-3e81a2306 - testing a refactor of the travis config (1 year, 4 months ago) <Jason Munro>
-e747e87a5 - testing another tweak with travis ci (1 year, 4 months ago) <Jason Munro>
-e45d33789 - yet another tweak for apache + travis + trusty (1 year, 4 months ago) <Jason Munro>
-6ac22aa99 - more travis tweaking to get apache + trusty working (1 year, 4 months ago) <Jason Munro>
-e36cc487e - still trying to get travis + trusty + apache working. Gettting closer! (1 year, 4 months ago) <Jason Munro>
-ec86267b4 - still trying to get apache + trusty + travis ci working (1 year, 4 months ago) <Jason Munro>
-ae1af96f6 - another fix for apache running in trusty in travis ci (1 year, 4 months ago) <Jason Munro>
-a47f6dc77 - yet another attempt to fix travis ci builds on trusty (1 year, 4 months ago) <Jason Munro>
-b61ba4256 - more tweaks to get travis ci on trusty working (1 year, 4 months ago) <Jason Munro>
-211ca83ea - another attempt at fixing travis ci with trusty (1 year, 4 months ago) <Jason Munro>
-9cbc0070e - try to fix broken travis build after trusty update (1 year, 4 months ago) <Jason Munro>
-a9cd3f75b - work on adding user default settings to the example ini file (1 year, 4 months ago) <Jason Munro>
-ac4aa0d18 - libsodium is not available for precise images in travis anymore, so start testing trusty (which I think is going to break us for a bit) (1 year, 4 months ago) <Jason Munro>
-316e1a5b3 - support for defining default user settings in the main ini file (1 year, 4 months ago) <Jason Munro>
-abff48601 - typo fix in the ini set file (1 year, 4 months ago) <Jason Munro>
-24a22f232 - version bump (1 year, 4 months ago) <Jason Munro>
-ff4af36d4 - add a couple site wide options to ease integration with other apps (1 year, 4 months ago) <Jason Munro>
-cf7170ed7 - rename a few functions until we have proper namespace support (1 year, 4 months ago) <Jason Munro>
-86e57ad67 - testing a refactor of the hm_modules trait (1 year, 5 months ago) <Jason Munro>
-74d9f816d - doc string updates (1 year, 5 months ago) <Jason Munro>
-4b31db206 - refactoring to help simplify the dispatch class (1 year, 5 months ago) <Jason Munro>
-8f094d363 - move a method to the correct trait in the server list code (1 year, 5 months ago) <Jason Munro>
-5d0b5f100 - testing some refactoring of a large trait (server list) (1 year, 5 months ago) <Jason Munro>
-1b7af4367 - minor tweaks for static analysis (1 year, 5 months ago) <Jason Munro>
-d1efdc9fe - simplify some framework methods (1 year, 5 months ago) <Jason Munro>
-7d48de01b - small type tweak to make static analysis happier (1 year, 5 months ago) <Jason Munro>
-56751fd5d - small tweaks to doc strings and a type check (1 year, 5 months ago) <Jason Munro>
-09658c8c0 - move the auth_none class to the test framework, only enable it for tests (1 year, 5 months ago) <Jason Munro>
-3e551e1c0 - unit test fix for config return type (1 year, 5 months ago) <Jason Munro>
-97d57f1fe - data type correction (1 year, 5 months ago) <Jason Munro>
-e417260d9 - doc string updates (1 year, 5 months ago) <Jason Munro>
-a39a68a51 - remove unused arg (1 year, 5 months ago) <Jason Munro>
-1b3afd123 - doc string update (1 year, 5 months ago) <Jason Munro>
-051f69653 - remove the invalid input feature that does not work as expected (1 year, 5 months ago) <Jason Munro>
-8c1933668 - some tweaks to request input processing (1 year, 5 months ago) <Jason Munro>
-61af8d3cc - last static analysis tweak of the night (unless it breaks!) (1 year, 5 months ago) <Jason Munro>
-4fb3fd788 - more code tweaking to resolve static analysis issues (1 year, 5 months ago) <Jason Munro>
-2032d42ef - small code refactor to simplify and reduce duplication (1 year, 5 months ago) <Jason Munro>
-d3e724979 - small code clean up for open basedir assignment (1 year, 5 months ago) <Jason Munro>
-bb8317865 - refactor some duplicate code (1 year, 5 months ago) <Jason Munro>
-9f3eccf31 - misc small static analysis fixes (1 year, 5 months ago) <Jason Munro>
-07f281357 - another attempt at fixing some static analysis issues (1 year, 5 months ago) <Jason Munro>
-94bc72357 - move some methods to the base session class from the php class (1 year, 5 months ago) <Jason Munro>
-9d30d3d86 - small init changes for request property types (1 year, 5 months ago) <Jason Munro>
-2a0daf159 - slight refactor to hopefully fix the last "major" static analysis issue (1 year, 5 months ago) <Jason Munro>
-f5e167d63 - yet another static analysis refactor (1 year, 5 months ago) <Jason Munro>
-d72b8dbf9 - refactoring to fix some static anlysis issues (hopefully) (1 year, 5 months ago) <Jason Munro>
-0c790afdc - doc string update (1 year, 5 months ago) <Jason Munro>
-2126832b2 - reduce some duplicated code (1 year, 5 months ago) <Jason Munro>
-ba2f244d3 - typo fix in the README update (1 year, 5 months ago) <Jason Munro>
-184caa34c - doc string and readme updates, and version a version bump (1 year, 5 months ago) <Jason Munro>
-39d0fa828 - doc string updates (1 year, 5 months ago) <Jason Munro>
-54a3e6b57 - refactor to reduce some duplication (1 year, 5 months ago) <Jason Munro>
-089c14983 - more refactoring to reduce method complexity (1 year, 5 months ago) <Jason Munro>
-22a525343 - more refactoring, and a unit test update (1 year, 5 months ago) <Jason Munro>
-d712c1e8a - more refactoring to reduce method complexity (1 year, 5 months ago) <Jason Munro>
-e9bd79f90 - unit test coverage update (1 year, 5 months ago) <Jason Munro>
-e908090a5 - another refactor to reduce method complexity (1 year, 5 months ago) <Jason Munro>
-0cb90bb6d - refactor some methods to reduce complexity (1 year, 5 months ago) <Jason Munro>
-771d0562a - doc string update (1 year, 5 months ago) <Jason Munro>
-fa523cb6f - some refactoring to simplify the modules class methods (1 year, 5 months ago) <Jason Munro>
-c64f8efdb - reduce some duplication in the db session class (1 year, 5 months ago) <Jason Munro>
-56aef2147 - doc string updates (1 year, 5 months ago) <Jason Munro>
-f68fc83bc - fix phpunit test coverage so it's back to 100% (1 year, 5 months ago) <Jason Munro>
-e1cf5e87d - change scope for unit testing (1 year, 5 months ago) <Jason Munro>
-b75cd1877 - refactor to reduce complexity (1 year, 5 months ago) <Jason Munro>
-3507e5e0f - refactor to simplify the php session check method (1 year, 5 months ago) <Jason Munro>
-daa2f7061 - doc string update (1 year, 5 months ago) <Jason Munro>
-7d351c8b2 - doc string updates (1 year, 5 months ago) <Jason Munro>
-5e3dad3bb - doc string fixes (1 year, 5 months ago) <Jason Munro>
-627c1c67c - I think I'm obsessed with this static analysis tool. Must keep improving... (1 year, 5 months ago) <Jason Munro>
-5a8d4a002 - more refactoring based on static analysis (1 year, 5 months ago) <Jason Munro>
-83c82ee35 - slight refactoring to simplify the connect method (1 year, 5 months ago) <Jason Munro>
-c666472e9 - refactor setup_session to have less complexity (1 year, 5 months ago) <Jason Munro>
-a77b98517 - another static analysis refactor (1 year, 5 months ago) <Jason Munro>
-d14770bb9 - still doing static analysis refactoring (1 year, 5 months ago) <Jason Munro>
-b2f3eabcb - another static analysis refactor (1 year, 5 months ago) <Jason Munro>
-ea71c6710 - another static code analysis related refactor (1 year, 5 months ago) <Jason Munro>
-d8c4b8b3b - more refactoring for the static analysis gods (1 year, 5 months ago) <Jason Munro>
-0fa8639f6 - some refactoring to reduce duplication (1 year, 5 months ago) <Jason Munro>
-be35f05b2 - couple more static analysis tweaks (1 year, 5 months ago) <Jason Munro>
-d71801d43 - yet another static analysis change (1 year, 5 months ago) <Jason Munro>
-1dac79644 - tweak for some static analysis fixes (1 year, 5 months ago) <Jason Munro>
-790ea879c - still trying to fix class compilation in php5 (1 year, 5 months ago) <Jason Munro>
-fe5b3e99f - another attempt to fix class compisition in php 5* (and keep from breaking static analysis) (1 year, 5 months ago) <Jason Munro>
-d7cf666e6 - fix some stuff I broke and add some more static analysis changes (1 year, 5 months ago) <Jason Munro>
-924f74045 - MOAR static analysis updates, and a few unit test tweaks to match (1 year, 5 months ago) <Jason Munro>
-a6fd1cf9e - even more static analysis tweaking for scrutinizer ci (1 year, 5 months ago) <Jason Munro>
-d9fedf60e - more tweaks for static analysis (1 year, 5 months ago) <Jason Munro>
-0d20d1e0e - another round of tweaks for static analysis (1 year, 5 months ago) <Jason Munro>
-07b1624ef - more static analysis related tweaks to the framework (1 year, 5 months ago) <Jason Munro>
-b999e6fb6 - more comment clean up for static analysis (1 year, 5 months ago) <Jason Munro>
-e9ff544d6 - comment clean up to help with static analysis (1 year, 5 months ago) <Jason Munro>
-0e4804c19 - testing some slight changes to improve static analysis (1 year, 5 months ago) <Jason Munro>
-ae9564c28 - add doc strings produced by scrutinizer ci (1 year, 5 months ago) <Jason Munro>
-56d94d111 - Merge branch 'master' of github.com:jasonmunro/cypht (1 year, 5 months ago) <Jason Munro>
-1dbbad8f1 - fix small type mismatch in functions for setting cookies (1 year, 5 months ago) <Jason Munro>
-c7276dfa3 - Merge pull request #198 from mav-/master (1 year, 5 months ago) <Jason Munro>
-bda35ad95 - Added initial wip version of So Alone theme (1 year, 5 months ago) <mav>
-8717e5671 - Allow to load local fonts in CSP (1 year, 5 months ago) <mav>
-c569bc0cc - add coveralls coverage status to the readme (1 year, 5 months ago) <Jason Munro>
-2f416fec1 - more travis ci tweaking (1 year, 5 months ago) <Jason Munro>
-b60d15473 - another travis ci tweak for libsodium (1 year, 5 months ago) <Jason Munro>
-7526dc623 - see if we can get libsodium installed in the travis container (1 year, 5 months ago) <Jason Munro>
-65adfde6a - still trying to get coveralls working in travis (1 year, 5 months ago) <Jason Munro>
-fea0ff854 - more testing with coveralls + travis ci (1 year, 5 months ago) <Jason Munro>
-1cfeb7e36 - testing out coveralls with travis ci builds (1 year, 5 months ago) <Jason Munro>
-17e39b84b - add a new ignore path (1 year, 5 months ago) <Jason Munro>
-cda308c7d - generate clover coverage report for phpunit tests (1 year, 5 months ago) <Jason Munro>
-a567483f2 - add a new ignore path (1 year, 5 months ago) <Jason Munro>
-73de99b24 - version bump (1 year, 5 months ago) <Jason Munro>
-a1515de91 - unit test update for better code coverage (1 year, 5 months ago) <Jason Munro>
-8d8630892 - slight refactore for brevity and better unit testing (1 year, 5 months ago) <Jason Munro>
-9940353d1 - version bump (1 year, 5 months ago) <Jason Munro>
-e89b59e59 - unit test updates for changes to the framework (1 year, 5 months ago) <Jason Munro>
-40ca661d4 - don't allow dynamic auth type without the dynamic login module activiated (1 year, 5 months ago) <Jason Munro>
-ed58c2983 - typo fix, thanks mwolfeu! (1 year, 5 months ago) <Jason Munro>
-06afef0ec - comment fix (1 year, 5 months ago) <Jason Munro>
-447286744 - version bump (1 year, 5 months ago) <Jason Munro>
-adc025ee6 - attempt to make it easier to override sessions and auth for a site (1 year, 5 months ago) <Jason Munro>
-cd5061fd2 - unit test update for the changes to includes in the framework (1 year, 5 months ago) <Jason Munro>
-c3f684c36 - move some includes and start work on a configurable session limit (1 year, 5 months ago) <Jason Munro>
-f1c01f8cc - some work on javascript sorting a message list (1 year, 5 months ago) <Jason Munro>
-29ae57721 - maintain list sort and filter when linking back from a message view (1 year, 5 months ago) <Jason Munro>
-637a09d33 - (tag: v1.0.0, origin/release-1.0.0) version bump (1 year, 5 months ago) <Jason Munro>
-18ee06878 - (refs/original/refs/heads/master) version bump (1 year, 5 months ago) <Jason Munro>
+30c677266 - fix outbound reply-to when no profile is enabled issue #291 [Fri, 12 Oct 2018 12:04:24 -0500]
+af93ad1ab - fix typo in core module setup file [Fri, 12 Oct 2018 11:34:48 -0500]
+1a490280e - improve module overrides so order in the ini file does not matter [Fri, 12 Oct 2018 11:34:05 -0500]
+19d55b3c9 - allow a couple pgp module functions to be overridden [Thu, 11 Oct 2018 15:41:40 -0500]
+81c631476 - comment update [Thu, 11 Oct 2018 15:40:58 -0500]
+cb56f8185 - fix for issue #291 [Thu, 11 Oct 2018 15:39:37 -0500]
+cc73417a9 - doc update for the release code [Thu, 11 Oct 2018 00:56:37 -0500]
+bdcafb3c6 - update pgp module readme [Thu, 11 Oct 2018 00:49:34 -0500]
+e14c80e87 - third party lib updates [Thu, 11 Oct 2018 00:39:49 -0500]
+5d0529c07 - re-add some files that should be in the release (oops) [Thu, 11 Oct 2018 00:09:09 -0500]
+86c2f3fc0 - update travis coverage report for new library file [Wed, 10 Oct 2018 23:55:50 -0500]
+8f5bab9c7 - remove more stuff not needed in a release [Thu, 11 Oct 2018 04:45:12 +0000]
+f2dd26766 - remove hello world module set for release [Thu, 11 Oct 2018 04:43:51 +0000]
+6dabf0cf5 - remove site module set for the release [Thu, 11 Oct 2018 04:40:56 +0000]
+cd0aff475 - disable add to calendar link that does not work yet [Thu, 11 Oct 2018 04:09:58 +0000]
+2e79c23e6 - remove tags module set for release [Thu, 11 Oct 2018 04:11:41 +0000]
+6508d53e5 - fix outbound reply-to when no profile is enabled issue #291 [Fri, 12 Oct 2018 12:04:24 -0500]
+117eac727 - version bump [Fri, 12 Oct 2018 12:04:06 -0500]
+b0267ddfe - fix typo in core module setup file [Fri, 12 Oct 2018 11:34:48 -0500]
+77fae13e4 - improve module overrides so order in the ini file does not matter [Fri, 12 Oct 2018 11:34:05 -0500]
+8d464a3f7 - version bump [Thu, 11 Oct 2018 15:42:22 -0500]
+be92fe27e - allow a couple pgp module functions to be overridden [Thu, 11 Oct 2018 15:41:40 -0500]
+06a1fec18 - remove some debugs [Thu, 11 Oct 2018 15:41:13 -0500]
+d12670895 - comment update [Thu, 11 Oct 2018 15:40:58 -0500]
+731dd8c64 - fix for issue #291 [Thu, 11 Oct 2018 15:39:37 -0500]
+04e4a630c - update pgp module readme [Thu, 11 Oct 2018 00:49:34 -0500]
+ac72e9a2b - third party lib updates [Thu, 11 Oct 2018 00:39:49 -0500]
+8af230bfe - initial checkin of WIP CardDav contact support [Thu, 11 Oct 2018 00:25:30 -0500]
+f10cfaa22 - update travis coverage report for new library file [Wed, 10 Oct 2018 23:55:50 -0500]
+dad0d58f3 - disable add to calendar link that does not work yet [Thu, 11 Oct 2018 04:09:58 +0000]
+d2a03f491 - don't show the apply button for pgp if no keys are setup [Wed, 10 Oct 2018 18:39:39 -0500]
+032a2d0db - version bump [Wed, 10 Oct 2018 17:53:44 -0500]
+b339b2b45 - lots more work on PGP support [Wed, 10 Oct 2018 17:53:33 -0500]
+d0736af2f - small tweak to the compose page layout [Wed, 10 Oct 2018 17:53:10 -0500]
+97b07bd39 - htmlentities in js [Wed, 10 Oct 2018 17:52:49 -0500]
+03ba56a2b - mobile layout css tweaks [Wed, 10 Oct 2018 17:52:30 -0500]
+3f00fe6c1 - openpgpjs update to latest release version [Wed, 10 Oct 2018 17:52:03 -0500]
+30d499c56 - fix typo I just committed [Tue, 9 Oct 2018 15:52:10 -0500]
+d5f79ecbf - work on pgp module (basic outbound encrypting is working) [Tue, 9 Oct 2018 15:45:56 -0500]
+4e502736e - version bump [Tue, 9 Oct 2018 15:45:51 -0500]
+a0fd3f721 - don't re-encode rfc822 message attachments [Tue, 9 Oct 2018 15:44:47 -0500]
+01e2947f6 - don't double up on loading animation speed if we overlap [Tue, 9 Oct 2018 15:43:27 -0500]
+78796a8fe - fix for maintaining prevnext on flagunflag message [Mon, 8 Oct 2018 20:23:54 -0500]
+87b5c99b1 - fix unit test I just broke (again). Thanks Travis (again)! [Mon, 1 Oct 2018 21:42:57 -0500]
+d81823065 - media query for nicely formatting printing of messages [Mon, 1 Oct 2018 21:05:55 -0500]
+0a4944204 - make selenium tests python 3 compatible [Fri, 28 Sep 2018 13:21:43 -0500]
+e7489ed1c - follow http redirects when finding a feed [Fri, 28 Sep 2018 12:33:37 -0500]
+354536bf1 - add some debugging for feed connectionparsing issues [Thu, 27 Sep 2018 15:38:27 -0500]
+728475956 - version bump [Wed, 26 Sep 2018 11:43:31 -0500]
+031639d8e - rewrite history module set to work server side issue #285 [Wed, 26 Sep 2018 11:43:10 -0500]
+5562d2985 - add subject placeholders if missing for wordpress notices [Wed, 26 Sep 2018 11:42:28 -0500]
+f2b7c5b86 - clean up some POP3 processing logic [Wed, 26 Sep 2018 11:41:59 -0500]
+68d5be7b6 - fix missing page title on specific github repo list views [Wed, 26 Sep 2018 11:41:23 -0500]
+9fdb3a037 - fix a warning when feed items are loaded but no longer present and add a todo [Wed, 26 Sep 2018 11:40:45 -0500]
+dd8367268 - don't remove the empty list div when working in background mode [Wed, 26 Sep 2018 11:40:12 -0500]
+743e166bf - disable web config builder for now for a couple reasons: [Mon, 24 Sep 2018 18:22:25 -0500]
+96a32a569 - FINALLY correctly fix issue #253 [Mon, 24 Sep 2018 17:05:18 -0500]
+34d5ddf50 - try to disable chrome on android default swipe down reload [Mon, 24 Sep 2018 15:31:57 -0500]
+4f4adbb45 - various mobile clean up, fix missing downloadable message parts [Mon, 24 Sep 2018 13:51:00 -0500]
+54e68f2b3 - zepto upgrade fixed swiping (WOOT), add swipe to hide folder list [Mon, 24 Sep 2018 13:50:39 -0500]
+d608766b1 - version bump [Mon, 24 Sep 2018 11:51:05 -0500]
+df53934bb - test updates for target changes [Mon, 24 Sep 2018 11:50:36 -0500]
+568163c35 - stop using target=_blank, and don't allow it in html message parts [Mon, 24 Sep 2018 11:50:05 -0500]
+2695ff34b - default to no forced logout in the idle timer [Mon, 24 Sep 2018 11:25:07 -0500]
+9190d6dfa - update HTMLPurifier to the latest release (4.10.0) [Mon, 24 Sep 2018 11:24:23 -0500]
+a89d9a365 - update zepto to latest git checkout (the last release is very old) [Mon, 24 Sep 2018 11:23:52 -0500]
+3bd2830c7 - hide imap folder filter and sort on mobile [Fri, 21 Sep 2018 13:34:28 -0500]
+7dc48690a - fix sending bug I just introduced [Fri, 21 Sep 2018 13:03:39 -0500]
+8fef1e4c1 - notify the user and disable sending if no SMTP servers are setup [Fri, 21 Sep 2018 12:32:00 -0500]
+549fcaa85 - squelch a warning if the site is not configured [Fri, 21 Sep 2018 12:31:33 -0500]
+5d5d6cd3a - couple test tweaks [Mon, 17 Sep 2018 10:21:33 -0500]
+abe054e1d - webdave format parsing updates [Mon, 17 Sep 2018 10:21:13 -0500]
+9c7dc63f0 - initial version of per module set readme files issue #276 [Wed, 12 Sep 2018 16:40:48 -0500]
+4c4407f72 - clean up the gmail contacts module slightly [Mon, 10 Sep 2018 13:48:39 -0500]
+8f80098e6 - fix unit tests, remove debug from webdav formats code [Mon, 10 Sep 2018 11:04:08 -0500]
+21d31c0cf - Azerbaijani interface translation thanks to Aziz Ibrahimov [Mon, 10 Sep 2018 10:31:21 -0500]
+1b063a821 - more work on webdav formats (vcard, ical) [Thu, 6 Sep 2018 20:11:06 +0000]
+0daa0f163 - don't reset list actions on abort, only failed server calls [Tue, 4 Sep 2018 14:57:09 -0500]
+4d33ec296 - add webdav formats test suite to phpunit config [Fri, 31 Aug 2018 17:22:37 +0000]
+c1c4abe33 - add some server page tests [Fri, 31 Aug 2018 16:40:23 +0000]
+41d739ccd - add some more helper functions for selenium tests [Fri, 31 Aug 2018 16:40:09 +0000]
+cbd5270a4 - fix test class name for profile tests [Fri, 31 Aug 2018 16:39:53 +0000]
+0156ef992 - comment update [Fri, 31 Aug 2018 16:36:07 +0000]
+387374836 - initial commit for webdav format parsing [Fri, 31 Aug 2018 01:05:47 -0500]
+0059bee3b - api interface update [Fri, 31 Aug 2018 01:04:00 -0500]
+2c6a900ed - clean up the api code, support custom HTTP methods, update tests [Wed, 29 Aug 2018 17:00:53 -0500]
+569abbda9 - add profile addupdatedelete selenium tests [Tue, 28 Aug 2018 16:27:50 +0000]
+8a60aa3d2 - add a class to profile update for easier testing [Tue, 28 Aug 2018 16:27:33 +0000]
+40b311474 - add class to submit profile button for easier testing [Tue, 28 Aug 2018 10:38:13 -0500]
+80b657ea0 - re-enable other builds in travis [Tue, 28 Aug 2018 03:49:30 +0000]
+fa98b3249 - still trying to clean up safari on browserstack (wtf) [Tue, 28 Aug 2018 03:38:18 +0000]
+14853dd89 - more browserstacktravissafari tweaking (damnit) [Tue, 28 Aug 2018 03:20:11 +0000]
+b811d1ab0 - more travis tweaking [Tue, 28 Aug 2018 03:06:29 +0000]
+b5b39c71f - see if the newer safari diver is any better than the default [Tue, 28 Aug 2018 02:55:04 +0000]
+3070a2145 - more travis + browserstack testing [Tue, 28 Aug 2018 02:44:31 +0000]
+f3d08240e - more travis tweaks [Mon, 27 Aug 2018 23:57:09 +0000]
+cc6304f70 - re-enable all travis tests [Mon, 27 Aug 2018 23:49:44 +0000]
+aaae8e682 - another travis test [Mon, 27 Aug 2018 23:36:56 +0000]
+bf8843b0c - more travis debugging [Mon, 27 Aug 2018 23:29:32 +0000]
+0f87f4580 - more travis testing [Mon, 27 Aug 2018 23:20:17 +0000]
+b4a6ae5e3 - more travis debuggingtweaks [Mon, 27 Aug 2018 23:12:34 +0000]
+fc18b48de - travis debugging [Mon, 27 Aug 2018 23:08:09 +0000]
+c3d04d1bb - fix debug output bug [Mon, 27 Aug 2018 23:03:55 +0000]
+a591f0ae8 - actually install postfix in travis this time, add some debug [Mon, 27 Aug 2018 22:58:37 +0000]
+0fe5dd3c3 - wait code clean up [Mon, 27 Aug 2018 22:51:46 +0000]
+01499759d - see if local sending in travis is possible without auth [Mon, 27 Aug 2018 22:50:59 +0000]
+3e7692e99 - more travis tweaks around smtp, don't install ui stuff for just unit tests [Mon, 27 Aug 2018 22:38:48 +0000]
+0fa741f48 - enable an SMTP server by default in Travis [Mon, 27 Aug 2018 22:18:32 +0000]
+38eee3d2f - start on a selenium test to send + recieve a message. Probably fail in travis [Mon, 27 Aug 2018 22:13:21 +0000]
+d77293559 - try to build a valid from address when we don't have one [Mon, 27 Aug 2018 16:53:42 -0500]
+c16c81f3c - disable safari again, hopefully correct the rest of the tests I broke [Thu, 23 Aug 2018 16:59:03 -0500]
+c8625d42f - add safari back to browserstack, test tweaks (crosses fingers) [Thu, 23 Aug 2018 16:38:39 -0500]
+01a4a974a - move the coverage report again [Thu, 23 Aug 2018 14:27:21 -0500]
+5458a4b0d - _actually_ move the coverage report to a different build this time [Thu, 23 Aug 2018 14:01:16 -0500]
+c32cb0336 - move the coverage report to a travis build with no selenium tests [Thu, 23 Aug 2018 13:37:54 -0500]
+dee9dafd0 - limit which build run selenium, add some more browsers [Thu, 23 Aug 2018 13:12:52 -0500]
+06b517605 - disable a selenium test, more cleanup [Thu, 23 Aug 2018 12:47:49 -0500]
+5c8111da3 - even more seleniumbrowserstacktravis tweaking [Thu, 23 Aug 2018 12:26:59 -0500]
+754855f83 - more seleniumtravisbrowserstack tweaking [Thu, 23 Aug 2018 12:02:21 -0500]
+3531671e7 - add a bunch of selenium debug output [Thu, 23 Aug 2018 11:12:44 -0500]
+48c743a4e - more selenium tweaks to try to make browserstack happy [Thu, 23 Aug 2018 10:39:01 -0500]
+98a064a50 - selenium: remove delay test, add a single rest for a specific test [Wed, 22 Aug 2018 23:08:24 -0500]
+526367637 - add a stupid long delay for browserstack to see if it helps (it won't) [Wed, 22 Aug 2018 17:43:52 -0500]
+41dcfae9c - more browserstacktravis testing [Wed, 22 Aug 2018 16:46:49 -0500]
+43259c2fd - attemtp to maximize browser windows in browserstack [Wed, 22 Aug 2018 13:10:12 -0500]
+1354a48d1 - extend rest times to see if it helps browserstack via travis [Wed, 22 Aug 2018 13:09:40 -0500]
+099068cb7 - limited selenium tests worked, lets try all instances in travis! [Wed, 22 Aug 2018 12:40:30 -0500]
+079539804 - try to force travis to upgrade python urllib3 for selenium [Wed, 22 Aug 2018 12:22:27 -0500]
+a35bb8182 - actually enable the selenium tests this time ... [Wed, 22 Aug 2018 11:46:46 -0500]
+bc6ce7a4c - re-enable selenium tests on travis see if they work any better [Wed, 22 Aug 2018 11:37:39 -0500]
+c0c3c9a09 - clean up selenium tests so they complete (locally at least) [Wed, 22 Aug 2018 11:33:43 -0500]
+11211cb03 - testing travis to see if php 7.2 is supported yet [Wed, 22 Aug 2018 11:03:00 -0500]
+004b444a9 - fix notification placement on mobile issue #280 [Tue, 21 Aug 2018 16:48:40 -0500]
+e2a49df47 - fix a typo, and finish a fix for issue #190 [Tue, 21 Aug 2018 16:34:28 -0500]
+b4dd5a488 - fix settimeout warning in chrome, allow callbacks on failed ajax [Tue, 21 Aug 2018 16:08:24 -0500]
+a77406c21 - fix tests I just broke [Mon, 20 Aug 2018 18:09:22 -0500]
+ad3b61592 - add tests for SRI integrity attributes [Mon, 20 Aug 2018 17:52:25 -0500]
+46b53edc2 - populate SRI values for site.js and site.css [Mon, 20 Aug 2018 17:51:57 -0500]
+ff1f7c4e6 - add SRI placeholders [Mon, 20 Aug 2018 17:51:47 -0500]
+6bbe2c7d3 - couple more form clean ups based on chrom dev tool recommendations [Mon, 20 Aug 2018 17:51:06 -0500]
+fd4eb511d - you can't delete github notices, but mark them unread if you try at least [Mon, 20 Aug 2018 17:50:45 -0500]
+3ec22e9f1 - output sri integrity attributes if set, clean up forms for chrome [Mon, 20 Aug 2018 17:50:22 -0500]
+898ee8192 - make the current username available to output modules when logged in [Mon, 20 Aug 2018 17:49:47 -0500]
+3fe7c9e0f - use MutationObserver since DOMSubtreeModified is deprecated [Mon, 20 Aug 2018 17:48:06 -0500]
+e690b13e1 - better reply profile selection logic, issue #279 [Wed, 15 Aug 2018 14:56:13 -0500]
+eda6bb3ec - don't assume the system temp directory is tmp [Tue, 14 Aug 2018 14:26:26 -0500]
+0371cdffe - version bump [Tue, 7 Aug 2018 14:45:37 -0500]
+bb4c3d9a4 - "add a feed" link to the bottom of the feeds section in the folder list [Tue, 7 Aug 2018 14:44:54 -0500]
+b9b4e203e - use correct site_id var when building the request key [Mon, 6 Aug 2018 17:20:48 -0500]
+b1134a09e - add a new unit test for allowing external image sources [Mon, 6 Aug 2018 17:14:21 -0500]
+cd52f1e33 - small refactor for test coverage (no functional change) [Mon, 6 Aug 2018 17:13:13 -0500]
+878c4342d - check for allowed external image sources and provide a link to load them [Mon, 6 Aug 2018 17:11:32 -0500]
+1b6e0959c - add new ini opiton to allow sites to enable external image sources [Mon, 6 Aug 2018 17:11:13 -0500]
+0588967c5 - allow sites to enable external image sources [Mon, 6 Aug 2018 17:10:57 -0500]
+c6da36e97 - update flagunflag message to support inline message view issue #278 [Mon, 23 Jul 2018 12:51:02 -0500]
+bb343a5de - Merge branch 'master' of github.com:jasonmunrocypht [Mon, 23 Jul 2018 12:26:07 -0500]
+cfd73d802 - Merge pull request #277 from benyankepatch-1 [Thu, 19 Jul 2018 11:13:47 -0500]
+64f6f8c18 - Adding username of created user to output for easier debugging [Wed, 18 Jul 2018 22:42:43 -0500]
+d1386992e - add class on inline message open to stop further event assignment [Mon, 23 Jul 2018 12:25:22 -0500]
+34a594d0a - don't re-assign movecopy events if message is opened inline [Mon, 23 Jul 2018 12:24:44 -0500]
+85f4ef45c - add class for easier styling of imap message part description [Mon, 23 Jul 2018 12:24:18 -0500]
+8f8b714d2 - css tweak to the unread counters in the folder list [Wed, 18 Jul 2018 14:17:52 -0500]
+fdf43c62b - reduce required size for db session key field [Fri, 13 Jul 2018 14:29:39 -0500]
+83fbcad5b - update for imap module unit test [Fri, 13 Jul 2018 14:29:26 -0500]
+020f9b2cf - fix unit test that broke with the last commit [Fri, 13 Jul 2018 13:57:25 -0500]
+b646d81b6 - fix for missing reply quote on last line for issue #275 [Fri, 13 Jul 2018 13:35:08 -0500]
+9f01e68b5 - limit cascading styles to keep inline message rendering clean [Wed, 6 Jun 2018 18:57:25 -0500]
+a8e564a17 - fix for delete inline message issue #225 [Wed, 6 Jun 2018 18:52:04 -0500]
+d38d1a70b - fix for subject not wrapping issue #274 [Wed, 6 Jun 2018 18:17:29 -0500]
+dff6759b8 - fix HTML escape bug in previousnext links [Wed, 6 Jun 2018 17:15:47 -0500]
+087402ea2 - more imap unit test updates [Sun, 22 Apr 2018 19:59:12 +0000]
+6ed19e1f2 - imap module unit test updates [Sun, 22 Apr 2018 18:47:55 +0000]
+a6bf24ae7 - minor changes to make testing easier [Sun, 22 Apr 2018 18:47:21 +0000]
+6be8b6147 - testing fixes for issues #253 and #244 [Mon, 16 Apr 2018 04:09:05 +0000]
+511503459 - proper mailto link support - issue #251 [Sun, 15 Apr 2018 20:57:31 +0000]
+8ac79a88d - version bump [Sun, 15 Apr 2018 20:57:25 +0000]
+736f44820 - attempted fix for api logout issue #263 [Sun, 15 Apr 2018 20:12:07 +0000]
+3f7e9f973 - avoid undefined warning with api logout [Sun, 15 Apr 2018 20:11:22 +0000]
+d08c63837 - testing a fix for inline message delete issue #225 [Tue, 20 Mar 2018 17:12:10 +0000]
+3f52a9bcc - imap unit test updates [Sun, 18 Mar 2018 14:02:14 -0500]
+777885659 - don't lowercase folder names in inline message move dialog issue #254 [Wed, 14 Mar 2018 23:59:38 +0000]
+2be14308f - better TLSSTARTTLS options when adding servers issue #267 [Wed, 14 Mar 2018 23:48:06 +0000]
+b87783efc - test updates [Wed, 28 Feb 2018 16:41:06 -0600]
+22eb1dbb7 - move server filtering into the framework [Wed, 28 Feb 2018 16:40:35 -0600]
+3747a3630 - version bump [Wed, 28 Feb 2018 16:40:26 -0600]
+6980166b4 - test a fix for empty username when saving settings in single server mode issue #265 [Wed, 28 Feb 2018 16:39:10 -0600]
+ae259d77d - testing a fix for api logout not deleting the session issue #263 [Thu, 22 Feb 2018 16:24:52 -0600]
+7a716ed64 - theme fix for the add contact icon [Thu, 22 Feb 2018 16:19:52 -0600]
+ec44c73c6 - clean up fromto field formatting in message lists, issue #246 [Mon, 19 Feb 2018 12:22:26 -0600]
+de0926ce1 - don't match unencoded square brackets in text message links. issue #264 [Mon, 19 Feb 2018 12:16:31 -0600]
+760c4dff2 - support custom sessionauth with api login [Mon, 19 Feb 2018 12:15:43 -0600]
+83ca0ecf6 - Merge branch 'master' of github.com:jasonmunrocypht [Tue, 6 Feb 2018 15:22:21 -0600]
+8b84c50a0 - fix warning when using single server mode [Thu, 1 Feb 2018 16:10:53 +0000]
+41241f7f6 - handle empty folder update details so we don't throw [Mon, 29 Jan 2018 12:49:25 -0600]
+651e3f934 - dark theme tweak [Mon, 29 Jan 2018 12:48:50 -0600]
+f836a1d17 - don't show the manage folders link in folder dialogs issue #256 [Wed, 24 Jan 2018 17:07:26 -0600]
+53459ee45 - dark theme tweak [Wed, 24 Jan 2018 17:06:53 -0600]
+ab5d5829d - show feed item detail even if no summary text is available [Tue, 23 Jan 2018 15:00:08 -0600]
+4e16293ba - add mailto link scheme to HTMLPurifier whitelist issue #255 [Mon, 22 Jan 2018 12:16:26 -0600]
+1a61f4c07 - style fix for movecopy dialog with the dark theme [Sun, 21 Jan 2018 21:10:33 +0000]
+2a09f433a - disable php nightly in travis for now due to breakage [Sun, 21 Jan 2018 21:00:22 +0000]
+e862bac44 - correct bad constant def fix [Sun, 21 Jan 2018 20:42:19 +0000]
+65eac172d - test a possible fix for travis breakage with php nightly [Sun, 21 Jan 2018 20:34:50 +0000]
+95339a819 - fix for libsodium check [Sun, 21 Jan 2018 20:34:32 +0000]
+5eca7950a - handle reply and reply-to address colleciton differently issue #249 [Tue, 16 Jan 2018 17:42:01 -0600]
+34d70a024 - another attempt at fixing search layout on mobile issue #234 [Thu, 11 Jan 2018 03:30:59 +0000]
+2ac6f7f10 - wrap a couple long lines [Thu, 11 Jan 2018 02:48:37 +0000]
+f419149d2 - comment typo fix [Thu, 11 Jan 2018 02:48:25 +0000]
+2c243ae33 - another fix for header encoding issue #238 [Thu, 11 Jan 2018 02:47:34 +0000]
+4f6df4c6d - don't quote empty display names in outbound address headers [Fri, 5 Jan 2018 12:34:22 -0600]
+ff17d9261 - test a fix for issue #238 [Fri, 5 Jan 2018 10:36:55 -0600]
+ed4cd35c7 - fix for search results being hidden by the form on mobile #243 [Tue, 2 Jan 2018 17:39:50 -0600]
+ee98aa067 - remove debug [Thu, 21 Dec 2017 16:40:57 -0600]
+9d6e33197 - fix search command double space bug [Thu, 21 Dec 2017 16:39:03 -0600]
+1c6232c8f - another fix for issue #238 [Thu, 21 Dec 2017 16:11:07 -0600]
+38ebdc9d4 - only set an imap search charset if the terms are non-ascii [Thu, 21 Dec 2017 15:59:36 -0600]
+162f823ae - fix the unit tests I just broke [Thu, 21 Dec 2017 15:59:22 -0600]
+24a96747b - attempt to correct header formatting for address fields issue #238 [Thu, 21 Dec 2017 15:10:46 -0600]
+1cab352fe - comment updates [Tue, 19 Dec 2017 15:24:40 -0600]
+c1094a906 - unit test updates [Tue, 19 Dec 2017 11:43:58 -0600]
+261941144 - add hm_exists() wrappers to all module functions [Tue, 19 Dec 2017 11:43:31 -0600]
+11d0e5e3e - move the site module libs.php include, add hm_exists for module functions [Tue, 19 Dec 2017 11:42:34 -0600]
+b9b53c8fc - another irc integration test [Mon, 18 Dec 2017 16:51:18 -0600]
+c429eaf27 - version bump [Mon, 18 Dec 2017 16:48:44 -0600]
+1fa6d9c7b - add a TODO, and test the git -> irc integration [Mon, 18 Dec 2017 16:45:16 -0600]
+6820d416d - testing a header encoding fix for issue #238 [Mon, 18 Dec 2017 15:57:42 -0600]
+577e16e5a - attempt at fixing non-ascii chars in gmail contact xml #237 [Wed, 6 Dec 2017 13:52:10 -0600]
+398f3c8da - another attempted fix for searching on non-ascii chars [Mon, 4 Dec 2017 12:25:52 -0600]
+ecc155578 - another attempt at fixing search with non-ascii chars #235 [Sat, 2 Dec 2017 12:15:19 -0600]
+34b0a896b - revert commit that added charset support to search (for now) [Fri, 1 Dec 2017 09:42:29 -0600]
+9d68f31e7 - add a search charset of UTF-8 [Thu, 30 Nov 2017 16:31:29 +0000]
+1fc0abfd8 - fix for issue #233 [Wed, 29 Nov 2017 11:39:46 -0600]
+babf2cc83 - add missing js for account delete [Wed, 29 Nov 2017 11:39:08 -0600]
+5b58fc1db - allow registered sources that don't display on the source list [Wed, 29 Nov 2017 11:38:30 -0600]
+d3f2e2290 - css tweak for toggle all checkbox [Mon, 20 Nov 2017 14:01:27 -0600]
+2d4d69066 - update accounts module with a user list + delete option [Mon, 20 Nov 2017 14:00:57 -0600]
+20c597b9f - update unit test for db lib change [Mon, 20 Nov 2017 13:59:48 -0600]
+85ea35ea3 - enable multiple results for the sql execute method [Mon, 20 Nov 2017 13:58:07 -0600]
+c0d210094 - style tweaks for compose with markdown [Mon, 13 Nov 2017 19:38:31 -0600]
+d57912266 - couple display tweaks for compose with markdown [Fri, 10 Nov 2017 14:52:56 -0600]
+f63ea6374 - version bump [Fri, 10 Nov 2017 14:07:51 -0600]
+7242b3562 - Add the ability to compose messages in Markdown [Fri, 10 Nov 2017 14:07:28 -0600]
+1e2baaa42 - another unit test correction [Fri, 10 Nov 2017 14:07:02 -0600]
+e3eea3fa5 - unit test fix [Mon, 30 Oct 2017 16:56:17 -0500]
+5bcce5168 - fix for issue #231 [Thu, 26 Oct 2017 15:13:29 -0500]
+e4e225198 - unread count style tweak [Thu, 26 Oct 2017 15:13:14 -0500]
+b2aa113aa - Merge branch 'master' of github.com:jasonmunrocypht [Wed, 25 Oct 2017 16:33:07 -0500]
+0a2ab08e4 - testing a travis tweak [Wed, 25 Oct 2017 19:08:46 +0000]
+a74aec4ff - add 2fa code to the settings page for manual entry [Wed, 25 Oct 2017 17:01:14 +0000]
+b417383a9 - version bump [Sat, 14 Oct 2017 14:35:04 -0500]
+5c365c203 - couple type casting fixes for the inline message module set [Sat, 14 Oct 2017 14:34:47 -0500]
+c781580d9 - couple profile related fixes [Sat, 14 Oct 2017 14:33:48 -0500]
+6a3f5aac1 - instead of "dot stuffing", qp encode dots for SMTP [Sat, 14 Oct 2017 13:54:32 -0500]
+33bee9175 - unit test fix [Fri, 13 Oct 2017 15:10:52 -0500]
+5c45ab5f9 - testing a fix for issue #225 [Fri, 13 Oct 2017 14:15:28 -0500]
+828088b26 - more work on IMAP unit tests [Tue, 10 Oct 2017 15:36:04 -0500]
+ce3ae9b8d - more work on IMAP module set unit tests [Mon, 9 Oct 2017 12:44:06 -0500]
+b4dcc1ba0 - version bump [Mon, 9 Oct 2017 12:43:29 -0500]
+3fe89cea9 - update smtp to use socket overrides so it can be unit tested [Mon, 9 Oct 2017 12:43:02 -0500]
+5bc67e426 - update pop3 to use the same socket connections as imap and smtp [Mon, 9 Oct 2017 12:42:30 -0500]
+b25f2858f - fix a potential bug and use an override for testing [Mon, 9 Oct 2017 12:42:07 -0500]
+993849652 - add new static method override for unit testing [Mon, 9 Oct 2017 12:41:31 -0500]
+87e7b3ee2 - fix for hosting cypht on non-standard ports, issue #226 [Mon, 9 Oct 2017 12:39:55 -0500]
+5960f56d8 - more imap unit test work [Wed, 4 Oct 2017 00:52:24 -0500]
+b403b3dc5 - more work on IMAP module set unit tests [Wed, 4 Oct 2017 00:27:59 -0500]
+2f9499443 - add option to the imap debug to make unit testing easier [Wed, 4 Oct 2017 00:21:25 -0500]
+763b5c5af - IMAP unit test updates [Tue, 3 Oct 2017 22:43:28 -0500]
+62e4cca28 - unit test mock updates [Tue, 3 Oct 2017 22:42:19 -0500]
+2ae4f7250 - add todo comment [Tue, 3 Oct 2017 22:40:53 -0500]
+696d7f749 - IMAP lib fixes (thanks to the new unit tests!) [Tue, 3 Oct 2017 22:40:03 -0500]
+06bb2c717 - wrap a couple long lines [Mon, 2 Oct 2017 14:27:54 -0500]
+e3681f35f - start working on unit tests for the IMAP module set [Mon, 2 Oct 2017 14:20:41 -0500]
+3c6ca279e - unit test update [Mon, 2 Oct 2017 14:14:05 -0500]
+d1b12cb04 - unit test framework updates [Mon, 2 Oct 2017 18:50:46 +0000]
+458623cc8 - abstract some parts of IMAP communication for unit testing [Mon, 2 Oct 2017 18:40:59 +0000]
+59ff05f71 - another single server mode tweak [Mon, 25 Sep 2017 17:39:05 -0500]
+d6bb8164a - add single server mode option to the hm3.ini [Mon, 25 Sep 2017 17:27:56 -0500]
+617439aae - version bump [Mon, 25 Sep 2017 16:07:54 -0500]
+400d8cec5 - more single server mode updates [Mon, 25 Sep 2017 16:07:40 -0500]
+75d395011 - single server mode fix [Mon, 25 Sep 2017 16:07:08 -0500]
+2095e871a - refactor single server mode for PHP 5 [Mon, 25 Sep 2017 15:22:32 -0500]
+73060539e - unit test updates for single server mode [Mon, 25 Sep 2017 14:29:07 -0500]
+c9c7babc5 - version bump [Mon, 25 Sep 2017 14:28:47 -0500]
+13c0d7b44 - single server mode updates [Mon, 25 Sep 2017 14:28:40 -0500]
+6b41b323b - add non-encrypted user settings support [Mon, 25 Sep 2017 14:25:16 -0500]
+2cf26c9ce - stub for saving settings without encryption [Mon, 25 Sep 2017 14:24:28 -0500]
+de4f6a17e - style tweak for inline message viewing [Thu, 21 Sep 2017 17:27:10 -0500]
+c6be04ea3 - version bump [Thu, 21 Sep 2017 17:16:49 -0500]
+8572e1bd6 - fixes around inline message view [Thu, 21 Sep 2017 17:16:38 -0500]
+9e1527939 - fixes for inline message view messing with the message list [Thu, 21 Sep 2017 16:42:50 -0500]
+f06f77c75 - fix combined sent view cache not being used on refresh [Thu, 21 Sep 2017 15:32:41 -0500]
+603f34c77 - testing some travis ci build speed ups [Tue, 19 Sep 2017 16:54:23 -0500]
+577d5d4c8 - travis ci tweaks to speed up builds [Tue, 19 Sep 2017 15:32:13 -0500]
+240c6f07e - fix bash syntax error in travis run script [Tue, 19 Sep 2017 15:12:07 -0500]
+ea0122829 - disable UI tests for now because browserstack is pissing me off [Tue, 19 Sep 2017 15:06:00 -0500]
+b4d39821c - add a longer wait to the folder list reload test [Tue, 19 Sep 2017 14:44:14 -0500]
+4a56b68e6 - update safari creds for browserstack [Tue, 19 Sep 2017 14:17:24 -0500]
+b5c574f4c - speed up selenium tests by removing fixed wait times [Tue, 19 Sep 2017 14:09:17 -0500]
+3c063cf3f - fix a unit test: timezones differ on different systems [Tue, 19 Sep 2017 13:13:40 -0500]
+98f218098 - disable test coverage for travis ci runs that don't need it [Tue, 19 Sep 2017 12:38:57 -0500]
+3b17d2c07 - unit test update [Tue, 19 Sep 2017 12:37:44 -0500]
+3b5e44450 - more unit test updates [Mon, 18 Sep 2017 15:06:33 -0500]
+417cd5eb0 - add a couple more core handler module set unit test assertions [Sun, 17 Sep 2017 22:03:28 -0500]
+978c85d97 - unit test updates for the core module set [Sun, 17 Sep 2017 14:02:22 -0500]
+3803a55a5 - encode all headers fields that have non-ascii values [Fri, 15 Sep 2017 09:28:04 -0500]
+641fd1ecf - another stab at fixing unit test helpers properly [Fri, 15 Sep 2017 08:50:33 -0500]
+dfd545bac - syntax fix for the unit test helper [Fri, 15 Sep 2017 08:13:51 -0500]
+a4124b2e6 - add a comment [Fri, 15 Sep 2017 01:23:24 -0500]
+9ad9cf5d1 - unit tests for handler and output modules in the core set round one [Fri, 15 Sep 2017 01:18:48 -0500]
+9fcd3d828 - remove some unit test excludes for the core module set [Fri, 15 Sep 2017 01:18:28 -0500]
+ec17a8698 - add some missing methodsprops to unit test mocks [Fri, 15 Sep 2017 01:17:55 -0500]
+d2deb8865 - helpers to created unit tests for module sets [Fri, 15 Sep 2017 01:17:30 -0500]
+527519642 - ignore list update for git [Fri, 15 Sep 2017 01:16:56 -0500]
+2e702bcc4 - testing a change to make unit testing easier [Fri, 15 Sep 2017 01:16:05 -0500]
+e743ec55c - minor style changes to the core handler mods, no functional change [Fri, 15 Sep 2017 01:15:41 -0500]
+cd9627890 - small change to make unit testing easier [Fri, 15 Sep 2017 01:15:22 -0500]
+0bf7772e7 - small change to make unit testing easier [Fri, 15 Sep 2017 01:15:10 -0500]
+a5e62b7b4 - unit test timezone fix [Thu, 14 Sep 2017 15:18:16 -0500]
+2d0d0a813 - more unit tests for the core module set [Thu, 14 Sep 2017 14:58:12 -0500]
+5077d1bd7 - refactor some functions to always return something [ci-skip] [Wed, 13 Sep 2017 08:20:28 -0500]
+26a3870e5 - more unit test updates [Tue, 12 Sep 2017 15:02:54 -0500]
+a1228a8bb - more travis tweaking [Tue, 12 Sep 2017 15:02:45 -0500]
+7597e2bbe - require once for easier unit testing [Tue, 12 Sep 2017 15:01:10 -0500]
+9f6288701 - unit test updates [Tue, 12 Sep 2017 12:46:38 -0500]
+3d2b4408f - php nightly bug fix [Tue, 12 Sep 2017 12:24:18 -0500]
+3fc4e194e - travis selenium test tweaks [Tue, 12 Sep 2017 12:24:07 -0500]
+cab5ee34e - unit test updates [Tue, 12 Sep 2017 11:59:31 -0500]
+fa7f5d921 - more travis tweaking [Tue, 12 Sep 2017 11:01:43 -0500]
+b3ba6eb9b - another travis tweak [Tue, 12 Sep 2017 10:56:53 -0500]
+893caf217 - more tweaking for travis ci [Tue, 12 Sep 2017 10:42:20 -0500]
+7b7d87bd0 - unit test updates [Tue, 12 Sep 2017 10:23:08 -0500]
+e56470c07 - testing travis breakage on php 7.0 with ldap [Tue, 12 Sep 2017 10:20:42 -0500]
+fa7a6dab2 - version bump [Mon, 11 Sep 2017 14:44:39 -0500]
+26f1e3fd6 - add a class to the message table tbody element [Mon, 11 Sep 2017 14:44:24 -0500]
+6bfb68dda - refactor some core module set js [Mon, 11 Sep 2017 14:43:53 -0500]
+53a1497cb - unify some code around address field parsing [Mon, 11 Sep 2017 14:43:03 -0500]
+a969b7b5c - tweaks to address field parsing [Mon, 11 Sep 2017 14:42:47 -0500]
+a4f454853 - remove debug [Mon, 11 Sep 2017 14:42:19 -0500]
+2fc185722 - fix for link formatting in text message parts (again) [Wed, 6 Sep 2017 17:10:23 +0000]
+5aa16a42d - clean up api login method, fix normal logins with it enabled [Wed, 30 Aug 2017 11:04:26 -0500]
+c85220382 - test a fix for url matching being a bit too greedy [Sat, 26 Aug 2017 12:41:10 -0500]
+ba780a558 - don't insert links into raw message view [Sat, 26 Aug 2017 12:40:52 -0500]
+b9dd0e697 - testing better recipient parsing on send [ci-skip] [Fri, 25 Aug 2017 12:15:19 -0500]
+f6135b885 - fix a bug that caused the folder list to keep reloading [ci-skip] [Fri, 25 Aug 2017 11:08:15 -0500]
+4ce06da3d - UI fix for move to dialog for issue #220 [Fri, 25 Aug 2017 10:39:11 -0500]
+f5576d423 - start working on a "single server" mode [Thu, 24 Aug 2017 13:09:01 -0500]
+690c800cd - add a debug to indicate if a user is logged in [Wed, 9 Aug 2017 16:32:16 -0500]
+1c814c7e0 - remove debug from the functional api login interface [Tue, 8 Aug 2017 03:53:48 +0000]
+18719040a - enable memcached extension in travis ci [Mon, 7 Aug 2017 16:52:20 -0500]
+8c3836de7 - make sure we load user data on the functional api login [Mon, 7 Aug 2017 15:44:07 -0500]
+c163b7e73 - unit test updates [Mon, 7 Aug 2017 15:09:28 -0500]
+012ff270c - fix php 7.1 in travis, re-enable all dbs [Sun, 6 Aug 2017 20:06:51 +0000]
+9986e3e4d - add memcached auth support [ci-skip] [Sun, 6 Aug 2017 19:00:32 +0000]
+9fd98ee72 - add nighty PHP to the list of builds [Sun, 6 Aug 2017 18:53:23 +0000]
+b2206bb92 - more work on a functional interface to loginout [Sun, 6 Aug 2017 18:37:46 +0000]
+0066170e0 - another tweak to try to get PHP nightly working on travis ci [Sun, 6 Aug 2017 18:33:51 +0000]
+5fbc4dac5 - more travis + PHP nightly testing [Sun, 6 Aug 2017 18:19:20 +0000]
+c39f009f7 - another travis tweaktest [Sun, 6 Aug 2017 18:03:07 +0000]
+ecc72c5b4 - more travis tweaking [Sun, 6 Aug 2017 17:58:39 +0000]
+511d78fa5 - work on supporting hhvm and php nightly builds in travis ci [Sun, 6 Aug 2017 17:30:16 +0000]
+f8a9708a6 - testing hhvm and nightly PHP versions on travis CI [Sun, 6 Aug 2017 17:24:07 +0000]
+774374c5e - function based login option for the api login module set [Sun, 6 Aug 2017 16:59:14 +0000]
+c970c7c46 - comment fix [Sun, 6 Aug 2017 16:58:33 +0000]
+274966061 - add an option to disable the browser fingerprint [Sun, 6 Aug 2017 16:58:01 +0000]
+6eb343f9b - testing a generic disconnect for any option connections to data sources [Thu, 3 Aug 2017 12:25:38 -0500]
+54916f243 - version bump [Wed, 2 Aug 2017 16:05:58 -0500]
+5400a3be6 - fix signatures for issue #215 [Wed, 2 Aug 2017 16:05:35 -0500]
+199b54b51 - move a function to core so it can be called from multiple module sets [Wed, 2 Aug 2017 16:05:20 -0500]
+63d940de6 - hash_equals should not be called directly, so change it to private [Wed, 2 Aug 2017 16:04:45 -0500]
+c12ffd058 - testing another include order tweak [ci skip] [Wed, 2 Aug 2017 13:34:01 -0500]
+efb569933 - testing a tweak to the order of includes [ci skip] [Wed, 2 Aug 2017 13:28:24 -0500]
+5c9170a8d - version bump [Wed, 2 Aug 2017 12:06:05 -0500]
+999997280 - make sure we are checking authed state for servers correctly [Wed, 2 Aug 2017 12:05:52 -0500]
+fbd4623dd - slight change in behavior for the server connect method [Wed, 2 Aug 2017 12:05:27 -0500]
+e382f09fc - better hash comparison to avoid timing attacks [Tue, 1 Aug 2017 16:16:32 -0500]
+531c90775 - Merge pull request #214 from hartoismaster [Sun, 30 Jul 2017 20:56:40 -0500]
+d41696235 - Russian localization update [Tue, 20 Jun 2017 15:08:30 +0300]
+5f2d5c5f8 - typo fix for issue #211 [Sun, 23 Jul 2017 17:31:03 +0000]
+d630a26d9 - re-enable full travis build and selenium tests [Tue, 18 Jul 2017 13:58:32 -0500]
+50301bade - lib sodium compat layer fix for PHP 7.2 [Tue, 18 Jul 2017 18:35:53 +0000]
+d1519b9d8 - PHP 7.2 fix for abstraction method signature [Tue, 18 Jul 2017 13:01:35 -0500]
+c7b84468b - libsodium support for PHP 7.2 and newer PECL packages [Tue, 18 Jul 2017 13:01:15 -0500]
+6e2c5dd7e - re-enable php version in travis build [Mon, 17 Jul 2017 18:52:07 +0000]
+507612dc6 - remove test that breaks travis build [Mon, 17 Jul 2017 18:39:38 +0000]
+dc9fc51a6 - still trying to get libsodium working in travis [Mon, 17 Jul 2017 18:27:54 +0000]
+6c375bfe0 - yet another travis ci debug attempt for libsodium [Mon, 17 Jul 2017 18:22:00 +0000]
+a0514203f - trying to fix libsodium in travis [Mon, 17 Jul 2017 18:04:01 +0000]
+767d5cf1a - send coverage report from Travis with PHP 7.1 [Mon, 17 Jul 2017 17:38:21 +0000]
+bc8d4cbe2 - enable all unit tests in travis but disable browserstack for now [Mon, 17 Jul 2017 16:48:52 +0000]
+1f2dfeeb3 - another tweak to hopefully resolve travis issues [Mon, 17 Jul 2017 15:52:52 +0000]
+016afe56b - more travis testing [Mon, 17 Jul 2017 15:44:11 +0000]
+83f900366 - almost got php 7.1 + travis working ... [Mon, 17 Jul 2017 15:25:45 +0000]
+f8255c644 - another travis php 7.1 ldap test [Mon, 17 Jul 2017 14:53:28 +0000]
+6d99dc216 - still trying to fix PHP 7.1 with travis ci [Mon, 17 Jul 2017 14:47:15 +0000]
+45a42c580 - another travis + PHP 7.1 + LDAP test fix [Mon, 17 Jul 2017 14:41:44 +0000]
+30411fe54 - another travis + php 7.1 test fix [Mon, 17 Jul 2017 14:35:07 +0000]
+38844bfb4 - debugging travis PHP 7.1 ldap issue [Mon, 17 Jul 2017 14:27:23 +0000]
+6477d8148 - test a bug fix when adding servers with the same username [Mon, 17 Jul 2017 04:19:56 +0000]
+2108e8364 - add an option to disable the client ip check [Fri, 14 Jul 2017 17:26:42 +0000]
+3b8c60f79 - travis tweaks [Fri, 14 Jul 2017 17:25:58 +0000]
+87c3fa71f - change which build sends coveralls the coverage report in travis [Thu, 13 Jul 2017 23:11:58 -0500]
+721cac3b2 - add an option to disable ini tweaks [Thu, 13 Jul 2017 23:11:47 -0500]
+79d8a1990 - remove poorly thought out code of conduct [Thu, 13 Jul 2017 17:01:49 -0500]
+1ab697162 - better push notice integration that does not require an extra js include [Thu, 13 Jul 2017 21:56:44 +0000]
+6ccf913f9 - load css before javascript [Wed, 12 Jul 2017 20:54:51 +0000]
+5f621a9e8 - expand the detail about the "stay logged in" option in the hm3.ini [Mon, 10 Jul 2017 18:08:09 -0500]
+fd0b79728 - Create CODE_OF_CONDUCT.md [Mon, 3 Jul 2017 12:57:51 -0500]
+0ccc89592 - Create CODE_OF_CONDUCT.md [Mon, 3 Jul 2017 12:57:35 -0500]
+87eb09208 - Create CONTRIBUTING.md [Mon, 3 Jul 2017 12:56:06 -0500]
+464f41848 - remove unused arg after cookie refactor [Mon, 3 Jul 2017 12:21:38 -0500]
+5b9f40ea9 - version bump [Mon, 3 Jul 2017 12:10:09 -0500]
+21aa51105 - update modules to use the changed secure cookie method [Mon, 3 Jul 2017 12:09:55 -0500]
+661a4b710 - add the "stay logged in" settings to the default hm3.ini file [Mon, 3 Jul 2017 12:09:27 -0500]
+a73a79a3f - add a "stay logged in" option to the login page [Mon, 3 Jul 2017 12:09:10 -0500]
+ec88e1bf6 - refactor to allow setting the session lifetime [Mon, 3 Jul 2017 12:08:41 -0500]
+051d1ccad - check for xml support and fail gracefully if not found [Mon, 3 Jul 2017 10:20:17 -0500]
+88a730964 - theme tweaks to "stick" the title bar on mobile [Sun, 25 Jun 2017 20:30:33 -0500]
+5ca23eec2 - Merge pull request #207 from hartoismaster [Tue, 20 Jun 2017 12:32:59 -0500]
+ec67db71d - Adding Office365 Nux service [Tue, 20 Jun 2017 13:50:32 +0300]
+44e49d81c - Russian localization update [Tue, 20 Jun 2017 13:49:20 +0300]
+6856c20f5 - test a fix for exchange for expanding folders into subfolders [Mon, 19 Jun 2017 18:19:23 +0000]
+87c297f26 - inline message module updates [Sun, 18 Jun 2017 22:49:54 -0500]
+c9a980c6a - fix for saving data with dynamic login [Sun, 18 Jun 2017 22:48:22 +0000]
+84ad71422 - another small refactory [ci skip] [Fri, 16 Jun 2017 15:15:12 -0500]
+62b52a22f - yet another small refactor [ci skip] [Fri, 16 Jun 2017 14:54:13 -0500]
+f15b4f798 - another small refactor to simplify a method in the framework [Fri, 16 Jun 2017 14:13:31 -0500]
+da020aa90 - split out another method in the framework [ci skip] [Fri, 16 Jun 2017 13:38:21 -0500]
+2b85028c0 - couple more small refactor tweaks [ci skip] [Fri, 16 Jun 2017 13:18:14 -0500]
+bc6a543bb - testing some minor refactoring in the framework [ci skip] [Fri, 16 Jun 2017 13:09:16 -0500]
+9b6cd1926 - refactoring to simplify some things (no functional change) [ci skip] [Fri, 16 Jun 2017 11:22:47 -0500]
+dac4f9672 - split up some methods into smaller bits [ci skip] [Thu, 15 Jun 2017 16:42:17 -0500]
+ea5411f7f - split up a large class, no functional change [ci skip] [Thu, 15 Jun 2017 15:16:46 -0500]
+7250559c6 - decouple a trait from the handler module class [ci skip] [Thu, 15 Jun 2017 14:55:47 -0500]
+63e687c49 - refactor, no functional changes [ci skip] [Thu, 15 Jun 2017 14:38:03 -0500]
+b890b5856 - refactor to split out some logic [Thu, 15 Jun 2017 14:00:52 -0500]
+a281bd391 - remove unused return statement [ci skip] [Thu, 15 Jun 2017 13:45:41 -0500]
+43d8adac8 - typo fix in the selenium tests [Thu, 15 Jun 2017 13:44:47 -0500]
+684540fdf - reduce some duplicate code [ci skip] [Thu, 15 Jun 2017 13:30:56 -0500]
+bd3661aad - version bump [Thu, 15 Jun 2017 13:21:23 -0500]
+c5375ec76 - test coverage update [Thu, 15 Jun 2017 13:21:11 -0500]
+2afbb4a03 - refactoring to clean up some code [Thu, 15 Jun 2017 13:20:53 -0500]
+d5b1a6551 - fix for selenium tests [Thu, 15 Jun 2017 13:20:36 -0500]
+58eef3d9a - auth class cleanup [ci skip] [Thu, 15 Jun 2017 12:56:00 -0500]
+27305932f - fix dynamic login, clean up authsession setup code [Thu, 15 Jun 2017 12:50:54 -0500]
+f11321f36 - more selenium tests [ci skip] [Tue, 13 Jun 2017 21:52:34 -0500]
+4c649a66b - travis build config update for new settings selenium tests [Tue, 13 Jun 2017 20:00:26 -0500]
+d8dc6a1fe - many new selenium tests for the settings page. Lots left to do! [Tue, 13 Jun 2017 18:23:10 -0500]
+3bcd48ba8 - testing a fix for "fluttering" unread count updates [Tue, 13 Jun 2017 14:40:04 -0500]
+d6dd82114 - typo fix [Tue, 13 Jun 2017 14:01:45 -0500]
+f2f223370 - try to fix libsodium install on travis ci [Tue, 13 Jun 2017 12:26:15 -0500]
+6456dfb8a - work on making it easier to add custom themes [Fri, 9 Jun 2017 17:31:40 +0000]
+4439ae11e - doc string update [Fri, 9 Jun 2017 17:30:32 +0000]
+85c1fb819 - travis + coveralls build tweak [Tue, 6 Jun 2017 10:31:34 -0500]
+58f059554 - fix for incorrectly formatted outbound message header [Sun, 4 Jun 2017 23:16:51 -0500]
+51e9745fe - another postgresql workaround for this unit test [Sun, 4 Jun 2017 14:33:19 -0500]
+c65800feb - version bump [Sun, 4 Jun 2017 14:22:27 -0500]
+82eafcf7d - unit test work around for postgresql [Sun, 4 Jun 2017 14:22:14 -0500]
+b35977cff - remove new close method since it did not fix the unit test [Sun, 4 Jun 2017 14:21:57 -0500]
+50e08e1c1 - try to fix a unit test broken with postgresql [Sun, 4 Jun 2017 14:16:04 -0500]
+ee6b8a767 - create a close connection method for the db class [Sun, 4 Jun 2017 14:15:35 -0500]
+77adda8d7 - refactor some logic to be simpler [ci skip] [Sun, 4 Jun 2017 14:01:08 -0500]
+6a06351b8 - unit test improvements [Sun, 4 Jun 2017 13:50:31 -0500]
+9ff5ef0e2 - update for new return value type [Sun, 4 Jun 2017 13:50:15 -0500]
+74dfb1731 - don't set user notices in the framework [Sun, 4 Jun 2017 13:50:00 -0500]
+cd29d4fc1 - refactor a method for simplicity [Sun, 4 Jun 2017 13:49:40 -0500]
+70141c82a - don't set user notices in the framework [Sun, 4 Jun 2017 13:49:23 -0500]
+eaac6657f - dont' set user notices in the framework [Sun, 4 Jun 2017 13:49:02 -0500]
+de4fa6780 - slight clean up, add user notices [Sun, 4 Jun 2017 13:48:33 -0500]
+c912f92d2 - add a user notice being removed from the framework to the core mod [Sun, 4 Jun 2017 13:48:03 -0500]
+180e2a1c9 - doc string update [ci skip] [Sat, 3 Jun 2017 17:48:36 -0500]
+f3734d79c - doc string update [ci skip] [Sat, 3 Jun 2017 17:47:27 -0500]
+d77636fda - docstring update [ci skip] [Sat, 3 Jun 2017 17:42:19 -0500]
+d5ae3015a - doc string updates [ci skip] [Sat, 3 Jun 2017 17:37:37 -0500]
+e3915a59b - reset accidentally changed default db for unit tests [Sat, 3 Jun 2017 17:32:36 -0500]
+c28b6c0ee - misc fixes around db access [Sat, 3 Jun 2017 17:23:51 -0500]
+8bd3befb7 - fix accidental copypaste, more db access work [Sat, 3 Jun 2017 17:02:55 -0500]
+4f17e784f - doc string update [Sat, 3 Jun 2017 16:51:19 -0500]
+bc356e73c - simplify database access, hopefully fix some unit test errors in travis [Sat, 3 Jun 2017 16:46:52 -0500]
+e92d3b559 - testing a fix for unit tests + sqlite [Sat, 3 Jun 2017 14:35:57 -0500]
+8b1cc8bf5 - unit test update [Sat, 3 Jun 2017 14:12:12 -0500]
+58c836fa2 - fix typo that breaks deleting db users [Sat, 3 Jun 2017 14:11:51 -0500]
+92e61fbf0 - add CII Best Practices badge to our readme [Sat, 3 Jun 2017 14:04:18 -0500]
+17a933206 - add a placeholder for release notes [Sat, 3 Jun 2017 13:51:06 -0500]
+e1806ae42 - improve deubgging around creating db accounts [Sat, 3 Jun 2017 13:28:14 -0500]
+453b1c31c - tweak to the travis build to include coveralls since PHP 7.1 was disabled [Fri, 2 Jun 2017 15:09:45 -0500]
+3f4b3e3be - unit test update [Fri, 2 Jun 2017 13:43:10 -0500]
+1361ddd26 - Merge branch 'master' of github.com:jasonmunrocypht [Fri, 2 Jun 2017 13:27:10 -0500]
+e4177b2ac - Merge pull request #200 from hartoismaster [Fri, 2 Jun 2017 13:03:12 -0500]
+86a787911 - small russian localization fix [Fri, 2 Jun 2017 13:31:32 +0300]
+2dd1ddc25 - fix for no valid recipients found bug [#201] [Fri, 2 Jun 2017 13:24:03 -0500]
+153fef6eb - remove unused argument, refactor ugly handler module [Thu, 1 Jun 2017 16:54:15 -0500]
+1c8c0e8c3 - add abstract method for php session auth trait [Thu, 1 Jun 2017 16:46:35 -0500]
+f987f13de - default ini file comment updates [Thu, 1 Jun 2017 16:37:11 -0500]
+4c28f06fc - split up the php session class a bit [Thu, 1 Jun 2017 16:36:21 -0500]
+6ff648b00 - testing some validation on request uri values [Thu, 1 Jun 2017 14:19:53 -0500]
+9a47b62bd - fix a bug causing the folder list to be loaded twice on settings save [Thu, 1 Jun 2017 14:17:15 -0500]
+d50944e08 - remove unused argument [Thu, 1 Jun 2017 12:59:43 -0500]
+2ca73ac8a - remove an unused code path in the debug output logic [Thu, 1 Jun 2017 12:41:43 -0500]
+63495c904 - version bump [Thu, 1 Jun 2017 12:25:13 -0500]
+74aecd27b - remove forced tls redirect - should be handled by a web server (and it's been a cause of problems) [Thu, 1 Jun 2017 12:24:40 -0500]
+37ff13397 - use better type checks on a few server vars [Thu, 1 Jun 2017 12:23:35 -0500]
+a6a254411 - disable php 7.1 build for now [Thu, 1 Jun 2017 10:47:58 -0500]
+609564733 - even more travis tweaking [Wed, 31 May 2017 22:54:10 -0500]
+9fa597765 - testing another travis tweak [Wed, 31 May 2017 22:35:36 -0500]
+209e4d047 - another travis test [Wed, 31 May 2017 22:23:31 -0500]
+3e81a2306 - testing a refactor of the travis config [Wed, 31 May 2017 22:12:24 -0500]
+e747e87a5 - testing another tweak with travis ci [Wed, 31 May 2017 22:03:20 -0500]
+e45d33789 - yet another tweak for apache + travis + trusty [Wed, 31 May 2017 17:24:21 -0500]
+6ac22aa99 - more travis tweaking to get apache + trusty working [Wed, 31 May 2017 17:15:27 -0500]
+e36cc487e - still trying to get travis + trusty + apache working. Gettting closer! [Wed, 31 May 2017 17:03:53 -0500]
+ec86267b4 - still trying to get apache + trusty + travis ci working [Wed, 31 May 2017 16:52:11 -0500]
+ae1af96f6 - another fix for apache running in trusty in travis ci [Wed, 31 May 2017 16:47:27 -0500]
+a47f6dc77 - yet another attempt to fix travis ci builds on trusty [Wed, 31 May 2017 16:42:59 -0500]
+b61ba4256 - more tweaks to get travis ci on trusty working [Wed, 31 May 2017 16:36:38 -0500]
+211ca83ea - another attempt at fixing travis ci with trusty [Wed, 31 May 2017 16:24:28 -0500]
+9cbc0070e - try to fix broken travis build after trusty update [Wed, 31 May 2017 16:13:58 -0500]
+a9cd3f75b - work on adding user default settings to the example ini file [Wed, 31 May 2017 16:13:29 -0500]
+ac4aa0d18 - libsodium is not available for precise images in travis anymore, so start testing trusty (which I think is going to break us for a bit) [Wed, 31 May 2017 15:53:51 -0500]
+316e1a5b3 - support for defining default user settings in the main ini file [Wed, 31 May 2017 15:49:41 -0500]
+abff48601 - typo fix in the ini set file [Wed, 31 May 2017 14:03:46 -0500]
+24a22f232 - version bump [Wed, 31 May 2017 13:44:37 -0500]
+ff4af36d4 - add a couple site wide options to ease integration with other apps [Wed, 31 May 2017 13:44:17 -0500]
+cf7170ed7 - rename a few functions until we have proper namespace support [Wed, 31 May 2017 13:43:26 -0500]
+86e57ad67 - testing a refactor of the hm_modules trait [Thu, 25 May 2017 16:08:31 -0500]
+74d9f816d - doc string updates [Thu, 25 May 2017 15:38:35 -0500]
+4b31db206 - refactoring to help simplify the dispatch class [Thu, 25 May 2017 15:33:00 -0500]
+8f094d363 - move a method to the correct trait in the server list code [Thu, 25 May 2017 15:10:09 -0500]
+5d0b5f100 - testing some refactoring of a large trait (server list) [Thu, 25 May 2017 15:05:30 -0500]
+1b7af4367 - minor tweaks for static analysis [Thu, 25 May 2017 13:49:45 -0500]
+d1efdc9fe - simplify some framework methods [Thu, 25 May 2017 13:40:25 -0500]
+7d48de01b - small type tweak to make static analysis happier [Thu, 25 May 2017 13:19:42 -0500]
+56751fd5d - small tweaks to doc strings and a type check [Thu, 25 May 2017 13:14:13 -0500]
+09658c8c0 - move the auth_none class to the test framework, only enable it for tests [Thu, 25 May 2017 12:40:47 -0500]
+3e551e1c0 - unit test fix for config return type [Thu, 25 May 2017 12:40:29 -0500]
+97d57f1fe - data type correction [Thu, 25 May 2017 12:39:41 -0500]
+e417260d9 - doc string updates [Thu, 25 May 2017 12:39:31 -0500]
+a39a68a51 - remove unused arg [Tue, 23 May 2017 14:48:21 -0500]
+1b3afd123 - doc string update [Tue, 23 May 2017 13:43:25 -0500]
+051f69653 - remove the invalid input feature that does not work as expected [Tue, 23 May 2017 13:40:04 -0500]
+8c1933668 - some tweaks to request input processing [Tue, 23 May 2017 12:56:18 -0500]
+61af8d3cc - last static analysis tweak of the night (unless it breaks!) [Mon, 22 May 2017 23:52:27 -0500]
+4fb3fd788 - more code tweaking to resolve static analysis issues [Mon, 22 May 2017 23:41:06 -0500]
+2032d42ef - small code refactor to simplify and reduce duplication [Mon, 22 May 2017 23:24:43 -0500]
+d3e724979 - small code clean up for open basedir assignment [Mon, 22 May 2017 23:11:44 -0500]
+bb8317865 - refactor some duplicate code [Mon, 22 May 2017 23:02:13 -0500]
+9f3eccf31 - misc small static analysis fixes [Mon, 22 May 2017 22:43:23 -0500]
+07f281357 - another attempt at fixing some static analysis issues [Mon, 22 May 2017 22:21:42 -0500]
+94bc72357 - move some methods to the base session class from the php class [Mon, 22 May 2017 22:04:21 -0500]
+9d30d3d86 - small init changes for request property types [Mon, 22 May 2017 21:46:56 -0500]
+2a0daf159 - slight refactor to hopefully fix the last "major" static analysis issue [Mon, 22 May 2017 21:35:46 -0500]
+f5e167d63 - yet another static analysis refactor [Mon, 22 May 2017 21:22:58 -0500]
+d72b8dbf9 - refactoring to fix some static anlysis issues (hopefully) [Mon, 22 May 2017 20:52:11 -0500]
+0c790afdc - doc string update [Mon, 22 May 2017 20:33:52 -0500]
+2126832b2 - reduce some duplicated code [Mon, 22 May 2017 19:38:26 -0500]
+ba2f244d3 - typo fix in the README update [Mon, 22 May 2017 16:21:49 -0500]
+184caa34c - doc string and readme updates, and version a version bump [Mon, 22 May 2017 16:20:36 -0500]
+39d0fa828 - doc string updates [Mon, 22 May 2017 15:23:18 -0500]
+54a3e6b57 - refactor to reduce some duplication [Mon, 22 May 2017 15:14:51 -0500]
+089c14983 - more refactoring to reduce method complexity [Mon, 22 May 2017 14:48:50 -0500]
+22a525343 - more refactoring, and a unit test update [Mon, 22 May 2017 14:26:36 -0500]
+d712c1e8a - more refactoring to reduce method complexity [Mon, 22 May 2017 13:46:26 -0500]
+e9bd79f90 - unit test coverage update [Mon, 22 May 2017 13:46:14 -0500]
+e908090a5 - another refactor to reduce method complexity [Mon, 22 May 2017 13:32:05 -0500]
+0cb90bb6d - refactor some methods to reduce complexity [Mon, 22 May 2017 13:10:46 -0500]
+771d0562a - doc string update [Mon, 22 May 2017 12:36:53 -0500]
+fa523cb6f - some refactoring to simplify the modules class methods [Mon, 22 May 2017 12:32:37 -0500]
+c64f8efdb - reduce some duplication in the db session class [Sat, 20 May 2017 18:28:55 -0500]
+56aef2147 - doc string updates [Sat, 20 May 2017 01:21:38 -0500]
+f68fc83bc - fix phpunit test coverage so it's back to 100% [Sat, 20 May 2017 01:16:30 -0500]
+e1cf5e87d - change scope for unit testing [Sat, 20 May 2017 01:16:03 -0500]
+b75cd1877 - refactor to reduce complexity [Sat, 20 May 2017 01:00:37 -0500]
+3507e5e0f - refactor to simplify the php session check method [Sat, 20 May 2017 00:43:32 -0500]
+daa2f7061 - doc string update [Sat, 20 May 2017 00:32:48 -0500]
+7d351c8b2 - doc string updates [Sat, 20 May 2017 00:29:01 -0500]
+5e3dad3bb - doc string fixes [Sat, 20 May 2017 00:22:09 -0500]
+627c1c67c - I think I'm obsessed with this static analysis tool. Must keep improving... [Sat, 20 May 2017 00:17:55 -0500]
+5a8d4a002 - more refactoring based on static analysis [Sat, 20 May 2017 00:02:29 -0500]
+83c82ee35 - slight refactoring to simplify the connect method [Fri, 19 May 2017 23:42:35 -0500]
+c666472e9 - refactor setup_session to have less complexity [Fri, 19 May 2017 23:32:19 -0500]
+a77b98517 - another static analysis refactor [Fri, 19 May 2017 22:39:06 -0500]
+d14770bb9 - still doing static analysis refactoring [Fri, 19 May 2017 21:24:57 -0500]
+b2f3eabcb - another static analysis refactor [Fri, 19 May 2017 21:03:03 -0500]
+ea71c6710 - another static code analysis related refactor [Fri, 19 May 2017 20:25:22 -0500]
+d8c4b8b3b - more refactoring for the static analysis gods [Fri, 19 May 2017 19:42:19 -0500]
+0fa8639f6 - some refactoring to reduce duplication [Fri, 19 May 2017 18:36:16 -0500]
+be35f05b2 - couple more static analysis tweaks [Fri, 19 May 2017 18:21:04 -0500]
+d71801d43 - yet another static analysis change [Fri, 19 May 2017 18:09:19 -0500]
+1dac79644 - tweak for some static analysis fixes [Fri, 19 May 2017 18:02:24 -0500]
+790ea879c - still trying to fix class compilation in php5 [Fri, 19 May 2017 17:50:14 -0500]
+fe5b3e99f - another attempt to fix class compisition in php 5 (and keep from breaking static analysis) [Fri, 19 May 2017 17:40:29 -0500]
+d7cf666e6 - fix some stuff I broke and add some more static analysis changes [Fri, 19 May 2017 17:13:57 -0500]
+924f74045 - MOAR static analysis updates, and a few unit test tweaks to match [Fri, 19 May 2017 16:59:56 -0500]
+a6fd1cf9e - even more static analysis tweaking for scrutinizer ci [Fri, 19 May 2017 16:34:49 -0500]
+d9fedf60e - more tweaks for static analysis [Fri, 19 May 2017 16:20:42 -0500]
+0d20d1e0e - another round of tweaks for static analysis [Fri, 19 May 2017 15:47:53 -0500]
+07b1624ef - more static analysis related tweaks to the framework [Fri, 19 May 2017 15:34:56 -0500]
+b999e6fb6 - more comment clean up for static analysis [Fri, 19 May 2017 15:05:23 -0500]
+e9ff544d6 - comment clean up to help with static analysis [Fri, 19 May 2017 14:51:57 -0500]
+0e4804c19 - testing some slight changes to improve static analysis [Fri, 19 May 2017 13:16:47 -0500]
+ae9564c28 - add doc strings produced by scrutinizer ci [Fri, 19 May 2017 12:58:42 -0500]
+56d94d111 - Merge branch 'master' of github.com:jasonmunrocypht [Fri, 19 May 2017 12:49:54 -0500]
+c7276dfa3 - Merge pull request #198 from mav-master [Thu, 18 May 2017 10:23:07 -0500]
+bda35ad95 - Added initial wip version of So Alone theme [Thu, 18 May 2017 11:48:46 +0200]
+8717e5671 - Allow to load local fonts in CSP [Thu, 18 May 2017 11:45:00 +0200]
+1dbbad8f1 - fix small type mismatch in functions for setting cookies [Fri, 19 May 2017 12:48:23 -0500]
+c569bc0cc - add coveralls coverage status to the readme [Tue, 16 May 2017 13:57:28 -0500]
+2f416fec1 - more travis ci tweaking [Tue, 16 May 2017 12:42:28 -0500]
+b60d15473 - another travis ci tweak for libsodium [Tue, 16 May 2017 12:21:43 -0500]
+7526dc623 - see if we can get libsodium installed in the travis container [Tue, 16 May 2017 12:12:42 -0500]
+65adfde6a - still trying to get coveralls working in travis [Tue, 16 May 2017 11:58:49 -0500]
+fea0ff854 - more testing with coveralls + travis ci [Tue, 16 May 2017 11:46:26 -0500]
+1cfeb7e36 - testing out coveralls with travis ci builds [Tue, 16 May 2017 11:32:16 -0500]
+17e39b84b - add a new ignore path [Tue, 16 May 2017 11:30:27 -0500]
+cda308c7d - generate clover coverage report for phpunit tests [Tue, 16 May 2017 11:29:56 -0500]
+a567483f2 - add a new ignore path [Tue, 16 May 2017 11:29:34 -0500]
+73de99b24 - version bump [Mon, 15 May 2017 18:34:26 -0500]
+a1515de91 - unit test update for better code coverage [Mon, 15 May 2017 18:33:45 -0500]
+8d8630892 - slight refactore for brevity and better unit testing [Mon, 15 May 2017 18:33:16 -0500]
+9940353d1 - version bump [Mon, 15 May 2017 18:00:55 -0500]
+e89b59e59 - unit test updates for changes to the framework [Mon, 15 May 2017 18:00:44 -0500]
+40ca661d4 - don't allow dynamic auth type without the dynamic login module activiated [Mon, 15 May 2017 18:00:22 -0500]
+ed58c2983 - typo fix, thanks mwolfeu! [Mon, 15 May 2017 17:32:23 -0500]
+06afef0ec - comment fix [Mon, 15 May 2017 17:06:42 -0500]
+447286744 - version bump [Mon, 15 May 2017 17:03:43 -0500]
+adc025ee6 - attempt to make it easier to override sessions and auth for a site [Mon, 15 May 2017 17:03:11 -0500]
+cd5061fd2 - unit test update for the changes to includes in the framework [Mon, 15 May 2017 17:02:23 -0500]
+c3f684c36 - move some includes and start work on a configurable session limit [Mon, 15 May 2017 17:00:23 -0500]
