@@ -116,7 +116,7 @@ add_handler('ajax_update_server_pw', 'process_pw_update', true, 'core', 'check_m
 
 /* folder list update ajax request */
 setup_base_ajax_page('ajax_hm_folders', 'core');
-add_handler('ajax_hm_folders', 'check_folder_icon_setting', true, 'ccore', 'load_user_data', 'after');
+add_handler('ajax_hm_folders', 'check_folder_icon_setting', true, 'core', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
 add_output('ajax_hm_folders', 'search_from_folder_list', true);
