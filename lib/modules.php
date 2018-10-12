@@ -30,6 +30,9 @@ trait Hm_Modules_Queue {
     /* queue for delayed module insertion for all pages */
     private static $all_page_queue = array();
 
+    /* queue for module replacement */
+    private static $replace_queue = array();
+
     /**
      * Queue a module to be added to all defined pages
      * @param string $module the module to add
@@ -72,6 +75,27 @@ trait Hm_Modules_Queue {
             Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
         }
         return false;
+    }
+
+    /**
+     * Queue a module replacement for retry
+     * @param string $target the module to replace
+     * @param string $replacement the module to replace the target with
+     * @param string $page the page to do the replacement for
+     * @return void
+     */
+    private static function queue_replacement_module($target, $replacement, $page) {
+        self::$replace_queue[] = array($target, $replacement, $page, self::$source);
+    }
+
+    /**
+     * Process the replacement queue and try to replace modules
+     * @return void
+     */
+    public static function process_replace_queue() {
+        foreach (self::$replace_queue as $vals) {
+            self::replace($vals[0], $vals[1], $vals[2], $vals[3]);
+        }
     }
 
     /**
@@ -231,20 +255,27 @@ trait Hm_Modules {
      * @param string $target module name to replace
      * @param string $replacement module name to swap in
      * @param string $page page to replace assignment on, try all pages if false
+     * @param string $source module set source
      * @return void
      */
-    public static function replace($target, $replacement, $page=false) {
+    public static function replace($target, $replacement, $page=false, $source=false) {
+        $found = false;
         if ($page !== false) {
             if (array_key_exists($page, self::$module_list) && array_key_exists($target, self::$module_list[$page])) {
-                self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
+                self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page], $source);
+                $found = true;
             }
         }
         else {
             foreach (self::$module_list as $page => $modules) {
                 if (array_key_exists($target, $modules)) {
-                    self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page]);
+                    self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page], $source);
+                    $found = true;
                 }
             }
+        }
+        if (!$found) {
+            self::queue_replacement_module($target, $replacement, $page);
         }
     }
 
@@ -253,16 +284,20 @@ trait Hm_Modules {
      * @param string $target array key to replace
      * @param string $replacement array key to swap in
      * @param array $modules list of modules
+     * @param string $source module set source
      * @return array new list with the key swapped out
      */
-    private static function swap_key($target, $replacement, $modules) {
+    private static function swap_key($target, $replacement, $modules, $source) {
+        if (!$source) {
+            $source = self::$source;
+        }
         $keys = array_keys($modules);
         $values = array_values($modules);
         $size = count($modules);
         for ($i = 0; $i < $size; $i++) {
             if ($keys[$i] == $target) {
                 $keys[$i] = $replacement;
-                $values[$i][0] = self::$source;
+                $values[$i][0] = $source;
                 break;
             }
         }
