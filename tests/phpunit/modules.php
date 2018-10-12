@@ -116,6 +116,16 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
         Hm_Test_Module_List::try_queued_modules();
         $this->assertEquals(3, count(Hm_Test_Module_List::get_for_page('test')));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_module_replace() {
+        Hm_Test_Module_List::replace('foo', false, 'test');
+        Hm_Test_Module_List::add('test', 'foo', false);
+        Hm_Test_Module_List::process_replace_queue();
+        $this->assertTrue(array_key_exists('', Hm_Test_Module_List::get_for_page('test')));
+    }
 }
 
 /**
