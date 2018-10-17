@@ -202,10 +202,13 @@ install_coveralls() {
 
 # install libsodium
 install_sodium() {
-    sudo apt-get install libsodium-dev -y
-    pecl channel-update pecl.php.net
-    pecl uninstall libsodium
-    pecl install libsodium-2.0.7
+    if [ "$TRAVIS_PHP_VERSION" != "7.2" ]; then
+        sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
+        sudo apt-get install libsodium-dev -y
+        pecl channel-update pecl.php.net
+        pecl uninstall libsodium
+        pecl install libsodium-2.0.7
+    fi
 }
 
 # setup just what is needed for the phpunit unit tests
