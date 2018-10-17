@@ -356,7 +356,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     $this->out('message_list_since', $this->user_config->get('github_since_setting', DEFAULT_SINCE));
                     $this->out('per_source_limit', $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE));
                     foreach ($repos as $repo) {
-                        $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                        $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => $repo, 'id' => $repo));
                     }
                 }
                 else {
@@ -370,14 +370,14 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                         $this->out('list_path', $path, false);
                     }
                     $this->out('custom_list_controls', ' ');
-                    $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                    $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => $repo, 'id' => $repo));
                 }
             }
             elseif ($this->page == 'message_list' && ($path == 'combined_inbox' || $path == 'unread')) {
                 $github_list = true;
                 if (!$excluded || $path == 'combined_inbox') {
                     foreach ($repos as $repo) {
-                        $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                        $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => $repo, 'id' => $repo));
                     }
                 }
             }
