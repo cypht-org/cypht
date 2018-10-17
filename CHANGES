@@ -1,3 +1,5 @@
+986aa0e60 - update travis config to not install libsodium for PHP 7.2 [Wed, 17 Oct 2018 12:54:35 -0500]
+5e59fb246 - change log update -remove some duplicates and add new commits [Wed, 17 Oct 2018 12:36:18 -0500]
 b73ecb1cb - fix github source names in combined view source list [Wed, 17 Oct 2018 12:21:23 -0500]
 c83e7013c - change log update and clean up [Fri, 12 Oct 2018 12:41:59 -0500]
 30c677266 - fix outbound reply-to when no profile is enabled issue #291 [Fri, 12 Oct 2018 12:04:24 -0500]
