@@ -230,8 +230,7 @@ class Hm_Handler_process_add_ldap_contact extends Hm_Handler_Module {
 class Hm_Handler_load_ldap_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
-        list($contacts, $ldap_config) = fetch_ldap_contacts($this->config, $contacts);
-        $ldap_config = ldap_add_user_auth($ldap_config, $this->user_config->get('ldap_contacts_auth_setting', array()));
+        list($contacts, $ldap_config) = fetch_ldap_contacts($this->config, $this->user_config, $contacts);
         $this->append('contact_sources', 'ldap');
         $edit = false;
         $sources = array();
@@ -770,8 +769,9 @@ function get_ldap_value($fld, $mod) {
  * @subpackage ldap_contacts/functions
  */
 if (!hm_exists('fetch_ldap_contacts')) {
-function fetch_ldap_contacts($config, $contact_store, $session=false) {
+function fetch_ldap_contacts($config, $user_config, $contact_store, $session=false) {
     $ldap_config = ldap_config($config);
+    $ldap_config = ldap_add_user_auth($ldap_config, $user_config->get('ldap_contacts_auth_setting', array()));
     if (count($ldap_config) > 0) {
         foreach ($ldap_config as $name => $vals) {
             $vals['name'] = $name;
