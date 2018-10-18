@@ -1,3 +1,6 @@
+318a71cbb - another fix for issue #292, this allows empty userpass settings [Thu, 18 Oct 2018 12:26:08 -0500]
+7b2b0028b - fix for ldap contacts not using user supplied creds issue #292 [Thu, 18 Oct 2018 12:13:27 -0500]
+a520d6e52 - another change log update [Wed, 17 Oct 2018 13:11:50 -0500]
 986aa0e60 - update travis config to not install libsodium for PHP 7.2 [Wed, 17 Oct 2018 12:54:35 -0500]
 5e59fb246 - change log update -remove some duplicates and add new commits [Wed, 17 Oct 2018 12:36:18 -0500]
 b73ecb1cb - fix github source names in combined view source list [Wed, 17 Oct 2018 12:21:23 -0500]
