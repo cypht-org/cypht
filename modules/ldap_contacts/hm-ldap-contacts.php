@@ -40,8 +40,10 @@ class Hm_LDAP_Contacts extends Hm_Auth_LDAP {
 
     protected function auth() {
         if (array_key_exists('auth', $this->config) && $this->config['auth']) {
-            if (array_key_exists('user', $this->config) && array_key_exists('pass', $this->config)) {
-                return ldap_bind($this->fh, $this->config['user'], $this->config['pass']);
+            if (array_key_exists('user', $this->config) && $this->config['user'] &&
+                array_key_exists('pass', $this->config) && $this->config['pass']) {
+
+                return @ldap_bind($this->fh, $this->config['user'], $this->config['pass']);
             }
         }
         else {
