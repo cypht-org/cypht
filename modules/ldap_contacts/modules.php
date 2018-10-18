@@ -285,10 +285,10 @@ class Hm_Handler_process_ldap_auth_settings extends Hm_Handler_Module {
         }
         foreach ($connections as $name => $vals) {
             $creds = array();
-            if (array_key_exists($name, $users) && trim($users[$name])) {
+            if (array_key_exists($name, $users)) {
                 $results[$name]['user'] = $users[$name];
             }
-            if (array_key_exists($name, $passwords) && trim($passwords[$name])) {
+            if (array_key_exists($name, $passwords)) {
                 $results[$name]['pass'] = $passwords[$name];
             }
         }
@@ -798,6 +798,9 @@ function ldap_add_user_auth($ldap_config, $auths) {
     foreach ($auths as $name => $vals) {
         if (array_key_exists($name, $ldap_config)) {
             if (array_key_exists('user', $vals)) {
+                if (!$vals['user']) {
+                    continue;
+                }
                 $user = sprintf('cn=%s,%s', $vals['user'], $ldap_config[$name]['base_dn']);
                 $ldap_config[$name]['user'] = $user;
             }
