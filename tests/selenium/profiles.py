@@ -47,7 +47,8 @@ class ProfileTest(WebTest):
         table.find_element_by_tag_name('a').click()
         self.wait_with_folder_list()
         self.by_name('profile_delete').click()
-        assert 'No Profiles Found' in self.by_class('profile_content').text
+        self.wait_on_sys_message()
+        assert self.by_class('sys_messages').text == 'Profile Deleted'
 
 
 if __name__ == '__main__':

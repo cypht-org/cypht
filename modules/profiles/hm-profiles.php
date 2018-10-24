@@ -24,6 +24,9 @@ class Hm_Profiles {
         if (count($this->data) == 0) {
             $this->load_legacy($hmod);
         }
+        if (count($this->data) == 0) {
+            $this->create_default($hmod);
+        }
     }
 
     public function load_new($hmod) {
@@ -52,6 +55,32 @@ class Hm_Profiles {
         }
         $this->data[$id]['default'] = true;
         return true;
+    }
+
+    public function create_default($hmod) {
+        if (!$hmod->module_is_supported('imap') || !$hmod->module_is_supported('smtp')) {
+            return;
+        }
+        if (!$hmod->config->get('autocreate_profile')) {
+            return;
+        }
+        $imap_servers = Hm_IMAP_List::dump();
+        $smtp_servers = Hm_SMTP_List::dump();
+        list($address, $reply_to) = outbound_address_check($hmod, $imap_servers[0]['user'], '');
+        if (count($imap_servers) == 1 && count($smtp_servers) == 1) {
+            $this->data[] = array(
+                'default' => true,
+                'name' => 'Default',
+                'address' => $address,
+                'replyto' => $reply_to,
+                'smtp_id' => 0,
+                'sig' => '',
+                'type' => 'imap',
+                'autocreate' => true,
+                'user' => $imap_servers[0]['user'],
+                'server' => $imap_servers[0]['server'],
+            );
+        }
     }
 
     public function load_legacy($hmod) {
@@ -96,6 +125,14 @@ class Hm_Profiles {
         return false;
 
     }
+
+    public function get($id) {
+        if (array_key_exists($id, $this->data)) {
+            return $this->data[$id];
+        }
+        return false;
+    }
+
     public function list_all() {
         return $this->data;
     }
