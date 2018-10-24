@@ -65,6 +65,11 @@ class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
         $data = $this->get('profiles');
         if (count($data) > $form['profile_id']) {
             $profiles = new Hm_Profiles($this);
+            $del_profile = $profiles->get($form['profile_id']);
+            if ($del_profile && array_key_exists('autocreate', $del_profile)) {
+                Hm_Msgs::add('ERRAutomatically created profile cannot be deleted');
+                return;
+            }
             if ($profiles->del($form['profile_id'])) {
                 $this->session->record_unsaved('Profile deleted');
                 Hm_Msgs::add('Profile Deleted');
