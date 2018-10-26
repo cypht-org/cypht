@@ -1,3 +1,6 @@
+4b227530f - fix for movecopy with inline message view issue #296 [Fri, 26 Oct 2018 10:57:24 -0500]
+161e19d2d - add an auto-create profile option for issue #293 [Wed, 24 Oct 2018 14:49:43 -0500]
+994146b1b - change log update [Thu, 18 Oct 2018 12:40:54 -0500]
 318a71cbb - another fix for issue #292, this allows empty userpass settings [Thu, 18 Oct 2018 12:26:08 -0500]
 7b2b0028b - fix for ldap contacts not using user supplied creds issue #292 [Thu, 18 Oct 2018 12:13:27 -0500]
 a520d6e52 - another change log update [Wed, 17 Oct 2018 13:11:50 -0500]
