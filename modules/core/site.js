@@ -140,8 +140,8 @@ var Hm_Ajax_Request = function() { return {
             if (hm_encrypt_ajax_requests()) {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
-            if (!res || (res.state && res.state == 'not callable') || !res.router_login_state) {
-                window.location.href = "?page=home";
+            if ((res.state && res.state == 'not callable') || !res.router_login_state) {
+                this.fail(res);
                 return;
             }
             if (Hm_Ajax.err_condition) {
