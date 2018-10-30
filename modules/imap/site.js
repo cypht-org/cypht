@@ -551,7 +551,11 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         }
     }
     $('.header_toggle').click(function() { return Hm_Utils.toggle_long_headers(); });
-    $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart'), false, false, false, false, false, $(this).data('allowImages')); });
+    $('.msg_part_link').click(function() {
+        $('.header_subject')[0].scrollIntoView();
+        $('.msg_text_inner').css('visibility', 'hidden');
+        return get_message_content($(this).data('messagePart'), false, false, false, false, false, $(this).data('allowImages'));
+    });
     $('#flag_msg').click(function() { return imap_flag_message($(this).data('state')); });
     $('#unflag_msg').click(function() { return imap_flag_message($(this).data('state')); });
     $('#delete_message').click(function() { return imap_delete_message(); });
