@@ -1,3 +1,6 @@
+c3a845e6d - improve coverage for webdav format tests [Tue, 30 Oct 2018 13:27:25 -0500]
+9dedcc739 - don't redirect on ajax failure. this helps with issue #298 [Tue, 30 Oct 2018 13:26:40 -0500]
+84012b68a - update change log [Fri, 26 Oct 2018 15:23:20 -0500]
 4b227530f - fix for movecopy with inline message view issue #296 [Fri, 26 Oct 2018 10:57:24 -0500]
 161e19d2d - add an auto-create profile option for issue #293 [Wed, 24 Oct 2018 14:49:43 -0500]
 994146b1b - change log update [Thu, 18 Oct 2018 12:40:54 -0500]
