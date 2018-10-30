@@ -1,3 +1,5 @@
+a5ce3c6d7 - slight UI improvement when loading different IMAP message parts [Tue, 30 Oct 2018 15:56:57 -0500]
+7d877c0ab - update change log for release [Tue, 30 Oct 2018 13:40:11 -0500]
 c3a845e6d - improve coverage for webdav format tests [Tue, 30 Oct 2018 13:27:25 -0500]
 9dedcc739 - don't redirect on ajax failure. this helps with issue #298 [Tue, 30 Oct 2018 13:26:40 -0500]
 84012b68a - update change log [Fri, 26 Oct 2018 15:23:20 -0500]
