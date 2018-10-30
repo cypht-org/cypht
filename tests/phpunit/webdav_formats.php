@@ -76,6 +76,7 @@ SEQUENCE:2
 UID:uid4@example.com
 DTSTART;TZID=US-Eastern:19970714T133000
 DUE:19980415T235959
+DTEND:19990415T235959
 STATUS:NEEDS-ACTION
 SUMMARY:Submit Income Taxes
 BEGIN:VALARM
@@ -89,7 +90,7 @@ END:VALARM
 END:VTODO
 END:VCALENDAR';
         $this->assertTrue($parser->import($card));
-        $this->assertEquals(16, count($parser->parsed_data()));
+        $this->assertEquals(17, count($parser->parsed_data()));
     }
 }
 ?>
