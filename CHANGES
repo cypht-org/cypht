@@ -1,3 +1,6 @@
+4be4411bf - update sample ini for removed module sets [Thu, 1 Nov 2018 12:12:07 -0500]
+c8979e60c - remove wordpress module. the .com api changes or is broken [Thu, 1 Nov 2018 12:11:48 -0500]
+9268df5d8 - change log update [Tue, 30 Oct 2018 16:03:16 -0500]
 a5ce3c6d7 - slight UI improvement when loading different IMAP message parts [Tue, 30 Oct 2018 15:56:57 -0500]
 7d877c0ab - update change log for release [Tue, 30 Oct 2018 13:40:11 -0500]
 c3a845e6d - improve coverage for webdav format tests [Tue, 30 Oct 2018 13:27:25 -0500]
