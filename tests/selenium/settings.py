@@ -136,9 +136,6 @@ class SettingsTests(SettingsHelpers):
     def unread_exclude_github_test(self):
         self.checkbox_test('unread_setting', 'unread_exclude_github', False, 'github')
 
-    def unread_exclude_wp_test(self):
-        self.checkbox_test('unread_setting', 'unread_exclude_wordpress', False, 'wordpress')
-
     def unread_exclude_feed_test(self):
         self.checkbox_test('unread_setting', 'unread_exclude_feeds', False, 'feeds')
         self.close_section('unread_setting')
@@ -214,7 +211,6 @@ if __name__ == '__main__':
         'unread_since_test',
         'unread_max_per_source_test',
         'unread_exclude_github_test',
-        'unread_exclude_wp_test',
         'unread_exclude_feed_test',
 
         # flagged options
