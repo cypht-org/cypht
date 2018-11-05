@@ -36,7 +36,8 @@ var inline_feed_msg = function(uid, list_path, inline_msg_loaded_callback) {
 
 
 var inline_msg_prep_imap_delete = function(path, uid, details) {
-    $('#'+path.substr(1)).prop('checked', false);
+    $('#'+path).prop('checked', false);
+    Hm_Message_List.remove_after_action('delete', [path]);
     return imap_delete_message(false, uid, details);
 };
 
@@ -52,14 +53,7 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     $('.part_charset').hide();
     $('div', $(path)).removeClass('unseen');
     $(path).removeClass('unseen');
-
-    $('#unflag_msg').unbind('click');
-    $('#flag_msg').unbind('click');
-    $('#delete_message').unbind('click');
-
-    $('#delete_message').click(function() { return inline_msg_prep_imap_delete(path, uid, details); });
-    $('#flag_msg').click(function() { return imap_flag_message($(this).data('state'), uid, details); });
-    $('#unflag_msg').click(function() { return imap_flag_message($(this).data('state', uid, details)); });
+    update_imap_links(uid, details);
 };
 
 var msg_container = function(type, path) {
@@ -117,6 +111,16 @@ var msg_inline_close = function() {
     $('tr').removeClass('hl');
 };
 
+var update_imap_links = function(uid, details) {
+    var path = details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
+    $('#unflag_msg').unbind('click');
+    $('#flag_msg').unbind('click');
+    $('#delete_message').unbind('click');
+    $('#delete_message').click(function() { return inline_msg_prep_imap_delete(path, uid, details); });
+    $('#flag_msg').click(function() { return imap_flag_message($(this).data('state'), uid, details); });
+    $('#unflag_msg').click(function() { return imap_flag_message($(this).data('state', uid, details)); });
+};
+
 var capture_subject_click = function() {
     $('a', $('.subject')).off('click');
     $('a', $('.subject')).click(function(e) {
@@ -127,6 +131,7 @@ var capture_subject_click = function() {
             $('.header_subject th').append('<span class="close_inline_msg">X</span>');
             $('.close_inline_msg').click(function() { msg_inline_close(); });
             $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
+            update_imap_links(uid, details);
         };
 
         if (list_path && uid) {
