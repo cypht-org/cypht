@@ -247,7 +247,6 @@ class Hm_Dispatch {
      */
     private function save_session() {
         $res = $this->session->is_active();
-        Hm_Page_Cache::save($this->session);
         $this->session->end();
         return $res;
     }

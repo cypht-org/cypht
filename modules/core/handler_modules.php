@@ -151,7 +151,6 @@ class Hm_Handler_close_session_early extends Hm_Handler_Module {
      * Uses the close_early method of the session this->session object
      */
     public function process() {
-        Hm_Page_Cache::save($this->session);
         $this->session->close_early();
     }
 }
@@ -475,7 +474,6 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
             foreach ($new_settings as $name => $value) {
                 $this->user_config->set($name, $value);
             }
-            Hm_Page_Cache::flush($this->session);
             Hm_Msgs::add('Settings updated');
             $this->session->record_unsaved('Site settings updated');
             $this->out('reload_folders', true, false);
@@ -569,7 +567,6 @@ class Hm_Handler_login extends Hm_Handler_Module {
             $this->session->check($this->request);
         }
         if ($this->session->is_active()) {
-            Hm_Page_Cache::load($this->session);
             $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
             $this->out('username', $this->session->get('username'));
         }

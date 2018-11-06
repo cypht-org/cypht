@@ -48,13 +48,8 @@ class Hm_POP3_List {
      * @param int $id server id
      * @return mixed
      */
-    public static function get_cache($session, $config, $id) {
-        $cache = new Hm_Memcached($config);
-        $key = hash('sha256', (sprintf('pop3%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
-        $res = $cache->get($key, $session->enc_key);
-        if (!$res) {
-            Hm_Debug::add('POP3 cache miss from Memcached');
-        }
+    public static function get_cache($hm_cache, $id) {
+        $res = $hm_cache->get('pop3'.$id);
         return $res;
     }
 }

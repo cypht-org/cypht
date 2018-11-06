@@ -155,15 +155,19 @@ class Hm_Transform {
      * Convert a stringified array back to an array
      * @param string|false $data data to be transformed from a string
      * @param string $encoding encoding to use for values
-     * @return mixed array on success, false on failure
+     * @param boolean $return return original string if true
+     * @return mixed array on success, false or original string on failure
      */
-    public static function unstringify($data, $encoding='base64_decode') {
+    public static function unstringify($data, $encoding='base64_decode', $return=false) {
         if (!is_string($data) || !trim($data)) {
             return false;
         }
         $result = self::convert($data);
         if (is_array($result)) {
             return self::hm_encode($result, $encoding);
+        }
+        if ($return) {
+            return $data;
         }
         return false;
     }

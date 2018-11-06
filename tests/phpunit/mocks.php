@@ -1,6 +1,7 @@
 <?php
 
 class Hm_Mock_Session {
+    public $enc_key = 'asdf';
     public $loaded = true;
     public $auth_state = true;
     public $cookie_set = false;
@@ -14,6 +15,13 @@ class Hm_Mock_Session {
             return $this->data[$id];
         }
         return $default;
+    }
+    public function del($name) {
+        if (array_key_exists($name, $this->data)) {
+            unset($this->data[$name]);
+            return true;
+        }
+        return false;
     }
     public function set($name, $value) {
         $this->data[$name] = $value;
@@ -48,6 +56,17 @@ class Hm_Mock_Session {
         return true;
     }
 }
+class Hm_Mock_Redis_No {
+    public static $fail_type = 'exception';
+    function connect($server, $port) {
+        if (self::$fail_type == 'exception') {
+            throw new Exception();
+        }
+        else {
+            return false;
+        }
+    }
+}
 class Hm_Mock_Memcached_No {
     function addServer($server, $port) {
         return false;
@@ -56,6 +75,7 @@ class Hm_Mock_Memcached_No {
 class Hm_Mock_Memcached {
     private $data = array();
     public static $set_failure = false;
+    const RES_NOTFOUND = 1;
     const OPT_BINARY_PROTOCOL = false;
     function addServer($server, $port) {
         return true;
@@ -89,10 +109,27 @@ class Hm_Mock_Memcached {
     function setSaslAuthData($u, $p) {
         return true;
     }
+    function getResultCode() {
+        return 16;
+    }
 }
 
+class Hm_Mock_Redis extends Hm_Mock_Memcached {
+    function connect($server, $port) {
+        return true;
+    }
+    function select($index) {
+        return true;
+    }
+    function auth($pass) {
+        return true;
+    }
+}
 if (!class_exists('Memcached')) {
     class Memcached extends Hm_Mock_Memcached {}
+}
+if (!class_exists('Redis')) {
+    class Redis extends Hm_Mock_Redis {}
 }
 class Hm_Mock_Config {
     public $mods = array();
@@ -197,6 +234,7 @@ class Hm_Functions {
     public static $resource = false;
     public static $rand_bytes = 'good';
     public static $memcache = true;
+    public static $redis_on = true;
     public static $exists = true;
     public static $exec_res = '{"unit":"test"}';
     public static $filter_failure = false;
@@ -220,6 +258,7 @@ class Hm_Functions {
     }
     public static function class_exists($func) { return self::$exists; }
     public static function memcached() { return self::$memcache ? new Hm_Mock_Memcached() : new Hm_Mock_Memcached_No(); }
+    public static function redis() { return self::$redis_on ? new Hm_Mock_Redis() : new Hm_Mock_Redis_No(); }
     public static function random_bytes($size) {
         if (self::$rand_bytes == 'good') {
             return random_bytes($size);
@@ -302,6 +341,7 @@ function build_parent_mock($request_type='HTML5') {
     $parent->request = new Hm_Mock_Request($request_type);
     $parent->site_config = new Hm_Mock_Config();
     $parent->user_config = new Hm_Mock_Config();
+    $parent->cache = new Hm_Cache($parent->session, $parent->site_config);
     return $parent;
 }
 function delete_uploaded_files($obj) {

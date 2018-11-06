@@ -165,6 +165,13 @@ if (!class_exists('Hm_Functions')) {
         }
 
         /**
+         * @return Redis
+         */
+        public static function redis() {
+            return new Redis();
+        }
+
+        /**
          * @param string $type input type
          * @param array $filters filter list
          * @return array filtered list

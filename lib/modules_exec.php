@@ -147,6 +147,7 @@ trait Hm_Handler_Module_Exec {
         $protected = array();
         $this->request = $request;
         $this->session = $session;
+        $this->cache = new Hm_Cache($this->site_config, $session);
         $modules = Hm_Handler_Modules::get_for_page($page);
         foreach ($modules as $name => $args) {
             list($input, $protected) = $this->run_handler_module($input, $protected, $name, $args, $session);

@@ -89,7 +89,6 @@ class Hm_Handler_process_dynamic_login extends Hm_Handler_login {
                 }
             }
             $this->session->auth_class = $this->session->get('auth_class');
-            Hm_Page_Cache::load($this->session);
             $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
         }
         Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);

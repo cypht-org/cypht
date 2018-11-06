@@ -319,6 +319,7 @@ abstract class Hm_Handler_Module {
     /* user settings */
     public $user_config;
 
+    public $cache;
     /**
      * Assign input and state sources
      * @param object $parent instance of the Hm_Request_Handler class
@@ -329,6 +330,7 @@ abstract class Hm_Handler_Module {
     public function __construct($parent, $page, $output=array(), $protected=array()) {
         $this->session = $parent->session;
         $this->request = $parent->request;
+        $this->cache = $parent->cache;
         $this->page = $page;
         $this->config = $parent->site_config;
         $this->user_config = $parent->user_config;

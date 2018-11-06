@@ -219,6 +219,7 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
         $this->assertEquals('testvalue', $session->get('test'));
         $session->del('test');
         $this->assertFalse($session->get('test'));
+        $this->assertFalse($session->del('notfound'));
         $session->destroy($request);
     }
     /**

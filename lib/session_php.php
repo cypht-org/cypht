@@ -135,7 +135,9 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
     public function del($name) {
         if (array_key_exists($name, $this->data)) {
             unset($this->data[$name]);
+            return true;
         }
+        return false;
     }
 
     /**

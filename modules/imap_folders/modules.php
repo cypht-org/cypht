@@ -101,7 +101,7 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
                 $new_folder = prep_folder_name($imap, $form['folder'], false, $parent_str);
                 if ($new_folder && $imap->create_mailbox($new_folder)) {
                     Hm_Msgs::add('Folder created');
-                    Hm_Page_Cache::flush($this->session);
+                    $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
                 }
                 else {
@@ -130,7 +130,7 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                 $new_folder = prep_folder_name($imap, $form['new_folder'], false, $parent_str);
                 if ($new_folder && $old_folder && $imap->rename_mailbox($old_folder, $new_folder)) {
                     Hm_Msgs::add('Folder renamed');
-                    Hm_Page_Cache::flush($this->session);
+                    $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
                 }
                 else {
@@ -154,7 +154,7 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
                 $del_folder = prep_folder_name($imap, $form['folder'], true);
                 if ($del_folder && $imap->delete_mailbox($del_folder)) {
                     Hm_Msgs::add('Folder deleted');
-                    Hm_Page_Cache::flush($this->session);
+                    $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
                 }
                 else {

@@ -7,123 +7,6 @@
  */
 
 /**
- * Used to cache HTML5 formatted sections of a page
- * @package framework
- * @subpackage cache
- */
-class Hm_Page_Cache {
-
-    /* holds the cached pages */
-    private static $pages = array();
-
-    /**
-     * Add a page
-     * @param string $key key to access the page data
-     * @param string $page data to cache
-     * @param bool $save flag used to cache between logins
-     * @return void
-     */
-    public static function add($key, $page, $save=false) {
-        self::$pages[$key] = array($page, $save);
-    }
-
-    /**
-     * Concatenate new cache data to an existing page
-     * @param string $key key to access the page data
-     * @param string $page data to cache
-     * @param bool $save flag used to cache between logins
-     * @param string $delim delimiter used between values
-     * @return void
-     */
-    public static function concat($key, $page, $save = false, $delim=false) {
-        if (array_key_exists($key, self::$pages)) {
-            if ($delim !== false) {
-                self::$pages[$key][0] .= $delim.$page;
-            }
-            else {
-                self::$pages[$key][0] .= $page;
-            }
-        }
-        else {
-            self::$pages[$key] = array($page, $save);
-        }
-    }
-
-    /**
-     * Delete a page from the cache
-     * @param string $key key name of the data to delete
-     * @return bool true on success
-     */
-    public static function del($key) {
-        if (array_key_exists($key, self::$pages)) {
-            unset(self::$pages[$key]);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Fetch a cached value from the list
-     * @param string $key key name of the data to fetch
-     * @return mixed string value on success, bool false on failure
-     */
-    public static function get($key) {
-        if (array_key_exists($key, self::$pages)) {
-            Hm_Debug::add(sprintf("PAGE CACHE: %s", $key));
-            return self::$pages[$key][0];
-        }
-        return false;
-    }
-
-    /**
-     * Return all cached values
-     * @return array list of cached values
-     */
-    public static function dump() {
-        return self::$pages;
-    }
-
-    /**
-     * Remove all cached values
-     * @param object $session session interface
-     * @return void
-     */
-    public static function flush($session) {
-        self::$pages = array();
-        $session->set('page_cache', array());
-        $session->set('saved_pages', array());
-    }
-
-    /**
-     * Load cached pages from session data
-     * @param object $session session interface
-     * @return void
-     */
-    public static function load($session) {
-        self::$pages = $session->get('page_cache', array());
-        self::$pages = array_merge(self::$pages, $session->get('saved_pages', array()));
-    }
-
-    /**
-     * Save the page cache in the session
-     * @param object $session session interface
-     * @return void
-     */
-    public static function save($session) {
-        $pages = self::$pages;
-        $saved_pages = array();
-        foreach (self::$pages as $key => $page) {
-            if ($page[1]) {
-                $saved_pages[$key] = $pages[$key];
-                unset($pages[$key]);
-            }
-        }
-        $session->set('page_cache', $pages);
-        $session->set('saved_pages', $saved_pages);
-    }
-}
-
-/**
  * Helper struct to provide data sources the don't track messages read or flagged state
  * (like POP3 or RSS) with an alternative.
  * @package framework
@@ -211,35 +94,40 @@ trait Hm_Uid_Cache {
 }
 
 /**
- * Memcached cache
+ * Shared utils for Redis and Memcached
  * @package framework
  * @subpackage cache
  */
-class Hm_Memcached {
+trait Hm_Cache_Base {
 
-    private $supported;
+    public $supported;
     private $enabled;
     private $server;
     private $config;
     private $port;
     private $cache_con;
 
-    /**
-     * @param Hm_Config $config site config object
+    /*
+     * @return boolean
      */
-    public function __construct($config) {
-        $this->server = $config->get('memcached_server', false);
-        $this->port = $config->get('memcached_port', false);
-        $this->enabled = $config->get('enable_memcached', false);
-        $this->supported = Hm_Functions::class_exists('Memcached');
-        $this->config = $config;
+    public function is_active() {
+        if (!$this->enabled) {
+            return false;
+        }
+        elseif (!$this->configured()) {
+            return false;
+        }
+        elseif (!$this->cache_con) {
+            return $this->connect();
+        }
+        return true;
     }
 
     /**
      * @return boolean
      */
     public function close() {
-        if (!$this->active()) {
+        if (!$this->is_active()) {
             return false;
         }
         return $this->cache_con->quit();
@@ -249,7 +137,7 @@ class Hm_Memcached {
      * @param string $key cache key to delete
      */
     public function del($key) {
-        if (!$this->active()) {
+        if (!$this->is_active()) {
             return false;
         }
         return $this->cache_con->delete($key);
@@ -262,8 +150,8 @@ class Hm_Memcached {
      * @param string $crypt_key encryption key
      * @return boolean
      */
-    public function set($key, $val, $lifetime=300, $crypt_key='') {
-        if (!$this->active()) {
+    public function set($key, $val, $lifetime=600, $crypt_key='') {
+        if (!$this->is_active()) {
             return false;
         }
         return $this->cache_con->set($key, $this->prep_in($val, $crypt_key), $lifetime);
@@ -275,7 +163,7 @@ class Hm_Memcached {
      * @return false|array|string
      */
     public function get($key, $crypt_key='') {
-        if (!$this->active()) {
+        if (!$this->is_active()) {
             return false;
         }
         return $this->prep_out($this->cache_con->get($key), $crypt_key);
@@ -300,12 +188,106 @@ class Hm_Memcached {
      */
     private function prep_out($data, $crypt_key) {
         if ($crypt_key && is_string($data) && trim($data)) {
-            return Hm_transform::unstringify(Hm_Crypt::plaintext($data, $crypt_key));
+            return Hm_transform::unstringify(Hm_Crypt::plaintext($data, $crypt_key), 'base64_decode', true);
         }
         return $data;
     }
 
     /**
+     * @return boolean
+     */
+    private function configured() {
+        if (!$this->server || !$this->port) {
+            Hm_Debug::add(sprintf('%s enabled but no server or port found', $this->type));
+            return false;
+        }
+        if (!$this->supported) {
+            Hm_Debug::add(sprintf('%s enabled but not supported by PHP', $this->type));
+            return false;
+        }
+        return true;
+    }
+}
+
+/**
+ * Redis cache
+ * @package framework
+ * @subpackage cache
+ */
+class Hm_Redis {
+
+    use Hm_Cache_Base;
+    private $type = 'Redis';
+    private $db_index;
+
+    /**
+     * @param Hm_Config $config site config object
+     */
+    public function __construct($config) {
+        $this->server = $config->get('redis_server', false);
+        $this->port = $config->get('redis_port', false);
+        $this->enabled = $config->get('enable_redis', false);
+        $this->db_index = $config->get('redis_index', 0);
+        $this->supported = Hm_Functions::class_exists('Redis');
+        $this->config = $config;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function connect() {
+        $this->cache_con = Hm_Functions::redis();
+        try {
+            if ($this->cache_con->connect($this->server, $this->port)) {
+                $this->auth();
+                $this->cache_con->select($this->db_index);
+                return true;
+            }
+            else {
+                $this->cache_con = false;
+                return false;
+            }
+        }
+        catch (Exception $oops) {
+            Hm_Debug::add('Redis connect failed');
+            $this->cache_con = false;
+            return false;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function auth() {
+        if ($this->config->get('redis_pass')) {
+            $this->cache_con->auth($this->config->get('redis_pass'));
+        }
+    }
+}
+
+/**
+ * Memcached cache
+ * @package framework
+ * @subpackage cache
+ */
+class Hm_Memcached {
+
+    use Hm_Cache_Base;
+    private $type = 'Memcached';
+
+    /**
+     * @param Hm_Config $config site config object
+     */
+    public function __construct($config) {
+        $this->server = $config->get('memcached_server', false);
+        $this->port = $config->get('memcached_port', false);
+        $this->enabled = $config->get('enable_memcached', false);
+        $this->supported = Hm_Functions::class_exists('Memcached');
+        $this->config = $config;
+    }
+
+    /**
+     * @return void
      */
     private function auth() {
         if ($this->config->get('memcached_auth')) {
@@ -329,34 +311,281 @@ class Hm_Memcached {
         return true;
     }
 
-    /*
+    /**
+     * @return mixed
+     */
+    public function last_err() {
+        if (!$this->is_active()) {
+            return false;
+        }
+        return $this->cache_con->getResultCode();
+    }
+}
+
+/**
+ * Generic cache
+ * @package framework
+ * @subpackage cache
+ */
+class Hm_Cache {
+
+    private $backend;
+    private $session;
+    public $type;
+
+    /**
+     * @param Hm_Config $config site config object
+     * @param object $session session object
+     * @return void
+     */
+    public function __construct($config, $session) {
+        $this->session = $session;
+        if (!$this->check_redis($config) && !$this->check_memcache($config)) {
+            $this->check_session($config);
+        }
+        Hm_Debug::add(sprintf('CACHE backend using: %s', $this->type));
+    }
+
+    /**
+     * @param Hm_Config $config site config object
+     * @return void
+     */
+    private function check_session($config) {
+        $this->type = 'noop';
+        if ($config->get('allow_session_cache')) {
+            $this->backend = $this->session;
+            $this->type = 'session';
+        }
+    }
+
+    /**
+     * @param Hm_Config $config site config object
      * @return boolean
      */
-    public function active() {
-        if (!$this->enabled) {
-            return false;
+    private function check_redis($config) {
+        if ($config->get('enable_redis', false)) {
+            $backend = new Hm_Redis($config);
+            if ($backend->is_active()) {
+                $this->type = 'redis';
+                $this->backend = $backend;
+                return true;
+            }
         }
-        elseif (!$this->configured()) {
-            return false;
+        return false;
+    }
+
+    /**
+     * @param Hm_Config $config site config object
+     * @return boolean
+     */
+    private function check_memcache($config) {
+        if ($config->get('enable_memcached', false)) {
+            $backend = new Hm_Memcached($config);
+            if ($backend->is_active()) {
+                $this->type = 'memcache';
+                $this->backend = $backend;
+                return true;
+            }
         }
-        elseif (!$this->cache_con) {
-            return $this->connect();
+        return false;
+    }
+
+    /**
+     * @param string $key key name
+     * @param string $msg_type log message
+     * @return void
+     */
+    private function log($key, $msg_type) {
+        switch ($msg_type) {
+        case 'save':
+            Hm_Debug::add(sprintf('CACHE: saving "%s" using %s', $key, $this->type));
+            break;
+        case 'hit':
+            Hm_Debug::add(sprintf('CACHE: hit for "%s" using %s', $key, $this->type));
+            break;
+        case 'miss':
+            Hm_Debug::add(sprintf('CACHE: miss for "%s" using %s', $key, $this->type));
+            break;
+        case 'del':
+            Hm_Debug::add(sprintf('CACHE: deleting "%s" using %s', $key, $this->type));
+            break;
         }
+    }
+
+    /**
+     * @param string $key name of value to cache
+     * @param mixed $val value to cache
+     * @param integer $lifetime how long to cache (if applicable for the backend)
+     * @param boolean $session store in the session instead of the enabled cache
+     * @return boolean/void
+     */
+    public function set($key, $val, $lifetime=600, $session=false) {
+        if ($session) {
+            return $this->session->set($key, $val);
+        }
+        return $this->{$this->type.'_set'}($key, $val, $lifetime);
+    }
+
+    /**
+     * @param string $key name of value to fetch
+     * @param mixed $default value to return if not found
+     * @param boolean $session fetch from the session instead of the enabled cache
+     * @return mixed
+     */
+    public function get($key, $default=false, $session=false) {
+        if ($session) {
+            return $this->get($session, $default);
+        }
+        return $this->{$this->type.'_get'}($key, $default);
+    }
+
+    /**
+     * @param string $key name to delete
+     * @return boolean
+     */
+    public function del($key) {
+        $this->log($key, 'del');
+        return $this->{$this->type.'_del'}($key);
+    }
+
+    /**
+     * @param string $key name of value to cache
+     * @param mixed $val value to cache
+     * @param integer $lifetime how long to cache (if applicable for the backend)
+     * @return boolean
+     */
+    private function redis_set($key, $val, $lifetime) {
+        $this->log($key, 'save');
+        return $this->backend->set($this->key_hash($key), $val, $lifetime, $this->session->enc_key);
+    }
+
+    /**
+     * @param string $key name of value to fetch
+     * @param mixed $default value to return if not found
+     * @return mixed
+     */
+    private function redis_get($key, $default) {
+        $res = $this->backend->get($this->key_hash($key), $this->session->enc_key);
+        if (!$res) {
+            $this->log($key, 'miss');
+            return $default;
+        }
+        $this->log($key, 'hit');
+        return $res;
+    }
+
+    /**
+     * @param string $key name to delete
+     * @return boolean
+     */
+    private function redis_del($key) {
+        $this->log($key, 'del');
+        return $this->backend->del($this->key_hash($key));
+    }
+
+    /**
+     * @param string $key name of value to cache
+     * @param mixed $val value to cache
+     * @param integer $lifetime how long to cache (if applicable for the backend)
+     * @return boolean/void
+     */
+    private function memcache_set($key, $val, $lifetime) {
+        $this->log($key, 'save');
+        return $this->backend->set($this->key_hash($key), $val, $lifetime, $this->session->enc_key);
+    }
+
+    /**
+     * @param string $key name of value to fetch
+     * @param mixed $default value to return if not found
+     * @return mixed
+     */
+    private function memcache_get($key, $default) {
+        $res = $this->backend->get($this->key_hash($key), $this->session->enc_key);
+        if (!$res && $this->backend->last_err() == Memcached::RES_NOTFOUND) {
+            $this->log($key, 'miss');
+            return $default;
+        }
+        $this->log($key, 'hit');
+        return $res;
+    }
+
+    /**
+     * @param string $key name to delete
+     * @return boolean
+     */
+    private function memcache_del($key) {
+        $this->log($key, 'del');
+        return $this->backend->del($this->key_hash($key));
+    }
+
+    /*
+     * @param string $key name of value to cache
+     * @param mixed $val value to cache
+     * @param integer $lifetime how long to cache (if applicable for the backend)
+     * @return boolean
+     */
+    private function session_set($key, $val, $lifetime) {
+        $this->log($key, 'save');
+        $this->backend->set($this->key_hash($key), $val);
         return true;
     }
 
     /**
+     * @param string $key name of value to fetch
+     * @param mixed $default value to return if not found
+     * @return mixed
+     */
+    private function session_get($key, $default) {
+        $res = $this->backend->get($this->key_hash($key), $default);
+        if ($res === $default) {
+            $this->log($key, 'miss');
+            return $default;
+        }
+        $this->log($key, 'hit');
+        return $res;
+    }
+
+    /**
+     * @param string $key name to delete
      * @return boolean
      */
-    private function configured() {
-        if (!$this->server || !$this->port) {
-            Hm_Debug::add('Memcached enabled but no server or port found');
-            return false;
-        }
-        if (!$this->supported) {
-            Hm_Debug::add('Memcached enabled but not supported by PHP');
-            return false;
-        }
+    private function session_del($key) {
+        $this->log($key, 'del');
+        return $this->backend->del($this->key_hash($key));
+    }
+
+    /**
+     * @param string $key name of value to fetch
+     * @param mixed $default value to return if not found
+     * @return mixed
+     */
+    private function noop_set($key, $val, $lifetime) {
+        return false;
+    }
+
+    /**
+     * @param string $key name of value to fetch
+     * @param mixed $default value to return if not found
+     * @return mixed
+     */
+    private function noop_get($key, $default) {
+        return $default;
+    }
+
+    /**
+     * @param string $key name of value to delete
+     * @return mixed
+     */
+    private function noop_del($key) {
         return true;
+    }
+
+    /*
+     * @param string $key key to make the hash unique
+     * @return string
+     */
+    private function key_hash($key) {
+        return sprintf('hm_cache_%s', hash('sha256', (sprintf('%s%s%s%s', $key, SITE_ID,
+            $this->session->get('fingerprint'), $this->session->get('username')))));
     }
 }

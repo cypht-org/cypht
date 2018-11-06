@@ -93,7 +93,7 @@ class Hm_Memcached_Session extends Hm_DB_Session {
      */
     public function connect() {
         $this->conn = new Hm_Memcached($this->site_config);
-        return $this->conn->active();
+        return $this->conn->is_active();
     }
 
     /**

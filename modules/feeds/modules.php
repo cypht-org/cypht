@@ -214,7 +214,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 foreach($ids as $id) {
                     $feed_data = Hm_Feed_List::dump($id);
                     if ($feed_data) {
-                        $cache = feed_memcached_fetch($this->config, $feed_data);
+                        $cache = feed_memcached_fetch($this, $feed_data);
                         $data = false;
                         if (is_array($cache) && count($cache) > 0) {
                             $data = $cache;
@@ -263,7 +263,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
             }
             if (!$cache) {
                 # TODO: fix potential warning about feed_data
-                feed_memcached_save($this->config, $feed_data, $res);
+                feed_memcached_save($this, $feed_data, $res);
             }
             $this->out('feed_list_data', $res);
             if (isset($this->request->get['list_path'])) {
@@ -291,7 +291,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
             $feed_items = array();
             $feed_data = Hm_Feed_List::dump($id);
             if ($feed_data) {
-                $cache = feed_memcached_fetch($this->config, $feed_data);
+                $cache = feed_memcached_fetch($this, $feed_data);
                 if (is_array($cache) && count($cache) > 0) {
                     $feed_items = $cache;
                 }
@@ -332,7 +332,7 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                 }
             }
             if ($title) {
-                feed_memcached_save($this->config, $feed_data, $feed_items);
+                feed_memcached_save($this, $feed_data, $feed_items);
                 Hm_Feed_Uid_Cache::read($form['feed_uid']);
                 $this->out('feed_message_content', $content);
                 $this->out('feed_message_headers', $headers);
@@ -412,7 +412,7 @@ class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
         foreach ($feeds as $index => $feed) {
             Hm_Feed_List::add($feed, $index);
         }
-        Hm_Feed_Uid_Cache::load($this->session->get('feed_read_uids', array()));
+        Hm_Feed_Uid_Cache::load($this->cache->get('feed_read_uids', array()));
     }
 }
 
@@ -497,7 +497,7 @@ class Hm_Handler_save_feeds extends Hm_Handler_Module {
     public function process() {
         $feeds = Hm_Feed_List::dump();
         $this->user_config->set('feeds', $feeds);
-        $this->session->set('feed_read_uids', Hm_Feed_Uid_Cache::dump());
+        $this->cache->set('feed_read_uids', Hm_Feed_Uid_Cache::dump(), 0);
     }
 }
 
@@ -988,18 +988,16 @@ function search_feed_item($item, $terms, $since, $fld) {
  * @subpackage feeds/functions
  */
 if (!hm_exists('feed_memcached_save')) {
-function feed_memcached_save($config, $feed_data, $data) {
-    $key = hash('sha256', (sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port'])));
-    $cache = new Hm_Memcached($config);
-    return $cache->set($key, $data);
+function feed_memcached_save($hmod, $feed_data, $data) {
+    $key = sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']);
+    $hmod->cache->set($key, $data, 500);
 }}
 
 /**
  * @subpackage feeds/functions
  */
 if (!hm_exists('feed_memcached_fetch')) {
-function feed_memcached_fetch($config, $feed_data) {
-    $key = hash('sha256', (sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port'])));
-    $cache = new Hm_Memcached($config);
-    return $cache->get($key);
+function feed_memcached_fetch($hmod, $feed_data) {
+    $key = sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']);
+    return $hmod->cache->get($key);
 }}

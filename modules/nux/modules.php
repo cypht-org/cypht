@@ -16,8 +16,9 @@ require APP_PATH.'modules/nux/services.php';
  */
 class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
     public function process() {
-        if (Hm_Page_Cache::get('nux_dev_news')) {
-            $this->out('nux_dev_news', Hm_Page_Cache::get('nux_dev_news'));
+        $cache = $this->cache->get('nux_dev_news', array());
+        if ($cache) {
+            $this->out('nux_dev_news', $cache);
             return;
         }
         $ch = Hm_Functions::c_init();
@@ -39,7 +40,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
                 }
             }
         }
-        Hm_Page_Cache::add('nux_dev_news', $res);
+        $this->cache->set('nux_dev_news', $res);
         $this->out('nux_dev_news', $res);
     }
 }

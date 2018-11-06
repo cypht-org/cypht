@@ -164,7 +164,7 @@ class Hm_Handler_pop3_folder_page extends Hm_Handler_Module {
             }
             $cache = false;
             if (!$unread_only) {
-                $cache = Hm_POP3_List::get_cache($this->session, $this->config, $form['pop3_server_id']);
+                $cache = Hm_POP3_List::get_cache($this->cache, $form['pop3_server_id']);
             }
             if ($cache) {
                 $this->out('pop3_cache_used', true);
@@ -223,7 +223,7 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('pop3_uid', 'pop3_list_path'));
         if ($success) {
             $id = (int) substr($form['pop3_list_path'], 5);
-            $cache = Hm_POP3_List::get_cache($this->session, $this->config, $id);
+            $cache = Hm_POP3_List::get_cache($this->cache, $id);
             $pop3 = Hm_POP3_List::connect($id, $cache);
             $details = Hm_POP3_List::dump($id);
             if (pop3_authed($pop3)) {
@@ -504,16 +504,8 @@ class Hm_Handler_save_pop3_cache extends Hm_Handler_Module {
             }
         }
         if (count($cache) > 0) {
-            $total = 0;
             foreach ($cache as $id => $data) {
-                $key = hash('sha256', (sprintf('pop3%s%s%s%s', SITE_ID, $this->session->get('fingerprint'), $id, $this->session->get('username'))));
-                $memcache = new Hm_Memcached($this->config);
-                if ($memcache->set($key, $cache[$id], 300, $this->session->enc_key)) {
-                    $total++;
-                }
-            }
-            if ($total) {
-                Hm_Debug::add(sprintf('Cached data for %d POP3 connections', count($cache)));
+                $this->cache->set('pop3'.$id, $cache[$id]);
             }
         }
     }
@@ -1120,10 +1112,8 @@ function search_pop3_msg($body, $headers, $terms, $fld) {
  * @subpackage pop3/functions
  */
 if (!hm_exists('bust_pop3_cache')) {
-function bust_pop3_cache($session, $config, $id) {
-    $key = hash('sha256', (sprintf('pop3%s%s%s%s', SITE_ID, $session->get('fingerprint'), $id, $session->get('username'))));
-    $memcache = new Hm_Memcached($config);
-    $memcache->set($key, array(), 1, $session->enc_key);
+function bust_pop3_cache($hm_cache, $id) {
+    $hm_cache->del('pop3'.$id);
     Hm_Debug::add('Busted POP3 cache for id '.$id);
 }}
 

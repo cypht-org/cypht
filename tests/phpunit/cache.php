@@ -1,98 +1,6 @@
 <?php
 
 /**
- * tests for Hm_Page_Cache
- */
-class Hm_Test_Page_Cache extends PHPUnit_Framework_TestCase {
-
-    public function setUp() {
-        require 'bootstrap.php';
-        $this->page_cache = new Hm_Page_Cache();
-        $this->page_cache->add('foo', 'bar');
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_get() {
-        $this->assertEquals('bar', $this->page_cache->get('foo'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_dump() {
-        $this->assertEquals(array('foo' => array('bar', false)), $this->page_cache->dump());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_add() {
-        $this->assertEquals(1, count($this->page_cache->dump()));
-        $this->page_cache->add('bar', 'foo');
-        $this->assertEquals(2, count($this->page_cache->dump()));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_concat() {
-        $this->assertEquals('bar', $this->page_cache->get('foo'));
-        $this->page_cache->concat('foo', 'foo');
-        $this->assertEquals('barfoo', $this->page_cache->get('foo'));
-        $this->page_cache->concat('foo', 'bar', false, ':');
-        $this->assertEquals('barfoo:bar', $this->page_cache->get('foo'));
-        $this->page_cache->concat('baz', 'baz');
-        $this->assertEquals('baz', $this->page_cache->get('baz'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_del() {
-        $this->assertEquals('bar', $this->page_cache->get('foo'));
-        $this->assertTrue($this->page_cache->del('foo'));
-        $this->assertFalse($this->page_cache->get('foo'));
-        $this->assertFalse($this->page_cache->del('blah'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_flush() {
-        $session = new Hm_Mock_Session();
-        $this->assertEquals(array('foo' => array('bar', false)), $this->page_cache->dump());
-        $this->page_cache->flush($session);
-        $this->assertEquals(array(), $this->page_cache->dump());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_load() {
-        $session = new Hm_Mock_Session();
-        $this->page_cache->flush($session);
-        $this->page_cache->load($session);
-        $this->assertEquals(array('foo' => array('bar', false)), $this->page_cache->dump());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_save() {
-        $session = new Hm_Mock_Session();
-        $this->page_cache->add('bar', 'foo', true);
-        $this->page_cache->save($session);
-        $this->assertEquals(array('foo' => array('bar', false)), $session->data['page_cache']);
-        $this->assertEquals(array('bar' => array('foo', true)), $session->data['saved_pages']);
-    }
-    public function tearDown() {
-        unset($this->page_cache);
-    }
-}
-
-/**
  * tests for Hm_Uid_Cache
  */
 class Hm_Test_Uid_Cache extends PHPUnit_Framework_TestCase {
@@ -244,5 +152,237 @@ class Hm_Test_Hm_Memcache extends PHPUnit_Framework_TestCase {
         $cache->del('foo');
         $this->assertFalse($cache->get('foo'));
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_result_code() {
+        $cache = new Hm_Memcached($this->config);
+        $this->assertFalse($cache->last_err());
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $this->config->set('enable_memcached', true);
+        $cache = new Hm_Memcached($this->config);
+        $this->assertEquals(16, $cache->last_err());
+    }
 }
 
+/**
+ * tests for Hm_Redis
+ */
+class Hm_Test_Hm_Redis extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        require 'bootstrap.php';
+        $this->config = new Hm_Mock_Config();
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_set() {
+        $this->config->set('enable_redis', true);
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->set('foo', 'bar'));
+
+        $this->config->set('redis_server', 'asdf');
+        $this->config->set('redis_port', 10);
+        $this->config->set('enable_redis', true);
+        $this->config->set('redis_pass', 'foo');
+
+        Hm_Functions::$exists = false;
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->set('foo', 'bar'));
+
+        Hm_Functions::$exists = true;
+        $cache = new Hm_Redis($this->config);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+
+        $this->assertTrue($cache->set('foo', array('bar'), 100, 'asdf'));
+        $this->assertEquals(array('bar'), $cache->get('foo', 'asdf'));
+
+        Hm_Functions::$redis_on = false;
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->set('foo', 'bar'));
+        Hm_Functions::$redis_on = true;
+
+        Hm_Functions::$redis_on = false;
+        Hm_Mock_Redis_No::$fail_type = false;
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->set('foo', 'bar'));
+        Hm_Functions::$redis_on = true;
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get() {
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->get('asdf'));
+        Hm_Functions::$exists = false;
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->get('asdf'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_auth() {
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->close());
+        $this->config->set('redis_server', 'asdf');
+        $this->config->set('redis_port', 10);
+        $this->config->set('enable_redis', true);
+        $this->config->set('redis_auth', true);
+        $cache = new Hm_Redis($this->config);
+        $this->assertTrue($cache->close());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_close() {
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->close());
+        $this->config->set('redis_server', 'asdf');
+        $this->config->set('redis_port', 10);
+        $this->config->set('enable_redis', true);
+        $cache = new Hm_Redis($this->config);
+        $this->assertTrue($cache->close());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_del() {
+        $cache = new Hm_Redis($this->config);
+        $this->assertFalse($cache->del('foo'));
+        $this->config->set('redis_server', 'asdf');
+        $this->config->set('redis_port', 10);
+        $this->config->set('enable_redis', true);
+        $cache = new Hm_Redis($this->config);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+        $cache->del('foo');
+        $this->assertFalse($cache->get('foo'));
+    }
+}
+
+/**
+ * tests for generica cache
+ */
+class Hm_Test_Hm_Cache extends PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        require 'bootstrap.php';
+        $this->config = new Hm_Mock_Config();
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_start() {
+        $session = new Hm_Mock_Session();
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertEquals('noop', $cache->type);
+        $session = new Hm_Mock_Session();
+        $this->config->set('allow_session_cache', true);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertEquals('session', $cache->type);
+        $this->config->set('enable_memcached', true);
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertEquals('memcache', $cache->type);
+        $this->config->set('enable_redis', true);
+        $this->config->set('redis_server', 'asdf');
+        $this->config->set('redis_port', 10);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertEquals('redis', $cache->type);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_set() {
+        $session = new Hm_Mock_Session();
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertFalse($cache->set('foo', 'bar'));
+        $this->config->set('allow_session_cache', true);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->config->set('enable_memcached', true);
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->config->set('enable_redis', true);
+        $this->config->set('redis_server', 'asdf');
+        $this->config->set('redis_port', 10);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get() {
+        $session = new Hm_Mock_Session();
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertEquals('baz', $cache->get('bar', 'baz'));
+        $this->config->set('allow_session_cache', true);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+        $this->assertEquals('baz', $cache->get('bar', 'baz'));
+        $this->config->set('enable_memcached', true);
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+        $this->assertEquals('baz', $cache->get('bar', 'baz'));
+        $this->config->set('enable_redis', true);
+        $this->config->set('redis_server', 'asdf');
+        $this->config->set('redis_port', 10);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+        $this->assertEquals('baz', $cache->get('bar', 'baz'));
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_del() {
+        $session = new Hm_Mock_Session();
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->del('foo'));
+
+        $this->config->set('allow_session_cache', true);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+        $cache->del('foo');
+        $this->assertFalse($cache->get('foo', false));
+        
+        $this->config->set('enable_memcached', true);
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+        $cache->del('foo');
+        $this->assertFalse($cache->get('foo', false));
+        
+        $this->config->set('enable_redis', true);
+        $this->config->set('redis_server', 'asdf');
+        $this->config->set('redis_port', 10);
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->set('foo', 'bar'));
+        $this->assertEquals('bar', $cache->get('foo'));
+        $cache->del('foo');
+        $this->assertFalse($cache->get('foo', false));
+    }
+}
