@@ -927,7 +927,7 @@ var Hm_Folders = {
             listitems = $('li', folder);
         }
         listitems.sort(function(a, b) {
-            if (last_name && $(b).attr('class') == last_name) {
+            if (last_name && ($(a).attr('class') == last_name || $(b).attr('class') == last_name)) {
                 return false;
             }
             if ($(b).text().toUpperCase() == 'ALL') {
