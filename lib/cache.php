@@ -137,16 +137,6 @@ trait Hm_Cache_Base {
     }
 
     /**
-     * @return boolean
-     */
-    public function close() {
-        if (!$this->is_active()) {
-            return false;
-        }
-        return $this->cache_con->quit();
-    }
-
-    /**
      * @param string $key cache key to delete
      */
     public function del($key) {
@@ -276,6 +266,16 @@ class Hm_Redis {
             $this->cache_con->auth($this->config->get('redis_pass'));
         }
     }
+
+    /**
+     * @return boolean
+     */
+    public function close() {
+        if (!$this->is_active()) {
+            return false;
+        }
+        return $this->cache_con->close();
+    }
 }
 
 /**
@@ -333,6 +333,30 @@ class Hm_Memcached {
         }
         return $this->cache_con->getResultCode();
     }
+
+    /**
+     * @return boolean
+     */
+    public function close() {
+        if (!$this->is_active()) {
+            return false;
+        }
+        return $this->cache_con->quit();
+    }
+}
+
+/**
+ * @package framework
+ * @subpackage cache
+ */
+class Hm_Noop_Cache {
+
+    public function del($key) {
+        return true;
+    }
+    public function set($key, $val, $lifetime, $crypt_key) {
+        return false;
+    }
 }
 
 /**
@@ -365,8 +389,8 @@ class Hm_Cache {
      */
     private function check_session($config) {
         $this->type = 'noop';
+        $this->backend = new Hm_Noop_Cache();
         if ($config->get('allow_session_cache')) {
-            $this->backend = $this->session;
             $this->type = 'session';
         }
     }
@@ -433,10 +457,10 @@ class Hm_Cache {
      * @return boolean
      */
     public function set($key, $val, $lifetime=600, $session=false) {
-        if ($session) {
-            return $this->session->set($key, $val);
+        if ($session || $this->type == 'session') {
+            return $this->session_set($key, $val, false);
         }
-        return $this->{$this->type.'_set'}($key, $val, $lifetime);
+        return $this->generic_set($key, $val, $lifetime);
     }
 
     /**
@@ -446,7 +470,7 @@ class Hm_Cache {
      * @return mixed
      */
     public function get($key, $default=false, $session=false) {
-        if ($session) {
+        if ($session || $this->type == 'session') {
             return $this->session_get($key, $default);
         }
         return $this->{$this->type.'_get'}($key, $default);
@@ -454,21 +478,14 @@ class Hm_Cache {
 
     /**
      * @param string $key name to delete
+     * @param boolean $session fetch from the session instead of the enabled cache
      * @return boolean
      */
-    public function del($key) {
-        $this->log($key, 'del');
-        return $this->{$this->type.'_del'}($key);
-    }
-
-    /**
-     * @param string $key name of value to cache
-     * @param mixed $val value to cache
-     * @param integer $lifetime how long to cache (if applicable for the backend)
-     * @return boolean
-     */
-    private function redis_set($key, $val, $lifetime) {
-        return $this->generic_set($key, $val, $lifetime);
+    public function del($key, $session=false) {
+        if ($session || $this->type == 'session') {
+            return $this->session_del($key);
+        }
+        return $this->generic_del($key);
     }
 
     /**
@@ -487,24 +504,6 @@ class Hm_Cache {
     }
 
     /**
-     * @param string $key name to delete
-     * @return boolean
-     */
-    private function redis_del($key) {
-        return $this->generic_del($key);
-    }
-
-    /**
-     * @param string $key name of value to cache
-     * @param mixed $val value to cache
-     * @param integer $lifetime how long to cache (if applicable for the backend)
-     * @return boolean
-     */
-    private function memcache_set($key, $val, $lifetime) {
-        return $this->generic_set($key, $val, $lifetime);
-    }
-
-    /**
      * @param string $key name of value to fetch
      * @param mixed $default value to return if not found
      * @return mixed
@@ -519,14 +518,6 @@ class Hm_Cache {
         return $res;
     }
 
-    /**
-     * @param string $key name to delete
-     * @return boolean
-     */
-    private function memcache_del($key) {
-        return $this->generic_del($key);
-    }
-
     /*
      * @param string $key name of value to cache
      * @param mixed $val value to cache
@@ -535,7 +526,7 @@ class Hm_Cache {
      */
     private function session_set($key, $val, $lifetime) {
         $this->log($key, 'save');
-        $this->backend->set($this->key_hash($key), $val);
+        $this->session->set($this->key_hash($key), $val);
         return true;
     }
 
@@ -545,7 +536,7 @@ class Hm_Cache {
      * @return mixed
      */
     private function session_get($key, $default) {
-        $res = $this->backend->get($this->key_hash($key), $default);
+        $res = $this->session->get($this->key_hash($key), $default);
         if ($res === $default) {
             $this->log($key, 'miss');
             return $default;
@@ -559,16 +550,8 @@ class Hm_Cache {
      * @return boolean
      */
     private function session_del($key) {
-        return $this->generic_del($key);
-    }
-
-    /**
-     * @param string $key name of value to fetch
-     * @param mixed $default value to return if not found
-     * @return mixed
-     */
-    private function noop_set($key, $val, $lifetime) {
-        return false;
+        $this->log($key, 'del');
+        return $this->session->del($this->key_hash($key));
     }
 
     /**
@@ -578,14 +561,6 @@ class Hm_Cache {
      */
     private function noop_get($key, $default) {
         return $default;
-    }
-
-    /**
-     * @param string $key name of value to delete
-     * @return mixed
-     */
-    private function noop_del($key) {
-        return true;
     }
 
     /*
