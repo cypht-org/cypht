@@ -7,7 +7,7 @@
  */
 
 /**
- * This session class uses a memcached to manage session data. It does not
+ * This session class uses a Redis to manage session data. It does not
  * use PHP session handlers at all and is a completely indenpendant session system.
  */
 class Hm_Redis_Session extends Hm_Memcached_Session {
