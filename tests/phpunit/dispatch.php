@@ -115,7 +115,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_page_redirect() {
-        $this->assertTrue(Hm_Dispatch::page_redirect('test', 303));
+        $this->assertEquals(null, Hm_Dispatch::page_redirect('test', 303));
     }
     /**
      * @preserveGlobalState disabled
@@ -146,7 +146,7 @@ class Hm_Test_Debug_Page_Redirect extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_debug_page_redirect() {
-        $this->assertTrue(Hm_Dispatch::page_redirect('test', 200));
+        $this->assertEquals(null, Hm_Dispatch::page_redirect('test', 200));
     }
 }
 

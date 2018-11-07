@@ -63,7 +63,11 @@ class Hm_Card_Parse {
      * @return array
      */
     protected function split_value($line, $delim, $limit) {
-        return preg_split("/\\\\.(*SKIP)(*FAIL)|$delim/s", $line, $limit);
+        $res = preg_split("/\\\\.(*SKIP)(*FAIL)|$delim/s", $line, $limit);
+        if ($res === false) {
+            return array('');
+        }
+        return $res;
     }
 
     /**
@@ -88,7 +92,7 @@ class Hm_Card_Parse {
     /**
      * Flatten a list with 1 value to a scaler
      * @param array $arr list to flatten
-     * @return array|string
+     * @return array
      */
     private function flatten($arr) {
         if (is_array($arr) && count($arr) == 1) {

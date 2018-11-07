@@ -136,7 +136,7 @@ trait Hm_Dispatch_Redirect {
         }
         Hm_Functions::header('HTTP/1.1 303 Found');
         Hm_Functions::header('Location: '.$url);
-        return Hm_Functions::cease();
+        Hm_Functions::cease();
     }
 
 }
