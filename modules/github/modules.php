@@ -91,7 +91,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
             $id_list = explode(',', $form['message_ids']);
-            Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array()));
+            Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array(), true));
             foreach ($id_list as $msg_id) {
                 if (preg_match("/^github_(\d)+_(\d)+$/", $msg_id)) {
                     $parts = explode('_', $msg_id, 3);
@@ -107,7 +107,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
                     }
                 }
             }
-            $this->cache->set('github_read_uids', Hm_Github_Uid_Cache::dump(), 0);
+            $this->cache->set('github_read_uids', Hm_Github_Uid_Cache::dump(), 0, true);
         }
     }
 }
@@ -129,7 +129,7 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('list_path', 'github_uid'));
         if ($success) {
-            Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array()));
+            Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array(), true));
             $details = $this->user_config->get('github_connect_details', array());
             $repos = $this->user_config->get('github_repos', array());
             $limit = $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE);
@@ -149,7 +149,7 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
                     }
                 }
                 Hm_Github_Uid_Cache::read($item['id']);
-                $this->cache->set('github_read_uids', Hm_Github_Uid_Cache::dump(), 0);
+                $this->cache->set('github_read_uids', Hm_Github_Uid_Cache::dump(), 0, true);
                 $this->out('github_event_detail', $event);
             }
         }
@@ -304,7 +304,7 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                     $this->out('list_parent', $this->request->get['list_path']);
                 }
             }
-            Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array()));
+            Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array(), true));
             $details = $this->user_config->get('github_connect_details');
             $repos = $this->user_config->get('github_repos');
             if (in_array($form['github_repo'], $repos, true) && $details) {
