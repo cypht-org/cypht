@@ -400,6 +400,9 @@ class Hm_Session_Setup {
         elseif ($this->session_type == 'MEM') {
             $session_class = 'Hm_Memcached_Session';
         }
+        elseif ($this->session_type == 'REDIS') {
+            $session_class = 'Hm_Redis_Session';
+        }
         elseif ($this->session_type == 'custom' && class_exists('Custom_Session')) {
             $session_class = 'Custom_Session';
         }

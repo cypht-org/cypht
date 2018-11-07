@@ -19,6 +19,7 @@ require APP_PATH.'lib/session_base.php';
 require APP_PATH.'lib/session_php.php';
 require APP_PATH.'lib/session_db.php';
 require APP_PATH.'lib/session_memcached.php';
+require APP_PATH.'lib/session_redis.php';
 require APP_PATH.'lib/format.php';
 require APP_PATH.'lib/dispatch.php';
 require APP_PATH.'lib/request.php';
