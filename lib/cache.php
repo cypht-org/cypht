@@ -1,5 +1,13 @@
 <?php
 
+
+/*
+ * TODO:
+ * - add flush on logout?
+ * - scrutinizer fixes
+ * - redis sessions
+ */
+
 /**
  * Cache structures
  * @package framework
@@ -417,7 +425,7 @@ class Hm_Cache {
      * @param mixed $val value to cache
      * @param integer $lifetime how long to cache (if applicable for the backend)
      * @param boolean $session store in the session instead of the enabled cache
-     * @return boolean/void
+     * @return boolean
      */
     public function set($key, $val, $lifetime=600, $session=false) {
         if ($session) {
@@ -455,8 +463,7 @@ class Hm_Cache {
      * @return boolean
      */
     private function redis_set($key, $val, $lifetime) {
-        $this->log($key, 'save');
-        return $this->backend->set($this->key_hash($key), $val, $lifetime, $this->session->enc_key);
+        return $this->generic_set($key, $val, $lifetime);
     }
 
     /**
@@ -479,19 +486,17 @@ class Hm_Cache {
      * @return boolean
      */
     private function redis_del($key) {
-        $this->log($key, 'del');
-        return $this->backend->del($this->key_hash($key));
+        return $this->generic_del($key);
     }
 
     /**
      * @param string $key name of value to cache
      * @param mixed $val value to cache
      * @param integer $lifetime how long to cache (if applicable for the backend)
-     * @return boolean/void
+     * @return boolean
      */
     private function memcache_set($key, $val, $lifetime) {
-        $this->log($key, 'save');
-        return $this->backend->set($this->key_hash($key), $val, $lifetime, $this->session->enc_key);
+        return $this->generic_set($key, $val, $lifetime);
     }
 
     /**
@@ -514,8 +519,7 @@ class Hm_Cache {
      * @return boolean
      */
     private function memcache_del($key) {
-        $this->log($key, 'del');
-        return $this->backend->del($this->key_hash($key));
+        return $this->generic_del($key);
     }
 
     /*
@@ -550,8 +554,7 @@ class Hm_Cache {
      * @return boolean
      */
     private function session_del($key) {
-        $this->log($key, 'del');
-        return $this->backend->del($this->key_hash($key));
+        return $this->generic_del($key);
     }
 
     /**
@@ -587,5 +590,25 @@ class Hm_Cache {
     private function key_hash($key) {
         return sprintf('hm_cache_%s', hash('sha256', (sprintf('%s%s%s%s', $key, SITE_ID,
             $this->session->get('fingerprint'), $this->session->get('username')))));
+    }
+
+    /**
+     * @param string $key name to delete
+     * @return boolean
+     */
+    private function generic_del($key) {
+        $this->log($key, 'del');
+        return $this->backend->del($this->key_hash($key));
+    }
+
+    /**
+     * @param string $key name of value to cache
+     * @param mixed $val value to cache
+     * @param integer $lifetime how long to cache (if applicable for the backend)
+     * @return boolean
+     */
+    private function generic_set($key, $val, $lifetime) {
+        $this->log($key, 'save');
+        return $this->backend->set($this->key_hash($key), $val, $lifetime, $this->session->enc_key);
     }
 }

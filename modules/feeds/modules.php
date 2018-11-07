@@ -497,7 +497,7 @@ class Hm_Handler_save_feeds extends Hm_Handler_Module {
     public function process() {
         $feeds = Hm_Feed_List::dump();
         $this->user_config->set('feeds', $feeds);
-        $this->cache->set('feed_read_uids', Hm_Feed_Uid_Cache::dump(), 0);
+        $this->cache->set('feed_read_uids', Hm_Feed_Uid_Cache::dump(), 0, true);
     }
 }
 
