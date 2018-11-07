@@ -131,6 +131,11 @@ add_output('ajax_hm_folders', 'settings_save_link', true);
 add_output('ajax_hm_folders', 'settings_menu_end', true);
 add_output('ajax_hm_folders', 'folder_list_content_end', true);
 
+/* no-op to test connectivity */
+add_handler('ajax_test', 'login', false, 'core');
+add_handler('ajax_test', 'load_user_data', true, 'core');
+add_handler('ajax_test', 'date', true, 'core');
+add_handler('ajax_test', 'http_headers', true, 'core');
 
 /* allowed input */
 return array(
@@ -142,10 +147,12 @@ return array(
         'message',
         'settings',
         'servers',
+        'ajax_test',
         'ajax_hm_folders',
         'ajax_message_action',
         'ajax_reset_search',
         'ajax_update_server_pw',
+        'ajax_no_op',
         'notfound',
         'search'
     ),

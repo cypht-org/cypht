@@ -7,6 +7,7 @@ html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #faf6f5, #faf6f5, #faf6f5, #faf6f5, #fff); font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; min-width: 700px; font-size: 100%; }
 table { width: 100%; border-spacing: 0px; }
 td { vertical-align: top; }
+.offline { display: none; cursor: pointer; position: absolute; right: 0px; top: 0px; z-index: 101; color: white; background-color: red; padding: 18px; padding-right: 25px; padding-left: 25px; font-weight: bold; }
 .subject div, .msg_date, .from, .source { overflow: hidden; color: #333; text-overflow: ellipsis; white-space: nowrap; }
 .subject { cursor: pointer; font-size: 110%; }
 .subject a { color: #333 !important; }
@@ -251,6 +252,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     .update_message_list { margin-right: 20px; }
     .msg_text { width: 100%; max-width: 480px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
     .msg_controls { background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; z-index: 100; position: fixed; right: -20px; height: 29px; font-size: 115%; padding-left: 10px; padding-top: 9px; top: 10px; left: 70px !important; }
+    .offline { height: 23px; padding-left: 36px; padding-right: 36px; }
     .header_subject th { white-space: normal !important; word-break: break-all !important; word-wrap: break-word !important; }
     .msg_headers th { padding-left: 10px !important; }
     .nlink, .plink, .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
