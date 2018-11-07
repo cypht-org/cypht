@@ -107,7 +107,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
                     }
                 }
             }
-            $this->cache->set('github_read_uids', Hm_Github_Uid_Cache::dump(), 0, true);
+            $this->cache->set('github_read_uids', Hm_Github_Uid_Cache::dump(), 0);
         }
     }
 }
@@ -149,7 +149,7 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
                     }
                 }
                 Hm_Github_Uid_Cache::read($item['id']);
-                $this->cache->set('github_read_uids', Hm_Github_Uid_Cache::dump(), 0, true);
+                $this->cache->set('github_read_uids', Hm_Github_Uid_Cache::dump(), 0);
                 $this->out('github_event_detail', $event);
             }
         }

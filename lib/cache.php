@@ -442,7 +442,7 @@ class Hm_Cache {
      */
     public function get($key, $default=false, $session=false) {
         if ($session) {
-            return $this->get($session, $default);
+            return $this->session_get($key, $default);
         }
         return $this->{$this->type.'_get'}($key, $default);
     }
