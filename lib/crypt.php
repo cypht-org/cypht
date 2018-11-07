@@ -199,8 +199,8 @@ class Hm_Crypt_Base {
      * Key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
      * @param string $key payload
      * @param string $salt random string from generate_salt
-     * @param string $length result length
-     * @param string $count iterations
+     * @param integer $length result length
+     * @param integer $count iterations
      * @param string $algo hash algorithm to use
      * @return string
      */
@@ -285,13 +285,11 @@ class Hm_Crypt_Base {
      * @return string
      */
     public static function random($size=128) {
-        $res = false;
         try {
-            $res = Hm_Functions::random_bytes($size);
+            return Hm_Functions::random_bytes($size);
         }
         catch (Exception $e) {
             Hm_Functions::cease('No reliable random byte source found');
         }
-        return $res;
     }
 }

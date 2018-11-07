@@ -77,7 +77,7 @@ if (!class_exists('Hm_Functions')) {
          * @return void
          */
         public static function header($header) {
-            return header($header);
+            header($header);
         }
 
         /**
