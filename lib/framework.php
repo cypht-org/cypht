@@ -74,7 +74,7 @@ if (!class_exists('Hm_Functions')) {
 
         /**
          * @param string $header
-         * @return null
+         * @return void
          */
         public static function header($header) {
             return header($header);
@@ -130,7 +130,7 @@ if (!class_exists('Hm_Functions')) {
         }
 
         /**
-         * @param resource|false $handle
+         * @param resource $handle
          */
         public static function c_exec($handle) {
             return curl_exec($handle);
@@ -172,7 +172,7 @@ if (!class_exists('Hm_Functions')) {
         }
 
         /**
-         * @param string $type input type
+         * @param integer $type input type
          * @param array $filters filter list
          * @return array filtered list
          */
@@ -186,7 +186,7 @@ if (!class_exists('Hm_Functions')) {
          * @param integer $errno error number
          * @param string $errstr error string
          * @param integer $mode connection mode
-         * @param object $ctx context
+         * @param resource $ctx context
          */
         public static function stream_socket_client($server, $port, &$errno, &$errstr, $timeout, $mode, $ctx) {
             return @stream_socket_client($server.':'.$port, $errno, $errstr, $timeout, $mode, $ctx);
