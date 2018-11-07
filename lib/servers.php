@@ -58,7 +58,7 @@ trait Hm_Server_Connect {
      * @param string|false $user username
      * @param string|false $pass password
      * @param array $server server details
-     * @return string[]
+     * @return array
      */
     private static function user_and_pass($user, $pass, $server) {
         if (array_key_exists('user', $server) && array_key_exists('pass', $server)) {
@@ -116,6 +116,8 @@ trait Hm_Server_Connect {
  */
 trait Hm_Server_Modify {
 
+    use Hm_Server_Connect;
+
     /**
      * Update the oauth2 password and password expiration
      * @param int $id server id
@@ -170,7 +172,6 @@ trait Hm_Server_Modify {
  */
 trait Hm_Server_List {
 
-    use Hm_Server_Connect;
     use Hm_Server_Modify;
 
     /**
