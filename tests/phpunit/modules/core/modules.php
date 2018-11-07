@@ -1299,7 +1299,7 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
     public function test_content_section_start() {
         $test = new Output_Test('content_section_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<main class="content_cell">'), $res->output_response);
+        $this->assertEquals(array('<main class="content_cell"><div class="offline">Offline</div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
