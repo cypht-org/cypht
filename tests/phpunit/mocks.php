@@ -124,6 +124,9 @@ class Hm_Mock_Redis extends Hm_Mock_Memcached {
     function auth($pass) {
         return true;
     }
+    function close() {
+        return true;
+    }
 }
 if (!class_exists('Memcached')) {
     class Memcached extends Hm_Mock_Memcached {}
