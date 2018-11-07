@@ -115,6 +115,11 @@ trait Hm_Cache_Base {
     private $port;
     private $cache_con;
 
+    /**
+     * @return boolean
+     */
+    abstract protected function connect();
+
     /*
      * @return boolean
      */
