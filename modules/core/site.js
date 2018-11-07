@@ -137,6 +137,7 @@ var Hm_Ajax_Request = function() { return {
             return;
         }
         else {
+            $('.offline').hide();
             if (hm_encrypt_ajax_requests()) {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
@@ -175,8 +176,8 @@ var Hm_Ajax_Request = function() { return {
     },
 
     fail: function() {
+        $('.offline').show();
         Hm_Ajax.err_condition = true;
-        setTimeout(function() { Hm_Notices.show({0: 'ERRAn error occurred communicating with the server'}); }, 1000);
         this.run_on_failure();
     },
 
@@ -1273,6 +1274,12 @@ var Hm_Utils = {
     },
     html_entities: function(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    },
+    test_connection: function() {
+        $('.offline').hide();
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_test'}],
+            false, [], false, false, false);
     }
 };
 
@@ -1416,5 +1423,6 @@ $(function() {
     }
     $('body').swipeRight(function() { Hm_Folders.open_folder_list(); });
     $('body').swipeLeft(function() { Hm_Folders.hide_folder_list(); });
+    $('.offline').click(function() { Hm_Utils.test_connection(); });
 
 });
