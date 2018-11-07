@@ -70,7 +70,7 @@ class Hm_API_Curl {
 
     /**
      * Process a curl request result
-     * @param resource|false $ch curl connection
+     * @param resource $ch curl connection
      * @return array
      */
     private function curl_result($ch) {

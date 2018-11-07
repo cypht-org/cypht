@@ -122,7 +122,7 @@ class Hm_Transform {
 
     /**
      * Convert an array to a string
-     * @param array|string $data data to be transformed to a string
+     * @param mixed $data data to be transformed to a string
      * @param string $encoding encoding to use for values
      * @return string on success, false on failure
      */
