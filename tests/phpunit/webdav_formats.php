@@ -33,7 +33,7 @@ class Hm_Test_Webdav_Formats extends PHPUnit_Framework_TestCase {
      */
     public function test_import_vcard_failed() {
         $parser = new Hm_VCard();
-        $card = "BEGIN:VCARD\nFOO\n";
+        $card = "BEGIN:VCARD\n\nFOO\n";
         $this->assertFalse($parser->import($card));
     }
     /**
@@ -60,6 +60,7 @@ x-qq:21588891
 END:VCARD';
         $this->assertTrue($parser->import($card));
         $this->assertEquals(13, count($parser->parsed_data()));
+        $this->assertEquals($card, $parser->raw_data());
     }
     /**
      * @preserveGlobalState disabled

@@ -72,9 +72,6 @@ class Hm_Card_Parse {
      */
     protected function split_value($line, $delim, $limit) {
         $res = preg_split("/\\\\.(*SKIP)(*FAIL)|$delim/s", $line, $limit);
-        if ($res === false) {
-            return array('');
-        }
         return $res;
     }
 
@@ -259,13 +256,13 @@ class Hm_Card_Parse {
         if (count($lines) < 4) {
             $res = false;
         }
-        if (strtolower(substr($lines[0], 0, 5)) != 'begin') {
+        if (count($lines) > 0 && strtolower(substr($lines[0], 0, 5)) != 'begin') {
             $res = false;
         }
-        if (strtolower(substr($lines[1], 0, 7)) != 'version') {
+        if (count($lines) > 1 && strtolower(substr($lines[1], 0, 7)) != 'version') {
             $res = false;
         }
-        if (strtolower(substr($lines[(count($lines) - 1)], 0, 3)) != 'end') {
+        if (count($lines) && strtolower(substr($lines[(count($lines) - 1)], 0, 3)) != 'end') {
             $res = false;
         }
         if (!$res) {
