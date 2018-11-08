@@ -583,6 +583,10 @@ class Hm_Test_Session_Functions extends PHPUnit_Framework_TestCase {
         $setup = new Hm_Session_Setup($this->config);
         $this->assertEquals('Custom_Session', get_class(($setup->setup_session())));
 
+        $this->config->set('session_type', 'REDIS');
+        $setup = new Hm_Session_Setup($this->config);
+        $this->assertEquals('Hm_Redis_Session', get_class(($setup->setup_session())));
+
         $this->config->set('session_type', 'MEM');
         $setup = new Hm_Session_Setup($this->config);
         $this->assertEquals('Hm_Memcached_Session', get_class(($setup->setup_session())));
