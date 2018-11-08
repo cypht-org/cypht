@@ -51,6 +51,14 @@ class Hm_Card_Parse {
      * Return parsed data for an input
      * @return array
      */
+    public function raw_data() {
+        return $this->raw_card;
+    }
+
+    /**
+     * Return parsed data for an input
+     * @return array
+     */
     public function parsed_data() {
         return $this->data;
     }
@@ -308,6 +316,20 @@ class Hm_VCard extends Hm_Card_Parse {
         'CLIENTPIDMAP', 'PHOTO', 'URL', 'KEY',
         'FBURL', 'CALADRURI', 'CALURI'
     );
+
+    protected function parse_n($vals) {
+        foreach ($vals as $index => $name) {
+            $flds = $this->split_value($name['value'], ';', 5);
+            $vals[$index]['value'] = array(
+                'lastname' => $flds[0],
+                'firstname' => $flds[1],
+                'additional' => $flds[2],
+                'prefixes' => $flds[3],
+                'suffixes' => $flds[4]
+            );
+        }
+        return $vals;
+    }
 
     protected function parse_adr($vals) {
         foreach ($vals as $index => $addr) {
