@@ -8,34 +8,25 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+require APP_PATH.'modules/carddav_contacts/hm-carddav.php';
+
 /**
  * @subpackage carddav_contacts/handler
  */
 class Hm_Handler_load_carddav_contacts extends Hm_Handler_Module {
     public function process() {
+
+        $user = 'testuser';
+        $pass = 'testpass';
+
         $contacts = $this->get('contact_store');
-        /* load here */
+        $details = get_ini($this->config, 'carddav.ini', true);
+
+        foreach ($details as $name => $vals) {
+            $carddav = new Hm_Carddav($name, $vals['server'], $user, $pass);
+            $contacts->import($carddav->addresses);
+            $this->append('contact_sources', 'carddav');
+        }
+        $this->out('contact_store', $contacts, false);
     }
-}
-
-/**
- * @subpackage carddav_contacts/functions
- */
-function propfind($url, $headers) {
-    
-    //$headers = array('Authorization: Basic '. base64_encode(sprintf('%s:%s', $user, $pass)));
-    $req_xml = '<d:propfind xmlns:d="DAV:" xmlns:cs="http://calendarserver.org/ns/"><d:prop>'.
-        '<cs:getctag /></d:prop></d:propfind>';
-    $api = new Hm_API_Curl('xml');
-}
-
-/**
- * @subpackage carddav_contacts/functions
- */
-function report($url, $user, $pass) {
-    
-    $headers = array('Authorization: Basic '. base64_encode(sprintf('%s:%s', $user, $pass)));
-    $req_xml = '<card:addressbook-query xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav">'.
-        '<d:prop><d:getetag /><card:address-data /></d:prop></card:addressbook-query>';
-    $api = new Hm_API_Curl('xml');
 }
