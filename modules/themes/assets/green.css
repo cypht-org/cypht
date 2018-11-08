@@ -4,6 +4,7 @@ body, .folder_cell { background: none !important; background-color: transparent 
 html { background: linear-gradient(340deg, #eee, #eee, #eee, #b8ccb9, #b8ccb9) !important; }
 .msg_controls { background: linear-gradient(340deg, #b8ccb9, #b8ccb9) !important; }
 img { opacity: .5 !important; }
+.msg_text_inner img, .apod_image img { opacity: 1 !important; }
 a { color: #222 !important; }
 .list_meta, a:hover { color: #000 !important; }
 .confirm_logout, .msg_controls a, textarea, select, input, .toggle_link { color: #aaa; background-color: #c7dcc8 !important; }

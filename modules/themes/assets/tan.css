@@ -3,6 +3,7 @@ main, div { border-radius: 0px 0px 3px 3px }
 body, .folder_cell { background: none !important; background-color: transparent !important; }
 html { background: linear-gradient(0deg, #33281a, #94734b) !important; }
 img { opacity: .4 !important; }
+.msg_text_inner img, .apod_image img { opacity: 1 !important; }
 a { color: #aaa !important; }
 ::-webkit-input-placeholder { color: #ddd; }
 a:hover { color: #fff !important; }

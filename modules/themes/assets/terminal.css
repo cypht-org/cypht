@@ -6,6 +6,7 @@ a { color: green !important; }
 .nlink:hover, .plink:hover, a:hover { color: #82c885 !important; }
 .confirm_logout, textarea, select, input, .toggle_link { border-radius: 0px; border-style: solid; border-color: #222 !important; color: green; background-color: #000 !important; }
 .toggle_link img { display: inline-block; }
+.msg_text_inner img, .apod_image img { opacity: 1 !important; }
 .prevnext { display: none; }
 ::-webkit-input-placeholder { color: #174214; }
 .checkbox_cell label { border: solid 1px green !important; }

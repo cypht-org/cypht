@@ -3,6 +3,7 @@ main, div { border-radius: 0px 0px 0px 0px }
 body, .folder_cell { padding-top: 10px; background: none !important; background-color: transparent !important; }
 html { background-color: #fff; }
 img { opacity: .5 !important; }
+.msg_text_inner img, .apod_image img { opacity: 1 !important; }
 a { color: #222 !important; }
 .list_meta, a:hover { color: #000 !important; }
 msg_controls a, textarea, select, input, .toggle_link { color: #aaa; }

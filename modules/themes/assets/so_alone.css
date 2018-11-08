@@ -108,6 +108,7 @@ body, .folder_cell { background: none !important; background-color: transparent 
 /* html { background: linear-gradient(0deg, #111, #333) !important; } */
 html { background: #242932 !important; }
 img { opacity: .4 !important; }
+.msg_text_inner img, .apod_image img { opacity: 1 !important; }
 /* a { color: #8fbcbb !important; } */
 a:hover { color: #9397cd !important; }
 

@@ -3,6 +3,7 @@ html * { color: #404a5d !important; border-color: #cfdeff !important; }
 body, .folder_cell { background: none !important; background-color: transparent !important; }
 html { background: linear-gradient(0deg, #e8f0ff, #ecf2ff) !important; }
 img { opacity: .3 !important; }
+.msg_text_inner img, .apod_image img { opacity: 1 !important; }
 a { color: #404a5d !important; }
 a:hover { color: #39528c !important; }
 textarea, select, input, .toggle_link { border-color: #ccc !important; color: #666; background-color: #e8f0ff; }
