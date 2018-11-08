@@ -65,6 +65,7 @@ function parse_module_ini_files($settings) {
         array('github.ini', false),
         array('ldap.ini', true),
         array('oauth2.ini', true),
+        array('carddav.ini', true),
         array('wordpress.ini', false),
         array('recaptcha.ini', false),
         array('dynamic_login.ini', false)
