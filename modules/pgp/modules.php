@@ -109,11 +109,11 @@ class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
         $res = '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>';
         $res .= '<div class="pgp_section">';
 
-        $res .= '<span class="pgp_sign"><label for="pgp_sign">'.$this->trans('PGP Sign as:').'</label>';
+        $res .= '<span class="pgp_sign"><label for="pgp_sign">'.$this->trans('PGP Sign as').'</label>';
         $res .= '<select id="pgp_sign" size="1"></select></span>';
 
         if (count($pub_keys) > 0) {
-            $res .= '<label for="pgp_encrypt">'.$this->trans('PGP Encrypt for:').
+            $res .= '<label for="pgp_encrypt">'.$this->trans('PGP Encrypt for').
                 '</label><select id="pgp_encrypt" size="1"><option disabled selected value=""></option>';
             foreach ($pub_keys as $vals) {
                 $res .= '<option value="'.$vals['key'].'">'.$vals['email'].'</option>';
