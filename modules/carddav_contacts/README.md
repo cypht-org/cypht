@@ -1,4 +1,3 @@
 ## CardDav module set
 
-Not functional yet, just a work in progress. Will eventually add support for
-CardDav servers for contacts.
+Initial support for contacts from a CardDav server. Servers must be defined in the carddav.ini file. As of right now support is read-only.

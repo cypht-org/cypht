@@ -340,8 +340,24 @@ class Hm_VCard extends Hm_Card_Parse {
                 'postal_code' => $flds[5],
                 'country' => $flds[6]
             );
+            $vals[$index]['formatted'] = $this->format_addr($vals[$index]);
         }
         return $vals;
+    }
+
+    protected function format_addr($vals) {
+        $name = 'address';
+        if (array_key_exists('type', $vals)) {
+            $name = sprintf('%s_address', strtolower($vals['type']));
+        }
+        $vals = $vals['value'];
+        $street = $vals['street'];
+        if (!$street && $vals['po']) {
+            $steet = $vals['po'];
+        }
+        $value = sprintf('%s, %s, %s, %s, %s', $street, $vals['locality'], $vals['region'],
+            $vals['country'], $vals['postal_code']);
+        return array('name' => $name, 'value' => $value);
     }
 }
 

@@ -63,16 +63,34 @@ class Hm_Carddav {
         $phone = '';
         $dn = array_key_exists('n', $data) ? sprintf('%s %s', $data['n']['firstname'], $data['n']['lastname']) : '';
         $phone = array_key_exists('tel', $data) && count($data['tel']) > 0 ? $data['tel'][0]['value']: '';
+        $all_flds = $this->parse_extr_flds($data);
 
         foreach ($data['email'] as $email) {
             $res[] = array(
                 'source' => $this->src,
                 'display_name' => $dn,
                 'phone_number' => $phone,
-                'email_address' => $email['value']
+                'email_address' => $email['value'],
+                'all_fields' => $all_flds
             );
         }
         return $res;
+    }
+
+    private function parse_extr_flds($data) {
+        $all_flds = array();
+        foreach ($data as $name => $vals) {
+            if (in_array($name, array('n', 'tel', 'email'))) {
+                continue;
+            }
+            if (is_array($vals) && array_key_exists('formatted', $vals)) {
+                $all_flds[$vals['formatted']['name']] = $vals['formatted']['value'];
+            }
+            if (is_string($vals)) {
+                $all_flds[$name] = $vals;
+            }
+        }
+        return $all_flds;
     }
 
     private function discover() {
@@ -89,8 +107,22 @@ class Hm_Carddav {
         return true;
     }
 
+    private function parse_xml($xml) {
+        try {
+            $data = new SimpleXMLElement($xml);
+            return $data;
+        }
+        catch (Exception $oops) {
+            Hm_Msgs::add('ERRUnable to access CardDav server');
+        }
+        return false;
+    }
+
     private function xml_find($xml, $path, $multi=false) {
-        $data = new SimpleXMLElement($xml);
+        $data = $this->parse_xml($xml);
+        if (!$data) {
+            return false;
+        }
         foreach ($data->getDocNamespaces() as $pre => $ns) {
             if (!$pre) {
                 $pre = 'a';

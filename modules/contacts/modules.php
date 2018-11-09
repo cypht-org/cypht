@@ -173,7 +173,8 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<span class="contact_src">'.($contact->value('source') ? $this->html_safe($contact->value('source')) : $this->trans('local')).'</span>'.
                     '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
                     '<td><div class="contact_fld">'.$this->html_safe($contact->value('email_address')).'</div></td>'.
-                    '<td class="contact_fld">'.$this->html_safe($contact->value('phone_number')).'</td>'.
+                    '<td class="contact_fld"><a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
+                    $this->html_safe($contact->value('phone_number')).'</a></td>'.
                     '<td class="contact_controls">';
                 if (in_array($contact->value('source'), $editable, true)) {
                     $res .= '<a data-id="'.$this->html_safe($id).'" data-source="'.$this->html_safe($contact->value('source')).
@@ -293,7 +294,14 @@ function name_map($val) {
         'employeenumber' => 'Employee Number',
         'employeetype' => 'Employee Type',
         'preferredlanguage' => 'Preferred Language',
-        'labeleduri' => 'Homepage URL'
+        'labeleduri' => 'Homepage URL',
+        'home_address' => 'Home Address',
+        'work_address' => 'Work Address',
+        'nickname' => 'Nickname',
+        'url' => 'Website',
+        'org' => 'Company',
+        'fn' => 'Full Name',
+        'uid' => 'Uid',
     );
     if (array_key_exists($val, $names)) {
         return $names[$val];
