@@ -1218,13 +1218,13 @@ function outbound_address_check($mod, $from, $reply_to) {
         }
     }
     if ($domain) {
-        if (!is_email_address($from)) {
+        if (strpos($from, '@') === false) {
             $from = $from.'@'.$domain;
         }
         if (!trim($reply_to)) {
             $reply_to = $from;
         }
-        elseif (!is_email_address($reply_to)) {
+        elseif (strpos($reply_to, '@') === false) {
             $reply_to = $reply_to.'@'.$domain;
         }
     }
