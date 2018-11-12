@@ -1,5 +1,6 @@
 from base import WebTest, USER, PASS
 from runner import test_runner
+from creds import IMAP_ID
 from selenium.common.exceptions import ElementNotVisibleException
 
 class ServersTest(WebTest):
@@ -55,9 +56,9 @@ class ServersTest(WebTest):
         assert self.by_class('sys_messages').text == 'Added server!'
 
     def imap_confirm(self):
-        user = self.by_id('imap_user_2')
+        user = self.by_id('imap_user_'+IMAP_ID)
         user.send_keys('testuser')
-        passw = self.by_id('imap_pass_2')
+        passw = self.by_id('imap_pass_'+IMAP_ID)
         passw.send_keys('testuser')
         self.by_class('test_imap_connect').click()
         self.wait_on_sys_message()

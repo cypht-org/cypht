@@ -1,4 +1,5 @@
 from base import WebTest, USER, PASS
+from creds import RECIP
 from runner import test_runner
 from selenium.common.exceptions import ElementNotVisibleException
 
@@ -17,7 +18,7 @@ class SendTest(WebTest):
 
     def compose_message(self):
         to = self.by_name('compose_to')
-        to.send_keys('testuser@localhost.localdomain')
+        to.send_keys(RECIP)
         subject = self.by_name('compose_subject')
         subject.send_keys('Test')
         body = self.by_name('compose_body')

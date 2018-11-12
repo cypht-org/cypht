@@ -3,6 +3,8 @@
 import os, sys
 from selenium import webdriver
 
+RECIP='testuser@localhost.localdomain'
+IMAP_ID='2'
 DESIRED_CAP = None
 SITE_URL = 'http://cypht-test.org/'
 USER = 'testuser'
