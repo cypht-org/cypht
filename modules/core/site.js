@@ -175,8 +175,13 @@ var Hm_Ajax_Request = function() { return {
         return false;
     },
 
-    fail: function() {
-        $('.offline').show();
+    fail: function(xhr) {
+        if (xhr.status && xhr.status == 500) {
+            Hm_Notices.show(['ERRServer Error']);
+        }
+        else {
+            $('.offline').show();
+        }
         Hm_Ajax.err_condition = true;
         this.run_on_failure();
     },

@@ -50,17 +50,9 @@ ini_set('session.name', 'hm_session');
 /* disable remote includes */
 ini_set('allow_url_include', 0);
 
-/* don't show errors in production */
-if (!DEBUG_MODE) {
-    ini_set('display_errors', 0);
-    ini_set('display_start_up_errors', 0);
-}
-
-/* show everthing in debug mode */
-else {
-    ini_set('display_errors', 1);
-    ini_set('display_start_up_errors', 1);
-}
+/* when display_errors is on PHP returns a 200 when it should be a 500 */
+ini_set('display_errors', 0);
+ini_set('display_start_up_errors', 0);
 
 $tmp_dir = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();
 $base = dirname(dirname(__FILE__)).PATH_SEPARATOR.$tmp_dir.PATH_SEPARATOR.'/dev/urandom';
