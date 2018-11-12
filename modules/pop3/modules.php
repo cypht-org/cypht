@@ -96,7 +96,7 @@ class Hm_Handler_pop3_message_action extends Hm_Handler_Module {
             }
             if (count($server_ids) > 0) {
                 foreach ($server_ids as $id) {
-                    bust_pop3_cache($this->session, $this->config, $id);
+                    bust_pop3_cache($this->cache, $id);
                 }
             }
         }
@@ -361,7 +361,7 @@ class Hm_Handler_pop3_message_content extends Hm_Handler_Module {
                 $this->out('pop3_message_body', $bodies);
                 $this->out('pop3_mailbox_page_path', $form['pop3_list_path']);
                 $this->out('pop3_server_id', $id);
-                bust_pop3_cache($this->session, $this->config, $id);
+                bust_pop3_cache($this->cache, $id);
                 Hm_POP3_Uid_Cache::read(sprintf("pop3_%s_%s", $id, $form['pop3_uid']));
             }
         }
