@@ -16,9 +16,6 @@ require APP_PATH.'modules/carddav_contacts/hm-carddav.php';
 class Hm_Handler_load_carddav_contacts extends Hm_Handler_Module {
     public function process() {
 
-        $user = 'testuser';
-        $pass = 'testpass';
-
         $contacts = $this->get('contact_store');
         $auths = $this->user_config->get('carddav_contacts_auth_setting', array());
         $details = get_ini($this->config, 'carddav.ini', true);

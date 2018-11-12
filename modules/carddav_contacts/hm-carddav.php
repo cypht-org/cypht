@@ -38,11 +38,14 @@ class Hm_Carddav {
     private function get_vcards() {
         $res = array();
         $parser = new Hm_VCard();
+        $count = 0;
         foreach ($this->xml_find($this->list_addressbooks(), $this->addr_list_path, true) as $url) {
             $url = $this->url_concat($url);
             if ($url == $this->address_url) {
                 continue;
             }
+            $count++;
+            Hm_Debug::add(sprintf('CARDDAV: Trying contacts url %s', $url));
             foreach ($this->xml_find($this->report($url), $this->addr_detail_path, true) as $addr) {
                 $parser->import($addr);
                 foreach ($this->convert_to_contact($parser->parsed_data()) as $contact) {
@@ -50,6 +53,7 @@ class Hm_Carddav {
                 }
             }
         }
+        Hm_Debug::add(sprintf('CARDDAV: %s contact urls found', $count));
         $this->addresses = $res;
     }
 
@@ -96,13 +100,17 @@ class Hm_Carddav {
     private function discover() {
         $path = $this->xml_find($this->principal_discover(), $this->principal_path);
         if ($path === false) {
+            Hm_Debug::add('CARDDAV: No principal path discovered');
             return false;
         }
+        Hm_Debug::add(sprintf('CARDDAV: Found %s principal path', $path));
         $this->principal_url = $this->url_concat($path);
         $address_path = $this->xml_find($this->addressbook_discover(), $this->addressbook_path);
         if ($address_path === false) {
+            Hm_Debug::add('CARDDAV: No address path discovered');
             return false;
         }
+        Hm_Debug::add(sprintf('CARDDAV: Found %s address path', $address_path));
         $this->address_url = $this->url_concat($address_path);
         return true;
     }
@@ -114,6 +122,7 @@ class Hm_Carddav {
         }
         catch (Exception $oops) {
             Hm_Msgs::add('ERRUnable to access CardDav server');
+            Hm_Debug::add(sprintf('CARDDAV: Could not parse XML: %s', $xml));
         }
         return false;
     }
@@ -137,8 +146,12 @@ class Hm_Carddav {
             $res[] = (string) $node;
         }
         if ($multi) {
+            if (count($res) == 0) {
+                Hm_Debug::add(sprintf('CARDDAV: find for %s failed in xml: %s', $path, $xml));
+            }
             return $res;
         }
+        Hm_Debug::add(sprintf('CARDDAV: find for %s failed in xml: %s', $path, $xml));
         return false;
     }
 
@@ -166,6 +179,7 @@ class Hm_Carddav {
     private function principal_discover() {
         $req_xml = '<d:propfind xmlns:d="DAV:"><d:prop><d:current-user-principal /></d:prop></d:propfind>';
         $api = new Hm_API_Curl('xml');
+        Hm_Debug::add(sprintf('CARDDAV: Sending discover XML: %s', $req_xml));
         return $api->command($this->url, $this->auth_headers(), array(), $req_xml, 'PROPFIND');
     }
 
@@ -175,6 +189,7 @@ class Hm_Carddav {
         $req_xml = '<d:propfind xmlns:d="DAV:" xmlns:cs="http://calendarserver.org/ns/"><d:prop>'.
            '<d:resourcetype /><d:displayname /><cs:getctag /></d:prop></d:propfind>';
         $api = new Hm_API_Curl('xml');
+        Hm_Debug::add(sprintf('CARDDAV: Sending addressbook XML: %s', $req_xml));
         return $api->command($this->address_url, $headers, array(), $req_xml, 'PROPFIND');
     }
 
@@ -182,6 +197,7 @@ class Hm_Carddav {
         $req_xml = '<card:addressbook-query xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav">'.
             '<d:prop><d:getetag /><card:address-data /></d:prop></card:addressbook-query>';
         $api = new Hm_API_Curl('xml');
+        Hm_Debug::add(sprintf('CARDDAV: Sending contacts XML: %s', $req_xml));
         return $api->command($url, $this->auth_headers(), array(), $req_xml, 'REPORT');
     }
 }
