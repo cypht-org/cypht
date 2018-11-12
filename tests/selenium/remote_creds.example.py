@@ -3,6 +3,12 @@
 # This is an example config file to run the Selenium tests remotely,
 # specifically with BrowserStack (https://www.browserstack.com) 
 
+# recipient E-mail for the send test
+RECIP='testuser@localhost.localdomain'
+
+# IMAP id (used to select the correct server in the servers test)
+IMAP_ID='2'
+
 # Get webdrivers
 from selenium import webdriver
 
