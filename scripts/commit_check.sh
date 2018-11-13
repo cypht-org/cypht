@@ -60,7 +60,6 @@ unit_test_check() {
         phpunit --stop-on-error --stop-on-failure && \
         cd "$CYPHT_DIR"
     err_condition
-    git checkout tests/phpunit/data/testuser.txt
 }
 
 # run ui tests
