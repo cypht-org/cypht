@@ -12,7 +12,7 @@ a { color: #222 !important; }
 .folder_list { background-color: transparent !important; }
 .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: transparent !important; }
 .src_name, .content_title { color: #666 !important; background: none !important; background-color: transparent !important; }
-.debug, .subtitle, { color: #999 !important; }
+.debug, .subtitle { color: #999 !important; }
 .settings_subtitle { color: #333 !important; }
 .empty_list, .subject a { color: #333 !important; }
 .selected_menu, .selected_menu a { color: green !important; }

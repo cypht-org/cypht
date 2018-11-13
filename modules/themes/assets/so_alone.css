@@ -7,7 +7,7 @@
        url('fonts/roboto-condensed-v14-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
        url('fonts/roboto-condensed-v14-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
-html * { font-family: 'Roboto Condensed', 'BlinkMacSystemFont', 'Lucida Grande', 'Segoe UI', 'Ubuntu Condensed', Ubuntu, Cantarell, sans-serif; !important;
+html * { font-family: 'Roboto Condensed', 'BlinkMacSystemFont', 'Lucida Grande', 'Segoe UI', 'Ubuntu Condensed', Ubuntu, Cantarell, sans-serif !important;
 	font-size: 15px;
 	/* color: #E0E3EC !important; */
 	/* border-color: #282828 !important;  */
@@ -335,14 +335,26 @@ textarea { font-size: 100%; }
     /* color: #9397cd !important; */
 }
 
-@media screen and (max-device-width:1080px) and (orientation : portrait), @media screen and (max-device-width:1080px) and (orientation : landscape), @media screen and (max-device-width:480px) and (orientation : portrait) {
+@media screen and (max-device-width:1080px) and (orientation : portrait) {
     .msg_controls { position: absolute; background: #363636 !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; }
     .content_title { padding-bottom: 10px; padding-top: 10px; padding-bottom: 10px; }
     .src_name { }
 }
 
-.total_unread_count, .unread_count {  /* unread count indicators */
-	color: #ffffff,
+@media screen and (max-device-width:1080px) and (orientation : landscape) {
+    .msg_controls { position: absolute; background: #363636 !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; }
+    .content_title { padding-bottom: 10px; padding-top: 10px; padding-bottom: 10px; }
+    .src_name { }
+}
+
+@media screen and (max-device-width:480px) and (orientation : portrait) {
+    .msg_controls { position: absolute; background: #363636 !important; z-index: 100; right: 0px; height: 30px; padding-top: 20px; top: 0px; left: 60px !important; }
+    .content_title { padding-bottom: 10px; padding-top: 10px; padding-bottom: 10px; }
+    .src_name { }
+}
+
+.total_unread_count, .unread_count {
+	color: #ffffff;
 	background-color: #9397cd;
 	background: #9397cd;
 	border-radius: 10px;
