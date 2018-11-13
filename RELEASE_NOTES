@@ -1,4 +1,10 @@
-Cypht version 1.1.0 RC1
+Cypht version 1.1.0
 
-This first 1.1.0 release candidate for a LONG overdue stable release.  The full
-change set including git short hashes can be found in the CHANGES file.
+This is the second stable Cypht release. It's been over a year and a half
+since our last stable release. A few new features have been added, testing
+has been VASTLY improved, and many many bugs have been fixed. Thanks to
+everyone who has generously contributed time to the project from PRs to
+bug reports to feature requests. Your feedback is appreciated! Details of
+the changes are in the CHANGELOG file. Questions or concerns can be sent
+to me at jason@cypht.org, the #hastymail channel at freenode, or with an
+issue filed at https://github.com/jasonmunro/cypht/.
