@@ -9,6 +9,7 @@
 /tests/selenium/remote_creds.py
 *.pyc
 apigen4.sh
+testuser.txt
 website/docs
 tests/phpunit/data/testuser.txt
 website
