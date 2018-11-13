@@ -10,9 +10,8 @@ END="\e[00m"
 err_condition() {
     if [[ $? != 0 ]];
     then
-        echo;
-        echo -e "$RED FAILED $END";
-        echo; exit 1;
+        echo; echo -e "$RED FAILED $END"; echo;
+        exit 1;
     fi;
 }
 
@@ -31,7 +30,7 @@ php_check() {
     err_condition
 }
 
-# syntax check on javascript files
+# syntax check on all javascript files
 js_check() {
     echo; echo -e "$YELLOW JS CHECK $END"; echo
     find . -name "*.js" \
@@ -43,7 +42,7 @@ js_check() {
     err_condition
 }
 
-# syntax check on module css files
+# syntax check on all css files
 css_check() {
     echo; echo -e "$YELLOW CSS CHECK $END"; echo
     find . -name "*.css" \
@@ -86,9 +85,7 @@ debug_check() {
     else
         echo 'DEBUG FOUND';
         echo "$DEBUG"
-        echo
-        echo  -e "$RED FAILED $END"
-        echo
+        echo; echo  -e "$RED FAILED $END"; echo
         exit 1
     fi
 }
