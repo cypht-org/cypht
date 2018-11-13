@@ -132,27 +132,35 @@ if [ $# -eq 0 ]
     case $1 in
         config)
             config_check
+            success
         ;;
         debug)
             debug_check
+            success
         ;;
         php)
             php_check
+            success
         ;;
         js)
             js_check
+            success
         ;;
         css)
             css_check
+            success
         ;;
         unit_test)
             unit_test_check
+            success
         ;;
         ui_test)
             ui_test_check
+            success
         ;;
         git_stat)
             git_stat
+            success
         ;;
         all)
             run_all
