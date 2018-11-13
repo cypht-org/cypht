@@ -4,8 +4,8 @@ from sys import exc_info
 from traceback import print_exception
 from creds import DESIRED_CAP, success
 
-GREEN = '\033[92m'
-RED = '\033[91m'
+GREEN = '\033[32m'
+RED = '\033[31m'
 END = '\033[0m'
 
 def run_tests(obj, tests):
