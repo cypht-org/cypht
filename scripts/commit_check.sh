@@ -1,0 +1,161 @@
+#!/bin/bash
+
+CYPHT_DIR="/home/jason/cypht"
+RED="\e[00;31m"
+GREEN="\e[00;32m"
+YELLOW="\e[00;33m"
+END="\e[00m"
+
+# exit on error
+err_condition() {
+    if [[ $? != 0 ]];
+    then
+        echo;
+        echo -e "$RED FAILED $END";
+        echo; exit 1;
+    fi;
+}
+
+# run config
+config_check() {
+    echo; echo -e "$YELLOW CONFIG CHECK $END"; echo
+    php ./scripts/config_gen.php
+    err_condition
+}
+
+# syntax check on all php files
+php_check() {
+    echo; echo -e "$YELLOW PHP CHECK $END"; echo
+    find . -name "*.php" -print \
+        | xargs -L 1  php -l
+    err_condition
+}
+
+# syntax check on javascript files
+js_check() {
+    echo; echo -e "$YELLOW JS CHECK $END"; echo
+    find . -name "*.js" \
+        | while read fname;
+        do echo $fname;
+            acorn --silent "$fname"; if [[ $? != 0 ]];
+        then exit 1; fi;
+        done
+    err_condition
+}
+
+# syntax check on module css files
+css_check() {
+    echo; echo -e "$YELLOW CSS CHECK $END"; echo
+    find . -name "*.css" \
+        | while read fname;
+        do csslint --errors=errors "$fname";
+            if [[ $? != 0 ]]; then exit 1; fi;
+        done
+    err_condition
+}
+
+# run unit tests
+unit_test_check() {
+    echo; echo -e "$YELLOW UNIT TEST CHECK $END"; echo
+    cd tests/phpunit && \
+        phpunit --stop-on-error --stop-on-failure && \
+        cd "$CYPHT_DIR"
+    err_condition
+    git checkout tests/phpunit/data/testuser.txt
+}
+
+# run ui tests
+ui_test_check() {
+    echo; echo -e "$YELLOW UI TEST CHECK $END"; echo
+    cd tests/selenium && \
+        sh ./runall.sh && \
+        cd "$CYPHT_DIR"
+    err_condition
+}
+
+# check for debug
+debug_check() {
+    echo; echo -e "$YELLOW DEBUG CHECK $END"; echo
+    DEBUG=`grep -r elog lib/* modules/* \
+        | grep -v 'function elog' \
+        | grep -v 'var elog = function' \
+        | grep -v Binary`
+
+    if [ -z "$DEBUG" ]; then
+        echo 'No debugs';
+    else
+        echo 'DEBUG FOUND';
+        echo "$DEBUG"
+        echo
+        echo  -e "$RED FAILED $END"
+        echo
+        exit 1
+    fi
+}
+
+# update git version
+version_update() {
+    echo; echo -e "$YELLOW VERSION UPDATE $END"; echo
+    COUNT=`git rev-list --all --count`
+    sed -i "s/GIT VERSION: [[:digit:]]\+/GIT VERSION: $COUNT/" index.php
+}
+
+# git status
+git_stat() {
+    echo; echo -e "$YELLOW GIT STATUS $END"; echo
+    git status --short --branch
+}
+
+# output success message
+success() {
+    echo; echo -e "$GREEN SUCCESS $END"; echo
+}
+
+# run all checks
+run_all() {
+    config_check
+    debug_check
+    php_check
+    js_check
+    css_check
+    unit_test_check
+    ui_test_check
+    git_stat
+    success
+}
+
+cd "$CYPHT_DIR"
+if [ $# -eq 0 ]
+  then
+      run_all
+  else
+    case $1 in
+        config)
+            config_check
+        ;;
+        debug)
+            debug_check
+        ;;
+        php)
+            php_check
+        ;;
+        js)
+            js_check
+        ;;
+        css)
+            css_check
+        ;;
+        unit_test)
+            unit_test_check
+        ;;
+        ui_test)
+            ui_test_check
+        ;;
+        git_stat)
+            git_stat
+        ;;
+        all)
+            run_all
+        ;;
+    esac
+fi
