@@ -20,10 +20,10 @@ class Hm_Carddav {
     private $pass;
     private $principal_url;
     private $address_url;
-    private $principal_path = '//a:response/a:propstat/a:prop/a:current-user-principal/a:href';
-    private $addressbook_path = '//a:response/a:propstat/a:prop/CR:addressbook-home-set/a:href';
-    private $addr_list_path = '//a:response/a:href';
-    private $addr_detail_path = '//a:response/a:propstat/a:prop/CR:address-data';
+    private $principal_path = '//response/propstat/prop/current-user-principal/href';
+    private $addressbook_path = '//response/propstat/prop/addressbook-home-set/href';
+    private $addr_list_path = '//response/href';
+    private $addr_detail_path = '//response/propstat/prop/address-data';
 
     public function __construct($src, $url, $user, $pass) {
         $this->user = $user;
@@ -116,6 +116,9 @@ class Hm_Carddav {
     }
 
     private function parse_xml($xml) {
+        $xml = preg_replace("/<[a-zA-Z]+:/Um", "<", $xml);
+        $xml = preg_replace("/<\/[a-zA-Z]+:/Um", "</", $xml);
+        $xml = str_replace('xmlns=', 'ns=', $xml);
         try {
             $data = new SimpleXMLElement($xml);
             return $data;
@@ -131,12 +134,6 @@ class Hm_Carddav {
         $data = $this->parse_xml($xml);
         if (!$data) {
             return false;
-        }
-        foreach ($data->getDocNamespaces() as $pre => $ns) {
-            if (!$pre) {
-                $pre = 'a';
-            }
-            $data->registerXPathNamespace($pre, $ns);
         }
         $res = array();
         foreach ($data->xpath($path) as $node) {
