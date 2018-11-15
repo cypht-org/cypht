@@ -45,7 +45,16 @@ function check_php() {
         die('Cypht requires PHP OpenSSL support');
     }
     if (!class_exists('PDO')) {
-        echo "WARNING: No PHP PDO support found, database featueres will not work\n";
+        echo "\nWARNING: No PHP PDO support found, database featueres will not work\n\n";
+    }
+    if (!class_exists('Redis')) {
+        echo "\nWARNING: No PHP Redis support found, Redis caching or sessions will not work\n\n";
+    }
+    if (!class_exists('Memcached')) {
+        echo "\nWARNING: No PHP Memcached support found, Memcached caching or sessions will not work\n\n";
+    }
+    if (!class_exists('gnupg')) {
+        echo "\nWARNING: No PHP gnupg support found, The PGP module set will not work if enabled\n\n";
     }
 }
 
