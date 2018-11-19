@@ -1,0 +1,14 @@
+.targets_section, .other_section, .submit_section, .time_section, .source_section, .terms_section { padding: 20px; padding-left: 60px; margin-bottom: 10px; }
+.targets_section, .other_section, .time_section { display: none; }
+.targets_section img, .time_section img, .source_section img, .terms_section img { cursor: pointer; margin-left: 10px; vertical-align: -3px; opacity: .4; }
+.submit_section { margin-top: 20px; }
+.other_section table, .targets_section table { width: 1%; white-space: nowrap; margin-bottom: 5px; }
+.other_section th, .targets_section th { vertical-align: top; font-weight: normal; text-align: left; padding: 5px; padding-bottom: 10px; }
+.other_section .flags { line-height: 150%; }
+.andor { width: 200px; padding: 10px; text-align: center; }
+.timeandor { width: 400px; padding: 10px; text-align: center; }
+.adv_folder_list { width: 400px; }
+.adv_source_list { margin-top: 10px; line-height: 150%; }
+.adv_source_list img { margin-right: 10px; }
+.adv_expand_all { margin-right: 10px; opacity: .4; vertical-align: -1px; cursor: pointer; }
+#adv_search { cursor: pointer; }
