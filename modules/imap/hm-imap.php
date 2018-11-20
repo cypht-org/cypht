@@ -973,7 +973,17 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @return array list of IMAP message UIDs that match the search
      */
     public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
-        if (!$this->is_clean($this->search_charset, 'charset') || !$this->is_clean($target, 'keyword')) {
+        if (!$this->is_clean($this->search_charset, 'charset')) {
+        }
+        if (is_array($target)) {
+            foreach ($target as $val) {
+                if (!$this->is_clean($val, 'keyword')) {
+                    return array();
+                }
+            }
+            $target = implode(' ', $target);
+        }
+        elseif (!$this->is_clean($target, 'keyword')) {
             return array();
         }
         if (!empty($terms)) {
