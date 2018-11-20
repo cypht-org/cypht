@@ -457,7 +457,8 @@ class Hm_IMAP_Base {
             'CC',         'TO',      'SIZE',      'UNSEEN',
             'SEEN',       'FLAGGED', 'UNFLAGGED', 'ANSWERED',
             'UNANSWERED', 'DELETED', 'UNDELETED', 'TEXT',
-            'ALL', 'DRAFT', 'NEW', 'RECENT', 'OLD', 'UNDRAFT'
+            'ALL', 'DRAFT', 'NEW', 'RECENT', 'OLD', 'UNDRAFT',
+            'BODY'
         );
         $valid = false;
         switch ($type) {
