@@ -320,7 +320,7 @@ function Message_List() {
             this.completed_count = 0;
             completed = true;
         }
-        if ($('input[type=checkbox]').filter(function() {return this.checked; }).length > 0) {
+        if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
             this.run_callbacks(completed);
             Hm_Ajax.aborted = true;
             return 0;
@@ -475,13 +475,13 @@ function Message_List() {
     };
 
     this.reset_checkboxes = function() {
-        $('input[type=checkbox]').each(function () { this.checked = false; });
+        $('input[type=checkbox]', $('.message_table')).each(function () { this.checked = false; });
         this.toggle_msg_controls();
         this.set_checkbox_callback();
     };
 
     this.toggle_msg_controls = function() {
-        if ($('input[type=checkbox]').filter(function() {return this.checked; }).length > 0) {
+        if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
             $('.msg_controls').addClass('msg_controls_visible');
         }
         else {
@@ -796,7 +796,7 @@ function Message_List() {
     };
 
     this.toggle_rows = function() {
-        $('input[type=checkbox]').each(function () { this.checked = !this.checked; });
+        $('input[type=checkbox]', $('.message_table')).each(function () { this.checked = !this.checked; });
         self.toggle_msg_controls();
         return false;
     };
@@ -829,8 +829,8 @@ function Message_List() {
     };
 
     this.set_checkbox_callback = function() {
-        $('input[type=checkbox]').unbind('click');
-        $('input[type=checkbox]').click(function(e) {
+        $('input[type=checkbox]', $('.message_table')).unbind('click');
+        $('input[type=checkbox]', $('.message_table')).click(function(e) {
             self.toggle_msg_controls();
         });
     };
