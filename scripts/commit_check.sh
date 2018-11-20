@@ -57,7 +57,7 @@ css_check() {
 unit_test_check() {
     echo; echo -e "$YELLOW UNIT TEST CHECK $END"; echo
     cd tests/phpunit && \
-        phpunit --stop-on-error --stop-on-failure && \
+        phpunit --debug -v --stop-on-error --stop-on-failure && \
         cd "$CYPHT_DIR"
     err_condition
 }
