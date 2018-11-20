@@ -120,20 +120,24 @@ var adv_folder_select = function(id) {
     var parts = id.split('_', 3);
     var parent_class = '.'+parts[0]+'_'+parts[1]+'_';
     var account = $('a', $(parent_class, container)).first().text();
+    var label = account+' &gt; '+folder;
+    add_source_to_list(id, label);
+    $('.adv_folder_list').html('');
+    $('.close_adv_folders').remove();
+    $('.adv_folder_list').hide();
+};
+
+var add_source_to_list = function(id, label) {
     var close = $(globals.close_html);
     close.addClass('adv_remove_source');
     close.attr('data-target', id);
-    var row = '<div class="'+id+'">'+close.prop('outerHTML')+' <span>'+account+'</span> &gt; <span>'+folder;
-    row += '</span><input type="hidden" value="'+id+'" /></div>';
+    var row = '<div class="'+id+'">'+close.prop('outerHTML')+label;
+    row += '<input type="hidden" value="'+id+'" /></div>';
     $('.adv_source_list').append(row);
     $('.adv_remove_source').unbind('click');
     $('.adv_remove_source').click(function() {
         $('.'+$(this).data('target'), $('.adv_source_list')).remove();
     });
-
-    $('.adv_folder_list').html('');
-    $('.close_adv_folders').remove();
-    $('.adv_folder_list').hide();
 };
 
 var expand_adv_folder_list = function(path) {
@@ -157,6 +161,14 @@ var expand_adv_folder_list = function(path) {
     return false;
 };
 
+var adv_collapse = function() {
+    $('.terms_section').hide();
+    $('.source_section').hide();
+    $('.targets_section').hide();
+    $('.time_section').hide();
+    $('.other_section').hide();
+}
+
 var adv_expand_sections = function() {
     $('.terms_section').show();
     $('.source_section').show();
@@ -172,7 +184,7 @@ var get_adv_sources = function() {
         return sources;
     }
     selected_sources.each(function() {
-        sources.push(this.className);
+        sources.push({'source': this.className, 'label': $(this).text()});
     });
     return sources;
 };
@@ -218,6 +230,7 @@ var get_adv_times = function() {
 
 var get_adv_targets = function() {
     var target;
+    var value;
     var target_id;
     var condition;
     var targets = [];
@@ -225,10 +238,13 @@ var get_adv_targets = function() {
     target_flds.each(function() {
         target = $('.target_radio:checked', $(this)).val();
         if (target == 'header') {
-            target = $('.adv_header_select', $(this)).val();
+            value = $('.adv_header_select', $(this)).val();
         }
         else if (target == 'custom') {
-            target = $('.adv_custom_header', $(this)).val();
+            value = 'HEADER '+$('.adv_custom_header', $(this)).val();
+        }
+        else {
+            value = target;
         }
         if (target) {
             target_id = this.id.substr(10);
@@ -238,7 +254,7 @@ var get_adv_targets = function() {
             else {
                 condition = false;
             }
-            targets.push({'target': target, 'condition': condition});
+            targets.push({'target': value, 'orig': target, 'condition': condition});
         }
     });
     return targets;
@@ -260,6 +276,7 @@ var get_adv_other = function() {
 };
 
 var process_advanced_search = function() {
+    Hm_Notices.hide(true);
     var terms = get_adv_terms();
     if (terms.length == 0) {
         Hm_Notices.show(['ERRYou must enter at least one search term']);
@@ -281,8 +298,27 @@ var process_advanced_search = function() {
         return;
     }
     var other = get_adv_other();
+
+    save_search_details(terms, sources, targets, times, other);
     send_requests(build_adv_search_requests(terms, sources, targets, times, other));
 };
+
+var save_search_details = function(terms, sources, targets, times, other) {
+    Hm_Utils.save_to_local_storage('adv_search_params',
+        Hm_Utils.json_encode({
+            'terms': terms,
+            'targets': targets,
+            'sources': sources,
+            'times': times,
+            'other': other
+        })
+    );
+};
+
+var load_search_details = function() {
+    return Hm_Utils.json_decode(Hm_Utils.get_from_local_storage('adv_search_params'));
+};
+
 
 var adv_group_vals = function(data, type) {
     var groups = [];
@@ -301,18 +337,36 @@ var adv_group_vals = function(data, type) {
 
 var send_requests = function(requests) {
     var request;
-    for (var i=0, len=requests.length; i < len; i++) {
-        request = requests[i];
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_adv_search'},
+    $('tr', Hm_Utils.tbody()).remove();
+    adv_collapse();
+    $('.adv_controls').hide();
+    for (var n=0, rlen=requests.length; n < rlen; n++) {
+        request = requests[n];
+        var params = [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_adv_search'},
             {'name': 'adv_source', 'value': request['source']},
-            {'name': 'adv_targets[]', 'value': request['targets']},
-            {'name': 'adv_terms[]', 'value': request['terms']},
             {'name': 'adv_start', 'value': request['time']['from']},
             {'name': 'adv_end', 'value': request['time']['to']},
             {'name': 'adv_charset', 'value': request['other']['charset']},
-            {'name': 'adv_flags[]', 'value': request['other']['flags']}],
+        ];
+
+        for (var i=0, len=request['terms'].length; i < len; i++) {
+            params.push({'name': 'adv_terms[]', 'value': request['terms'][i]});
+        }
+        for (var i=0, len=request['targets'].length; i < len; i++) {
+            params.push({'name': 'adv_targets[]', 'value': request['targets'][i]});
+        }
+        for (var i=0, len=request['other']['flags'].length; i < len; i++) {
+            params.push({'name': 'adv_flags[]', 'value': request['other']['flags'][i]});
+        }
+        Hm_Ajax.request(
+            params,
             function(res) {
+                var detail = Hm_Utils.parse_folder_path(request['source'], 'imap');
+                Hm_Message_List.update([detail.server_id+n], res.formatted_message_list, 'imap');
+                if (Hm_Utils.rows().length > 0) {
+                    $('.adv_controls').show();
+                }
         });
     }
 };
@@ -331,15 +385,60 @@ var build_adv_search_requests = function(terms, sources, targets, times, other) 
         for (var tag=0, taglen=target_groups.length; tag < taglen; tag++) {
             target_vals = target_groups[tag];
             for (var s=0, slen=sources.length; s < slen; s++) {
-                source = sources[s];
+                source = sources[s]['source'];
                 for (var ti=0, tilen=times.length; ti < tilen; ti++) {
                     time = times[ti];
-                    requests.push({'source': source, 'time': time, 'other': other, 'targets': target_vals, 'terms': term_vals});
+                    requests.push({'source': source, 'time': time, 'other': other,
+                        'targets': target_vals, 'terms': term_vals});
                 }
             }
         }
     }
     return requests;
+};
+
+var apply_saved_search = function() {
+    /*
+     * {"terms":[{"term":"test","condition":false},{"term":"foo","condition":"or"}],
+     * "sources":[{"source":"imap_0_494e424f58","label":" localhost > INBOX"}],
+     * "targets":[{"target":"TEXT","condition":false},{"target":"SUBJECT","condition":"or"}],
+     * "times":[{"from":"2017-11-19","to":"2018-11-19"},{"from":"2017-11-19","to":"2018-11-19"}],
+     * "other":{"flags":["SEEN"],"charset":"ASCII"}}
+     */
+    var details = load_search_details();
+    var target_id;
+    for (var i=0, len=details['terms'].length; i < len; i++) {
+        if (i == 0) {
+            $('#adv_term').val(details['terms'][i]['term']);
+        }
+        else {
+            $('.new_term').trigger('click');
+            $('#adv_term'+i).val(details['terms'][i]['term']);
+            $('input[type=radio][value='+details['terms'][i]['condition']+']', $('#term_and_or'+i)).attr('checked', true);
+        }
+    }
+    for (var i=0, len=details['sources'].length; i < len; i++) {
+        add_source_to_list(details['sources'][i]['source'], details['sources'][i]['label']);
+    }
+    for (var i=0, len=details['targets'].length; i < len; i++) {
+        if (i == 0) {
+            target_id = '#adv_target';
+        }
+        else {
+            target_id = '#adv_target'+i;
+            $('.new_target').trigger('click');
+            $('input[type=radio][value='+details['targets'][i]['condition']+']', $('#target_and_or'+i)).attr('checked', true);
+        }
+        $('input[type=radio][value='+details['targets'][i]['orig']+']', $(target_id)).attr('checked', true);
+        if (details['targets'][i]['orig'] == 'custom') {
+            $('.adv_custom_header', $(target_id)).val(details['targets'][i]['target'].substring(7));
+        }
+        else if (details['targets'][i]['orig'] == 'header') {
+            $('.adv_header_select', $(target_id)).val(details['targets'][i]['target']);
+        }
+    }
+    for (var i=0, len=details['times'].length; i < len; i++) {
+    }
 };
 
 $(function() {
@@ -360,5 +459,8 @@ $(function() {
         $('.new_term').click(function() { add_remove_terms(this); });
         $('.adv_expand_all').click(function() { adv_expand_sections(); });
         $('#adv_search').click(function() { process_advanced_search(); });
+        $('.toggle_link').click(function() { return Hm_Message_List.toggle_rows(); });
+
+        apply_saved_search();
     }
 });

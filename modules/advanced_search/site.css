@@ -1,5 +1,6 @@
 .targets_section, .other_section, .submit_section, .time_section, .source_section, .terms_section { padding: 20px; padding-left: 60px; margin-bottom: 10px; }
-.targets_section, .other_section, .time_section { display: none; }
+.adv_controls { margin-left: 25px; display: none; }
+/*.targets_section, .other_section, .time_section { display: none; }*/
 .targets_section img, .time_section img, .source_section img, .terms_section img { cursor: pointer; margin-left: 10px; vertical-align: -3px; opacity: .4; }
 .submit_section { margin-top: 20px; }
 .other_section table, .targets_section table { width: 1%; white-space: nowrap; margin-bottom: 5px; }
@@ -12,3 +13,4 @@
 .adv_source_list img { margin-right: 10px; }
 .adv_expand_all { margin-right: 10px; opacity: .4; vertical-align: -1px; cursor: pointer; }
 #adv_search { cursor: pointer; }
+.search_result_title { margin-bottom: 20px; }

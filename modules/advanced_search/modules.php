@@ -13,7 +13,121 @@ if (!defined('DEBUG_MODE')) { die(); }
  * @subpackage advanced_search/output
  */
 class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
+
+    private $imap_id;
+    private $folder;
+
     public function process() {
+        list($success, $form) = $this->process_form(array(
+            'adv_source',
+            'adv_start',
+            'adv_end',
+            'adv_charset',
+            'adv_terms',
+            'adv_targets'
+        ));
+        if (!$success) {
+            return;
+        }
+        if (!$this->validate_date($form['adv_start']) ||
+            !$this->validate_date($form['adv_end'])) {
+            Hm_Msgs::add('ERRInvalid date format');
+            return;
+        }
+        $flags = array('ALL');
+        if (array_key_exists('adv_flags', $this->request->post)) {
+            if (!$this->validate_flags($this->request->post['adv_flags'])) {
+                Hm_Msgs::add('ERRInvalid flag');
+                return;
+            }
+            $flags = $this->request->post['adv_flags'];
+        }
+        if (!$this->validate_source($form['adv_source'])) {
+            Hm_Msgs::add('ERRInvalid source');
+            return;
+        }
+        $charset = false;
+        if (array_key_exists('charset', $this->request->post) &&
+            in_array($this->request->post, array('UTF-8', 'ASCII'), true)) {
+            $charset = $this->request->post['charset'];
+        }
+
+        $cache = Hm_IMAP_List::get_cache($this->cache, $this->imap_id);
+        $imap = Hm_IMAP_List::connect($this->imap_id, $cache);
+        if (!imap_authed($imap)) {
+            return;
+        }
+        if (!$imap->select_mailbox($this->folder)) {
+            return;
+        }
+        if ($charset) {
+            $imap->search_charset = $charset;
+        }
+        $params = array(
+            'SENTBEFORE' => date('j-M-Y', strtotime($form['adv_end'])),
+            'SENTSINCE' => date('j-M-Y', strtotime($form['adv_start'])),
+        );
+        foreach ($form['adv_terms'] as $term) {
+            foreach ($form['adv_targets'] as $target) {
+                $params[$target] = $term;
+            }
+        }
+        $this->out('imap_search_results', $this->imap_search($flags, $imap, $params));
+        $this->out('folder_status', $imap->folder_state);
+        $this->out('imap_server_ids', array($this->imap_id));
+    }
+
+    private function imap_search($flags, $imap, $params) {
+        $msg_list = array();
+        $msgs = $imap->search($flags, false, $params);
+        if (!$msgs) {
+            return $msg_list;
+        }
+        $server_details = Hm_IMAP_List::dump($this->imap_id);
+        foreach ($imap->get_message_list($msgs) as $msg) {
+            if (array_key_exists('content-type', $msg) && stristr($msg['content-type'], 'multipart/mixed')) {
+                $msg['flags'] .= ' \Attachment';
+            }
+            if (stristr($msg['flags'], 'deleted')) {
+                continue;
+            }
+            $msg['server_id'] = $this->imap_id;
+            $msg['folder'] = bin2hex($this->folder);
+            $msg['server_name'] = $server_details['name'];
+            $msg_list[] = $msg;
+        }
+        return $msg_list;
+    }
+
+    private function validate_source($val) {
+        if (substr_count($val, '_') !== 2) {
+            return false;
+        }
+        $source_parts = explode('_', $val);
+        $this->imap_id = $source_parts[1];
+        $this->folder = hex2bin($source_parts[2]);
+        return true;
+    }
+
+    private function validate_date($val) {
+        return preg_match("/\d{4}-\d{2}-\d{2}/", $val) ? true : false;
+    }
+
+    private function validate_flags($data) {
+        $flags = array('SEEN', 'UNSEEN', 'UNSEEN', 'SEEN', 'ANSWERED', 'UNANSWERED',
+            'FLAGGED', 'UNFLAGGED', 'DELETED', 'UNDELETED');
+        if (!array_key_exists('adv_flags', $data)) {
+            return true;
+        }
+        if (!is_array($adv_flags)) {
+            return false;
+        }
+        foreach ($data as $flag) {
+            if (!in_array($flag, $flags, true)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 
@@ -86,12 +200,12 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
         return '<div data-target=".targets_section" class="settings_subtitle"><img width="16" height="16" alt="'.
             $this->trans('targets').'" src="'.Hm_Image_Sources::$doc.'" />'.$this->trans('Targets').'</div>'.
             '<div class="targets_section"><table id="adv_target" class="adv_targets">'.
-            '<tr><th><input type="radio" value="msg" class="target_radio" checked="checked" name="target_type" /><label>'.
+            '<tr><th><input type="radio" value="TEXT" class="target_radio" checked="checked" name="target_type" /><label>'.
             $this->trans('Entire message').'</label></th><td></td></tr><tr><th><input type="radio" '.
-            'class="target_radio" value="body" name="target_type" /><label>'.$this->trans('Body').'</label></th><td></td></tr>'.
+            'class="target_radio" value="BODY" name="target_type" /><label>'.$this->trans('Body').'</label></th><td></td></tr>'.
             '<tr><th><input type="radio" class="target_radio" value="header" name="target_type" /><label>'.$this->trans('Header').
-            '</label></th><td>'.'<select class="adv_header_select" ><option value="from">'.$this->trans('From').'</option><option value="subject">'.$this->trans('Subject').
-            '</option><option value="to">'.$this->trans('To').'</option><option value="cc">'.$this->trans('Cc').'</option></select></td></tr>'.
+            '</label></th><td>'.'<select class="adv_header_select" ><option value="FROM">'.$this->trans('From').'</option><option value="SUBJECT">'.$this->trans('Subject').
+            '</option><option value="TO">'.$this->trans('To').'</option><option value="CC">'.$this->trans('Cc').'</option></select></td></tr>'.
             '<tr><th><input type="radio" class="target_radio" value="custom" name="target_type" /><label>'.$this->trans('Custom Header').
             '</label></th><td><input class="adv_custom_header" type="text" /></td></tr></table><img class="new_target" width="16" height="16" alt="'.
             $this->trans('Add').'" src="'.Hm_Image_Sources::$plus.'" /></div>';
@@ -129,15 +243,15 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
         return '<div data-target=".other_section" class="settings_subtitle"><img width="16" height="16" alt="'.
             $this->trans('other').'" src="'.Hm_Image_Sources::$cog.'" />'.$this->trans('Other').'</div>'.
             '<div class="other_section"><table><tr><th>'.$this->trans('Character set').'</th><td><select class="charset" />'.
-            '<option value="UTF-8">UTF-8</option><option value="ASCII">ASCII</option></select></td></tr><tr><th>'.$this->trans('Flags').'</th><td>'.
-            '<div class="flags"></label><input class="adv_flag" value="read" type="checkbox"><label>'.$this->trans('Read').
-            '<br /></label><input class="adv_flag" value="unread" type="checkbox"><label>'.$this->trans('Unread').
-            '<br /></label><input class="adv_flag" value="answered" type="checkbox"><label>'.$this->trans('Answered').
-            '<br /></label><input class="adv_flag" value="unanswered" type="checkbox"><label>'.$this->trans('Unanswered').
-            '<br /></label><input class="adv_flag" value="flagged" type="checkbox"><label>'.$this->trans('Flagged').
-            '<br /></label><input class="adv_flag" value="unflagged" type="checkbox"><label>'.$this->trans('Unflagged').
-            '<br /></label><input class="adv_flag" value="deleted" type="checkbox"><label>'.$this->trans('Deleted').
-            '<br /></label><input class="adv_flag" value="undeleted" type="checkbox"><label>'.$this->trans('Not deleted').
+            '<option value="">'.$this->trans('None').'</option><option value="UTF-8">UTF-8</option><option value="ASCII">ASCII</option></select></td></tr><tr><th>'.$this->trans('Flags').'</th><td>'.
+            '<div class="flags"></label><input class="adv_flag" value="SEEN" type="checkbox"><label>'.$this->trans('Read').
+            '<br /></label><input class="adv_flag" value="UNSEEN" type="checkbox"><label>'.$this->trans('Unread').
+            '<br /></label><input class="adv_flag" value="ANSWERED" type="checkbox"><label>'.$this->trans('Answered').
+            '<br /></label><input class="adv_flag" value="UNANSWERED" type="checkbox"><label>'.$this->trans('Unanswered').
+            '<br /></label><input class="adv_flag" value="FLAGGED" type="checkbox"><label>'.$this->trans('Flagged').
+            '<br /></label><input class="adv_flag" value="UNFLAGGED" type="checkbox"><label>'.$this->trans('Unflagged').
+            '<br /></label><input class="adv_flag" value="DELETED" type="checkbox"><label>'.$this->trans('Deleted').
+            '<br /></label><input class="adv_flag" value="UNDELETED" type="checkbox"><label>'.$this->trans('Not deleted').
             '</div></td></tr></table></div>';
     }
 }
@@ -148,7 +262,10 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
  */
 class Hm_Output_advanced_search_form_end extends Hm_Output_Module {
     protected function output() {
-        return '</div>';
+        return '</div><div class="content_title search_result_title"><img width="16" height="16" src="'.
+            Hm_Image_Sources::$env_closed.'" alt="'.$this->trans('Results').
+            '" class="adv_expand_all">'.$this->trans('Search Results').'</div>'.
+            '<div class="adv_controls">'.message_controls($this).'</div>';
     }
 }
 

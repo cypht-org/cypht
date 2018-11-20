@@ -16,7 +16,7 @@ add_output('advanced_search', 'advanced_search_results_table_end', true, 'advanc
 add_output('advanced_search', 'advanced_search_content_end', true, 'advanced_search', 'advanced_search_results_table_end', 'after');
 
 setup_base_ajax_page('ajax_adv_search', 'core');
-add_handler('ajax_adv_search', 'process_adv_search_request', true, 'advanced_search', 'load_user_data');
+add_handler('ajax_adv_search', 'process_adv_search_request', true, 'advanced_search', 'imap_oauth2_token_check');
 
 /* allowed input */
 return array(
@@ -29,8 +29,8 @@ return array(
         'adv_start' => FILTER_SANITIZE_STRING,
         'adv_end' => FILTER_SANITIZE_STRING,
         'adv_charset' => FILTER_SANITIZE_STRING,
-        'adv_flags' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
-        'adv_terms' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
-        'adv_targets' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
+        'adv_flags' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_terms' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_targets' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
     )
 );
