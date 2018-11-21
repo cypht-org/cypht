@@ -17,7 +17,7 @@
 .source_count, .time_count, .target_count, .other_count, .term_count { display: none; float: right; margin-right: 30px; }
 .imap_support_required { padding: 100px; text-align: center; font-size: 120%; color: #666; }
 .adv_reset { margin-left: 20px; cursor: pointer; }
-.adv_link { margin-left: 20px; }
+.adv_search_link { margin-left: 20px; }
 
 @media screen and (max-device-width:480px) and (orientation : portrait) {
     .search_result_title { position: relative !important; z-index: 99 !important;}

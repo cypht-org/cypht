@@ -167,7 +167,7 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
  */
 class Hm_Output_advanced_search_link extends Hm_Output_Module {
     protected function output() {
-        return '<a class="adv_link" href="?page=advanced_search">'.$this->trans('Advanced').'</a>';
+        return '<a class="adv_search_link" href="?page=advanced_search">'.$this->trans('Advanced').'</a>';
     }
 }
 
