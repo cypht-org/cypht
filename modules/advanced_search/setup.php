@@ -16,9 +16,13 @@ add_output('advanced_search', 'message_list_start', true, 'advanced_search', 'ad
 add_output('advanced_search', 'advanced_search_results_table_end', true, 'advanced_search', 'message_list_start', 'after');
 add_output('advanced_search', 'advanced_search_content_end', true, 'advanced_search', 'advanced_search_results_table_end', 'after');
 
+/* search page link */
+add_output('search', 'advanced_search_link', true, 'advanced_search', 'search_form_end', 'before');
+
 setup_base_ajax_page('ajax_adv_search', 'core');
 add_handler('ajax_adv_search', 'advanced_search_prepare', true, 'advanced_search', 'date', 'after');
 add_handler('ajax_adv_search', 'process_adv_search_request', true, 'advanced_search', 'imap_oauth2_token_check');
+add_output('ajax_adv_search', 'filter_imap_advanced_search', true, 'advanced_search');
 
 /* allowed input */
 return array(

@@ -167,6 +167,8 @@ var adv_collapse = function() {
     $('.targets_section').hide();
     $('.time_section').hide();
     $('.other_section').hide();
+    $('.adv_expand_all').show();
+    $('.adv_collapse_all').hide();
 }
 
 var adv_expand_sections = function() {
@@ -175,6 +177,8 @@ var adv_expand_sections = function() {
     $('.targets_section').show();
     $('.time_section').show();
     $('.other_section').show();
+    $('.adv_expand_all').hide();
+    $('.adv_collapse_all').show();
 }
 
 var get_adv_sources = function() {
@@ -500,6 +504,7 @@ $(function() {
         $('.new_target').click(function() { add_remove_targets(this); });
         $('.new_term').click(function() { add_remove_terms(this); });
         $('.adv_expand_all').click(function() { adv_expand_sections(); });
+        $('.adv_collapse_all').click(function() { adv_collapse(); });
         $('#adv_search').click(function() { process_advanced_search(); });
         $('.toggle_link').click(function() { return Hm_Message_List.toggle_rows(); });
         $('.adv_reset').click(function() { adv_reset_page(); });
