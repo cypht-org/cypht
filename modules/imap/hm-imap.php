@@ -974,6 +974,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      */
     public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
         if (!$this->is_clean($this->search_charset, 'charset')) {
+            return array();
         }
         if (is_array($target)) {
             foreach ($target as $val) {
