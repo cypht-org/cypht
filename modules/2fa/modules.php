@@ -181,7 +181,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                 '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
                 '</head><body><form class="login_form" method="POST"><h1 class="title">'.
                 $this->html_safe($this->get('router_app_name')).'</h1>'. $error.'<div class="tfa_input">'.
-                '<label for="2fa_code">'.$this->trans('Enter the 6 digit code from Google Authenticator').
+                '<label for="2fa_code">'.$this->trans('Enter the 6 digit code from your Authenticator application').
                 '</label></div><input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'" />'.
                 '<input autofocus required id="2fa_code" type="number" name="2fa_code" value="" placeholder="'.
                 $this->trans('Login code').'" /><input type="submit" value="'.$this->trans('Submit').
