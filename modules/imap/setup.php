@@ -224,7 +224,6 @@ add_output('ajax_imap_search', 'filter_imap_search', true);
 /* advanced search results */
 add_handler('ajax_adv_search', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_adv_search', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_output('ajax_adv_search', 'filter_imap_search', true, 'imap');
 
 /* combined inbox */
 setup_base_ajax_page('ajax_imap_combined_inbox', 'core');
