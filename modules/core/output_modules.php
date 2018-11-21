@@ -23,7 +23,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
         }
         $res .= '<input type="hidden" name="page" value="search" />'.
             '<label class="screen_reader" for="search_terms">'.$this->trans('Search').
-            '</label><input type="search" id="search_terms" class="search_terms" '.
+            '</label><input type="search" class="search_terms" '.
             'name="search_terms" placeholder="'.$this->trans('Search').'" /></form></li>';
         if ($this->format == 'HTML5') {
             return $res;
