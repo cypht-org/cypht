@@ -406,7 +406,7 @@ return array(
     'Flag the message' => 'Marcar esta mensagem',
     'Unflag the message' => 'Desmarcar esta mensagem',
     'Delete the message' => 'Remover esta mensagem',
-    'Enter the 6 digit code from Google Authenticator' => 'Entre com o código de 6 dígitos do seu Google Authenticator',
+    'Enter the 6 digit code from your Authenticator application' => 'Entre com o código de 6 dígitos do seu Google Authenticator',
     'Login Code' => 'Código de Login',
     '2 factor authentication code does not match' => 'Código de autenticação de 2 fatores não confere',
     '2 Factor Authentication' => 'Autenticação de 2 fatores',

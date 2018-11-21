@@ -411,7 +411,7 @@ return array(
     'Flag the message' => 'Bayraqla qeyd etmək',
     'Unflag the message' => 'Bayrağı silmək',
     'Delete the message' => 'Mesajı silmək',
-    'Enter the 6 digit code from Google Authenticator' => 'Google autentifikatoranın 6-rəqəmli kodunu daxil edin',
+    'Enter the 6 digit code from your Authenticator application' => 'Google autentifikatoranın 6-rəqəmli kodunu daxil edin',
     'Login Code' => 'Girişin kodu',
     '2 factor authentication code does not match' => 'İki-faktor kodu uyğun gəlmir',
     '2 Factor Authentication' => 'İki-faktor müəyyənləşdirilməsi',

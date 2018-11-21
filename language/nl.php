@@ -406,7 +406,7 @@ return array(
     'Flag the message' => 'Bericht flaggen',
     'Unflag the message' => 'Flag verwijderen van bericht',
     'Delete the message' => 'Bericht verwijderen',
-    'Enter the 6 digit code from Google Authenticator' => 'Geef de 6-digit code van Google Authenticator in',
+    'Enter the 6 digit code from your Authenticator application' => 'Geef de 6-digit code van Google Authenticator in',
     'Login Code' => 'Login code',
     '2 factor authentication code does not match' => '2-factor authenticatie code komt niet overeen',
     '2 Factor Authentication' => '2-factor authenticatie',

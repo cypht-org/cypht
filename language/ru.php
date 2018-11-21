@@ -408,7 +408,7 @@ return array(
     'Flag the message' => 'Отметить флагом',
     'Unflag the message' => 'Сять флаг',
     'Delete the message' => 'Удалить сообщение',
-    'Enter the 6 digit code from Google Authenticator' => 'Введте 6-значный код Google аутентификатора',
+    'Enter the 6 digit code from your Authenticator application' => 'Введте 6-значный код Google аутентификатора',
     'Login Code' => 'Код входа',
     '2 factor authentication code does not match' => 'Двухфакторный код не совпадает',
     '2 Factor Authentication' => 'Двухфакторная аутентификация',

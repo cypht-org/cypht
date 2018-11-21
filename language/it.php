@@ -406,7 +406,7 @@ return array(
     'Flag the message' => false,
     'Unflag the message' => false,
     'Delete the message' => false,
-    'Enter the 6 digit code from Google Authenticator' => false,
+    'Enter the 6 digit code from your Authenticator application' => false,
     'Login Code' => false,
     '2 factor authentication code does not match' => false,
     '2 Factor Authentication' => false,

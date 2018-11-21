@@ -406,7 +406,7 @@ return array(
     'Flag the message' => "Makiere die Nachricht",
     'Unflag the message' => "Demakiere die Nachricht",
     'Delete the message' => "Lösche die Nachricht",
-    'Enter the 6 digit code from Google Authenticator' => "Trage den 6 Stelligen Token vom Google Authenticator ein",
+    'Enter the 6 digit code from your Authenticator application' => "Trage den 6 Stelligen Token vom Google Authenticator ein",
     'Login Code' => "Login Code",
     '2 factor authentication code does not match' => "Code für die 2 Faktor Authentifizierung ist nicht korrekt",
     '2 Factor Authentication' => '2 Faktor Authentifizierung',

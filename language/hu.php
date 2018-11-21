@@ -406,7 +406,7 @@ return array(
     'Flag the message' => 'Üzenet megjelölése',
     'Unflag the message' => 'Üzenet jelölésének törlése',
     'Delete the message' => 'Üzenet törlése',
-    'Enter the 6 digit code from Google Authenticator' => 'Adja meg a 6 jegyű kódot a Google Hitelesítőből',
+    'Enter the 6 digit code from your Authenticator application' => 'Adja meg a 6 jegyű kódot a Google Hitelesítőből',
     'Login Code' => 'Bejelentkező kód',
     '2 factor authentication code does not match' => '2-lépcsős hitelesítés kód nem egyezik',
     '2 Factor Authentication' => '2-lépcsős hitelesítés',
