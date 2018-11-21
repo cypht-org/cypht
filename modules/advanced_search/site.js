@@ -262,9 +262,6 @@ var get_adv_targets = function() {
 
 var get_adv_other = function() {
     var charset = $('.charset').val();
-    if (!charset) {
-        charset = 'UTF-8';
-    }
     var flags = [];
     var flag_flds = $('.adv_flag:checked');
     if (flag_flds) {
@@ -300,6 +297,9 @@ var process_advanced_search = function() {
     var other = get_adv_other();
 
     save_search_details(terms, sources, targets, times, other);
+    search_summary({ 'terms': terms, 'targets': targets, 'sources': sources,
+            'times': times, 'other': other });
+
     send_requests(build_adv_search_requests(terms, sources, targets, times, other));
 };
 
@@ -338,8 +338,10 @@ var adv_group_vals = function(data, type) {
 var send_requests = function(requests) {
     var request;
     $('tr', Hm_Utils.tbody()).remove();
+    Hm_Utils.save_to_local_storage('formatted_advanced_search_data', '');
     adv_collapse();
     $('.adv_controls').hide();
+    $('.empty_list').remove();
     for (var n=0, rlen=requests.length; n < rlen; n++) {
         request = requests[n];
         var params = [
@@ -366,8 +368,18 @@ var send_requests = function(requests) {
                 Hm_Message_List.update([detail.server_id+n], res.formatted_message_list, 'imap');
                 if (Hm_Utils.rows().length > 0) {
                     $('.adv_controls').show();
+                    $('.core_msg_control').unbind('click');
+                    $('.core_msg_control').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
+                    Hm_Message_List.set_checkbox_callback();
                 }
-        });
+                Hm_Message_List.check_empty_list();
+            },
+            [],
+            false,
+            function() {
+                Hm_Message_List.set_message_list_state('formatted_advanced_search_data');
+            }
+        );
     }
 };
 
@@ -397,16 +409,27 @@ var build_adv_search_requests = function(terms, sources, targets, times, other) 
     return requests;
 };
 
+var search_summary = function(details) {
+    if (!details) {
+        return;
+    }
+    var charset = 0;
+    if (details['other']['charset']) { charset = 1; }
+    $('.term_count').text($('.term_count').text().replace(/\d+/, details['terms'].length)).show();
+    $('.target_count').text($('.target_count').text().replace(/\d+/, details['targets'].length)).show();
+    $('.source_count').text($('.source_count').text().replace(/\d+/, details['sources'].length)).show();
+    $('.time_count').text($('.time_count').text().replace(/\d+/, details['times'].length)).show();
+    $('.other_count').text($('.other_count').text().replace(/\d+/, (charset + details['other']['flags'].length))).show();
+};
+
 var apply_saved_search = function() {
-    /*
-     * {"terms":[{"term":"test","condition":false},{"term":"foo","condition":"or"}],
-     * "sources":[{"source":"imap_0_494e424f58","label":" localhost > INBOX"}],
-     * "targets":[{"target":"TEXT","condition":false},{"target":"SUBJECT","condition":"or"}],
-     * "times":[{"from":"2017-11-19","to":"2018-11-19"},{"from":"2017-11-19","to":"2018-11-19"}],
-     * "other":{"flags":["SEEN"],"charset":"ASCII"}}
-     */
     var details = load_search_details();
+    if (!details) {
+        return;
+    }
+    search_summary(details);
     var target_id;
+    var time_id;
     for (var i=0, len=details['terms'].length; i < len; i++) {
         if (i == 0) {
             $('#adv_term').val(details['terms'][i]['term']);
@@ -438,7 +461,26 @@ var apply_saved_search = function() {
         }
     }
     for (var i=0, len=details['times'].length; i < len; i++) {
+        if (i == 0) {
+            time_id = '#adv_time';
+        }
+        else {
+            time_id = '#adv_time'+i;
+            $('.new_time').trigger('click');
+        }
+        $('.adv_time_fld_from', $(time_id)).val(details['times'][i]['from']);
+        $('.adv_time_fld_to', $(time_id)).val(details['times'][i]['to']);
     }
+    $('.charset').val(details['other']['charset']);
+    for (var i=0, len=details['other']['flags'].length; i < len; i++) {
+        $('input[type=checkbox][value='+details['other']['flags'][i]+']', $('.flags')).attr('checked', true);
+    }
+};
+
+var adv_reset_page = function() {
+    Hm_Utils.save_to_local_storage('formatted_advanced_search_data', '');
+    Hm_Utils.save_to_local_storage('adv_search_params', '');
+    document.location.href = '?page=advanced_search';
 };
 
 $(function() {
@@ -460,7 +502,18 @@ $(function() {
         $('.adv_expand_all').click(function() { adv_expand_sections(); });
         $('#adv_search').click(function() { process_advanced_search(); });
         $('.toggle_link').click(function() { return Hm_Message_List.toggle_rows(); });
+        $('.adv_reset').click(function() { adv_reset_page(); });
 
         apply_saved_search();
+        var data = Hm_Utils.get_from_local_storage('formatted_advanced_search_data');
+        if (data && data.length) {
+            adv_collapse(); 
+            Hm_Utils.tbody().html(data);
+            $('.adv_controls').show();
+            $('.core_msg_control').unbind('click');
+            $('.core_msg_control').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
+            Hm_Message_List.set_checkbox_callback();
+        }
+        Hm_Message_List.check_empty_list();
     }
 });

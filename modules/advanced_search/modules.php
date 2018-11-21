@@ -9,6 +9,29 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * TODO:
+ * - consider where module assigments should go
+ * - fix "sticky" date values on add range
+ * - add support to saved searchs module set
+ * - advanced search link on search page
+ * - deleted support in process search
+ * - ...
+ */
+
+
+/**
+ * Setup advanced search
+ * @subpackage advanced_search/output
+ */
+class Hm_Handler_advanced_search_prepare extends Hm_Handler_Module {
+
+    public function process() {
+        $this->out('msg_list_icons', $this->user_config->get('show_list_icons_setting', false));
+        $this->out('imap_supported', $this->module_is_supported('imap'));
+    }
+}
+
+/**
  * Process an advanced search ajax request
  * @subpackage advanced_search/output
  */
@@ -18,11 +41,13 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
     private $folder;
 
     public function process() {
+        if (!$this->module_is_supported('imap')) {
+            return;
+        }
         list($success, $form) = $this->process_form(array(
             'adv_source',
             'adv_start',
             'adv_end',
-            'adv_charset',
             'adv_terms',
             'adv_targets'
         ));
@@ -146,9 +171,6 @@ class Hm_Output_advanced_search_form_start extends Hm_Output_Module {
  * @subpackage advanced_search/output
  */
 class Hm_Output_advanced_search_content_start extends Hm_Output_Module {
-    /**
-     * Leaves two open div tags that are closed in Hm_Output_advanced_search_content_end and Hm_Output_advanced_search_form
-     */
     protected function output() {
         return '<div class="search_content"><div class="content_title">'.
             '<img width="16" height="16" src="'.Hm_Image_Sources::$plus.'" '.
@@ -166,7 +188,7 @@ class Hm_Output_advanced_search_content_end extends Hm_Output_Module {
      * Closes a div opened in Hm_Output_advanced_search_content_start
      */
     protected function output() {
-        return '</div>';
+        return '</div></div></div>';
     }
 }
 
@@ -176,44 +198,40 @@ class Hm_Output_advanced_search_content_end extends Hm_Output_Module {
  */
 class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
     protected function output() {
-        /**
-         * TODO:
-         * - disable if no imap
-         * - fill out all drop down options
-         * - labels + ids
-         * - input names + values
-         * - set defaults:
-         *     - time: 1 year from today
-         *     - sources: none
-         *     - other: none
-         */
+        if (!$this->get('imap_supported')) {
+            return '<div class="imap_support_required">'.$this->trans('the IMAP module set must be enabled for advanced search').'</div>';
+        }
         return 
             $this->terms().
             $this->sources().
             $this->targets().
             $this->times().
             $this->other().
-            '<div class="submit_section"><input type="button" id="adv_search" value="'.$this->trans('Search').'" />';
+            '<div class="submit_section"><input type="button" id="adv_search" value="'.$this->trans('Search').'" />'.
+            ' <input type="button" class="adv_reset" value="'.$this->trans('Reset').'" />';
     }
 
     protected function targets() {
         return '<div data-target=".targets_section" class="settings_subtitle"><img width="16" height="16" alt="'.
-            $this->trans('targets').'" src="'.Hm_Image_Sources::$doc.'" />'.$this->trans('Targets').'</div>'.
+            $this->trans('targets').'" src="'.Hm_Image_Sources::$doc.'" />'.$this->trans('Targets').
+            '<span class="target_count">'.sprintf($this->trans('%d targets'), 0).'</span></div>'.
             '<div class="targets_section"><table id="adv_target" class="adv_targets">'.
-            '<tr><th><input type="radio" value="TEXT" class="target_radio" checked="checked" name="target_type" /><label>'.
+            '<tr><th><input type="radio" value="TEXT" id="adv_msg" class="target_radio" checked="checked" name="target_type" /><label for="adv_msg">'.
             $this->trans('Entire message').'</label></th><td></td></tr><tr><th><input type="radio" '.
-            'class="target_radio" value="BODY" name="target_type" /><label>'.$this->trans('Body').'</label></th><td></td></tr>'.
-            '<tr><th><input type="radio" class="target_radio" value="header" name="target_type" /><label>'.$this->trans('Header').
-            '</label></th><td>'.'<select class="adv_header_select" ><option value="FROM">'.$this->trans('From').'</option><option value="SUBJECT">'.$this->trans('Subject').
+            'class="target_radio" value="BODY" name="target_type" id="adv_body" /><label for="adv_body">'.$this->trans('Body').'</label></th><td></td></tr>'.
+            '<tr><th><input type="radio" class="target_radio" value="header" id="adv_header_radio" name="target_type" /><label for="adv_header_radio">'.
+            $this->trans('Header').'</label></th><td>'.'<select class="adv_header_select" ><option value="FROM">'.
+            $this->trans('From').'</option><option value="SUBJECT">'.$this->trans('Subject').
             '</option><option value="TO">'.$this->trans('To').'</option><option value="CC">'.$this->trans('Cc').'</option></select></td></tr>'.
-            '<tr><th><input type="radio" class="target_radio" value="custom" name="target_type" /><label>'.$this->trans('Custom Header').
+            '<tr><th><input type="radio" class="target_radio" value="custom" id="adv_custom" name="target_type" /><label for="adv_custom">'.$this->trans('Custom Header').
             '</label></th><td><input class="adv_custom_header" type="text" /></td></tr></table><img class="new_target" width="16" height="16" alt="'.
             $this->trans('Add').'" src="'.Hm_Image_Sources::$plus.'" /></div>';
     }
 
     protected function terms() {
         return '<div data-target=".terms_section" class="settings_subtitle"><img width="16" height="16" alt="'.
-            $this->trans('terms').'" src="'.Hm_Image_Sources::$search.'" />'.$this->trans('Terms').'</div>'.
+            $this->trans('terms').'" src="'.Hm_Image_Sources::$search.'" />'.$this->trans('Terms').
+            '<span class="term_count">'.sprintf($this->trans('%d terms'), 0).'</span></div>'.
             '<div class="terms_section"><input class="adv_terms" id="adv_term" type="text" /><img class="new_term" '.
             'width="16" height="16" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$plus.'" /></div>';
     }
@@ -223,7 +241,8 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
         $from_date = date("Y-m-d", $time);
         $to_date = date("Y-m-d", time());
         return '<div data-target=".time_section" class="settings_subtitle"><img width="16" height="16" alt="'.
-            $this->trans('time').'" src="'.Hm_Image_Sources::$calendar.'" />'.$this->trans('Time').'</div>'.
+            $this->trans('time').'" src="'.Hm_Image_Sources::$calendar.'" />'.$this->trans('Time').
+            '<span class="time_count">'.sprintf($this->trans('%d time ranges'), 0).'</span></div>'.
             '<div class="time_section"><span id="adv_time" class="adv_times">'.$this->trans('From').
             ' <input class="adv_time_fld_from" type="date" value="'.$this->html_safe($from_date).
             '" /> '.$this->trans('To').' <input class="adv_time_fld_to" type="date" value="'.
@@ -233,7 +252,8 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
 
     protected function sources() {
         return '<div data-target=".source_section" class="settings_subtitle"><img width="16" height="16" alt="'.
-            $this->trans('sources').'" src="'.Hm_Image_Sources::$folder.'" />'.$this->trans('Sources').'</div>'.
+            $this->trans('sources').'" src="'.Hm_Image_Sources::$folder.'" />'.$this->trans('Sources').
+            '<span class="source_count">'.sprintf($this->trans('%d sources'), 0).'</span></div>'.
             '<div class="source_section">'.$this->trans('IMAP').' <img class="adv_folder_select" width="16" '.
             'height="16" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$plus.'" /><br /><div '.
             'class="adv_folder_list"></div><div class="adv_source_list"></div></div>';
@@ -241,18 +261,19 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
 
     protected function other() {
         return '<div data-target=".other_section" class="settings_subtitle"><img width="16" height="16" alt="'.
-            $this->trans('other').'" src="'.Hm_Image_Sources::$cog.'" />'.$this->trans('Other').'</div>'.
-            '<div class="other_section"><table><tr><th>'.$this->trans('Character set').'</th><td><select class="charset" />'.
-            '<option value="">'.$this->trans('None').'</option><option value="UTF-8">UTF-8</option><option value="ASCII">ASCII</option></select></td></tr><tr><th>'.$this->trans('Flags').'</th><td>'.
-            '<div class="flags"></label><input class="adv_flag" value="SEEN" type="checkbox"><label>'.$this->trans('Read').
-            '<br /></label><input class="adv_flag" value="UNSEEN" type="checkbox"><label>'.$this->trans('Unread').
-            '<br /></label><input class="adv_flag" value="ANSWERED" type="checkbox"><label>'.$this->trans('Answered').
-            '<br /></label><input class="adv_flag" value="UNANSWERED" type="checkbox"><label>'.$this->trans('Unanswered').
-            '<br /></label><input class="adv_flag" value="FLAGGED" type="checkbox"><label>'.$this->trans('Flagged').
-            '<br /></label><input class="adv_flag" value="UNFLAGGED" type="checkbox"><label>'.$this->trans('Unflagged').
-            '<br /></label><input class="adv_flag" value="DELETED" type="checkbox"><label>'.$this->trans('Deleted').
-            '<br /></label><input class="adv_flag" value="UNDELETED" type="checkbox"><label>'.$this->trans('Not deleted').
-            '</div></td></tr></table></div>';
+            $this->trans('other').'" src="'.Hm_Image_Sources::$cog.'" />'.$this->trans('Other').
+            '<span class="other_count">'.sprintf($this->trans('%d other settings'), 0).'</span></div>'.
+            '<div class="other_section"><table><tr><th>'.$this->trans('Character set').'</th><td><select class="charset">'.
+            '<option value="">'.$this->trans('Default').'</option><option value="UTF-8">UTF-8</option><option value="ASCII">ASCII</option></select></td></tr><tr><th>'.$this->trans('Flags').'</th><td>'.
+            '<div class="flags"><input id="adv_flag_read" class="adv_flag" value="SEEN" type="checkbox"><label for="adv_flag_read">'.$this->trans('Read').
+            '<br /></label><input id="adv_flag_unread" class="adv_flag" value="UNSEEN" type="checkbox"><label for="adv_flag_unread">'.$this->trans('Unread').
+            '<br /></label><input id="adv_flag_answered" class="adv_flag" value="ANSWERED" type="checkbox"><label for="adv_flag_answered">'.$this->trans('Answered').
+            '<br /></label><input id="adv_flag_unanswered" class="adv_flag" value="UNANSWERED" type="checkbox"><label for="adv_flag_unanswered">'.$this->trans('Unanswered').
+            '<br /></label><input id="adv_flag_flagged" class="adv_flag" value="FLAGGED" type="checkbox"><label for="adv_flag_flagged">'.$this->trans('Flagged').
+            '<br /></label><input id="adv_flag_unflagged" class="adv_flag" value="UNFLAGGED" type="checkbox"><label for="adv_flag_unflagged">'.$this->trans('Unflagged').
+            '<br /></label><input id="adv_flag_deleted" class="adv_flag" value="DELETED" type="checkbox"><label for="adv_flag_deleted">'.$this->trans('Deleted').
+            '<br /></label><input id="adv_flag_undeleted" class="adv_flag" value="UNDELETED" type="checkbox"><label for="adv_flag_undeleted">'.$this->trans('Not deleted').
+            '</label></div></td></tr></table></div>';
     }
 }
 
@@ -265,7 +286,8 @@ class Hm_Output_advanced_search_form_end extends Hm_Output_Module {
         return '</div><div class="content_title search_result_title"><img width="16" height="16" src="'.
             Hm_Image_Sources::$env_closed.'" alt="'.$this->trans('Results').
             '" class="adv_expand_all">'.$this->trans('Search Results').'</div>'.
-            '<div class="adv_controls">'.message_controls($this).'</div>';
+            '<div class="adv_controls">'.message_controls($this).'</div>'.
+            '<div class="message_list">';
     }
 }
 
