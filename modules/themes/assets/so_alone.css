@@ -7,7 +7,7 @@
        url('fonts/roboto-condensed-v14-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
        url('fonts/roboto-condensed-v14-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
-html * { font-family: 'Roboto Condensed', 'BlinkMacSystemFont', 'Lucida Grande', 'Segoe UI', 'Ubuntu Condensed', Ubuntu, Cantarell, sans-serif !important;
+html * { font-family: 'Roboto Condensed', 'BlinkMacSystemFont', 'Lucida Grande', 'Segoe UI', 'Ubuntu Condensed', Ubuntu, Cantarell, sans-serif;
 	font-size: 15px;
 	/* color: #E0E3EC !important; */
 	/* border-color: #282828 !important;  */
