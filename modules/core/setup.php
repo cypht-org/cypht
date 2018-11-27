@@ -212,6 +212,7 @@ return array(
         'search_fld' => FILTER_SANITIZE_STRING,
         'filter' => FILTER_SANITIZE_STRING,
         'sort' => FILTER_SANITIZE_STRING,
+        'keyword' => FILTER_SANITIZE_STRING,
     ),
 
     'allowed_post' => array(

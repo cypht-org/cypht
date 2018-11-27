@@ -370,9 +370,19 @@ var setup_imap_folder_page = function() {
     Hm_Timer.add_job(function() { select_imap_folder(hm_list_path()); }, 60);
     $('.remove_source').click(remove_imap_combined_source);
     $('.add_source').click(add_imap_combined_source);
-    $('.refresh_link').click(function() { select_imap_folder(hm_list_path()); });
+    $('.refresh_link').click(function() {
+        if ($('.imap_keyword').val()) {
+            $('#imap_filter_form').submit();
+        }
+        else {
+            select_imap_folder(hm_list_path());
+        }
+    });
     $('.imap_filter').change(function() { $('#imap_filter_form').submit(); });
     $('.imap_sort').change(function() { $('#imap_filter_form').submit(); });
+    $('.imap_keyword').on('search', function() {
+        $('#imap_filter_form').submit();
+    });
     Hm_Ajax.add_callback_hook('ajax_message_action', function() { select_imap_folder(hm_list_path()); });
 };
 

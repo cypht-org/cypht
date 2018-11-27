@@ -460,6 +460,9 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
                 }
                 $this->out('custom_list_controls_type', $custom_link);
+                if (array_key_exists('keyword', $this->request->get)) {
+                    $this->out('list_keyword', $this->request->get['keyword']);
+                }
                 if (array_key_exists('filter', $this->request->get)) {
                     if (in_array($this->request->get['filter'], array('all', 'unseen', 'seen',
                         'answered', 'unanswered', 'flagged', 'unflagged'), true)) {
@@ -553,6 +556,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         if ($this->get('list_filter')) {
             $filter = strtoupper($this->get('list_filter'));
         }
+        $keyword = $this->get('list_keyword', '');
         list($sort, $rev) = process_sort_arg($this->get('list_sort'));
         $limit = $this->user_config->get('imap_per_page_setting', DEFAULT_PER_SOURCE);
         $offset = 0;
@@ -575,7 +579,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], false);
             if (imap_authed($imap)) {
                 $this->out('imap_mailbox_page_path', $path);
-                list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit);
+                list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
@@ -1521,6 +1525,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
         if ($this->get('custom_list_controls_type')) {
             $filter = $this->get('list_filter');
             $sort = $this->get('list_sort');
+            $keyword = $this->get('list_keyword');
             $opts = array('all' => $this->trans('All'), 'unseen' => $this->trans('Unread'),
                 'seen' => $this->trans('Read'), 'flagged' => $this->trans('Flagged'),
                 'unflagged' => $this->trans('Unflagged'), 'answered' => $this->trans('Answered'),
@@ -1533,6 +1538,8 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                 $custom = '<form id="imap_filter_form" method="GET">';
                 $custom .= '<input type="hidden" name="page" value="message_list" />';
                 $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
+                $custom .= '<input type="search" placeholder="'.$this->trans('search').
+                    '" class="imap_keyword" name="keyword" value="'.$this->html_safe($keyword).'" />';
                 $custom .= '<select name="sort" class="imap_sort">';
                 foreach ($sorts as $name => $val) {
                     $custom .= '<option ';

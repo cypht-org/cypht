@@ -2047,10 +2047,11 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param string $filter type of messages to include (UNSEEN, ANSWERED, ALL, etc)
      * @param int $limit max number of messages to return
      * @param int $offset offset from the first message in the list
+     * @param string $keyword optional keyword to filter the results by
      * @return array list of headers
      */
 
-    public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0) {
+    public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false) {
         $result = array();
 
         /* select the mailbox if need be */
@@ -2066,6 +2067,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         /* fall back to using FETCH and manually sorting */
         else {
             $uids = $this->sort_by_fetch($sort, $rev, $filter);
+        }
+        if ($keyword) {
+            $uids = $this->search($filter, $uids, array('TEXT' => $keyword));
         }
         $total = count($uids);
 
