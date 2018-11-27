@@ -53,6 +53,7 @@ TEL;TYPE=work,voice;VALUE=uri:tel:+1-111-555-1212
 TEL;TYPE=home,voice;VALUE=uri:tel:+1-404-555-1212
 ADR;TYPE=WORK;PREF=1;LABEL="100 Waters Edge\nBaytown\, LA 30314\nUnited States of America":;;100 Waters Edge;Baytown;LA;30314;United States of America
 ADR:;;100 Waters Edge;Baytown;LA;30314;United States of America
+ADR:1234;;;Baytown;LA;30314;United States of America
 ADR;TYPE=HOME;LABEL="42 Plantation St.\nBaytown\, LA 30314\nUnited States of America":;;42 Plantation St.;Baytown;LA;30314;United States of America
 EMAIL:forrestgump@example.com
 REV:20080424T195243Z
