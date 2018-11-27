@@ -30,6 +30,7 @@ class Hm_Carddav {
         $this->src = $src;
         $this->pass = $pass;
         $this->url = $url;
+        $this->api = new Hm_API_Curl('xml');
         if ($this->discover()) {
             $this->get_vcards();
         }
@@ -116,6 +117,10 @@ class Hm_Carddav {
     }
 
     private function parse_xml($xml) {
+        if (substr((string) $this->api->last_status, 0, 1) != '2') {
+            Hm_Msgs::add(sprintf('ERRUnable to access CardDav server (%d)', $this->api->last_status));
+            return false;
+        }
         $xml = preg_replace("/<[a-zA-Z]+:/Um", "<", $xml);
         $xml = preg_replace("/<\/[a-zA-Z]+:/Um", "</", $xml);
         $xml = str_replace('xmlns=', 'ns=', $xml);
@@ -169,15 +174,13 @@ class Hm_Carddav {
     private function addressbook_discover() {
         $req_xml = '<d:propfind xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav"><d:prop>'.
             '<card:addressbook-home-set /></d:prop></d:propfind>';
-        $api = new Hm_API_Curl('xml');
-        return $api->command($this->principal_url, $this->auth_headers(), array(), $req_xml, 'PROPFIND');
+        return $this->api->command($this->principal_url, $this->auth_headers(), array(), $req_xml, 'PROPFIND');
     }
 
     private function principal_discover() {
         $req_xml = '<d:propfind xmlns:d="DAV:"><d:prop><d:current-user-principal /></d:prop></d:propfind>';
-        $api = new Hm_API_Curl('xml');
         Hm_Debug::add(sprintf('CARDDAV: Sending discover XML: %s', $req_xml));
-        return $api->command($this->url, $this->auth_headers(), array(), $req_xml, 'PROPFIND');
+        return $this->api->command($this->url, $this->auth_headers(), array(), $req_xml, 'PROPFIND');
     }
 
     private function list_addressbooks() {
@@ -185,16 +188,14 @@ class Hm_Carddav {
         $headers[] = 'Depth: 1';
         $req_xml = '<d:propfind xmlns:d="DAV:" xmlns:cs="http://calendarserver.org/ns/"><d:prop>'.
            '<d:resourcetype /><d:displayname /><cs:getctag /></d:prop></d:propfind>';
-        $api = new Hm_API_Curl('xml');
         Hm_Debug::add(sprintf('CARDDAV: Sending addressbook XML: %s', $req_xml));
-        return $api->command($this->address_url, $headers, array(), $req_xml, 'PROPFIND');
+        return $this->api->command($this->address_url, $headers, array(), $req_xml, 'PROPFIND');
     }
 
     private function report($url) {
         $req_xml = '<card:addressbook-query xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav">'.
             '<d:prop><d:getetag /><card:address-data /></d:prop></card:addressbook-query>';
-        $api = new Hm_API_Curl('xml');
         Hm_Debug::add(sprintf('CARDDAV: Sending contacts XML: %s', $req_xml));
-        return $api->command($url, $this->auth_headers(), array(), $req_xml, 'REPORT');
+        return $this->api->command($url, $this->auth_headers(), array(), $req_xml, 'REPORT');
     }
 }

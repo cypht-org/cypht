@@ -24,7 +24,11 @@ class Hm_Handler_load_carddav_contacts extends Hm_Handler_Module {
             if (!array_key_exists($name, $auths)) {
                 continue;
             }
-            $carddav = new Hm_Carddav($name, $vals['server'], $auths[$name]['user'], $auths[$name]['pass']);
+            $pass = '';
+            if (array_key_exists('pass', $auths[$name])) {
+                $pass = $auths[$name]['pass'];
+            }
+            $carddav = new Hm_Carddav($name, $vals['server'], $auths[$name]['user'], $pass);
             $contacts->import($carddav->addresses);
             $this->append('contact_sources', 'carddav');
         }
