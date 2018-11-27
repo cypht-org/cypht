@@ -252,6 +252,7 @@ class Hm_Functions {
     public static function error_log($str=true) { return $str; }
     public static function c_init() { return true; }
     public static function c_setopt() { return true; }
+    public static function c_status() { return 200; }
     public static function c_exec() { return self::$exec_res; }
     public static function function_exists($func) {
         if ((float) substr(phpversion(), 0, 3) < 5.6) {
