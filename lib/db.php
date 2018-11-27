@@ -26,8 +26,7 @@ class Hm_DB {
      * @return void
      */
     static private function parse_config($site_config) {
-        self::$config = array(
-            'db_driver' => $site_config->get('db_driver', false),
+        self::$config = array('db_driver' => $site_config->get('db_driver', false),
             'db_host' => $site_config->get('db_host', false),
             'db_name' => $site_config->get('db_name', false),
             'db_user' => $site_config->get('db_user', false),
