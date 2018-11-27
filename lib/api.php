@@ -11,6 +11,7 @@
  */
 class Hm_API_Curl {
 
+    public $last_status;
     private $format = '';
 
     /**
@@ -75,6 +76,7 @@ class Hm_API_Curl {
      */
     private function curl_result($ch) {
         $curl_result = Hm_Functions::c_exec($ch);
+        $this->last_status = Hm_Functions::c_status($ch);
         if ($this->format != 'json') {
             return $curl_result;
         }

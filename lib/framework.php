@@ -138,6 +138,13 @@ if (!class_exists('Hm_Functions')) {
         }
 
         /**
+         * @param resource $handle
+         */
+        public static function c_status($ch) {
+            return curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        }
+
+        /**
          * @param string $func
          */
         public static function function_exists($func) {
