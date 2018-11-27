@@ -266,7 +266,7 @@ function process_address_fld($fld) {
                 if ($i == $email_pos) {
                     continue;
                 }
-                if ($v{0} == '(') {
+                if ($v && $v{0} == '(') {
                     $parts['comment'] = $v;
                 }
                 else {
