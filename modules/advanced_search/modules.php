@@ -10,8 +10,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * TODO:
- * - fix list_parent on message view page
- * - fix prev/next message view page
+ * - fix date range end
  * - fix "sticky" date values on add range
  * - add support to saved searches module set
  * - "not" option for terms
@@ -249,7 +248,9 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
         return '<div data-target=".terms_section" class="settings_subtitle"><img width="16" height="16" alt="'.
             $this->trans('terms').'" src="'.Hm_Image_Sources::$search.'" />'.$this->trans('Terms').
             '<span class="term_count">'.sprintf($this->trans('terms: %d'), 0).'</span></div>'.
-            '<div class="terms_section"><input class="adv_terms" id="adv_term" type="text" /><img class="new_term" '.
+            '<div class="terms_section">'.
+            //'<input class="adv_term_nots" type="checkbox" value="not" id="adv_term_not" /> !'.
+            '<input class="adv_terms" id="adv_term" type="text" /><img class="new_term" '.
             'width="16" height="16" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$plus.'" /></div>';
     }
 

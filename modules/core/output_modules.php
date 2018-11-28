@@ -1403,7 +1403,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
      * @todo this is pretty ugly, clean it up and remove module specific stuff
      */
     protected function output() {
-        if ($this->in('list_parent', array('github_all', 'sent', 'search', 'flagged', 'combined_inbox', 'unread', 'feeds', 'email'))) {
+        if ($this->in('list_parent', array('advanced_search', 'github_all', 'sent', 'search', 'flagged', 'combined_inbox', 'unread', 'feeds', 'email'))) {
             if ($this->get('list_parent') == 'combined_inbox') {
                 $list_name = $this->trans('Everything');
             }
@@ -1413,7 +1413,10 @@ class Hm_Output_message_start extends Hm_Output_Module {
             else {
                 $list_name = $this->trans(ucwords(str_replace('_', ' ', $this->get('list_parent', ''))));
             }
-            if ($this->get('list_parent') == 'search') {
+            if ($this->get('list_parent') == 'advanced_search') {
+                $page = 'advanced_search';
+            }
+            elseif ($this->get('list_parent') == 'search') {
                 $page = 'search';
             }
             else {

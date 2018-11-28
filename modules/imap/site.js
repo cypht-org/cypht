@@ -544,6 +544,9 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         else if (hm_list_parent() === 'flagged') {
             Hm_Message_List.prev_next_links('formatted_flagged_data', class_name);
         }
+        else if (hm_list_parent() === 'advanced_search') {
+            Hm_Message_List.prev_next_links('formatted_advanced_search_data', class_name);
+        }
         else if (hm_list_parent() === 'search') {
             Hm_Message_List.prev_next_links('formatted_search_data', class_name);
         }
