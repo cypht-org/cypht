@@ -305,8 +305,8 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
      */
     public function test_search() {
         /* TODO: coverage and assertions */
-        $this->imap->search('ALL', false, array('BODY' => 'debian'));
-        $this->imap->search('ALL', array(1680, 1682), array('BODY' => 'debian'));
+        $this->imap->search('ALL', false, array(array('BODY', 'debian')));
+        $this->imap->search('ALL', array(1680, 1682), array(array('BODY', 'debian')));
     }
     /**
      * @preserveGlobalState disabled
