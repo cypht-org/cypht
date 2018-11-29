@@ -52,10 +52,13 @@ class Hm_Handler_load_carddav_settings extends Hm_Handler_Module {
  */
 class Hm_Handler_process_carddav_auth_settings extends Hm_Handler_Module {
     public function process() {
-        $settings = $this->get('carddav_settings', array());
+        if (!array_key_exists('save_settings', $this->request->post)) {
+            return;
+        }
+        $settings = $this->user_config->get('carddav_contacts_auth_setting', array());
         $users = array();
         $passwords = array();
-        $results = array();
+        $results = $settings; 
         if (array_key_exists('carddav_usernames', $this->request->post)) {
             $users = $this->request->post['carddav_usernames'];
         }
@@ -63,7 +66,6 @@ class Hm_Handler_process_carddav_auth_settings extends Hm_Handler_Module {
             $passwords = $this->request->post['carddav_passwords'];
         }
         foreach ($settings as $name => $vals) {
-            $creds = array();
             if (array_key_exists($name, $users)) {
                 $results[$name]['user'] = $users[$name];
             }

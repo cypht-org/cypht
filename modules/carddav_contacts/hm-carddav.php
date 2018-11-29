@@ -118,7 +118,7 @@ class Hm_Carddav {
 
     private function parse_xml($xml) {
         if (substr((string) $this->api->last_status, 0, 1) != '2') {
-            Hm_Msgs::add(sprintf('ERRUnable to access CardDav server (%d)', $this->api->last_status));
+            Hm_Debug::add(sprintf('ERRUnable to access CardDav server (%d)', $this->api->last_status));
             return false;
         }
         $xml = preg_replace("/<[a-zA-Z]+:/Um", "<", $xml);
