@@ -273,7 +273,8 @@ var get_adv_other = function() {
             flags.push($(this).val());
         });
     }
-    return {'flags': flags, 'charset': charset};
+    var limit = $('.adv_source_limit').val();
+    return {'limit': limit, 'flags': flags, 'charset': charset};
 };
 
 var process_advanced_search = function() {
@@ -353,6 +354,7 @@ var send_requests = function(requests) {
             {'name': 'adv_source', 'value': request['source']},
             {'name': 'adv_start', 'value': request['time']['from']},
             {'name': 'adv_end', 'value': request['time']['to']},
+            {'name': 'adv_source_limit', 'value': request['other']['limit']},
             {'name': 'adv_charset', 'value': request['other']['charset']},
         ];
 
@@ -479,6 +481,7 @@ var apply_saved_search = function() {
     for (var i=0, len=details['other']['flags'].length; i < len; i++) {
         $('input[type=checkbox][value='+details['other']['flags'][i]+']', $('.flags')).attr('checked', true);
     }
+    $('.adv_source_limit').val(details['other']['limit']);
 };
 
 var adv_reset_page = function() {

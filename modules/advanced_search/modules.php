@@ -48,11 +48,16 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
             'adv_source',
             'adv_start',
             'adv_end',
+            'adv_source_limit',
             'adv_terms',
             'adv_targets'
         ));
         if (!$success) {
             return;
+        }
+        $limit = $form['adv_source_limit'];
+        if (!$limit || !is_int($limit) || (is_int($limit) && $limit > 1000)) {
+            $limit = 100;
         }
         if (!$this->validate_date($form['adv_start']) ||
             !$this->validate_date($form['adv_end'])) {
@@ -97,12 +102,12 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
                 $params[$target] = $term;
             }
         }
-        $this->out('imap_search_results', $this->imap_search($flags, $imap, $params));
+        $this->out('imap_search_results', $this->imap_search($flags, $imap, $params, $limit));
         $this->out('folder_status', $imap->folder_state);
         $this->out('imap_server_ids', array($this->imap_id));
     }
 
-    private function imap_search($flags, $imap, $params) {
+    private function imap_search($flags, $imap, $params, $limit) {
         $msg_list = array();
         $exclude_deleted = true;
         if (in_array('deleted', $flags, true)) {
@@ -125,7 +130,7 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
             $msg['server_name'] = $server_details['name'];
             $msg_list[] = $msg;
         }
-        return $msg_list;
+        return array_slice($msg_list, 0, $limit);
     }
 
     private function validate_source($val) {
@@ -283,7 +288,8 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
             '<span class="other_count">'.sprintf($this->trans('other settings: %d'), 0).'</span></div>'.
             '<div class="other_section"><table><tr><th>'.$this->trans('Character set').'</th><td><select class="charset">'.
             '<option value="">'.$this->trans('Default').'</option><option value="UTF-8">UTF-8</option>'.
-            '<option value="ASCII">ASCII</option></select></td></tr><tr><th>'.$this->trans('Flags').'</th><td>'.
+            '<option value="ASCII">ASCII</option></select></td></tr><tr><th>'.$this->trans('Results per source').'</th>'.
+            '<td><input type="number" value="100" class="adv_source_limit" /></td></tr><tr><th>'.$this->trans('Flags').'</th><td>'.
             '<div class="flags"><input id="adv_flag_read" class="adv_flag" value="SEEN" type="checkbox">'.
             '<label for="adv_flag_read">'.$this->trans('Read').
             ' </label><input id="adv_flag_unread" class="adv_flag" value="UNSEEN" type="checkbox">'.

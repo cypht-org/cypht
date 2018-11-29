@@ -33,6 +33,7 @@ return array(
     'allowed_post' => array(
         'adv_source' => FILTER_SANITIZE_STRING,
         'adv_start' => FILTER_SANITIZE_STRING,
+        'adv_source_limit' => FILTER_VALIDATE_INT,
         'adv_end' => FILTER_SANITIZE_STRING,
         'adv_charset' => FILTER_SANITIZE_STRING,
         'adv_flags' => array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
