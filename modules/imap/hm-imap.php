@@ -988,8 +988,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             return array();
         }
         if (!empty($terms)) {
-            foreach ($terms as $fld => $term) {
-                if (!$this->is_clean($fld, 'search_str') || !$this->is_clean($term, 'search_str')) {
+            foreach ($terms as $vals) {
+                if (!$this->is_clean($vals[0], 'search_str') || !$this->is_clean($vals[1], 'search_str')) {
                     return array();
                 }
             }
@@ -1013,16 +1013,13 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             $charset = '';
         }
         if (!empty($terms)) {
-            $search_key = false;
-            $search_lit = false;
             $flds = array();
-            foreach ($terms as $fld => $term) {
-                if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'), true)) {
-                    $search_key = $fld;
-                    $search_lit = $term;
+            foreach ($terms as $vals) {
+                if (substr($vals[1], 0, 4) == 'NOT ') {
+                    $flds[] = 'NOT '.$vals[0].' "'.str_replace('"', '\"', substr($vals[1], 4)).'"';
                 }
                 else {
-                    $flds[] = $fld.' "'.str_replace('"', '\"', $term).'"';
+                    $flds[] = $vals[0].' "'.str_replace('"', '\"', $vals[1]).'"';
                 }
             }
             $fld = ' '.implode(' ', $flds);
@@ -1048,24 +1045,13 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $command .= 'RETURN ('.implode(' ', $valid).') ';
             }
         }
-        $cache_command = $command.$charset.'('.$target.') '.$uids.$fld.' '.$search_key.' '.$search_lit."\r\n";
+        $cache_command = $command.$charset.'('.$target.') '.$uids.$fld."\r\n";
         $cache = $this->check_cache($cache_command);
         if ($cache !== false) {
             return $cache;
         }
-        if (!$search_lit) {
-            $command .= $charset.'('.$target.') '.$uids.$fld."\r\n";
-            $this->send_command($command);
-        }
-        else {
-            $command .= $charset.'('.$target.') '.$uids.$fld.' '.$search_key.' {'.strlen($search_lit)."}\r\n";
-            $this->send_command($command);
-            $lit_res = $result = $this->fgets(1024);
-            if (substr($lit_res, 0, 1) != '+') {
-                return array();
-            }
-            $this->send_command($search_lit."\r\n", true);
-        }
+        $command .= $charset.'('.$target.') '.$uids.$fld."\r\n";
+        $this->send_command($command);
         $result = $this->get_response(false, true);
         $status = $this->check_response($result, true);
         $res = array();

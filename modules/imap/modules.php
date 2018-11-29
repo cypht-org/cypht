@@ -794,7 +794,7 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), MAX_PER_SOURCE, array('SINCE' => $date, $fld => $terms));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), MAX_PER_SOURCE, array(array('SINCE', $date), array($fld, $terms)));
             $this->out('imap_search_results', $msg_list);
             $this->out('folder_status', $status);
             $this->out('imap_server_ids', $form['imap_server_ids']);
@@ -821,10 +821,10 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
                 $folder = $this->request->post['folder'];
             }
             if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
-                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array('SINCE' => $date), true);
+                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
             }
             else {
-                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array('SINCE' => $date), false);
+                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
             }
             $folders = array();
             foreach ($msg_list as $msg) {
@@ -867,7 +867,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)));
             $this->out('folder_status', $status);
             $this->out('imap_combined_inbox_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
@@ -893,7 +893,7 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->cache, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)));
             $this->out('folder_status', $status);
             $this->out('imap_flagged_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
@@ -950,7 +950,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'UNSEEN', $this->session, $this->cache, array(hex2bin($folder)), $limit, array('SINCE' => $date));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'UNSEEN', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)));
             $this->out('folder_status', $status);
             $this->out('imap_unread_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
@@ -2855,7 +2855,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                 $status['imap_'.$id.'_'.bin2hex($folder)] = $imap->folder_state;
                 if (!empty($terms)) {
                     foreach ($terms as $term) {
-                        if (preg_match('/(?:[^\x00-\x7F])/', $term) === 1) {
+                        if (preg_match('/(?:[^\x00-\x7F])/', $term[1]) === 1) {
                             $imap->search_charset = 'UTF-8';
                             break;
                         }
