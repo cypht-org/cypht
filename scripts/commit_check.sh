@@ -5,6 +5,7 @@ RED="\e[00;31m"
 GREEN="\e[00;32m"
 YELLOW="\e[00;33m"
 END="\e[00m"
+STARTTIME=`date +%s`
 
 # exit on error
 err_condition() {
@@ -104,7 +105,9 @@ git_stat() {
 
 # output success message
 success() {
-    echo; echo -e "$GREEN SUCCESS $END"; echo
+    ENDTIME=`date +%s`
+    RUNTIME=$((ENDTIME-STARTTIME))
+    echo; echo -e "$GREEN SUCCESS ($RUNTIME seconds) $END"; echo
 }
 
 # run all checks
