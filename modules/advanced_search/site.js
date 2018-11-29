@@ -27,12 +27,12 @@ var add_remove_terms = function(el) {
 var add_remove_times = function(el) {
     var close = $(globals.close_html);
     var count = $('.adv_times').length;
-    var timeset = $('#adv_time').clone(false);
+    var time_html = '<span id="adv_time" class="adv_times">From <input class="adv_time_fld_from" ';
+    time_html += 'type="date" value=""> To <input class="adv_time_fld_to" type="date" value=""></span>';
+    var timeset = $(time_html);
     var and_or_html = '<div class="timeandor"><input type="radio" name="time_and_or'+count;
     and_or_html += '" checked="checked" value="or">or</div>';
     var and_or = $(and_or_html);
-    $('.adv_time_fld_from', timeset).val('');
-    $('.adv_time_fld_to', timeset).val('');
     timeset.attr('id', 'adv_time'+count);
     close.attr('id', 'time_adv_remove'+count);
     and_or.attr('id', 'time_and_or'+count);

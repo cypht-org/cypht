@@ -8,15 +8,6 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-/**
- * TODO:
- * - fix date range end
- * - fix "sticky" date values on add range
- * - add support to saved searches module set
- * - "not" option for terms
- * - ...
- */
-
 
 /**
  * Setup advanced search
@@ -260,9 +251,10 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
     }
 
     protected function times() {
-        $time = strtotime("-1 year", time());
-        $from_date = date("Y-m-d", $time);
-        $to_date = date("Y-m-d", time());
+        $from_time = strtotime("-1 year", time());
+        $from_date = date("Y-m-d", $from_time);
+        $to_time = strtotime("+1 day", time());
+        $to_date = date("Y-m-d", $to_time);
         return '<div data-target=".time_section" class="settings_subtitle"><img width="16" height="16" alt="'.
             $this->trans('time').'" src="'.Hm_Image_Sources::$calendar.'" />'.$this->trans('Time').
             '<span class="time_count">'.sprintf($this->trans('time ranges: %d'), 0).'</span></div>'.
