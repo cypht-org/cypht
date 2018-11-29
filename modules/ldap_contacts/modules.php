@@ -273,10 +273,13 @@ class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_process_ldap_auth_settings extends Hm_Handler_Module {
     public function process() {
+        if (!array_key_exists('save_settings', $this->request->post)) {
+            return;
+        }
         $connections = $this->get('ldap_contact_connections');
         $users = array();
         $passwords = array();
-        $results = array();
+        $results = $connections;
         if (array_key_exists('ldap_usernames', $this->request->post)) {
             $users = $this->request->post['ldap_usernames'];
         }
@@ -284,7 +287,6 @@ class Hm_Handler_process_ldap_auth_settings extends Hm_Handler_Module {
             $passwords = $this->request->post['ldap_passwords'];
         }
         foreach ($connections as $name => $vals) {
-            $creds = array();
             if (array_key_exists($name, $users)) {
                 $results[$name]['user'] = $users[$name];
             }
