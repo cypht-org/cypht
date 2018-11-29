@@ -529,7 +529,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
-                $this->cache->set('imap_folders_'.$path, $msgs, 0);
+                $this->cache->set('imap_folders_'.$path, $msgs);
                 $this->out('imap_expanded_folder_data', $msgs);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
