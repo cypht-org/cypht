@@ -4,6 +4,7 @@ var add_remove_terms = function(el) {
     var close = $(globals.close_html);
     var count = $('.adv_terms').length;
     var term = $('#adv_term').clone(false);
+    var not_chk = $('<span id="adv_term_not" class="adv_term_nots"><input type="checkbox" value="not" id="adv_term_not" /> !</span>');
     var and_or_html = '<div class="andor"><input checked="checked" type="radio" name="term_and'
     and_or_html += '_or'+count+'" value="and">and <input type="radio" name="term_and_or'+count;
     and_or_html += '" value="or">or</div>';
@@ -11,10 +12,12 @@ var add_remove_terms = function(el) {
     term.attr('id', 'adv_term'+count);
     close.attr('id', 'term_adv_remove'+count);
     and_or.attr('id', 'term_and_or'+count);
-    $(el).prev().after(and_or.prop('outerHTML')+term.prop('outerHTML')+close.prop('outerHTML'));
+    not_chk.attr('id', 'adv_term_not'+count);
+    $(el).prev().after(and_or.prop('outerHTML')+not_chk.prop('outerHTML')+term.prop('outerHTML')+close.prop('outerHTML'));
     $(el).hide();
     $('#term_adv_remove'+count).click(function() {
         $('#adv_term'+count).remove();
+        $('#adv_term_not'+count).remove();
         $('#term_and_or'+count).remove();
         $(this).remove();
         $(el).show();
@@ -197,6 +200,7 @@ var get_adv_terms = function() {
     var term;
     var term_id;
     var condition;
+    var not;
     var terms = [];
     var term_flds = $('.adv_terms');
     term_flds.each(function() {
@@ -208,6 +212,9 @@ var get_adv_terms = function() {
             }
             else {
                 condition = false;
+            }
+            if ($('input:checked', $('#adv_term_not'+term_id)).val() == 'not') {
+                term = 'NOT '+term;
             }
             terms.push({'term': term, 'condition': condition});
         }
@@ -436,14 +443,26 @@ var apply_saved_search = function() {
     search_summary(details);
     var target_id;
     var time_id;
+    var not;
     for (var i=0, len=details['terms'].length; i < len; i++) {
+        not = false;
+        if (details['terms'][i]['term'].substring(0, 4) == 'NOT ') {
+            details['terms'][i]['term'] = details['terms'][i]['term'].substring(4);
+            not = true;
+        }
         if (i == 0) {
             $('#adv_term').val(details['terms'][i]['term']);
+            if (not) {
+                $('input', $('#adv_term_not')).attr('checked', true);
+            }
         }
         else {
             $('.new_term').trigger('click');
             $('#adv_term'+i).val(details['terms'][i]['term']);
             $('input[type=radio][value='+details['terms'][i]['condition']+']', $('#term_and_or'+i)).attr('checked', true);
+            if (not) {
+                $('input', $('#adv_term_not'+i)).attr('checked', true);
+            }
         }
     }
     for (var i=0, len=details['sources'].length; i < len; i++) {

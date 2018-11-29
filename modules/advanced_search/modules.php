@@ -94,12 +94,12 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
             $imap->search_charset = $charset;
         }
         $params = array(
-            'SENTBEFORE' => date('j-M-Y', strtotime($form['adv_end'])),
-            'SENTSINCE' => date('j-M-Y', strtotime($form['adv_start'])),
+            array('SENTBEFORE', date('j-M-Y', strtotime($form['adv_end']))),
+            array('SENTSINCE', date('j-M-Y', strtotime($form['adv_start'])))
         );
         foreach ($form['adv_terms'] as $term) {
             foreach ($form['adv_targets'] as $target) {
-                $params[$target] = $term;
+                $params[] = array($target, $term);
             }
         }
         $this->out('imap_search_results', $this->imap_search($flags, $imap, $params, $limit));
@@ -254,7 +254,7 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
             $this->trans('terms').'" src="'.Hm_Image_Sources::$search.'" />'.$this->trans('Terms').
             '<span class="term_count">'.sprintf($this->trans('terms: %d'), 0).'</span></div>'.
             '<div class="terms_section">'.
-            //'<input class="adv_term_nots" type="checkbox" value="not" id="adv_term_not" /> !'.
+            '<span id="adv_term_not" class="adv_term_nots"><input type="checkbox" value="not" id="adv_term_not" /> !</span>'.
             '<input class="adv_terms" id="adv_term" type="text" /><img class="new_term" '.
             'width="16" height="16" alt="'.$this->trans('Add').'" src="'.Hm_Image_Sources::$plus.'" /></div>';
     }
