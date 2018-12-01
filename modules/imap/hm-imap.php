@@ -2055,7 +2055,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             $uids = $this->sort_by_fetch($sort, $rev, $filter);
         }
         if ($keyword) {
-            $uids = $this->search($filter, $uids, array('TEXT' => $keyword));
+            $uids = $this->search($filter, $uids, array(array('TEXT', $keyword)));
         }
         $total = count($uids);
 
