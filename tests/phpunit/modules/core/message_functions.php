@@ -15,6 +15,8 @@ class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
         $this->assertEquals('foo', format_msg_html($test));
         $test = '<a href="http://blah.com">';
         $this->assertEquals('<a href="http://blah.com"></a>', format_msg_html($test));
+        $test ='foo<body>bar</body>';
+        $this->assertEquals('foobar', format_msg_html($test));
     }
     /**
      * @preserveGlobalState disabled

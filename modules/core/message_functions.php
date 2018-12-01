@@ -15,13 +15,13 @@
  */
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
+    $str = str_ireplace('</body>', '', $str);
     require_once APP_PATH.'third_party/HTMLPurifier.standalone.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
     }
-    //$config->set('HTML.TargetBlank', true);
     $config->set('URI.AllowedSchemes', array('mailto' => true, 'data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
     $purifier = new HTMLPurifier($config);
