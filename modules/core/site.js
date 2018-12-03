@@ -176,7 +176,7 @@ var Hm_Ajax_Request = function() { return {
     },
 
     fail: function(xhr, not_callable) {
-        if (not_callable || (xhr.status && xhr.status == 500)) {
+        if (not_callable === true || (xhr.status && xhr.status == 500)) {
             Hm_Notices.show(['ERRServer Error']);
         }
         else {
