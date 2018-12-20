@@ -140,6 +140,12 @@ var Keyboard_Shortcuts = {
 };
 
 $(function() {
+    var shortcut_data = document.getElementById("shortcuts").innerHTML;
+    var shortcut_script = document.createElement('script')
+    shortcut_script.type = 'text/javascript';
+    shortcut_script.innerHTML = shortcut_data;
+    document.getElementsByTagName('head')[0].appendChild(shortcut_script);
+
     if ($('.menu_shortcuts').length) {
         $(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
     }

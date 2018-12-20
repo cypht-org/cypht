@@ -193,7 +193,7 @@ class Hm_Output_shortcuts_content extends Hm_Output_Module {
 class Hm_Output_keyboard_shortcut_data extends Hm_Output_Module {
     protected function output() {
         if ($this->get('shortcuts_enabled')) {
-            return '<script type="text/javascript">'.format_shortcuts($this->get('keyboard_shortcut_data')).'</script>';
+            return '<script id="shortcuts" type="text/delayscript">'.format_shortcuts($this->get('keyboard_shortcut_data')).'</script>';
         }
     }
 }

@@ -480,7 +480,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
             if (defined('JS_HASH') && JS_HASH) {
                 $res .= 'integrity="'.JS_HASH.'" ';
             }
-            $res .= 'src="site.js?v='.CACHE_ID.'"></script>';
+            $res .= 'src="site.js?v='.CACHE_ID.'" async></script>';
             return $res;
         }
     }
@@ -1032,7 +1032,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#"><img alt="" src="'.Hm_Image_Sources::$menu.'" width="16" height="20" /></a>'.
+        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<img alt="" src="'.Hm_Image_Sources::$menu.'" width="16" height="20" /></a>'.
             '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
@@ -1346,7 +1346,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<a href="#" class="hide_folders"><img src="'.Hm_Image_Sources::$big_caret_left.
+        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<img src="'.Hm_Image_Sources::$big_caret_left.
             '" alt="'.$this->trans('Collapse').'" width="16" height="16" /></a>';
         if ($this->format == 'HTML5') {
             return $res;

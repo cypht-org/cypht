@@ -226,7 +226,7 @@ if (!hm_exists('subject_callback')) {
 function subject_callback($vals, $style, $output_mod) {
     $img = '';
     if (count($vals) == 4 && $vals[3]) {
-        $img = '<img src="'.Hm_Image_Sources::${$vals[3]}.'" />';
+        $img = '<img alt="'.$output_mod->trans('list item').'" src="'.Hm_Image_Sources::${$vals[3]}.'" />';
     }
     $subject = $output_mod->html_safe($vals[0]);
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);

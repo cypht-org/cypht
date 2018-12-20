@@ -875,7 +875,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
 if (!hm_exists('feed_source_callback')) {
 function feed_source_callback($vals, $style, $output_mod) {
     if ($vals[2]) {
-        $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+        $img = '<img alt="'.$output_mod->trans('feed item').'" src="'.Hm_Image_Sources::${$vals[2]}.'" />';
     }
     else {
         $img = '';

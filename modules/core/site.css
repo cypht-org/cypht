@@ -119,7 +119,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .list_controls a { padding-right: 5px; }
 .list_settings_dialog table { width: 1%; white-space: nowrap; }
 .list_settings_dialog table th { font-size: 90%; font-weight: normal; text-align: left; }
-.folder_toggle { position: absolute; top: 20px; left: 7px; display: none; }
+.folder_toggle { font-size: 0px; position: absolute; top: 20px; left: 7px; display: none; }
 .folder_toggle img { opacity: .5; }
 .next_img { background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAM9JREFUOI2dkkEOgjAQRR8uFA9DiJfSa8AZxMjCsxjjISB4Etm0LlrIZBgr8SezaOb/3z/TwhIHoAVewBhrAK5AafBn7IEb4BPlonluiZ+KrCF7D21i3Zwy8HGkeWYr7i8DB5Qb4GSQ1yADjhC2/U8CD/QZ4Zm2X27QBhrjRhzqKJrKMpyqlo1BRKoMoUYl+B2E55BzpUwqxT1D+J5uhYkWO6CYmi3LDVcJsQca6Z4TvqdlYonvwE5HzGMSPY6O3VhiiRK4AD3wjtURFlZo8geE63UUiXP5tgAAAABJRU5ErkJggg==') top left no-repeat; }
 .prev_img { background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAMBJREFUOI2lkkEOgkAMRR8sdDyMId6QO4iBhVeRGA8h0YXxGLAZXEwxk1LIGH/SBbT/zXRamOsANMATGCQeQA0URv1XO+AMjCvhBe4s880wlBL6/1VDrJPLKG9B6rjnNfMSxCNv0iSYlyAnCK+dYrYgHYQxpZo1pM8EsDGKMvU9GjVDDrx/OFnrlQPtH4ALhFF45qPUsrZyPyX1KFMAVZx0hPVMBbTAVhc4uYnVTnztyjLHKggb1gG9xB04xj1P+gCAqG/EiKgzLwAAAABJRU5ErkJggg==') top left no-repeat; }
@@ -133,7 +133,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .list_meta { float: right; margin-right: 120px; letter-spacing: 0px; display: inline; color: #666 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; }
 .list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ede8e6; opacity: 1; padding-top: 100px; text-align: center; }
-.hide_folders { float: left; clear: none; margin-top: 10px; margin-left: 23px; }
+.hide_folders { font-size: 0px; float: left; clear: none; margin-top: 10px; margin-left: 23px; }
 .hide_folders img { opacity: .4; }
 .section_caret { opacity: .15; vertical-align: 4px; padding-right: 10px; }
 .server_count { float: right; margin-right: 120px; font-size: 90%; }
