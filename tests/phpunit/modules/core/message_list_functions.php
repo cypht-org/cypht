@@ -77,7 +77,7 @@ class Hm_Test_Core_Message_List_Functions extends PHPUnit_Framework_TestCase {
     public function test_subject_callback() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals('<td class="subject"><div class=""><a title="foo" href="bar">foo</a></div></td>', subject_callback(array('foo', 'bar', array()), 'email', $mod));
-        $this->assertEquals('<div class="subject"><div class="" title="foo"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M5%201l-3%206h1l3-6h-1zm-4%201l-1%202%201%202h1l-1-2%201-2h-1zm5%200l1%202-1%202h1l1-2-1-2h-1z%22%20%2F%3E%0A%3C%2Fsvg%3E" /> <a href="bar">foo</a></div></div>', subject_callback(array('foo', 'bar', array(), 'code'), 'news', $mod));
+        $this->assertEquals('<div class="subject"><div class="" title="foo"><img alt="list item" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M5%201l-3%206h1l3-6h-1zm-4%201l-1%202%201%202h1l-1-2%201-2h-1zm5%200l1%202-1%202h1l1-2-1-2h-1z%22%20%2F%3E%0A%3C%2Fsvg%3E" /> <a href="bar">foo</a></div></div>', subject_callback(array('foo', 'bar', array(), 'code'), 'news', $mod));
     }
     /**
      * @preserveGlobalState disabled
