@@ -24,7 +24,9 @@ class WebTest:
     def __init__(self, cap=None):
         self.read_ini()
         self.driver = get_driver(cap)
-        self.browser = self.driver.capabilities['browserName'].lower()
+        self.browser = False
+        if 'browserName' in self.driver.capabilities:
+            self.browser = self.driver.capabilities['browserName'].lower()
         self.load()
 
     def read_ini(self):
